@@ -384,12 +384,12 @@ class Fixometer
 
             try {
                 if ($return_rows) {
-                    return DB::select(DB::raw($sql), ['id' => $id, 'object' => $object]);
+                    return DB::select($sql, ['id' => $id, 'object' => $object]);
                 }
 
-                return count(DB::select(DB::raw($sql), ['id' => $id, 'object' => $object])) > 0 ? true : false;
+                return count(DB::select($sql, ['id' => $id, 'object' => $object])) > 0 ? true : false;
             } catch (\Illuminate\Database\QueryException $e) {
-                return db($e);
+                return $return_rows ? [] : false;
             }
         }
     }
@@ -432,12 +432,12 @@ class Fixometer
                   `xref`.`reference_type` = :object AND
                   `xref`.`reference` = :id ';
 
-            DB::delete(DB::raw($sql), ['id' => $id, 'object' => $object]);
+            DB::delete($sql, ['id' => $id, 'object' => $object]);
 
             /** delete image from db **/
             $sql = 'DELETE FROM `images` WHERE `images`.`idimages` = :image';
 
-            DB::delete(DB::raw($sql), ['image' => $image->idimages]);
+            DB::delete($sql, ['image' => $image->idimages]);
 
             /** delete image from disk **/
             unlink($_SERVER['DOCUMENT_ROOT'].'/uploads/'.$image->path);
@@ -528,32 +528,81 @@ class Fixometer
           ];
     }
 
-    public static function loginRegisterStats()
+    const STATS_TTL = 86400;      // 24 hours — always serve from cache
+    const STATS_FRESH_TTL = 7200; // 2 hours — background refresh when this expires
+
+    private static function isStatsValid($stats): bool
     {
-        $Party = new \App\Party;
-        $Device = new \App\Device;
+        return is_array($stats)
+            && array_key_exists('partiesCount', $stats)
+            && array_key_exists('waste_stats', $stats)
+            && is_array($stats['device_count_status'] ?? null)
+            && is_array($stats['waste_stats'][0] ?? null);
+    }
 
-        $stats = [];
-        if (\Cache::has('all_stats')) {
+    public static function loginRegisterStats(): array
+    {
+        $stats = \Cache::get('all_stats');
+
+        if (! static::isStatsValid($stats)) {
+            // Cold start — compute synchronously, but only once across concurrent workers.
+            \Cache::lock('all_stats_computing', 60)->block(30, function () {
+                if (static::isStatsValid(\Cache::get('all_stats'))) {
+                    return; // another worker just computed valid stats
+                }
+                $fresh = static::computeStats();
+                \Cache::put('all_stats', $fresh, self::STATS_TTL);
+                \Cache::put('all_stats_fresh', true, self::STATS_FRESH_TTL);
+            });
             $stats = \Cache::get('all_stats');
-
-            // We've seen a Sentry problem which I can only see happening if there was invalid data in the cache.
-            if (
-                ! $stats ||
-                ! array_key_exists('allparties', $stats) ||
-                ! array_key_exists('waste_stats', $stats) ||
-                ! array_key_exists('device_count_status', $stats)
-            ) {
-                $stats = [];
+            if (! static::isStatsValid($stats)) {
+                // Cache write failed (disk full, backend down) — compute uncached.
+                $stats = static::computeStats();
+            }
+        } elseif (\Cache::missing('all_stats_fresh')) {
+            // Stale — serve immediately, dispatch one background refresh.
+            if (\Cache::lock('all_stats_refreshing', self::STATS_FRESH_TTL)->get()) {
+                dispatch(new \App\Jobs\RefreshLoginStats());
             }
         }
 
-        if ($stats == []) {
-            $stats['allparties'] = $Party->ofThisGroup('admin', true, false);
-            $stats['waste_stats'] = \App\Helpers\LcaStats::getWasteStats();
-            $stats['device_count_status'] = $Device->statusCount();
-            \Cache::put('all_stats', $stats, 7200);
+        return static::decorateStats($stats);
+    }
+
+    public static function computeStats(): array
+    {
+        $device = new \App\Device;
+        $ws = \App\Helpers\LcaStats::getWasteStats()[0] ?? null;
+
+        return [
+            'partiesCount' => \App\Party::where('event_end_utc', '<', now())->count(),
+            'waste_stats' => [[
+                'powered_waste' => $ws->powered_waste ?? 0,
+                'unpowered_waste' => $ws->unpowered_waste ?? 0,
+                'powered_footprint' => $ws->powered_footprint ?? 0,
+                'unpowered_footprint' => $ws->unpowered_footprint ?? 0,
+            ]],
+            'device_count_status' => array_map(
+                static fn ($row) => ['status' => $row->status, 'counter' => $row->counter],
+                $device->statusCount()
+            ),
+        ];
+    }
+
+    private static function decorateStats(array $stats): array
+    {
+        $stats['deviceCount'] = 0;
+        foreach ($stats['device_count_status'] as $statusRow) {
+            $row = (array) $statusRow;
+            if (($row['status'] ?? null) == \App\Device::REPAIR_STATUS_FIXED) {
+                $stats['deviceCount'] = $row['counter'] ?? 0;
+                break;
+            }
         }
+
+        $ws = $stats['waste_stats'][0] ?? [];
+        $stats['co2Total'] = ($ws['powered_footprint'] ?? 0) + ($ws['unpowered_footprint'] ?? 0);
+        $stats['wasteTotal'] = ($ws['powered_waste'] ?? 0) + ($ws['unpowered_waste'] ?? 0);
 
         return $stats;
     }
@@ -639,9 +688,8 @@ class Fixometer
      * Returns users who have a particular preference by slug
      *
      * @param $slug
-     * @return Collection
      */
-    public static function usersWhoHavePreference($slug)
+    public static function usersWhoHavePreference($slug): Collection
     {
         return User::join('users_preferences', 'users_preferences.user_id', '=', 'users.id')
             ->join('preferences', 'preferences.id', '=', 'users_preferences.preference_id')

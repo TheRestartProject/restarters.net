@@ -37,7 +37,7 @@ class Category extends Model
     public function findAll()
     {
         try {
-            return DB::select(DB::raw('SELECT * FROM `'.$this->table.'` WHERE `revision` = :rev'), ['rev' => $this->revision]);
+            return DB::select("SELECT * FROM `{$this->table}` WHERE `revision` = :rev", ['rev' => $this->revision]);
         } catch (\Illuminate\Database\QueryException $e) {
             return false;
         }
@@ -45,12 +45,12 @@ class Category extends Model
 
     public function listed()
     {
-        $clusters = DB::select(DB::raw('SELECT * FROM clusters ORDER BY idclusters ASC'));
+        $clusters = DB::select('SELECT * FROM clusters ORDER BY idclusters ASC');
 
-        $sql = 'SELECT * FROM `'.$this->table.'` WHERE `revision` = :rev AND `cluster` = :cluster ORDER BY `idcategories` ASC';
+        $sql = "SELECT * FROM `{$this->table}` WHERE `revision` = :rev AND `cluster` = :cluster ORDER BY `idcategories` ASC";
 
         foreach ($clusters as $k => $cluster) {
-            $clusters[$k]->categories = DB::select(DB::raw($sql), ['rev' => $this->revision, 'cluster' => $cluster->idclusters]);
+            $clusters[$k]->categories = DB::select($sql, ['rev' => $this->revision, 'cluster' => $cluster->idclusters]);
         }
 
         return $clusters;
@@ -59,7 +59,7 @@ class Category extends Model
     public function findAllByRevision($rev)
     {
         try {
-            DB::select(DB::raw('SELECT * FROM `'.$this->table.'` WHERE `revision` = :rev'), ['rev' => $rev]);
+            return DB::select("SELECT * FROM `{$this->table}` WHERE `revision` = :rev", ['rev' => $rev]);
         } catch (\Illuminate\Database\QueryException $e) {
             return false;
         }

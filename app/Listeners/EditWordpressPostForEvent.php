@@ -27,16 +27,19 @@ class EditWordpressPostForEvent extends BaseEvent
 
     /**
      * Handle the event.
-     *
-     * @param  EditEvent  $event
-     * @return void
      */
-    public function handle(EditEvent $event)
+    public function handle(EditEvent $event): void
     {
         $id = $event->party->idevents;
         $data = $event->data;
 
         $theParty = Party::find($id);
+
+        if (! $theParty) {
+            Log::info('Event no longer exists');
+
+            return;
+        }
 
         if (! $theParty->shouldPushToWordpress()) {
             Log::info('Events for groups in this network are not published');

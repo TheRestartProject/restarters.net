@@ -2,21 +2,24 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\View\View;
+use Illuminate\Http\RedirectResponse;
 use App\Group;
+use App\GroupTags;
+use App\Helpers\Fixometer;
 use App\Network;
 use Auth;
 use FixometerFile;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Lang;
 
 class NetworkController extends Controller
 {
     /**
      * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(): View
     {
         $user = Auth::user();
 
@@ -42,11 +45,8 @@ class NetworkController extends Controller
 
     /**
      * Display the specified network.
-     *
-     * @param  \App\Network  $network
-     * @return \Illuminate\Http\Response
      */
-    public function show(Network $network)
+    public function show(Network $network): View
     {
         $user = Auth::user();
 
@@ -82,24 +82,67 @@ class NetworkController extends Controller
             }
         }
 
+        // Get network stats
+        $stats = $network->stats();
+        $stats['groups'] = $network->groups->count();
+
+        // Determine if user can manage tags (NC for this network or Admin)
+        $canManageTags = Fixometer::hasRole($user, 'Administrator') ||
+            ($user->isCoordinatorOf($network));
+
+        // Get tags for this network
+        $tags = [];
+        if ($canManageTags) {
+            $tags = GroupTags::forNetwork($network->id)
+                ->get()
+                ->map(function ($tag) {
+                    return [
+                        'id' => $tag->id,
+                        'name' => $tag->tag_name,
+                        'description' => $tag->description,
+                        'groups_count' => $tag->groupTagGroups()->count(),
+                    ];
+                });
+        }
+
+        // Prepare network data for Vue component
+        $networkData = [
+            'id' => $network->id,
+            'name' => $network->name,
+            'description' => $network->description,
+            'website' => $network->website,
+            'logo' => $network->sizedLogo('_x100'),
+            'coordinators' => $network->coordinators->map(function ($c) {
+                $profile = $c->getProfile($c->id);
+                $path = $profile ? $profile->path : null;
+                return [
+                    'id' => $c->id,
+                    'name' => $c->name,
+                    'picture' => $path ? '/uploads/thumbnail_' . $path : '/images/placeholder-avatar.png',
+                ];
+            }),
+        ];
 
         return view('networks.show', [
             'network' => $network,
+            'networkData' => $networkData,
             'groupsForAssociating' => $groupsForAssociating,
             'mapBounds' => [
                 [ $minLat, $minLng ],
                 [ $maxLat, $maxLng ],
             ],
+            'stats' => $stats,
+            'tags' => $tags,
+            'canManageTags' => $canManageTags,
+            'canAssociateGroups' => $user->can('associateGroups', $network),
+            'apiToken' => $user->api_token,
         ]);
     }
 
     /**
      * Show the form for editing the specified resource.
-     *
-     * @param  \App\Network  $network
-     * @return \Illuminate\Http\Response
      */
-    public function edit(Network $network)
+    public function edit(Network $network): View
     {
         $this->authorize('update', $network);
 
@@ -110,23 +153,29 @@ class NetworkController extends Controller
 
     /**
      * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Network  $network
-     * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Network $network)
+    public function update(Request $request, Network $network): RedirectResponse
     {
         $this->authorize('update', $network);
 
         if ($request->hasFile('network_logo')) {
+            // Determine the correct disk to use (s3 on Fly, public_uploads in dev)
+            $disk = config('filesystems.default') === 's3' ? 's3' : 'public_uploads';
+
             // Save the file.
             $path = $request->file('network_logo')->store('network_logos', [
-                'disk' => 'public_uploads',
+                'disk' => $disk,
             ]);
 
             // Store it in the network object.
             if ($path) {
+                // Generate the _x100 sized version by copying the file
+                $sizedPath = preg_replace('/\.([^.\s]{3,4})$/', '-_x100.$1', $path);
+                $storage = Storage::disk($disk);
+
+                // Copy the uploaded file to the _x100 filename
+                $storage->copy($path, $sizedPath);
+
                 $network->logo = $path;
                 $network->save();
             } else {
@@ -139,11 +188,8 @@ class NetworkController extends Controller
 
     /**
      * Associate groups to the specified network.
-     *
-     * @param  \App\Network  $network
-     * @return \Illuminate\Http\Response
      */
-    public function associateGroup(Request $request, Network $network)
+    public function associateGroup(Request $request, Network $network): RedirectResponse
     {
         $this->authorize('associateGroups', $network);
 
@@ -160,6 +206,6 @@ class NetworkController extends Controller
 
         $numberOfGroups = count($groupIds);
 
-        return redirect()->route('networks.show', [$network])->withSuccess(Lang::get('networks.show.add_groups_success', ['number' => $numberOfGroups]));
+        return redirect()->route('networks.show', [$network])->withSuccess(Lang::choice('networks.show.add_groups_success', $numberOfGroups, ['number' => $numberOfGroups]));
     }
 }

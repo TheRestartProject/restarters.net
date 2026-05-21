@@ -20,32 +20,30 @@ class FixVolunteerCount extends Command
      *
      * @var string
      */
-    protected $description = 'Fix the volunteer count for all events';
+    protected $description = 'Fix negative volunteer counts for events';
 
     /**
      * Execute the console command.
      *
-     * @return mixed
+     * Volunteer counts can be manually incremented/decremented, so we only
+     * fix cases where the count has gone negative - that is always wrong.
      */
-    public function handle()
+    public function handle(): void
     {
-        $events = Party::all();
+        $events = Party::where('volunteers', '<', 0)->get();
+
+        if ($events->isEmpty()) {
+            $this->info('No events with negative volunteer counts found.');
+            return;
+        }
 
         foreach ($events as $event) {
             $actual = DB::table('events_users')->where('event', $event->idevents)->where('status', 1)->count();
-
-            if ($actual > $event->volunteers) {
-                if ($event->volunteers < 0) {
-                    $this->info("Event {$event->idevents} has negative count {$event->volunteers}, $actual have confirmed");
-                } else {
-                    $this->info("Event {$event->idevents} has count {$event->volunteers}, but more ($actual) have confirmed");
-                }
-
-                $event->volunteers = $actual;
-                $event->save();
-            } else if ($event->volunteers < 0) {
-                $this->info("Event {$event->idevents} has negative count {$event->volunteers}, fewewr ($actual) have confirmed");
-            }
+            $this->info("Event {$event->idevents}: volunteer count is {$event->volunteers}, setting to {$actual}");
+            $event->volunteers = $actual;
+            $event->save();
         }
+
+        $this->info("Fixed {$events->count()} event(s).");
     }
 }

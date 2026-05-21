@@ -18,7 +18,7 @@
 </template>
 
 <script>
-const htmlToText = require('html-to-text');
+import * as htmlToText from 'html-to-text';
 import clip from "text-clipper"
 // Originally based on https://github.com/orlyyani/read-more, with thanks.
 
@@ -77,7 +77,7 @@ export default {
       return ret
     },
     needsTruncating() {
-      if (this.text && (text.length > maxChars)) {
+      if (this.text && (this.text.length > this.maxChars)) {
         return true
       }
 

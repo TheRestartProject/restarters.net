@@ -3,6 +3,7 @@
 use App\Images;
 use App\Xref;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 use Intervention\Image\ImageManagerStatic as Image;
 
 class FixometerFile extends Model
@@ -19,7 +20,7 @@ class FixometerFile extends Model
     public function move($from, $to) {
         // This is for phpunit tests.
         if (FixometerFile::$uploadTesting) {
-            return copy($from, $to);
+            return @copy($from, $to);
         } else {
             return @move_uploaded_file($from, $to);
         }
@@ -50,17 +51,12 @@ class FixometerFile extends Model
             $clear = false;
         }
 
-        if ($clear) {
-            Xref::where('reference', $reference)
-                  ->where('reference_type', $referenceType)
-                    ->forceDelete();
-        }
-
-        if ($ajax && gettype($user_file['tmp_name']) == 'array') {
-            $error = $user_file['error'][0];
+        // Handle both array and non-array formats for $_FILES
+        if (gettype($user_file['tmp_name']) == 'array') {
+            $error = is_array($user_file['error']) ? $user_file['error'][0] : $user_file['error'];
             $tmp_name = $user_file['tmp_name'][0];
         } else {
-            $error = $user_file['error'];
+            $error = is_array($user_file['error']) ? $user_file['error'][0] : $user_file['error'];
             $tmp_name = $user_file['tmp_name'];
         }
 
@@ -69,15 +65,30 @@ class FixometerFile extends Model
             $filename = $this->filename($tmp_name);
             $this->file = $filename;
             $lpath = $_SERVER['DOCUMENT_ROOT'].'/uploads/'.$filename;
+
+            // Attempt the move BEFORE touching existing records — if the move fails
+            // (e.g. uploads directory missing/unwritable) we preserve the old image.
             if (!$this->move($tmp_name, $lpath)) {
                 return false;
             }
+
+            // Move succeeded — safe to remove previous image records.
+            if ($clear) {
+                Xref::where('reference', $reference)
+                      ->where('reference_type', $referenceType)
+                        ->forceDelete();
+            }
+
             $data = [];
             $this->path = $lpath;
             $data['path'] = $this->file;
 
             // Fix orientation
             Image::make($lpath)->orientate()->save($lpath);
+
+            if ($type !== 'image') {
+                $this->syncToCloud($filename);
+            }
 
             if ($type === 'image') {
                 $size = getimagesize($this->path);
@@ -129,6 +140,10 @@ class FixometerFile extends Model
                 $thumb->save($_SERVER['DOCUMENT_ROOT'].'/uploads/'.'thumbnail_'.$filename, 85);
                 $mid->save($_SERVER['DOCUMENT_ROOT'].'/uploads/'.'mid_'.$filename, 85);
 
+                $this->syncToCloud($filename);
+                $this->syncToCloud('thumbnail_'.$filename);
+                $this->syncToCloud('mid_'.$filename);
+
                 $this->table = 'images';
                 $Images = new Images;
 
@@ -176,18 +191,63 @@ class FixometerFile extends Model
         return time().sha1_file($tmp_name).rand(1, 15000).'.'.$lext;
     }
 
+    /**
+     * Sync a file from local uploads directory to cloud storage (S3/Tigris).
+     * Only acts when FILESYSTEM_DISK is set to 's3'.
+     */
+    protected function syncToCloud($filename)
+    {
+        if (config('filesystems.default') !== 's3') {
+            return;
+        }
+
+        $localPath = $_SERVER['DOCUMENT_ROOT'].'/uploads/'.$filename;
+
+        if (file_exists($localPath)) {
+            Storage::disk('s3')->put($filename, file_get_contents($localPath), 'public');
+        }
+    }
+
     public function findImages($of_ref_type, $ref_id)
     {
         $sql = 'SELECT * FROM `images` AS `i`
                     INNER JOIN `xref` AS `x` ON `x`.`object` = `i`.`idimages`
-                    WHERE `x`.`object_type` = '.env('TBL_IMAGES').' AND
+                    WHERE `x`.`object_type` = :objectType AND
                     `x`.`reference_type` = :refType AND
                     `x`.`reference` = :refId';
 
         try {
-            return DB::select(DB::raw($sql), ['refType' => $of_ref_type, 'refId' => $ref_id]);
+            return DB::select($sql, ['objectType' => env('TBL_IMAGES'), 'refType' => $of_ref_type, 'refId' => $ref_id]);
         } catch (\Illuminate\Database\QueryException $e) {
-            return db($e);
+            return [];
+        }
+    }
+
+    public function findImagesForMany($of_ref_type, array $ref_ids): array
+    {
+        if (empty($ref_ids)) {
+            return [];
+        }
+
+        $placeholders = implode(',', array_fill(0, count($ref_ids), '?'));
+        $sql = "SELECT `i`.*, `x`.`reference` FROM `images` AS `i`
+                    INNER JOIN `xref` AS `x` ON `x`.`object` = `i`.`idimages`
+                    WHERE `x`.`object_type` = ? AND
+                    `x`.`reference_type` = ? AND
+                    `x`.`reference` IN ($placeholders)";
+
+        try {
+            $rows = DB::select($sql, array_merge(
+                [env('TBL_IMAGES'), $of_ref_type],
+                array_map('intval', $ref_ids)
+            ));
+            $grouped = [];
+            foreach ($rows as $row) {
+                $grouped[$row->reference][] = $row;
+            }
+            return $grouped;
+        } catch (\Illuminate\Database\QueryException $e) {
+            return [];
         }
     }
 
@@ -195,7 +255,7 @@ class FixometerFile extends Model
     {
         // Delete the xref.  This is sufficient to stop the image being attached to the device.  We leave the
         // file in existence in case we want it later for debugging/mining.
-        $sql = 'DELETE FROM `xref` WHERE `idxref` = :id AND `object_type` = '.env('TBL_IMAGES');
-        DB::delete(DB::raw($sql), ['id' => $idxref]);
+        $sql = 'DELETE FROM `xref` WHERE `idxref` = :id AND `object_type` = :objectType';
+        DB::delete($sql, ['id' => $idxref, 'objectType' => env('TBL_IMAGES')]);
     }
 }

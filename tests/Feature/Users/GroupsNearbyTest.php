@@ -18,13 +18,13 @@ use Tests\TestCase;
 
 class GroupsNearbyTest extends TestCase
 {
-    public function testNoLocation()
+    public function testNoLocation(): void
     {
         $user = User::factory()->create();
         $this->assertEquals(0, count($user->groupsNearby()));
     }
 
-    public function testLocationNoGroups()
+    public function testLocationNoGroups(): void
     {
         $user = User::factory()->create([
             'latitude' => -12.0464,
@@ -33,7 +33,7 @@ class GroupsNearbyTest extends TestCase
         $this->assertEquals(0, count($user->groupsNearby()));
     }
 
-    public function testOneGroupNearby()
+    public function testOneGroupNearby(): void
     {
         $groupAttributes = Group::factory()->raw();
         $groupAttributes['name'] = 'Lancaster Fixers';
@@ -52,7 +52,7 @@ class GroupsNearbyTest extends TestCase
         $this->assertEquals($group->id, $groups[0]->id);
     }
 
-    public function testDontShowUnlessApproved()
+    public function testDontShowUnlessApproved(): void
     {
         $group = Group::factory()->create([
                                                    'latitude' => -12.0464,
@@ -67,7 +67,7 @@ class GroupsNearbyTest extends TestCase
         $this->assertEquals(0, count($groups));
     }
 
-    public function testCloseButNoCigar()
+    public function testCloseButNoCigar(): void
     {
         $group = Group::factory()->create([
                                                    'latitude' => -12.0464,
@@ -88,7 +88,7 @@ class GroupsNearbyTest extends TestCase
         $this->assertEquals(0, count($groups));
     }
 
-    public function testInactive()
+    public function testInactive(): void
     {
         $group = Group::factory()->create([
                                                    'latitude' => -12.0464,
@@ -113,7 +113,7 @@ class GroupsNearbyTest extends TestCase
         $this->assertEquals(0, count($groups));
     }
 
-    public function testNotification() {
+    public function testNotification(): void {
         Notification::fake();
 
         // Create a user in London.

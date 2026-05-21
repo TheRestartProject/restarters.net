@@ -30,7 +30,7 @@ return [
   'getting_the_most_bullet1' => '<strong>Get fixing</strong>: <a href="https://restarters.net/group" target="_blank" rel="noopener">follow your nearest community repair group</a> and brush up or share your skills with our <a href="https://wiki.restarters.net/" target="_blank">repair wiki</a>.',
   'getting_the_most_bullet2' => '<strong>Get organising</strong>: <a href="https://talk.restarters.net/session/sso?return_path=https://talk.restarters.net/t/how-to-run-a-repair-event-the-restart-party-kit/324/" target="_blank">learn how to run a repair event</a> and/or <a href="https://talk.restarters.net/c/community-repair/5" target="_blank">ask the community for help on Talk</a>.',
   'getting_the_most_bullet3' => '<strong>Get chatting</strong>: <a href="https://talk.restarters.net/session/sso?return_path=https://talk.restarters.net/" target="_blank">catch up on the latest conversations</a> on our forum, Talk. Why not <a href="https://talk.restarters.net/t/who-is-everyone-meet-and-greet/44" target="_blank">introduce yourself</a> too?',
-  'getting_the_most_bullet4' => '<strong>Get analytical</strong>: see our impact in <a href="https://restarters.net/fixometer" target="_blank">the Fixometer</a>. Or <a href="https://restarters.net/workbench" target="_blank">join a data quest</a> to power up our Right to Repair advocacy (no expertise required).',
+  'getting_the_most_bullet4' => '<strong>Get analytical</strong>: see our impact in <a href="https://restarters.net/fixometer" target="_blank">the Fixometer</a>.',
   'upcoming_events_title' => 'Upcoming events',
   'upcoming_events_subtitle' => 'Your groups\' upcoming events:',
   'add_event' => 'Add',

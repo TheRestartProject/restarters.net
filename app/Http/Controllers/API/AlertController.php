@@ -212,7 +212,6 @@ class AlertController extends Controller
         $alert = Alert::findOrFail($id);
 
         list($start, $end, $title, $html, $ctatitle, $ctalink) = $this->validateAlertParams($request, true);
-        echo "Start $start, $end";
 
         $alert->update([
             'start' => $start,

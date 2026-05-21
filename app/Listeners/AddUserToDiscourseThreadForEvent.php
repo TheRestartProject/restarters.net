@@ -8,9 +8,11 @@ use App\Role;
 use App\Services\DiscourseService;
 use App\User;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Contracts\Queue\InteractsWithQueue;
+use Illuminate\Queue\InteractsWithQueue;
 
 class AddUserToDiscourseThreadForEvent implements ShouldQueue {
+    use InteractsWithQueue;
+
     private $discourseService;
     public $tries = 1;
 
@@ -29,26 +31,25 @@ class AddUserToDiscourseThreadForEvent implements ShouldQueue {
         return $hosts->count() ? $hosts[0] : null;
     }
 
-    public function handle(UserConfirmedEvent $e) {
-        // This call can block for a long time - add our own timeout so that we can fail it rather than block
-        // the whole queue.
-        pcntl_signal(SIGALRM, function () {
-            $this->fail();
-        });
-
-        pcntl_alarm(10);
+    public function handle(UserConfirmedEvent $e): void {
+        if (function_exists('pcntl_signal')) {
+            pcntl_signal(SIGALRM, function () {
+                $this->fail();
+            });
+            pcntl_alarm(10);
+        }
 
         if ($e->iduser) {
             $event = Party::find($e->idevents);
             $user = User::find($e->iduser);
 
-            if ($event->theGroup->archived_at) {
-                // Suppress notifications for archived groups.
-                return;
-            }
-
             // Might not exist - timing windows.
             if ($event && $user && $event->discourse_thread) {
+                if ($event->theGroup && $event->theGroup->archived_at) {
+                    // Suppress notifications for archived groups.
+                    return;
+                }
+
                 // We need a host of the event to add the user to the thread.
                 $host = $this->getHost($event->idevents);
 
@@ -62,6 +63,8 @@ class AddUserToDiscourseThreadForEvent implements ShouldQueue {
             }
         }
 
-        pcntl_alarm(0);
+        if (function_exists('pcntl_alarm')) {
+            pcntl_alarm(0);
+        }
     }
 }

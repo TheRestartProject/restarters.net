@@ -53,31 +53,27 @@
                 </div>
                 <div class="form-group">
                     <label for="reliability">@lang('admin.reliability'):</label>
-                    <div class="form-control form-control__select">
-                        <select name="reliability" id="reliability" class="field field select2">
-                          @foreach(App\Helpers\Fixometer::footprintReliability() as $key => $value)
-                            <option value="{{ $key }}" {{ $key == $category->footprint_reliability ? 'selected' : ''}} >{{ $value }}</option>
-                          @endforeach
-                        </select>
-                    </div>
+                    <select name="reliability" id="reliability" class="form-control">
+                      @foreach(App\Helpers\Fixometer::footprintReliability() as $key => $value)
+                        <option value="{{ $key }}" {{ $key == $category->footprint_reliability ? 'selected' : ''}} >{{ $value }}</option>
+                      @endforeach
+                    </select>
                 </div>
                 <?php //dd($categories);?>
                 <div class="form-group">
                     <label for="category_cluster">@lang('admin.category_cluster'):</label>
-                    <div class="form-control form-control__select">
-                        <select name="category_cluster" id="category_cluster" class="field field select2">
-                          <!-- REDUNDANT   -->
-                          <!-- @foreach(App\Helpers\Fixometer::categoryCluster() as $key => $value)
-                            <option value="{{ $key }}" {{ $key == $category->cluster ? 'selected' : ''}} >{{ $value }}</option>
-                          @endforeach -->
+                    <select name="category_cluster" id="category_cluster" class="form-control">
+                      <!-- REDUNDANT   -->
+                      <!-- @foreach(App\Helpers\Fixometer::categoryCluster() as $key => $value)
+                        <option value="{{ $key }}" {{ $key == $category->cluster ? 'selected' : ''}} >{{ $value }}</option>
+                      @endforeach -->
 
-                          @if(isset($categories))
-                            <?php foreach ($categories as $cluster) { ?>
-                            <option value="<?php echo $cluster->idclusters; ?>"<?php echo $cluster->idclusters == $category->cluster ? ' selected' : ''; ?>><?php echo $cluster->name; ?></option>
-                            <?php } ?>
-                          @endif
-                        </select>
-                    </div>
+                      @if(isset($categories))
+                        <?php foreach ($categories as $cluster) { ?>
+                        <option value="<?php echo $cluster->idclusters; ?>"<?php echo $cluster->idclusters == $category->cluster ? ' selected' : ''; ?>><?php echo $cluster->name; ?></option>
+                        <?php } ?>
+                      @endif
+                    </select>
                 </div>
 
 

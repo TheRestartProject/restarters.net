@@ -93,7 +93,7 @@ class CalendarTest extends TestCase
         ]);
     }
 
-    public function testByUser() {
+    public function testByUser(): void {
         // Valid hash.
         $response = $this->get('/calendar/user/' . $this->host->calendar_hash);
         $response->assertStatus(200);
@@ -107,7 +107,7 @@ class CalendarTest extends TestCase
         $response = $this->get('/calendar/user/' . $this->host->calendar_hash . '1');
     }
 
-    public function testByGroup() {
+    public function testByGroup(): void {
         // One event.
         $response = $this->get('/calendar/group/' . $this->group->idgroups);
         $response->assertStatus(200);
@@ -120,7 +120,7 @@ class CalendarTest extends TestCase
         $response = $this->get('/calendar/group/' . $this->group2->idgroups);
     }
 
-    public function testByNetwork() {
+    public function testByNetwork(): void {
         // One event.
         $response = $this->get('/calendar/network/' . $this->network->id);
         $response->assertStatus(200);
@@ -134,7 +134,7 @@ class CalendarTest extends TestCase
         $response = $this->get('/calendar/network/' . $network->id);
     }
 
-    public function testByArea() {
+    public function testByArea(): void {
         // One event.
         $response = $this->get('/calendar/group-area/London');
         $response->assertStatus(200);
@@ -147,7 +147,7 @@ class CalendarTest extends TestCase
         $response = $this->get('/calendar/group-area/Edinburgh');
     }
 
-    public function testAll() {
+    public function testAll(): void {
         // One event.
         $response = $this->get('/calendar/all-events/' . env('CALENDAR_HASH'));
         $response->assertStatus(200);
@@ -159,7 +159,7 @@ class CalendarTest extends TestCase
         $response = $this->get('/calendar/all-events/' . env('CALENDAR_HASH') . '1');
     }
 
-    public function testCancelled() {
+    public function testCancelled(): void {
         $this->event->cancelled = 1;
         $this->event->save();
         $response = $this->get('/calendar/user/' . $this->host->calendar_hash);
@@ -167,7 +167,7 @@ class CalendarTest extends TestCase
         $this->expectOutputRegex('/CANCELLED/');
     }
 
-    public function testEventNotApproved() {
+    public function testEventNotApproved(): void {
         $this->event->approved = false;
         $this->event->save();
         $response = $this->get('/calendar/user/' . $this->host->calendar_hash);
@@ -175,7 +175,7 @@ class CalendarTest extends TestCase
         $this->expectOutputRegex('/TENTATIVE/');
     }
 
-    public function testGroupNotApproved() {
+    public function testGroupNotApproved(): void {
         $this->group->approved = false;
         $this->group->save();
         $response = $this->get('/calendar/user/' . $this->host->calendar_hash);
@@ -183,7 +183,7 @@ class CalendarTest extends TestCase
         $this->expectOutputRegex('/TENTATIVE/');
     }
 
-    public function testEventNotVisible() {
+    public function testEventNotVisible(): void {
         $host = User::factory()->create([
                                             'latitude' => 50.64,
                                                  'longitude' => 5.58,

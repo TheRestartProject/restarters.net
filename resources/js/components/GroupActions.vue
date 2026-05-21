@@ -11,9 +11,6 @@
         <b-dropdown-item  data-toggle="modal" data-target="#invite-to-group" v-if="canedit">
           {{ __('groups.invite_volunteers') }}
         </b-dropdown-item>
-        <b-dropdown-item :href="'/group/nearby/' + idgroups" v-if="canedit">
-          {{ __('groups.volunteers_nearby') }}
-        </b-dropdown-item>
         <b-dropdown-item  data-toggle="modal" data-target="#group-share-stats" v-if="canedit">
           {{ __('groups.share_group_stats') }}
         </b-dropdown-item>
@@ -64,7 +61,7 @@
 </template>
 <script>
 import group from '../mixins/group'
-import ConfirmModal from './ConfirmModal'
+import ConfirmModal from './ConfirmModal.vue'
 
 export default {
   components: {ConfirmModal},
@@ -120,6 +117,10 @@ export default {
       group.id = this.idgroups
       group.archived_at = (new Date()).toISOString()
       group.description = group.free_text
+
+      // Make sure we don't stomp on the networks.
+      delete group.networks
+
       await this.$store.dispatch('groups/edit', group)
 
       await this.$store.dispatch('groups/fetch', {

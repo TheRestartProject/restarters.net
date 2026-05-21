@@ -2,6 +2,8 @@
 
 namespace App\Http\Middleware;
 
+use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Http\Request;
 use App;
 use Auth;
 use Closure;
@@ -13,12 +15,8 @@ class LanguageSwitcher
 {
     /**
      * Handle an incoming request.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
-     * @return mixed
      */
-    public function handle($request, Closure $next)
+    public function handle(Request $request, Closure $next): Response
     {
         // A query string parameter of locale overrides all other places to attempt to determine the locale.
         if ($request->exists('locale')) {

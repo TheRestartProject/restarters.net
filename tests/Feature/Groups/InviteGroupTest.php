@@ -18,7 +18,7 @@ use Illuminate\Validation\ValidationException;
 
 class InviteGroupTest extends TestCase
 {
-    public function testInvite()
+    public function testInvite(): void
     {
         Notification::fake();
         $this->withoutExceptionHandling();
@@ -70,6 +70,9 @@ class InviteGroupTest extends TestCase
         $response2->assertSee('You have an invitation to this group.');
 
         // Check the counts.
+        // Small delay to ensure any database commits or cache invalidations are complete
+        usleep(100000); // 100ms
+
         $props = $this->assertVueProperties($response2, [
             [],
             [
@@ -78,10 +81,28 @@ class InviteGroupTest extends TestCase
         ]);
 
         $initialGroup = json_decode($props[1][':initial-group'], true);
-        $this->assertEquals(1, $initialGroup['all_hosts_count']);
-        $this->assertEquals(1, $initialGroup['all_confirmed_hosts_count']);
-        $this->assertEquals(1, $initialGroup['all_restarters_count']);
-        $this->assertEquals(0, $initialGroup['all_confirmed_restarters_count']);
+
+        // Debug info for CI failures - collect group membership state
+        $groupMembers = DB::table('users_groups')
+            ->where('group', $group->idgroups)
+            ->get()
+            ->map(function($m) {
+                return "user={$m->user}, role={$m->role}, status={$m->status}";
+            })
+            ->implode('; ');
+        $debugInfo = sprintf(
+            "Group ID: %d, Host ID: %d, User ID: %d, Members: [%s], Initial group data: %s",
+            $group->idgroups,
+            $host->id,
+            $user->id,
+            $groupMembers,
+            json_encode($initialGroup)
+        );
+
+        $this->assertEquals(1, $initialGroup['all_hosts_count'], "all_hosts_count mismatch. Debug: $debugInfo");
+        $this->assertEquals(1, $initialGroup['all_confirmed_hosts_count'], "all_confirmed_hosts_count mismatch. Debug: $debugInfo");
+        $this->assertEquals(1, $initialGroup['all_restarters_count'], "all_restarters_count mismatch. Debug: $debugInfo");
+        $this->assertEquals(0, $initialGroup['all_confirmed_restarters_count'], "all_confirmed_restarters_count mismatch. Debug: $debugInfo");
 
         // Now accept the invite.
         preg_match('/href="(\/group\/accept-invite.*?)"/', $response2->getContent(), $matches);
@@ -131,7 +152,7 @@ class InviteGroupTest extends TestCase
         );
     }
 
-    public function testInviteViaLink() {
+    public function testInviteViaLink(): void {
         $group = Group::factory()->create();
 
         $unique_shareable_code = Fixometer::generateUniqueShareableCode(\App\Group::class, 'shareable_code');
@@ -160,7 +181,7 @@ class InviteGroupTest extends TestCase
     /**
      * @dataProvider invalidEmailProvider
      */
-    public function testInviteInvalidEmail($email, $valid)
+    public function testInviteInvalidEmail($email, $valid): void
     {
         $this->loginAsTestUser(Role::ADMINISTRATOR);
 
@@ -179,7 +200,7 @@ class InviteGroupTest extends TestCase
         ]);
     }
 
-    public function invalidEmailProvider()
+    public static function invalidEmailProvider(): array
     {
         return [
             ['test@test.com', true],

@@ -2,9 +2,11 @@
 
 namespace App\Listeners;
 
+use Illuminate\Events\Dispatcher;
 use App\Events\UserEmailUpdated;
 use App\Events\UserLanguageUpdated;
 use App\Events\UserRegistered;
+use App\Events\UserDeleted;
 use App\Services\DiscourseService;
 use Illuminate\Support\Facades\Log;
 
@@ -117,12 +119,26 @@ class DiscourseUserEventSubscriber extends BaseEvent
         }
     }
 
+    public function onUserDeleted(UserDeleted $event)
+    {
+        if (config('restarters.features.discourse_integration') === true)
+        {
+            $user = $event->user;
+
+            try
+            {
+                $this->discourseService->anonymise($user);
+            } catch (\Exception $ex)
+            {
+                Log::error('Could not anonymise ' . $user->id . ' on Discourse: ' . $ex->getMessage());
+            }
+        }
+    }
+
     /**
      * Register the listeners for the subscriber.
-     *
-     * @param  \Illuminate\Events\Dispatcher  $events
      */
-    public function subscribe($events)
+    public function subscribe(Dispatcher $events)
     {
         // We subscribe to all the events irrespective of whether the feature is enabled so that we can test them.
         $events->listen(
@@ -138,6 +154,11 @@ class DiscourseUserEventSubscriber extends BaseEvent
         $events->listen(
             \App\Events\UserRegistered::class,
             'App\Listeners\DiscourseUserEventSubscriber@onUserRegistered'
+        );
+
+        $events->listen(
+            \App\Events\UserDeleted::class,
+            'App\Listeners\DiscourseUserEventSubscriber@onUserDeleted'
         );
     }
 }

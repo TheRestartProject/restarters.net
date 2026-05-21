@@ -8,10 +8,8 @@ return new class extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
-    public function up()
+    public function up(): void
     {
         // Add JSON columns.  In older versions of MySQL these will be LONGTEXT rather than JSON, so
         // if we ever want to do extraction/query/indexing on them we might need to migrate them at that point.
@@ -25,10 +23,8 @@ return new class extends Migration
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::table('groups', function (Blueprint $table) {
             $table->dropColumn('network_data');

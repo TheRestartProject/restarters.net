@@ -26,10 +26,10 @@
           </b-dropdown-item>
         </div>
         <div v-else>
-          <b-dropdown-item data-toggle="modal" data-target="#event-invite-to" v-if="isAttending && upcoming && approved">
+          <b-dropdown-item @click="$refs.inviteModal.show()" v-if="isAttending && upcoming && approved">
             {{ __('events.invite_volunteers') }}
           </b-dropdown-item>
-          <b-dropdown-item v-b-tooltip.hover id="invite-when-approved" data-toggle="modal" v-else-if="isAttending && upcoming" :title="__('events.invite_when_approved')" disabled>
+          <b-dropdown-item v-b-tooltip.hover id="invite-when-approved" v-else-if="isAttending && upcoming" :title="__('events.invite_when_approved')" disabled>
             {{ __('events.invite_volunteers') }}
           </b-dropdown-item>
           <b-dropdown-item :href="'/party/join/' + idevents" v-else>
@@ -48,7 +48,7 @@
           <b-dropdown-item :href="'/group/join/' + event.group.idgroups" v-if="!inGroup">
             {{ __('events.follow_group') }}
           </b-dropdown-item>
-          <b-dropdown-item data-toggle="modal" data-target="#event-invite-to" v-if="attending && upcoming">
+          <b-dropdown-item @click="$refs.inviteModal.show()" v-if="attending && upcoming">
             {{ __('events.invite_volunteers') }}
           </b-dropdown-item>
           <b-dropdown-item :href="'/party/join/' + idevents" v-else>
@@ -58,14 +58,16 @@
       </div>
     </b-dropdown>
     <ConfirmModal @confirm="confirmedDelete" :message="__('events.confirm_delete')" ref="confirmdelete" />
+    <EventInviteModal :idevents="idevents" :canedit="canedit" ref="inviteModal" />
   </div>
 </template>
 <script>
 import event from '../mixins/event'
-import ConfirmModal from './ConfirmModal'
+import ConfirmModal from './ConfirmModal.vue'
+import EventInviteModal from './EventInviteModal.vue'
 
 export default {
-  components: {ConfirmModal},
+  components: {ConfirmModal, EventInviteModal},
   mixins: [ event ],
   props: {
     idevents: {

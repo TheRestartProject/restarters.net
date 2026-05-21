@@ -9,8 +9,8 @@
   </div>
 </template>
 <script>
-import ConfirmModal from './ConfirmModal'
-import DeviceImageModal from './DeviceImageModal'
+import ConfirmModal from './ConfirmModal.vue'
+import DeviceImageModal from './DeviceImageModal.vue'
 export default {
   components: {DeviceImageModal, ConfirmModal},
   props: {

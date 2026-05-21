@@ -42,11 +42,8 @@ class RegisterController extends Controller
 
     /**
      * Get a validator for an incoming registration request.
-     *
-     * @param  array  $data
-     * @return \Illuminate\Contracts\Validation\Validator
      */
-    protected function validator(array $data)
+    protected function validator(array $data): \Illuminate\Contracts\Validation\Validator
     {
         return Validator::make($data, [
             'name' => 'required|string|max:255',
@@ -59,20 +56,20 @@ class RegisterController extends Controller
 
     /**
      * Create a new user instance after a valid registration.
-     *
-     * @param  array  $data
-     * @return \App\User
      */
-    protected function create(array $data)
+    protected function create(array $data): User
     {
         $user = User::create([
                                 'name' => $data['name'],
                                 'email' => $data['email'],
                                 'password' => Hash::make($data['password']),
-            'role' => 4,
             'recovery' => substr(bin2hex(openssl_random_pseudo_bytes(32)), 0, 24),
             'recovery_expires' => strftime('%Y-%m-%d %X', time() + (24 * 60 * 60)),
                             ]);
+
+        // role excluded from $fillable (security: C2/M1); set via direct assignment
+        $user->role = 4;
+        $user->save();
 
         Session::createSession($user->id);
 

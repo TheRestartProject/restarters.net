@@ -9,10 +9,7 @@ use Illuminate\Support\Facades\Notification;
 
 class SendAdminUserDeletedNotification extends BaseEvent
 {
-    /**
-     * @param UserDeleted $event
-     */
-    public function handle(UserDeleted $event)
+    public function handle(UserDeleted $event): void
     {
         $notify_users = Fixometer::usersWhoHavePreference('admin-user-deleted');
 

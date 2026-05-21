@@ -2,8 +2,8 @@
     <CollapsibleSection class="pt-3 p-md-0 lineheight">
     <template slot="title">
           <div class="d-flex">
-      {{ __('microtasking.discussion.title') }}
-      <b-img class="icon ml-3 d-none d-md-block" src="/images/talk_doodle.svg" style="width:70px"/>
+      {{ __('discourse.title') }}
+      <b-img class="icon ml-3 d-none d-md-block" :src="imageUrl('/images/talk_doodle.svg')" style="width:70px"/>
           </div>
     </template>
 
@@ -15,10 +15,10 @@
             <b-tr class="border-0">
               <b-th></b-th>
               <b-th class="d-none d-md-table-cell">
-                <b-img class="icon" src="/images/speech_bubble.svg" :title="__('microtasking.discussion.number_of_comments')"/>
+                <b-img class="icon" :src="imageUrl('/images/speech_bubble.svg')" :title="__('discourse.number_of_comments')"/>
               </b-th>
               <b-th class="d-none d-md-table-cell">
-                <b-img class="icon" height="28px" src="/images/clock.svg" :title="__('microtasking.discussion.topic_created_at')"/>
+                <b-img class="icon" height="28px" :src="imageUrl('/images/clock.svg')" :title="__('discourse.topic_created_at')"/>
               </b-th>
             </b-tr>
           </b-thead>
@@ -33,7 +33,7 @@
         </b-table-simple>
 
         <div class="text-right pt-0 pb-2 pr-2">
-          <a :href="seeAllTopicsLink">{{ __('microtasking.discussion.see_all') }}</a>
+          <a :href="seeAllTopicsLink">{{ __('discourse.see_all') }}</a>
         </div>
       </div>
     </template>
@@ -41,11 +41,13 @@
 </template>
 
 <script>
-import DiscourseTopic from './DiscourseTopic'
-import CollapsibleSection from './CollapsibleSection'
-const axios = require('axios')
+import DiscourseTopic from './DiscourseTopic.vue'
+import CollapsibleSection from './CollapsibleSection.vue'
+import images from '../mixins/images'
+import axios from 'axios'
 
 export default {
+  mixins: [images],
   components: {CollapsibleSection, DiscourseTopic},
   props: {
     seeAllTopicsLink: {

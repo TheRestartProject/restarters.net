@@ -63,8 +63,8 @@
         </div>
 
         <?php
-          $can_edit_event = Auth::check() && App\Helpers\Fixometer::userHasEditPartyPermission($event->idevents, Auth::user()->id);
-          $can_delete_event = Auth::check() && App\Helpers\Fixometer::userHasDeletePartyPermission($event->idevents, Auth::user()->id) && $event->canDelete();
+          $can_edit_event = App\Helpers\Fixometer::userHasEditPartyPermission($event->idevents);
+          $can_delete_event = App\Helpers\Fixometer::userHasDeletePartyPermission($event->idevents) && $event->canDelete();
           $is_admin = Auth::check() && App\Helpers\Fixometer::hasRole(Auth::user(), 'Administrator');
           $is_attending = is_object($is_attending) && $is_attending->status == 1;
 
@@ -87,18 +87,7 @@
           $expanded_devices = [];
 
           foreach ($event->devices as $device) {
-              $device->category = $device->deviceCategory;
-              $device->shortProblem = $device->getShortProblem();
-
-              $barriers = [];
-
-              foreach ($device->barriers as $barrier) {
-                  $barriers[] = $barrier->id;
-              }
-
-              $device->barrier = $barriers;
-              $device->images = $device->getImages();
-              $expanded_devices[] = $device;
+            $expanded_devices[] = (new \App\Http\Resources\Device($device))->resolve();
           }
 
           $expanded_clusters = [];
@@ -148,7 +137,7 @@
     </div>
   </section>
 
-  @include('includes.modals.event-invite-to')
+  {{-- Event invite modal is now handled by EventInviteModal.vue component --}}
   @include('includes.modals.event-description')
   @include('includes.modals.event-share-stats')
   @include('includes.modals.event-request-review')

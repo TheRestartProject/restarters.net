@@ -19,7 +19,7 @@ class CountsTest extends TestCase
     // Event counts should only include events in the past.
 
     /** @test */
-    public function it_can_check_if_event_counts_past()
+    public function it_can_check_if_event_counts_past(): void
     {
         // Create a group and an event on it.
         $network = Network::factory()->create();
@@ -51,8 +51,8 @@ class CountsTest extends TestCase
         // The event we created is in the future, so the count of all should be more than the count in the past.
         $this->assertGreaterThan($pastcount, $allcount);
 
-        // The accessor should construct the timestamp.
-        $this->assertEquals('2130-01-01 10:15', $event2->event_timestamp);
+        // The accessor should construct the timestamp.  This is in local time, i.e. UTC in this test.
+        $this->assertEquals('2130-01-01 05:15', $event2->event_timestamp);
 
         // The devices should be fetched on demand.
         $this->assertEquals(1, count($event2->devices));

@@ -30,6 +30,7 @@
               :value.sync="free_text"
               :has-error="$v.free_text.$error"
               ref="free_text"/>
+          <small class="form-text text-muted">{{ __('events.endof10_helper') }}</small>
         </b-form-group>
       </div>
       <div class="event-date">
@@ -64,7 +65,7 @@
       />
       <b-card v-if="canApprove" no-body class="event-admin">
         <b-card-header>
-          <b-img src="/images/cog.svg" />
+          <b-img :src="imageUrl('/images/cog.svg')" />
           {{ __('groups.group_admin_only') }}
         </b-card-header>
         <b-card-body>
@@ -140,17 +141,18 @@
 <script>
 import event from '../mixins/event'
 import auth from '../mixins/auth'
-import RichTextEditor from './RichTextEditor'
-import EventDatePicker from './EventDatePicker'
-import EventTimeRangePicker from './EventTimeRangePicker'
-import VenueAddress from './VenueAddress'
-import EventVenue from './EventVenue'
-import EventGroup from './EventGroup'
-import EventLink from './EventLink'
+import images from '../mixins/images'
+import RichTextEditor from './RichTextEditor.vue'
+import EventDatePicker from './EventDatePicker.vue'
+import EventTimeRangePicker from './EventTimeRangePicker.vue'
+import VenueAddress from './VenueAddress.vue'
+import EventVenue from './EventVenue.vue'
+import EventGroup from './EventGroup.vue'
+import EventLink from './EventLink.vue'
 import { required, url, helpers } from 'vuelidate/lib/validators'
 import validationHelpers from '../mixins/validationHelpers'
 import moment from 'moment-timezone'
-import NetworkData from './NetworkData'
+import NetworkData from './NetworkData.vue'
 import SpinButton from "./SpinButton.vue";
 
 function geocodeableValidation() {
@@ -161,7 +163,7 @@ const timeValidator = helpers.regex('timeValidator', /^([0-1]?[0-9]|2[0-3]):[0-5
 
 export default {
   components: {EventGroup, EventVenue, EventLink, VenueAddress, EventTimeRangePicker, EventDatePicker, RichTextEditor, NetworkData, SpinButton,},
-  mixins: [event, auth, validationHelpers],
+  mixins: [event, auth, validationHelpers, images],
   props: {
     duplicateFrom: {
       type: Number,
@@ -257,7 +259,7 @@ export default {
       return this.group ? this.group.auto_approve : false
     },
     creationMessage() {
-      return this.$lang.get(this.autoApprove ? 'events.created_success_message_autoapproved' : 'events.created_success_message')
+      return this.__(this.autoApprove ? 'events.created_success_message_autoapproved' : 'events.created_success_message')
     },
     // The server expects the UTC versions of the data, but without milliseconds.
     eventStartUtc() {
@@ -343,7 +345,6 @@ export default {
 
       if (this.$v.$invalid) {
         // It's not - prevent the submit.
-        console.log("Not valid event", this.$v)
         this.validationFocusFirstError()
       } else {
         if (this.creating) {
@@ -415,9 +416,9 @@ export default {
 </script>
 <style scoped lang="scss">
 @import 'resources/global/css/_variables';
-@import '~bootstrap/scss/functions';
-@import '~bootstrap/scss/variables';
-@import '~bootstrap/scss/mixins/_breakpoints';
+@import 'bootstrap/scss/functions';
+@import 'bootstrap/scss/variables';
+@import 'bootstrap/scss/mixins/_breakpoints';
 
 .box {
   background-color: $white;
@@ -531,7 +532,7 @@ export default {
 
   .creation-message {
     grid-row: 10 / 11;
-    grid-colum: 1 / 2;
+    grid-column: 1 / 2;
 
     @include media-breakpoint-up(lg) {
       grid-row: 8 / 9;
@@ -541,7 +542,7 @@ export default {
 
   .event-buttons {
     grid-row: 11 / 12;
-    grid-colum: 1 / 2;
+    grid-column: 1 / 2;
 
     ::v-deep .btn {
       font-size: 16px;

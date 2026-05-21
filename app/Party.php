@@ -2,6 +2,9 @@
 
 namespace App;
 
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Events\ApproveEvent;
 use Auth;
@@ -47,7 +50,7 @@ class Party extends Model implements Auditable
         'user_id',
         'network_data',
     ];
-    protected $hidden = ['created_at', 'deleted_at', 'frequency', 'group', 'group', 'user_id', 'wordpress_post_id', 'cancelled', 'devices_updated_at'];
+    protected $hidden = ['created_at', 'deleted_at', 'frequency', 'group', 'user_id', 'wordpress_post_id', 'cancelled', 'devices_updated_at'];
 
     // Eager-loading the group reduces N+1 queries.
     protected $with = 'theGroup';
@@ -64,7 +67,7 @@ class Party extends Model implements Auditable
     public function findAllSearchable()
     {
         // TODO Can this be replaced by Party::past?
-        return DB::select(DB::raw('SELECT
+        return DB::select('SELECT
                     `e`.`idevents` AS `id`,
                     UNIX_TIMESTAMP(`event_start_utc`) AS `event_timestamp`,
                     TIME(CONVERT_TZ(`event_start_utc`, \'GMT\', `e`.`timezone`)) AS `start`,
@@ -84,7 +87,7 @@ class Party extends Model implements Auditable
                 INNER JOIN `groups` AS `g`
                     ON `g`.`idgroups` = `e`.`group`
                 WHERE `event_end_utc` < NOW()
-                ORDER BY `e`.`event_start_utc` DESC'));
+                ORDER BY `e`.`event_start_utc` DESC');
     }
 
     public function findThis($id, $devices = false)
@@ -119,7 +122,7 @@ class Party extends Model implements Auditable
                 WHERE `e`.`idevents` = :id
                 ORDER BY `e`.`event_start_utc` DESC';
 
-        $party = DB::select(DB::raw($sql), ['id' => $id]);
+        $party = DB::select($sql, ['id' => $id]);
 
         if ($devices) {
             $devices = new Device;
@@ -131,7 +134,7 @@ class Party extends Model implements Auditable
 
     public function deleteUserList($party)
     {
-        return DB::delete(DB::raw('DELETE FROM `events_users` WHERE `event` = :party'), ['party' => $party]);
+        return DB::delete('DELETE FROM `events_users` WHERE `event` = :party', ['party' => $party]);
     }
 
     public function ofThisGroup($group = 'admin', $only_past = false, $devices = false)
@@ -172,13 +175,13 @@ class Party extends Model implements Auditable
 
         if (! is_null($group)) {
             try {
-                return DB::select(DB::raw($sql), ['group' => $group]);
+                return DB::select($sql, ['group' => $group]);
             } catch (\Illuminate\Database\QueryException $e) {
                 dd($e);
             }
         } else {
             try {
-                return DB::select(DB::raw($sql));
+                return DB::select($sql);
             } catch (\Illuminate\Database\QueryException $e) {
                 dd($e);
             }
@@ -264,7 +267,7 @@ class Party extends Model implements Auditable
         $this->defaultUserIds($userids);
         $query = $query->approved();
         $query = $query->join('users_groups AS hfgug', 'hfgug.group', '=', 'events.group')
-            ->where('hfgug.status', 1)
+            ->where('hfgug.status', '1')
             ->whereNull('hfgug.deleted_at')
             ->whereIn('hfgug.user', $userids)
             ->select('events.*');
@@ -334,7 +337,7 @@ class Party extends Model implements Auditable
         $exclude_group_ids = array_merge($exclude_group_ids, Group::where('approved', false)->pluck('idgroups')->toArray());
 
         return $this
-      ->select(DB::raw('`events`.*, ( 6371 * acos( cos( radians('.$user->latitude.') ) * cos( radians( events.latitude ) ) * cos( radians( events.longitude ) - radians('.$user->longitude.') ) + sin( radians('.$user->latitude.') ) * sin( radians( events.latitude ) ) ) ) AS distance'))
+      ->selectRaw('`events`.*, ( 6371 * acos( cos( radians(?) ) * cos( radians( events.latitude ) ) * cos( radians( events.longitude ) - radians(?) ) + sin( radians(?) ) * sin( radians( events.latitude ) ) ) ) AS distance', [$user->latitude, $user->longitude, $user->latitude])
       ->join('groups', 'groups.idgroups', '=', 'events.group')
       ->join('group_network', 'groups.idgroups', '=', 'group_network.group_id')
       ->join('networks', 'networks.id', '=', 'group_network.network_id')
@@ -349,17 +352,17 @@ class Party extends Model implements Auditable
       ->orderBy('distance', 'ASC');
     }
 
-    public function allDevices()
+    public function allDevices(): HasMany
     {
         return $this->hasMany(\App\Device::class, 'event', 'idevents')->join('categories', 'categories.idcategories', '=', 'devices.category');
     }
 
-    public function allInvited()
+    public function allInvited(): HasMany
     {
-        return $this->hasMany(\App\EventsUsers::class, 'event', 'idevents')->where('status', '!=', 1);
+        return $this->hasMany(\App\EventsUsers::class, 'event', 'idevents')->where('status', '<>', '1');
     }
 
-    public function allConfirmedVolunteers()
+    public function allConfirmedVolunteers(): HasMany
     {
         return $this->hasMany(EventsUsers::class, 'event', 'idevents')
             ->where(function ($query) {
@@ -369,7 +372,7 @@ class Party extends Model implements Auditable
     }
 
     // Doesn't work if called 'group' - I guess because a reserved SQL keyword.
-    public function theGroup()
+    public function theGroup(): HasOne
     {
         return $this->hasOne(\App\Group::class, 'idgroups', 'group');
     }
@@ -377,10 +380,9 @@ class Party extends Model implements Auditable
     /**
      * Return formatted date, in timezone of event.
      *
-     * @param string $format
      * @return false|string
      */
-    public function getFormattedLocalStart($format = 'd/m/Y')
+    public function getFormattedLocalStart(string $format = 'd/m/Y')
     {
         $dt = new Carbon($this->event_start_utc);
         $dt->setTimezone($this->timezone);
@@ -390,10 +392,9 @@ class Party extends Model implements Auditable
     /**
      * Return formatted date, in timezone of event.
      *
-     * @param string $format
      * @return false|string
      */
-    public function getFormattedLocalEnd($format = 'd/m/Y')
+    public function getFormattedLocalEnd(string $format = 'd/m/Y')
     {
         $dt = new Carbon($this->event_end_utc);
         $dt->setTimezone($this->timezone);
@@ -441,9 +442,8 @@ class Party extends Model implements Auditable
      * If the event is of today, is not in progress and has not finished = true.
      * @author Christopher Kelker
      * @date   2019-06-13T15:48:05+010
-     * @return bool
      */
-    public function isStartingSoon()
+    public function isStartingSoon(): bool
     {
         $start = new Carbon($this->event_start_utc);
 
@@ -509,56 +509,67 @@ class Party extends Model implements Auditable
 
         // Normally we only count stats for devices for events that have started or finished.
         if (($includeFuture || $this->hasFinished() || $this->isInProgress()) && !empty($this->allDevices)) {
+            // Hoist env lookups out of the loop — each env() call is cheap but compounds over thousands of devices.
+            $miscPoweredId   = (int) env('MISC_CATEGORY_ID_POWERED');
+            $miscUnpoweredId = (int) env('MISC_CATEGORY_ID_UNPOWERED');
+
             foreach ($this->allDevices as $device) {
-                // We cache the powered flag for a category to avoid many DB queries.
-                $powered = \Cache::remember('category-powered-' . $device->category, 15, function() use ($device) {
-                    return $device->deviceCategory->powered;
-                });
+                // allDevices JOINs with categories, so powered/weight/footprint are already on the device
+                // object as direct attributes — no Redis round-trips needed.
+                $powered = (bool) $device->powered;
+                $isFixed = $device->repair_status === Device::REPAIR_STATUS_FIXED;
 
                 if ($powered) {
                     $result['devices_powered']++;
 
-                    if ($device->isFixed()) {
-                        $result['co2_powered'] += $device->eCo2Diverted($eEmissionRatio, $displacementFactor);
-                        $result['waste_powered'] += $device->eWasteDiverted();
+                    if ($isFixed) {
+                        $result['fixed_devices']++;
                         $result['fixed_powered']++;
+
+                        if ($device->category == $miscPoweredId && $device->estimate > 0) {
+                            $result['co2_powered']   += $device->estimate * $eEmissionRatio * $displacementFactor;
+                            $result['waste_powered'] += $device->estimate;
+                        } else {
+                            $result['co2_powered']   += $device->footprint * $displacementFactor;
+                            $result['waste_powered'] += $device->weight;
+                        }
+
+                        if ($device->weight == 0 && $device->estimate == 0 && $device->category == $miscPoweredId) {
+                            $result['no_weight_powered']++;
+                        }
                     }
                 } else {
                     $result['devices_unpowered']++;
 
-                    if ($device->isFixed()) {
-                        $result['co2_unpowered'] += $device->uCo2Diverted($uEmissionratio, $displacementFactor);
-                        $result['waste_unpowered'] += $device->uWasteDiverted();
+                    if ($isFixed) {
+                        $result['fixed_devices']++;
                         $result['fixed_unpowered']++;
+
+                        if ($device->estimate > 0) {
+                            $result['co2_unpowered']   += $device->estimate * $uEmissionratio * $displacementFactor;
+                            $result['waste_unpowered'] += $device->estimate;
+                        } else {
+                            $result['co2_unpowered']   += $device->footprint * $displacementFactor;
+                            $result['waste_unpowered'] += $device->weight;
+                        }
+
+                        if ($device->weight == 0 && $device->estimate == 0 && $device->category == $miscUnpoweredId) {
+                            $result['no_weight_unpowered']++;
+                        }
                     }
                 }
 
-                switch ($device->repair_status) {
-                    case Device::REPAIR_STATUS_FIXED:
-                        $result['fixed_devices']++;
-                        break;
-                    case Device::REPAIR_STATUS_REPAIRABLE:
-                        $result['repairable_devices']++;
-                        break;
-                    case Device::REPAIR_STATUS_ENDOFLIFE:
-                        $result['dead_devices']++;
-                        break;
-                    default:
-                        $result['unknown_repair_status']++;
-                        break;
-                }
-
-                if ($device->isFixed()) {
-                    $category = \Cache::remember('category-' . $device->category, 15, function() use ($device) {
-                        return $device->deviceCategory;
-                    });
-
-                    if ($category->weight == 0 && $device->estimate == 0) {
-                        if ($category->isMiscPowered()) {
-                            $result['no_weight_powered']++;
-                        } elseif ($category->isMiscUnpowered()) {
-                            $result['no_weight_unpowered']++;
-                        }
+                if (! $isFixed) {
+                    switch ($device->repair_status) {
+                        case Device::REPAIR_STATUS_REPAIRABLE:
+                            $result['repairable_devices']++;
+                            break;
+                        case Device::REPAIR_STATUS_ENDOFLIFE:
+                            $result['dead_devices']++;
+                            break;
+                        default:
+                            $result['unknown_repair_status']++;
+                            break;
                     }
                 }
             }
@@ -574,7 +585,7 @@ class Party extends Model implements Auditable
         return $result;
     }
 
-    public function devices()
+    public function devices(): HasMany
     {
         return $this->hasMany(\App\Device::class, 'event', 'idevents');
     }
@@ -622,11 +633,7 @@ class Party extends Model implements Auditable
         return '';
     }
 
-    /**
-     * @param int|null $user_id
-     * @return bool
-     */
-    public function isVolunteer($user_id = null)
+    public function isVolunteer(?int $user_id = null): bool
     {
         return $this->allConfirmedVolunteers
             ->contains('user', $user_id ?: auth()->id());
@@ -650,7 +657,7 @@ class Party extends Model implements Auditable
      * @version 1.0.0
      * @return  [type]
      */
-    public function owner()
+    public function owner(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
@@ -748,6 +755,20 @@ class Party extends Model implements Auditable
 
     public function getEventEndUtcAttribute() {
         return array_key_exists('event_end_utc', $this->attributes) ? Carbon::parse($this->attributes['event_end_utc'], 'UTC')->toIso8601String() : null;
+    }
+
+    // MySQL doesn't handle ISO 8601 strings well, so we convert them to the UTC timezone before
+    // storing them in the database.  This is a mutator, so it will be called when the model is saved.
+    public function setEventStartUtcAttribute($val) {
+        $dt = Carbon::parse($val);
+        $dt->setTimezone('UTC');
+        $this->attributes['event_start_utc'] = $dt->toDateTimeString();
+    }
+
+    public function setEventEndUtcAttribute($val) {
+        $dt = Carbon::parse($val);
+        $dt->setTimezone('UTC');
+        $this->attributes['event_end_utc'] = $dt->toDateTimeString();
     }
 
     // Mutators for previous event_date/start/end fields.  These are now superceded by the UTC fields and therefore

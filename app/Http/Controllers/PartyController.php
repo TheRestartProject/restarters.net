@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\View\View;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use App\Audits;
 use App\Brands;
 use App\Cluster;
@@ -82,7 +85,7 @@ class PartyController extends Controller
             } else {
                 $is_attending = EventsUsers::where('event', $event->idevents)->where('user', Auth::user()->id)->first();
 
-                if ($is_attending && $is_attending->status !== 1) {
+                if ($is_attending && (string) $is_attending->status !== '1') {
                     $thisone['invitation'] = "/party/accept-invite/{$event->idevents}/{$is_attending->status}";
                 }
             }
@@ -103,6 +106,7 @@ class PartyController extends Controller
         $thisone['event_date_local'] = $event->eventDateLocal;
         $thisone['start_local'] = $event->startLocal;
         $thisone['end_local'] = $event->endLocal;
+        $thisone['timezone'] = $event->timezone;
 
         $thisone['upcoming'] = $event->isUpcoming();
         $thisone['finished'] = $event->hasFinished();
@@ -117,7 +121,7 @@ class PartyController extends Controller
         return $thisone;
     }
 
-    public function index($group_id = null)
+    public function index($group_id = null): View
     {
         $events = [];
 
@@ -135,11 +139,17 @@ class PartyController extends Controller
             // This is a logged-in user's events page.  We want all relevant events.
             //
             // Get the list of events we are attending and invited to- speeds up expansion.
-            $attending = EventsUsers::where('user', Auth::user()->id)->where('status', 1)->pluck('event')->toArray();
-            $invited = EventsUsers::where('user', Auth::user()->id)->where('status', '!=', 1)->pluck('event')->toArray();
-            $volunteering = EventsUsers::where('user', Auth::user()->id)->where('status', 1)->orWhereNull('status')->pluck('event')->toArray();
+            $attending = EventsUsers::where('user', Auth::user()->id)->where('status', '1')->pluck('event')->toArray();
+            $invited = EventsUsers::where('user', Auth::user()->id)->where('status', '<>', '1')->pluck('event')->toArray();
+            $volunteering = EventsUsers::where('user', Auth::user()->id)->where(function($query) {
+                $query->where('status', '1')->orWhereNull('status');
+            })->pluck('event')->toArray();
 
-            foreach (Party::forUser(null)->reorder()->orderBy('event_start_utc', 'DESC')->get() as $event) {
+            $expandWith = ['allInvited', 'allDevices.deviceCategory', 'theGroup.groupImage.image'];
+            // Future events have no devices yet, so skip allDevices to avoid loading thousands of empty rows.
+            $futureExpandWith = ['allInvited', 'theGroup.groupImage.image'];
+
+            foreach (Party::forUser(null)->with($expandWith)->reorder()->orderBy('event_start_utc', 'DESC')->get() as $event) {
                 $e = \App\Http\Controllers\PartyController::expandEvent($event, NULL, $countries, $attending, $invited, $volunteering);
                 $events[] = $e;
             }
@@ -147,6 +157,7 @@ class PartyController extends Controller
             if (! is_null(Auth::user()->latitude) && ! is_null(Auth::user()->longitude)) {
                 // We know the location of this user, so we can also get nearby upcoming events.
                 $upcoming_events_in_area = Party::upcomingEventsInUserArea(Auth::user())
+                    ->with($futureExpandWith)
                     ->whereNotIn('idevents', \Illuminate\Support\Arr::pluck($events, 'idevents'))
                     ->get();
 
@@ -161,7 +172,7 @@ class PartyController extends Controller
             }
 
             // ...and any other upcoming approved events
-            $other_upcoming_events = Party::with('theGroup.networks')->future()->
+            $other_upcoming_events = Party::with(array_merge(['theGroup.networks'], $futureExpandWith))->future()->
                 whereNotIn('idevents', \Illuminate\Support\Arr::pluck($events, 'idevents'))->
                 get();
 
@@ -187,7 +198,7 @@ class PartyController extends Controller
         ]);
     }
 
-    public function create(Request $request, $group_id = null)
+    public function create(Request $request, $group_id = null): View
     {
         $user = Auth::user();
         $autoapprove = $group_id ? Group::where('idgroups', $group_id)->first()->auto_approve : false;
@@ -308,7 +319,7 @@ class PartyController extends Controller
         ]);
     }
 
-    public function view($id)
+    public function view($id): View
     {
         $File = new FixometerFile;
         $Party = new Party;
@@ -345,7 +356,7 @@ class PartyController extends Controller
             $attended_summary = clone $attendees->take(6)->get();
         }
 
-        $invites = EventsUsers::where('event', $id)->where('status', '!=', 1);
+        $invites = EventsUsers::where('event', $id)->where('status', '<>', '1');
         $invited = clone $invites->get();
 
         if (count($invited) > 5 && ! $event->hasFinished() && ! Auth::guest() && ! Fixometer::hasRole(Auth::user(), 'Restarter')) {
@@ -358,12 +369,8 @@ class PartyController extends Controller
         $brands = Brands::all();
         $clusters = Cluster::all();
 
-        $device_images = [];
-
-        //Get Device Images
-        foreach ($event->devices as $device) {
-            $device_images[$device->iddevices] = $File->findImages(env('TBL_DEVICES'), $device->iddevices);
-        }
+        $device_ids = $event->devices->pluck('iddevices')->toArray();
+        $device_images = $File->findImagesForMany(env('TBL_DEVICES'), $device_ids);
 
         // Items can be logged at any time.
         $stats = $event->getEventStats(null, null, true);
@@ -412,12 +419,12 @@ class PartyController extends Controller
         }
     }
 
-    public function getJoinEvent($event_id)
+    public function getJoinEvent($event_id): RedirectResponse
     {
         $user_id = Auth::id();
         $not_in_event = EventsUsers::where('event', $event_id)
         ->where('user', $user_id)
-        ->where('status', '!=', 1)
+        ->where('status', '<>', '1')
         ->first();
 
         if (empty($not_in_event)) {
@@ -433,7 +440,7 @@ class PartyController extends Controller
                                                                   'user' => $user_id,
                                                                   'event' => $event_id,
                                                               ], [
-                                                                  'status' => 1,
+                                                                  'status' => '1',
                                                                   'role' => 4,
                                                               ]);
 
@@ -490,7 +497,7 @@ class PartyController extends Controller
         }
     }
 
-    public static function stats($id)
+    public static function stats($id): View
     {
         $event = Party::where('idevents', $id)->first();
 
@@ -509,13 +516,13 @@ class PartyController extends Controller
      *
      * @param int $event_id The event for which to find associated users.
      *
-     * @return Response json formatted array of relevant info on users in the group.
+     * @return JsonResponse json formatted array of relevant info on users in the group.
      */
-    public function getGroupEmailsWithNames($event_id)
+    public function getGroupEmailsWithNames(int $event_id): JsonResponse
     {
         $group_user_ids = UserGroups::where('group', Party::find($event_id)->group)
         ->where('user', '!=', Auth::user()->id)
-        ->where('status', '=', 1)
+        ->where('status', '1')
         ->pluck('user')
         ->toArray();
 
@@ -534,7 +541,7 @@ class PartyController extends Controller
         return response()->json($group_users);
     }
 
-    public function updateQuantity(Request $request)
+    public function updateQuantity(Request $request): JsonResponse
     {
         $event_id = $request->input('event_id');
         $quantity = $request->input('quantity');
@@ -556,7 +563,7 @@ class PartyController extends Controller
         return response()->json($return);
     }
 
-    public function updateVolunteerQuantity(Request $request)
+    public function updateVolunteerQuantity(Request $request): JsonResponse
     {
         $event_id = $request->input('event_id');
         $quantity = $request->input('quantity');
@@ -578,7 +585,7 @@ class PartyController extends Controller
         return response()->json($return);
     }
 
-    public function removeVolunteer(Request $request)
+    public function removeVolunteer(Request $request): JsonResponse
     {
         // The id that's passed in is that of the events_users table, because the entry may refer to a user without
         // an id.
@@ -609,7 +616,7 @@ class PartyController extends Controller
         }
     }
 
-    public function postSendInvite(Request $request)
+    public function postSendInvite(Request $request): RedirectResponse
     {
         $from_id = Auth::id();
         $request->validate([
@@ -623,106 +630,84 @@ class PartyController extends Controller
         $message = $request->input('message_to_restarters');
 
         if (! empty($emails)) {
-            $invalid = [];
+            $users = User::whereIn('email', $emails)->get();
 
-            foreach ($emails as $email) {
-                if (! filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                    $invalid[] = $email;
-                }
-            }
+            $non_users = array_diff($emails, User::whereIn('email', $emails)->pluck('email')->toArray());
+            $from = User::find($from_id);
 
-            if (count($invalid)) {
-                return redirect()->back()->with('warning', __('events.invite_invalid_emails', [
-                    'emails' => implode(', ', $invalid)
-                ]));
-            } else {
-                $users = User::whereIn('email', $emails)->get();
+            foreach ($users as $user) {
+                $user_event = EventsUsers::where('user', $user->id)->where('event', $event_id)->first();
 
-                $non_users = array_diff($emails, User::whereIn('email', $emails)->pluck('email')->toArray());
-                $from = User::find($from_id);
+                if (is_null($user_event) || $user_event->status != '1') {
+                    $hash = substr(bin2hex(openssl_random_pseudo_bytes(32)), 0, 24);
+                    $url = url('/party/accept-invite/'.$event_id.'/'.$hash);
 
-                foreach ($users as $user) {
-                    $user_event = EventsUsers::where('user', $user->id)->where('event', $event_id)->first();
-
-                    if (is_null($user_event) || $user_event->status != '1') {
-                        $hash = substr(bin2hex(openssl_random_pseudo_bytes(32)), 0, 24);
-                        $url = url('/party/accept-invite/'.$event_id.'/'.$hash);
-
-                        if (! is_null($user_event)) {
-                            $user_event->update([
-                                                    'status' => $hash,
-                                                ]);
-                        } else {
-                            EventsUsers::create([
-                                                    'user' => $user->id,
-                                                    'event' => $event_id,
-                                                    'status' => $hash,
-                                                    'role' => 4,
-                                                ]);
-                        }
-
-                        $event = Party::find($event_id);
-
-                        $arr = [
-                            'name' => $from->name,
-                            'group' => $group_name,
-                            'url' => $url,
-                            'view_url' => url('/party/view/'.$event->idevents),
-                            'message' => $message,
-                            'event' => $event,
-                        ];
-
-                        // Get Creator of Event
-                        if (! empty($userCreator = User::find($event->user_id))) {
-                            $event_details = [
-                                'event_venue' => $event->venue,
-                                'event_url' => url('/party/edit/'.$event->idevents),
-                            ];
-                        }
-
-                        // Send Invites
-                        Notification::send($user, new JoinEvent($arr, $user));
+                    if (! is_null($user_event)) {
+                        $user_event->update([
+                                                'status' => $hash,
+                                            ]);
                     } else {
-                        $not_sent[] = $user->email;
+                        EventsUsers::create([
+                                                'user' => $user->id,
+                                                'event' => $event_id,
+                                                'status' => $hash,
+                                                'role' => 4,
+                                            ]);
                     }
+
+                    $event = Party::find($event_id);
+
+                    $arr = [
+                        'name' => $from->name,
+                        'group' => $group_name,
+                        'url' => $url,
+                        'view_url' => url('/party/view/'.$event->idevents),
+                        'message' => $message,
+                        'event' => $event,
+                    ];
+
+                    // Send Invites
+                    Notification::send($user, new JoinEvent($arr, $user));
+                } else {
+                    $not_sent[] = $user->email;
                 }
-
-                if (! empty($non_users)) {
-                    foreach ($non_users as $non_user) {
-                        $hash = substr(bin2hex(openssl_random_pseudo_bytes(32)), 0, 24);
-                        $url = url('/user/register/'.$hash);
-
-                        $invite = Invite::create([
-                                                     'record_id' => $event_id,
-                                                     'email' => $non_user,
-                                                     'hash' => $hash,
-                                                     'type' => 'event',
-                                                 ]);
-
-                        $event = Party::find($event_id);
-
-                        $arr = [
-                            'name' => $from->name,
-                            'group' => $group_name,
-                            'url' => $url,
-                            'view_url' => url('/party/view/'.$event->idevents),
-                            'message' => $message,
-                            'event' => $event,
-                        ];
-
-                        Notification::send($invite, new JoinEvent($arr));
-                    }
-                }
-
-                if (! isset($not_sent)) {
-                    return redirect()->back()->with('success', __('events.invite_success'));
-                }
-
-                // Don't log to Sentry - legitimate user error.
-                return redirect()->back()->with('warning', __('events.invite_invalid_emails', [
-                    'emails' => implode(', ', $not_sent)
-                ]));
             }
+
+            if (! empty($non_users)) {
+                foreach ($non_users as $non_user) {
+                    $hash = substr(bin2hex(openssl_random_pseudo_bytes(32)), 0, 24);
+                    $url = url('/user/register/'.$hash);
+
+                    $invite = Invite::create([
+                                                 'record_id' => $event_id,
+                                                 'email' => $non_user,
+                                                 'hash' => $hash,
+                                                 'type' => 'event',
+                                             ]);
+
+                    $event = Party::find($event_id);
+
+                    $arr = [
+                        'name' => $from->name,
+                        'group' => $group_name,
+                        'url' => $url,
+                        'view_url' => url('/party/view/'.$event->idevents),
+                        'message' => $message,
+                        'event' => $event,
+                    ];
+
+                    Notification::send($invite, new JoinEvent($arr));
+                }
+            }
+
+            if (! isset($not_sent)) {
+                return redirect()->back()->with('success', __('events.invite_success'));
+            }
+
+            // Don't log to Sentry - legitimate user error.
+            return redirect()->back()->with('warning', __('events.invite_invalid_emails', [
+                'emails' => implode(', ', $not_sent)
+            ]));
         }
 
         \Sentry\CaptureMessage(__('events.invite_noemails'));
@@ -730,14 +715,14 @@ class PartyController extends Controller
         return redirect()->back()->with('warning', __('events.invite_noemails'));
     }
 
-    public function confirmInvite($event_id, $hash)
+    public function confirmInvite($event_id, $hash): RedirectResponse
     {
         $user_event = EventsUsers::where('status', $hash)->where('event', $event_id)->first();
 
         if (! empty($user_event)) {
             // Update event invite
             EventsUsers::where('status', $hash)->where('event', $event_id)->first()->update([
-                'status' => 1,
+                'status' => '1',
             ]);
 
             $this->notifyHostsOfRsvp($user_event, $event_id);
@@ -749,7 +734,7 @@ class PartyController extends Controller
         return redirect('/party/view/'.intval($event_id))->with('warning', __('events.invite_invalid'));
     }
 
-    public function cancelInvite($event_id)
+    public function cancelInvite($event_id): RedirectResponse
     {
         // We have to do a loop to avoid the gotcha where bulk delete operations don't invoke observers.
         foreach (EventsUsers::where('user', Auth::user()->id)->where('event', $event_id)->get() as $delete) {
@@ -789,7 +774,7 @@ class PartyController extends Controller
         }
     }
 
-    public function deleteImage($event_id, $id, $path)
+    public function deleteImage($event_id, $id, $path): RedirectResponse
     {
         $user = Auth::user();
 
@@ -810,7 +795,7 @@ class PartyController extends Controller
     * This sends an email to all user except the host logged in an email to ask for contributions
     *
     */
-    public function getContributions($event_id)
+    public function getContributions($event_id): RedirectResponse
     {
         $event = Party::find($event_id);
 
@@ -838,7 +823,7 @@ class PartyController extends Controller
      * Called via AJAX.
      * @param id The event id.
      */
-    public function deleteEvent($id)
+    public function deleteEvent($id): RedirectResponse
     {
         $event = Party::findOrFail($id);
         $user = Auth::user();
@@ -876,11 +861,10 @@ class PartyController extends Controller
      * @author Christopher Kelker - @date 2019-03-25
      * @editor  Christopher Kelker
      * @version 1.0.0
-     * @param   Request     $request
      * @param   [type]      $code
      * @return  [type]
      */
-    public function confirmCodeInvite(Request $request, $code)
+    public function confirmCodeInvite(Request $request, $code): RedirectResponse
     {
         // Variables
         $party = Party::where('shareable_code', $code)->first();

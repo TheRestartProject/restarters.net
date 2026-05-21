@@ -11,9 +11,9 @@ class RepairNetworkService
 {
     public function addGroupToNetwork($user, $group, $network)
     {
-        // TODO: Network leads will have permissions once this role is added.
-        if (! $user->hasRole('Administrator')) {
-            throw new \Exception('Only Adminstrators can add groups to networks');
+        if (! $user->hasRole('Administrator') &&
+            ! ($user->hasRole('NetworkCoordinator') && $user->networks->contains($network))) {
+            throw new \Exception('Only Administrators and Network Coordinators can add groups to networks');
         }
 
         $network->addGroup($group);

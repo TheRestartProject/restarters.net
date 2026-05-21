@@ -21,24 +21,22 @@ class AddUserToDiscourseGroup extends BaseEvent
 
     /**
      * Handle the event.
-     *
-     * @param  UserFollowedGroup  $event
-     * @return void
      */
-    public function handle(UserFollowedGroup $event)
+    public function handle(UserFollowedGroup $event): void
     {
         if (! config('restarters.features.discourse_integration')) {
             return;
         }
 
-        if ($event->theGroup->archived_at) {
+        $repairGroup = $event->group;
+        $user = $event->user;
+	
+        if ($repairGroup->archived_at) {
             // Suppress notifications for archived groups.
             return;
         }
 
         // add user to the network groups for the group the user followed.
-        $repairGroup = $event->group;
-        $user = $event->user;
 
         if (!$user->username) {
             $user->generateAndSetUsername();

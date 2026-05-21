@@ -2,6 +2,8 @@
 
 namespace App\Http\Middleware;
 
+use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Http\Request;
 use App\EventsUsers;
 use App\Invite;
 use App\UserGroups;
@@ -12,12 +14,8 @@ class AcceptUserInvites
 {
     /**
      * Handle an incoming request.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
-     * @return mixed
      */
-    public function handle($request, Closure $next)
+    public function handle(Request $request, Closure $next): Response
     {
         // Check if there are existing Groups/Events Shareable Invites for the
         // Current User
@@ -41,7 +39,7 @@ class AcceptUserInvites
                         UserGroups::updateOrCreate([
                             'user' => auth()->id(),
                             'group' => $acceptance->record_id,
-                            'status' => 1,
+                            'status' => '1',
                             'role' => 4,
                         ]);
                         $acceptance->delete();
@@ -74,7 +72,7 @@ class AcceptUserInvites
                         EventsUsers::updateOrCreate([
                             'user' => auth()->id(),
                             'event' => $acceptance->record_id,
-                            'status' => 1,
+                            'status' => '1',
                             'role' => 4,
                         ]);
                         $acceptance->delete();

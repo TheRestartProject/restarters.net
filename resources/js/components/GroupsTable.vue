@@ -1,6 +1,41 @@
 <template>
   <div>
     <p v-if="count" v-html="translatedGroupCount" />
+    <div class="pl-4 pr-4 pt-2 pb-2 d-none d-md-block">
+      <GroupsTableFilters
+          v-if="search"
+          :name.sync="searchName"
+          :location.sync="searchLocation"
+          :network.sync="searchNetwork"
+          :country.sync="searchCountry"
+          :tags.sync="searchTags"
+          :networks="networks"
+          :groups="groups"
+          :all-group-tags="allGroupTags"
+          :show-tags="showTags"
+      />
+    </div>
+    <div class="d-block d-md-none" v-if="search">
+      <div class="clickme d-flex justify-content-end pr-3 text-uppercase" v-if="!searchShow" @click="toggleFilters">
+        <a href="#">{{ __('groups.show_filters') }}</a>&nbsp;<b-img class="plusminusicon" :src="imageUrl('/images/add-icon.svg')" />
+      </div>
+      <div class="clickme d-flex justify-content-end pr-3 text-uppercase" v-if="searchShow" @click="toggleFilters">
+        <b-img class="plusminusicon" :src="imageUrl('/images/minus-icon.svg')" /><a href="#">&nbsp;{{ __('groups.hide_filters') }}</a>
+      </div>
+      <GroupsTableFilters
+          v-if="searchShow"
+          class="pl-1 pr-1 pt-2 pb-2"
+          :name.sync="searchName"
+          :location.sync="searchLocation"
+          :network.sync="searchNetwork"
+          :country.sync="searchCountry"
+          :networks="networks"
+          :groups="groups"
+          :all-group-tags="allGroupTags"
+          :show-tags="showTags"
+      />
+    </div>
+    <hr class="d-block d-md-none" />
     <b-table :fields="fields" :items="itemsToShow" sort-null-last thead-tr-class="d-none d-md-table-row" :sort-compare="sortCompare"
              @row-hovered="rowHovered" @row-unhovered="rowUnhovered"
     >
@@ -12,14 +47,22 @@
         <b-img-lazy :src="defaultProfile" class="profile" v-else />
       </template>
       <template slot="head(group_name)">
-        <b-img src="/icons/group_name_ico.svg" class="mt-3 icon" />
+        <b-img :src="imageUrl('/icons/group_name_ico.svg')" class="mt-3 icon" />
       </template>
       <template slot="cell(group_name)" slot-scope="data">
-        <a :href="'/group/view/' + data.item.id">{{ data.item.name }}</a>
-        <GroupArchivedBadge :idgroups="data.item.id" />
+        <a :href="'/group/view/' + data.item.group_name.idgroups">{{ data.item.group_name.name }}</a>
+        <GroupArchivedBadge :idgroups="data.item.group_name.idgroups" />
+        <div v-if="showTags && data.item.group_name.group_tags_full && data.item.group_name.group_tags_full.length" class="mt-1">
+          <b-badge
+              v-for="tag in visibleTags(data.item.group_name.group_tags_full)"
+              :key="tag.id"
+              variant="secondary"
+              class="mr-1 tag-badge"
+          >{{ tag.name }}</b-badge>
+        </div>
       </template>
       <template slot="head(location)">
-        <b-img src="/icons/map_marker_ico.svg" class="mt-3 icon " />
+        <b-img :src="imageUrl('/icons/map_marker_ico.svg')" class="mt-3 icon " />
       </template>
       <template slot="cell(location)" slot-scope="data">
         <div class="d-none d-md-block" v-if="data.item.location && data.item.location.location">
@@ -28,14 +71,14 @@
           <span class="small text-muted">{{ data.item.location.country }}</span>
         </div>
       </template>
-      <template slot="head(hosts)">
-        <b-img src="/icons/user_ico.svg" class="mt-3 iconsmall" />
+      <template slot="head(all_confirmed_hosts_count)">
+        <b-img :src="imageUrl('/icons/user_ico.svg')" class="mt-3 iconsmall" />
       </template>
-      <template slot="head(restarters)">
-        <b-img src="/icons/volunteer_ico-thick.svg" class="mt-3 icon" />
+      <template slot="head(all_confirmed_restarters_count)">
+        <b-img :src="imageUrl('/icons/volunteer_ico-thick.svg')" class="mt-3 icon" />
       </template>
       <template slot="head(next_event)">
-        <b-img src="/icons/events_ico.svg" class="mt-3 icon" />
+        <b-img :src="imageUrl('/icons/events_ico.svg')" class="mt-3 icon" />
       </template>
       <template slot="cell(next_event)" slot-scope="data">
         <div>
@@ -81,14 +124,17 @@
 </template>
 <script>
 import { DATE_FORMAT, DEFAULT_PROFILE } from '../constants'
+import images from '../mixins/images'
 import moment from 'moment'
-import ConfirmModal from './ConfirmModal'
+import GroupsTableFilters from './GroupsTableFilters.vue'
+import ConfirmModal from './ConfirmModal.vue'
 import GroupArchivedBadge from "./GroupArchivedBadge.vue";
 import InfiniteLoading from 'vue-infinite-loading'
 
 
 export default {
-  components: {GroupArchivedBadge, ConfirmModal, InfiniteLoading},
+  components: {GroupArchivedBadge, ConfirmModal, GroupsTableFilters, InfiniteLoading},
+  mixins: [images],
   props: {
     groupids: {
       type: Array,
@@ -155,7 +201,7 @@ export default {
       return items
     },
     translatedGroupCount() {
-      return this.$lang.choice('groups.group_count', this.items.length, {
+      return this.__('groups.group_count', {
         count: this.items.length
       })
     },
@@ -248,15 +294,24 @@ export default {
     },
     rowUnhovered(item, index, event) {
       this.$emit('update:hover', null)
+    },
+    visibleTags(tags) {
+      // Filter tags to only show those the user has access to view
+      // allGroupTags contains the tags the user can see (admin sees all, NC sees their networks)
+      if (!this.allGroupTags || !tags) {
+        return []
+      }
+      const visibleTagIds = this.allGroupTags.map(t => t.id)
+      return tags.filter(t => visibleTagIds.includes(t.id))
     }
   },
 }
 </script>
 <style scoped lang="scss">
 @import 'resources/global/css/_variables';
-@import '~bootstrap/scss/functions';
-@import '~bootstrap/scss/variables';
-@import '~bootstrap/scss/mixins/_breakpoints';
+@import 'bootstrap/scss/functions';
+@import 'bootstrap/scss/variables';
+@import 'bootstrap/scss/mixins/_breakpoints';
 
 .profile {
   border: 1px solid black;
@@ -313,5 +368,11 @@ export default {
   @include media-breakpoint-up(md) {
     display: table-cell;
   }
+}
+
+.tag-badge {
+  font-size: 0.75rem;
+  font-weight: normal;
+  padding: 0.2em 0.5em;
 }
 </style>

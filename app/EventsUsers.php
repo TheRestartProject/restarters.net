@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use DB;
 use Illuminate\Database\Eloquent\Model;
 
@@ -27,18 +28,18 @@ class EventsUsers extends Model
     public $timestamps = false;
 
     //Table Relations
-    public function role()
+    public function role(): HasOne
     {
         return $this->hasOne(\App\Role::class, 'role', 'role');
     }
 
     //Table Relations
-    public function volunteer()
+    public function volunteer(): HasOne
     {
         return $this->hasOne(\App\User::class, 'id', 'user');
     }
 
-    public function event()
+    public function event(): HasOne
     {
         return $this->hasOne(\App\Party::class, 'id', 'event');
     }

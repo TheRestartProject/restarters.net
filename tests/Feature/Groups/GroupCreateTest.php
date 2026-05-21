@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Notification;
 
 class GroupCreateTest extends TestCase
 {
-    public function testCreate()
+    public function testCreate(): void
     {
         $user = User::factory()->administrator()->create([
                                                                       'api_token' => '1234',
@@ -40,7 +40,7 @@ class GroupCreateTest extends TestCase
         self::assertEquals('dummy', $ret[0]['network_data']['dummy']);
     }
 
-    public function testCreateGroupAsRestarter() {
+    public function testCreateGroupAsRestarter(): void {
         // Restarters can create groups.  This wasn't true in the past and for backwards compatibility the act
         // of creation should convert them into a host.
         $user = $this->loginAsTestUser(Role::RESTARTER);
@@ -66,7 +66,7 @@ class GroupCreateTest extends TestCase
         $this->assertTrue($user->hasRole('Host'));
     }
 
-    public function testCreateBadLocation()
+    public function testCreateBadLocation(): void
     {
         $this->loginAsTestUser(Role::ADMINISTRATOR);
 
@@ -75,7 +75,7 @@ class GroupCreateTest extends TestCase
         $this->assertNull($this->createGroup('Test Group', 'https://therestartproject.org', 'zzzzzzzzzzz123', 'Some text', false));
     }
 
-    public function roles() {
+    public static function roles(): array {
         return [
             [ 'Administrator'],
             [ 'NetworkCoordinator' ]
@@ -85,7 +85,7 @@ class GroupCreateTest extends TestCase
     /**
      * @dataProvider roles
      */
-    public function testApprove($role) {
+    public function testApprove($role): void {
         Notification::fake();
 
         $actas = User::factory()->{lcfirst($role)}()->create();
@@ -97,7 +97,12 @@ class GroupCreateTest extends TestCase
         $network->addGroup($group);
 
         $network2 = Network::factory()->create();
-        $tag = GroupTags::factory()->create();
+        // Create a global tag (NC should NOT be able to add - global tags are admin-only)
+        $globalTag = GroupTags::factory()->create();
+        // Create a tag belonging to the NC's network (NC CAN add this)
+        $networkTag = GroupTags::factory()->create(['network_id' => $network->id]);
+        // Create a tag belonging to another network (NC should NOT be able to add this)
+        $otherNetworkTag = GroupTags::factory()->create(['network_id' => $network2->id]);
 
         if ($role == 'NetworkCoordinator') {
             $network->addCoordinator($actas);
@@ -134,7 +139,7 @@ class GroupCreateTest extends TestCase
             'area' => 'London',
             'postcode' => 'SW9 7QD',
             'networks' => json_encode([ $network->id, $network2->id ]),
-            'tags' => json_encode([ $tag->id ]),
+            'tags' => json_encode([ $globalTag->id, $networkTag->id, $otherNetworkTag->id ]),
         ]);
 
         $response->assertSuccessful();
@@ -155,19 +160,23 @@ class GroupCreateTest extends TestCase
 
         $group->refresh();
         if ($role == 'NetworkCoordinator') {
-            // Attempt to edit the networks or tags should be ignored.
+            // NC can't edit networks. NC can only add tags from networks they coordinate (not global or other networks).
             $this->assertTrue($group->networks->contains($network));
             $this->assertFalse($group->networks->contains($network2));
-            $this->assertFalse($group->group_tags->contains($tag));
+            $this->assertFalse($group->group_tags->contains($globalTag)); // Global tag - NOT allowed for NC
+            $this->assertTrue($group->group_tags->contains($networkTag)); // Own network's tag - allowed
+            $this->assertFalse($group->group_tags->contains($otherNetworkTag)); // Other network's tag - NOT allowed
         } else if ($role == 'Administrator') {
-            // Administrators can edit networks and tags.
+            // Administrators can edit networks and all tags (global + any network's tags).
             $this->assertTrue($group->networks->contains($network));
             $this->assertTrue($group->networks->contains($network2));
-            $this->assertTrue($group->group_tags->contains($tag));
+            $this->assertTrue($group->group_tags->contains($globalTag));
+            $this->assertTrue($group->group_tags->contains($networkTag));
+            $this->assertTrue($group->group_tags->contains($otherNetworkTag));
         }
     }
 
-    public function testEventVisibility() {
+    public function testEventVisibility(): void {
         // Create a network.
         $network = Network::factory()->create();
 

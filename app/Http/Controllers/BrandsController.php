@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\RedirectResponse;
 use App\Brands;
 use App\Helpers\Fixometer;
 use Auth;
@@ -24,7 +25,7 @@ class BrandsController extends Controller
         ]);
     }
 
-    public function postCreateBrand(Request $request)
+    public function postCreateBrand(Request $request): RedirectResponse
     {
         if (! Fixometer::hasRole(Auth::user(), 'Administrator')) {
             return redirect('/user/forbidden');
@@ -51,7 +52,7 @@ class BrandsController extends Controller
         ]);
     }
 
-    public function postEditBrand($id, Request $request)
+    public function postEditBrand($id, Request $request): RedirectResponse
     {
         if (! Fixometer::hasRole(Auth::user(), 'Administrator')) {
             return redirect('/user/forbidden');
@@ -64,7 +65,7 @@ class BrandsController extends Controller
         return Redirect::back()->with('success', __('brands.update_success'));
     }
 
-    public function getDeleteBrand($id)
+    public function getDeleteBrand($id): RedirectResponse
     {
         if (! Fixometer::hasRole(Auth::user(), 'Administrator')) {
             return redirect('/user/forbidden');

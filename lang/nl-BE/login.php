@@ -4,7 +4,7 @@ return [
   'login_title' => 'Inloggen',
   'more' => 'Meer weten',
   'stat_1' => 'Herstelde toestellen',
-  'stat_2' => 'CO<sub>2</sub>-uitstoot vermeden',
+  'stat_2' => 'CO<sub>2</sub>e-uitstoot vermeden',
   'stat_3' => 'afval vermeden',
   'stat_4' => 'herstelactiviteiten',
   'whatis' => 'Welkom!',

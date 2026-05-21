@@ -40,14 +40,14 @@ export default {
   },
   computed: {
     translatedClose() {
-      return this.$lang.get('partials.close')
+      return this.__('partials.close')
     },
     translatedDownload() {
       // TODO Translations.
-      return this.$lang.get('partials.download')
+      return this.__('partials.download')
     },
     translatedShareTitle() {
-      return this.$lang.get('partials.share_modal_title')
+      return this.__('partials.share_modal_title')
     },
   },
   data: function() {
@@ -84,9 +84,9 @@ export default {
 </script>
 <style scoped lang="scss">
 @import 'resources/global/css/_variables';
-@import '~bootstrap/scss/functions';
-@import '~bootstrap/scss/variables';
-@import '~bootstrap/scss/mixins/_breakpoints';
+@import 'bootstrap/scss/functions';
+@import 'bootstrap/scss/variables';
+@import 'bootstrap/scss/mixins/_breakpoints';
 
 ::v-deep .buttons button {
   font-size: 12px;

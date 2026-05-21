@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use Illuminate\Http\Request;
 use App\Helpers\Fixometer;
 use App\User;
 use Cookie;
@@ -42,7 +43,7 @@ class CheckAuthService extends JsonResource
 
     public function __construct()
     {
-        $this->edit_profile_link = env('APP_URL').'/profile/edit/';
+        $this->edit_profile_link = url('/profile/edit/');
 
         $this->menu = collect([
             'general' => collect([]),
@@ -85,11 +86,8 @@ class CheckAuthService extends JsonResource
 
     /**
      * Transform the resource into an array.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return array
      */
-    public function toArray($request)
+    public function toArray(Request $request): array
     {
         return [
             'authenticated' => $this->authenticated,

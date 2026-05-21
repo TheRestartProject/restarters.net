@@ -10,10 +10,8 @@ class NetworksTableSeeder extends Seeder
 {
     /**
      * Run the database seeds.
-     *
-     * @return void
      */
-    public function run()
+    public function run(): void
     {
         // Restarters network is REQUIRED, so is created as part of the database
         // migrations with id = 1.

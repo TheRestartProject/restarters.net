@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\Storage;
 class GroupEditTest extends TestCase
 {
     /** @test */
-    public function group_tags_retained_after_edited_by_host()
+    public function group_tags_retained_after_edited_by_host(): void
     {
         $this->withoutExceptionHandling();
 
@@ -58,7 +58,7 @@ class GroupEditTest extends TestCase
         ]);
     }
 
-    public function testEditGroupAsRestarter() {
+    public function testEditGroupAsRestarter(): void {
         $group = Group::factory()->create();
 
         $this->loginAsTestUser(Role::RESTARTER);
@@ -67,7 +67,7 @@ class GroupEditTest extends TestCase
     }
 
     /** @test */
-    public function invalid_location()
+    public function invalid_location(): void
     {
         $this->withoutExceptionHandling();
 
@@ -93,7 +93,7 @@ class GroupEditTest extends TestCase
     }
 
     /** @test */
-    public function image_upload() {
+    public function image_upload(): void {
         Storage::fake('avatars');
         $group = Group::factory()->create();
 
@@ -128,8 +128,7 @@ class GroupEditTest extends TestCase
         $this->assertEquals('success - image uploaded', $response->getContent());
 
         // Delete the image.
-        $image = \DB::select(
-        \Illuminate\Support\Facades\DB::raw("SELECT idimages, path FROM images ORDER BY idimages DESC LIMIT 1"));
+        $image = \DB::select("SELECT idimages, path FROM images ORDER BY idimages DESC LIMIT 1");
         $idimages = $image[0]->idimages;
         $path = $image[0]->path;
         $response = $this->get("/group/image/delete/{$group->idgroups}/$idimages/$path");
@@ -138,7 +137,79 @@ class GroupEditTest extends TestCase
     }
 
     /** @test */
-    public function can_edit_timezone() {
+    public function image_upload_preserves_existing_image_when_upload_fails(): void {
+        $group = Group::factory()->create();
+        $host = User::factory()->host()->create();
+        $group->addVolunteer($host);
+        $group->makeMemberAHost($host);
+        $this->actingAs($host);
+
+        $_SERVER['DOCUMENT_ROOT'] = getcwd();
+        \FixometerFile::$uploadTesting = true;
+
+        if (!is_dir(getcwd() . '/uploads')) {
+            mkdir(getcwd() . '/uploads', 0777, true);
+        }
+
+        file_put_contents('/tmp/UT_preserve.jpg', file_get_contents(public_path() . '/images/community.jpg'));
+
+        // First upload via API (the path the Vue component uses)
+        $_FILES = [
+            'image' => [
+                'error'    => "0",
+                'name'     => 'UT_preserve.jpg',
+                'size'     => 123,
+                'tmp_name' => ['/tmp/UT_preserve.jpg'],
+                'type'     => 'image/jpeg'
+            ]
+        ];
+
+        $response = $this->patch('/api/v2/groups/' . $group->idgroups, [
+            'description' => 'Test',
+            'location'    => 'London',
+            'name'        => 'Test',
+        ]);
+        $response->assertSuccessful();
+
+        $xrefCount = \DB::table('xref')
+            ->where('reference', $group->idgroups)
+            ->where('reference_type', env('TBL_GROUPS'))
+            ->count();
+        $this->assertEquals(1, $xrefCount, 'Should have one image after first upload');
+
+        // Now simulate a failed upload — non-existent directory (like Fly.io with no uploads dir)
+        $_SERVER['DOCUMENT_ROOT'] = '/tmp/nonexistent_upload_dir_' . uniqid();
+        file_put_contents('/tmp/UT_preserve2.jpg', file_get_contents(public_path() . '/images/community.jpg'));
+        $_FILES = [
+            'image' => [
+                'error'    => "0",
+                'name'     => 'UT_preserve2.jpg',
+                'size'     => 123,
+                'tmp_name' => ['/tmp/UT_preserve2.jpg'],
+                'type'     => 'image/jpeg'
+            ]
+        ];
+
+        $this->patch('/api/v2/groups/' . $group->idgroups, [
+            'description' => 'Test',
+            'location'    => 'London',
+            'name'        => 'Test',
+        ]);
+
+        // The old image must still exist — it should NOT be deleted when the new upload fails
+        $xrefCountAfterFail = \DB::table('xref')
+            ->where('reference', $group->idgroups)
+            ->where('reference_type', env('TBL_GROUPS'))
+            ->count();
+        $this->assertEquals(1, $xrefCountAfterFail, 'Old image must be preserved when new upload fails');
+
+        // Clean up
+        $_FILES = [];
+        $_SERVER['DOCUMENT_ROOT'] = getcwd();
+    }
+
+    /** @test */
+    public function can_edit_timezone(): void {
         // Get list of timezones.
         $response = $this->get('/api/timezones');
         $response->assertSuccessful();
@@ -158,7 +229,7 @@ class GroupEditTest extends TestCase
     }
 
     /** @test */
-    public function edit_email()
+    public function edit_email(): void
     {
         $this->withoutExceptionHandling();
 
@@ -191,7 +262,7 @@ class GroupEditTest extends TestCase
         $this->assertEquals('info@test.com', $group->email);
     }
 
-    public function testEditAsNetworkCoordinator() {
+    public function testEditAsNetworkCoordinator(): void {
         $network = Network::factory()->create();
         $coordinator = User::factory()->restarter()->create();
         $network->addCoordinator($coordinator);

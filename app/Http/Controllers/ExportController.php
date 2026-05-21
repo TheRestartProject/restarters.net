@@ -61,13 +61,13 @@ class ExportController extends Controller
         if ($idevents != NULL) {
             $event = Party::findOrFail($idevents);
             $eventName = $event->venue ? $event->venue : $event->location;
-            $eventName = iconv("UTF-8", "ISO-8859-9//TRANSLIT", $eventName);
-            $eventName = str_replace(' ', '-', $eventName);
+            $eventName = iconv("UTF-8", "ISO-8859-9//IGNORE", $eventName);
+            $eventName = str_replace([' ', '/'],  '-', $eventName);
             $filename .= '-' . $eventName . '-' . (new Carbon($event->event_start_utc))->format('Y-m-d');
         } else if ($idgroups != NULL) {
             $group = Group::findOrFail($idgroups);
-            $groupName = iconv("UTF-8", "ISO-8859-9//TRANSLIT", $group->name);
-            $groupName = str_replace(' ', '-', $groupName);
+            $groupName = iconv("UTF-8", "ISO-8859-9//IGNORE", $group->name);
+            $groupName = str_replace([' ', '/'], '-', $groupName);
             $filename .= '-' . $groupName;
         }
 
@@ -77,20 +77,24 @@ class ExportController extends Controller
         $me = auth()->user();
 
         // We can't put accented characters into a CSV file, so flatten them.
+        // Use //TRANSLIT//IGNORE to handle characters that can't be transliterated on
+        // servers with older glibc (e.g. 2.27) and POSIX locale, which lack transliteration
+        // tables for certain Unicode characters like emdash (—). Without //IGNORE, iconv
+        // throws "Detected an illegal character in input string" on such systems.
         $columns = [
-            iconv('UTF-8', 'ASCII//TRANSLIT', __('devices.item_type_short')),
-            iconv('UTF-8', 'ASCII//TRANSLIT', __('devices.category')),
-            iconv('UTF-8', 'ASCII//TRANSLIT', __('devices.brand')),
-            iconv('UTF-8', 'ASCII//TRANSLIT', __('devices.model')),
-            iconv('UTF-8', 'ASCII//TRANSLIT', __('devices.title_assessment')),
-            iconv('UTF-8', 'ASCII//TRANSLIT', __('devices.repair_status')),
-            iconv('UTF-8', 'ASCII//TRANSLIT', __('devices.spare_parts')),
-            iconv('UTF-8', 'ASCII//TRANSLIT', __('events.event')),
-            iconv('UTF-8', 'ASCII//TRANSLIT', __('groups.group')),
-            iconv('UTF-8', 'ASCII//TRANSLIT', __('events.event_date')),
-            iconv('UTF-8', 'ASCII//TRANSLIT', __('events.stat-7')),
-            iconv('UTF-8', 'ASCII//TRANSLIT', __('events.stat-6')),
-            iconv('UTF-8', 'ASCII//TRANSLIT', ucfirst(__('devices.title_powered')))
+            iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', __('devices.item_type_short')),
+            iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', __('devices.category')),
+            iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', __('devices.brand')),
+            iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', __('devices.model')),
+            iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', __('devices.title_assessment')),
+            iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', __('devices.repair_status')),
+            iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', __('devices.spare_parts')),
+            iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', __('events.event')),
+            iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', __('groups.group')),
+            iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', __('events.event_date')),
+            iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', __('events.stat-7')),
+            iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', __('events.stat-6')),
+            iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', ucfirst(__('devices.title_powered')))
         ];
 
         fputcsv($file, $columns);
@@ -168,18 +172,22 @@ class ExportController extends Controller
 
     private function exportEvents($parties) {
         // We can't put accented characters into a CSV file, so flatten them.
+        // Use //TRANSLIT//IGNORE to handle characters that can't be transliterated on
+        // servers with older glibc (e.g. 2.27) and POSIX locale, which lack transliteration
+        // tables for certain Unicode characters like emdash (—). Without //IGNORE, iconv
+        // throws "Detected an illegal character in input string" on such systems.
         $headers = [
-            iconv('UTF-8', 'ASCII//TRANSLIT', __('groups.export.events.date')),
-            iconv('UTF-8', 'ASCII//TRANSLIT', __('groups.export.events.event')),
-            iconv('UTF-8', 'ASCII//TRANSLIT', __('groups.export.events.volunteers')),
-            iconv('UTF-8', 'ASCII//TRANSLIT', __('groups.export.events.participants')),
-            iconv('UTF-8', 'ASCII//TRANSLIT', __('groups.export.events.items_total')),
-            iconv('UTF-8', 'ASCII//TRANSLIT', __('groups.export.events.items_fixed')),
-            iconv('UTF-8', 'ASCII//TRANSLIT', __('groups.export.events.items_repairable')),
-            iconv('UTF-8', 'ASCII//TRANSLIT', __('groups.export.events.items_end_of_life')),
-            iconv('UTF-8', 'ASCII//TRANSLIT', __('groups.export.events.items_kg_waste_prevented')),
-            iconv('UTF-8', 'ASCII//TRANSLIT', __('groups.export.events.items_kg_co2_prevent')),
-            iconv('UTF-8', 'ASCII//TRANSLIT', __('groups.export.events.group'))
+            iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', __('groups.export.events.date')),
+            iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', __('groups.export.events.event')),
+            iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', __('groups.export.events.volunteers')),
+            iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', __('groups.export.events.participants')),
+            iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', __('groups.export.events.items_total')),
+            iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', __('groups.export.events.items_fixed')),
+            iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', __('groups.export.events.items_repairable')),
+            iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', __('groups.export.events.items_end_of_life')),
+            iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', __('groups.export.events.items_kg_waste_prevented')),
+            iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', __('groups.export.events.items_kg_co2_prevent')),
+            iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', __('groups.export.events.group'))
         ];
 
         // Send these to getEventStats() to speed things up a bit.
@@ -205,7 +213,7 @@ class ExportController extends Controller
                 $stats['dead_devices'],
                 $stats['waste_powered'] + $stats['waste_unpowered'],
                 $stats['co2_powered'] + $stats['co2_unpowered'],
-                iconv('UTF-8', 'ASCII//TRANSLIT', $party->theGroup && $party->theGroup->name ? $party->theGroup->name : '?'),
+                iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $party->theGroup && $party->theGroup->name ? $party->theGroup->name : '?'),
             ];
         }
 

@@ -7,13 +7,14 @@ use App\User;
 use App\UsersPermissions;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Event;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Tests\TestCase;
 
 class MenusTest extends TestCase
 {
-    public function provider()
+    public static function provider()
     {
         return [
             [
@@ -39,7 +40,8 @@ class MenusTest extends TestCase
                 'NetworkCoordinator',
                 [
                     0 => 'Administrator',
-                    1 => 'General',
+                    1 => 'Reporting',
+                    2 => 'General',
                 ],
                 true,
                 [
@@ -70,7 +72,7 @@ class MenusTest extends TestCase
     /**
      *@dataProvider provider
      */
-    public function testSections($role, $present, $translator, $adminMenu)
+    public function testSections($role, $present, $translator, $adminMenu): void
     {
         $user = User::factory()->{lcfirst($role)}()->create();
 
@@ -81,6 +83,8 @@ class MenusTest extends TestCase
             $up->save();
         }
 
+        Auth::logout();
+        session()->flush();
         $this->actingAs($user);
 
         $response = $this->get('/user/menus');
@@ -93,7 +97,7 @@ class MenusTest extends TestCase
         }
     }
 
-    public function testLoggedOut()
+    public function testLoggedOut(): void
     {
         $this->expectException(NotFoundHttpException::class);
         $this->get('/user/menus');

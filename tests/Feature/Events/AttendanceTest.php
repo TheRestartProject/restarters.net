@@ -37,7 +37,7 @@ class AttendanceTest extends TestCase
         $this->party = $this->group->parties()->latest()->first();
     }
 
-    public function testParticipants() {
+    public function testParticipants(): void {
         // Initial count will be 0.
         self::assertEquals(0, $this->party->pax);
 
@@ -52,7 +52,7 @@ class AttendanceTest extends TestCase
     }
 
 
-    public function testVolunteers() {
+    public function testVolunteers(): void {
         // Initial count will be 1, for the host.
         self::assertEquals(1, $this->party->volunteers);
 

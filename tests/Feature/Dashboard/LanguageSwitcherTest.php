@@ -13,7 +13,7 @@ use function PHPUnit\Framework\assertEquals;
 
 class LanguageSwitcherTest extends TestCase
 {
-    public function testSwitchEndpoint()
+    public function testSwitchEndpoint(): void
     {
         $this->loginAsTestUser(Role::ADMINISTRATOR);
         $user = Auth::user();
@@ -28,7 +28,7 @@ class LanguageSwitcherTest extends TestCase
         assertEquals('en', $user->language);
     }
 
-    public function testMiddleware()
+    public function testMiddleware(): void
     {
         $this->loginAsTestUser(Role::ADMINISTRATOR);
         $user = Auth::user();
@@ -41,16 +41,17 @@ class LanguageSwitcherTest extends TestCase
         assertEquals('en', $user->language);
     }
 
-    public function testMiddlewareHeader()
+    public function testMiddlewareHeader(): void
     {
         // Passing get headers doesn't seem to be working, but this'll do.
+        $this->loginAsTestUser(Role::ADMINISTRATOR);
         $_SERVER['HTTP_ACCEPT_LANGUAGE'] = 'de';
         $this->withSession([
                                'locale' => 'UT'
-                           ])->get('/workbench')->assertSee(' Deutsch</button>', false);
+                           ])->get('/fixometer')->assertSee(' Deutsch</button>', false);
         $_SERVER['HTTP_ACCEPT_LANGUAGE'] = 'en';
         $this->withSession([
                                'locale' => 'UT'
-                           ])->get('/workbench')->assertSee(' English</button>', false);
+                           ])->get('/fixometer')->assertSee(' English</button>', false);
     }
 }

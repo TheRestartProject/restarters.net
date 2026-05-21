@@ -43,8 +43,8 @@
 import { DEFAULT_PROFILE } from '../constants'
 import event from '../mixins/event'
 import moment from 'moment'
-import EventActions from './EventActions'
-import EventTitle from './EventTitle'
+import EventActions from './EventActions.vue'
+import EventTitle from './EventTitle.vue'
 
 export default {
   components: {EventTitle, EventActions},
@@ -87,7 +87,7 @@ export default {
       // Existing translations may have a :group parameter, so set that empty so that it doesn't appear in the result.
       // We no longer use that parameter because the design has different styling for the translated text and the
       // group name.
-      return this.$lang.get('events.organised_by', {
+      return this.__('events.organised_by', {
         group: ''
       })
     },
@@ -101,9 +101,9 @@ export default {
 </script>
 <style scoped lang="scss">
 @import 'resources/global/css/_variables';
-@import '~bootstrap/scss/functions';
-@import '~bootstrap/scss/variables';
-@import '~bootstrap/scss/mixins/_breakpoints';
+@import 'bootstrap/scss/functions';
+@import 'bootstrap/scss/variables';
+@import 'bootstrap/scss/mixins/_breakpoints';
 
 .border-top-very-thick {
   border-top: 5px solid $black;

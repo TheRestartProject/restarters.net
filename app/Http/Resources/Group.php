@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -268,13 +269,12 @@ class Group extends JsonResource
 
     /**
      * Transform the resource into an array.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return array
      */
-    public function toArray($request)
+    public function toArray(Request $request): array
     {
-        if ($request->get('includeStats', true)) {
+        $stats = [];
+
+        if ($request->get('includeStats', false)) {
             $stats = $this->resource->getGroupStats();
             $stats['events'] = $stats['parties'];
             unset($stats['parties']);
@@ -298,7 +298,7 @@ class Group extends JsonResource
             'updated_at' => Carbon::parse($this->updated_at)->toIso8601String(),
             'location' => new GroupLocation($this),
             'networks' => new NetworkSummaryCollection($this->networks),
-            'tags' => new TagCollection($this->group_tags),
+            'tags' => new TagCollection($this->resource->getFilteredTagsForUser()),
             'timezone' => $this->timezone,
             'approved' => $this->approved ? true : false,
             'network_data' => $networkData,

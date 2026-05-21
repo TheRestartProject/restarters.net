@@ -1,0 +1,38 @@
+app = "restarters-dev-mail"
+primary_region = "lhr"
+
+# Mailpit — dev/staging email capture and inspection.
+#
+# SMTP (port 1025) is reachable from other apps in the same Fly org via
+# private 6PN networking (e.g. restarters-dev-mail.internal:1025) without
+# being publicly exposed. The web UI (port 8025) is public so you can open
+# it in a browser (protected by Fly's basic auth via MP_UI_AUTH_FILE or
+# just leave open for dev use).
+#
+# Deploy for dev:   fly deploy --config fly-mailpit.toml
+# Deploy for branch: fly deploy --config fly-mailpit.toml --app restarters-pr-123-mail
+# Access web UI:    fly proxy 8025:8025 -a restarters-dev-mail
+#                   then open http://localhost:8025
+
+[build]
+  image = "axllent/mailpit"
+
+[env]
+  MP_DATABASE = "/data/mailpit.db"
+  MP_MAX_MESSAGES = "500"
+
+# Web UI only — SMTP on 1025 is accessible via private 6PN without listing it here
+[http_service]
+  internal_port = 8025
+  force_https = true
+  auto_stop_machines = "off"
+  auto_start_machines = true
+  min_machines_running = 1
+
+[mounts]
+  source = "mailpit_data_dev"
+  destination = "/data"
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = 256

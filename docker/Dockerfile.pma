@@ -1,0 +1,20 @@
+FROM phpmyadmin:5
+
+# Install apache2-utils for htpasswd
+RUN apt-get update && apt-get install -y --no-install-recommends apache2-utils && rm -rf /var/lib/apt/lists/*
+
+# Enable basic auth on phpMyAdmin's Apache
+RUN echo '<Directory /var/www/html>\n\
+    AuthType Basic\n\
+    AuthName "phpMyAdmin"\n\
+    AuthUserFile /etc/phpmyadmin/.htpasswd\n\
+    Require valid-user\n\
+</Directory>' > /etc/apache2/conf-enabled/basic-auth.conf
+
+# Startup script to create htpasswd from env vars then start Apache
+RUN echo '#!/bin/bash\n\
+htpasswd -cb /etc/phpmyadmin/.htpasswd "$PMA_BASIC_AUTH_USER" "$PMA_BASIC_AUTH_PASS"\n\
+exec /docker-entrypoint.sh apache2-foreground' > /usr/local/bin/start.sh && \
+    chmod +x /usr/local/bin/start.sh
+
+CMD ["/usr/local/bin/start.sh"]

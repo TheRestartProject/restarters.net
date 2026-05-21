@@ -13,7 +13,7 @@ use Tests\Feature\Stats\StatsTestCase;
 class GroupStatsTest extends StatsTestCase
 {
     /** @test */
-    public function a_group_with_no_events_has_empty_stats()
+    public function a_group_with_no_events_has_empty_stats(): void
     {
         $group = Group::factory()->create()->first();
         $expect = \App\Group::getGroupStatsArrayKeys();
@@ -21,7 +21,7 @@ class GroupStatsTest extends StatsTestCase
     }
 
     /** @test */
-    public function a_group_with_one_past_event_has_stats_for_that_event()
+    public function a_group_with_one_past_event_has_stats_for_that_event(): void
     {
         $group = Group::factory()->create();
         Party::factory()->moderated()->create([
@@ -41,7 +41,7 @@ class GroupStatsTest extends StatsTestCase
     }
 
     /** @test */
-    public function a_group_with_mixed_devices_has_correct_stats()
+    public function a_group_with_mixed_devices_has_correct_stats(): void
     {
         $group = Group::factory()->create();
         $event = Party::factory()->moderated()->create([
@@ -195,7 +195,7 @@ class GroupStatsTest extends StatsTestCase
     }
 
     /** @test */
-    public function two_groups_with_mixed_devices_have_correct_stats()
+    public function two_groups_with_mixed_devices_have_correct_stats(): void
     {
         $group1 = Group::factory()->create();
         $event1 = Party::factory()->moderated()->create([
@@ -341,7 +341,7 @@ class GroupStatsTest extends StatsTestCase
     }
 
     /** @test */
-    public function get_of_stats_after_deletion() {
+    public function get_of_stats_after_deletion(): void {
 
         $admin = User::factory()->administrator()->create([
                                                                            'api_token' => '1234',

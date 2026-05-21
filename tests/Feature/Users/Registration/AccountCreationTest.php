@@ -13,7 +13,7 @@ use Tests\TestCase;
 
 class AccountCreationTest extends TestCase
 {
-    public function testRegister()
+    public function testRegister(): void
     {
         $response = $this->get('/user/register');
         $response->assertSee(__('registration.reg-step-1-heading'), $response->getContent());
@@ -45,17 +45,7 @@ class AccountCreationTest extends TestCase
                             ], json_decode($response2->getContent(), TRUE));
     }
 
-    public function testWorkbenchThenRegister()
-    {
-        $this->get('/workbench');
-        $userAttributes = $this->userAttributes();
-        $response = $this->post('/user/register/', $userAttributes);
-
-        $response->assertStatus(302);
-        $response->assertRedirect('workbench');
-    }
-
-    public function testRegisterInvalidAddress()
+    public function testRegisterInvalidAddress(): void
     {
         $userAttributes = $this->userAttributes();
 
@@ -77,7 +67,7 @@ class AccountCreationTest extends TestCase
         ]);
     }
 
-    public function testRegisterAgain()
+    public function testRegisterAgain(): void
     {
         $response = $this->post('/user/register/', $this->userAttributes());
 
@@ -102,7 +92,7 @@ class AccountCreationTest extends TestCase
         $this->assertEquals(1950, \Auth::user()->age);
     }
 
-    public function testLogout()
+    public function testLogout(): void
     {
         $response = $this->post('/user/register/', $this->userAttributes());
 
@@ -115,7 +105,7 @@ class AccountCreationTest extends TestCase
         $response->assertRedirect('login');
     }
 
-    public function testLogoutAndBackIn()
+    public function testLogoutAndBackIn(): void
     {
         $userAttributes = $this->userAttributes();
         $response = $this->post('/user/register/', $userAttributes);
@@ -138,7 +128,7 @@ class AccountCreationTest extends TestCase
         $response->assertRedirect('dashboard');
     }
 
-    public function testValidEmail()
+    public function testValidEmail(): void
     {
 
         // Check with a registered email.
@@ -155,10 +145,12 @@ class AccountCreationTest extends TestCase
             'email' => 'test@invalid.com',
         ]);
 
-        $this->assertNull(json_decode($response->getContent(), true));
+        $this->assertEquals([
+            'message' => 'Email is available',
+        ], json_decode($response->getContent(), true));
     }
 
-    public function testAdminCreate()
+    public function testAdminCreate(): void
     {
         $this->loginAsTestUser(Role::ADMINISTRATOR);
         $idgroups = $this->createGroup();
@@ -185,7 +177,7 @@ class AccountCreationTest extends TestCase
         $response->assertSee('alert-danger');
     }
 
-    public function testValidationFail()
+    public function testValidationFail(): void
     {
         $userAttributes = $this->userAttributes();
         unset($userAttributes['consent_gdpr']);
@@ -197,7 +189,7 @@ class AccountCreationTest extends TestCase
     /**
      * @dataProvider missingProvider
      */
-    public function testAdminCreateErrors($remove)
+    public function testAdminCreateErrors($remove): void
     {
         $this->loginAsTestUser(Role::ADMINISTRATOR);
 
@@ -212,7 +204,7 @@ class AccountCreationTest extends TestCase
         $response->assertSee('alert-danger');
     }
 
-    public function missingProvider() {
+    public static function missingProvider(): array {
         return [
             [ 'email' ],
             [ 'role' ],

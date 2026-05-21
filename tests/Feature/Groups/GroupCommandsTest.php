@@ -13,7 +13,7 @@ use function PHPUnit\Framework\assertFalse;
 use function PHPUnit\Framework\assertTrue;
 
 class GroupCommandsTest extends TestCase {
-    public function testImport() {
+    public function testImport(): void {
         $network = Network::all()->first();
         file_put_contents('/tmp/group.csv', "Headers\nTest,London,SW9 7QD,London,UK,51.5073510,-0.1277584,https://therestartproject.org,1234,,Testing\n");
         $this->artisan('import:groups /tmp/group.csv');

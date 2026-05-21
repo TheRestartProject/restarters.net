@@ -13,20 +13,28 @@
 </a>
 
 @if(env('APP_SHOW_BRANCH'))
-    <div style="position: fixed; top: 0px; left: 0px; color: red; text-transform: uppercase">
-        <?php
-        // We want to show the current branch.  This will only be set on development or staging environments.
-        $branch = "Unknown branch";
+    <?php
+    $flyApp = env('FLY_APP_NAME');
+    if ($flyApp) {
+        // On Fly: derive branch label by stripping the "restarters-" prefix
+        $branch = preg_replace('/^restarters-/', '', $flyApp);
+        $mailpitUrl = 'https://' . $flyApp . '-mail.fly.dev';
+    } else {
+        // Local dev fallback: read from git
+        $branch = 'unknown';
+        $mailpitUrl = null;
         if (is_dir(base_path() . '/.git')) {
-            exec('cd ' . base_path() . '; git branch | ' . "grep ' * '", $shellOutput);
+            exec('cd ' . base_path() . '; git branch | grep \' * \'', $shellOutput);
             foreach ($shellOutput as $line) {
                 if (strpos($line, '* ') !== false) {
                     $branch = trim(strtolower(str_replace('* ', '', $line)));
                 }
             }
         }
-        ?>
-        {{ $branch }}
+    }
+    ?>
+    <div style="position: fixed; top: 0; left: 0; color: red; text-transform: uppercase; z-index: 9999; font-size: 12px; background: rgba(255,255,255,0.8); padding: 2px 6px;">
+        {{ $branch }}@if($mailpitUrl) | <a href="{{ $mailpitUrl }}" target="_blank" rel="noopener" style="color: red;">mail</a>@endif
     </div>
 @endif
 
@@ -75,13 +83,6 @@
         @include('svgs/navigation/wiki-icon')
         <span>@lang('general.menu_wiki')</span>
     </a>
-    </li>
-
-    <li class="@if(Str::contains(url()->current(), route('workbench')) || Str::contains(url()->current(), '/mobifix') || Str::contains(url()->current(), '/misccat') || Str::contains(url()->current(), '/faultcat') || Str::contains(url()->current(), '/printcat')) active @endif" style="flex-basis: 100%;">
-        <a href="{{ route('workbench') }}" rel="noopener noreferrer">
-            @include('svgs/navigation/workbench-icon')
-            <span>@lang('general.menu_workbench')</span>
-        </a>
     </li>
 </ul>
 
@@ -192,10 +193,11 @@
         <div class="notifications__scroll">
             <div id="tabs" class="notifications__inner">
 
-                @if( isset($user->notifications) && is_object($user->notifications) && $user->notifications->count() > 0 )
+                @php($navbarNotifications = isset($user) ? $user->notifications()->take(10)->get() : collect())
+                @if($navbarNotifications->isNotEmpty())
                 <div class="cards">
 
-                @foreach ($user->notifications->take(10) as $notification)
+                @foreach ($navbarNotifications as $notification)
                     @include('partials.notification')
                 @endforeach
 

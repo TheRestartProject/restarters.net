@@ -5,7 +5,7 @@
         <div class="mt-2">
         {{ __('groups.groups') }}
         </div>
-        <b-img class="height ml-4" src="/images/group_doodle_ico.svg" />
+        <b-img class="height ml-4" :src="imageUrl('/images/group_doodle_ico.svg')" />
       </div>
       <div>
         <b-btn variant="primary" href="/group/create" v-if="canCreate">
@@ -54,13 +54,14 @@
   </div>
 </template>
 <script>
-import GroupsTable from './GroupsTable'
+import GroupsTable from './GroupsTable.vue'
 import auth from '../mixins/auth'
 import GroupMapAndList from "./GroupMapAndList.vue";
+import images from '../mixins/images'
 
 export default {
   components: {GroupMapAndList, GroupsTable},
-  mixins: [ auth ],
+  mixins: [ auth, images ],
   props: {
     network: {
       type: Number,
@@ -134,7 +135,7 @@ export default {
       }) : []
     },
     nearestGroups() {
-      return this.$lang.get('groups.nearest_groups', {
+      return this.__('groups.nearest_groups', {
         location: this.yourArea
       })
     }

@@ -2,15 +2,18 @@
 
 namespace Tests\Feature;
 
+use App\Events\UserDeleted;
+use App\Listeners\DiscourseUserEventSubscriber;
 use App\Notifications\AdminUserDeleted;
 use App\User;
 use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
+use Illuminate\Support\Facades\Event;
 
 class UserDeletedNotificationTest extends TestCase
 {
     /** @test */
-    public function a_notification_is_sent_to_admins_when_a_user_is_deleted()
+    public function a_notification_is_sent_to_admins_when_a_user_is_deleted(): void
     {
         Notification::fake();
 

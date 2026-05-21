@@ -1,0 +1,403 @@
+# https://taskfile.dev
+
+version: "3"
+
+# Load environment-specific .env file
+dotenv:
+  - .env
+
+env:
+  UID:
+    sh: |
+      if command -v id >/dev/null 2>&1; then
+        id -u
+      else
+        echo "1000"
+      fi
+  GID:
+    sh: |
+      if command -v id >/dev/null 2>&1; then
+        id -g
+      else
+        echo "1000"
+      fi
+
+vars:
+  DOCKER_CMD:
+    sh: command -v docker-compose &> /dev/null && echo "docker-compose" || echo "docker compose"
+  COMPOSE_PROFILES:
+    map:
+      all: "'*'"
+      core: "core"
+      debug: "debug"
+      discourse: "discourse"
+
+tasks:
+  # Default task
+  default:
+    desc: List all tasks
+    cmds:
+      - task --list
+
+  # Docker container management tasks
+  docker:up-*:
+    desc: Start Docker containers for a given profile (Usage - task docker:up-[core|debug|discourse|all])
+    summary: |
+      Start a set of Docker containers at a given time. The core services are always started with any profile.
+      For just the core services, use:
+      task docker:up-core
+
+      To include phpMyAdmin and Mailhog, use:
+      task docker:up-debug
+
+      To include the Discourse set of containers, use:
+      task docker:up-discourse
+
+      If you want to start all containers, use:
+      task docker:up-all
+
+    requires: &PROFILE_REQUIRES
+      vars:
+        - name: PROFILE
+          enum: [core, debug, discourse, all]
+    
+    vars: &PROFILE_VARS
+      PROFILE: "{{index .MATCH 0}}"
+
+    cmds:
+      - '{{.DOCKER_CMD}} --profile {{ index .COMPOSE_PROFILES .PROFILE }} up -d'
+
+  docker:down-*:
+    desc: Stop Docker containers for a given profile (Usage - task docker:down-[core|debug|discourse|all])
+    summary: |
+      Stop a set of Docker containers at a given time. The core services are always stopped with any profile.
+      For just the core services, use:
+      task docker:down-core
+
+      To include phpMyAdmin and Mailhog, use:
+      task docker:down-debug
+
+      To include the Discourse set of containers, use:
+      task docker:down-discourse
+
+      If you want to stop all containers, use:
+      task docker:down-all
+
+    requires: *PROFILE_REQUIRES
+    
+    vars: *PROFILE_VARS
+
+    cmds:
+      - '{{.DOCKER_CMD}} --profile {{ index .COMPOSE_PROFILES .PROFILE }} down'
+
+  docker:rebuild-*:
+    desc: Rebuild Docker containers for a given profile (Usage - task docker:rebuild-[core|debug|discourse|all])
+    summary: |
+      Rebuild a set of Docker containers at a given time. The core services are always rebuilt with any profile.
+      For just the core services, use:
+      task docker:rebuild-core
+
+      To include phpMyAdmin and Mailhog, use:
+      task docker:rebuild-debug
+
+      To include the Discourse set of containers, use:
+      task docker:rebuild-discourse
+
+      To rebuild all containers, use:
+      task docker:rebuild-all
+
+    requires: *PROFILE_REQUIRES
+    
+    vars: *PROFILE_VARS
+
+    cmds:
+      - '{{.DOCKER_CMD}} --profile {{ index .COMPOSE_PROFILES .PROFILE }} down -v --rmi all'
+      - '{{.DOCKER_CMD}} --profile {{ index .COMPOSE_PROFILES .PROFILE }} up -d'
+
+  docker:restart-*:
+    desc: Restart Docker containers for a given profile (Usage - task docker:restart-[core|debug|discourse|all])
+    summary: |
+      Restart a set of Docker containers at a given time. The core services are always restarted with any profile.
+      For just the core services, use:
+      task docker:restart-core
+
+      To include phpMyAdmin and Mailhog, use:
+      task docker:restart-debug
+
+      To include the Discourse set of containers, use:
+      task docker:restart-discourse
+
+      To restart all containers, use:
+      task docker:restart-all
+
+    requires: *PROFILE_REQUIRES
+    
+    vars: *PROFILE_VARS
+
+    cmds:
+      - '{{.DOCKER_CMD}} --profile {{ index .COMPOSE_PROFILES .PROFILE }} restart'
+
+
+  docker:logs:
+    desc: Show the logs for the core application container.
+    cmds:
+      - cmd: docker logs -f restarters
+        ignore_error: true
+
+
+  docker:shell:
+    desc: Open a shell into the core application container.
+    cmds:
+      - cmd: docker exec -it restarters bash
+        ignore_error: true
+
+  docker:run:bash:
+    desc: Run a bash command in the core application container.
+    summary: |
+      Run a bash command in the core application container. To pass the arguments, use the -- flag.
+      For example, to run the ls command, use:
+      task docker:run:bash -- ls -la
+
+    cmds:
+      - docker exec -it restarters bash -c "{{ .CLI_ARGS }}"
+
+  docker:run:artisan:
+    desc: Run an artisan command in the core application container.
+    summary: |
+      Run an artisan command in the core application container. To pass the arguments, use the -- flag.
+      For example, to run the migrate command, use:
+      task docker:run:artisan -- migrate
+
+    cmds:
+      - docker exec -it restarters php artisan "{{ .CLI_ARGS }}"
+
+  docker:vite:
+    desc: Start Vite dev server with HMR in the container.
+    summary: |
+      Start Vite dev server for hot module replacement.
+      This runs in the foreground - use Ctrl+C to stop.
+      For background execution, use: task docker:vite &
+    cmds:
+      - docker exec -it restarters npm run dev
+
+  docker:vite:start:
+    desc: Start Vite dev server in the background.
+    summary: |
+      Start Vite dev server in background (detached mode).
+      Use 'task docker:vite:stop' to stop it.
+    cmds:
+      - docker exec -d restarters npm run dev
+      - echo "Vite dev server started in background"
+
+  docker:vite:stop:
+    desc: Stop Vite dev server running in the container.
+    cmds:
+      - docker exec restarters bash -c "ps aux | grep 'node.*vite' | grep -v grep | awk '{print $$2}' | xargs -r kill || true"
+      - echo "Vite dev server stopped"
+
+  docker:test:phpunit:
+    desc: Run PHPUnit tests in the core application container.
+    summary: |
+      Run PHPUnit tests with the same configuration used in CircleCI.
+      This ensures consistency between local development and CI environments.
+
+      The command includes:
+      - Database reset and migrations (fresh test database state)
+      - Memory limit set to 1024M
+      - Coverage reporting (clover.xml)
+      - JUnit XML output for CI integration
+      - TeamCity output format for better test reporting
+      - Coverage upload to Coveralls if COVERALLS_REPO_TOKEN is set
+      - Support for additional PHPUnit options via CLI_ARGS
+
+      Use this task instead of running phpunit directly to maintain consistency.
+
+      Examples:
+      - task docker:test:phpunit -- --stop-on-failure
+      - task docker:test:phpunit -- --filter=UserTest
+
+    cmds:
+      - mkdir -p /tmp/test-results/phpunit
+      - |
+        if [ -z "$CIRCLECI" ]; then
+          echo "Resetting test database and running migrations..."
+          docker exec restarters bash -c "php artisan migrate:fresh --seed --database=mysql_testing --force"
+        else
+          echo "Running on CircleCI - skipping database reset (handled by CI setup)"
+        fi
+      - docker exec -e COVERALLS_REPO_TOKEN="$COVERALLS_REPO_TOKEN" restarters bash -c "export XDEBUG_MODE=coverage; ./vendor/bin/phpunit -d memory_limit=1024M --bootstrap tests/bootstrap.php --coverage-clover tests/clover.xml --log-junit /tmp/phpunit-results.xml --configuration ./phpunit.xml --teamcity {{ .CLI_ARGS }}"
+      - |
+        if [ ! -z "$COVERALLS_REPO_TOKEN" ]; then
+          echo "Uploading coverage to Coveralls..."
+          docker exec -e COVERALLS_REPO_TOKEN="$COVERALLS_REPO_TOKEN" restarters bash -c "./upload-coverage.sh tests/clover.xml"
+        else
+          echo "COVERALLS_REPO_TOKEN not set, skipping coverage upload"
+        fi
+
+  docker:test:jest:
+    desc: Run Jest tests in the core application container.
+    summary: |
+      Run Jest tests with JUnit output for CI integration.
+      This ensures consistency between local development and CI environments.
+
+    cmds:
+      - mkdir -p /tmp/test-results/jest
+      - docker exec restarters bash -c "npm i jest-junit; JEST_JUNIT_OUTPUT_DIR=/tmp/test-results npm run jest -- --testResultsProcessor=jest-junit"
+
+  docker:test:playwright:
+    desc: Run Playwright tests in dedicated playwright container.
+    summary: |
+      Run Playwright end-to-end tests using a dedicated playwright container.
+      This ensures proper isolation and reliable network access to the application.
+
+      The command includes:
+      - Environment variables for test configuration
+      - HTML report generation
+      - Proper test isolation
+
+    cmds:
+      - mkdir -p /tmp/test-results/playwright
+      - docker exec restarters bash -c "php artisan cache:clear"
+      - docker exec restarters bash -c "echo \"DB::statement('SET foreign_key_checks=0'); App\\\\Device::truncate(); DB::statement('SET foreign_key_checks=1');\" | php artisan tinker" || true
+      - docker exec restarters bash -c "echo \"\\\$u=App\\\\User::firstOrCreate(['email'=>'jane@bloggs.net'], ['name'=>'Jane Bloggs','password'=>Hash::make('passw0rd'),'consent_past_data'=>'2021-01-01','consent_future_data'=>'2021-01-01','consent_gdpr'=>'2021-01-01']);\\\$u->role=2;\\\$u->save();\" | php artisan tinker" || true
+      - |
+        # Create test data for group tags tests (NC user, host user, network, group)
+        docker exec restarters php artisan tinker --execute='$nc = App\User::firstOrCreate(["email"=>"nc@test.net"], ["name"=>"NC User","password"=>Hash::make("passw0rd"),"consent_past_data"=>"2021-01-01","consent_future_data"=>"2021-01-01","consent_gdpr"=>"2021-01-01"]); $nc->role=6; $nc->save(); $host = App\User::firstOrCreate(["email"=>"host@test.net"], ["name"=>"Host User","password"=>Hash::make("passw0rd"),"consent_past_data"=>"2021-01-01","consent_future_data"=>"2021-01-01","consent_gdpr"=>"2021-01-01"]); $host->role=3; $host->save(); $network = App\Network::where("name","Test London")->first(); if (!$network) { $network = new App\Network(); $network->name="Test London"; $network->shortname="testlondon"; $network->description="Test network"; $network->default_language="en"; $network->save(); } DB::table("user_network")->insertOrIgnore(["user_id"=>$nc->id,"network_id"=>$network->id]); $group = App\Group::firstOrCreate(["name"=>"Tag Test Group"], ["website"=>"https://test.example.com","location"=>"London","area"=>"London","postcode"=>"SW1A 1AA","latitude"=>51.5,"longitude"=>-0.1,"free_text"=>"Test group","approved"=>true]); DB::table("group_network")->insertOrIgnore(["group_id"=>$group->idgroups,"network_id"=>$network->id]); DB::table("users_groups")->insertOrIgnore(["user"=>$host->id,"group"=>$group->idgroups,"role"=>3,"status"=>1]); echo "Group tags test data: NC=".$nc->id." Host=".$host->id." Network=".$network->id." Group=".$group->idgroups;' || true
+      - docker exec restarters bash -c "sed -i 's/.throttle:api.,//g' /var/www/app/Http/Kernel.php"
+      - docker exec restarters bash -c "sed -i 's/APP_DEBUG=.*$/APP_DEBUG=false/g' /var/www/.env"
+      - docker exec restarters bash -c "sed -i 's/QUEUE_CONNECTION=.*/QUEUE_CONNECTION=sync/g' /var/www/.env"
+      - docker exec restarters bash -c "sed -i 's/MAIL_MAILER=.*/MAIL_MAILER=log/g' /var/www/.env"
+      - |
+        # Stop Vite dev server and build assets for production
+        echo "Stopping Vite dev server and building assets..."
+        docker exec restarters bash -c "ps aux | grep 'node.*vite' | grep -v grep | awk '{print \$2}' | xargs -r kill || true"
+        docker exec restarters bash -c "rm -f /var/www/public/hot && npm run build"
+      - |
+        # Ensure Playwright browsers are installed (handles version mismatches)
+        echo "Installing Playwright browsers..."
+        docker exec restarters_playwright bash -c "npx playwright install chromium"
+      - |
+        docker exec restarters_playwright bash -c "
+          export PLAYWRIGHT_TEST=true
+          export PLAYWRIGHT_DEBUG=true
+          export PWTEST_SKIP_TEST_OUTPUT=0
+          export DEBUG=playwright
+          export PLAYWRIGHT_BASE_URL=http://restarters_nginx
+          export PW_TEST_HTML_REPORT_OPEN=never
+          export FORCE_COLOR=1
+          stdbuf -oL -eL npx playwright test --reporter=html
+        "
+
+  docker:wait-for-services-*:
+    desc: Wait for Docker services to be ready and responding for a given profile (Usage - task docker:wait-for-services-[core|debug|discourse|all])
+    summary: |
+      Wait for Docker services to be ready by checking their health endpoints.
+      This task will check that services are listening on their ports and returning
+      plausible responses before proceeding, but only for the services in the specified profile.
+
+      For just the core services, use:
+      task docker:wait-for-services-core
+
+      To include debug tools (phpMyAdmin, Mailhog), use:
+      task docker:wait-for-services-debug
+
+      To include Discourse services, use:
+      task docker:wait-for-services-discourse
+
+      To wait for all services, use:
+      task docker:wait-for-services-all
+
+      The task checks:
+      - Core profile: MySQL database, Restarters web app
+      - Debug profile: Core + phpMyAdmin, Mailhog
+      - Discourse profile: Core + Discourse, PostgreSQL, Redis, Sidekiq
+      - All profile: All services
+
+    requires: *PROFILE_REQUIRES
+
+    vars: *PROFILE_VARS
+
+    silent: true
+
+    cmds:
+      - |
+        # Cross-platform sleep function
+        cross_platform_sleep() {
+          if command -v sleep >/dev/null 2>&1; then
+            sleep "$1"
+          elif command -v powershell >/dev/null 2>&1; then
+            powershell -Command "Start-Sleep -Seconds $1"
+          else
+            # Fallback using ping (works on most systems)
+            ping -n $(($1 + 1)) 127.0.0.1 >/dev/null 2>&1 || ping -c $1 127.0.0.1 >/dev/null 2>&1
+          fi
+        }
+        
+        # Generic wait function that takes: service_name, container_name, check_command, max_attempts, sleep_interval
+        wait_for_service() {
+          local service_name="$1"
+          local container_name="$2"
+          local check_command="$3"
+          local max_attempts="$4"
+          local sleep_interval="$5"
+
+          echo "Waiting for $service_name..."
+          local attempt=0
+          local initial_restart_count=0
+
+          # Get initial restart count if container exists
+          if docker ps -a --format "table {{.Names}}" | grep -q "^${container_name}$"; then
+            initial_restart_count=$(docker inspect --format='{{.RestartCount}}' "$container_name" 2>/dev/null || echo "0")
+          fi
+
+          while [ $attempt -lt $max_attempts ]; do
+            # Check if container has restarted since we started monitoring
+            if docker ps -a --format "table {{.Names}}" | grep -q "^${container_name}$"; then
+              current_restart_count=$(docker inspect --format='{{.RestartCount}}' "$container_name" 2>/dev/null || echo "0")
+              if [ "$current_restart_count" -gt "$initial_restart_count" ]; then
+                echo "❌ $service_name container ($container_name) has restarted during health check!"
+                echo "   Initial restart count: $initial_restart_count"
+                echo "   Current restart count: $current_restart_count"
+                echo "   Container logs:"
+                docker logs --tail=50 "$container_name" 2>&1 || echo "   Could not retrieve logs"
+                exit 1
+              fi
+            fi
+
+            if eval "$check_command" >/dev/null 2>&1; then
+              echo "✓ $service_name is ready"
+              return 0
+            fi
+            echo "  $service_name not ready, waiting... (attempt $((attempt + 1))/$max_attempts)"
+            cross_platform_sleep "$sleep_interval"
+            attempt=$((attempt + 1))
+          done
+          echo "❌ $service_name failed to start after $max_attempts attempts"
+          exit 1
+        }
+        
+        echo "Waiting for services in profile: {{.PROFILE}}"
+        echo ""
+        
+        # Wait for core services (always needed)
+        wait_for_service "MySQL database" "restarters_db" "docker exec restarters_db mysqladmin ping -h localhost -u root -ps3cr3t --silent" 60 5
+        wait_for_service "Restarters web application" "restarters" "curl -f -s http://localhost:8001" 120 5
+
+        # Wait for debug services (if in debug or all profile)
+        {{- if or (eq .PROFILE "debug") (eq .PROFILE "all") }}
+        wait_for_service "phpMyAdmin" "phpmyadmin" "curl -f -s http://localhost:8002" 60 5
+        wait_for_service "Mailhog" "mailhog" "curl -f -s http://localhost:8026" 60 5
+        {{- else }}
+        echo "✓ phpMyAdmin not in profile {{.PROFILE}}, skipping"
+        echo "✓ Mailhog not in profile {{.PROFILE}}, skipping"
+        {{- end }}
+
+        # Wait for discourse services (if in discourse or all profile)
+        {{- if or (eq .PROFILE "discourse") (eq .PROFILE "all") }}
+        wait_for_service "PostgreSQL" "postgresql" "docker exec postgresql pg_isready -U postgres" 60 5
+        wait_for_service "Discourse" "restarters_discourse" "curl -f -s http://localhost:8003" 120 10
+        {{- else }}
+        echo "✓ PostgreSQL not in profile {{.PROFILE}}, skipping"
+        echo "✓ Discourse not in profile {{.PROFILE}}, skipping"
+        {{- end }}
+      - echo "🎉 All services in profile {{.PROFILE}} are ready!"

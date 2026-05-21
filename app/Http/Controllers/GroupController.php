@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\RedirectResponse;
 use App\Device;
 use App\Events\ApproveGroup;
 use App\Events\EditGroup;
@@ -44,8 +45,21 @@ class GroupController extends Controller
         //Get current logged in user
         $user = Auth::user();
 
-        // Get all group tags
-        $all_group_tags = GroupTags::all();
+        // Get all groups
+        $groups = Group::with(['networks', 'groupImage.image', 'nextUpcomingParty'])
+            ->orderBy('name', 'ASC')
+            ->get();
+
+        // Get group tags based on user role
+        // Admins see all tags, NCs see tags from their networks only
+        if (Fixometer::hasRole($user, 'Administrator')) {
+            $all_group_tags = GroupTags::all();
+        } elseif (Fixometer::hasRole($user, 'NetworkCoordinator')) {
+            $userNetworkIds = $user->networks->pluck('id')->toArray();
+            $all_group_tags = GroupTags::whereIn('network_id', $userNetworkIds)->get();
+        } else {
+            $all_group_tags = collect([]);
+        }
         $networks = Network::all();
 
         // Look for groups we have joined, not just been invited to.  We have to explicitly test on deleted_at because
@@ -309,7 +323,7 @@ class GroupController extends Controller
         ]);
     }
 
-    public function postSendInvite(Request $request)
+    public function postSendInvite(Request $request): RedirectResponse
     {
         $request->validate([
             'manual_invite_box' => [(new Delimited('email'))->min(1)],
@@ -324,20 +338,6 @@ class GroupController extends Controller
         if (empty($emails)) {
             \Sentry\CaptureMessage('You have not entered any emails!');
             return redirect()->back()->with('warning', __('groups.invite.no_emails'));
-        }
-
-        $invalid = [];
-
-        foreach ($emails as $email) {
-            if (! filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                $invalid[] = $email;
-            }
-        }
-
-        if (count($invalid)) {
-            return redirect()->back()->with('warning', __('groups.invite_invalid_emails', [
-                'emails' => implode(', ', $invalid)
-            ]));
         }
 
         $users = User::whereIn('email', $emails)->get();
@@ -415,7 +415,7 @@ class GroupController extends Controller
         ]));
     }
 
-    public function confirmInvite($group_id, $hash)
+    public function confirmInvite($group_id, $hash): RedirectResponse
     {
         // Find user/group relationship based on the invitation hash.
         $user_group = UserGroups::where('status', $hash)->where('group', $group_id)->first();
@@ -459,17 +459,19 @@ class GroupController extends Controller
             abort(403);
         }
 
+        // Only return the most recent 100 audits - returning too many is too much for the client, and usually.
+        // we're only interested in the most recent events.
         return view('group.edit', [
             'id' => $id,
             'name' => $group->name,
-            'audits' => $group->audits,
+            'audits' => $group->audits->sortByDesc('id')->take(100),
             'networks' => Network::all(),
             'can_approve' => Fixometer::hasRole($user, 'Administrator') ||
                 Fixometer::hasRole($user, 'NetworkCoordinator') && $isCoordinatorForGroup
         ]);
     }
 
-    public function delete($id)
+    public function delete($id): RedirectResponse
     {
         $group = Group::where('idgroups', $id)->first();
 
@@ -515,7 +517,7 @@ class GroupController extends Controller
             foreach ($groups as $group) {
                 $group_image = $group->groupImage;
 
-                $event = $group->getNextUpcomingEvent();
+                $event = $group->nextUpcomingParty;
 
                 // We want to return the distance from our own location.
                 $distance = null;
@@ -550,7 +552,14 @@ class GroupController extends Controller
                     'all_confirmed_restarters_count' => $group->all_confirmed_restarters_count,
                     'all_confirmed_hosts_count' => $group->all_confirmed_hosts_count,
                     'networks' => \Illuminate\Support\Arr::pluck($group->networks, 'id'),
-                    'group_tags' => $group->group_tags()->get()->pluck('id'),
+                    'group_tags' => $group->group_tags->pluck('id'),
+                    'group_tags_full' => $group->group_tags->map(function($tag) {
+                        return [
+                            'id' => $tag->id,
+                            'name' => $tag->tag_name,
+                            'network_id' => $tag->network_id,
+                        ];
+                    }),
                     'following' => in_array($group->idgroups, $your_groupids),
                     'archived_at' => $group->archived_at ? Carbon::parse($group->archived_at)->toIso8601String() : null
                 ];
@@ -574,7 +583,7 @@ class GroupController extends Controller
         return view('group.stats', $groupStats);
     }
 
-    public function getJoinGroup($group_id)
+    public function getJoinGroup($group_id): RedirectResponse
     {
         $user_id = Auth::id();
         $alreadyInGroup = UserGroups::where('group', $group_id)
@@ -663,65 +672,16 @@ class GroupController extends Controller
         return 'Sorry, but the image can\'t be deleted';
     }
 
-    public function inviteNearbyRestarter($groupId, $userId)
-    {
-        $user_group = UserGroups::where('user', $userId)->where('group', $groupId)->first();
-        $user = User::where('id', $userId)->first();
-
-        // not already a confirmed member of the group
-        if (is_null($user_group) || $user_group->status != '1') {
-            $hash = substr(bin2hex(openssl_random_pseudo_bytes(32)), 0, 24);
-            $url = url('/').'/group/accept-invite/'.$groupId.'/'.$hash;
-
-            // already been invited once, set a new invite hash
-            if (! is_null($user_group)) {
-                $user_group->update([
-                    'status' => $hash,
-                ]);
-            // not associated with the group at all yet
-            } else {
-                UserGroups::create([
-                    'user' => $userId,
-                    'group' => $groupId,
-                    'status' => $hash,
-                    'role' => 4,
-                ]);
-            }
-
-            try {
-                $from = Auth::user();
-                $group = Group::where('idgroups', $groupId)->first();
-                if ($user->invites == 1) {
-                    Notification::send($user, new JoinGroup([
-                        'name' => $from->name,
-                        'group' => $group->name,
-                        'url' => $url,
-                        'message' => null,
-                    ], $user));
-                } else {
-                    $not_sent[] = $user->email;
-                }
-            } catch (\Exception $ex) {
-                Log::error('An error occurred while sending invitation to nearby Restarter:'.$ex->getMessage());
-            }
-        } else { // already a confirmed member of the group or been sent an invite
-            $not_sent[] = $user->email;
-        }
-
-        return redirect('/group/nearby/'.intval($groupId))->with('success', $user->name.' has been invited');
-    }
-
     /**
      * [confirmCodeInvite description].
      *
      * @author Christopher Kelker - @date 2019-03-25
      * @editor  Christopher Kelker
      * @version 1.0.0
-     * @param   Request     $request
      * @param   [type]      $code
      * @return  [type]
      */
-    public function confirmCodeInvite(Request $request, $code)
+    public function confirmCodeInvite(Request $request, $code): RedirectResponse
     {
         // Variables
         $group = Group::where('shareable_code', $code)->first();

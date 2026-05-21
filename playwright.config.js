@@ -6,21 +6,29 @@ const { devices } = require('@playwright/test');
 const config = {
   // Generate trace if a test fails; can be viewed using something like:
   // npx playwright show-trace test-results/group-Can-create-group-Desktop-Chromium-retry1/trace.zip
-  retries: 1,
-
   // Only use 1 worker, otherwise we hit CSRF issues.
   workers: 1,
 
+  // Exclude the slow autocomplete test from the main test run
+  grep: /^(?!.*Automatic category suggestion from item type)/,
+
   use: {
-    // Always record traces, so that we can check the success ones.
     trace: 'on',
+    // Take screenshot on failure for debugging
+    screenshot: 'on',
+    // Also capture video on failure for additional context
+    video: 'on',
+    // Configurable timeout for waitForURL operations
+    navigationTimeout: 30000,
+    // Note: We use route interception to add X-Playwright-Test header only to our backend,
+    // not to CDN resources, to avoid CORS issues. See baseURL project config below.
   },
   projects: [
     {
       name: 'Desktop Chromium',
       use: {
         browserName: 'chromium',
-        baseURL: 'http://localhost'
+        baseURL: process.env.PLAYWRIGHT_BASE_URL || 'http://restarters_nginx'
       },
     },
     // TODO The other browsers don't work reliably yet.

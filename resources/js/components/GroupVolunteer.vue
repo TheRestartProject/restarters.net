@@ -27,7 +27,7 @@
              'text-muted': noskills
             }">
               <div v-b-tooltip.hover :title="skillList">
-                <b-img-lazy src="/images/star.svg" :class="{
+                <b-img-lazy :src="imageUrl('/images/star.svg')" :class="{
                    'star': true,
                    'mr-1': true,
                    'faded': noskills
@@ -38,11 +38,13 @@
         </div>
       </div>
       <b-dropdown v-if="canedit" variant="none" ref="dropdown" class="edit-dropdown" no-caret>
+        <template slot="button-content">
+          <img :src="imageUrl('/icons/edit_ico_green.svg')" alt="" width="24" height="24" />
+        </template>
         <b-dropdown-item v-if="volunteer.host && candemote" @click="removeHostRole">{{ __('groups.remove_host_role') }}</b-dropdown-item>
         <b-dropdown-item v-if="!volunteer.host" @click="makeVolunteerHost">{{ __('groups.make_host') }}</b-dropdown-item>
         <b-dropdown-item @click="removeVolunteer">{{ __('groups.remove_volunteer') }}</b-dropdown-item>
       </b-dropdown>
-      <button class="dropdown-toggle d-none" />
     </div>
     <b-alert variant="danger" v-if="error">
       {{ __('partials.something_wrong') }}: {{ error }}
@@ -53,11 +55,13 @@
 </template>
 <script>
 import { DEFAULT_PROFILE, HOST, RESTARTER } from '../constants'
-import ConfirmModal from './ConfirmModal'
+import images from '../mixins/images'
+import ConfirmModal from './ConfirmModal.vue'
 import volunteers from '../store/volunteers'
 
 export default {
   components: {ConfirmModal},
+  mixins: [images],
   props: {
     id: {
       type: Number,
@@ -95,7 +99,7 @@ export default {
       let ret = null
       let skills = this.volunteer.skills
       let len = skills && skills.length ? skills.length : 0
-      ret = len + ' ' + this.$lang.choice('partials.skills', len)
+      ret = len + ' ' + this.__('partials.skills', { count: len })
       return ret
     },
     skillList() {

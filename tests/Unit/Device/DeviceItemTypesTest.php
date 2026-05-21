@@ -17,7 +17,7 @@ use Tests\TestCase;
 
 class DeviceItemTypesTest extends TestCase
 {
-    public function testItemTypesDuplicates() {
+    public function testItemTypesDuplicates(): void {
         $cat1 = Category::factory()->create([
             'idcategories' => 444,
             'revision' => 1,
@@ -42,6 +42,7 @@ class DeviceItemTypesTest extends TestCase
             'item_type' => 'flatscreen LCD'
         ]);
 
-        $this->assertEquals(1, count(Device::getItemTypes()));
+        $types = Device::getItemTypes();
+        $this->assertEquals(1, count($types));
     }
 }

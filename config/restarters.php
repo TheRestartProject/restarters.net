@@ -3,7 +3,7 @@
 return [
 
     'features' => [
-        'discourse_integration' => env('FEATURE__DISCOURSE_INTEGRATION', true),
+        'discourse_integration' => env('FEATURE__DISCOURSE_INTEGRATION', true) && !empty(env('DISCOURSE_URL')),
     ],
 
     'wiki' => [
@@ -15,13 +15,9 @@ return [
         'base_url' => env('REPAIRDIRECTORY_URL'),
     ],
 
-    'microtasking' => [
-        'discussion_tag' => env('MICROTASKING_DISCUSSION_TAG', 'workbench'),
-        'active_quest' => env('MICROTASKING_ACTIVE_QUEST', 'default'),
-    ],
-
     'xref_types' => [
         'networks' => 7,
     ],
 
+    'support_email_address' => env('SUPPORT_EMAIL_ADDRESS'),
 ];

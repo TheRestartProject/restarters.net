@@ -2,13 +2,14 @@
 
 namespace App\Http\Resources;
 
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
  * @OA\Schema(
  *     title="Item",
  *     schema="Item",
- *     description="An item which can be specified in a device",
+ *     description="An item which can be specified in a Device",
  *     @OA\Property(
  *          property="type",
  *          title="type",
@@ -44,11 +45,8 @@ class Item extends JsonResource
 {
     /**
      * Transform the resource into an array.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return array
      */
-    public function toArray($request)
+    public function toArray(Request $request): array
     {
         return [
             'type' => $this->item_type,

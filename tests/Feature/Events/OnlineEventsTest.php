@@ -29,7 +29,7 @@ class OnlineEventsTest extends TestCase
     }
 
     /** @test */
-    public function a_host_can_create_an_online_event()
+    public function a_host_can_create_an_online_event(): void
     {
         $this->withoutExceptionHandling();
 

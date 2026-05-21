@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
+use Illuminate\Http\JsonResponse;
 use App\Events\ApproveGroup;
 use App\Events\EditGroup;
 use App\Group;
@@ -15,6 +16,7 @@ use App\Network;
 use App\Notifications\AdminModerationGroup;
 use App\Notifications\GroupConfirmed;
 use App\Notifications\NewGroupWithinRadius;
+use App\EventsUsers;
 use App\Party;
 use App\Role;
 use App\Rules\Timezone;
@@ -60,7 +62,7 @@ class GroupController extends Controller
         return response()->json($groupChanges);
     }
 
-    public static function getGroupsByUsersNetworks(Request $request)
+    public static function getGroupsByUsersNetworks(Request $request): JsonResponse
     {
         $authenticatedUser = Auth::user();
 
@@ -84,6 +86,8 @@ class GroupController extends Controller
             }
         }
 
+        $allGroupStats = Group::bulkGroupStats($groups);
+
         // New Collection Instance
         $collection = collect([]);
 
@@ -94,7 +98,7 @@ class GroupController extends Controller
                 $group->latitude >= $minLat && $group->latitude <= $maxLat &&
                 $group->longitude >= $minLng && $group->longitude <= $maxLng
                 )) {
-                $groupStats = $group->getGroupStats();
+                $groupStats = $allGroupStats[$group->idgroups];
                 $collection->push([
                                       'id' => $group->idgroups,
                                       'name' => $group->name,
@@ -213,7 +217,7 @@ class GroupController extends Controller
         return $groupChange;
     }
 
-    public static function getGroupList()
+    public static function getGroupList(): JsonResponse
     {
         $groups = Group::orderBy('created_at', 'desc');
 
@@ -413,8 +417,35 @@ class GroupController extends Controller
      *     )
      */
     public static function listTagsv2(Request $request) {
+        // Try session auth first, then API token auth
+        $user = Auth::user();
+        if (!$user) {
+            $user = auth('api')->user();
+        }
+
+        // Unauthenticated users cannot see any tags
+        if (!$user) {
+            return [
+                'data' => []
+            ];
+        }
+
+        // Admins see all tags
+        if ($user->hasRole('Administrator')) {
+            return [
+                'data' => TagCollection::make(GroupTags::with('network')->get())
+            ];
+        }
+
+        // Network Coordinators only see tags from their networks (NOT global tags - those are admin-only)
+        $userNetworkIds = $user->networks->pluck('id')->toArray();
+
+        $tags = GroupTags::with('network')
+            ->whereIn('network_id', $userNetworkIds)
+            ->get();
+
         return [
-            'data' => TagCollection::make(GroupTags::all())
+            'data' => TagCollection::make($tags)
         ];
     }
 
@@ -573,10 +604,24 @@ class GroupController extends Controller
      *     )
      */
 
-    public static function getVolunteersForGroupv2($idgroups) {
+    public function getVolunteersForGroupv2(Request $request, $idgroups) {
         $group = Group::findOrFail($idgroups);
-        $volunteers = $group->allConfirmedVolunteers()->get();
-        return VolunteerCollection::make($volunteers);
+        $query = $group->allConfirmedVolunteers();
+
+        // Optionally exclude users already confirmed at a specific event.
+        $excludeEvent = $request->query('exclude_event');
+        if ($excludeEvent) {
+            $confirmedUserIds = EventsUsers::where('event', $excludeEvent)
+                ->where(function ($query) {
+                    $query->where('status', '1')
+                          ->orWhereNull('status');
+                })
+                ->whereNotNull('user')
+                ->pluck('user');
+            $query = $query->whereNotIn('users_groups.user', $confirmedUserIds);
+        }
+
+        return VolunteerCollection::make($query->get());
     }
 
     /**
@@ -674,6 +719,7 @@ class GroupController extends Controller
     {
         $user = $this->getUser();
         $host = $request->get('host', false);
+        $volunteer = User::findOrFail($iduser);
 
         $group = Group::findOrFail($id);
         $is_host_of_group = Fixometer::userHasEditGroupPermission($id, $user->id);
@@ -688,6 +734,11 @@ class GroupController extends Controller
         if (!is_null($userGroupAssociation)) {
             $userGroupAssociation->role = $host ? Role::HOST : Role::RESTARTER;
             $userGroupAssociation->save();
+
+            if ($host) {
+                $group->refresh();
+                $group->makeMemberAHost($volunteer);
+            }
         }
     }
 
@@ -739,7 +790,7 @@ class GroupController extends Controller
      *       ),
      *     )
      */
-    public function moderateGroupsv2(Request $request) {
+    public function moderateGroupsv2(Request $request): JsonResponse {
         $user = $this->getUser();
         $ret = \App\Http\Resources\GroupCollection::make(Group::unapprovedVisibleTo($user->id));
         return response()->json($ret);
@@ -821,7 +872,7 @@ class GroupController extends Controller
      *     )
      *  )
      */
-    public function createGroupv2(Request $request) {
+    public function createGroupv2(Request $request): JsonResponse {
         $user = $this->getUser();
         $user->convertToHost();
 
@@ -969,17 +1020,19 @@ class GroupController extends Controller
      *     )
      *  )
      */
-    public function updateGroupv2(Request $request, $idGroup) {
+    public function updateGroupv2(Request $request, $idGroup): JsonResponse {
         $user = $this->getUser();
+
+        $group = Group::findOrFail($idGroup);
 
         list($name, $area, $postcode, $location, $phone, $website, $description, $timezone,
             $latitude, $longitude, $country, $network_data, $email,
             $archived_at) = $this->validateGroupParams(
             $request,
-            false
+            false,
+            $group
         );
 
-        $group = Group::findOrFail($idGroup);
         $is_host_of_group = Fixometer::userHasEditGroupPermission($idGroup, $user->id);
         $isCoordinatorForGroup = $user->isCoordinatorForGroup($group);
 
@@ -1038,14 +1091,62 @@ class GroupController extends Controller
                 $group->networks()->sync($networks);
             }
 
-            // We can update the tags.  The parameter is an array of ids.
-            // TODO The old code restricts updating tags to admins.  But I wonder if it should include
-            // networks coordinators too.
+            // Administrators can update tags with any tag (global or any network's tags)
             $tags = $request->tags;
 
             if ($tags) {
                 $tags = json_decode($tags);
                 $group->group_tags()->sync($tags);
+            }
+        } elseif ($isCoordinatorForGroup) {
+            // Network Coordinators can update tags, but only with tags that belong to
+            // networks they coordinate (global tags are admin-only).
+            // IMPORTANT: Preserve tags from networks the NC doesn't coordinate.
+            $tags = $request->tags;
+
+            if ($tags !== null) {
+                $tags = json_decode($tags);
+
+                // Get the network IDs this user coordinates
+                $userNetworkIds = $user->networks->pluck('id')->toArray();
+
+                // Get the network IDs the group belongs to
+                $groupNetworkIds = $group->networks->pluck('id')->toArray();
+
+                // Find the intersection: networks where NC coordinates AND group belongs
+                $editableNetworkIds = array_intersect($userNetworkIds, $groupNetworkIds);
+
+                // Get existing tags on the group that are from networks the NC CANNOT edit
+                // (either global tags, or tags from networks the NC doesn't coordinate,
+                // or tags from networks the group doesn't belong to)
+                $existingTagIds = $group->group_tags->pluck('id')->toArray();
+                $tagsToPreserve = [];
+                foreach ($existingTagIds as $existingTagId) {
+                    $existingTag = \App\GroupTags::find($existingTagId);
+                    if ($existingTag) {
+                        // Preserve if: global tag OR not in editable networks
+                        if ($existingTag->network_id === null || !in_array($existingTag->network_id, $editableNetworkIds)) {
+                            $tagsToPreserve[] = $existingTagId;
+                        }
+                    }
+                }
+
+                // Validate each submitted tag belongs to an editable network
+                $validNewTags = [];
+                foreach ($tags as $tagId) {
+                    $tag = \App\GroupTags::find($tagId);
+                    if ($tag) {
+                        // Tag is valid only if it belongs to an editable network
+                        if ($tag->network_id !== null && in_array($tag->network_id, $editableNetworkIds)) {
+                            $validNewTags[] = $tagId;
+                        }
+                    }
+                }
+
+                // Combine preserved tags with new valid tags
+                $finalTags = array_unique(array_merge($tagsToPreserve, $validNewTags));
+
+                $group->group_tags()->sync($finalTags);
             }
         }
 
@@ -1093,7 +1194,7 @@ class GroupController extends Controller
                                 ]);
     }
 
-    private function validateGroupParams(Request $request, $create): array {
+    private function validateGroupParams(Request $request, $create, ?Group $existingGroup = null): array {
         // We don't validate max lengths of other strings, to avoid duplicating the length information both here
         // and in the migrations.  If we wanted to do that we should extract the length dynamically from the
         // schema, which is possible but not trivial.
@@ -1107,7 +1208,7 @@ class GroupController extends Controller
             $request->validate([
                                    'name' => ['max:255'],
                                    'location' => ['max:255'],
-                                   'archived_at' => ['date'],
+                                   'archived_at' => ['nullable', 'date'],
                                ]);
         }
 
@@ -1132,23 +1233,33 @@ class GroupController extends Controller
         }
 
         if (!empty($location)) {
-            $geocoder = new \App\Helpers\Geocoder();
-            $geocoded = $geocoder->geocode($location);
+            // Skip geocoding when the location string hasn't changed — avoids unnecessary API calls
+            // and prevents failures when editing other fields (e.g. group icon) in environments
+            // where the geocoding API key is unavailable.
+            $locationUnchanged = $existingGroup !== null && $location === $existingGroup->location;
 
-            if (empty($geocoded))
-            {
-                throw ValidationException::withMessages(['location ' => __('groups.geocode_failed')]);
+            if ($locationUnchanged) {
+                $latitude = $existingGroup->latitude;
+                $longitude = $existingGroup->longitude;
+                $country_code = $existingGroup->country_code;
+            } else {
+                $geocoder = app(\App\Helpers\Geocoder::class);
+                $geocoded = $geocoder->geocode($location);
+
+                if (empty($geocoded)) {
+                    throw ValidationException::withMessages(['location ' => __('groups.geocode_failed')]);
+                }
+
+                $latitude = $geocoded['latitude'];
+                $longitude = $geocoded['longitude'];
+
+                // Note that the country returned by the geocoder is already in English, which is what we need for the
+                // value in the database.
+                $country_code = $geocoded['country_code'] ?? null;
             }
-
-            $latitude = $geocoded['latitude'];
-            $longitude = $geocoded['longitude'];
-
-            // Note that the country returned by the geocoder is already in English, which is what we need for the
-            // value in the database.
-            $country_code = $geocoded['country_code'];
         }
 
-        return array(
+        return [
             $name,
             $area,
             $postcode,
@@ -1163,6 +1274,6 @@ class GroupController extends Controller
             $network_data,
             $email,
             $archived_at
-        );
+        ];
     }
 }

@@ -53,7 +53,7 @@ class DeviceStatsTest extends StatsTestCase
     /** WASTE TESTS */
 
     /** @test */
-    public function an_unpowered_nonmisc_device_has_waste_diverted()
+    public function an_unpowered_nonmisc_device_has_waste_diverted(): void
     {
         $device = Device::factory()->fixed()->create([
             'category' => $this->_idUnpoweredNonMisc,
@@ -64,7 +64,7 @@ class DeviceStatsTest extends StatsTestCase
     }
 
     /** @test */
-    public function a_powered_misc_device_without_estimate_has_no_waste_diverted()
+    public function a_powered_misc_device_without_estimate_has_no_waste_diverted(): void
     {
         $device = Device::factory()->fixed()->create([
             'category' => $this->_idPoweredMisc,
@@ -75,7 +75,7 @@ class DeviceStatsTest extends StatsTestCase
     }
 
     /** @test */
-    public function a_powered_misc_device_with_estimate_has_waste_diverted()
+    public function a_powered_misc_device_with_estimate_has_waste_diverted(): void
     {
         $device = Device::factory()->fixed()->create([
             'category' => $this->_idPoweredMisc,
@@ -87,7 +87,7 @@ class DeviceStatsTest extends StatsTestCase
     }
 
     /** @test */
-    public function a_powered_non_misc_device_has_waste_diverted()
+    public function a_powered_non_misc_device_has_waste_diverted(): void
     {
         $device = Device::factory()->fixed()->create([
             'category' => $this->_idPoweredNonMisc,
@@ -98,7 +98,7 @@ class DeviceStatsTest extends StatsTestCase
     }
 
     /** @test */
-    public function a_powered_non_fixed_device_has_no_waste_diverted()
+    public function a_powered_non_fixed_device_has_no_waste_diverted(): void
     {
         $device = Device::factory()->repairable()->create([
             'category' => $this->_idPoweredNonMisc,
@@ -124,7 +124,7 @@ class DeviceStatsTest extends StatsTestCase
     }
 
     /** @test */
-    public function an_unpowered_misc_device_without_estimate_has_no_waste_diverted()
+    public function an_unpowered_misc_device_without_estimate_has_no_waste_diverted(): void
     {
         $device = Device::factory()->fixed()->create([
             'category' => $this->_idUnpoweredMisc,
@@ -135,7 +135,7 @@ class DeviceStatsTest extends StatsTestCase
     }
 
     /** @test */
-    public function an_unpowered_misc_device_with_estimate_has_waste_diverted()
+    public function an_unpowered_misc_device_with_estimate_has_waste_diverted(): void
     {
         $device = Device::factory()->fixed()->create([
             'category' => $this->_idUnpoweredMisc,
@@ -147,7 +147,7 @@ class DeviceStatsTest extends StatsTestCase
     }
 
     /** @test */
-    public function an_unpowered_non_misc_device_has_waste_diverted()
+    public function an_unpowered_non_misc_device_has_waste_diverted(): void
     {
         $device = Device::factory()->fixed()->create([
             'category' => $this->_idUnpoweredNonMisc,
@@ -160,7 +160,7 @@ class DeviceStatsTest extends StatsTestCase
     /** CO2 TESTS */
 
     /** @test */
-    public function an_unpowered_non_fixed_device_has_no_waste_diverted()
+    public function an_unpowered_non_fixed_device_has_no_waste_diverted(): void
     {
         $device1 = Device::factory()->repairable()->create([
             'category' => $this->_idUnpoweredNonMisc,
@@ -189,7 +189,7 @@ class DeviceStatsTest extends StatsTestCase
     }
 
     /** @test */
-    public function a_powered_misc_device_with_no_estimate_has_no_c02_diverted()
+    public function a_powered_misc_device_with_no_estimate_has_no_c02_diverted(): void
     {
         $device = Device::factory()->fixed()->create([
             'category' => $this->_idPoweredMisc,
@@ -201,7 +201,7 @@ class DeviceStatsTest extends StatsTestCase
     }
 
     /** @test */
-    public function a_powered_misc_device_with_estimate_has_c02_diverted()
+    public function a_powered_misc_device_with_estimate_has_c02_diverted(): void
     {
         $device = Device::factory()->fixed()->create([
             'category' => $this->_idPoweredMisc,
@@ -215,7 +215,7 @@ class DeviceStatsTest extends StatsTestCase
     }
 
     /** @test */
-    public function a_powered_non_misc_device_has_c02_diverted()
+    public function a_powered_non_misc_device_has_c02_diverted(): void
     {
         $device = Device::factory()->fixed()->create([
             'category' => $this->_idPoweredNonMisc,
@@ -228,7 +228,7 @@ class DeviceStatsTest extends StatsTestCase
     }
 
     /** @test */
-    public function an_unpowered_misc_device_with_no_estimate_has_no_c02_diverted()
+    public function an_unpowered_misc_device_with_no_estimate_has_no_c02_diverted(): void
     {
         $device = Device::factory()->fixed()->create([
             'category' => $this->_idUnpoweredMisc,
@@ -240,7 +240,7 @@ class DeviceStatsTest extends StatsTestCase
     }
 
     /** @test */
-    public function an_unpowered_misc_device_with_estimate_has_c02_diverted()
+    public function an_unpowered_misc_device_with_estimate_has_c02_diverted(): void
     {
         $device = Device::factory()->fixed()->create([
             'category' => $this->_idUnpoweredMisc,
@@ -254,7 +254,7 @@ class DeviceStatsTest extends StatsTestCase
     }
 
     /** @test */
-    public function an_unpowered_non_misc_device_has_c02_diverted()
+    public function an_unpowered_non_misc_device_has_c02_diverted(): void
     {
         $device = Device::factory()->fixed()->create([
             'category' => $this->_idUnpoweredNonMisc,

@@ -5,6 +5,7 @@ namespace App\Observers;
 use App\Events\UserConfirmedEvent;
 use App\Events\UserLeftEvent;
 use App\EventsUsers;
+use App\Party;
 use App\Role;
 use App\Services\DiscourseService;
 use App\User;
@@ -26,34 +27,30 @@ class EventsUsersObserver {
 
         /**
      * Listen to the created event.
-     *
-     * @param  \App\EventsUsers  $eu
-     * @return void
      */
-    public function created(EventsUsers $eu)
+    public function created(EventsUsers $eu): void
     {
         $idevents = $eu->event;
         $event = \App\Party::find($idevents);
         $iduser = $eu->user;
         $user = $iduser ? User::find($iduser) : null;
         
-        if ($eu->status == 1) {
-            // Confirmed.  Make sure they are on the thread.
-            $this->confirmed($event, $user, true);
-        } else {
-            // Not confirmed.  Make sure they are not on the thread.  Don't change the count, as they shouldn't
-            // be on it anyway.
-            $this->removed($event, $user, false);
+        if ($user) {
+            if ((string) $eu->status === '1') {
+                // Confirmed.  Make sure they are on the thread.
+                $this->confirmed($event, $user, true);
+            } else {
+                // Not confirmed.  Make sure they are not on the thread.  Don't change the count, as they shouldn't
+                // be on it anyway.
+                $this->removed($event, $user, false);
+            }
         }
     }
 
     /**
      * Listen to the updated event.
-     *
-     * @param  \App\EventsUsers  $eu
-     * @return void
      */
-    public function updating(EventsUsers $eu) {
+    public function updating(EventsUsers $eu): void {
         $idevents = $eu->event;
         $event = \App\Party::find($idevents);
         $iduser = $eu->user;
@@ -62,7 +59,7 @@ class EventsUsersObserver {
         if ($eu->isDirty('status')) {
             // The confirmed status has changed, so we need to update the thread.
 
-            if ($eu->status == 1) {
+            if ((string) $eu->status === '1') {
                 // Confirmed.  Make sure they are on the thread.
                 $this->confirmed($event, $user, true);
             } else {
@@ -74,11 +71,8 @@ class EventsUsersObserver {
 
     /**
      * Listen to the deleted event.
-     *
-     * @param  \App\EventsUsers  $eu
-     * @return void
      */
-    public function deleted(EventsUsers $eu)
+    public function deleted(EventsUsers $eu): void
     {
         $idevents = $eu->event;
         $event = \App\Party::find($idevents);
@@ -86,15 +80,12 @@ class EventsUsersObserver {
         $user = $iduser ? User::find($iduser) : null;
 
         // Make sure they are not on the thread.  If they were confirmed, we need to update the volunteer count.
-        $this->removed($event, $user, true, $eu->status == 1);
+        if ($user) {
+            $this->removed($event, $user, (string) $eu->status === '1');
+        }
     }
 
-    /**
-     * @param Party $event
-     * @param User $user
-     * @return void
-     */
-    private function confirmed($event, $user, $count): void
+    private function confirmed(Party $event, User $user, $count): void
     {
         if ($count) {
             $event->increment('volunteers');
@@ -103,12 +94,7 @@ class EventsUsersObserver {
         event(new UserConfirmedEvent($event->idevents, $user ? $user->id : null));
     }
 
-    /**
-     * @param Party $event
-     * @param User $user
-     * @return void
-     */
-    private function removed($event, $user, $count): void
+    private function removed(Party $event, User $user, $count): void
     {
         if ($count) {
             $event->decrement('volunteers');

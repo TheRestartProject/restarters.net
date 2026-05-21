@@ -39,7 +39,7 @@ class ModerationEventPhotosNotificationTest extends TestCase
     protected $group;
 
     /** @test */
-    public function a_moderation_notification_is_sent_to_admins_when_event_photos_are_uploaded()
+    public function a_moderation_notification_is_sent_to_admins_when_event_photos_are_uploaded(): void
     {
         Notification::fake();
 
@@ -86,7 +86,7 @@ class ModerationEventPhotosNotificationTest extends TestCase
         );
 
         // Delete the image.
-        $image = \DB::select(DB::raw("SELECT idimages, path FROM images ORDER BY idimages DESC LIMIT 1"));
+        $image = \DB::select("SELECT idimages, path FROM images ORDER BY idimages DESC LIMIT 1");
         $idimages = $image[0]->idimages;
         $path = $image[0]->path;
         $response = $this->get("/party/image/delete/{$event->idevents}/$idimages/$path");

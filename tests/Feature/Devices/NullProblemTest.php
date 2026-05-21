@@ -19,12 +19,7 @@ class NullProblemTest extends TestCase
         Device::truncate();
         DB::statement('SET foreign_key_checks=1');
 
-        $event = Party::factory()->create();
-        $this->device_inputs = Device::factory()->raw([
-                                                               'event_id' => $event->idevents,
-                                                               'quantity' => 1,
-                                                           ]);
-
+        $this->event = Party::factory()->create();
         $admin = User::factory()->administrator()->create();
         $this->actingAs($admin);
 
@@ -32,10 +27,9 @@ class NullProblemTest extends TestCase
     }
 
     /** @test */
-    public function null_problem_mapped_to_empty_string()
+    public function null_problem_mapped_to_empty_string(): void
     {
-        $this->device_inputs['problem'] = null;
-        $this->post('/device/create', $this->device_inputs);
+        $iddevices = $this->createDevice($this->event->idevents, 'misc', null, 1, 100, null);
         $iddevices = Device::latest()->first()->iddevices;
 
         $device = Device::find($iddevices);

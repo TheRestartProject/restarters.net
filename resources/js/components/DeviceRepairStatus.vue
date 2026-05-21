@@ -46,18 +46,16 @@
     <multiselect
         :disabled="disabled"
         v-if="showBarriers"
-        v-model="barriersValue"
+        v-model="barrierValue"
         :placeholder="__('partials.choose_barriers')"
-        :options="translatedBarriers"
-        :multiple="true"
+        :options="barriersOptions"
+        :multiple="false"
         :allow-empty="false"
         deselect-label=""
         track-by="id"
-        label="barrier"
+        label="text"
         :taggable="false"
         selectLabel=""
-        selectedLabel=""
-        :allowEmpty="true"
     />
   </div>
 </template>
@@ -74,26 +72,24 @@ import {
 export default {
   props: {
     status: {
-      type: Number,
+      type: String,
       required: false,
       default: null
     },
     parts: {
-      type: Number,
+      type: String,
       required: false,
       default: null
     },
     steps: {
-      type: Number,
+      type: String,
       required: false,
       default: null
     },
-    barriers: {
-      type: Array,
+    barrier: {
+      type: String,
       required: false,
-      default: function() {
-        return []
-      }
+      default: null
     },
     barrierList: {
       type: Array,
@@ -106,13 +102,6 @@ export default {
     },
   },
   computed: {
-    translatedBarriers() {
-      return this.barrierList.map(b => {
-        var newb = JSON.parse(JSON.stringify(b))
-        newb.barrier = this.$lang.get('strings.' + b.barrier)
-        return newb
-      })
-    },
     showSteps () {
       return this.status === REPAIRABLE
     },
@@ -140,15 +129,15 @@ export default {
       return [
         {
           id: FIXED,
-          text: this.$lang.get('partials.fixed')
+          text: this.__('partials.fixed')
         },
         {
           id: REPAIRABLE,
-          text: this.$lang.get('partials.repairable')
+          text: this.__('partials.repairable')
         },
         {
           id: END_OF_LIFE,
-          text: this.$lang.get('partials.end_of_life')
+          text: this.__('partials.end_of_life')
         }
       ]
     },
@@ -166,15 +155,15 @@ export default {
       return [
         {
           id: NEXT_STEPS_MORE_TIME,
-          text: this.$lang.get('partials.more_time')
+          text: this.__('partials.more_time')
         },
         {
           id: NEXT_STEPS_PROFESSIONAL,
-          text: this.$lang.get('partials.professional_help')
+          text: this.__('partials.professional_help')
         },
         {
           id: NEXT_STEPS_DIY,
-          text: this.$lang.get('partials.diy')
+          text: this.__('partials.diy')
         }
       ]
     },
@@ -192,34 +181,36 @@ export default {
       return [
         {
           id: SPARE_PARTS_THIRD_PARTY,
-          text: this.$lang.get('partials.yes_third_party')
+          text: this.__('partials.yes_third_party')
         },
         {
           id: SPARE_PARTS_MANUFACTURER,
-          text: this.$lang.get('partials.yes_manufacturer')
+          text: this.__('partials.yes_manufacturer')
         },
         {
           id: SPARE_PARTS_NOT_NEEDED,
-          text: this.$lang.get('partials.no')
+          text: this.__('partials.no')
         }
       ]
     },
-    barriersValue: {
-      get() {
-        // We have an array of ids which we need to map to an array of options.
-        var ret = this.barrierList.filter(b => {
-          return this.barriers && this.barriers.indexOf(b.id) !== -1
-        })
+    barriersOptions() {
+      return this.barrierList.map(b => {
+        var newb = {
+          id: b.barrier,
+          text: this.__(b.barrier)
+        }
 
-        return ret.map(b => {
-          return this.translatedBarriers.find(t => {
-            return t.id === b.id
-          })
+        return newb
+      })
+    },
+    barrierValue: {
+      get() {
+        return this.barriersOptions.find(o => {
+          return o.id === this.barrier
         })
       },
       set(newval) {
-        // We have an array of options we want to emit as an array of ids.
-        this.$emit('update:barriers', newval.map(o => o.id))
+        this.$emit('update:barrier', newval.id)
       }
     },
   }

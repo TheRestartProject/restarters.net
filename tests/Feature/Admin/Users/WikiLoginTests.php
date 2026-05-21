@@ -28,7 +28,7 @@ class WikiLoginTests extends TestCase
     }
 
     /** @test */
-    public function if_flagged_for_creation_create_when_logging_in()
+    public function if_flagged_for_creation_create_when_logging_in(): void
     {
         $this->withoutExceptionHandling();
         Honeypot::disable();
@@ -52,7 +52,7 @@ class WikiLoginTests extends TestCase
     }
 
     /** @test */
-    public function if_not_flagged_for_creation()
+    public function if_not_flagged_for_creation(): void
     {
         $this->withoutExceptionHandling();
         Honeypot::disable();
@@ -76,7 +76,7 @@ class WikiLoginTests extends TestCase
     }
 
     /** @test */
-    public function if_already_created()
+    public function if_already_created(): void
     {
         $this->withoutExceptionHandling();
         Honeypot::disable();
@@ -100,7 +100,7 @@ class WikiLoginTests extends TestCase
     }
 
     /** @test */
-    public function if_wiki_user_changes_password()
+    public function if_wiki_user_changes_password(): void
     {
         $this->withoutExceptionHandling();
 
@@ -118,5 +118,27 @@ class WikiLoginTests extends TestCase
         $response = $this->post('/profile/edit-password', ['current-password' => 'secret', 'new-password' => 'f00', 'new-password-repeat' => 'f00']);
 
         // Then the user's wiki password should be changed to match
+    }
+
+    /** @test */
+    public function login_succeeds_when_wiki_unavailable()
+    {
+        $this->withoutExceptionHandling();
+        Honeypot::disable();
+
+        // Bind null for UserCreator to simulate Wiki being unavailable
+        $this->instance(UserCreator::class, null);
+
+        // Given we have a user
+        $user = User::factory()->create();
+        $user->wiki_sync_status = WikiSyncStatus::CreateAtLogin;
+        $user->save();
+
+        // When user logs in
+        $response = $this->post('/login', ['email' => $user->email, 'password'=> 'secret', 'my_name' => 'foo', 'my_time' => 1]);
+
+        // Then the login should succeed (redirects to dashboard)
+        $response->assertStatus(302);
+        $this->assertAuthenticatedAs($user);
     }
 }

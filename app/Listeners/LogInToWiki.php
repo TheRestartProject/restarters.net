@@ -7,9 +7,12 @@ use Cookie;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use Mediawiki\Api\ApiUser;
-use Mediawiki\Api\MediawikiApi;
-use Mediawiki\Api\Service\UserCreator;
+use Addwiki\Mediawiki\Api\Client\Action\ActionApi;
+use Addwiki\Mediawiki\Api\Client\Auth\UserAndPassword;
+use Addwiki\Mediawiki\Api\Client\MediaWiki;
+use Addwiki\Mediawiki\Api\Guzzle\ClientFactory;
+use Addwiki\Mediawiki\Api\Service\UserCreator;
+use GuzzleHttp\Cookie\CookieJar;
 
 // Don't extend BaseEvent - we don't want to queue because this needs to happen before we return to the client.
 class LogInToWiki
@@ -25,7 +28,7 @@ class LogInToWiki
      *
      * @return void
      */
-    public function __construct(Request $request, UserCreator $mediawikiUserCreator)
+    public function __construct(Request $request, ?UserCreator $mediawikiUserCreator)
     {
         $this->request = $request;
         $this->wikiUserCreator = $mediawikiUserCreator;
@@ -33,29 +36,42 @@ class LogInToWiki
 
     /**
      * Handle the event.
-     *
-     * @param  Login  $event
-     * @return void
      */
-    public function handle(Login $event)
+    public function handle(Login $event): void
     {
-        $user = $event->user;
+        try {
+            // If Wiki integration is not available, just return without error
+            if ($this->wikiUserCreator === null) {
+                Log::info("Wiki integration not available - skipping wiki login");
+                return;
+            }
 
-        if ($user->wiki_sync_status == WikiSyncStatus::CreateAtLogin) {
-            Log::info("Need to create " . $user->name);
-            $this->createUserInWiki($user);
-            $user->refresh();
-        }
+            $user = $event->user;
 
-        if (! is_null($user->mediawiki) && ! empty($user->mediawiki) &&
-            $user->wiki_sync_status == WikiSyncStatus::Created) {
-            $this->logUserIn($user);
+            if ($user->wiki_sync_status == WikiSyncStatus::CreateAtLogin) {
+                Log::info("Need to create " . $user->name);
+                $this->createUserInWiki($user);
+                $user->refresh();
+            }
+
+            if (! is_null($user->mediawiki) && ! empty($user->mediawiki) &&
+                $user->wiki_sync_status == WikiSyncStatus::Created) {
+                $this->logUserIn($user);
+            }
+        } catch (\Exception $ex) {
+            // Log the error but don't let it break the user's login
+            Log::error("Wiki login failed but user login will continue: " . $ex->getMessage());
         }
     }
 
     protected function createUserInWiki($user)
     {
         try {
+            if (!$this->wikiUserCreator) {
+                Log::error("Wiki UserCreator not available - cannot create user '".$user->username."' in mediawiki");
+                return;
+            }
+
             // Mediawiki does strange things with underscores.
             $mediawikiUsername = str_replace('_', '-', $user->username);
             $this->wikiUserCreator->create($mediawikiUsername, $user->password, $user->email);
@@ -63,7 +79,7 @@ class LogInToWiki
             $user->wiki_sync_status = WikiSyncStatus::Created;
             $user->mediawiki = $mediawikiUsername;
             $user->save();
-        } catch (\Exception $ex) {
+        } catch (\Throwable $ex) {
             Log::error("Failed to create new account for user '".$user->username."' in mediawiki: ".$ex->getMessage());
         }
     }
@@ -72,15 +88,13 @@ class LogInToWiki
     {
         try {
             Log::info("Log in to wiki $user->mediawiki");
-            $api = MediawikiApi::newFromApiEndpoint(env('WIKI_URL').'/api.php');
-            $api->login(new ApiUser($user->mediawiki, $user->password));
+            $cookieJar = new CookieJar();
+            $guzzleClient = (new ClientFactory(['cookies' => $cookieJar, 'timeout' => 10, 'connect_timeout' => 5]))->getClient();
+            $auth = new UserAndPassword($user->mediawiki, $user->password);
+            $api = new ActionApi(env('WIKI_URL').'/api.php', $auth, $guzzleClient);
+            $api->getToken('csrf');
             Log::info("Logged in to wiki $user->mediawiki");
 
-            // NGM: it appears that right from the beginning MediawikiApi->getClient access modifier was changed
-            // in our vendor folder from private to public in order to access the underlying client for the cookies.
-            // This is really bad, as obviously when we update the package via composer the method changes back to private.
-            // Stuck with that until we can figure out an alternative way to access the client.
-            $cookieJar = $api->getClient()->getConfig('cookies');
             $cookieJarArray = $cookieJar->toArray();
 
             if (! empty($cookieJarArray)) {
@@ -88,7 +102,7 @@ class LogInToWiki
                     Cookie::queue(Cookie::make($cookie['Name'], $cookie['Value'], $cookie['Expires']));
                 }
             }
-        } catch (\Exception $ex) {
+        } catch (\Throwable $ex) {
             Log::error("Failed to log user '".$user->mediawiki."' in to mediawiki: ".$ex->getMessage());
         }
     }

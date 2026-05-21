@@ -1,0 +1,55 @@
+<?php
+
+namespace Tests\Feature;
+
+use App\Device;
+use App\Notifications\AdminAbnormalDevices;
+use App\Party;
+use App\User;
+use DB;
+use Illuminate\Support\Facades\Notification;
+use Tests\TestCase;
+
+class TooManyMiscTest extends TestCase
+{
+    /**
+     * @dataProvider provider
+     */
+    public function testTooMany($count, $notif): void
+    {
+        Notification::fake();
+
+        $this->event = Party::factory()->create();
+        $this->admin = User::factory()->administrator()->create();
+        $this->admin->addPreference('admin-abnormal-devices');
+
+        $this->device_inputs = Device::factory()->raw([
+                                                               'event_id' => $this->event->idevents,
+                                                               'quantity' => 1,
+                                                               'category' => env('MISC_CATEGORY_ID_POWERED'),
+                                                               'category_creation' => env('MISC_CATEGORY_ID_POWERED'),
+                                                           ]);
+        $this->actingAs($this->admin);
+
+        for ($i = 0; $i < $count; $i++) {
+            $iddevices = $this->createDevice($this->event->idevents, 'misc');
+            $this->assertNotNull($iddevices);
+        }
+
+        if ($notif) {
+            Notification::assertSentTo(
+                [$this->admin],
+                AdminAbnormalDevices::class
+            );
+        }
+
+        self::assertTrue(true);
+    }
+
+    public static function provider(): array {
+        return [
+            [ env('DEVICE_ABNORMAL_MISC_COUNT', 5) - 1, false, ],
+            [ env('DEVICE_ABNORMAL_MISC_COUNT', 5), true, ]
+        ];
+    }
+}

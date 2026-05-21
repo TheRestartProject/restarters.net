@@ -159,7 +159,7 @@ export default {
           this.iconName
       )
     },
-    onClick() {
+    onClick(event) {
       if (!this.loading) {
         // Blur so that the button doesn't stay focused and therefore e.g. black.
         this.$refs.btn.blur()
@@ -171,7 +171,7 @@ export default {
     }
   },
   beforeUnmount() {
-    clearTimeout(timer)
+    clearTimeout(this.timer)
   }
 }
 </script>

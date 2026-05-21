@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
+use Illuminate\Http\JsonResponse;
 use App\Events\EditEvent;
 use App\EventsUsers;
 use App\Group;
@@ -145,7 +146,7 @@ class EventController extends Controller
         return $collection;
     }
 
-    public function addVolunteer(Request $request, $idevents)
+    public function addVolunteer(Request $request, $idevents): JsonResponse
     {
         $request->validate([
             'volunteer_email_address' => ['nullable', 'email'],
@@ -185,21 +186,21 @@ class EventController extends Controller
         // Check if user was invited but not RSVPed.
         $invitedUserQuery = EventsUsers::where('event', $idevents)
             ->where('user', $user)
-            ->where('status', '<>', 1)
+            ->where('status', '<>', '1')
             ->whereNotNull('status')
             ->where('role', $eventRole);
         $userWasInvited = $invitedUserQuery->count() == 1;
 
         if ($userWasInvited) {
             $invitedUser = $invitedUserQuery->first();
-            $invitedUser->status = 1;
+            $invitedUser->status = '1';
             $invitedUser->save();
         } else {
             // Let's add the volunteer.
             EventsUsers::create([
                 'event' => $idevents,
                 'user' => $user,
-                'status' => 1,
+                'status' => '1',
                 'role' => $eventRole,
                 'full_name' => $full_name,
             ]);
@@ -236,7 +237,7 @@ class EventController extends Controller
     }
 
 
-    public function listVolunteers(Request $request, $idevents)
+    public function listVolunteers(Request $request, $idevents): JsonResponse
     {
         $party = Party::findOrFail($idevents);
 
@@ -455,7 +456,7 @@ class EventController extends Controller
      *     )
      *  )
      */
-    public function createEventv2(Request $request)
+    public function createEventv2(Request $request): JsonResponse
     {
         $user = $this->getUser();
 
@@ -506,14 +507,21 @@ class EventController extends Controller
         EventsUsers::create([
             'event' => $idParty,
             'user' => $user->id,
-            'status' => 1,
+            'status' => '1',
             'role' => Role::HOST,
         ]);
 
         // Notify relevant users.
         $usersToNotify = Fixometer::usersWhoHavePreference('admin-moderate-event');
+
         foreach ($party->associatedNetworkCoordinators() as $coordinator) {
-            $usersToNotify->push($coordinator);
+            // If the user is an admin, we allow them to turn off the notification.
+            // Network coordinators must always receive them, for fear of events languishing unapproved.
+            // So only add network coordinators who aren't admins, and rely on usersWhoHavePreference to have
+            // added relevant admins.
+            if (!$coordinator->hasRole('Administrator')) {
+                $usersToNotify->push($coordinator);
+            }
         }
 
         Notification::send(
@@ -617,7 +625,7 @@ class EventController extends Controller
      *     )
      *  )
      */
-    public function updateEventv2(Request $request, $idEvents)
+    public function updateEventv2(Request $request, $idEvents): JsonResponse
     {
         $user = $this->getUser();
 
@@ -733,7 +741,7 @@ class EventController extends Controller
             $longitude = $geocoded['longitude'];
         }
 
-        return array(
+        return [
             $groupid,
             $start,
             $end,
@@ -746,6 +754,6 @@ class EventController extends Controller
             $online,
             $link,
             $network_data
-        );
+        ];
     }
 }

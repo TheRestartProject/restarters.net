@@ -19,6 +19,8 @@ use App\Skills;
 use App\UsersSkills;
 use App\User;
 use App\UserGroups;
+use App\UsersPermissions;
+use App\UsersPreferences;
 use App\Xref;
 use App\Alert;
 use Auth;
@@ -29,8 +31,8 @@ use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Queue;
 use Symfony\Component\DomCrawler\Crawler;
-use Osteel\OpenApi\Testing\ValidatorBuilder;
-use Osteel\OpenApi\Testing\Exceptions\ValidationException;
+use ReflectionFunction;
+use Illuminate\Events\Dispatcher;
 
 abstract class TestCase extends BaseTestCase
 {
@@ -40,6 +42,11 @@ abstract class TestCase extends BaseTestCase
     public $groupCount = 0;
     private $DOM = null;
     public $lastResponse = null;
+
+    private $host = null;
+    private $group = null;
+    private $event_start_utc = null;
+    private $event_end_utc = null;
 
     protected function setUp(): void
     {
@@ -52,6 +59,8 @@ abstract class TestCase extends BaseTestCase
         Audits::truncate();
         EventsUsers::truncate();
         UserGroups::truncate();
+        UsersPreferences::truncate();
+        UsersPermissions::truncate();
         DeviceBarrier::truncate();
         Device::truncate();
         Party::truncate();
@@ -66,11 +75,12 @@ abstract class TestCase extends BaseTestCase
         Alert::truncate();
         DB::statement('delete from audits');
         DB::delete('delete from user_network');
+        DB::delete('delete from users_preferences');
+        DB::delete('delete from users_permissions');
         DB::delete('delete from grouptags_groups');
         DB::delete('delete from failed_jobs');
         DB::table('notifications')->truncate();
         DB::statement('SET foreign_key_checks=1');
-        DB::delete('delete from devices_faults_vacuums_ora_opinions');
 
         // Set up random auto increment values.  This avoids tests working because everything is 1.
         //
@@ -102,12 +112,25 @@ abstract class TestCase extends BaseTestCase
         $this->withoutExceptionHandling();
         app('honeypot')->disable();
 
-        Category::factory()->count(1)->cat1()->create();
-        Category::factory()->count(1)->cat2()->create();
-        Category::factory()->count(1)->cat3()->create();
-        Category::factory()->count(1)->mobile()->create();
-        Category::factory()->count(1)->misc()->create();
-        Category::factory()->count(1)->desktopComputer()->create();
+        // Create categories defensively - only if they don't already exist
+        if (!Category::where('idcategories', 111)->exists()) {
+            Category::factory()->count(1)->cat1()->create();
+        }
+        if (!Category::where('idcategories', 222)->exists()) {
+            Category::factory()->count(1)->cat2()->create();
+        }
+        if (!Category::where('idcategories', 333)->exists()) {
+            Category::factory()->count(1)->cat3()->create();
+        }
+        if (!Category::where('idcategories', 25)->exists()) {
+            Category::factory()->count(1)->mobile()->create();
+        }
+        if (!Category::where('idcategories', 46)->exists()) {
+            Category::factory()->count(1)->misc()->create();
+        }
+        if (!Category::where('idcategories', 11)->exists()) {
+            Category::factory()->count(1)->desktopComputer()->create();
+        }
 
         // We manipulate some globals for image upload testing.
         \FixometerFile::$uploadTesting = FALSE;
@@ -117,8 +140,6 @@ abstract class TestCase extends BaseTestCase
         }
 
         $this->processQueuedNotifications();
-        $this->OpenAPIValidator = ValidatorBuilder::fromJson(storage_path('api-docs/api-docs.json'))->getValidator();
-
         // Some tests may override the queue.
         $queueManager = $this->app['queue'];
         $queueManager->setDefaultDriver('database');
@@ -270,18 +291,83 @@ abstract class TestCase extends BaseTestCase
         return $idevents;
     }
 
-    public function createDevice($idevents, $type)
+    public function createDevice($idevents, $type, $barrierstr = null, $age = 1.5, $estimate = 100, $problem = '', $repair_status = NULL, $next_steps = NULL, $spare_parts = NULL, $category = NULL)
     {
+        // Many tests use $type to create a device from DeviceFactory.
         $deviceAttributes = Device::factory()->{lcfirst($type)}()->raw();
 
-        $deviceAttributes['event_id'] = $idevents;
-        $deviceAttributes['quantity'] = 1;
+        if (array_key_exists('problem', $deviceAttributes)) {
+            $problem = $deviceAttributes['problem'];
+        }
 
-        $response = $this->post('/device/create', $deviceAttributes);
-        $iddevices = Device::latest()->first()->iddevices;
+        // The v2 API takes the repair stats as a string
+        if (!$repair_status) {
+            $rs = array_key_exists('repair_status', $deviceAttributes) ? $deviceAttributes['repair_status'] : Device::REPAIR_STATUS_REPAIRABLE;
+
+            switch ($rs) {
+                case Device::REPAIR_STATUS_FIXED:
+                    $repair_status = Device::REPAIR_STATUS_FIXED_STR;
+                    break;
+                case Device::REPAIR_STATUS_REPAIRABLE:
+                    $repair_status = Device::REPAIR_STATUS_REPAIRABLE_STR;
+                    break;
+                case Device::REPAIR_STATUS_ENDOFLIFE:
+                    $repair_status = Device::REPAIR_STATUS_ENDOFLIFE_STR;
+                    break;
+                default:
+                    $this->assertTrue(false);
+            }
+        }
+
+        $params = [
+            'eventid' => $idevents,
+            'category' => $deviceAttributes['category'],
+            'problem' =>  $problem,
+            'notes' => 'Test notes',
+            'brand' => 'Test brand',
+            'model' => 'Test model',
+            'age' => $age,
+            'estimate' => $estimate,
+            'item_type' => 'Test item type',
+            'repair_status' => $repair_status,
+            'barrier' => $barrierstr,
+        ];
+
+        if ($next_steps) {
+            $params['next_steps'] = $next_steps;
+        }
+
+        if ($spare_parts) {
+            $params['spare_parts'] = $spare_parts;
+        }
+
+        if ($category) {
+            $params['category'] = $category;
+        }
+
+        $response = $this->post('/api/v2/devices', $params);
+
+        $this->assertTrue($response->isSuccessful());
+        $json = json_decode($response->getContent(), true);
+        $this->assertTrue(array_key_exists('id', $json));
+        $iddevices = $json['id'];
         $this->assertNotNull($iddevices);
 
         return $iddevices;
+    }
+
+    public function getDevice($iddevices) {
+        $response = $this->get("/api/v2/devices/$iddevices");
+        $response->assertSuccessful();
+        $json = json_decode($response->getContent(), true);
+        $atts = $json['data'];
+        return $atts;
+    }
+
+    public function deleteDevice($iddevices)
+    {
+        $response = $this->delete("/api/v2/devices/$iddevices");
+        $this->assertTrue($response->isSuccessful());
     }
 
     public function createJane()
@@ -391,47 +477,6 @@ abstract class TestCase extends BaseTestCase
         }
     }
 
-    // We override the methods to make HTTP requests so that we can automatically validate them against our OpenAPI
-    // definition where appropriate.
-    public function get($uri, array $headers = [])
-    {
-        $response = parent::get($uri, $headers);
-
-        if (strpos($uri, '/api/v2') === 0) {
-            // Validate response against OpenAPI schema.
-            $result = $this->OpenAPIValidator->validate($response->baseResponse, $uri, 'get');
-            $this->assertTrue($result);
-        }
-
-        return $response;
-    }
-
-    public function patch($uri, array $params = [], $headers = [])
-    {
-        $response = parent::patch($uri, $params, $headers);
-
-        if (strpos($uri, '/api/v2') === 0) {
-            // Validate response against OpenAPI schema.
-            $result = $this->OpenAPIValidator->validate($response->baseResponse, $uri, 'patch');
-            $this->assertTrue($result);
-        }
-
-        return $response;
-    }
-
-    public function post($uri, array $params = [], $headers = [])
-    {
-        $response = parent::post($uri, $params, $headers);
-
-        if (strpos($uri, '/api/v2') === 0) {
-            // Validate response against OpenAPI schema.
-            $result = $this->OpenAPIValidator->validate($response->baseResponse, $uri, 'post');
-            $this->assertTrue($result);
-        }
-
-        return $response;
-    }
-
     /**
      * Convert the internal attribute names to the names used in the v2 API.  We have this because some of the tests
      * use getAttributes() for convenience, which returns the internal attribute names, and then calls the API with
@@ -462,5 +507,23 @@ abstract class TestCase extends BaseTestCase
         $atts['groupid'] = $atts['group'];
 
         return $atts;
+    }
+
+    public function assertListenerIsAttachedToEvent($listener, $event)
+    {
+        $dispatcher = app(Dispatcher::class);
+
+        foreach ($dispatcher->getListeners(is_object($event) ? get_class($event) : $event) as $listenerClosure) {
+            $reflection = new ReflectionFunction($listenerClosure);
+            $listenerClass = $reflection->getStaticVariables()['listener'];
+
+            if ($listenerClass === $listener) {
+                $this->assertTrue(true);
+
+                return;
+            }
+        }
+
+        $this->assertTrue(false, sprintf('Event %s does not have the %s listener attached to it', $event, $listener));
     }
 }

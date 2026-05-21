@@ -11,7 +11,7 @@ return [
                             </ul>',
   'more' => 'En savoir plus',
   'stat_1' => 'Appareils réparés',
-  'stat_2' => 'Émissions de CO<sub>2</sub> évitées',
+  'stat_2' => 'Émissions de CO<sub>2</sub>e évitées',
   'stat_3' => 'Déchets<br>évités',
   'stat_4' => 'Événements<br>réalisés',
   'login_title' => 'Connexion',

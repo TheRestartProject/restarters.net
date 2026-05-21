@@ -11,7 +11,7 @@ use Tests\TestCase;
 
 class BrandsTest extends TestCase
 {
-    public function testBasic()
+    public function testBasic(): void
     {
         $this->loginAsTestUser(Role::ADMINISTRATOR);
 
@@ -47,7 +47,7 @@ class BrandsTest extends TestCase
         $response->assertSessionHas('message');
     }
 
-    public function testErrors() {
+    public function testErrors(): void {
         $this->loginAsTestUser(Role::RESTARTER);
 
         $response = $this->post('/brands/create', [

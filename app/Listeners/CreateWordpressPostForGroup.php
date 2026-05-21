@@ -24,11 +24,8 @@ class CreateWordpressPostForGroup extends BaseEvent
 
     /**
      * Handle the event.
-     *
-     * @param  ApproveGroup  $event
-     * @return void
      */
-    public function handle(ApproveGroup $event)
+    public function handle(ApproveGroup $event): void
     {
         $id = $event->group->idgroups;
         $data = $event->data;

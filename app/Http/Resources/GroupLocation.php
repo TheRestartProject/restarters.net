@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Auth;
@@ -62,11 +63,8 @@ class GroupLocation extends JsonResource
 {
     /**
      * Transform the resource into an array.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return array
      */
-    public function toArray($request)
+    public function toArray(Request $request): array
     {
         $ret = [
             'location' => $this->location,

@@ -29,23 +29,8 @@
         <br>
         <div class="row">
             <div class="col-12">
-                <div class="table-responsive table-section">
-                    <table class="table table-striped">
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Permissions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($roleList as $role)
-                            <tr>
-                                <td><a href="/role/edit/<?php echo $role->id; ?>" title="edit role permissions"><?php echo $role->role; ?></a></td>
-                                <td><?php echo $role->permissions_list; ?></td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                <div class="vue">
+                    <roles-table :roles="{{ json_encode($tableData) }}"></roles-table>
                 </div>
             </div>
         </div>
