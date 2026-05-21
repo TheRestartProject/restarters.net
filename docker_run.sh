@@ -18,6 +18,7 @@ then
  cp .env.example .env
 fi
 
+rm -rf vendor
 log_step "Starting composer install"
 composer install
 log_step "composer install done"
