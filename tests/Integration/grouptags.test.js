@@ -52,6 +52,10 @@ test('NC can create a tag', async ({page, baseURL}) => {
   await login(page, baseURL, NC_EMAIL, PASSWORD)
   const networkId = await getNetworkId(page, baseURL)
   await page.goto(baseURL + '/networks/' + networkId)
+  await page.waitForSelector('.tags-management', { timeout: 15000 })
+  // Allow mounted() GET for tags to complete before submitting, so the
+  // response can't overwrite the newly created tag.
+  await page.waitForTimeout(1000)
 
   // Fill in tag name and description
   await page.fill('.tag-name-input', 'PW Test Tag')
