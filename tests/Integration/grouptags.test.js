@@ -284,10 +284,8 @@ test('NC should see tags on groups list', async ({page, baseURL}) => {
 
   // Go to network groups list
   await page.goto(baseURL + '/group/network/' + networkId)
-  await page.waitForLoadState('networkidle')
-  // Wait for the API-driven loading spinner to disappear before checking for the table.
-  // GroupMapAndList shows a spinner while fetching groups, then the map initializes and
-  // fires bounds events before GroupsTable renders — this takes longer than a fixed wait.
+  // Don't use networkidle — Leaflet tile requests prevent it from resolving.
+  // Wait for the API-driven loading spinner to disappear instead.
   await page.waitForSelector('.loader', { state: 'hidden', timeout: 15000 })
 
   // Tags should be visible (either as badges or filter dropdown)
@@ -324,8 +322,8 @@ test('NC can filter groups list by tag', async ({page, baseURL}) => {
 
   // Now go to the groups list and filter by tag
   await page.goto(baseURL + '/group/network/' + networkId)
-  await page.waitForLoadState('networkidle')
-  await page.waitForTimeout(2000)
+  // Don't use networkidle — Leaflet tile requests prevent it from resolving.
+  await page.waitForSelector('.loader', { state: 'hidden', timeout: 15000 })
 
   // Click on "All Groups" tab to see all groups
   const allGroupsTab = page.locator('text=All Groups').first()
@@ -770,8 +768,7 @@ test('Admin should see tags on groups list', async ({page, baseURL}) => {
   const networkId = await getNetworkId(page, baseURL)
 
   await page.goto(baseURL + '/group/network/' + networkId)
-  await page.waitForLoadState('networkidle')
-  // Wait for the API-driven loading spinner to disappear before checking for the table.
+  // Don't use networkidle — Leaflet tile requests prevent it from resolving.
   await page.waitForSelector('.loader', { state: 'hidden', timeout: 15000 })
 
   // Admin should see groups table with tags
@@ -784,8 +781,8 @@ test('Admin can filter groups by tag', async ({page, baseURL}) => {
   const networkId = await getNetworkId(page, baseURL)
 
   await page.goto(baseURL + '/group/network/' + networkId)
-  await page.waitForLoadState('networkidle')
-  await page.waitForTimeout(2000)
+  // Don't use networkidle — Leaflet tile requests prevent it from resolving.
+  await page.waitForSelector('.loader', { state: 'hidden', timeout: 15000 })
 
   // The tag filter multiselect should be visible for admins
   // Try to find and use the tag filter
