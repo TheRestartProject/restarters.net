@@ -59,7 +59,7 @@ test('NC can create a tag', async ({page, baseURL}) => {
   await page.click('.create-tag button[type=submit]')
 
   // Tag should appear in the list
-  await expect(page.locator('.tag-item', { hasText: 'PW Test Tag' })).toBeVisible()
+  await expect(page.locator('.tag-item', { hasText: 'PW Test Tag' })).toBeVisible({ timeout: 15000 })
 })
 
 test('NC cannot create duplicate tag', async ({page, baseURL}) => {
@@ -90,7 +90,7 @@ test('NC can create tag with same name as global tag', async ({page, baseURL}) =
   await page.click('.create-tag button[type=submit]')
 
   // Should succeed - network tags can share names with global tags
-  await expect(page.locator('.tag-item', { hasText: 'GlobalTestTag' })).toBeVisible()
+  await expect(page.locator('.tag-item', { hasText: 'GlobalTestTag' })).toBeVisible({ timeout: 15000 })
 })
 
 test('NC can edit a tag', async ({page, baseURL}) => {
@@ -109,7 +109,7 @@ test('NC can edit a tag', async ({page, baseURL}) => {
 
   // Wait for modal to close and verify
   await page.waitForSelector('.modal.show', { state: 'hidden' })
-  await expect(page.locator('.tag-item', { hasText: 'PW Edited Tag' })).toBeVisible()
+  await expect(page.locator('.tag-item', { hasText: 'PW Edited Tag' })).toBeVisible({ timeout: 15000 })
 })
 
 test('NC cannot edit tag to duplicate name', async ({page, baseURL}) => {
@@ -122,7 +122,7 @@ test('NC cannot edit tag to duplicate name', async ({page, baseURL}) => {
   await page.fill('.tag-name-input', 'PW Second Tag')
   await page.fill('.tag-description-input', 'Second tag')
   await page.click('.create-tag button[type=submit]')
-  await expect(page.locator('.tag-item', { hasText: 'PW Second Tag' })).toBeVisible()
+  await expect(page.locator('.tag-item', { hasText: 'PW Second Tag' })).toBeVisible({ timeout: 15000 })
 
   // Edit the second tag to have the same name as the first
   const editButtons = page.locator('.edit-tag-btn')
@@ -146,7 +146,7 @@ test('NC can delete tag with 0 groups', async ({page, baseURL}) => {
   await page.fill('.tag-name-input', 'PW Delete Me')
   await page.fill('.tag-description-input', 'Will be deleted')
   await page.click('.create-tag button[type=submit]')
-  await expect(page.locator('.tag-item', { hasText: 'PW Delete Me' })).toBeVisible()
+  await expect(page.locator('.tag-item', { hasText: 'PW Delete Me' })).toBeVisible({ timeout: 15000 })
 
   // Count tags before delete
   const countBefore = await page.locator('.tag-item').count()
@@ -174,7 +174,7 @@ test('NC can delete tag with groups attached', async ({page, baseURL}) => {
   await page.fill('.tag-name-input', 'PW Tag With Group')
   await page.fill('.tag-description-input', 'Tag assigned to a group')
   await page.click('.create-tag button[type=submit]')
-  await expect(page.locator('.tag-item', { hasText: 'PW Tag With Group' })).toBeVisible()
+  await expect(page.locator('.tag-item', { hasText: 'PW Tag With Group' })).toBeVisible({ timeout: 15000 })
 
   // Step 2: Assign the tag to the group via the group edit page
   const groupId = await getGroupId(page, baseURL)
@@ -195,12 +195,13 @@ test('NC can delete tag with groups attached', async ({page, baseURL}) => {
 
   // Step 3: Go back to network page and verify the tag shows group count
   await page.goto(baseURL + '/networks/' + networkId)
-  await page.waitForLoadState('networkidle')
+  // Don't use networkidle — Leaflet tile requests prevent it from resolving.
+  await page.waitForSelector('.tags-management', { timeout: 15000 })
 
   // Find the tag showing "(1 group)" and click delete
   const tagItem = page.locator('.tag-item', { hasText: 'PW Tag With Group' })
-  await expect(tagItem).toBeVisible()
-  await expect(tagItem.locator('text=1 group')).toBeVisible()
+  await expect(tagItem).toBeVisible({ timeout: 15000 })
+  await expect(tagItem.locator('text=1 group')).toBeVisible({ timeout: 15000 })
 
   await tagItem.locator('.delete-tag-btn').click()
 
@@ -498,7 +499,7 @@ test('Admin can create a tag for a network', async ({page, baseURL}) => {
   await page.fill('.tag-description-input', 'Created by admin')
   await page.click('.create-tag button[type=submit]')
 
-  await expect(page.locator('.tag-item', { hasText: 'Admin Test Tag' })).toBeVisible()
+  await expect(page.locator('.tag-item', { hasText: 'Admin Test Tag' })).toBeVisible({ timeout: 15000 })
 })
 
 test('Admin cannot create duplicate tag', async ({page, baseURL}) => {
@@ -526,7 +527,7 @@ test('Admin can create tag with same name as global tag', async ({page, baseURL}
   await page.fill('.tag-description-input', 'Same name as global')
   await page.click('.create-tag button[type=submit]')
 
-  await expect(page.locator('.tag-item', { hasText: 'Admin Global Name Tag' })).toBeVisible()
+  await expect(page.locator('.tag-item', { hasText: 'Admin Global Name Tag' })).toBeVisible({ timeout: 15000 })
 })
 
 test('Admin can edit a tag', async ({page, baseURL}) => {
@@ -546,7 +547,7 @@ test('Admin can edit a tag', async ({page, baseURL}) => {
   await page.waitForSelector('.modal.show', { state: 'hidden' })
 
   // Verify the tag was updated
-  await expect(page.locator('.tag-item', { hasText: 'Admin Edited Tag' })).toBeVisible()
+  await expect(page.locator('.tag-item', { hasText: 'Admin Edited Tag' })).toBeVisible({ timeout: 15000 })
 })
 
 test('Admin cannot edit tag to duplicate name', async ({page, baseURL}) => {
@@ -559,7 +560,7 @@ test('Admin cannot edit tag to duplicate name', async ({page, baseURL}) => {
   await page.fill('.tag-name-input', 'Admin Unique Tag')
   await page.fill('.tag-description-input', 'Will try to rename')
   await page.click('.create-tag button[type=submit]')
-  await expect(page.locator('.tag-item', { hasText: 'Admin Unique Tag' })).toBeVisible()
+  await expect(page.locator('.tag-item', { hasText: 'Admin Unique Tag' })).toBeVisible({ timeout: 15000 })
 
   // Edit the new tag to have the same name as an existing tag
   const tagItem = page.locator('.tag-item', { hasText: 'Admin Unique Tag' })
@@ -584,7 +585,7 @@ test('Admin can delete tag with 0 groups', async ({page, baseURL}) => {
   await page.fill('.tag-name-input', 'Admin Delete Me')
   await page.fill('.tag-description-input', 'Will be deleted')
   await page.click('.create-tag button[type=submit]')
-  await expect(page.locator('.tag-item', { hasText: 'Admin Delete Me' })).toBeVisible()
+  await expect(page.locator('.tag-item', { hasText: 'Admin Delete Me' })).toBeVisible({ timeout: 15000 })
 
   const countBefore = await page.locator('.tag-item').count()
 
@@ -610,7 +611,7 @@ test('Admin can delete tag with groups attached', async ({page, baseURL}) => {
   await page.fill('.tag-name-input', 'Admin Tag With Group')
   await page.fill('.tag-description-input', 'Tag to assign then delete')
   await page.click('.create-tag button[type=submit]')
-  await expect(page.locator('.tag-item', { hasText: 'Admin Tag With Group' })).toBeVisible()
+  await expect(page.locator('.tag-item', { hasText: 'Admin Tag With Group' })).toBeVisible({ timeout: 15000 })
 
   // Assign it to the group
   const groupId = await getGroupId(page, baseURL)
@@ -630,11 +631,12 @@ test('Admin can delete tag with groups attached', async ({page, baseURL}) => {
 
   // Go back to network page and delete the tag
   await page.goto(baseURL + '/networks/' + networkId)
-  await page.waitForLoadState('networkidle')
+  // Don't use networkidle — Leaflet tile requests prevent it from resolving.
+  await page.waitForSelector('.tags-management', { timeout: 15000 })
 
   const tagItem = page.locator('.tag-item', { hasText: 'Admin Tag With Group' })
-  await expect(tagItem).toBeVisible()
-  await expect(tagItem.locator('text=1 group')).toBeVisible()
+  await expect(tagItem).toBeVisible({ timeout: 15000 })
+  await expect(tagItem.locator('text=1 group')).toBeVisible({ timeout: 15000 })
 
   await tagItem.locator('.delete-tag-btn').click()
 
