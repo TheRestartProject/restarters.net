@@ -400,7 +400,7 @@ test('Host does not see tags on groups list', async ({page, baseURL}) => {
 
   // Go to groups page
   await page.goto(baseURL + '/group')
-  await page.waitForLoadState('networkidle')
+  // Don't use networkidle — Leaflet tile requests prevent it from resolving.
   await page.waitForTimeout(2000)
 
   // Tags badges and tag filter should NOT be visible for hosts
