@@ -366,7 +366,11 @@ export default {
     if (this.canManageTags && (!this.initialTags || this.initialTags.length === 0)) {
       try {
         const response = await axios.get(`/api/v2/networks/${this.network.id}/tags?api_token=${this.apiToken}`)
-        this.tags = response.data.data || []
+        const fetched = response.data.data || []
+        // Merge fetched tags with any already added via createTag() to avoid a race condition
+        // where the GET response (issued before a concurrent POST) overwrites the pushed tag.
+        const existingIds = new Set(this.tags.map(t => t.id))
+        this.tags = [...this.tags, ...fetched.filter(t => !existingIds.has(t.id))]
       } catch (error) {
         console.error('Failed to fetch network tags:', error)
       }
