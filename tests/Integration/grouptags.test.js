@@ -55,11 +55,10 @@ test('NC can create a tag', async ({page, baseURL}) => {
   await page.goto(baseURL + '/networks/' + networkId)
   console.log('[create-tag] waiting for .tags-management')
   await page.waitForSelector('.tags-management', { timeout: 15000 })
-  // Allow mounted() GET for tags to complete before submitting, so the
-  // response can't overwrite the newly created tag.
-  await page.waitForTimeout(1000)
   console.log('[create-tag] filling tag name')
-  await page.fill('.tag-name-input', 'PW Test Tag', { timeout: 10000 })
+  // Use pressSequentially to simulate real keystrokes — fill() can fail to
+  // update Vue's reactive state after a mounted() GET triggers a re-render.
+  await page.locator('.tag-name-input').pressSequentially('PW Test Tag', { delay: 20 })
   console.log('[create-tag] filling description')
   await page.fill('.tag-description-input', 'Created by Playwright', { timeout: 10000 })
   console.log('[create-tag] clicking submit')
