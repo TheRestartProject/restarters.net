@@ -264,13 +264,17 @@ tasks:
         # Create test data for group tags tests (NC user, host user, network, group)
         docker exec restarters php artisan tinker --execute='$nc = App\User::firstOrCreate(["email"=>"nc@test.net"], ["name"=>"NC User","password"=>Hash::make("passw0rd"),"consent_past_data"=>"2021-01-01","consent_future_data"=>"2021-01-01","consent_gdpr"=>"2021-01-01"]); $nc->role=6; $nc->save(); $host = App\User::firstOrCreate(["email"=>"host@test.net"], ["name"=>"Host User","password"=>Hash::make("passw0rd"),"consent_past_data"=>"2021-01-01","consent_future_data"=>"2021-01-01","consent_gdpr"=>"2021-01-01"]); $host->role=3; $host->save(); $network = App\Network::where("name","Test London")->first(); if (!$network) { $network = new App\Network(); $network->name="Test London"; $network->shortname="testlondon"; $network->description="Test network"; $network->default_language="en"; $network->save(); } DB::table("user_network")->insertOrIgnore(["user_id"=>$nc->id,"network_id"=>$network->id]); $group = App\Group::firstOrCreate(["name"=>"Tag Test Group"], ["website"=>"https://test.example.com","location"=>"London","area"=>"London","postcode"=>"SW1A 1AA","latitude"=>51.5,"longitude"=>-0.1,"free_text"=>"Test group","approved"=>true]); DB::table("group_network")->insertOrIgnore(["group_id"=>$group->idgroups,"network_id"=>$network->id]); DB::table("users_groups")->insertOrIgnore(["user"=>$host->id,"group"=>$group->idgroups,"role"=>3,"status"=>1]); echo "Group tags test data: NC=".$nc->id." Host=".$host->id." Network=".$network->id." Group=".$group->idgroups;' || true
       - docker exec restarters bash -c "sed -i 's/.throttle:api.,//g' /var/www/app/Http/Kernel.php"
+      - |
+        # Stop Vite dev server BEFORE modifying .env.
+        # Vite v4 crashes with ERR_INVALID_ARG_TYPE when it detects .env changes mid-run;
+        # killing it first prevents the crash from corrupting the build environment.
+        echo "Stopping Vite dev server..."
+        docker exec restarters bash -c "ps aux | grep 'node.*vite' | grep -v grep | awk '{print \$2}' | xargs -r kill -9 || true"
       - docker exec restarters bash -c "sed -i 's/APP_DEBUG=.*$/APP_DEBUG=false/g' /var/www/.env"
       - docker exec restarters bash -c "sed -i 's/QUEUE_CONNECTION=.*/QUEUE_CONNECTION=sync/g' /var/www/.env"
       - docker exec restarters bash -c "sed -i 's/MAIL_MAILER=.*/MAIL_MAILER=log/g' /var/www/.env"
       - |
-        # Stop Vite dev server and build assets for production
-        echo "Stopping Vite dev server and building assets..."
-        docker exec restarters bash -c "ps aux | grep 'node.*vite' | grep -v grep | awk '{print \$2}' | xargs -r kill || true"
+        echo "Building assets for production..."
         docker exec restarters bash -c "rm -f /var/www/public/hot && npm run build"
       - |
         # Ensure Playwright browsers are installed (handles version mismatches)
@@ -285,7 +289,7 @@ tasks:
           export PLAYWRIGHT_BASE_URL=http://restarters_nginx
           export PW_TEST_HTML_REPORT_OPEN=never
           export FORCE_COLOR=1
-          stdbuf -oL -eL npx playwright test --reporter=html
+          stdbuf -oL -eL npx playwright test --reporter=list,html
         "
 
   docker:wait-for-services-*:

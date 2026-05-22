@@ -51,19 +51,23 @@ test('NC can create a tag', async ({page, baseURL}) => {
   test.slow()
   await login(page, baseURL, NC_EMAIL, PASSWORD)
   const networkId = await getNetworkId(page, baseURL)
+  console.log('[create-tag] navigating to network', networkId)
   await page.goto(baseURL + '/networks/' + networkId)
+  console.log('[create-tag] waiting for .tags-management')
   await page.waitForSelector('.tags-management', { timeout: 15000 })
   // Allow mounted() GET for tags to complete before submitting, so the
   // response can't overwrite the newly created tag.
   await page.waitForTimeout(1000)
-
-  // Fill in tag name and description
-  await page.fill('.tag-name-input', 'PW Test Tag')
-  await page.fill('.tag-description-input', 'Created by Playwright')
-  await page.click('.create-tag button[type=submit]')
-
+  console.log('[create-tag] filling tag name')
+  await page.fill('.tag-name-input', 'PW Test Tag', { timeout: 10000 })
+  console.log('[create-tag] filling description')
+  await page.fill('.tag-description-input', 'Created by Playwright', { timeout: 10000 })
+  console.log('[create-tag] clicking submit')
+  await page.click('.create-tag button[type=submit]', { timeout: 10000 })
+  console.log('[create-tag] waiting for tag item')
   // Tag should appear in the list
   await expect(page.locator('.tag-item', { hasText: 'PW Test Tag' })).toBeVisible({ timeout: 15000 })
+  console.log('[create-tag] PASS')
 })
 
 test('NC cannot create duplicate tag', async ({page, baseURL}) => {
