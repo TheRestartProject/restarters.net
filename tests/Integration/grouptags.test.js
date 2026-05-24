@@ -37,6 +37,26 @@ async function getGroupId(page, baseURL) {
   return group.id
 }
 
+// Helper to wait for the network page tag form to be ready and fill it via Vue's
+// reactive data. Bootstrap Vue 2's b-form-input doesn't reliably respond to
+// Playwright's synthetic input events — setting Vue state directly is more robust.
+// Vue 2 sets __vue__ on DOM elements in both dev and production builds.
+async function fillTagForm(page, name, description) {
+  await page.waitForSelector('.tags-management', { timeout: 15000 })
+  await page.waitForTimeout(500)
+  await page.evaluate(([n, d]) => {
+    const form = document.querySelector('.create-tag form')
+    if (!form || !form.__vue__) return
+    let vm = form.__vue__
+    while (vm && !('newTagName' in (vm.$data || {}))) vm = vm.$parent
+    if (!vm) return
+    vm.newTagName = n
+    vm.newTagDescription = d || ''
+  }, [name, description || ''])
+  await page.waitForSelector('.create-tag button[type=submit]:not([disabled])', { timeout: 5000 })
+  await page.click('.create-tag button[type=submit]', { timeout: 5000 })
+}
+
 // ---------- NC: Tag management for the network ----------
 
 test('NC can view network page with tags section', async ({page, baseURL}) => {
@@ -53,22 +73,9 @@ test('NC can create a tag', async ({page, baseURL}) => {
   const networkId = await getNetworkId(page, baseURL)
   console.log('[create-tag] navigating to network', networkId)
   await page.goto(baseURL + '/networks/' + networkId, { waitUntil: 'domcontentloaded' })
-  console.log('[create-tag] waiting for .tags-management')
-  await page.waitForSelector('.tags-management', { timeout: 15000 })
-  // Give Vue time to complete its mounted() tags fetch and async DOM update before
-  // filling the form. Using fill() (not pressSequentially) so the value is set
-  // atomically — Vue's v-model will pick up the input event regardless of pending re-renders.
-  await page.waitForTimeout(500)
-  console.log('[create-tag] filling tag name')
-  await page.fill('.tag-name-input', 'PW Test Tag')
-  console.log('[create-tag] filling description')
-  await page.fill('.tag-description-input', 'Created by Playwright')
-  // Verify Vue reactive state picked up the value (button enabled = newTagName is set)
-  await page.waitForSelector('.create-tag button[type=submit]:not([disabled])', { timeout: 5000 })
-  console.log('[create-tag] clicking submit')
-  await page.click('.create-tag button[type=submit]', { timeout: 10000 })
+  console.log('[create-tag] filling tag form')
+  await fillTagForm(page, 'PW Test Tag', 'Created by Playwright')
   console.log('[create-tag] waiting for tag item')
-  // Tag should appear in the list
   await expect(page.locator('.tag-item', { hasText: 'PW Test Tag' })).toBeVisible({ timeout: 15000 })
   console.log('[create-tag] PASS')
 })
@@ -78,16 +85,8 @@ test('NC cannot create duplicate tag', async ({page, baseURL}) => {
   await login(page, baseURL, NC_EMAIL, PASSWORD)
   const networkId = await getNetworkId(page, baseURL)
   await page.goto(baseURL + '/networks/' + networkId, { waitUntil: 'domcontentloaded' })
-  await page.waitForSelector('.tags-management', { timeout: 15000 })
-  await page.waitForTimeout(500)
-
-  // Try to create a tag with the same name
-  await page.fill('.tag-name-input', 'PW Test Tag')
-  await page.fill('.tag-description-input', 'Duplicate attempt')
-  await page.waitForSelector('.create-tag button[type=submit]:not([disabled])', { timeout: 5000 })
-  await page.click('.create-tag button[type=submit]')
-
-  // Should see error message
+  await fillTagForm(page, 'PW Test Tag', 'Duplicate attempt')
+  // Should see error message (tag already exists from previous test)
   await expect(page.locator('.text-danger')).toBeVisible()
 })
 
@@ -97,15 +96,7 @@ test('NC can create tag with same name as global tag', async ({page, baseURL}) =
   await login(page, baseURL, NC_EMAIL, PASSWORD)
   const networkId = await getNetworkId(page, baseURL)
   await page.goto(baseURL + '/networks/' + networkId, { waitUntil: 'domcontentloaded' })
-  await page.waitForSelector('.tags-management', { timeout: 15000 })
-  await page.waitForTimeout(500)
-
-  // Create a network tag with the same name as the global tag
-  await page.fill('.tag-name-input', 'GlobalTestTag')
-  await page.fill('.tag-description-input', 'Network tag with global name')
-  await page.waitForSelector('.create-tag button[type=submit]:not([disabled])', { timeout: 5000 })
-  await page.click('.create-tag button[type=submit]')
-
+  await fillTagForm(page, 'GlobalTestTag', 'Network tag with global name')
   // Should succeed - network tags can share names with global tags
   await expect(page.locator('.tag-item', { hasText: 'GlobalTestTag' })).toBeVisible({ timeout: 15000 })
 })
@@ -135,14 +126,8 @@ test('NC cannot edit tag to duplicate name', async ({page, baseURL}) => {
   await login(page, baseURL, NC_EMAIL, PASSWORD)
   const networkId = await getNetworkId(page, baseURL)
   await page.goto(baseURL + '/networks/' + networkId, { waitUntil: 'domcontentloaded' })
-  await page.waitForSelector('.tags-management', { timeout: 15000 })
-  await page.waitForTimeout(500)
-
   // Need at least 2 tags. Create another one first.
-  await page.fill('.tag-name-input', 'PW Second Tag')
-  await page.fill('.tag-description-input', 'Second tag')
-  await page.waitForSelector('.create-tag button[type=submit]:not([disabled])', { timeout: 5000 })
-  await page.click('.create-tag button[type=submit]')
+  await fillTagForm(page, 'PW Second Tag', 'Second tag')
   await expect(page.locator('.tag-item', { hasText: 'PW Second Tag' })).toBeVisible({ timeout: 15000 })
 
   // Edit the second tag to have the same name as the first
@@ -162,14 +147,8 @@ test('NC can delete tag with 0 groups', async ({page, baseURL}) => {
   await login(page, baseURL, NC_EMAIL, PASSWORD)
   const networkId = await getNetworkId(page, baseURL)
   await page.goto(baseURL + '/networks/' + networkId, { waitUntil: 'domcontentloaded' })
-  await page.waitForSelector('.tags-management', { timeout: 15000 })
-  await page.waitForTimeout(500)
-
   // Create a fresh tag to delete
-  await page.fill('.tag-name-input', 'PW Delete Me')
-  await page.fill('.tag-description-input', 'Will be deleted')
-  await page.waitForSelector('.create-tag button[type=submit]:not([disabled])', { timeout: 5000 })
-  await page.click('.create-tag button[type=submit]')
+  await fillTagForm(page, 'PW Delete Me', 'Will be deleted')
   await expect(page.locator('.tag-item', { hasText: 'PW Delete Me' })).toBeVisible({ timeout: 15000 })
 
   // Count tags before delete
@@ -195,12 +174,7 @@ test('NC can delete tag with groups attached', async ({page, baseURL}) => {
 
   // Step 1: Create a tag on the network page
   await page.goto(baseURL + '/networks/' + networkId, { waitUntil: 'domcontentloaded' })
-  await page.waitForSelector('.tags-management', { timeout: 15000 })
-  await page.waitForTimeout(500)
-  await page.fill('.tag-name-input', 'PW Tag With Group')
-  await page.fill('.tag-description-input', 'Tag assigned to a group')
-  await page.waitForSelector('.create-tag button[type=submit]:not([disabled])', { timeout: 5000 })
-  await page.click('.create-tag button[type=submit]')
+  await fillTagForm(page, 'PW Tag With Group', 'Tag assigned to a group')
   await expect(page.locator('.tag-item', { hasText: 'PW Tag With Group' })).toBeVisible({ timeout: 15000 })
 
   // Step 2: Assign the tag to the group via the group edit page
@@ -250,13 +224,7 @@ test('NC can add a tag to a group', async ({page, baseURL}) => {
 
   // First ensure there's a tag to add
   await page.goto(baseURL + '/networks/' + networkId, { waitUntil: 'domcontentloaded' })
-  await page.waitForSelector('.tags-management', { timeout: 15000 })
-  await page.waitForTimeout(500)
-  // Create a fresh tag if needed
-  await page.fill('.tag-name-input', 'PW Group Assign Tag')
-  await page.fill('.tag-description-input', 'For group assignment')
-  await page.waitForSelector('.create-tag button[type=submit]:not([disabled])', { timeout: 5000 })
-  await page.click('.create-tag button[type=submit]')
+  await fillTagForm(page, 'PW Group Assign Tag', 'For group assignment')
   await page.waitForTimeout(1000)
 
   // Go to group edit page
@@ -395,12 +363,7 @@ test('NC should see tags displayed on group page', async ({page, baseURL}) => {
 
   // Ensure a tag exists and is assigned to the group
   await page.goto(baseURL + '/networks/' + networkId, { waitUntil: 'domcontentloaded' })
-  await page.waitForSelector('.tags-management', { timeout: 15000 })
-  await page.waitForTimeout(500)
-  await page.fill('.tag-name-input', 'PW Visible Tag')
-  await page.fill('.tag-description-input', 'Should appear on group page')
-  await page.waitForSelector('.create-tag button[type=submit]:not([disabled])', { timeout: 5000 })
-  await page.click('.create-tag button[type=submit]')
+  await fillTagForm(page, 'PW Visible Tag', 'Should appear on group page')
   await page.waitForTimeout(1000)
 
   await page.goto(baseURL + '/group/edit/' + groupId, { waitUntil: 'domcontentloaded' })
@@ -527,14 +490,7 @@ test('Admin can create a tag for a network', async ({page, baseURL}) => {
   await login(page, baseURL, ADMIN_EMAIL, PASSWORD)
   const networkId = await getNetworkId(page, baseURL)
   await page.goto(baseURL + '/networks/' + networkId, { waitUntil: 'domcontentloaded' })
-  await page.waitForSelector('.tags-management', { timeout: 15000 })
-  await page.waitForTimeout(500)
-
-  await page.fill('.tag-name-input', 'Admin Test Tag')
-  await page.fill('.tag-description-input', 'Created by admin')
-  await page.waitForSelector('.create-tag button[type=submit]:not([disabled])', { timeout: 5000 })
-  await page.click('.create-tag button[type=submit]')
-
+  await fillTagForm(page, 'Admin Test Tag', 'Created by admin')
   await expect(page.locator('.tag-item', { hasText: 'Admin Test Tag' })).toBeVisible({ timeout: 15000 })
 })
 
@@ -543,14 +499,7 @@ test('Admin cannot create duplicate tag', async ({page, baseURL}) => {
   await login(page, baseURL, ADMIN_EMAIL, PASSWORD)
   const networkId = await getNetworkId(page, baseURL)
   await page.goto(baseURL + '/networks/' + networkId, { waitUntil: 'domcontentloaded' })
-  await page.waitForSelector('.tags-management', { timeout: 15000 })
-  await page.waitForTimeout(500)
-
-  await page.fill('.tag-name-input', 'Admin Test Tag')
-  await page.fill('.tag-description-input', 'Duplicate attempt')
-  await page.waitForSelector('.create-tag button[type=submit]:not([disabled])', { timeout: 5000 })
-  await page.click('.create-tag button[type=submit]')
-
+  await fillTagForm(page, 'Admin Test Tag', 'Duplicate attempt')
   await expect(page.locator('.text-danger')).toBeVisible()
 })
 
@@ -559,16 +508,9 @@ test('Admin can create tag with same name as global tag', async ({page, baseURL}
   await login(page, baseURL, ADMIN_EMAIL, PASSWORD)
   const networkId = await getNetworkId(page, baseURL)
   await page.goto(baseURL + '/networks/' + networkId, { waitUntil: 'domcontentloaded' })
-  await page.waitForSelector('.tags-management', { timeout: 15000 })
-  await page.waitForTimeout(500)
-
   // Create a tag with a name that might exist as a global tag
   // This should succeed - network tags can share names with global tags
-  await page.fill('.tag-name-input', 'Admin Global Name Tag')
-  await page.fill('.tag-description-input', 'Same name as global')
-  await page.waitForSelector('.create-tag button[type=submit]:not([disabled])', { timeout: 5000 })
-  await page.click('.create-tag button[type=submit]')
-
+  await fillTagForm(page, 'Admin Global Name Tag', 'Same name as global')
   await expect(page.locator('.tag-item', { hasText: 'Admin Global Name Tag' })).toBeVisible({ timeout: 15000 })
 })
 
@@ -597,14 +539,8 @@ test('Admin cannot edit tag to duplicate name', async ({page, baseURL}) => {
   await login(page, baseURL, ADMIN_EMAIL, PASSWORD)
   const networkId = await getNetworkId(page, baseURL)
   await page.goto(baseURL + '/networks/' + networkId, { waitUntil: 'domcontentloaded' })
-  await page.waitForSelector('.tags-management', { timeout: 15000 })
-  await page.waitForTimeout(500)
-
   // Create a second tag to try to rename to an existing name
-  await page.fill('.tag-name-input', 'Admin Unique Tag')
-  await page.fill('.tag-description-input', 'Will try to rename')
-  await page.waitForSelector('.create-tag button[type=submit]:not([disabled])', { timeout: 5000 })
-  await page.click('.create-tag button[type=submit]')
+  await fillTagForm(page, 'Admin Unique Tag', 'Will try to rename')
   await expect(page.locator('.tag-item', { hasText: 'Admin Unique Tag' })).toBeVisible({ timeout: 15000 })
 
   // Edit the new tag to have the same name as an existing tag
@@ -625,14 +561,8 @@ test('Admin can delete tag with 0 groups', async ({page, baseURL}) => {
   await login(page, baseURL, ADMIN_EMAIL, PASSWORD)
   const networkId = await getNetworkId(page, baseURL)
   await page.goto(baseURL + '/networks/' + networkId, { waitUntil: 'domcontentloaded' })
-  await page.waitForSelector('.tags-management', { timeout: 15000 })
-  await page.waitForTimeout(500)
-
   // Create a fresh tag to delete
-  await page.fill('.tag-name-input', 'Admin Delete Me')
-  await page.fill('.tag-description-input', 'Will be deleted')
-  await page.waitForSelector('.create-tag button[type=submit]:not([disabled])', { timeout: 5000 })
-  await page.click('.create-tag button[type=submit]')
+  await fillTagForm(page, 'Admin Delete Me', 'Will be deleted')
   await expect(page.locator('.tag-item', { hasText: 'Admin Delete Me' })).toBeVisible({ timeout: 15000 })
 
   const countBefore = await page.locator('.tag-item').count()
@@ -656,12 +586,7 @@ test('Admin can delete tag with groups attached', async ({page, baseURL}) => {
 
   // Create a tag
   await page.goto(baseURL + '/networks/' + networkId, { waitUntil: 'domcontentloaded' })
-  await page.waitForSelector('.tags-management', { timeout: 15000 })
-  await page.waitForTimeout(500)
-  await page.fill('.tag-name-input', 'Admin Tag With Group')
-  await page.fill('.tag-description-input', 'Tag to assign then delete')
-  await page.waitForSelector('.create-tag button[type=submit]:not([disabled])', { timeout: 5000 })
-  await page.click('.create-tag button[type=submit]')
+  await fillTagForm(page, 'Admin Tag With Group', 'Tag to assign then delete')
   await expect(page.locator('.tag-item', { hasText: 'Admin Tag With Group' })).toBeVisible({ timeout: 15000 })
 
   // Assign it to the group
@@ -707,12 +632,7 @@ test('Admin can remove a tag from a group', async ({page, baseURL}) => {
 
   // First ensure there's a tag assigned - create and assign one
   await page.goto(baseURL + '/networks/' + networkId, { waitUntil: 'domcontentloaded' })
-  await page.waitForSelector('.tags-management', { timeout: 15000 })
-  await page.waitForTimeout(500)
-  await page.fill('.tag-name-input', 'Admin Remove Tag')
-  await page.fill('.tag-description-input', 'Will be removed from group')
-  await page.waitForSelector('.create-tag button[type=submit]:not([disabled])', { timeout: 5000 })
-  await page.click('.create-tag button[type=submit]')
+  await fillTagForm(page, 'Admin Remove Tag', 'Will be removed from group')
   await page.waitForTimeout(1000)
 
   // Assign to group
