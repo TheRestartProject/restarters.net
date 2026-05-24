@@ -64,7 +64,7 @@ export default {
     return {
       moved: false,
       mapObject: null,
-      zoom: props.minZoom,
+      zoom: this.minZoom,
       destroyed: false,
       mapIdle: 0,
       center: null,
