@@ -1,89 +1,91 @@
 version: 2.1
 
-# Shared setup steps — used by both test-php and test-playwright jobs.
+# Shared setup steps via CircleCI reusable command.
 # Both jobs need their own Docker environment (CircleCI jobs can't share Docker).
-setup_steps: &setup_steps
-  - checkout
+commands:
+  setup_docker:
+    steps:
+      - checkout
 
-  - run:
-      name: Install Task
-      command: |
-        sudo sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b /usr/local/bin
-        task --version
+      - run:
+          name: Install Task
+          command: |
+            sudo sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b /usr/local/bin
+            task --version
 
-  - run:
-      name: Setup environment
-      command: |
-        cp .env.example .env
-        sed -i 's/DB_HOST=.*$/DB_HOST=restarters_db/g' .env
-        sed -i 's/DB_DATABASE=.*$/DB_DATABASE=restarters_db_test/g' .env
-        sed -i 's/DB_USERNAME=.*$/DB_USERNAME=restarters/g' .env
-        sed -i 's/DB_PASSWORD=.*$/DB_PASSWORD=s3cr3t/g' .env
-        sed -i 's/FEATURE__DISCOURSE_INTEGRATION=.*$/FEATURE__DISCOURSE_INTEGRATION=true/g' .env
-        sed -i 's/DISCOURSE_URL=.*$/DISCOURSE_URL=http:\/\/restarters_discourse/g' .env
-        sed -i 's/DISCOURSE_APIKEY=.*$/DISCOURSE_APIKEY=fb71f38ca2b8b7cd6a041e57fd8202c9937088f0ecae7db40722bd758dda92fc/g' .env
-        sed -i 's/DISCOURSE_APIUSER=.*$/DISCOURSE_APIUSER=someuser/g' .env
-        sed -i 's/APP_DEBUG=.*$/APP_DEBUG=false/g' .env
-        sed -i 's/SESSION_DOMAIN=.*$/SESSION_DOMAIN=localhost/g' .env
-        sed -i 's/HONEYPOT_DISABLE=.*$/HONEYPOT_DISABLE=TRUE/g' .env
-        sed -i 's/APP_URL=.*$/APP_URL=http:\/\/localhost:8001/g' .env
-        echo "" >> .env
-        echo "GOOGLE_API_CONSOLE_KEY=$GOOGLE_API_CONSOLE_KEY" >> .env
-        echo "MAPBOX_TOKEN=$MAPBOX_TOKEN" >> .env
+      - run:
+          name: Setup environment
+          command: |
+            cp .env.example .env
+            sed -i 's/DB_HOST=.*$/DB_HOST=restarters_db/g' .env
+            sed -i 's/DB_DATABASE=.*$/DB_DATABASE=restarters_db_test/g' .env
+            sed -i 's/DB_USERNAME=.*$/DB_USERNAME=restarters/g' .env
+            sed -i 's/DB_PASSWORD=.*$/DB_PASSWORD=s3cr3t/g' .env
+            sed -i 's/FEATURE__DISCOURSE_INTEGRATION=.*$/FEATURE__DISCOURSE_INTEGRATION=true/g' .env
+            sed -i 's/DISCOURSE_URL=.*$/DISCOURSE_URL=http:\/\/restarters_discourse/g' .env
+            sed -i 's/DISCOURSE_APIKEY=.*$/DISCOURSE_APIKEY=fb71f38ca2b8b7cd6a041e57fd8202c9937088f0ecae7db40722bd758dda92fc/g' .env
+            sed -i 's/DISCOURSE_APIUSER=.*$/DISCOURSE_APIUSER=someuser/g' .env
+            sed -i 's/APP_DEBUG=.*$/APP_DEBUG=false/g' .env
+            sed -i 's/SESSION_DOMAIN=.*$/SESSION_DOMAIN=localhost/g' .env
+            sed -i 's/HONEYPOT_DISABLE=.*$/HONEYPOT_DISABLE=TRUE/g' .env
+            sed -i 's/APP_URL=.*$/APP_URL=http:\/\/localhost:8001/g' .env
+            echo "" >> .env
+            echo "GOOGLE_API_CONSOLE_KEY=$GOOGLE_API_CONSOLE_KEY" >> .env
+            echo "MAPBOX_TOKEN=$MAPBOX_TOKEN" >> .env
 
-  - restore_cache:
-      keys:
-        - composer-v2-{{ checksum "composer.lock" }}
-        - composer-v2-
+      - restore_cache:
+          keys:
+            - composer-v2-{{ checksum "composer.lock" }}
+            - composer-v2-
 
-  - restore_cache:
-      keys:
-        - node-modules-v1-{{ checksum "package-lock.json" }}
-        - node-modules-v1-
+      - restore_cache:
+          keys:
+            - node-modules-v1-{{ checksum "package-lock.json" }}
+            - node-modules-v1-
 
-  - run:
-      name: Build frontend assets
-      command: |
-        npm install --legacy-peer-deps
-        npm run build
-      no_output_timeout: 15m
+      - run:
+          name: Build frontend assets
+          command: |
+            npm install --legacy-peer-deps
+            npm run build
+          no_output_timeout: 15m
 
-  - save_cache:
-      key: node-modules-v1-{{ checksum "package-lock.json" }}
-      paths:
-        - node_modules
+      - save_cache:
+          key: node-modules-v1-{{ checksum "package-lock.json" }}
+          paths:
+            - node_modules
 
-  - run:
-      name: Start Docker services
-      command: |
-        export CIRCLECI=true
-        export COMPOSE_BAKE=true
-        task docker:up-all
-      no_output_timeout: 10m
+      - run:
+          name: Start Docker services
+          command: |
+            export CIRCLECI=true
+            export COMPOSE_BAKE=true
+            task docker:up-all
+          no_output_timeout: 10m
 
-  - run:
-      name: Wait for services
-      command: |
-        task docker:wait-for-services-all
+      - run:
+          name: Wait for services
+          command: |
+            task docker:wait-for-services-all
 
-  - save_cache:
-      key: composer-v2-{{ checksum "composer.lock" }}
-      paths:
-        - vendor
+      - save_cache:
+          key: composer-v2-{{ checksum "composer.lock" }}
+          paths:
+            - vendor
 
-  - run:
-      name: Setup application
-      command: |
-        docker exec restarters_db mysql -u root -ps3cr3t -e "GRANT SELECT ON mysql.time_zone_name TO 'restarters'@'%';"
-        docker exec restarters_db mysql -u root -ps3cr3t -e "SET GLOBAL log_bin_trust_function_creators = 1;"
-        docker exec restarters_db mysql -u root -ps3cr3t -e "SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));"
-        docker exec restarters php artisan l5-swagger:generate
+      - run:
+          name: Setup application
+          command: |
+            docker exec restarters_db mysql -u root -ps3cr3t -e "GRANT SELECT ON mysql.time_zone_name TO 'restarters'@'%';"
+            docker exec restarters_db mysql -u root -ps3cr3t -e "SET GLOBAL log_bin_trust_function_creators = 1;"
+            docker exec restarters_db mysql -u root -ps3cr3t -e "SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));"
+            docker exec restarters php artisan l5-swagger:generate
 
-  - run:
-      name: Setup Discourse
-      command: |
-        docker exec postgresql psql -U postgres -c "INSERT INTO api_keys (id, user_id, created_by_id, created_at, updated_at, allowed_ips, hidden, last_used_at, revoked_at, description, key_hash, truncated_key) VALUES (1, NULL, 1, '2021-10-25 13:56:20.033338', '2021-10-25 13:56:20.033338', NULL, false, NULL, NULL, 'Restarters', 'd89e9dfacfb611fbaf004807648187ce7ed474df44dcb0ada230fab5c8dd6a5b', '9fd7');" bitnami_discourse
-        docker exec restarters php artisan discourse:setting personal_message_enabled_groups 10
+      - run:
+          name: Setup Discourse
+          command: |
+            docker exec postgresql psql -U postgres -c "INSERT INTO api_keys (id, user_id, created_by_id, created_at, updated_at, allowed_ips, hidden, last_used_at, revoked_at, description, key_hash, truncated_key) VALUES (1, NULL, 1, '2021-10-25 13:56:20.033338', '2021-10-25 13:56:20.033338', NULL, false, NULL, NULL, 'Restarters', 'd89e9dfacfb611fbaf004807648187ce7ed474df44dcb0ada230fab5c8dd6a5b', '9fd7');" bitnami_discourse
+            docker exec restarters php artisan discourse:setting personal_message_enabled_groups 10
 
 jobs:
   test-php:
@@ -94,7 +96,7 @@ jobs:
       - TZ: "UTC"
 
     steps:
-      - *setup_steps
+      - setup_docker
 
       - run:
           name: Run PHPUnit tests
@@ -126,7 +128,7 @@ jobs:
       - TZ: "UTC"
 
     steps:
-      - *setup_steps
+      - setup_docker
 
       - run:
           name: Run main Playwright tests
