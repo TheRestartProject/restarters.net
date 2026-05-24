@@ -149,9 +149,16 @@ jobs:
       - run:
           name: Run main Playwright tests
           command: |
-            # Run Playwright tests using Task for consistency with local development
+            # Keepalive: print a heartbeat every 60s so CircleCI's no_output_timeout never fires.
+            # Tests with test.slow() can take up to 15 min; without this, 10 min silence kills the job.
+            ( while true; do sleep 60; echo "[ci-keepalive] $(date -u +%H:%M:%S)"; done ) &
+            KEEPALIVE_PID=$!
+            trap "kill $KEEPALIVE_PID 2>/dev/null || true" EXIT
             task docker:test:playwright
-          no_output_timeout: 10m
+            EXIT_CODE=$?
+            kill $KEEPALIVE_PID 2>/dev/null || true
+            exit $EXIT_CODE
+          no_output_timeout: 30m
 
       # Copy test results and artifacts
       - run:

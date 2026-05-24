@@ -77,7 +77,6 @@ async function fillTagForm(page, name, description) {
 // ---------- NC: Tag management for the network ----------
 
 test('NC can view network page with tags section', async ({page, baseURL}) => {
-  test.slow()
   await login(page, baseURL, NC_EMAIL, PASSWORD)
   const networkId = await getNetworkId(page, baseURL)
   await page.goto(baseURL + '/networks/' + networkId, { waitUntil: 'domcontentloaded' })
@@ -85,7 +84,6 @@ test('NC can view network page with tags section', async ({page, baseURL}) => {
 })
 
 test('NC can create a tag', async ({page, baseURL}) => {
-  test.slow()
   await login(page, baseURL, NC_EMAIL, PASSWORD)
   const networkId = await getNetworkId(page, baseURL)
   console.log('[create-tag] navigating to network', networkId)
@@ -98,7 +96,6 @@ test('NC can create a tag', async ({page, baseURL}) => {
 })
 
 test('NC cannot create duplicate tag', async ({page, baseURL}) => {
-  test.slow()
   await login(page, baseURL, NC_EMAIL, PASSWORD)
   const networkId = await getNetworkId(page, baseURL)
   await page.goto(baseURL + '/networks/' + networkId, { waitUntil: 'domcontentloaded' })
@@ -108,7 +105,6 @@ test('NC cannot create duplicate tag', async ({page, baseURL}) => {
 })
 
 test('NC can create tag with same name as global tag', async ({page, baseURL}) => {
-  test.slow()
   // Requires a global tag named "GlobalTestTag" to already exist (created in test setup)
   await login(page, baseURL, NC_EMAIL, PASSWORD)
   const networkId = await getNetworkId(page, baseURL)
@@ -119,7 +115,6 @@ test('NC can create tag with same name as global tag', async ({page, baseURL}) =
 })
 
 test('NC can edit a tag', async ({page, baseURL}) => {
-  test.slow()
   await login(page, baseURL, NC_EMAIL, PASSWORD)
   const networkId = await getNetworkId(page, baseURL)
   await page.goto(baseURL + '/networks/' + networkId, { waitUntil: 'domcontentloaded' })
@@ -127,19 +122,18 @@ test('NC can edit a tag', async ({page, baseURL}) => {
   // Click edit on the first tag
   await page.waitForSelector('.edit-tag-btn', { timeout: 15000 })
   await page.click('.edit-tag-btn', { timeout: 10000 })
-  await page.waitForSelector('.modal.show')
+  await page.waitForSelector('.modal.show', { timeout: 10000 })
 
   // Change the name
   await page.fill('.modal.show input', 'PW Edited Tag')
   await page.click('.modal.show .btn-primary')
 
   // Wait for modal to close and verify
-  await page.waitForSelector('.modal.show', { state: 'hidden' })
+  await page.waitForSelector('.modal.show', { state: 'hidden', timeout: 10000 })
   await expect(page.locator('.tag-item', { hasText: 'PW Edited Tag' })).toBeVisible({ timeout: 15000 })
 })
 
 test('NC cannot edit tag to duplicate name', async ({page, baseURL}) => {
-  test.slow()
   await login(page, baseURL, NC_EMAIL, PASSWORD)
   const networkId = await getNetworkId(page, baseURL)
   await page.goto(baseURL + '/networks/' + networkId, { waitUntil: 'domcontentloaded' })
@@ -150,7 +144,7 @@ test('NC cannot edit tag to duplicate name', async ({page, baseURL}) => {
   // Edit the second tag to have the same name as the first
   const editButtons = page.locator('.edit-tag-btn')
   await editButtons.last().click()
-  await page.waitForSelector('.modal.show')
+  await page.waitForSelector('.modal.show', { timeout: 10000 })
 
   await page.fill('.modal.show input', 'PW Edited Tag')
   await page.click('.modal.show .btn-primary')
@@ -160,7 +154,6 @@ test('NC cannot edit tag to duplicate name', async ({page, baseURL}) => {
 })
 
 test('NC can delete tag with 0 groups', async ({page, baseURL}) => {
-  test.slow()
   await login(page, baseURL, NC_EMAIL, PASSWORD)
   const networkId = await getNetworkId(page, baseURL)
   await page.goto(baseURL + '/networks/' + networkId, { waitUntil: 'domcontentloaded' })
@@ -176,16 +169,15 @@ test('NC can delete tag with 0 groups', async ({page, baseURL}) => {
   await deleteButtons.last().click()
 
   // Confirm in the modal
-  await page.waitForSelector('.modal.show')
+  await page.waitForSelector('.modal.show', { timeout: 10000 })
   await page.click('.modal.show .btn-primary')
-  await page.waitForSelector('.modal.show', { state: 'hidden' })
+  await page.waitForSelector('.modal.show', { state: 'hidden', timeout: 10000 })
 
   // Should have one fewer tag
   await expect(page.locator('.tag-item')).toHaveCount(countBefore - 1)
 })
 
 test('NC can delete tag with groups attached', async ({page, baseURL}) => {
-  test.slow()
   await login(page, baseURL, NC_EMAIL, PASSWORD)
   const networkId = await getNetworkId(page, baseURL)
 
@@ -224,18 +216,17 @@ test('NC can delete tag with groups attached', async ({page, baseURL}) => {
   await tagItem.locator('.delete-tag-btn').click()
 
   // Modal should warn about groups
-  await page.waitForSelector('.modal.show')
+  await page.waitForSelector('.modal.show', { timeout: 10000 })
   await expect(page.locator('.modal.show .text-warning')).toBeVisible()
 
   // Confirm delete
   await page.click('.modal.show .btn-primary')
-  await page.waitForSelector('.modal.show', { state: 'hidden' })
+  await page.waitForSelector('.modal.show', { state: 'hidden', timeout: 10000 })
 })
 
 // ---------- NC: Tag management for groups ----------
 
 test('NC can add a tag to a group', async ({page, baseURL}) => {
-  test.slow()
   await login(page, baseURL, NC_EMAIL, PASSWORD)
   const networkId = await getNetworkId(page, baseURL)
 
@@ -268,7 +259,6 @@ test('NC can add a tag to a group', async ({page, baseURL}) => {
 })
 
 test('NC can remove a tag from a group', async ({page, baseURL}) => {
-  test.slow()
   await login(page, baseURL, NC_EMAIL, PASSWORD)
   const groupId = await getGroupId(page, baseURL)
 
@@ -294,7 +284,6 @@ test('NC can remove a tag from a group', async ({page, baseURL}) => {
 // ---------- NC: Tag display on group pages / lists ----------
 
 test('NC should see tags on groups list', async ({page, baseURL}) => {
-  test.slow()
   await login(page, baseURL, NC_EMAIL, PASSWORD)
   const networkId = await getNetworkId(page, baseURL)
 
@@ -312,7 +301,6 @@ test('NC should see tags on groups list', async ({page, baseURL}) => {
 })
 
 test('NC can filter groups list by tag', async ({page, baseURL}) => {
-  test.slow()
   await login(page, baseURL, NC_EMAIL, PASSWORD)
   const networkId = await getNetworkId(page, baseURL)
 
@@ -373,7 +361,6 @@ test('NC can filter groups list by tag', async ({page, baseURL}) => {
 })
 
 test('NC should see tags displayed on group page', async ({page, baseURL}) => {
-  test.slow()
   await login(page, baseURL, NC_EMAIL, PASSWORD)
   const networkId = await getNetworkId(page, baseURL)
   const groupId = await getGroupId(page, baseURL)
@@ -409,7 +396,6 @@ test('NC should see tags displayed on group page', async ({page, baseURL}) => {
 // ---------- Host: Should not see tags ----------
 
 test('Host does not see tags on groups list', async ({page, baseURL}) => {
-  test.slow()
   await login(page, baseURL, HOST_EMAIL, PASSWORD)
 
   // Go to groups page
@@ -422,7 +408,6 @@ test('Host does not see tags on groups list', async ({page, baseURL}) => {
 })
 
 test('Host does not see tags on group page', async ({page, baseURL}) => {
-  test.slow()
   await login(page, baseURL, HOST_EMAIL, PASSWORD)
   const groupId = await getGroupId(page, baseURL)
 
@@ -495,7 +480,6 @@ test('API: Retrieve stats filtered by tag', async ({page, baseURL}) => {
 // ---------- Admin: Tag management ----------
 
 test('Admin can view network page and see tags', async ({page, baseURL}) => {
-  test.slow()
   await login(page, baseURL, ADMIN_EMAIL, PASSWORD)
   const networkId = await getNetworkId(page, baseURL)
   await page.goto(baseURL + '/networks/' + networkId, { waitUntil: 'domcontentloaded' })
@@ -503,7 +487,6 @@ test('Admin can view network page and see tags', async ({page, baseURL}) => {
 })
 
 test('Admin can create a tag for a network', async ({page, baseURL}) => {
-  test.slow()
   await login(page, baseURL, ADMIN_EMAIL, PASSWORD)
   const networkId = await getNetworkId(page, baseURL)
   await page.goto(baseURL + '/networks/' + networkId, { waitUntil: 'domcontentloaded' })
@@ -512,7 +495,6 @@ test('Admin can create a tag for a network', async ({page, baseURL}) => {
 })
 
 test('Admin cannot create duplicate tag', async ({page, baseURL}) => {
-  test.slow()
   await login(page, baseURL, ADMIN_EMAIL, PASSWORD)
   const networkId = await getNetworkId(page, baseURL)
   await page.goto(baseURL + '/networks/' + networkId, { waitUntil: 'domcontentloaded' })
@@ -521,7 +503,6 @@ test('Admin cannot create duplicate tag', async ({page, baseURL}) => {
 })
 
 test('Admin can create tag with same name as global tag', async ({page, baseURL}) => {
-  test.slow()
   await login(page, baseURL, ADMIN_EMAIL, PASSWORD)
   const networkId = await getNetworkId(page, baseURL)
   await page.goto(baseURL + '/networks/' + networkId, { waitUntil: 'domcontentloaded' })
@@ -532,7 +513,6 @@ test('Admin can create tag with same name as global tag', async ({page, baseURL}
 })
 
 test('Admin can edit a tag', async ({page, baseURL}) => {
-  test.slow()
   await login(page, baseURL, ADMIN_EMAIL, PASSWORD)
   const networkId = await getNetworkId(page, baseURL)
   await page.goto(baseURL + '/networks/' + networkId, { waitUntil: 'domcontentloaded' })
@@ -541,18 +521,17 @@ test('Admin can edit a tag', async ({page, baseURL}) => {
   await page.locator('.edit-tag-btn').first().click()
 
   // Modal should open with edit fields
-  await page.waitForSelector('.modal.show')
+  await page.waitForSelector('.modal.show', { timeout: 10000 })
   const nameInput = page.locator('.modal.show .tag-name-input, .modal.show input[type="text"]').first()
   await nameInput.fill('Admin Edited Tag')
   await page.click('.modal.show .btn-primary')
-  await page.waitForSelector('.modal.show', { state: 'hidden' })
+  await page.waitForSelector('.modal.show', { state: 'hidden', timeout: 10000 })
 
   // Verify the tag was updated
   await expect(page.locator('.tag-item', { hasText: 'Admin Edited Tag' })).toBeVisible({ timeout: 15000 })
 })
 
 test('Admin cannot edit tag to duplicate name', async ({page, baseURL}) => {
-  test.slow()
   await login(page, baseURL, ADMIN_EMAIL, PASSWORD)
   const networkId = await getNetworkId(page, baseURL)
   await page.goto(baseURL + '/networks/' + networkId, { waitUntil: 'domcontentloaded' })
@@ -564,7 +543,7 @@ test('Admin cannot edit tag to duplicate name', async ({page, baseURL}) => {
   const tagItem = page.locator('.tag-item', { hasText: 'Admin Unique Tag' })
   await tagItem.locator('.edit-tag-btn').click()
 
-  await page.waitForSelector('.modal.show')
+  await page.waitForSelector('.modal.show', { timeout: 10000 })
   const nameInput = page.locator('.modal.show .tag-name-input, .modal.show input[type="text"]').first()
   await nameInput.fill('Admin Edited Tag')
   await page.click('.modal.show .btn-primary')
@@ -574,7 +553,6 @@ test('Admin cannot edit tag to duplicate name', async ({page, baseURL}) => {
 })
 
 test('Admin can delete tag with 0 groups', async ({page, baseURL}) => {
-  test.slow()
   await login(page, baseURL, ADMIN_EMAIL, PASSWORD)
   const networkId = await getNetworkId(page, baseURL)
   await page.goto(baseURL + '/networks/' + networkId, { waitUntil: 'domcontentloaded' })
@@ -589,15 +567,14 @@ test('Admin can delete tag with 0 groups', async ({page, baseURL}) => {
   await tagItem.locator('.delete-tag-btn').click()
 
   // Confirm in modal
-  await page.waitForSelector('.modal.show')
+  await page.waitForSelector('.modal.show', { timeout: 10000 })
   await page.click('.modal.show .btn-primary')
-  await page.waitForSelector('.modal.show', { state: 'hidden' })
+  await page.waitForSelector('.modal.show', { state: 'hidden', timeout: 10000 })
 
   await expect(page.locator('.tag-item')).toHaveCount(countBefore - 1)
 })
 
 test('Admin can delete tag with groups attached', async ({page, baseURL}) => {
-  test.slow()
   await login(page, baseURL, ADMIN_EMAIL, PASSWORD)
   const networkId = await getNetworkId(page, baseURL)
 
@@ -634,16 +611,15 @@ test('Admin can delete tag with groups attached', async ({page, baseURL}) => {
   await tagItem.locator('.delete-tag-btn').click()
 
   // Modal should warn about groups
-  await page.waitForSelector('.modal.show')
+  await page.waitForSelector('.modal.show', { timeout: 10000 })
   await expect(page.locator('.modal.show .text-warning')).toBeVisible()
 
   // Confirm delete
   await page.click('.modal.show .btn-primary')
-  await page.waitForSelector('.modal.show', { state: 'hidden' })
+  await page.waitForSelector('.modal.show', { state: 'hidden', timeout: 10000 })
 })
 
 test('Admin can remove a tag from a group', async ({page, baseURL}) => {
-  test.slow()
   await login(page, baseURL, ADMIN_EMAIL, PASSWORD)
   const networkId = await getNetworkId(page, baseURL)
 
@@ -691,19 +667,13 @@ test('Admin can remove a tag from a group', async ({page, baseURL}) => {
 })
 
 test('Admin should see tags displayed on group page', async ({page, baseURL}) => {
-  test.slow()
   await login(page, baseURL, ADMIN_EMAIL, PASSWORD)
   const networkId = await getNetworkId(page, baseURL)
   const groupId = await getGroupId(page, baseURL)
 
   // Ensure a tag exists and is assigned to the group
   await page.goto(baseURL + '/networks/' + networkId, { waitUntil: 'domcontentloaded' })
-  await page.waitForSelector('.tags-management', { timeout: 15000 })
-  await page.waitForTimeout(500)
-  await page.fill('.tag-name-input', 'Admin Visible Tag')
-  await page.fill('.tag-description-input', 'Should appear on group page')
-  await page.waitForSelector('.create-tag button[type=submit]:not([disabled])', { timeout: 5000 })
-  await page.click('.create-tag button[type=submit]')
+  await fillTagForm(page, 'Admin Visible Tag', 'Should appear on group page')
   await page.waitForTimeout(1000)
 
   await page.goto(baseURL + '/group/edit/' + groupId, { waitUntil: 'domcontentloaded' })
@@ -730,7 +700,6 @@ test('Admin should see tags displayed on group page', async ({page, baseURL}) =>
 })
 
 test('Admin can add tag to group (scoped to group networks)', async ({page, baseURL}) => {
-  test.slow()
   await login(page, baseURL, ADMIN_EMAIL, PASSWORD)
   const groupId = await getGroupId(page, baseURL)
 
@@ -759,7 +728,6 @@ test('Admin can add tag to group (scoped to group networks)', async ({page, base
 })
 
 test('Admin should see tags on groups list', async ({page, baseURL}) => {
-  test.slow()
   await login(page, baseURL, ADMIN_EMAIL, PASSWORD)
   const networkId = await getNetworkId(page, baseURL)
 
@@ -772,7 +740,6 @@ test('Admin should see tags on groups list', async ({page, baseURL}) => {
 })
 
 test('Admin can filter groups by tag', async ({page, baseURL}) => {
-  test.slow()
   await login(page, baseURL, ADMIN_EMAIL, PASSWORD)
   const networkId = await getNetworkId(page, baseURL)
 
@@ -802,7 +769,6 @@ test('Admin can filter groups by tag', async ({page, baseURL}) => {
 // ---------- Admin: Global tag management (/tags page) ----------
 
 test('Admin can view global tags page', async ({page, baseURL}) => {
-  test.slow()
   await login(page, baseURL, ADMIN_EMAIL, PASSWORD)
   await page.goto(baseURL + '/tags', { waitUntil: 'domcontentloaded' })
   await page.waitForLoadState('domcontentloaded')
@@ -812,14 +778,13 @@ test('Admin can view global tags page', async ({page, baseURL}) => {
 })
 
 test('Admin can add a global tag', async ({page, baseURL}) => {
-  test.slow()
   await login(page, baseURL, ADMIN_EMAIL, PASSWORD)
   await page.goto(baseURL + '/tags', { waitUntil: 'domcontentloaded' })
   await page.waitForLoadState('domcontentloaded')
 
   // Click create button to open modal
   await page.click('button[data-target="#add-new-tag"], .btn-save')
-  await page.waitForSelector('#add-new-tag.show, .modal.show')
+  await page.waitForSelector('#add-new-tag.show, .modal.show', { timeout: 10000 })
 
   // Fill in the form
   await page.fill('#tag-name', 'PW Global Tag')
@@ -838,7 +803,6 @@ test('Admin can add a global tag', async ({page, baseURL}) => {
 })
 
 test('Admin can edit a global tag', async ({page, baseURL}) => {
-  test.slow()
   await login(page, baseURL, ADMIN_EMAIL, PASSWORD)
   await page.goto(baseURL + '/tags', { waitUntil: 'domcontentloaded' })
   await page.waitForLoadState('domcontentloaded')
@@ -865,7 +829,6 @@ test('Admin can edit a global tag', async ({page, baseURL}) => {
 })
 
 test('Admin can delete a global tag', async ({page, baseURL}) => {
-  test.slow()
   await login(page, baseURL, ADMIN_EMAIL, PASSWORD)
   await page.goto(baseURL + '/tags', { waitUntil: 'domcontentloaded' })
   await page.waitForLoadState('domcontentloaded')
