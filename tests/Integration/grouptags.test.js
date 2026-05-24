@@ -40,20 +40,37 @@ async function getGroupId(page, baseURL) {
 // Helper to wait for the network page tag form to be ready and fill it via Vue's
 // reactive data. Bootstrap Vue 2's b-form-input doesn't reliably respond to
 // Playwright's synthetic input events — setting Vue state directly is more robust.
-// Vue 2 sets __vue__ on DOM elements in both dev and production builds.
+// Walk UP the DOM from .create-tag to find the ancestor element whose __vue__
+// instance (or one of its $parent chain) has newTagName in its $data.
 async function fillTagForm(page, name, description) {
   await page.waitForSelector('.tags-management', { timeout: 15000 })
   await page.waitForTimeout(500)
   await page.evaluate(([n, d]) => {
-    const form = document.querySelector('.create-tag form')
-    if (!form || !form.__vue__) return
-    let vm = form.__vue__
-    while (vm && !('newTagName' in (vm.$data || {}))) vm = vm.$parent
-    if (!vm) return
-    vm.newTagName = n
-    vm.newTagDescription = d || ''
+    return new Promise((resolve) => {
+      // Walk up the DOM from .create-tag; component root elements have __vue__ set.
+      // NetworkPage's root element will be an ancestor of .create-tag.
+      let el = document.querySelector('.create-tag')
+      while (el) {
+        if (el.__vue__) {
+          let vm = el.__vue__
+          let depth = 0
+          while (vm && depth < 15) {
+            if (vm.$data && 'newTagName' in vm.$data) {
+              vm.newTagName = n
+              vm.newTagDescription = d || ''
+              vm.$nextTick ? vm.$nextTick(resolve) : resolve()
+              return
+            }
+            vm = vm.$parent
+            depth++
+          }
+        }
+        el = el.parentElement
+      }
+      resolve()
+    })
   }, [name, description || ''])
-  await page.waitForSelector('.create-tag button[type=submit]:not([disabled])', { timeout: 5000 })
+  await page.waitForSelector('.create-tag button[type=submit]:not([disabled])', { timeout: 8000 })
   await page.click('.create-tag button[type=submit]', { timeout: 5000 })
 }
 
