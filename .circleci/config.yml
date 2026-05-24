@@ -1,7 +1,92 @@
 version: 2.1
 
+# Shared setup steps — used by both test-php and test-playwright jobs.
+# Both jobs need their own Docker environment (CircleCI jobs can't share Docker).
+setup_steps: &setup_steps
+  - checkout
+
+  - run:
+      name: Install Task
+      command: |
+        sudo sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b /usr/local/bin
+        task --version
+
+  - run:
+      name: Setup environment
+      command: |
+        cp .env.example .env
+        sed -i 's/DB_HOST=.*$/DB_HOST=restarters_db/g' .env
+        sed -i 's/DB_DATABASE=.*$/DB_DATABASE=restarters_db_test/g' .env
+        sed -i 's/DB_USERNAME=.*$/DB_USERNAME=restarters/g' .env
+        sed -i 's/DB_PASSWORD=.*$/DB_PASSWORD=s3cr3t/g' .env
+        sed -i 's/FEATURE__DISCOURSE_INTEGRATION=.*$/FEATURE__DISCOURSE_INTEGRATION=true/g' .env
+        sed -i 's/DISCOURSE_URL=.*$/DISCOURSE_URL=http:\/\/restarters_discourse/g' .env
+        sed -i 's/DISCOURSE_APIKEY=.*$/DISCOURSE_APIKEY=fb71f38ca2b8b7cd6a041e57fd8202c9937088f0ecae7db40722bd758dda92fc/g' .env
+        sed -i 's/DISCOURSE_APIUSER=.*$/DISCOURSE_APIUSER=someuser/g' .env
+        sed -i 's/APP_DEBUG=.*$/APP_DEBUG=false/g' .env
+        sed -i 's/SESSION_DOMAIN=.*$/SESSION_DOMAIN=localhost/g' .env
+        sed -i 's/HONEYPOT_DISABLE=.*$/HONEYPOT_DISABLE=TRUE/g' .env
+        sed -i 's/APP_URL=.*$/APP_URL=http:\/\/localhost:8001/g' .env
+        echo "" >> .env
+        echo "GOOGLE_API_CONSOLE_KEY=$GOOGLE_API_CONSOLE_KEY" >> .env
+        echo "MAPBOX_TOKEN=$MAPBOX_TOKEN" >> .env
+
+  - restore_cache:
+      keys:
+        - composer-v2-{{ checksum "composer.lock" }}
+        - composer-v2-
+
+  - restore_cache:
+      keys:
+        - node-modules-v1-{{ checksum "package-lock.json" }}
+        - node-modules-v1-
+
+  - run:
+      name: Build frontend assets
+      command: |
+        npm install --legacy-peer-deps
+        npm run build
+      no_output_timeout: 15m
+
+  - save_cache:
+      key: node-modules-v1-{{ checksum "package-lock.json" }}
+      paths:
+        - node_modules
+
+  - run:
+      name: Start Docker services
+      command: |
+        export CIRCLECI=true
+        export COMPOSE_BAKE=true
+        task docker:up-all
+      no_output_timeout: 10m
+
+  - run:
+      name: Wait for services
+      command: |
+        task docker:wait-for-services-all
+
+  - save_cache:
+      key: composer-v2-{{ checksum "composer.lock" }}
+      paths:
+        - vendor
+
+  - run:
+      name: Setup application
+      command: |
+        docker exec restarters_db mysql -u root -ps3cr3t -e "GRANT SELECT ON mysql.time_zone_name TO 'restarters'@'%';"
+        docker exec restarters_db mysql -u root -ps3cr3t -e "SET GLOBAL log_bin_trust_function_creators = 1;"
+        docker exec restarters_db mysql -u root -ps3cr3t -e "SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));"
+        docker exec restarters php artisan l5-swagger:generate
+
+  - run:
+      name: Setup Discourse
+      command: |
+        docker exec postgresql psql -U postgres -c "INSERT INTO api_keys (id, user_id, created_by_id, created_at, updated_at, allowed_ips, hidden, last_used_at, revoked_at, description, key_hash, truncated_key) VALUES (1, NULL, 1, '2021-10-25 13:56:20.033338', '2021-10-25 13:56:20.033338', NULL, false, NULL, NULL, 'Restarters', 'd89e9dfacfb611fbaf004807648187ce7ed474df44dcb0ada230fab5c8dd6a5b', '9fd7');" bitnami_discourse
+        docker exec restarters php artisan discourse:setting personal_message_enabled_groups 10
+
 jobs:
-  build:
+  test-php:
     machine:
       image: ubuntu-2204:current
     resource_class: large
@@ -9,148 +94,44 @@ jobs:
       - TZ: "UTC"
 
     steps:
-      - checkout
-      
-      # Install Task
-      - run:
-          name: Install Task
-          command: |
-            sudo sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b /usr/local/bin
-            task --version
+      - *setup_steps
 
-      # Set up environment file
-      - run:
-          name: Setup environment
-          command: |
-            cp .env.example .env
-            
-            # Configure for Docker Compose setup
-            sed -i 's/DB_HOST=.*$/DB_HOST=restarters_db/g' .env
-            sed -i 's/DB_DATABASE=.*$/DB_DATABASE=restarters_db_test/g' .env
-            sed -i 's/DB_USERNAME=.*$/DB_USERNAME=restarters/g' .env
-            sed -i 's/DB_PASSWORD=.*$/DB_PASSWORD=s3cr3t/g' .env
-            
-            # Configure Discourse integration
-            sed -i 's/FEATURE__DISCOURSE_INTEGRATION=.*$/FEATURE__DISCOURSE_INTEGRATION=true/g' .env
-            sed -i 's/DISCOURSE_URL=.*$/DISCOURSE_URL=http:\/\/restarters_discourse/g' .env
-            sed -i 's/DISCOURSE_APIKEY=.*$/DISCOURSE_APIKEY=fb71f38ca2b8b7cd6a041e57fd8202c9937088f0ecae7db40722bd758dda92fc/g' .env
-            sed -i 's/DISCOURSE_APIUSER=.*$/DISCOURSE_APIUSER=someuser/g' .env
-            
-            # Configure for testing
-            sed -i 's/APP_DEBUG=.*$/APP_DEBUG=false/g' .env
-            sed -i 's/SESSION_DOMAIN=.*$/SESSION_DOMAIN=localhost/g' .env
-            sed -i 's/HONEYPOT_DISABLE=.*$/HONEYPOT_DISABLE=TRUE/g' .env
-            sed -i 's/APP_URL=.*$/APP_URL=http:\/\/localhost:8001/g' .env
-            
-            # Add environment variables from CircleCI
-            echo "" >> .env
-            echo "GOOGLE_API_CONSOLE_KEY=$GOOGLE_API_CONSOLE_KEY" >> .env
-            echo "MAPBOX_TOKEN=$MAPBOX_TOKEN" >> .env
-
-      # Restore Composer vendor cache to speed up cold-start composer install in container
-      - restore_cache:
-          keys:
-            - composer-v2-{{ checksum "composer.lock" }}
-            - composer-v2-
-
-      # Restore node_modules cache to speed up npm install
-      - restore_cache:
-          keys:
-            - node-modules-v1-{{ checksum "package-lock.json" }}
-            - node-modules-v1-
-
-      # Build frontend assets on host before Docker starts.
-      # This ensures public/build/manifest.json exists in the volume-mounted workspace
-      # when php-fpm starts, preventing Vite manifest errors (HTTP 500) during health checks.
-      - run:
-          name: Build frontend assets
-          command: |
-            npm install --legacy-peer-deps
-            npm run build
-          no_output_timeout: 15m
-
-      # Save node_modules cache for next run
-      - save_cache:
-          key: node-modules-v1-{{ checksum "package-lock.json" }}
-          paths:
-            - node_modules
-
-      # Start Docker services using Task
-      - run:
-          name: Start Docker services
-          command: |
-            # Set environment variable for CircleCI detection
-            export CIRCLECI=true
-            # Enable Docker Compose bake for build optimization
-            export COMPOSE_BAKE=true
-            # Start all services using Task
-            task docker:up-all
-          no_output_timeout: 10m
-
-      # Wait for services to be ready (includes build completion and restart detection)
-      - run:
-          name: Wait for services
-          command: |
-            task docker:wait-for-services-all
-
-      # Save Composer vendor cache for next run (populated by docker_run.sh via volume mount)
-      - save_cache:
-          key: composer-v2-{{ checksum "composer.lock" }}
-          paths:
-            - vendor
-
-      # Setup database and application
-      - run:
-          name: Setup application
-          command: |
-            # Grant timezone access - run directly on MySQL container
-            docker exec restarters_db mysql -u root -ps3cr3t -e "GRANT SELECT ON mysql.time_zone_name TO 'restarters'@'%';"
-
-            # Setup additional configuration needed for CI (most setup already done by docker_run.sh)
-            # Set MySQL function creators using session variable (compatible with MySQL 5.7)
-            docker exec restarters_db mysql -u root -ps3cr3t -e "SET GLOBAL log_bin_trust_function_creators = 1;"
-
-            # Disable ONLY_FULL_GROUP_BY for compatibility with getItemTypes() query
-            docker exec restarters_db mysql -u root -ps3cr3t -e "SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));"
-
-            # Generate additional Laravel artifacts for testing
-            docker exec restarters php artisan l5-swagger:generate
-
-      # Setup Discourse API
-      - run:
-          name: Setup Discourse
-          command: |
-            # Add API key to Discourse - run directly on PostgreSQL container
-            docker exec postgresql psql -U postgres -c "INSERT INTO api_keys (id, user_id, created_by_id, created_at, updated_at, allowed_ips, hidden, last_used_at, revoked_at, description, key_hash, truncated_key) VALUES (1, NULL, 1, '2021-10-25 13:56:20.033338', '2021-10-25 13:56:20.033338', NULL, false, NULL, NULL, 'Restarters', 'd89e9dfacfb611fbaf004807648187ce7ed474df44dcb0ada230fab5c8dd6a5b', '9fd7');" bitnami_discourse
-            
-            # Configure Discourse settings
-            docker exec restarters php artisan discourse:setting personal_message_enabled_groups 10
-
-      # Run PHPUnit tests
       - run:
           name: Run PHPUnit tests
           command: |
-            # Run PHPUnit tests using Task for consistency with local development
+            mkdir -p /tmp/test-results/phpunit
             task docker:test:phpunit
-            # Copy test results to host
             docker cp restarters:/tmp/phpunit-results.xml /tmp/test-results/phpunit/results.xml
           no_output_timeout: 45m
 
-      # Run Jest tests
       - run:
           name: Run Jest tests
           command: |
-            # Run Jest tests using Task for consistency with local development
+            mkdir -p /tmp/test-results/jest
             task docker:test:jest
-            # Copy test results to host if they exist
             docker cp restarters:/tmp/test-results/junit.xml /tmp/test-results/jest/junit.xml || echo "Jest results not found, skipping"
 
-      # Run main Playwright tests (excluding autocomplete)
+      - store_artifacts:
+          path: /tmp/test-results
+          destination: test-results-php
+
+      - store_test_results:
+          path: /tmp/test-results
+
+  test-playwright:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large
+    environment:
+      - TZ: "UTC"
+
+    steps:
+      - *setup_steps
+
       - run:
           name: Run main Playwright tests
           command: |
-            # Keepalive: print a heartbeat every 60s so CircleCI's no_output_timeout never fires.
-            # Tests with test.slow() can take up to 15 min; without this, 10 min silence kills the job.
+            mkdir -p /tmp/test-results/playwright /tmp/test-results/logs
             ( while true; do sleep 60; echo "[ci-keepalive] $(date -u +%H:%M:%S)"; done ) &
             KEEPALIVE_PID=$!
             trap "kill $KEEPALIVE_PID 2>/dev/null || true" EXIT
@@ -160,35 +141,21 @@ jobs:
             exit $EXIT_CODE
           no_output_timeout: 30m
 
-      # Copy test results and artifacts
       - run:
           name: Copy Playwright artifacts
           command: |
-            # Create test results directory on host
-            mkdir -p /tmp/test-results/playwright
-            mkdir -p /tmp/test-results/logs
-
-            # List what's available in the playwright container
+            mkdir -p /tmp/test-results/playwright /tmp/test-results/logs
             docker exec restarters_playwright bash -c "ls -la /tmp/test-results/* || echo 'No playwright directories found'"
-
-            # Copy test results and artifacts from playwright container to host
-            docker cp restarters_playwright:/tmp/test-results/. /tmp/test-results/playwright/ || echo "Playwright HTML report not found"
-
-            # Copy Vite log from restarters container for debugging
+            docker cp restarters_playwright:/tmp/test-results/. /tmp/test-results/playwright/ || echo "Playwright results not found"
             docker cp restarters:/tmp/vite.log /tmp/test-results/logs/vite.log || echo "Vite log not found"
-
-            # Capture restarters container logs (includes docker_run.sh timestamp output)
             docker logs restarters > /tmp/test-results/logs/restarters.log 2>&1 || echo "Could not capture restarters logs"
-
-            # Capture Laravel application log (shows PHP exceptions causing HTTP 500)
             docker exec restarters bash -c "tail -300 /var/www/storage/logs/laravel.log 2>/dev/null" > /tmp/test-results/logs/laravel.log || echo "No laravel log found"
           when: always
 
-      # Store artifacts
       - store_artifacts:
           path: /tmp/test-results
           destination: playwright-test-results
-      
+
       - store_test_results:
           path: /tmp/test-results
 
@@ -229,13 +196,18 @@ jobs:
 workflows:
   build-and-deploy:
     jobs:
-      - build:
+      - test-php:
+          filters:
+            branches:
+              ignore: production
+      - test-playwright:
           filters:
             branches:
               ignore: production
       - deploy-fly-dev:
           requires:
-            - build
+            - test-php
+            - test-playwright
           filters:
             branches:
               only: develop
