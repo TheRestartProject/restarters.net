@@ -43,7 +43,7 @@ test('NC can view network page with tags section', async ({page, baseURL}) => {
   test.slow()
   await login(page, baseURL, NC_EMAIL, PASSWORD)
   const networkId = await getNetworkId(page, baseURL)
-  await page.goto(baseURL + '/networks/' + networkId)
+  await page.goto(baseURL + '/networks/' + networkId, { waitUntil: 'domcontentloaded' })
   await expect(page.locator('.tags-management')).toBeVisible()
 })
 
@@ -52,7 +52,7 @@ test('NC can create a tag', async ({page, baseURL}) => {
   await login(page, baseURL, NC_EMAIL, PASSWORD)
   const networkId = await getNetworkId(page, baseURL)
   console.log('[create-tag] navigating to network', networkId)
-  await page.goto(baseURL + '/networks/' + networkId)
+  await page.goto(baseURL + '/networks/' + networkId, { waitUntil: 'domcontentloaded' })
   console.log('[create-tag] waiting for .tags-management')
   await page.waitForSelector('.tags-management', { timeout: 15000 })
   // Wait for the mounted() tags fetch to complete so Vue doesn't re-render during typing.
@@ -80,7 +80,7 @@ test('NC cannot create duplicate tag', async ({page, baseURL}) => {
   test.slow()
   await login(page, baseURL, NC_EMAIL, PASSWORD)
   const networkId = await getNetworkId(page, baseURL)
-  await page.goto(baseURL + '/networks/' + networkId)
+  await page.goto(baseURL + '/networks/' + networkId, { waitUntil: 'domcontentloaded' })
 
   // Try to create a tag with the same name
   await page.fill('.tag-name-input', 'PW Test Tag')
@@ -96,7 +96,7 @@ test('NC can create tag with same name as global tag', async ({page, baseURL}) =
   // Requires a global tag named "GlobalTestTag" to already exist (created in test setup)
   await login(page, baseURL, NC_EMAIL, PASSWORD)
   const networkId = await getNetworkId(page, baseURL)
-  await page.goto(baseURL + '/networks/' + networkId)
+  await page.goto(baseURL + '/networks/' + networkId, { waitUntil: 'domcontentloaded' })
 
   // Create a network tag with the same name as the global tag
   await page.fill('.tag-name-input', 'GlobalTestTag')
@@ -111,7 +111,7 @@ test('NC can edit a tag', async ({page, baseURL}) => {
   test.slow()
   await login(page, baseURL, NC_EMAIL, PASSWORD)
   const networkId = await getNetworkId(page, baseURL)
-  await page.goto(baseURL + '/networks/' + networkId)
+  await page.goto(baseURL + '/networks/' + networkId, { waitUntil: 'domcontentloaded' })
 
   // Click edit on the first tag
   await page.waitForSelector('.edit-tag-btn', { timeout: 15000 })
@@ -131,7 +131,7 @@ test('NC cannot edit tag to duplicate name', async ({page, baseURL}) => {
   test.slow()
   await login(page, baseURL, NC_EMAIL, PASSWORD)
   const networkId = await getNetworkId(page, baseURL)
-  await page.goto(baseURL + '/networks/' + networkId)
+  await page.goto(baseURL + '/networks/' + networkId, { waitUntil: 'domcontentloaded' })
 
   // Need at least 2 tags. Create another one first.
   await page.fill('.tag-name-input', 'PW Second Tag')
@@ -155,7 +155,7 @@ test('NC can delete tag with 0 groups', async ({page, baseURL}) => {
   test.slow()
   await login(page, baseURL, NC_EMAIL, PASSWORD)
   const networkId = await getNetworkId(page, baseURL)
-  await page.goto(baseURL + '/networks/' + networkId)
+  await page.goto(baseURL + '/networks/' + networkId, { waitUntil: 'domcontentloaded' })
 
   // Create a fresh tag to delete
   await page.fill('.tag-name-input', 'PW Delete Me')
@@ -185,7 +185,7 @@ test('NC can delete tag with groups attached', async ({page, baseURL}) => {
   const networkId = await getNetworkId(page, baseURL)
 
   // Step 1: Create a tag on the network page
-  await page.goto(baseURL + '/networks/' + networkId)
+  await page.goto(baseURL + '/networks/' + networkId, { waitUntil: 'domcontentloaded' })
   await page.fill('.tag-name-input', 'PW Tag With Group')
   await page.fill('.tag-description-input', 'Tag assigned to a group')
   await page.click('.create-tag button[type=submit]')
@@ -193,8 +193,8 @@ test('NC can delete tag with groups attached', async ({page, baseURL}) => {
 
   // Step 2: Assign the tag to the group via the group edit page
   const groupId = await getGroupId(page, baseURL)
-  await page.goto(baseURL + '/group/edit/' + groupId)
-  await page.waitForLoadState('networkidle')
+  await page.goto(baseURL + '/group/edit/' + groupId, { waitUntil: 'domcontentloaded' })
+  await page.waitForLoadState('domcontentloaded')
   await page.waitForTimeout(2000)
 
   await page.locator('label[for="tags"]').click()
@@ -205,11 +205,11 @@ test('NC can delete tag with groups attached', async ({page, baseURL}) => {
 
   // Save the group
   await page.locator('button', { hasText: 'Save changes' }).click()
-  await page.waitForLoadState('networkidle')
+  await page.waitForLoadState('domcontentloaded')
   await page.waitForTimeout(2000)
 
   // Step 3: Go back to network page and verify the tag shows group count
-  await page.goto(baseURL + '/networks/' + networkId)
+  await page.goto(baseURL + '/networks/' + networkId, { waitUntil: 'domcontentloaded' })
   // Don't use networkidle — Leaflet tile requests prevent it from resolving.
   await page.waitForSelector('.tags-management', { timeout: 15000 })
 
@@ -237,7 +237,7 @@ test('NC can add a tag to a group', async ({page, baseURL}) => {
   const networkId = await getNetworkId(page, baseURL)
 
   // First ensure there's a tag to add
-  await page.goto(baseURL + '/networks/' + networkId)
+  await page.goto(baseURL + '/networks/' + networkId, { waitUntil: 'domcontentloaded' })
   // Create a fresh tag if needed
   await page.fill('.tag-name-input', 'PW Group Assign Tag')
   await page.fill('.tag-description-input', 'For group assignment')
@@ -246,8 +246,8 @@ test('NC can add a tag to a group', async ({page, baseURL}) => {
 
   // Go to group edit page
   const groupId = await getGroupId(page, baseURL)
-  await page.goto(baseURL + '/group/edit/' + groupId)
-  await page.waitForLoadState('networkidle')
+  await page.goto(baseURL + '/group/edit/' + groupId, { waitUntil: 'domcontentloaded' })
+  await page.waitForLoadState('domcontentloaded')
   await page.waitForTimeout(2000)
 
   // Click on the multiselect to activate it (makes input visible)
@@ -273,8 +273,8 @@ test('NC can remove a tag from a group', async ({page, baseURL}) => {
   const groupId = await getGroupId(page, baseURL)
 
   // Go to group edit page (tag should be assigned from previous test)
-  await page.goto(baseURL + '/group/edit/' + groupId)
-  await page.waitForLoadState('networkidle')
+  await page.goto(baseURL + '/group/edit/' + groupId, { waitUntil: 'domcontentloaded' })
+  await page.waitForLoadState('domcontentloaded')
   await page.waitForTimeout(2000)
 
   // Remove the tag by clicking the X on the multiselect tag
@@ -299,7 +299,7 @@ test('NC should see tags on groups list', async ({page, baseURL}) => {
   const networkId = await getNetworkId(page, baseURL)
 
   // Go to network groups list
-  await page.goto(baseURL + '/group/network/' + networkId)
+  await page.goto(baseURL + '/group/network/' + networkId, { waitUntil: 'domcontentloaded' })
   // Don't use networkidle — Leaflet tile requests prevent it from resolving.
   // Wait for the API-driven loading spinner to disappear instead.
   await page.waitForSelector('.loader', { state: 'hidden', timeout: 15000 })
@@ -318,8 +318,8 @@ test('NC can filter groups list by tag', async ({page, baseURL}) => {
 
   // First assign a tag to the group so filtering has data
   const groupId = await getGroupId(page, baseURL)
-  await page.goto(baseURL + '/group/edit/' + groupId)
-  await page.waitForLoadState('networkidle')
+  await page.goto(baseURL + '/group/edit/' + groupId, { waitUntil: 'domcontentloaded' })
+  await page.waitForLoadState('domcontentloaded')
   await page.waitForTimeout(2000)
 
   // Add a tag if none assigned
@@ -337,7 +337,7 @@ test('NC can filter groups list by tag', async ({page, baseURL}) => {
   }
 
   // Now go to the groups list and filter by tag
-  await page.goto(baseURL + '/group/network/' + networkId)
+  await page.goto(baseURL + '/group/network/' + networkId, { waitUntil: 'domcontentloaded' })
   // Don't use networkidle — Leaflet tile requests prevent it from resolving.
   await page.waitForSelector('.loader', { state: 'hidden', timeout: 15000 })
 
@@ -379,14 +379,14 @@ test('NC should see tags displayed on group page', async ({page, baseURL}) => {
   const groupId = await getGroupId(page, baseURL)
 
   // Ensure a tag exists and is assigned to the group
-  await page.goto(baseURL + '/networks/' + networkId)
+  await page.goto(baseURL + '/networks/' + networkId, { waitUntil: 'domcontentloaded' })
   await page.fill('.tag-name-input', 'PW Visible Tag')
   await page.fill('.tag-description-input', 'Should appear on group page')
   await page.click('.create-tag button[type=submit]')
   await page.waitForTimeout(1000)
 
-  await page.goto(baseURL + '/group/edit/' + groupId)
-  await page.waitForLoadState('networkidle')
+  await page.goto(baseURL + '/group/edit/' + groupId, { waitUntil: 'domcontentloaded' })
+  await page.waitForLoadState('domcontentloaded')
   await page.waitForTimeout(2000)
 
   await page.locator('label[for="tags"]').click()
@@ -396,12 +396,12 @@ test('NC should see tags displayed on group page', async ({page, baseURL}) => {
   await page.locator('.multiselect__content-wrapper .multiselect__option', { hasText: 'PW Visible Tag' }).first().click({ timeout: 10000 })
 
   await page.locator('button', { hasText: 'Save changes' }).click()
-  await page.waitForLoadState('networkidle')
+  await page.waitForLoadState('domcontentloaded')
   await page.waitForTimeout(2000)
 
   // View the group page (not edit)
-  await page.goto(baseURL + '/group/view/' + groupId)
-  await page.waitForLoadState('networkidle')
+  await page.goto(baseURL + '/group/view/' + groupId, { waitUntil: 'domcontentloaded' })
+  await page.waitForLoadState('domcontentloaded')
   await page.waitForTimeout(2000)
 
   // Tags should be displayed as badges on the group view page
@@ -415,7 +415,7 @@ test('Host does not see tags on groups list', async ({page, baseURL}) => {
   await login(page, baseURL, HOST_EMAIL, PASSWORD)
 
   // Go to groups page
-  await page.goto(baseURL + '/group')
+  await page.goto(baseURL + '/group', { waitUntil: 'domcontentloaded' })
   // Don't use networkidle — Leaflet tile requests prevent it from resolving.
   await page.waitForTimeout(2000)
 
@@ -429,8 +429,8 @@ test('Host does not see tags on group page', async ({page, baseURL}) => {
   const groupId = await getGroupId(page, baseURL)
 
   // Go to group view page
-  await page.goto(baseURL + '/group/view/' + groupId)
-  await page.waitForLoadState('networkidle')
+  await page.goto(baseURL + '/group/view/' + groupId, { waitUntil: 'domcontentloaded' })
+  await page.waitForLoadState('domcontentloaded')
   await page.waitForTimeout(2000)
 
   // Tags should NOT be visible for hosts
@@ -500,7 +500,7 @@ test('Admin can view network page and see tags', async ({page, baseURL}) => {
   test.slow()
   await login(page, baseURL, ADMIN_EMAIL, PASSWORD)
   const networkId = await getNetworkId(page, baseURL)
-  await page.goto(baseURL + '/networks/' + networkId)
+  await page.goto(baseURL + '/networks/' + networkId, { waitUntil: 'domcontentloaded' })
   await expect(page.locator('.tags-management')).toBeVisible()
 })
 
@@ -508,7 +508,7 @@ test('Admin can create a tag for a network', async ({page, baseURL}) => {
   test.slow()
   await login(page, baseURL, ADMIN_EMAIL, PASSWORD)
   const networkId = await getNetworkId(page, baseURL)
-  await page.goto(baseURL + '/networks/' + networkId)
+  await page.goto(baseURL + '/networks/' + networkId, { waitUntil: 'domcontentloaded' })
 
   await page.fill('.tag-name-input', 'Admin Test Tag')
   await page.fill('.tag-description-input', 'Created by admin')
@@ -521,7 +521,7 @@ test('Admin cannot create duplicate tag', async ({page, baseURL}) => {
   test.slow()
   await login(page, baseURL, ADMIN_EMAIL, PASSWORD)
   const networkId = await getNetworkId(page, baseURL)
-  await page.goto(baseURL + '/networks/' + networkId)
+  await page.goto(baseURL + '/networks/' + networkId, { waitUntil: 'domcontentloaded' })
 
   await page.fill('.tag-name-input', 'Admin Test Tag')
   await page.fill('.tag-description-input', 'Duplicate attempt')
@@ -534,7 +534,7 @@ test('Admin can create tag with same name as global tag', async ({page, baseURL}
   test.slow()
   await login(page, baseURL, ADMIN_EMAIL, PASSWORD)
   const networkId = await getNetworkId(page, baseURL)
-  await page.goto(baseURL + '/networks/' + networkId)
+  await page.goto(baseURL + '/networks/' + networkId, { waitUntil: 'domcontentloaded' })
 
   // Create a tag with a name that might exist as a global tag
   // This should succeed - network tags can share names with global tags
@@ -549,7 +549,7 @@ test('Admin can edit a tag', async ({page, baseURL}) => {
   test.slow()
   await login(page, baseURL, ADMIN_EMAIL, PASSWORD)
   const networkId = await getNetworkId(page, baseURL)
-  await page.goto(baseURL + '/networks/' + networkId)
+  await page.goto(baseURL + '/networks/' + networkId, { waitUntil: 'domcontentloaded' })
 
   // Find the first tag's edit button and click it
   await page.locator('.edit-tag-btn').first().click()
@@ -569,7 +569,7 @@ test('Admin cannot edit tag to duplicate name', async ({page, baseURL}) => {
   test.slow()
   await login(page, baseURL, ADMIN_EMAIL, PASSWORD)
   const networkId = await getNetworkId(page, baseURL)
-  await page.goto(baseURL + '/networks/' + networkId)
+  await page.goto(baseURL + '/networks/' + networkId, { waitUntil: 'domcontentloaded' })
 
   // Create a second tag to try to rename to an existing name
   await page.fill('.tag-name-input', 'Admin Unique Tag')
@@ -594,7 +594,7 @@ test('Admin can delete tag with 0 groups', async ({page, baseURL}) => {
   test.slow()
   await login(page, baseURL, ADMIN_EMAIL, PASSWORD)
   const networkId = await getNetworkId(page, baseURL)
-  await page.goto(baseURL + '/networks/' + networkId)
+  await page.goto(baseURL + '/networks/' + networkId, { waitUntil: 'domcontentloaded' })
 
   // Create a fresh tag to delete
   await page.fill('.tag-name-input', 'Admin Delete Me')
@@ -622,7 +622,7 @@ test('Admin can delete tag with groups attached', async ({page, baseURL}) => {
   const networkId = await getNetworkId(page, baseURL)
 
   // Create a tag
-  await page.goto(baseURL + '/networks/' + networkId)
+  await page.goto(baseURL + '/networks/' + networkId, { waitUntil: 'domcontentloaded' })
   await page.fill('.tag-name-input', 'Admin Tag With Group')
   await page.fill('.tag-description-input', 'Tag to assign then delete')
   await page.click('.create-tag button[type=submit]')
@@ -630,8 +630,8 @@ test('Admin can delete tag with groups attached', async ({page, baseURL}) => {
 
   // Assign it to the group
   const groupId = await getGroupId(page, baseURL)
-  await page.goto(baseURL + '/group/edit/' + groupId)
-  await page.waitForLoadState('networkidle')
+  await page.goto(baseURL + '/group/edit/' + groupId, { waitUntil: 'domcontentloaded' })
+  await page.waitForLoadState('domcontentloaded')
   await page.waitForTimeout(2000)
 
   await page.locator('label[for="tags"]').click()
@@ -641,11 +641,11 @@ test('Admin can delete tag with groups attached', async ({page, baseURL}) => {
   await page.locator('.multiselect__content-wrapper .multiselect__option', { hasText: 'Admin Tag With Group' }).first().click({ timeout: 10000 })
 
   await page.locator('button', { hasText: 'Save changes' }).click()
-  await page.waitForLoadState('networkidle')
+  await page.waitForLoadState('domcontentloaded')
   await page.waitForTimeout(2000)
 
   // Go back to network page and delete the tag
-  await page.goto(baseURL + '/networks/' + networkId)
+  await page.goto(baseURL + '/networks/' + networkId, { waitUntil: 'domcontentloaded' })
   // Don't use networkidle — Leaflet tile requests prevent it from resolving.
   await page.waitForSelector('.tags-management', { timeout: 15000 })
 
@@ -670,7 +670,7 @@ test('Admin can remove a tag from a group', async ({page, baseURL}) => {
   const networkId = await getNetworkId(page, baseURL)
 
   // First ensure there's a tag assigned - create and assign one
-  await page.goto(baseURL + '/networks/' + networkId)
+  await page.goto(baseURL + '/networks/' + networkId, { waitUntil: 'domcontentloaded' })
   await page.fill('.tag-name-input', 'Admin Remove Tag')
   await page.fill('.tag-description-input', 'Will be removed from group')
   await page.click('.create-tag button[type=submit]')
@@ -678,8 +678,8 @@ test('Admin can remove a tag from a group', async ({page, baseURL}) => {
 
   // Assign to group
   const groupId = await getGroupId(page, baseURL)
-  await page.goto(baseURL + '/group/edit/' + groupId)
-  await page.waitForLoadState('networkidle')
+  await page.goto(baseURL + '/group/edit/' + groupId, { waitUntil: 'domcontentloaded' })
+  await page.waitForLoadState('domcontentloaded')
   await page.waitForTimeout(2000)
 
   await page.locator('label[for="tags"]').click()
@@ -689,12 +689,12 @@ test('Admin can remove a tag from a group', async ({page, baseURL}) => {
   await page.locator('.multiselect__content-wrapper .multiselect__option', { hasText: 'Admin Remove Tag' }).first().click({ timeout: 10000 })
 
   await page.locator('button', { hasText: 'Save changes' }).click()
-  await page.waitForLoadState('networkidle')
+  await page.waitForLoadState('domcontentloaded')
   await page.waitForTimeout(2000)
 
   // Now remove the tag
-  await page.goto(baseURL + '/group/edit/' + groupId)
-  await page.waitForLoadState('networkidle')
+  await page.goto(baseURL + '/group/edit/' + groupId, { waitUntil: 'domcontentloaded' })
+  await page.waitForLoadState('domcontentloaded')
   await page.waitForTimeout(2000)
 
   // Click the remove button on the tag in the multiselect
@@ -703,12 +703,12 @@ test('Admin can remove a tag from a group', async ({page, baseURL}) => {
   await tagToRemove.locator('.multiselect__tag-icon, i').click()
 
   await page.locator('button', { hasText: 'Save changes' }).click()
-  await page.waitForLoadState('networkidle')
+  await page.waitForLoadState('domcontentloaded')
   await page.waitForTimeout(2000)
 
   // Verify tag was removed - reload and check
-  await page.goto(baseURL + '/group/edit/' + groupId)
-  await page.waitForLoadState('networkidle')
+  await page.goto(baseURL + '/group/edit/' + groupId, { waitUntil: 'domcontentloaded' })
+  await page.waitForLoadState('domcontentloaded')
   await page.waitForTimeout(2000)
 
   await expect(page.locator('.multiselect__tag', { hasText: 'Admin Remove Tag' })).not.toBeVisible()
@@ -721,14 +721,14 @@ test('Admin should see tags displayed on group page', async ({page, baseURL}) =>
   const groupId = await getGroupId(page, baseURL)
 
   // Ensure a tag exists and is assigned to the group
-  await page.goto(baseURL + '/networks/' + networkId)
+  await page.goto(baseURL + '/networks/' + networkId, { waitUntil: 'domcontentloaded' })
   await page.fill('.tag-name-input', 'Admin Visible Tag')
   await page.fill('.tag-description-input', 'Should appear on group page')
   await page.click('.create-tag button[type=submit]')
   await page.waitForTimeout(1000)
 
-  await page.goto(baseURL + '/group/edit/' + groupId)
-  await page.waitForLoadState('networkidle')
+  await page.goto(baseURL + '/group/edit/' + groupId, { waitUntil: 'domcontentloaded' })
+  await page.waitForLoadState('domcontentloaded')
   await page.waitForTimeout(2000)
 
   await page.locator('label[for="tags"]').click()
@@ -738,12 +738,12 @@ test('Admin should see tags displayed on group page', async ({page, baseURL}) =>
   await page.locator('.multiselect__content-wrapper .multiselect__option', { hasText: 'Admin Visible Tag' }).first().click({ timeout: 10000 })
 
   await page.locator('button', { hasText: 'Save changes' }).click()
-  await page.waitForLoadState('networkidle')
+  await page.waitForLoadState('domcontentloaded')
   await page.waitForTimeout(2000)
 
   // View the group page (not edit)
-  await page.goto(baseURL + '/group/view/' + groupId)
-  await page.waitForLoadState('networkidle')
+  await page.goto(baseURL + '/group/view/' + groupId, { waitUntil: 'domcontentloaded' })
+  await page.waitForLoadState('domcontentloaded')
   await page.waitForTimeout(2000)
 
   // Tags should be displayed as badges on the group view page
@@ -755,8 +755,8 @@ test('Admin can add tag to group (scoped to group networks)', async ({page, base
   await login(page, baseURL, ADMIN_EMAIL, PASSWORD)
   const groupId = await getGroupId(page, baseURL)
 
-  await page.goto(baseURL + '/group/edit/' + groupId)
-  await page.waitForLoadState('networkidle')
+  await page.goto(baseURL + '/group/edit/' + groupId, { waitUntil: 'domcontentloaded' })
+  await page.waitForLoadState('domcontentloaded')
   await page.waitForTimeout(2000)
 
   // Click the label to activate multiselect
@@ -784,7 +784,7 @@ test('Admin should see tags on groups list', async ({page, baseURL}) => {
   await login(page, baseURL, ADMIN_EMAIL, PASSWORD)
   const networkId = await getNetworkId(page, baseURL)
 
-  await page.goto(baseURL + '/group/network/' + networkId)
+  await page.goto(baseURL + '/group/network/' + networkId, { waitUntil: 'domcontentloaded' })
   // Don't use networkidle — Leaflet tile requests prevent it from resolving.
   await page.waitForSelector('.loader', { state: 'hidden', timeout: 15000 })
 
@@ -797,7 +797,7 @@ test('Admin can filter groups by tag', async ({page, baseURL}) => {
   await login(page, baseURL, ADMIN_EMAIL, PASSWORD)
   const networkId = await getNetworkId(page, baseURL)
 
-  await page.goto(baseURL + '/group/network/' + networkId)
+  await page.goto(baseURL + '/group/network/' + networkId, { waitUntil: 'domcontentloaded' })
   // Don't use networkidle — Leaflet tile requests prevent it from resolving.
   await page.waitForSelector('.loader', { state: 'hidden', timeout: 15000 })
 
@@ -825,8 +825,8 @@ test('Admin can filter groups by tag', async ({page, baseURL}) => {
 test('Admin can view global tags page', async ({page, baseURL}) => {
   test.slow()
   await login(page, baseURL, ADMIN_EMAIL, PASSWORD)
-  await page.goto(baseURL + '/tags')
-  await page.waitForLoadState('networkidle')
+  await page.goto(baseURL + '/tags', { waitUntil: 'domcontentloaded' })
+  await page.waitForLoadState('domcontentloaded')
 
   // Should see the tags table
   await expect(page.locator('#tags-table, table').first()).toBeVisible()
@@ -835,8 +835,8 @@ test('Admin can view global tags page', async ({page, baseURL}) => {
 test('Admin can add a global tag', async ({page, baseURL}) => {
   test.slow()
   await login(page, baseURL, ADMIN_EMAIL, PASSWORD)
-  await page.goto(baseURL + '/tags')
-  await page.waitForLoadState('networkidle')
+  await page.goto(baseURL + '/tags', { waitUntil: 'domcontentloaded' })
+  await page.waitForLoadState('domcontentloaded')
 
   // Click create button to open modal
   await page.click('button[data-target="#add-new-tag"], .btn-save')
@@ -847,26 +847,26 @@ test('Admin can add a global tag', async ({page, baseURL}) => {
   await page.fill('#tag-description', 'Created by Playwright')
   await page.click('#add-new-tag .btn-primary, .modal.show button[type="submit"]')
 
-  await page.waitForLoadState('networkidle')
+  await page.waitForLoadState('domcontentloaded')
 
   // After creation, redirects to edit page with success message
   await expect(page.locator('text=successfully created')).toBeVisible({ timeout: 5000 })
 
   // Navigate back to tags list and verify it's there
-  await page.goto(baseURL + '/tags')
-  await page.waitForLoadState('networkidle')
+  await page.goto(baseURL + '/tags', { waitUntil: 'domcontentloaded' })
+  await page.waitForLoadState('domcontentloaded')
   await expect(page.locator('#tags-table, table').first()).toContainText('PW Global Tag')
 })
 
 test('Admin can edit a global tag', async ({page, baseURL}) => {
   test.slow()
   await login(page, baseURL, ADMIN_EMAIL, PASSWORD)
-  await page.goto(baseURL + '/tags')
-  await page.waitForLoadState('networkidle')
+  await page.goto(baseURL + '/tags', { waitUntil: 'domcontentloaded' })
+  await page.waitForLoadState('domcontentloaded')
 
   // Click on the tag name link to go to edit page
   await page.locator('a[href*="/tags/edit/"]', { hasText: 'PW Global Tag' }).first().click()
-  await page.waitForLoadState('networkidle')
+  await page.waitForLoadState('domcontentloaded')
 
   // Should be on the edit page
   await expect(page.locator('#tag-name')).toBeVisible()
@@ -874,30 +874,30 @@ test('Admin can edit a global tag', async ({page, baseURL}) => {
   // Change the name
   await page.fill('#tag-name', 'PW Global Tag Edited')
   await page.click('.btn-create, button[type="submit"]')
-  await page.waitForLoadState('networkidle')
+  await page.waitForLoadState('domcontentloaded')
 
   // After save, stays on edit page with success message
   await expect(page.locator('text=successfully updated')).toBeVisible({ timeout: 5000 })
 
   // Navigate back to tags list and verify updated name
-  await page.goto(baseURL + '/tags')
-  await page.waitForLoadState('networkidle')
+  await page.goto(baseURL + '/tags', { waitUntil: 'domcontentloaded' })
+  await page.waitForLoadState('domcontentloaded')
   await expect(page.locator('#tags-table, table').first()).toContainText('PW Global Tag Edited')
 })
 
 test('Admin can delete a global tag', async ({page, baseURL}) => {
   test.slow()
   await login(page, baseURL, ADMIN_EMAIL, PASSWORD)
-  await page.goto(baseURL + '/tags')
-  await page.waitForLoadState('networkidle')
+  await page.goto(baseURL + '/tags', { waitUntil: 'domcontentloaded' })
+  await page.waitForLoadState('domcontentloaded')
 
   // Click on the tag to go to edit page
   await page.locator('a[href*="/tags/edit/"]', { hasText: 'PW Global Tag Edited' }).click()
-  await page.waitForLoadState('networkidle')
+  await page.waitForLoadState('domcontentloaded')
 
   // Click delete button
   await page.click('.btn-danger')
-  await page.waitForLoadState('networkidle')
+  await page.waitForLoadState('domcontentloaded')
 
   // Should redirect to tags list, tag should be gone
   await expect(page.locator('#tags-table, table').first()).not.toContainText('PW Global Tag Edited')
