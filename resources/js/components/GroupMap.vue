@@ -76,7 +76,7 @@ export default {
     mapOptions() {
       return {
         zoomControl: true,
-        dragging: process.client && window?.L?.Browser?.mobile,
+        dragging: !!window?.L?.Browser?.mobile,
         touchZoom: true,
         scrollWheelZoom: false,
         bounceAtZoomLimits: true,
