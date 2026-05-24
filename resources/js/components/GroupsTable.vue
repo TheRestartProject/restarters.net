@@ -50,11 +50,11 @@
         <b-img :src="imageUrl('/icons/group_name_ico.svg')" class="mt-3 icon" />
       </template>
       <template slot="cell(group_name)" slot-scope="data">
-        <a :href="'/group/view/' + data.item.group_name.idgroups">{{ data.item.group_name.name }}</a>
-        <GroupArchivedBadge :idgroups="data.item.group_name.idgroups" />
-        <div v-if="showTags && data.item.group_name.group_tags_full && data.item.group_name.group_tags_full.length" class="mt-1">
+        <a :href="'/group/view/' + (data.item.idgroups || data.item.id)">{{ data.item.name }}</a>
+        <GroupArchivedBadge :idgroups="data.item.idgroups || data.item.id" />
+        <div v-if="showTags && data.item.group_tags_full && data.item.group_tags_full.length" class="mt-1">
           <b-badge
-              v-for="tag in visibleTags(data.item.group_name.group_tags_full)"
+              v-for="tag in visibleTags(data.item.group_tags_full)"
               :key="tag.id"
               variant="secondary"
               class="mr-1 tag-badge"
@@ -300,7 +300,7 @@ export default {
         } else if (bRow.next_event && !aRow.next_event) {
           return 1
         } else {
-          return new moment(aRow.group_name.next_event).unix() - new moment(bRow.group_name.next_event).unix()
+          return new moment(aRow.next_event).unix() - new moment(bRow.next_event).unix()
         }
       } else if (key === 'hosts' || key === 'restarters') {
         if (parseInt(a) < parseInt(b)) {

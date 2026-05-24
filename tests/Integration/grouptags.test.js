@@ -55,7 +55,13 @@ test('NC can create a tag', async ({page, baseURL}) => {
   await page.goto(baseURL + '/networks/' + networkId)
   console.log('[create-tag] waiting for .tags-management')
   await page.waitForSelector('.tags-management', { timeout: 15000 })
-  await page.waitForLoadState('networkidle', { timeout: 10000 })
+  // Wait for the mounted() tags fetch to complete so Vue doesn't re-render during typing.
+  // Using waitForResponse instead of waitForLoadState('networkidle') because the map loads
+  // Leaflet tiles indefinitely, preventing networkidle from ever firing.
+  await page.waitForResponse(
+    resp => resp.url().includes('/api/v2/networks/') && resp.url().includes('/tags'),
+    { timeout: 5000 }
+  ).catch(() => {})
   console.log('[create-tag] filling tag name')
   // Use pressSequentially to simulate real keystrokes — fill() can fail to
   // update Vue's reactive state after a mounted() GET triggers a re-render.
@@ -106,7 +112,6 @@ test('NC can edit a tag', async ({page, baseURL}) => {
   await login(page, baseURL, NC_EMAIL, PASSWORD)
   const networkId = await getNetworkId(page, baseURL)
   await page.goto(baseURL + '/networks/' + networkId)
-  await page.waitForLoadState('networkidle', { timeout: 10000 })
 
   // Click edit on the first tag
   await page.waitForSelector('.edit-tag-btn', { timeout: 15000 })
