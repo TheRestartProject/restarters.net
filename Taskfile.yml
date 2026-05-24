@@ -285,7 +285,6 @@ tasks:
           export PLAYWRIGHT_TEST=true
           export PLAYWRIGHT_DEBUG=true
           export PWTEST_SKIP_TEST_OUTPUT=0
-          export DEBUG=playwright
           export PLAYWRIGHT_BASE_URL=http://restarters_nginx
           export PW_TEST_HTML_REPORT_OPEN=never
           export FORCE_COLOR=1
