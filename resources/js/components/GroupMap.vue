@@ -110,7 +110,10 @@ export default {
   watch: {
     allGroups: {
       handler(newVal, oldVal) {
-        if (!oldVal.length && newVal.length) {
+        // oldVal is undefined on the first (immediate) run.
+        const hadGroups = oldVal && oldVal.length
+        const hasGroups = newVal && newVal.length
+        if (!hadGroups && hasGroups) {
           this.zoomToGroups()
         }
       },

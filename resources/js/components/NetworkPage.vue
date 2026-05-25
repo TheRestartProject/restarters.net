@@ -289,7 +289,7 @@ export default {
           description: this.newTagDescription.trim() || null
         })
 
-        this.tags.push(response.data.data)
+        this.tags = [...this.tags, response.data.data]
         this.newTagName = ''
         this.newTagDescription = ''
       } catch (error) {
