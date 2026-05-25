@@ -225,7 +225,9 @@ export default {
   data() {
     return {
       stats: this.initialStats,
-      tags: this.initialTags,
+      // Copy the array so we don't accidentally mutate the prop or share
+      // its reactive observer with the parent.
+      tags: Array.isArray(this.initialTags) ? [...this.initialTags] : [],
       newTagName: '',
       newTagDescription: '',
       tagError: null,
@@ -289,13 +291,17 @@ export default {
           description: this.newTagDescription.trim() || null
         })
 
+        console.log('[NetPage.createTag] before push, tags.length:', this.tags.length, '_uid:', this._uid)
         this.tags = [...this.tags, response.data.data]
+        console.log('[NetPage.createTag] after push, tags.length:', this.tags.length)
         this.newTagName = ''
         this.newTagDescription = ''
-        // Force a re-render in case the array reassignment hasn't propagated
-        // through Vue's reactivity for some lifecycle reason.
         this.$forceUpdate()
+        console.log('[NetPage.createTag] after forceUpdate')
         await this.$nextTick()
+        const dom = this.$el && this.$el.querySelector ? this.$el.querySelector('.tags-management') : null
+        const domSnippet = dom ? dom.outerHTML.substring(0, 200) : 'no .tags-management in $el'
+        console.log('[NetPage.createTag] after nextTick, _isMounted:', this._isMounted, '_isDestroyed:', this._isDestroyed, 'mountedDom:', domSnippet)
       } catch (error) {
         if (error.response && error.response.data && error.response.data.message) {
           this.tagError = error.response.data.message

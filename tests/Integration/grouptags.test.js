@@ -142,6 +142,35 @@ test('NC can create a tag', async ({page, baseURL}) => {
   })
   console.log('[create-tag] state after 201:', JSON.stringify(stateAfterCreate))
 
+  // Wait 500ms and recheck — maybe Vue eventually renders
+  await page.waitForTimeout(500)
+  const stateLater = await page.evaluate(() => {
+    const items = document.querySelectorAll('.tag-item')
+    return { count: items.length, texts: Array.from(items).map(el => el.textContent.trim().substring(0, 30)) }
+  })
+  console.log('[create-tag] state after 500ms:', JSON.stringify(stateLater))
+
+  // Look up the SAME vm and see if forceUpdate had any effect
+  const vmCheck = await page.evaluate(() => {
+    const input = document.querySelector('.create-tag .tag-name-input')
+    if (!input || !input.__vue__) return null
+    let vm = input.__vue__
+    while (vm && !(vm.$data && 'tags' in vm.$data)) vm = vm.$parent
+    if (!vm) return null
+    // Look at all NetworkPage instances rendered on this page via DOM
+    const allManagement = document.querySelectorAll('.tags-management')
+    return {
+      tagsLen: vm.$data.tags.length,
+      uid: vm._uid,
+      isMounted: vm._isMounted,
+      isDestroyed: vm._isDestroyed,
+      elTagName: vm.$el ? vm.$el.tagName : null,
+      elIsConnected: vm.$el ? vm.$el.isConnected : null,
+      tagsManagementCount: allManagement.length,
+    }
+  })
+  console.log('[create-tag] vmCheck:', JSON.stringify(vmCheck))
+
   console.log('[create-tag] waiting for tag item')
   await expect(page.locator('.tag-item', { hasText: 'PW Test Tag' })).toBeVisible({ timeout: 15000 })
   console.log('[create-tag] PASS')
