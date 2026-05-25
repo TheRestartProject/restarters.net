@@ -292,6 +292,10 @@ export default {
         this.tags = [...this.tags, response.data.data]
         this.newTagName = ''
         this.newTagDescription = ''
+        // Force a re-render in case the array reassignment hasn't propagated
+        // through Vue's reactivity for some lifecycle reason.
+        this.$forceUpdate()
+        await this.$nextTick()
       } catch (error) {
         if (error.response && error.response.data && error.response.data.message) {
           this.tagError = error.response.data.message

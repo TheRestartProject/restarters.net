@@ -114,18 +114,31 @@ test('NC can create a tag', async ({page, baseURL}) => {
   const stateAfterCreate = await page.evaluate(() => {
     const input = document.querySelector('.create-tag .tag-name-input')
     let vueState = null
+    let vmDepth = 0
+    let canManageTags = null
     if (input && input.__vue__) {
       let vm = input.__vue__
       while (vm) {
         if (vm.$data && 'tags' in vm.$data) {
           vueState = { count: vm.$data.tags.length, names: vm.$data.tags.map(t => t.name) }
+          canManageTags = vm.canManageTags
           break
         }
         vm = vm.$parent
+        vmDepth++
       }
     }
     const domItems = document.querySelectorAll('.tag-item')
-    return { vueState, domItemCount: domItems.length, domTexts: Array.from(domItems).map(el => el.textContent.trim().substring(0, 60)) }
+    const tagsManagement = document.querySelector('.tags-management')
+    const tagsManagementHtml = tagsManagement ? tagsManagement.outerHTML.substring(0, 600) : null
+    return {
+      vueState,
+      vmDepth,
+      canManageTags,
+      domItemCount: domItems.length,
+      domTexts: Array.from(domItems).map(el => el.textContent.trim().substring(0, 60)),
+      tagsManagementHtml,
+    }
   })
   console.log('[create-tag] state after 201:', JSON.stringify(stateAfterCreate))
 
