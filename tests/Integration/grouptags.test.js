@@ -46,23 +46,30 @@ async function fillTagForm(page, name, description) {
   await page.waitForSelector('.tags-management', { timeout: 15000 })
   await page.waitForSelector('.create-tag .tag-name-input', { timeout: 8000 })
 
-  await page.evaluate(([n, d]) => {
+  const fillResult = await page.evaluate(([n, d]) => {
     return new Promise((resolve, reject) => {
       const input = document.querySelector('.create-tag .tag-name-input')
       if (!input) { reject(new Error('tag-name-input not found')); return }
 
       // Walk up $parent chain from BFormInput's Vue instance to find NetworkPage (has newTagName in $data).
-      // Chain: BFormInput.__vue__ -> BForm.$parent -> NetworkPage.$parent traversal (~2 hops).
+      // Chain: BFormInput.__vue__ -> BForm.$parent -> NetworkPage (~2 hops).
       if (input.__vue__) {
         let vm = input.__vue__
+        const chain = []
         for (let depth = 0; vm && depth < 20; depth++, vm = vm.$parent) {
-          if (vm.$data && 'newTagName' in vm.$data) {
+          const name = vm.$options.name || vm.$options._componentTag || 'anon'
+          const hasKey = !!(vm.$data && 'newTagName' in vm.$data)
+          chain.push(name + (hasKey ? '*' : ''))
+          if (hasKey) {
             vm.newTagName = n
             vm.newTagDescription = d || ''
-            vm.$nextTick(resolve)
+            vm.$nextTick(() => resolve('vue:' + chain.join('>')))
             return
           }
         }
+        // $parent chain exhausted without finding target
+        resolve('vue-not-found:' + chain.join('>'))
+        return
       }
 
       // Fallback: native value setter triggers Bootstrap Vue's onInput handler → Vue v-model update.
@@ -74,9 +81,11 @@ async function fillTagForm(page, name, description) {
         setter.call(descEl, d)
         descEl.dispatchEvent(new Event('input', { bubbles: true }))
       }
-      resolve()
+      resolve('native-setter')
     })
   }, [name, description || ''])
+
+  console.log('[fillTagForm]', fillResult)
 
   await page.waitForSelector('.create-tag button[type=submit]:not([disabled])', { timeout: 10000 })
   await page.click('.create-tag button[type=submit]', { timeout: 5000 })
