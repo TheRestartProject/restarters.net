@@ -38,54 +38,26 @@ async function getGroupId(page, baseURL) {
 }
 
 // Helper to fill the network page tag creation form.
-// Bootstrap Vue 2's b-form-input ignores Playwright's synthetic fill() events.
-// Primary: set Vue reactive data directly on NetworkPage ($parent traversal from input.__vue__),
-// then await $nextTick so the DOM updates before we click submit.
-// Fallback: native HTMLInputElement setter + input event dispatch (triggers BVue onInput).
+// Bootstrap Vue 2's b-form-input ignores Playwright's synthetic fill() events,
+// so we use the native HTMLInputElement value setter and dispatch a bubbling
+// 'input' event. BFormInput's @input handler picks this up, updates its localValue,
+// and emits to the parent's v-model, which updates newTagName → button enables.
 async function fillTagForm(page, name, description) {
   await page.waitForSelector('.tags-management', { timeout: 15000 })
   await page.waitForSelector('.create-tag .tag-name-input', { timeout: 8000 })
 
-  const fillResult = await page.evaluate(([n, d]) => {
-    return new Promise((resolve, reject) => {
-      const input = document.querySelector('.create-tag .tag-name-input')
-      if (!input) { reject(new Error('tag-name-input not found')); return }
-
-      // Walk up $parent chain from BFormInput's Vue instance to find NetworkPage (has newTagName in $data).
-      // Chain: BFormInput.__vue__ -> BForm.$parent -> NetworkPage (~2 hops).
-      if (input.__vue__) {
-        let vm = input.__vue__
-        const chain = []
-        for (let depth = 0; vm && depth < 20; depth++, vm = vm.$parent) {
-          const name = vm.$options.name || vm.$options._componentTag || 'anon'
-          const hasKey = !!(vm.$data && 'newTagName' in vm.$data)
-          chain.push(name + (hasKey ? '*' : ''))
-          if (hasKey) {
-            vm.newTagName = n
-            vm.newTagDescription = d || ''
-            vm.$nextTick(() => resolve('vue:' + chain.join('>')))
-            return
-          }
-        }
-        // $parent chain exhausted without finding target
-        resolve('vue-not-found:' + chain.join('>'))
-        return
-      }
-
-      // Fallback: native value setter triggers Bootstrap Vue's onInput handler → Vue v-model update.
-      const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set
-      setter.call(input, n)
-      input.dispatchEvent(new Event('input', { bubbles: true }))
-      const descEl = document.querySelector('.create-tag .tag-description-input')
-      if (d && descEl) {
-        setter.call(descEl, d)
-        descEl.dispatchEvent(new Event('input', { bubbles: true }))
-      }
-      resolve('native-setter')
-    })
+  await page.evaluate(([n, d]) => {
+    const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set
+    const input = document.querySelector('.create-tag .tag-name-input')
+    if (!input) throw new Error('tag-name-input not found')
+    setter.call(input, n)
+    input.dispatchEvent(new Event('input', { bubbles: true }))
+    const descEl = document.querySelector('.create-tag .tag-description-input')
+    if (d && descEl) {
+      setter.call(descEl, d)
+      descEl.dispatchEvent(new Event('input', { bubbles: true }))
+    }
   }, [name, description || ''])
-
-  console.log('[fillTagForm]', fillResult)
 
   await page.waitForSelector('.create-tag button[type=submit]:not([disabled])', { timeout: 10000 })
   await page.click('.create-tag button[type=submit]', { timeout: 5000 })
