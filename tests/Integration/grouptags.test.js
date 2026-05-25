@@ -45,9 +45,6 @@ async function getGroupId(page, baseURL) {
 async function fillTagForm(page, name, description) {
   await page.waitForSelector('.tags-management', { timeout: 15000 })
   await page.waitForSelector('.create-tag .tag-name-input', { timeout: 8000 })
-  // Wait for mounted() async requests (stats + tags fetch) to complete before interacting.
-  // This eliminates the race between the mounted() GET /tags response and createTag()'s push.
-  await page.waitForLoadState('networkidle', { timeout: 15000 }).catch(() => {})
 
   const fillResult = await page.evaluate(([n, d]) => {
     return new Promise((resolve, reject) => {

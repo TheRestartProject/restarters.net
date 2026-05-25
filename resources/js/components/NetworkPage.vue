@@ -362,19 +362,6 @@ export default {
       }
     }
 
-    // Fetch tags if not provided and user can manage tags.
-    // Guard: only apply if tags haven't been locally modified since mount started
-    // (prevents a slow GET from overwriting a tag just created via createTag()).
-    if (this.canManageTags && (!this.initialTags || this.initialTags.length === 0)) {
-      try {
-        const response = await axios.get(`/api/v2/networks/${this.network.id}/tags?api_token=${this.apiToken}`)
-        if (this.tags.length === 0) {
-          this.tags = response.data.data || []
-        }
-      } catch (error) {
-        console.error('Failed to fetch network tags:', error)
-      }
-    }
   }
 }
 </script>
