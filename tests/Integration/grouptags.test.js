@@ -39,26 +39,46 @@ async function getGroupId(page, baseURL) {
 
 // Helper to fill the network page tag creation form.
 // Bootstrap Vue 2's b-form-input ignores Playwright's synthetic fill() events.
-// Use the native HTMLInputElement value setter + dispatch a real DOM input event
-// so Bootstrap Vue's onInput handler fires and updates Vue's v-model binding.
-// Poll via waitForFunction so we retry if Vue is mid-render on the first dispatch.
+// Primary: set Vue reactive data directly on NetworkPage ($parent traversal from input.__vue__),
+// then await $nextTick so the DOM updates before we click submit.
+// Fallback: native HTMLInputElement setter + input event dispatch (triggers BVue onInput).
 async function fillTagForm(page, name, description) {
   await page.waitForSelector('.tags-management', { timeout: 15000 })
   await page.waitForSelector('.create-tag .tag-name-input', { timeout: 8000 })
 
-  await page.waitForFunction(([n, d]) => {
-    function setNativeValue(selector, value) {
-      const el = document.querySelector(selector)
-      if (!el) return
-      const nativeSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set
-      nativeSetter.call(el, value)
-      el.dispatchEvent(new Event('input', { bubbles: true }))
-    }
-    setNativeValue('.create-tag .tag-name-input', n)
-    if (d) setNativeValue('.create-tag .tag-description-input', d)
-    return !!document.querySelector('.create-tag button[type=submit]:not([disabled])')
-  }, [name, description || ''], { timeout: 10000, polling: 200 })
+  await page.evaluate(([n, d]) => {
+    return new Promise((resolve, reject) => {
+      const input = document.querySelector('.create-tag .tag-name-input')
+      if (!input) { reject(new Error('tag-name-input not found')); return }
 
+      // Walk up $parent chain from BFormInput's Vue instance to find NetworkPage (has newTagName in $data).
+      // Chain: BFormInput.__vue__ -> BForm.$parent -> NetworkPage.$parent traversal (~2 hops).
+      if (input.__vue__) {
+        let vm = input.__vue__
+        for (let depth = 0; vm && depth < 20; depth++, vm = vm.$parent) {
+          if (vm.$data && 'newTagName' in vm.$data) {
+            vm.newTagName = n
+            vm.newTagDescription = d || ''
+            vm.$nextTick(resolve)
+            return
+          }
+        }
+      }
+
+      // Fallback: native value setter triggers Bootstrap Vue's onInput handler → Vue v-model update.
+      const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set
+      setter.call(input, n)
+      input.dispatchEvent(new Event('input', { bubbles: true }))
+      const descEl = document.querySelector('.create-tag .tag-description-input')
+      if (d && descEl) {
+        setter.call(descEl, d)
+        descEl.dispatchEvent(new Event('input', { bubbles: true }))
+      }
+      resolve()
+    })
+  }, [name, description || ''])
+
+  await page.waitForSelector('.create-tag button[type=submit]:not([disabled])', { timeout: 10000 })
   await page.click('.create-tag button[type=submit]', { timeout: 5000 })
 }
 
@@ -77,7 +97,23 @@ test('NC can create a tag', async ({page, baseURL}) => {
   console.log('[create-tag] navigating to network', networkId)
   await page.goto(baseURL + '/networks/' + networkId, { waitUntil: 'domcontentloaded' })
   console.log('[create-tag] filling tag form')
+
+  // Capture API response to diagnose failures
+  const apiResponsePromise = page.waitForResponse(
+    r => r.url().includes('/tags') && r.request().method() === 'POST',
+    { timeout: 20000 }
+  )
+
   await fillTagForm(page, 'PW Test Tag', 'Created by Playwright')
+
+  const apiResponse = await apiResponsePromise
+  const status = apiResponse.status()
+  console.log('[create-tag] API response status:', status)
+  if (status >= 400) {
+    const body = await apiResponse.text()
+    throw new Error(`Tag creation API failed: HTTP ${status} - ${body}`)
+  }
+
   console.log('[create-tag] waiting for tag item')
   await expect(page.locator('.tag-item', { hasText: 'PW Test Tag' })).toBeVisible({ timeout: 15000 })
   console.log('[create-tag] PASS')
