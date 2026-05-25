@@ -45,6 +45,9 @@ async function getGroupId(page, baseURL) {
 async function fillTagForm(page, name, description) {
   await page.waitForSelector('.tags-management', { timeout: 15000 })
   await page.waitForSelector('.create-tag .tag-name-input', { timeout: 8000 })
+  // Wait for mounted() async requests (stats + tags fetch) to complete before interacting.
+  // This eliminates the race between the mounted() GET /tags response and createTag()'s push.
+  await page.waitForLoadState('networkidle', { timeout: 15000 }).catch(() => {})
 
   const fillResult = await page.evaluate(([n, d]) => {
     return new Promise((resolve, reject) => {
@@ -122,6 +125,25 @@ test('NC can create a tag', async ({page, baseURL}) => {
     const body = await apiResponse.text()
     throw new Error(`Tag creation API failed: HTTP ${status} - ${body}`)
   }
+
+  // Inspect Vue state and DOM immediately after 201 to diagnose if tag is in data but not DOM
+  const stateAfterCreate = await page.evaluate(() => {
+    const input = document.querySelector('.create-tag .tag-name-input')
+    let vueState = null
+    if (input && input.__vue__) {
+      let vm = input.__vue__
+      while (vm) {
+        if (vm.$data && 'tags' in vm.$data) {
+          vueState = { count: vm.$data.tags.length, names: vm.$data.tags.map(t => t.name) }
+          break
+        }
+        vm = vm.$parent
+      }
+    }
+    const domItems = document.querySelectorAll('.tag-item')
+    return { vueState, domItemCount: domItems.length, domTexts: Array.from(domItems).map(el => el.textContent.trim().substring(0, 60)) }
+  })
+  console.log('[create-tag] state after 201:', JSON.stringify(stateAfterCreate))
 
   console.log('[create-tag] waiting for tag item')
   await expect(page.locator('.tag-item', { hasText: 'PW Test Tag' })).toBeVisible({ timeout: 15000 })
