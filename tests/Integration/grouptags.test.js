@@ -41,11 +41,12 @@ async function getGroupId(page, baseURL) {
 // Bootstrap Vue 2's b-form-input ignores Playwright's synthetic fill() events.
 // Use the native HTMLInputElement value setter + dispatch a real DOM input event
 // so Bootstrap Vue's onInput handler fires and updates Vue's v-model binding.
+// Poll via waitForFunction so we retry if Vue is mid-render on the first dispatch.
 async function fillTagForm(page, name, description) {
   await page.waitForSelector('.tags-management', { timeout: 15000 })
   await page.waitForSelector('.create-tag .tag-name-input', { timeout: 8000 })
 
-  await page.evaluate(([n, d]) => {
+  await page.waitForFunction(([n, d]) => {
     function setNativeValue(selector, value) {
       const el = document.querySelector(selector)
       if (!el) return
@@ -55,9 +56,9 @@ async function fillTagForm(page, name, description) {
     }
     setNativeValue('.create-tag .tag-name-input', n)
     if (d) setNativeValue('.create-tag .tag-description-input', d)
-  }, [name, description || ''])
+    return !!document.querySelector('.create-tag button[type=submit]:not([disabled])')
+  }, [name, description || ''], { timeout: 10000, polling: 200 })
 
-  await page.waitForSelector('.create-tag button[type=submit]:not([disabled])', { timeout: 8000 })
   await page.click('.create-tag button[type=submit]', { timeout: 5000 })
 }
 
