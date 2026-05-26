@@ -242,6 +242,21 @@ export default {
       showDescriptionModal: false
     }
   },
+  watch: {
+    tags: {
+      handler(newVal, oldVal) {
+        console.log('[NetPage] tags watcher: new=' + (newVal ? newVal.length : 'null') +
+          ' old=' + (oldVal ? oldVal.length : 'null') +
+          ' sameRef=' + (newVal === oldVal))
+      },
+      deep: true,
+    },
+  },
+  updated() {
+    const liveCount = this.$el && this.$el.querySelectorAll ? this.$el.querySelectorAll('.tag-item').length : 'N/A'
+    console.log('[NetPage] updated(): tags.length=' + (this.tags ? this.tags.length : 'null') +
+      ' .tag-item in DOM=' + liveCount)
+  },
   computed: {
     truncatedDescription() {
       if (!this.network.description) return ''
@@ -363,9 +378,11 @@ export default {
     }
   },
   async mounted() {
+    console.log('[NetPage] mounted, _uid:', this._uid, ' initialTags:', this.initialTags && this.initialTags.length, ' tagsBefore:', this.tags)
     // Initialise tags from the prop *after* mount so Vue tracks the
     // null -> array transition rather than an in-place empty-array push.
     this.tags = Array.isArray(this.initialTags) ? this.initialTags.slice() : []
+    console.log('[NetPage] mounted after tags set, tags.length:', this.tags.length)
 
     // Fetch stats if not provided
     if (!this.initialStats || Object.keys(this.initialStats).length === 0) {
