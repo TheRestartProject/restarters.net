@@ -95,10 +95,10 @@
         <section class="mb-4" v-if="canManageTags">
           <h2>{{ __('networks.tags.title') }}</h2>
           <div class="tags-management">
-            <div v-if="tags.length === 0" class="text-muted mb-2">
+            <div v-if="tags && tags.length === 0" class="text-muted mb-2">
               {{ __('networks.tags.no_tags') }}
             </div>
-            <div :key="'tags-list-' + tags.length" class="tags-list mb-3" v-show="tags.length > 0">
+            <div v-if="tags && tags.length > 0" :key="'tags-list-' + tags.length" class="tags-list mb-3">
               <div v-for="tag in tags" :key="tag.id" class="tag-item mb-2 p-2 border rounded">
                 <div class="d-flex justify-content-between align-items-start">
                   <div>
@@ -225,9 +225,10 @@ export default {
   data() {
     return {
       stats: this.initialStats,
-      // Copy the array so we don't accidentally mutate the prop or share
-      // its reactive observer with the parent.
-      tags: Array.isArray(this.initialTags) ? [...this.initialTags] : [],
+      // Start as null so the first assignment in mounted() is a type
+      // transition (null -> array) rather than empty-array -> mutated
+      // empty-array. Vue 2's reactivity reliably re-renders type changes.
+      tags: null,
       newTagName: '',
       newTagDescription: '',
       tagError: null,
@@ -362,6 +363,10 @@ export default {
     }
   },
   async mounted() {
+    // Initialise tags from the prop *after* mount so Vue tracks the
+    // null -> array transition rather than an in-place empty-array push.
+    this.tags = Array.isArray(this.initialTags) ? this.initialTags.slice() : []
+
     // Fetch stats if not provided
     if (!this.initialStats || Object.keys(this.initialStats).length === 0) {
       try {
