@@ -319,10 +319,19 @@ export default {
           ' protoIsArrayMethods:', protoIsArrayMethods,
           ' subTypes:', obBefore && obBefore.dep && obBefore.dep.subs && obBefore.dep.subs.map(s => s && (s.expression || s.cb || 'render')).join(','))
         this.tags.splice(this.tags.length, 0, response.data.data)
-        // Force notification in case the patched splice isn't triggering it.
-        if (this.tags && this.tags.__ob__ && this.tags.__ob__.dep) {
-          this.tags.__ob__.dep.notify()
-          console.log('[NetPage.createTag] manually notified ob.dep')
+        // Inspect render watcher state and subs in detail
+        const rw = this._watcher
+        console.log('[NetPage.createTag] render watcher state. active:', rw && rw.active,
+          ' dirty:', rw && rw.dirty,
+          ' id:', rw && rw.id,
+          ' depsLen:', rw && rw.deps && rw.deps.length,
+          ' newDepsLen:', rw && rw.newDeps && rw.newDeps.length,
+          ' depIds:', rw && rw.deps && rw.deps.map(d => d.id).join(','),
+          ' obDepIdInRw:', rw && rw.deps && rw.deps.some(d => d.id === (this.tags && this.tags.__ob__ && this.tags.__ob__.dep && this.tags.__ob__.dep.id)))
+        // BRUTE FORCE: bypass the scheduler and run the render watcher directly.
+        if (rw && rw.active) {
+          rw.run()
+          console.log('[NetPage.createTag] manually ran render watcher')
         }
         const obAfter = this.tags && this.tags.__ob__
         console.log('[NetPage.createTag] after splice + notify. tags.length:', this.tags.length,
