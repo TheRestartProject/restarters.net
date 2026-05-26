@@ -95,10 +95,10 @@
         <section class="mb-4" v-if="canManageTags">
           <h2>{{ __('networks.tags.title') }}</h2>
           <div class="tags-management">
-            <div v-if="tags && tags.length === 0" class="text-muted mb-2">
+            <div v-if="tags.length === 0" class="text-muted mb-2">
               {{ __('networks.tags.no_tags') }}
             </div>
-            <div v-if="tags && tags.length > 0" :key="'tags-list-' + tags.length" class="tags-list mb-3">
+            <div v-else class="tags-list mb-3">
               <div v-for="tag in tags" :key="tag.id" class="tag-item mb-2 p-2 border rounded">
                 <div class="d-flex justify-content-between align-items-start">
                   <div>
@@ -225,10 +225,7 @@ export default {
   data() {
     return {
       stats: this.initialStats,
-      // Start as null so the first assignment in mounted() is a type
-      // transition (null -> array) rather than empty-array -> mutated
-      // empty-array. Vue 2's reactivity reliably re-renders type changes.
-      tags: null,
+      tags: Array.isArray(this.initialTags) ? this.initialTags.slice() : [],
       newTagName: '',
       newTagDescription: '',
       tagError: null,
@@ -241,21 +238,6 @@ export default {
       editTagError: null,
       showDescriptionModal: false
     }
-  },
-  watch: {
-    tags: {
-      handler(newVal, oldVal) {
-        console.log('[NetPage] tags watcher: new=' + (newVal ? newVal.length : 'null') +
-          ' old=' + (oldVal ? oldVal.length : 'null') +
-          ' sameRef=' + (newVal === oldVal))
-      },
-      deep: true,
-    },
-  },
-  updated() {
-    const liveCount = this.$el && this.$el.querySelectorAll ? this.$el.querySelectorAll('.tag-item').length : 'N/A'
-    console.log('[NetPage] updated(): tags.length=' + (this.tags ? this.tags.length : 'null') +
-      ' .tag-item in DOM=' + liveCount)
   },
   computed: {
     truncatedDescription() {
@@ -307,43 +289,9 @@ export default {
           description: this.newTagDescription.trim() || null
         })
 
-        const obBefore = this.tags && this.tags.__ob__
-        const spliceIsPatched = this.tags && this.tags.splice !== Array.prototype.splice
-        const pushIsPatched = this.tags && this.tags.push !== Array.prototype.push
-        const protoIsArrayMethods = this.tags && Object.getPrototypeOf(this.tags) !== Array.prototype
-        console.log('[NetPage.createTag] before splice. tags.length:', this.tags.length,
-          ' obDepId:', obBefore && obBefore.dep && obBefore.dep.id,
-          ' obDepSubs:', obBefore && obBefore.dep && obBefore.dep.subs && obBefore.dep.subs.length,
-          ' spliceIsPatched:', spliceIsPatched,
-          ' pushIsPatched:', pushIsPatched,
-          ' protoIsArrayMethods:', protoIsArrayMethods,
-          ' subTypes:', obBefore && obBefore.dep && obBefore.dep.subs && obBefore.dep.subs.map(s => s && (s.expression || s.cb || 'render')).join(','))
-        this.tags.splice(this.tags.length, 0, response.data.data)
-        // Inspect render watcher state and subs in detail
-        const rw = this._watcher
-        console.log('[NetPage.createTag] render watcher state. active:', rw && rw.active,
-          ' dirty:', rw && rw.dirty,
-          ' id:', rw && rw.id,
-          ' depsLen:', rw && rw.deps && rw.deps.length,
-          ' newDepsLen:', rw && rw.newDeps && rw.newDeps.length,
-          ' depIds:', rw && rw.deps && rw.deps.map(d => d.id).join(','),
-          ' obDepIdInRw:', rw && rw.deps && rw.deps.some(d => d.id === (this.tags && this.tags.__ob__ && this.tags.__ob__.dep && this.tags.__ob__.dep.id)))
-        // BRUTE FORCE: bypass the scheduler and run the render watcher directly.
-        if (rw && rw.active) {
-          rw.run()
-          console.log('[NetPage.createTag] manually ran render watcher')
-        }
-        const obAfter = this.tags && this.tags.__ob__
-        console.log('[NetPage.createTag] after splice + notify. tags.length:', this.tags.length,
-          ' has __ob__:', !!obAfter,
-          ' sameOb:', obBefore === obAfter,
-          ' obDepSubs:', obAfter && obAfter.dep && obAfter.dep.subs && obAfter.dep.subs.length)
+        this.tags.push(response.data.data)
         this.newTagName = ''
         this.newTagDescription = ''
-        await this.$nextTick()
-        const dom = this.$el && this.$el.querySelector ? this.$el.querySelector('.tags-management') : null
-        const domSnippet = dom ? dom.outerHTML.substring(0, 200) : 'no .tags-management in $el'
-        console.log('[NetPage.createTag] after nextTick, _isMounted:', this._isMounted, '_isDestroyed:', this._isDestroyed, 'mountedDom:', domSnippet)
       } catch (error) {
         if (error.response && error.response.data && error.response.data.message) {
           this.tagError = error.response.data.message
@@ -404,12 +352,6 @@ export default {
     }
   },
   async mounted() {
-    console.log('[NetPage] mounted, _uid:', this._uid, ' initialTags:', this.initialTags && this.initialTags.length, ' tagsBefore:', this.tags)
-    // Initialise tags from the prop *after* mount so Vue tracks the
-    // null -> array transition rather than an in-place empty-array push.
-    this.tags = Array.isArray(this.initialTags) ? this.initialTags.slice() : []
-    console.log('[NetPage] mounted after tags set, tags.length:', this.tags.length)
-
     // Fetch stats if not provided
     if (!this.initialStats || Object.keys(this.initialStats).length === 0) {
       try {

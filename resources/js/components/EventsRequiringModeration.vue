@@ -54,7 +54,13 @@ export default {
     },
   },
   async mounted() {
-    await this.$store.dispatch('events/getModerationRequired')
+    try {
+      await this.$store.dispatch('events/getModerationRequired')
+    } catch (e) {
+      // See note in GroupsRequiringModeration.vue: an unhandled async
+      // rejection here breaks Vue 2's nextTick scheduler.
+      console.error('Failed to fetch events requiring moderation:', e)
+    }
     this.$nextTick(() => {
       this.loaded = true
     })

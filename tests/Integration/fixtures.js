@@ -9,14 +9,6 @@ const test = base.extend({
       window.PLAYWRIGHT_TEST = true;
     });
 
-    // Mirror tag-related browser console messages to the test output.
-    page.on('console', msg => {
-      const t = msg.text()
-      if (t.startsWith('[NetPage') || t.startsWith('[fillTagForm')) {
-        console.log('BROWSER:', t)
-      }
-    });
-
     // Add X-Playwright-Test header only to requests to our backend, not CDN resources
     // This avoids CORS issues while still allowing cache bypass in ItemController
     await page.route('**/*', async (route) => {

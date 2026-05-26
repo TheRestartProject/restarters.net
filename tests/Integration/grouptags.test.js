@@ -120,16 +120,15 @@ test('NC can view network page with tags section', async ({page, baseURL}) => {
   await expect(page.locator('.tags-management')).toBeVisible()
 })
 
-test('NC can create a tag (via Vue UI - diagnostic)', async ({page, baseURL}) => {
-  // This test deliberately drives the Vue form (vs the API helper used elsewhere)
-  // to verify the underlying reactivity bug is fixed. The earlier symptom was
-  // that splice/push on data.tags from an empty initial value didn't trigger
-  // a render even though the data was mutated.
+test('NC can create a tag', async ({page, baseURL}) => {
   await login(page, baseURL, NC_EMAIL, PASSWORD)
   const networkId = await getNetworkId(page, baseURL)
   await page.goto(baseURL + '/networks/' + networkId, { waitUntil: 'domcontentloaded' })
   await page.waitForSelector('.create-tag .tag-name-input', { timeout: 8000 })
 
+  // Drive the Vue form via the component's createTag method. Direct
+  // page.fill() doesn't reliably trigger Bootstrap Vue's b-form-input
+  // localValue sync, so we set the reactive data and call the method.
   await page.evaluate(([n, d]) => {
     return new Promise((resolve, reject) => {
       const input = document.querySelector('.create-tag .tag-name-input')
