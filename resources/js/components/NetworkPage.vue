@@ -98,7 +98,7 @@
             <div v-if="tags.length === 0" class="text-muted mb-2">
               {{ __('networks.tags.no_tags') }}
             </div>
-            <div v-else class="tags-list mb-3">
+            <div :key="'tags-list-' + tags.length" class="tags-list mb-3" v-show="tags.length > 0">
               <div v-for="tag in tags" :key="tag.id" class="tag-item mb-2 p-2 border rounded">
                 <div class="d-flex justify-content-between align-items-start">
                   <div>
