@@ -307,11 +307,24 @@ export default {
           description: this.newTagDescription.trim() || null
         })
 
-        console.log('[NetPage.createTag] before splice, tags.length:', this.tags.length, '_uid:', this._uid)
-        // Vue 2 reliably intercepts array splice (it's in the patched method list);
-        // reassignment via spread had been missing the render in some lifecycle states.
+        const obBefore = this.tags && this.tags.__ob__
+        const protoIsPatched = this.tags && Object.getPrototypeOf(this.tags) !== Array.prototype
+        const isFrozen = this.tags && Object.isFrozen(this.tags)
+        const isExtensible = this.tags && Object.isExtensible(this.tags)
+        console.log('[NetPage.createTag] before splice. tags.length:', this.tags.length,
+          ' has __ob__:', !!obBefore,
+          ' obDepId:', obBefore && obBefore.dep && obBefore.dep.id,
+          ' obDepSubs:', obBefore && obBefore.dep && obBefore.dep.subs && obBefore.dep.subs.length,
+          ' protoPatched:', protoIsPatched,
+          ' frozen:', isFrozen,
+          ' extensible:', isExtensible,
+          ' _uid:', this._uid)
         this.tags.splice(this.tags.length, 0, response.data.data)
-        console.log('[NetPage.createTag] after splice, tags.length:', this.tags.length)
+        const obAfter = this.tags && this.tags.__ob__
+        console.log('[NetPage.createTag] after splice. tags.length:', this.tags.length,
+          ' has __ob__:', !!obAfter,
+          ' sameOb:', obBefore === obAfter,
+          ' obDepSubs:', obAfter && obAfter.dep && obAfter.dep.subs && obAfter.dep.subs.length)
         this.newTagName = ''
         this.newTagDescription = ''
         await this.$nextTick()
