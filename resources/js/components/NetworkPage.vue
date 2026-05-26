@@ -292,12 +292,14 @@ export default {
         this.tags.push(response.data.data)
         this.newTagName = ''
         this.newTagDescription = ''
+        this.flushRender()
       } catch (error) {
         if (error.response && error.response.data && error.response.data.message) {
           this.tagError = error.response.data.message
         } else {
           this.tagError = this.__('networks.tags.create_error')
         }
+        this.flushRender()
       }
     },
     confirmDeleteTag(tag) {
@@ -311,6 +313,7 @@ export default {
         await axios.delete(`/api/v2/networks/${this.network.id}/tags/${this.tagToDelete.id}?api_token=${this.apiToken}`)
         this.tags = this.tags.filter(t => t.id !== this.tagToDelete.id)
         this.tagToDelete = null
+        this.flushRender()
       } catch (error) {
         console.error('Failed to delete tag:', error)
       }
@@ -342,12 +345,25 @@ export default {
 
         this.showEditModal = false
         this.editingTag = null
+        this.flushRender()
       } catch (error) {
         if (error.response && error.response.data && error.response.data.message) {
           this.editTagError = error.response.data.message
         } else {
           this.editTagError = this.__('networks.tags.edit_error')
         }
+        this.flushRender()
+      }
+    },
+    flushRender() {
+      // Force-run the render watcher synchronously. Vue 2's scheduler can be
+      // left in a 'waiting=true' state if another component's render watcher
+      // throws during a previous flush (we've wrapped the obvious async
+      // lifecycle rejections, but a stuck scheduler in CI is still observable
+      // here on the first mutation when initialTags is empty). Bypassing the
+      // queue here guarantees the tag list reflects the latest state.
+      if (this._watcher && this._watcher.active) {
+        this._watcher.run()
       }
     }
   },
