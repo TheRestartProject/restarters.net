@@ -24,9 +24,13 @@ RUN npm install -g @playwright/test && \
 
 ADD --chmod=0755 https://github.com/mlocati/docker-php-extension-installer/releases/download/2.11.1/install-php-extensions /usr/local/bin/
 
+# bcmath via PHP's own docker-php-ext-install — install-php-extensions
+# trips over a pre-existing libbcmath/src/.libs directory in some PHP 8.4
+# base image variants ("mkdir: cannot create directory ...: File exists").
+RUN docker-php-ext-install bcmath
+
 RUN install-php-extensions \
     pdo_mysql \
-    bcmath \
     zip \
     xmlrpc \
     xdebug \
