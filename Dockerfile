@@ -22,7 +22,7 @@ RUN npm install -g @playwright/test && \
     npx playwright install-deps && \
     npm uninstall -g @playwright/test
 
-ADD --chmod=0755 https://github.com/mlocati/docker-php-extension-installer/releases/download/2.7.31/install-php-extensions /usr/local/bin/
+ADD --chmod=0755 https://github.com/mlocati/docker-php-extension-installer/releases/download/2.11.1/install-php-extensions /usr/local/bin/
 
 RUN install-php-extensions \
     pdo_mysql \
