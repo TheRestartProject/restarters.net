@@ -291,13 +291,13 @@ export default {
           description: this.newTagDescription.trim() || null
         })
 
-        console.log('[NetPage.createTag] before push, tags.length:', this.tags.length, '_uid:', this._uid)
-        this.tags = [...this.tags, response.data.data]
-        console.log('[NetPage.createTag] after push, tags.length:', this.tags.length)
+        console.log('[NetPage.createTag] before splice, tags.length:', this.tags.length, '_uid:', this._uid)
+        // Vue 2 reliably intercepts array splice (it's in the patched method list);
+        // reassignment via spread had been missing the render in some lifecycle states.
+        this.tags.splice(this.tags.length, 0, response.data.data)
+        console.log('[NetPage.createTag] after splice, tags.length:', this.tags.length)
         this.newTagName = ''
         this.newTagDescription = ''
-        this.$forceUpdate()
-        console.log('[NetPage.createTag] after forceUpdate')
         await this.$nextTick()
         const dom = this.$el && this.$el.querySelector ? this.$el.querySelector('.tags-management') : null
         const domSnippet = dom ? dom.outerHTML.substring(0, 200) : 'no .tags-management in $el'
