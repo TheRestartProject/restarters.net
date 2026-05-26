@@ -78,11 +78,19 @@ export default {
   },
   mounted() {
     setTimeout(async() => {
-      const ret = await axios.get('/api/users/' + this.userId + '/notifications/')
+      // Wrap to avoid an unhandled rejection — even though this setTimeout
+      // callback is fire-and-forget, an uncaught rejection here would still
+      // be reported to Vue's globalHandleError and can corrupt the
+      // scheduler's `pending` flag.
+      try {
+        const ret = await axios.get('/api/users/' + this.userId + '/notifications/')
 
-      if (ret.data.success) {
-        this.restartersNotifications = ret.data.restarters
-        this.discourseNotifications = ret.data.discourse
+        if (ret.data.success) {
+          this.restartersNotifications = ret.data.restarters
+          this.discourseNotifications = ret.data.discourse
+        }
+      } catch (e) {
+        console.error('Failed to fetch notifications:', e)
       }
     }, 5000)
   },

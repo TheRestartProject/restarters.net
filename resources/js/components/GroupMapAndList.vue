@@ -107,9 +107,15 @@ export default {
     },
   },
   async mounted() {
-    await this.$store.dispatch('groups/list', {
-      details: true
-    })
+    // Wrap to avoid an unhandled async rejection breaking Vue 2's
+    // scheduler — see notes in GroupsRequiringModeration.vue.
+    try {
+      await this.$store.dispatch('groups/list', {
+        details: true
+      })
+    } catch (e) {
+      console.error('Failed to fetch groups list:', e)
+    }
 
     this.loading = false
   },
