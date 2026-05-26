@@ -308,20 +308,24 @@ export default {
         })
 
         const obBefore = this.tags && this.tags.__ob__
-        const protoIsPatched = this.tags && Object.getPrototypeOf(this.tags) !== Array.prototype
-        const isFrozen = this.tags && Object.isFrozen(this.tags)
-        const isExtensible = this.tags && Object.isExtensible(this.tags)
+        const spliceIsPatched = this.tags && this.tags.splice !== Array.prototype.splice
+        const pushIsPatched = this.tags && this.tags.push !== Array.prototype.push
+        const protoIsArrayMethods = this.tags && Object.getPrototypeOf(this.tags) !== Array.prototype
         console.log('[NetPage.createTag] before splice. tags.length:', this.tags.length,
-          ' has __ob__:', !!obBefore,
           ' obDepId:', obBefore && obBefore.dep && obBefore.dep.id,
           ' obDepSubs:', obBefore && obBefore.dep && obBefore.dep.subs && obBefore.dep.subs.length,
-          ' protoPatched:', protoIsPatched,
-          ' frozen:', isFrozen,
-          ' extensible:', isExtensible,
-          ' _uid:', this._uid)
+          ' spliceIsPatched:', spliceIsPatched,
+          ' pushIsPatched:', pushIsPatched,
+          ' protoIsArrayMethods:', protoIsArrayMethods,
+          ' subTypes:', obBefore && obBefore.dep && obBefore.dep.subs && obBefore.dep.subs.map(s => s && (s.expression || s.cb || 'render')).join(','))
         this.tags.splice(this.tags.length, 0, response.data.data)
+        // Force notification in case the patched splice isn't triggering it.
+        if (this.tags && this.tags.__ob__ && this.tags.__ob__.dep) {
+          this.tags.__ob__.dep.notify()
+          console.log('[NetPage.createTag] manually notified ob.dep')
+        }
         const obAfter = this.tags && this.tags.__ob__
-        console.log('[NetPage.createTag] after splice. tags.length:', this.tags.length,
+        console.log('[NetPage.createTag] after splice + notify. tags.length:', this.tags.length,
           ' has __ob__:', !!obAfter,
           ' sameOb:', obBefore === obAfter,
           ' obDepSubs:', obAfter && obAfter.dep && obAfter.dep.subs && obAfter.dep.subs.length)
