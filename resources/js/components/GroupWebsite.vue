@@ -2,7 +2,10 @@
   <b-form-group>
     <label for="group_website">{{ __('groups.groups_website') }}:</label>
     <b-input type="url" id="group_website" name="website" v-model="currentwebsite" :class="{ hasError: hasError }"/>
-    <small>{{ __('groups.groups_website_small') }}</small>
+    <small v-if="hasError" class="form-text text-danger group-website-error">
+      {{ __('groups.groups_website_invalid') }}
+    </small>
+    <small v-else>{{ __('groups.groups_website_small') }}</small>
   </b-form-group>
 </template>
 <script>
