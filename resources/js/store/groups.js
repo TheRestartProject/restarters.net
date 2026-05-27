@@ -31,6 +31,10 @@ function getLocale() {
   return el.innerText.trim()
 }
 
+// Module-scoped map of in-flight `groups/fetch` promises, keyed by
+// `${id}|${includeStats}`. Used by the action to de-dup concurrent callers.
+const inFlight = new Map()
+
 export default {
   namespaced: true,
   state: {
@@ -224,21 +228,38 @@ export default {
       return id
     },
     async fetch({ rootGetters, commit }, params) {
-      // TODO Handle fetching case.
-      try {
-        let url = '/api/v2/groups/' + params.id + '?api_token=' + rootGetters['auth/apiToken'] + '&locale=' + getLocale()
+      // De-dup concurrent fetches for the same (id, includeStats) so callers
+      // like GroupsPage's mounted loop don't fire N parallel requests when
+      // the user has many groups. The cache key includes includeStats because
+      // the two responses have different shapes.
+      const key = params.id + '|' + (params.hasOwnProperty('includeStats') ? String(params.includeStats) : '')
+      if (inFlight.has(key)) {
+        return inFlight.get(key)
+      }
 
-        if (params.hasOwnProperty('includeStats')) {
-           url += '&includeStats=' + params.includeStats
+      const request = (async () => {
+        try {
+          let url = '/api/v2/groups/' + params.id + '?api_token=' + rootGetters['auth/apiToken'] + '&locale=' + getLocale()
+
+          if (params.hasOwnProperty('includeStats')) {
+             url += '&includeStats=' + params.includeStats
+          }
+
+          let ret = await axios.get(url)
+
+          commit('set', ret.data.data)
+
+          return ret.data.data
+        } catch (e) {
+          console.error("Group fetch failed", e)
         }
+      })()
 
-        let ret = await axios.get(url)
-
-        commit('set', ret.data.data)
-
-        return ret.data.data
-      } catch (e) {
-        console.error("Group fetch failed", e)
+      inFlight.set(key, request)
+      try {
+        return await request
+      } finally {
+        inFlight.delete(key)
       }
     }
   },

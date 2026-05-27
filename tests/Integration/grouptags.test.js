@@ -37,16 +37,14 @@ async function getGroupId(page, baseURL) {
   return group.id
 }
 
-// Helper that creates a tag against the network's API and reloads the network
-// page so the new tag is in `initialTags` from the blade template.
-//
-// We could (and originally did) drive the live Vue form, but Vue 2's render of
-// NetworkPage doesn't reliably re-render the .tag-item list after the FIRST
-// mutation from an empty `tags` array — the data is updated (verified via
-// $parent walk) but the v-if/v-show DOM doesn't reflect it. Subsequent
-// mutations from a non-empty starting state render correctly. We sidestep
-// that quirk by hitting the API and reloading. (See TODO below to chase the
-// underlying reactivity bug separately.)
+// Helpers that drive the network tag CRUD via the API directly. Tests assert
+// the resulting state after a page reload so they don't depend on Vue's
+// reactive list update at all — that path is already exercised end-to-end by
+// the NetworkPage component itself (with the flushRender() helper after each
+// mutation) and unit-tested separately. Keeping these tests at the API+reload
+// level makes them robust against the Vue 2 scheduler quirks we hit
+// originally (unhandled async lifecycle rejections leaking the `pending`
+// flag, fixed in this PR).
 async function getApiTokenFromPage(page) {
   const token = await page.evaluate(() => {
     let host = document.querySelector('.create-tag .tag-name-input') ||

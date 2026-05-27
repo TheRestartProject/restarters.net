@@ -31,7 +31,10 @@
                 class="mt-3"
                 :tab="currentTab"
                 @nearest="currentTab = 1"
-                your-area="yourArea"
+                :your-area="yourArea"
+                :networks="networks"
+                :all-group-tags="allGroupTags"
+                :show-tags="showTags"
             />
           </div>
           <div v-else class="mt-2 mb-2 text-center" v-html="__('groups.no_groups_mine')" />
@@ -86,21 +89,6 @@ export default {
       required: false,
       default: null
     },
-    yourLat: {
-      type: String,
-      required: false,
-      default: null
-    },
-    yourLng: {
-      type: String,
-      required: false,
-      default: null
-    },
-    userId: {
-      type: Number,
-      required: false,
-      default: null
-    },
     canCreate: {
       type: Boolean,
       required: false,
@@ -115,7 +103,6 @@ export default {
       type: Array,
       required: true
     },
-    // TODO Check whether all these parameters are now used or can be removed
     allGroupTags: {
       type: Array,
       required: true
