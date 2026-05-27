@@ -1,8 +1,7 @@
 <template>
   <div v-if="loaded && groups.length">
     <section class="table-section" id="groups-1">
-      TODO
-<!--      <GroupsTable :groups="groups" approve />-->
+      <GroupsTable :groupids="groupIds" approve />
     </section>
   </div>
 </template>
@@ -45,6 +44,11 @@ export default {
       }
 
       return ret
+    },
+    groupIds() {
+      // GroupsTable's `groupids` prop is the ids it should render — the
+      // moderate store uses { idgroups, id } (via newToOld), so accept either.
+      return this.groups.map(g => g.idgroups || g.id)
     },
   },
   async mounted() {
