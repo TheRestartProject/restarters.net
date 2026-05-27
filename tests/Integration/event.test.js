@@ -53,6 +53,6 @@ test('Invite volunteers modal opens from Event Actions dropdown', async ({page, 
   // BootstrapVue adds .show to the active modal div.
   console.log('Waiting for modal')
   await expect(page.locator('.modal.show')).toBeVisible({ timeout: 10000 })
-  await expect(page.locator('.modal.show .multiselect')).toBeVisible({ timeout: 5000 })
+  await expect(page.locator('.modal.show .multiselect').first()).toBeVisible({ timeout: 5000 })
   console.log('Modal open with multiselect - PASS')
 })

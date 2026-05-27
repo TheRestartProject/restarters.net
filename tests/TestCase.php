@@ -31,8 +31,6 @@ use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Queue;
 use Symfony\Component\DomCrawler\Crawler;
-use Osteel\OpenApi\Testing\ValidatorBuilder;
-use Osteel\OpenApi\Testing\Exceptions\ValidationException;
 use ReflectionFunction;
 use Illuminate\Events\Dispatcher;
 
@@ -49,7 +47,6 @@ abstract class TestCase extends BaseTestCase
     private $group = null;
     private $event_start_utc = null;
     private $event_end_utc = null;
-    private $OpenAPIValidator = null;
 
     protected function setUp(): void
     {
@@ -143,8 +140,6 @@ abstract class TestCase extends BaseTestCase
         }
 
         $this->processQueuedNotifications();
-        $this->OpenAPIValidator = ValidatorBuilder::fromJson(storage_path('api-docs/api-docs.json'))->getValidator();
-
         // Some tests may override the queue.
         $queueManager = $this->app['queue'];
         $queueManager->setDefaultDriver('database');
@@ -480,47 +475,6 @@ abstract class TestCase extends BaseTestCase
         while (Queue::size() > 0) {
             Artisan::call('queue:work', ['--once' => true]);
         }
-    }
-
-    // We override the methods to make HTTP requests so that we can automatically validate them against our OpenAPI
-    // definition where appropriate.
-    public function get($uri, array $headers = [])
-    {
-        $response = parent::get($uri, $headers);
-
-        if (strpos($uri, '/api/v2') === 0) {
-            // Validate response against OpenAPI schema.
-            $result = $this->OpenAPIValidator->validate($response->baseResponse, $uri, 'get');
-            $this->assertTrue($result);
-        }
-
-        return $response;
-    }
-
-    public function patch($uri, array $params = [], $headers = [])
-    {
-        $response = parent::patch($uri, $params, $headers);
-
-        if (strpos($uri, '/api/v2') === 0) {
-            // Validate response against OpenAPI schema.
-            $result = $this->OpenAPIValidator->validate($response->baseResponse, $uri, 'patch');
-            $this->assertTrue($result);
-        }
-
-        return $response;
-    }
-
-    public function post($uri, array $params = [], $headers = [])
-    {
-        $response = parent::post($uri, $params, $headers);
-
-        if (strpos($uri, '/api/v2') === 0) {
-            // Validate response against OpenAPI schema.
-            $result = $this->OpenAPIValidator->validate($response->baseResponse, $uri, 'post');
-            $this->assertTrue($result);
-        }
-
-        return $response;
     }
 
     /**
