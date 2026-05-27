@@ -3,6 +3,7 @@
 use App\Http\Controllers\DeviceUrlController;
 use App\Http\Controllers\InformationAlertCookieController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\PreviewDeployController;
 use App\Http\Controllers\BattcatOraController;
 use App\Http\Controllers\BrandsController;
 use App\Http\Controllers\CalendarEventsController;
@@ -300,6 +301,8 @@ Route::middleware('auth', 'verifyUserConsent', 'ensureAPIToken')->group(function
     //Admin Controller
     Route::prefix('admin')->group(function () {
         Route::get('/stats', [AdminController::class, 'stats']);
+        Route::get('/preview-deploy', [PreviewDeployController::class, 'show'])->name('admin.preview-deploy.show');
+        Route::post('/preview-deploy', [PreviewDeployController::class, 'deploy'])->name('admin.preview-deploy.deploy');
     });
 
     //Category Controller

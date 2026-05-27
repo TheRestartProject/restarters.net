@@ -48,7 +48,7 @@ if [ ! -d /var/lib/mysql/mysql ]; then
 fi
 
 mysqld_safe --user=mysql --skip-networking=0 --bind-address=127.0.0.1 \
-    --innodb-buffer-pool-size=512M \
+    --innodb-buffer-pool-size=1G \
     --innodb-flush-log-at-trx-commit=2 &
 
 # Wait for MariaDB (up to 60s)
@@ -61,6 +61,10 @@ done
 mysql -e "CREATE DATABASE IF NOT EXISTS \`${DB_DATABASE:-restarters}\` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;" 2>/dev/null
 mysql -e "CREATE USER IF NOT EXISTS '${DB_USERNAME:-restarters}'@'127.0.0.1' IDENTIFIED BY '${DB_PASSWORD:-restarters}';" 2>/dev/null
 mysql -e "GRANT ALL ON \`${DB_DATABASE:-restarters}\`.* TO '${DB_USERNAME:-restarters}'@'127.0.0.1'; FLUSH PRIVILEGES;" 2>/dev/null
+# The production backup contains triggers with DEFINER='restarters'@'%'. Create that user locally
+# so trigger execution doesn't fail (bind-address=127.0.0.1 so '%' can't connect from outside).
+mysql -e "CREATE USER IF NOT EXISTS '${DB_USERNAME:-restarters}'@'%' IDENTIFIED BY '${DB_PASSWORD:-restarters}';" 2>/dev/null
+mysql -e "GRANT ALL ON \`${DB_DATABASE:-restarters}\`.* TO '${DB_USERNAME:-restarters}'@'%'; FLUSH PRIVILEGES;" 2>/dev/null
 
 log "MariaDB ready."
 
@@ -68,7 +72,7 @@ log "MariaDB ready."
 # The health check grace_period (1200s) covers the full restore time.
 # Running synchronously ensures the machine never auto-stops mid-restore.
 
-YESTERDAY=$(date -u -d 'yesterday' +%Y%m%d)
+TODAY=$(date -u +%Y%m%d)
 RCLONE_FLAGS="--drive-root-folder-id=$GDRIVE_BACKUP_FOLDER_ID --drive-team-drive=$RCLONE_CONFIG_GDRIVE_TEAM_DRIVE"
 
 list_backups() {
@@ -76,16 +80,16 @@ list_backups() {
 }
 
 log "Finding backup to restore..."
-BACKUP_FILE=$(list_backups | grep "db-backup-${YESTERDAY}-03" | head -1)
+BACKUP_FILE=$(list_backups | grep "db-backup-${TODAY}-03" | tail -1)
 
 if [ -z "$BACKUP_FILE" ]; then
-    log "No 3am backup for ${YESTERDAY}, trying any backup from yesterday..."
-    BACKUP_FILE=$(list_backups | grep "db-backup-${YESTERDAY}-" | head -1)
+    log "No 3am backup for ${TODAY}, trying any backup from today..."
+    BACKUP_FILE=$(list_backups | grep "db-backup-${TODAY}-" | tail -1)
 fi
 
 if [ -z "$BACKUP_FILE" ]; then
-    log "No yesterday backup found, falling back to oldest available..."
-    BACKUP_FILE=$(list_backups | head -1)
+    log "No today backup found, falling back to most recent available..."
+    BACKUP_FILE=$(list_backups | tail -1)
 fi
 
 if [ -z "$BACKUP_FILE" ]; then
@@ -97,8 +101,8 @@ else
     if rclone copy "gdrive:$BACKUP_FILE" /tmp/ $RCLONE_FLAGS 2>>"$LOG"; then
         log "Download complete. Restoring database..."
 
-        if gunzip -c "/tmp/$BACKUP_FILE" | mysql --protocol=TCP -h 127.0.0.1 \
-            -u "${DB_USERNAME:-restarters}" -p"${DB_PASSWORD:-restarters}" \
+        if gunzip -c "/tmp/$BACKUP_FILE" | mysql -u root \
+            --socket=/run/mysqld/mysqld.sock \
             "${DB_DATABASE:-restarters}" 2>>"$LOG"; then
 
             log "Database restore complete."

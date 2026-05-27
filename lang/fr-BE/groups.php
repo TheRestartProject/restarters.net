@@ -15,6 +15,7 @@ return [
   'groups_about_group' => 'Parlez-nous de votre Repair Café',
   'groups_website' => 'Votre site web',
   'groups_website_small' => 'Vous n\'avez pas de site web? Vous pouvez aussi ajouter une page Facebook ou autre',
+  'groups_website_invalid' => 'Veuillez saisir une adresse de site web complète commençant par http:// ou https://',
   'groups_email' => 'Adresse électronique',
   'groups_email_small' => 'Une adresse électronique de contact public pour votre Repair Café (facultatif)',
   'groups_group_small' => 'Par exemple \'Restarters Torino\' ou \'Réparateurs de Paris\'',

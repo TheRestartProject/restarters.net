@@ -9,7 +9,7 @@ class YesterdayBanner
 {
     public function handle(Request $request, Closure $next)
     {
-        if (env('YESTERDAY_MODE') === 'true') {
+        if (env('YESTERDAY_MODE')) {
             $snapshotFile = storage_path('framework/yesterday-snapshot.txt');
             $snapshotTime = file_exists($snapshotFile)
                 ? trim(file_get_contents($snapshotFile))

@@ -1,23 +1,26 @@
-app = "restarters-yesterday"
+app = "restarters-dev"
 primary_region = "lhr"
 
 [build]
   dockerfile = "Dockerfile.fly"
   [build.args]
+    # Restore the overnight DB backup at startup (same logic as yesterday container)
     STARTUP_SCRIPT = "yesterday-startup.sh"
 
+# Migrations run in startup.sh instead of release_command because
+# release_command machines don't have 6PN network access to the DB.
+
 [env]
-  APP_NAME = "Restarters Yesterday"
   APP_ENV = "staging"
   APP_DEBUG = "false"
-  APP_URL = "https://yesterday.restarters.net"
-  YESTERDAY_MODE = "true"
+  APP_URL = "https://restarters.dev"
+  # Use local embedded MariaDB (restored from backup at startup)
   DB_CONNECTION = "mysql"
   DB_HOST = "127.0.0.1"
   DB_PORT = "3306"
   DB_DATABASE = "restarters"
   DB_USERNAME = "restarters"
-  DB_PASSWORD = "restarters_yesterday"
+  DB_PASSWORD = "restarters_preview"
   CACHE_DRIVER = "file"
   SESSION_DRIVER = "file"
   QUEUE_CONNECTION = "sync"
@@ -29,7 +32,13 @@ primary_region = "lhr"
   AWS_USE_PATH_STYLE_ENDPOINT = "true"
   FEATURE__WIKI_INTEGRATION = "false"
   FEATURE__DISCOURSE_INTEGRATION = "false"
-  SENTRY_ENVIRONMENT = "yesterday-restore"
+  SENTRY_ENVIRONMENT = "preview"
+  MAIL_MAILER = "smtp"
+  MAIL_HOST = "restarters-dev-mail.internal"
+  MAIL_PORT = "1025"
+  MAIL_ENCRYPTION = ""
+  MAIL_FROM_ADDRESS = "dev@restarters.dev"
+  MAIL_FROM_NAME = "Restarters Dev (Preview)"
   # Table type constants
   TBL_USERS = "1"
   TBL_GROUPS = "2"
@@ -50,19 +59,22 @@ primary_region = "lhr"
   EMISSION_RATIO_UNPOWERED = "17.70147059"
   EMISSION_RATIO_POWERED = "32.06679233"
   # Session
-  SESSION_COOKIE = "restarters_yesterday_session"
+  SESSION_COOKIE = "restarters_session"
   SESSION_LIFETIME = "10080"
   SESSION_TABLE = "laravel_sessions"
   # Misc
   L5_SWAGGER_GENERATE_ALWAYS = "false"
   VITE_MANIFEST_PATH = "public/build/manifest.json"
+  BASIC_AUTH_ENABLED = "true"
+  BASIC_AUTH_PASSWORD = "project"
+  APP_SHOW_BRANCH = "true"
 
 [http_service]
   internal_port = 80
   force_https = true
   auto_stop_machines = "stop"
   auto_start_machines = true
-  min_machines_running = 1
+  min_machines_running = 0
 
 [checks]
   [checks.health]
@@ -70,10 +82,16 @@ primary_region = "lhr"
     type = "http"
     interval = "30s"
     timeout = "10s"
-    grace_period = "3600s"
+    # Long grace period covers full DB restore (~10 min)
+    grace_period = "900s"
     method = "GET"
     path = "/robots.txt"
+
+[mounts]
+  source = "app_logs_dev"
+  destination = "/var/log"
 
 [[vm]]
   size = "performance-1x"
   memory = 2048
+  swap_size_mb = 2048
