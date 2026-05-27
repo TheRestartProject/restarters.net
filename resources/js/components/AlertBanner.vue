@@ -50,14 +50,7 @@ export default {
     },
   },
   async mounted() {
-    // Wrap to avoid an unhandled rejection if the alerts endpoint fails:
-    // Vue 2's scheduler leaks `pending` when a lifecycle hook rejects
-    // unobserved, after which dep.notify() never flushes its watchers.
-    try {
-      await this.$store.dispatch('alerts/fetch')
-    } catch (e) {
-      console.error('Failed to fetch alerts:', e)
-    }
+    await this.$store.dispatch('alerts/fetch')
   },
   methods: {
     dismissed(id) {

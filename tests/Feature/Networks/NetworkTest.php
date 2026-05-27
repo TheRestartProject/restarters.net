@@ -285,7 +285,10 @@ class NetworkTest extends TestCase
         ]);
         $response->assertRedirect();
 
-        // Group won't show on network page as retrieved via API.
+        // Group should now show on network page and in encoded list of networks for a group.
+        $response = $this->get('/group/network/' . $network->id);
+        $response->assertSee($group->name);
+        $response->assertSee('&quot;networks&quot;:[' . $network->id . ']', false);
 
         // All networks list visible to admin.
         $this->loginAsTestUser(Role::ADMINISTRATOR);

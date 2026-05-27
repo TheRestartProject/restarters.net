@@ -31,7 +31,6 @@
                 :can-associate-groups="{{ json_encode($canAssociateGroups) }}"
                 :is-logged-in="{{ json_encode(Auth::check()) }}"
                 api-token="{{ $apiToken }}"
-                :map-bounds="{{ json_encode($mapBounds) }}"
             />
         </div>
 

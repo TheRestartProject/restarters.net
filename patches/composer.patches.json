@@ -1,16 +1,10 @@
 {
   "patches": {
-    "guzzlehttp/promises": {
-      "PHP 8.4 nullable type deprecations": "patches/guzzle-promises-nullable.patch"
-    },
     "addwiki/mediawiki-api-base": {
       "Make getClient public": "patches/mediawiki-api-base.patch"
     },
     "mariuzzo/laravel-js-localization": {
       "Translation doesn't handle new lang folder location": "patches/laravel-translation.patch"
-    },
-    "wouternl/laravel-drip": {
-      "Add Laravel 11/12/13 support": "patches/laravel-drip-l11.patch"
     }
   }
 }

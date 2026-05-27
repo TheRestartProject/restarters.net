@@ -6,22 +6,13 @@
 USER_ID=${UID:-1000}
 GROUP_ID=${GID:-1000}
 
-# Timestamp logging for CI diagnostics
-log_step() {
-  echo "[$(date '+%H:%M:%S')] $1"
-}
-
-log_step "docker_run.sh started"
-
 if [ ! -f .env ]
 then
  cp .env.example .env
 fi
 
 rm -rf vendor
-log_step "Starting composer install"
 composer install
-log_step "composer install done"
 
 # Point at the DB server
 sed -i 's/DB_HOST=.*$/DB_HOST=restarters_db/g' .env
@@ -83,21 +74,25 @@ done
 # Wait for MySQL database to be ready before running migrations
 wait_for_service "MySQL database" "mysqladmin ping -h restarters_db --skip-ssl --silent" 60 5
 
-log_step "Starting migrate:fresh --seed"
 php artisan migrate:fresh --seed
-log_step "migrate:fresh --seed done"
+npm install --legacy-peer-deps
+npm rebuild node-sass
 
-# npm install, node-sass rebuild, Playwright browser download, and Vite are slow
-# (network-dependent) and not needed for PHP-FPM to serve HTTP. Run them in the
-# background so php-fpm can start immediately after migrations.
-(npm install --legacy-peer-deps && npm rebuild node-sass && nohup npm run dev > /tmp/vite.log 2>&1) &
-(npm install -D @playwright/test && npx playwright install) &
+# Install Playwright for testing (system deps already in Dockerfile)
+npm install -D @playwright/test
+npx playwright install
 
-log_step "Starting artisan setup commands"
+# Start Vite dev server in the background with logging
+echo "Starting Vite dev server..."
+nohup npm run dev > /tmp/vite.log 2>&1 &
+echo "Vite dev server started with PID $!"
+
 php artisan key:generate
 php artisan cache:clear
 php artisan config:clear
-log_step "artisan setup commands done"
+
+# Generate OpenAPI documentation needed for tests
+php artisan l5-swagger:generate
 
 # Ensure we have the admin user
 echo "User::firstOrCreate(['email'=>'jane@bloggs.net'], ['name'=>'Jane Bloggs','password'=>Hash::make('passw0rd'),'role'=>2,'consent_past_data'=>'2021-01-01','consent_future_data'=>'2021-01-01','consent_gdpr'=>'2021-01-01']);" | php artisan tinker
@@ -105,9 +100,7 @@ echo "User::firstOrCreate(['email'=>'jane@bloggs.net'], ['name'=>'Jane Bloggs','
 # Ensure we have a test group tag
 echo "\App\GroupTags::firstOrCreate(['tag_name'=>'Test Tag'], ['description'=>'A test tag for development']);" | php artisan tinker
 
-log_step "Starting php-fpm"
-# Start php-fpm — this is what serves HTTP, everything above just needs to be done first.
-# npm/playwright continue in background; they'll be ready long before Playwright tests run.
-# Note: l5-swagger:generate is intentionally omitted here — CI runs it in "Setup application" after
-# "Wait for services" passes, so it's redundant here and would only slow startup.
 php-fpm
+
+# In case everything else bombs out.
+sleep infinity

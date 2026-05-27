@@ -89,7 +89,7 @@ class AlertsTest extends TestCase
         }
     }
 
-    public static function roleProvider(): array {
+    public function roleProvider(): array {
         return [
             [ Role::GUSET, FALSE ],
             [ Role::RESTARTER, FALSE ],

@@ -76,17 +76,13 @@
       <div v-if="eventsModerationEmpty" class="text-muted">{{ __('networks.show.none') }}</div>
     </section>
 
-    <!-- Groups Map -->
+    <!-- Groups -->
     <section class="groups-section mb-4">
       <h2>{{ __('networks.general.groups') }}</h2>
-      <GroupMapAndList
-          :network="network.id"
-          :initial-bounds="mapBounds"
-          :show-filters="true"
-          :can-manage-tags="canManageTags"
-          :available-tags="tags"
-          fetch-groups
-      />
+      <div class="groups-info border p-3">
+        {{ __('networks.show.groups_count', { count: stats.groups || 0, name: network.name }) }}
+        <a :href="'/group/network/' + network.id">{{ __('networks.show.view_groups_link') }}</a>
+      </div>
     </section>
 
     <div class="row">
@@ -175,11 +171,10 @@
 import axios from 'axios'
 import GroupsRequiringModeration from './GroupsRequiringModeration.vue'
 import EventsRequiringModeration from './EventsRequiringModeration.vue'
-import GroupMapAndList from './GroupMapAndList.vue'
 import images from '../mixins/images'
 
 export default {
-  components: { GroupsRequiringModeration, EventsRequiringModeration, GroupMapAndList },
+  components: { GroupsRequiringModeration, EventsRequiringModeration },
   mixins: [images],
   props: {
     network: {
@@ -215,17 +210,12 @@ export default {
       type: String,
       required: false,
       default: null
-    },
-    mapBounds: {
-      type: Array,
-      required: false,
-      default: () => []
     }
   },
   data() {
     return {
       stats: this.initialStats,
-      tags: Array.isArray(this.initialTags) ? this.initialTags.slice() : [],
+      tags: this.initialTags,
       newTagName: '',
       newTagDescription: '',
       tagError: null,
@@ -292,14 +282,12 @@ export default {
         this.tags.push(response.data.data)
         this.newTagName = ''
         this.newTagDescription = ''
-        this.flushRender()
       } catch (error) {
         if (error.response && error.response.data && error.response.data.message) {
           this.tagError = error.response.data.message
         } else {
           this.tagError = this.__('networks.tags.create_error')
         }
-        this.flushRender()
       }
     },
     confirmDeleteTag(tag) {
@@ -313,7 +301,6 @@ export default {
         await axios.delete(`/api/v2/networks/${this.network.id}/tags/${this.tagToDelete.id}?api_token=${this.apiToken}`)
         this.tags = this.tags.filter(t => t.id !== this.tagToDelete.id)
         this.tagToDelete = null
-        this.flushRender()
       } catch (error) {
         console.error('Failed to delete tag:', error)
       }
@@ -345,25 +332,12 @@ export default {
 
         this.showEditModal = false
         this.editingTag = null
-        this.flushRender()
       } catch (error) {
         if (error.response && error.response.data && error.response.data.message) {
           this.editTagError = error.response.data.message
         } else {
           this.editTagError = this.__('networks.tags.edit_error')
         }
-        this.flushRender()
-      }
-    },
-    flushRender() {
-      // Force-run the render watcher synchronously. Vue 2's scheduler can be
-      // left in a 'waiting=true' state if another component's render watcher
-      // throws during a previous flush (we've wrapped the obvious async
-      // lifecycle rejections, but a stuck scheduler in CI is still observable
-      // here on the first mutation when initialTags is empty). Bypassing the
-      // queue here guarantees the tag list reflects the latest state.
-      if (this._watcher && this._watcher.active) {
-        this._watcher.run()
       }
     }
   },
@@ -378,6 +352,15 @@ export default {
       }
     }
 
+    // Fetch tags if not provided and user can manage tags
+    if (this.canManageTags && (!this.initialTags || this.initialTags.length === 0)) {
+      try {
+        const response = await axios.get(`/api/v2/networks/${this.network.id}/tags?api_token=${this.apiToken}`)
+        this.tags = response.data.data || []
+      } catch (error) {
+        console.error('Failed to fetch network tags:', error)
+      }
+    }
   }
 }
 </script>

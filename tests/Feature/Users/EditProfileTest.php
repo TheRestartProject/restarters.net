@@ -128,7 +128,7 @@ class EditProfileTest extends TestCase
         $this->assertNull($user->longitude);
     }
 
-    public static function idProvider(): array {
+    public function idProvider(): array {
         return [
             [ TRUE ],
             [ FALSE ]

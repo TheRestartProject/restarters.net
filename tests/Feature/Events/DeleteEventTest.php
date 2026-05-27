@@ -150,7 +150,7 @@ class DeleteEventTest extends TestCase
         }
     }
 
-    public static function roleProvider(): array {
+    public function roleProvider(): array {
         return [
             [ Role::ADMINISTRATOR ],
             [ Role::NETWORK_COORDINATOR ],
@@ -225,7 +225,7 @@ class DeleteEventTest extends TestCase
         );
     }
 
-    public static function provider(): array
+    public function provider(): array
     {
         // We return:
         // - role

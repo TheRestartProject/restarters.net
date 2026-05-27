@@ -182,18 +182,26 @@ class GroupViewTest extends TestCase
             'event_end_utc' => $nextWeek->addHours(2)->toIso8601String(),
         ]);
 
-        // Groups are fetched via API (not server-rendered) — test that next_event is returned.
-        $response = $this->get('/api/v2/groups/summary?includeNextEvent=true');
+        // Load the group index and check both groups appear with a next_event.
+        $response = $this->get('/group');
         $response->assertSuccessful();
 
-        $groups = $response->json('data');
-        $group1 = collect($groups)->firstWhere('id', $id1);
-        $group2 = collect($groups)->firstWhere('id', $id2);
+        $props = $this->getVueProperties($response);
+        $allGroupsJson = null;
+        foreach ($props as $prop) {
+            if (isset($prop[':all-groups'])) {
+                $allGroupsJson = $prop[':all-groups'];
+                break;
+            }
+        }
+        $this->assertNotNull($allGroupsJson, 'Could not find :all-groups prop. Props found: ' . json_encode(array_map('array_keys', $props)));
+        $groups = json_decode($allGroupsJson, true);
 
-        $this->assertNotNull($group1, "Group Alpha (id=$id1) not found in API response");
-        $this->assertNotNull($group2, "Group Beta (id=$id2) not found in API response");
-        $this->assertNotNull($group1['next_event'], 'Group Alpha should have a next_event');
-        $this->assertNotNull($group2['next_event'], 'Group Beta should have a next_event');
+        $group1 = collect($groups)->firstWhere('idgroups', $id1);
+        $group2 = collect($groups)->firstWhere('idgroups', $id2);
+
+        $this->assertNotNull($group1['next_event'], 'Group 1 should have a next_event');
+        $this->assertNotNull($group2['next_event'], 'Group 2 should have a next_event');
     }
 
     public function testGroupIndexQueryCountScalesWithO1NotN(): void

@@ -206,7 +206,7 @@ class AddRemoveVolunteerTest extends TestCase
         ])->assertSee('true');
     }
 
-    public static function roleProvider(): array {
+    public function roleProvider(): array {
         return [
             [ 'Administrator', 'Restarter', false ],
             [ 'NetworkCoordinator', 'HostThis', true ],

@@ -58,30 +58,6 @@ class NetworkController extends Controller
             $groupsForAssociating = $network->groupsNotIn()->sortBy('name');
         }
 
-        // Find the lat/lng bounding box for all groups in this network.
-        $minLat = $minLng = $maxLat = $maxLng = null;
-
-        foreach ($network->groups as $group) {
-            $lat = $group->latitude;
-            $lng = $group->longitude;
-
-            if (is_null($minLat) || $lat < $minLat) {
-                $minLat = $lat;
-            }
-
-            if (is_null($minLng) || $lng < $minLng) {
-                $minLng = $lng;
-            }
-
-            if (is_null($maxLat) || $lat > $maxLat) {
-                $maxLat = $lat;
-            }
-
-            if (is_null($maxLng) || $lng > $maxLng) {
-                $maxLng = $lng;
-            }
-        }
-
         // Get network stats
         $stats = $network->stats();
         $stats['groups'] = $network->groups->count();
@@ -127,10 +103,6 @@ class NetworkController extends Controller
             'network' => $network,
             'networkData' => $networkData,
             'groupsForAssociating' => $groupsForAssociating,
-            'mapBounds' => [
-                [ $minLat, $minLng ],
-                [ $maxLat, $maxLng ],
-            ],
             'stats' => $stats,
             'tags' => $tags,
             'canManageTags' => $canManageTags,

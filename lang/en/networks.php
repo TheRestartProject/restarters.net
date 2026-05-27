@@ -53,6 +53,8 @@ return [
     'add_groups_warning_none_selected' => 'No groups selected.',
     'add_groups_success' => '{1} :number group added.|[2,*] :number groups added.',
     'view_groups_menuitem' => 'View groups',
+    'groups_count' => '{0} There are currently no groups in the :name network.|{1} There is currently :count group in the :name network.|[2,*] There are currently :count groups in the :name network.',
+    'view_groups_link' => 'View these groups.',
     'none' => 'None',
   ],
   'edit' => [

@@ -11,6 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // See https://github.com/doctrine/dbal/issues/3161.
+        DB::connection()->getDoctrineSchemaManager()->getDatabasePlatform()->registerDoctrineTypeMapping('enum', 'string');
+
         Schema::table('devices', function (Blueprint $table) {
             $table->mediumText('problem')->nullable(false)->change();
         });
@@ -21,6 +24,8 @@ return new class extends Migration
      */
     public function down(): void
     {
+        DB::connection()->getDoctrineSchemaManager()->getDatabasePlatform()->registerDoctrineTypeMapping('enum', 'string');
+
         Schema::table('devices', function (Blueprint $table) {
             $table->mediumText('problem')->nullable(true)->change();
         });

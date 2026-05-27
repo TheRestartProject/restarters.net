@@ -40,7 +40,6 @@ return [
             'web',
             'api',
         ],
-        'resolver' => OwenIt\Auditing\Resolvers\UserResolver::class,
     ],
 
     /*
@@ -48,10 +47,11 @@ return [
     | Audit Resolvers
     |--------------------------------------------------------------------------
     |
-    | Define the IP Address, User Agent and URL resolver implementations.
+    | Define the User, IP Address, User Agent and URL resolver implementations.
     |
     */
-    'resolvers' => [
+    'resolver' => [
+        'user'       => OwenIt\Auditing\Resolvers\UserResolver::class,
         'ip_address' => OwenIt\Auditing\Resolvers\IpAddressResolver::class,
         'user_agent' => OwenIt\Auditing\Resolvers\UserAgentResolver::class,
         'url'        => OwenIt\Auditing\Resolvers\UrlResolver::class,

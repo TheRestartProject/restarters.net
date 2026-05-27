@@ -1,9 +1,9 @@
 <?php
 
-use Geocoder\Laravel\Http\LaravelHttpClient;
 use Geocoder\Provider\Chain\Chain;
 use Geocoder\Provider\GeoPlugin\GeoPlugin;
 use Geocoder\Provider\Mapbox\Mapbox;
+use Http\Client\Curl\Client;
 
 return [
     'cache' => [
@@ -36,8 +36,6 @@ return [
         */
 
         'duration' => 9999999,
-
-        'auto_register_serializable_classes' => true,
     ],
 
     /*
@@ -80,7 +78,7 @@ return [
     | Default: Client::class (FQCN for CURL adapter)
     |
     */
-    'adapter'  => LaravelHttpClient::class,
+    'adapter'  => Client::class,
 
     /*
     |---------------------------------------------------------------------------

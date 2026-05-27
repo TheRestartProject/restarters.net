@@ -5,7 +5,6 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Cache;
 
 /**
  * @OA\Schema(
@@ -64,18 +63,6 @@ use Cache;
  *          ref="#/components/schemas/EventSummary"
  *     ),
  *     @OA\Property(
- *         property="hosts",
- *         title="hosts",
- *         description="The number of hosts of this group (if requested via API call flag).",
- *         type="number",
- *     ),
- *     @OA\Property(
- *         property="restarters",
- *         title="hosts",
- *         description="The number of restarters in this group (if requested via API call flag).",
- *         type="number",
- *     ),
- *     @OA\Property(
  *          property="summary",
  *          title="summary",
  *          description="Indicates that this is a summary result, not full group information.",
@@ -101,7 +88,7 @@ class GroupSummary extends JsonResource
         $ret = [
             'id' => $this->idgroups,
             'name' => $this->name,
-            'image' => $this->image,
+            'image' => $this->groupImage && is_object($this->groupImage) && is_object($this->groupImage->image) ? $this->groupImage->image->path : null,
             'location' => new GroupLocation($this),
             'networks' => new NetworkSummaryCollection($this->resource->networks),
             'updated_at' => Carbon::parse($this->updated_at)->toIso8601String(),
@@ -109,53 +96,27 @@ class GroupSummary extends JsonResource
             'summary' => true
         ];
 
-        if ($request->get('includeCounts', false)) {
-            $ret['hosts'] = $this->resource->all_confirmed_hosts_count;
-            $ret['restarters'] = $this->resource->all_confirmed_restarters_count;
-        }
-
         if ($request->get('includeNextEvent', false)) {
-            // Get next approved event for group.  We cache all upcoming events to speed up the case where we
-            // are fetching many groups.
-            if (Cache::has('future_events')) {
-                $upcoming = Cache::get('future_events');
-            } else {
-                $future = \App\Party::future()->get();
+            // Get next approved event for group.
+            $nextevent = \App\Group::find($this->idgroups)->getNextUpcomingEvent();
 
-                // Can't serialise the whole event, and we only need a few fields.
-                $upcoming = [];
-
-                foreach ($future as $event) {
-                    $upcoming[] = [
-                        'id' => $event->idevents,
-                        'group_id' => $event->group,
-                        'start' => $event->event_start_utc,
-                        'end' => $event->event_end_utc,
-                        'timezone' => $event->timezone,
-                        'title' => $event->venue ?? $event->location,
-                        'location' => $event->location,
-                        'online' => $event->online,
-                        'lat' => $event->latitude,
-                        'lng' => $event->longitude,
-                        'updated_at' => $event->updated_at->toIso8601String(),
-                        'summary' => true
-                    ];
-                }
-
-                Cache::put('future_events', $upcoming, 60);
+            if ($nextevent) {
+                // Using the resource for the nested event causes infinite loops.  Just add the model attributes we
+                // need directly.
+                $ret['next_event'] = [
+                    'id' => $nextevent->idevents,
+                    'start' => $nextevent->event_start_utc,
+                    'end' => $nextevent->event_end_utc,
+                    'timezone' => $nextevent->timezone,
+                    'title' => $nextevent->venue ?? $nextevent->location,
+                    'location' => $nextevent->location,
+                    'online' => $nextevent->online,
+                    'lat' => $nextevent->latitude,
+                    'lng' => $nextevent->longitude,
+                    'updated_at' => $nextevent->updated_at->toIso8601String(),
+                    'summary' => true
+                ];
             }
-
-            // Find the next event for this group.
-            $nextevent = null;
-
-            foreach ($upcoming as $event) {
-                if ($event['group_id'] == $this->idgroups) {
-                    $nextevent = $event;
-                    break;
-                }
-            }
-
-           $ret['next_event'] = $nextevent;
         }
 
         return($ret);

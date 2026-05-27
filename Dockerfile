@@ -1,5 +1,5 @@
 # This is the docker for restarters.  It's used from docker-compose.
-FROM php:8.4-fpm
+FROM php:8.2-fpm
 
 # Install dependencies
 RUN apt-get update && \
@@ -22,15 +22,11 @@ RUN npm install -g @playwright/test && \
     npx playwright install-deps && \
     npm uninstall -g @playwright/test
 
-ADD --chmod=0755 https://github.com/mlocati/docker-php-extension-installer/releases/download/2.11.1/install-php-extensions /usr/local/bin/
-
-# bcmath via PHP's own docker-php-ext-install — install-php-extensions
-# trips over a pre-existing libbcmath/src/.libs directory in some PHP 8.4
-# base image variants ("mkdir: cannot create directory ...: File exists").
-RUN docker-php-ext-install bcmath
+ADD --chmod=0755 https://github.com/mlocati/docker-php-extension-installer/releases/download/2.7.31/install-php-extensions /usr/local/bin/
 
 RUN install-php-extensions \
     pdo_mysql \
+    bcmath \
     zip \
     xmlrpc \
     xdebug \

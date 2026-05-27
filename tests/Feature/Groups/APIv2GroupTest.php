@@ -84,7 +84,7 @@ class APIv2GroupTest extends TestCase
         }
     }
 
-    public static function providerTrueFalse(): array
+    public function providerTrueFalse(): array
     {
         return [
             [false],
@@ -182,23 +182,6 @@ class APIv2GroupTest extends TestCase
         $json = json_decode($response->getContent(), true);
         $groups = $json['data'];
         $this->assertGroupFound($groups, $idgroups, true);
-
-        // Group should now appear in the list of groups.
-        $response = $this->get('/api/v2/groups/summary');
-        $response->assertSuccessful();
-        $json = json_decode($response->getContent(), true);
-        $groups = $json['data'];
-        $found = false;
-
-        foreach ($groups as $g)
-        {
-            if ($group->name == $g['name'])
-            {
-                $found = true;
-            }
-        }
-
-        $this->assertTrue($found);
     }
 
     private function assertGroupFound($groups, $id, $shouldBeFound) {

@@ -46,16 +46,19 @@ class BasicTest extends TestCase
                 ':show-tags' => 'false',
             ],
         ]);
+
+        $groups = json_decode($props[1][':all-groups'], true);
+        $this->assertEquals($group->idgroups, $groups[0]['idgroups']);
+        $this->assertEquals(0, $groups[0]['location']['distance']);
     }
 
 
-    public static function tabProvider(): array {
+    public function tabProvider(): array {
         return [
             ['', 'mine'],
-            ['/all', 'other'],
+            ['/all', 'all'],
             ['/mine', 'mine'],
-            ['/nearby','other'],
-            ['/other', 'other'],
+            ['/nearby','nearby'],
         ];
     }
 }

@@ -9,7 +9,7 @@
   <form action="/profile/edit-repair-directory" method="post">
     @csrf
 
-    <input type="hidden" name="id" value="{{ $user->id }}">
+    {{ Form::hidden('id', $user->id) }}
 
     <?php
       $roles = [];

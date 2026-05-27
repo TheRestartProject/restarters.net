@@ -167,7 +167,7 @@ class GroupTest extends TestCase
         }
     }
 
-    public static function timezoneProvider(): array {
+    public function timezoneProvider(): array {
         return [
             [ NULL, 'Europe/Paris', NULL, 'Europe/Paris', FALSE ],
             [ NULL, 'Europe/Paris', 'Europe/Paris', 'Europe/Paris', FALSE ],

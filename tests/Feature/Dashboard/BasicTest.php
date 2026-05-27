@@ -28,7 +28,7 @@ class BasicTest extends TestCase
     /**
      *@dataProvider provider
      */
-    public function testPageLoads($city, $country, $lat, $lng, $nearbyGroupCount, $newGroupCount): void
+    public function testPageLoads($city, $country, $lat, $lng, $nearbyGroupCount): void
     {
         // Test the dashboard page loads and shows a nearby group when relevant.
         $user = User::factory()->host()->create();
@@ -66,7 +66,7 @@ class BasicTest extends TestCase
         ]);
 
         $this->assertEquals($nearbyGroupCount, count(json_decode($props[1][':nearby-groups'], true)));
-        $this->assertEquals($newGroupCount, count(json_decode($props[1][':new-groups'], true)));
+        $this->assertEquals($nearbyGroupCount, count(json_decode($props[1][':new-groups'], true)));
 
         // Test Discourse API call which will be made by the Vue client.
         $response = $this->get('/api/talk/topics');
@@ -76,14 +76,13 @@ class BasicTest extends TestCase
         self::assertTrue(array_key_exists('topics', $ret));
     }
 
-    public static function provider()
+    public function provider()
     {
         return [
-            // city, country, lat, lng, nearby_groups_count, new_groups_count
-            ['London', 'GB', 51.5465, -0.10581, 1, 1],   // Known location: both nearby and new groups visible
-            [null, 'GB', null, null, 1, 0],               // Country only: country-match shows nearby=1, new=0 (guarded by null lat/lng in controller)
-            ['Lima', 'PE', -12.0464, -77.04280, 0, 0],   // Known location, no groups in range
-            [null, 'PE', null, null, 0, 0],               // Unknown location, no PE groups exist
+            ['London', 'GB', 51.5465, -0.10581, 1],    // Known location, nearby group
+            [null, 'GB', null, null, 0],               // Unknown location, no nearby group
+            ['Lima', 'PE', -12.0464, -77.04280, 0],    // Known location, no nearby group
+            [null, 'PE', null, null, 0],                // Unknown location, no nearby group
         ];
     }
 

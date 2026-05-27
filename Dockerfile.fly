@@ -1,7 +1,7 @@
 # =============================================================================
 # Stage 1: Build assets (Node + Composer)
 # =============================================================================
-FROM php:8.4-cli AS builder
+FROM php:8.2-cli AS builder
 
 # Install system dependencies for building
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -16,7 +16,6 @@ RUN pecl install channel://pecl.php.net/xmlrpc-1.0.0RC3 && docker-php-ext-enable
 
 # Install composer
 COPY --from=composer/composer:2-bin /composer /usr/bin/composer
-ENV COMPOSER_ALLOW_SUPERUSER=1
 
 # Install Node 18
 RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
@@ -25,9 +24,8 @@ RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
 
 WORKDIR /build
 
-# Copy composer files and patches for layer caching
+# Copy composer files first for layer caching
 COPY composer.json composer.lock ./
-COPY patches/ ./patches/
 RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist
 
 # Copy package files for npm layer caching
@@ -64,7 +62,7 @@ RUN rm -f .env
 # =============================================================================
 # Stage 2: Production image (Nginx + PHP-FPM + Supervisord + Cron)
 # =============================================================================
-FROM php:8.4-fpm
+FROM php:8.2-fpm
 
 # yesterday mode adds mariadb-server (co-located DB for restored snapshots).
 ARG STARTUP_SCRIPT=startup.sh

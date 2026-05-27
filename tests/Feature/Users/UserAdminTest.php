@@ -13,7 +13,7 @@ use Tests\TestCase;
 
 class UserAdminTest extends TestCase
 {
-    public static function provider()
+    public function provider()
     {
         return [
             [

@@ -850,7 +850,7 @@ class UserController extends Controller
         }
 
         $stats = Fixometer::loginRegisterStats();
-        $deviceCount = array_key_exists(0, $stats['device_count_status']) ? ($stats['device_count_status'][0]['counter'] ?? 0) : 0;
+        $deviceCount = array_key_exists(0, $stats['device_count_status']) ? $stats['device_count_status'][0]->counter : 0;
 
         $activeRepairNetworkId = session()->get('repair_network');
         $network = Network::find($activeRepairNetworkId);
@@ -858,8 +858,8 @@ class UserController extends Controller
 
         return view('auth.register-new', [
             'skills' => Fixometer::allSkills(),
-            'co2Total' => ($stats['waste_stats'][0]['powered_footprint'] ?? 0) + ($stats['waste_stats'][0]['unpowered_footprint'] ?? 0),
-            'wasteTotal' => ($stats['waste_stats'][0]['powered_waste'] ?? 0) + ($stats['waste_stats'][0]['unpowered_waste'] ?? 0),
+            'co2Total' => $stats['waste_stats'][0]->powered_footprint + $stats['waste_stats'][0]->unpowered_footprint,
+            'wasteTotal' => $stats['waste_stats'][0]->powered_waste + $stats['waste_stats'][0]->unpowered_waste,
             'partiesCount' => $stats['partiesCount'],
             'deviceCount' => $deviceCount,
             'showNewsletterSignup' => $showNewsletterSignup,

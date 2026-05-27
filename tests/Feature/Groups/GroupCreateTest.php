@@ -95,7 +95,7 @@ class GroupCreateTest extends TestCase
         $this->assertNotNull($idgroups);
     }
 
-    public static function roles(): array {
+    public function roles(): array {
         return [
             [ 'Administrator'],
             [ 'NetworkCoordinator' ]

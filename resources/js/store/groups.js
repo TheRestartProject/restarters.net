@@ -63,7 +63,7 @@ export default {
   },
   mutations: {
     set(state, params) {
-      Vue.set(state.list, params.id || params.idgroups, params)
+      Vue.set(state.list, params.idgroups, params)
     },
     setList(state, params) {
       let list = {}
@@ -132,20 +132,9 @@ export default {
         commit('setModerate', ret.data)
       }
     },
-    async list({commit}, params) {
-      let url
-
-      if (params && params.details) {
-        // We want more details.
-        url = '/api/v2/groups/summary?locale=' + getLocale() + '&includeNextEvent=true&includeCounts=true'
-      } else {
-        // Just the name and lat/lng.
-        url = '/api/v2/groups/names?locale=' + getLocale()
-      }
-
-      let ret = await axios.get(url)
-
-      if (ret) {
+    async list({commit}) {
+      let ret = await axios.get('/api/v2/groups/names?locale=' + getLocale())
+      if (ret && ret.data) {
         commit('setList', {
           groups: ret.data.data
         })
@@ -224,15 +213,8 @@ export default {
       return id
     },
     async fetch({ rootGetters, commit }, params) {
-      // TODO Handle fetching case.
       try {
-        let url = '/api/v2/groups/' + params.id + '?api_token=' + rootGetters['auth/apiToken'] + '&locale=' + getLocale()
-
-        if (params.hasOwnProperty('includeStats')) {
-           url += '&includeStats=' + params.includeStats
-        }
-
-        let ret = await axios.get(url)
+        let ret = await axios.get('/api/v2/groups/' + params.id + '?api_token=' + rootGetters['auth/apiToken'] + '&locale=' + getLocale())
 
         commit('set', ret.data.data)
 

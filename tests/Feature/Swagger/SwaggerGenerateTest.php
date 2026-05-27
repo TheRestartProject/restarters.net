@@ -1,10 +1,11 @@
 <?php
 
-namespace Tests\Feature\Swagger;
+namespace Tests\Swagger;
 
+use DB;
 use Tests\TestCase;
 
-class SwaggerGenerateTest extends TestCase {
+class DiscourseTest extends TestCase {
     public function testSwaggerGenerate(): void {
         // Check we can generate the docs.
         $this->artisan('l5-swagger:generate')->assertExitCode(0);

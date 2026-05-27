@@ -6,15 +6,6 @@ return new class extends Migration
 {
     public function up(): void
     {
-        // MySQL 8.0 with binary logging enabled blocks CREATE TRIGGER for non-SUPER
-        // users unless this flag is set. Best-effort: if we don't have SUPER the
-        // server my.cnf must already have it (e.g. production's custom.cnf).
-        try {
-            DB::statement('SET GLOBAL log_bin_trust_function_creators = 1');
-        } catch (\Exception $e) {
-            // No SUPER privilege — rely on server-side configuration.
-        }
-
         // The 2025_01_08 migration dropped these triggers to fix Docker Compose
         // test permissions. Without them, repair_status_str is always 'Unknown'
         // for new/updated devices. Recreate them here.

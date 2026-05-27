@@ -21,7 +21,7 @@ class HomeTest extends TestCase
         $response->assertSee('language-bar');
     }
 
-    public static function landingPagesProvider(): array {
+    public function landingPagesProvider(): array {
         return [
             [ '/' ],
             [ '/about' ],
