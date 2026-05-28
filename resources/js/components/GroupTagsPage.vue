@@ -86,7 +86,11 @@ export default {
     },
     stripTags(value) {
       if (value == null) return ''
-      return String(value).replace(/<\/?[^>]+>/g, '')
+      // Use the browser parser rather than a regex: avoids the (false-positive)
+      // SonarCloud S5852 super-linear-regex warning, and is more robust against
+      // odd input (unclosed tags, entities) than any pattern we could write.
+      const doc = new DOMParser().parseFromString(String(value), 'text/html')
+      return doc.body.textContent || ''
     },
     truncate(value, length) {
       if (value == null) return ''
