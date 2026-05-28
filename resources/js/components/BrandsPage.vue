@@ -37,7 +37,7 @@
               striped
               hover
               sort-icon-left
-              :empty-text="__('admin.no-brands') || 'No brands yet.'"
+              :empty-text="__('admin.no-brands')"
               show-empty
               data-testid="brands-table"
             >
@@ -139,6 +139,10 @@ export default {
     apiToken: {
       type: String,
       required: true
+    },
+    initialEditId: {
+      type: Number,
+      default: null
     }
   },
   data() {
@@ -166,7 +170,6 @@ export default {
     confirmDeleteMessage() {
       if (!this.brandPendingDelete) return ''
       return this.__('admin.confirm_delete_brand', { name: this.brandPendingDelete.brand_name })
-        || `Delete ${this.brandPendingDelete.brand_name}?`
     },
     apiBase() {
       return `/api/v2/brands`
@@ -211,7 +214,7 @@ export default {
         this.feedback = { variant: 'success', message: this.__('brands.create_success') }
         this.showCreate = false
       } catch (err) {
-        this.createError = this.extractError(err) || this.__('brands.create_error') || 'Could not create brand.'
+        this.createError = this.extractError(err) || this.__('brands.create_error')
       } finally {
         this.saving = false
       }
@@ -233,7 +236,7 @@ export default {
         this.feedback = { variant: 'success', message: this.__('brands.update_success') }
         this.showEdit = false
       } catch (err) {
-        this.editError = this.extractError(err) || this.__('brands.update_error') || 'Could not save brand.'
+        this.editError = this.extractError(err) || this.__('brands.update_error')
       } finally {
         this.saving = false
       }
@@ -248,7 +251,7 @@ export default {
       } catch (err) {
         this.feedback = {
           variant: 'danger',
-          message: this.extractError(err) || this.__('brands.delete_error') || 'Could not delete brand.'
+          message: this.extractError(err) || this.__('brands.delete_error')
         }
       } finally {
         this.brandPendingDelete = null
@@ -274,6 +277,10 @@ export default {
       } catch (err) {
         console.error('Failed to load brands', err)
       }
+    }
+    if (this.initialEditId) {
+      const target = this.brands.find((b) => b.id === this.initialEditId)
+      if (target) this.openEditModal(target)
     }
   }
 }

@@ -43,7 +43,7 @@ class Handler extends ExceptionHandler
             }
 
             if ($exception instanceof AuthorizationException) {
-                return response()->json(['message' => $exception->getMessage()], 403);
+                return response()->json(['message' => 'Unauthorized.'], 403);
             }
 
             if ($exception instanceof ModelNotFoundException) {

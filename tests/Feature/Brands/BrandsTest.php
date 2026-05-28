@@ -12,26 +12,41 @@ class BrandsTest extends TestCase
     {
         $this->loginAsTestUser(Role::ADMINISTRATOR);
 
-        Brands::factory()->create(['brand_name' => 'UT Brand']);
+        $brand = Brands::factory()->create(['brand_name' => 'UT Brand']);
 
         $response = $this->get('/brands');
         $response->assertOk();
-        // Page hosts the Vue admin SPA - the brand should be in the JSON-encoded prop
-        $response->assertSee('BrandsPage', false);
-        $response->assertSee('UT Brand', false);
+        $html = $response->getContent();
+
+        // Should host the Vue admin SPA
+        $this->assertStringContainsString('<BrandsPage', $html);
+
+        // The brand should appear in the JSON-encoded :initial-brands prop, not just anywhere
+        // on the page (which would be true even for breadcrumb / nav matches).
+        $this->assertMatchesRegularExpression(
+            '/:initial-brands="\[[^"]*&quot;brand_name&quot;:&quot;UT Brand&quot;[^"]*\]"/',
+            $html,
+            'Expected the brand to appear inside the :initial-brands prop'
+        );
+
+        // No edit modal pre-opened when arriving at /brands
+        $this->assertStringContainsString(':initial-edit-id="null"', $html);
     }
 
-    public function testLegacyEditUrlServesAdminPage(): void
+    public function testLegacyEditUrlPreOpensEditModalForBrand(): void
     {
         $this->loginAsTestUser(Role::ADMINISTRATOR);
 
         $brand = Brands::factory()->create(['brand_name' => 'Legacy Bookmark']);
 
-        // /brands/edit/{id} used to render a server-side form; we now redirect bookmarks
-        // through the SPA so the user lands on the admin page.
+        // /brands/edit/{id} used to render a server-side form; we now route bookmarks
+        // through the SPA and pass the id so the edit modal opens for the right brand.
         $response = $this->get('/brands/edit/' . $brand->id);
         $response->assertOk();
-        $response->assertSee('BrandsPage', false);
+        $html = $response->getContent();
+
+        $this->assertStringContainsString('<BrandsPage', $html);
+        $this->assertStringContainsString(':initial-edit-id="' . $brand->id . '"', $html);
     }
 
     public function testBrandsAdminPageForbiddenForRestarter(): void

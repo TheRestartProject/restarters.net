@@ -40,4 +40,6 @@ return [
   'brand-name' => 'Brand name',
   'edit-brand' => 'Edit brand',
   'edit-brand-content' => '',
+  'no-brands' => 'No brands yet.',
+  'confirm_delete_brand' => 'Are you sure you want to delete the brand ":name"?',
 ];

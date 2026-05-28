@@ -403,8 +403,8 @@ Route::middleware('auth', 'verifyUserConsent', 'ensureAPIToken')->group(function
     //Brand Controller - all CRUD is now via /api/v2/brands; this only renders the Vue admin page
     Route::prefix('brands')->group(function () {
         Route::get('/', [BrandsController::class, 'index'])->name('brands');
-        // Legacy bookmarks → admin page (edit/create/delete happen in-page via the API)
-        Route::get('/edit/{id}', [BrandsController::class, 'index']);
+        // Legacy bookmarks → admin page; pre-open the edit modal for the requested brand
+        Route::get('/edit/{editId}', [BrandsController::class, 'index']);
         Route::get('/create', [BrandsController::class, 'index']);
     });
 

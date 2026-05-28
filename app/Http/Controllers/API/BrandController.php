@@ -173,7 +173,7 @@ class BrandController extends Controller
      *      @OA\Response(response=404, description="Brand not found")
      * )
      */
-    public function deleteBrandv2($id): JsonResponse
+    public function deleteBrandv2($id)
     {
         if (!Fixometer::hasRole(Auth::user(), 'Administrator')) {
             return response()->json(['message' => 'Forbidden'], 403);
@@ -182,6 +182,6 @@ class BrandController extends Controller
         $brand = Brands::findOrFail($id);
         $brand->delete();
 
-        return response()->json(['message' => 'Brand deleted'], 200);
+        return response()->noContent();
     }
 }

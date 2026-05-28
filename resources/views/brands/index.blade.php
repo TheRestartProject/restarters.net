@@ -7,6 +7,7 @@
 <div class="vue">
     <BrandsPage
         :initial-brands="{{ json_encode($brandsForVue) }}"
+        :initial-edit-id="{{ json_encode($editId) }}"
         api-token="{{ $apiToken }}"
     />
 </div>

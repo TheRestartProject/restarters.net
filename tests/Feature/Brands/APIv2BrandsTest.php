@@ -167,8 +167,21 @@ class APIv2BrandsTest extends TestCase
         $this->actingAs($admin);
 
         $response = $this->delete("/api/v2/brands/{$brand->id}?api_token=admin1");
-        $response->assertSuccessful();
+        $response->assertNoContent();
         $this->assertDatabaseMissing('brands', ['id' => $brand->id]);
+    }
+
+    public function testUpdateAllowsSameNameAsItself(): void
+    {
+        $brand = Brands::factory()->create(['brand_name' => 'Sony']);
+        $admin = User::factory()->administrator()->create(['api_token' => 'admin1']);
+        $this->actingAs($admin);
+
+        $response = $this->putJson("/api/v2/brands/{$brand->id}?api_token=admin1", [
+            'brand_name' => 'Sony',
+        ]);
+        $response->assertSuccessful();
+        $this->assertDatabaseHas('brands', ['id' => $brand->id, 'brand_name' => 'Sony']);
     }
 
     public function testDeleteBrandRequiresAuth(): void
