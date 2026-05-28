@@ -149,5 +149,15 @@ Route::prefix('v2')->group(function() {
                 Route::delete('{id}', [API\SkillController::class, 'deleteSkillv2']);
             });
         });
+
+        Route::prefix('/group-tags')->group(function() {
+            Route::get('/', [API\GroupTagController::class, 'listGroupTagsv2']);
+            Route::get('{id}', [API\GroupTagController::class, 'getGroupTagv2']);
+            Route::middleware('auth:api')->group(function() {
+                Route::post('/', [API\GroupTagController::class, 'createGroupTagv2']);
+                Route::put('{id}', [API\GroupTagController::class, 'updateGroupTagv2']);
+                Route::delete('{id}', [API\GroupTagController::class, 'deleteGroupTagv2']);
+            });
+        });
     });
 });

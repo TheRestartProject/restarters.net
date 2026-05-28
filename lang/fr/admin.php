@@ -41,4 +41,13 @@ return [
   'tag-name' => 'Nom de l\'étiquette',
   'edit-brand' => 'Editer la marque',
   'edit-brand-content' => 'Editer le contenu de la marque',
+  'no-brands' => 'Aucune marque pour le moment.',
+  'confirm_delete_brand' => 'Êtes-vous sûr de vouloir supprimer la marque ":name" ?',
+  'skill-name' => 'Nom de la compétence',
+  'category' => 'Catégorie',
+  'no-skills' => 'Aucune compétence pour le moment.',
+  'confirm_delete_skill' => 'Êtes-vous sûr de vouloir supprimer la compétence ":name" ? Cela la retirera également de tous les bénévoles qui l\'ont sélectionnée.',
+  'edit-tag' => 'Modifier l\'étiquette',
+  'no-group-tags' => 'Aucune étiquette de groupe pour le moment.',
+  'confirm_delete_group_tag' => 'Êtes-vous sûr de vouloir supprimer l\'étiquette de groupe ":name" ?',
 ];

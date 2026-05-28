@@ -6,4 +6,7 @@ return [
     'delete_success' => 'Le code du Repair Café supprimée!',
     'title' => 'Codes du Repair Café',
     'edit_tag' => 'Modifier le code du Repair Café',
+    'create_error' => 'Impossible de créer le code du Repair Café.',
+    'update_error' => 'Impossible d\'enregistrer le code du Repair Café.',
+    'delete_error' => 'Impossible de supprimer le code du Repair Café.',
 ];

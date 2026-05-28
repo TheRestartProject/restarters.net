@@ -60,6 +60,7 @@ import RolesTable from './components/RolesTable.vue'
 import EmailValidation from './components/EmailValidation.vue'
 import BrandsPage from './components/BrandsPage.vue'
 import SkillsPage from './components/SkillsPage.vue'
+import GroupTagsPage from './components/GroupTagsPage.vue'
 
 import lang from './mixins/lang'
 
@@ -423,6 +424,7 @@ function initializeJQuery() {
             'emailvalidation': EmailValidation,
             'brandspage': BrandsPage,
             'skillspage': SkillsPage,
+            'grouptagspage': GroupTagsPage,
           }
         })
       })

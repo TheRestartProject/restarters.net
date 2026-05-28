@@ -46,4 +46,7 @@ return [
   'category' => 'Category',
   'no-skills' => 'No skills yet.',
   'confirm_delete_skill' => 'Are you sure you want to delete the skill ":name"? This also removes it from any volunteers who have selected it.',
+  'edit-tag' => 'Edit tag',
+  'no-group-tags' => 'No group tags yet.',
+  'confirm_delete_group_tag' => 'Are you sure you want to delete the group tag ":name"?',
 ];

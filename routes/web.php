@@ -416,13 +416,12 @@ Route::middleware('auth', 'verifyUserConsent', 'ensureAPIToken')->group(function
         Route::get('/create', [SkillsController::class, 'index']);
     });
 
-    //GroupTags Controller
+    //GroupTags Controller - all CRUD is now via /api/v2/group-tags; this only renders the Vue admin page
     Route::prefix('tags')->group(function () {
         Route::get('/', [GroupTagsController::class, 'index'])->name('tags');
-        Route::post('/create', [GroupTagsController::class, 'postCreateTag']);
-        Route::get('/edit/{id}', [GroupTagsController::class, 'getEditTag']);
-        Route::post('/edit/{id}', [GroupTagsController::class, 'postEditTag']);
-        Route::get('/delete/{id}', [GroupTagsController::class, 'getDeleteTag']);
+        // Legacy bookmarks → admin page; pre-open the edit modal for the requested tag
+        Route::get('/edit/{editId}', [GroupTagsController::class, 'index']);
+        Route::get('/create', [GroupTagsController::class, 'index']);
     });
 });
 
