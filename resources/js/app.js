@@ -59,6 +59,7 @@ import CategoriesTable from './components/CategoriesTable.vue'
 import RolesTable from './components/RolesTable.vue'
 import EmailValidation from './components/EmailValidation.vue'
 import BrandsPage from './components/BrandsPage.vue'
+import SkillsPage from './components/SkillsPage.vue'
 
 import lang from './mixins/lang'
 
@@ -421,6 +422,7 @@ function initializeJQuery() {
             'roles-table': RolesTable,
             'emailvalidation': EmailValidation,
             'brandspage': BrandsPage,
+            'skillspage': SkillsPage,
           }
         })
       })

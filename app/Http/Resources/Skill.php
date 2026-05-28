@@ -18,8 +18,8 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *          example=1
  *     ),
  *     @OA\Property(
- *          property="name",
- *          title="name",
+ *          property="skill_name",
+ *          title="skill_name",
  *          description="Name of this skill",
  *          format="string",
  *          example="First aid"
@@ -29,14 +29,16 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *          title="description",
  *          description="Optional description of this skill",
  *          format="string",
- *          example="This is for qualified First Aiders to identify themselves to event organisers"
+ *          example="This is for qualified First Aiders to identify themselves to event organisers",
+ *          nullable=true
  *     ),
  *     @OA\Property(
  *          property="category",
  *          title="category",
- *          description="Category of this skill",
+ *          description="Category of this skill (1 = Organising, 2 = Technical; see Fixometer::skillCategories())",
  *          format="int64",
- *          example=1
+ *          example=1,
+ *          nullable=true
  *     ),
  * )
  */
@@ -50,9 +52,9 @@ class Skill extends JsonResource
     {
         return [
             'id' => $this->id,
-            'name' => $this->skill_name,
+            'skill_name' => $this->skill_name,
             'description' => $this->description,
-            'category' => $this->category,
+            'category' => $this->category !== null ? (int) $this->category : null,
         ];
     }
 }

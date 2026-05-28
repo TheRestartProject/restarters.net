@@ -139,5 +139,15 @@ Route::prefix('v2')->group(function() {
                 Route::delete('{id}', [API\BrandController::class, 'deleteBrandv2']);
             });
         });
+
+        Route::prefix('/skills')->group(function() {
+            Route::get('/', [API\SkillController::class, 'listSkillsv2']);
+            Route::get('{id}', [API\SkillController::class, 'getSkillv2']);
+            Route::middleware('auth:api')->group(function() {
+                Route::post('/', [API\SkillController::class, 'createSkillv2']);
+                Route::put('{id}', [API\SkillController::class, 'updateSkillv2']);
+                Route::delete('{id}', [API\SkillController::class, 'deleteSkillv2']);
+            });
+        });
     });
 });

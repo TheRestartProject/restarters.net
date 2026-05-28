@@ -408,13 +408,12 @@ Route::middleware('auth', 'verifyUserConsent', 'ensureAPIToken')->group(function
         Route::get('/create', [BrandsController::class, 'index']);
     });
 
-    //Skills Controller
+    //Skills Controller - all CRUD is now via /api/v2/skills; this only renders the Vue admin page
     Route::prefix('skills')->group(function () {
         Route::get('/', [SkillsController::class, 'index'])->name('skills');
-        Route::post('/create', [SkillsController::class, 'postCreateSkill']);
-        Route::get('/edit/{id}', [SkillsController::class, 'getEditSkill']);
-        Route::post('/edit/{id}', [SkillsController::class, 'postEditSkill']);
-        Route::get('/delete/{id}', [SkillsController::class, 'getDeleteSkill']);
+        // Legacy bookmarks → admin page; pre-open the edit modal for the requested skill
+        Route::get('/edit/{editId}', [SkillsController::class, 'index']);
+        Route::get('/create', [SkillsController::class, 'index']);
     });
 
     //GroupTags Controller

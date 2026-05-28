@@ -83,20 +83,28 @@
             :label="field.label + ':'"
             :label-for="`${testidPrefix}-create-${field.key}`"
           >
-            <b-form-input
-              v-if="field.type !== 'textarea'"
+            <b-form-select
+              v-if="field.type === 'select'"
               :id="`${testidPrefix}-create-${field.key}`"
               v-model="createForm[field.key]"
-              :type="field.type || 'text'"
-              :maxlength="field.maxLength"
+              :options="field.options"
               :data-testid="`${testidPrefix}-create-${field.key}`"
               :state="fieldErrors[field.key] ? false : null"
             />
             <b-form-textarea
-              v-else
+              v-else-if="field.type === 'textarea'"
               :id="`${testidPrefix}-create-${field.key}`"
               v-model="createForm[field.key]"
               :rows="field.rows || 3"
+              :maxlength="field.maxLength"
+              :data-testid="`${testidPrefix}-create-${field.key}`"
+              :state="fieldErrors[field.key] ? false : null"
+            />
+            <b-form-input
+              v-else
+              :id="`${testidPrefix}-create-${field.key}`"
+              v-model="createForm[field.key]"
+              :type="field.type || 'text'"
               :maxlength="field.maxLength"
               :data-testid="`${testidPrefix}-create-${field.key}`"
               :state="fieldErrors[field.key] ? false : null"
@@ -126,20 +134,28 @@
             :label="field.label + ':'"
             :label-for="`${testidPrefix}-edit-${field.key}`"
           >
-            <b-form-input
-              v-if="field.type !== 'textarea'"
+            <b-form-select
+              v-if="field.type === 'select'"
               :id="`${testidPrefix}-edit-${field.key}`"
               v-model="editForm[field.key]"
-              :type="field.type || 'text'"
-              :maxlength="field.maxLength"
+              :options="field.options"
               :data-testid="`${testidPrefix}-edit-${field.key}`"
               :state="fieldErrors[field.key] ? false : null"
             />
             <b-form-textarea
-              v-else
+              v-else-if="field.type === 'textarea'"
               :id="`${testidPrefix}-edit-${field.key}`"
               v-model="editForm[field.key]"
               :rows="field.rows || 3"
+              :maxlength="field.maxLength"
+              :data-testid="`${testidPrefix}-edit-${field.key}`"
+              :state="fieldErrors[field.key] ? false : null"
+            />
+            <b-form-input
+              v-else
+              :id="`${testidPrefix}-edit-${field.key}`"
+              v-model="editForm[field.key]"
+              :type="field.type || 'text'"
               :maxlength="field.maxLength"
               :data-testid="`${testidPrefix}-edit-${field.key}`"
               :state="fieldErrors[field.key] ? false : null"

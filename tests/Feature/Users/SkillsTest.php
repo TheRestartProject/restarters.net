@@ -4,94 +4,43 @@ namespace Tests\Feature;
 
 use App\Role;
 use App\Skills;
-use App\User;
-use DB;
-use Hash;
-use Mockery;
 use Tests\TestCase;
 
 class SkillsTest extends TestCase
 {
-    public function testIndex(): void {
+    public function testSkillsAdminPageRendersForAdministrator(): void
+    {
         $this->loginAsTestUser(Role::RESTARTER);
+        $this->get('/skills')->assertRedirect('/user/forbidden');
 
-        $response = $this->get('/skills');
-        $response->assertRedirect('/user/forbidden');
-
-        $skill1 = Skills::create([
-                                     'skill_name'  => 'UT1',
-                                     'category' => 1,
-                                     'description' => 'Planning',
-                                 ]);
+        Skills::factory()->create(['skill_name' => 'UT1', 'category' => 1, 'description' => 'Planning']);
 
         $this->loginAsTestUser(Role::ADMINISTRATOR);
         $response = $this->get('/skills');
-        $response->assertSee('UT1');
+        $response->assertOk();
+        $html = $response->getContent();
+
+        $this->assertStringContainsString('<SkillsPage', $html);
+        $this->assertMatchesRegularExpression(
+            '/:initial-skills="\[[^"]*&quot;skill_name&quot;:&quot;UT1&quot;[^"]*\]"/',
+            $html,
+            'Expected the skill to appear inside the :initial-skills prop'
+        );
+        $this->assertStringContainsString(':initial-edit-id="null"', $html);
+        $this->assertStringContainsString(':skill-categories=', $html);
     }
 
-    public function testCreate(): void {
-        $this->loginAsTestUser(Role::RESTARTER);
-
-        $response = $this->post('/skills/create');
-        $response->assertRedirect('/user/forbidden');
-
+    public function testLegacyEditUrlPreOpensEditModalForSkill(): void
+    {
         $this->loginAsTestUser(Role::ADMINISTRATOR);
 
-        $response = $this->post('/skills/create', [
-            'skill_name' => 'UT1',
-            'skill_desc' => 'UT'
-        ]);
-        $this->assertTrue($response->isRedirection());
-        $response->assertSessionHas('success');
+        $skill = Skills::factory()->create(['skill_name' => 'Bookmark target', 'category' => 1]);
 
-        $response = $this->get('/skills');
-        $response->assertSee('UT1');
-    }
+        $response = $this->get('/skills/edit/' . $skill->id);
+        $response->assertOk();
+        $html = $response->getContent();
 
-    public function testEdit(): void {
-        $this->loginAsTestUser(Role::RESTARTER);
-
-        $skill1 = Skills::create([
-                                     'skill_name'  => 'UT1',
-                                     'description' => 'Planning',
-                                 ]);
-
-        $response = $this->get('/skills/edit/' . $skill1->id);
-        $response->assertRedirect('/user/forbidden');
-
-        $response = $this->post('/skills/edit/' . $skill1->id);
-        $response->assertRedirect('/user/forbidden');
-
-        $this->loginAsTestUser(Role::ADMINISTRATOR);
-        $response = $this->get('/skills/edit/' . $skill1->id);
-        $response->assertSee('name="skill-name"', false);
-
-        $response = $this->post('/skills/edit/' . $skill1->id, [
-            'skill-name'  => 'UT2',
-            'category' => 2,
-            'description' => 'Chaos',
-
-        ]);
-        $response->assertSessionHas('success');
-
-        $response = $this->get('/skills');
-        $response->assertSee('UT2');
-    }
-
-    public function testDelete(): void {
-        $this->loginAsTestUser(Role::RESTARTER);
-
-        $skill1 = Skills::create([
-                                     'skill_name'  => 'UT1',
-                                     'category' => 1,
-                                     'description' => 'Planning',
-                                 ]);
-
-        $response = $this->get('/skills/delete/' . $skill1->id);
-        $response->assertRedirect('/user/forbidden');
-
-        $this->loginAsTestUser(Role::ADMINISTRATOR);
-        $response = $this->get('/skills/delete/' . $skill1->id);
-        $response->assertSessionHas('success');
+        $this->assertStringContainsString('<SkillsPage', $html);
+        $this->assertStringContainsString(':initial-edit-id="' . $skill->id . '"', $html);
     }
 }

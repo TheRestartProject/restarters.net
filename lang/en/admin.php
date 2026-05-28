@@ -42,4 +42,8 @@ return [
   'edit-brand-content' => '',
   'no-brands' => 'No brands yet.',
   'confirm_delete_brand' => 'Are you sure you want to delete the brand ":name"?',
+  'skill-name' => 'Skill name',
+  'category' => 'Category',
+  'no-skills' => 'No skills yet.',
+  'confirm_delete_skill' => 'Are you sure you want to delete the skill ":name"? This also removes it from any volunteers who have selected it.',
 ];
