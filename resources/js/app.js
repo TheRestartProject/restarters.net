@@ -61,6 +61,7 @@ import EmailValidation from './components/EmailValidation.vue'
 import BrandsPage from './components/BrandsPage.vue'
 import SkillsPage from './components/SkillsPage.vue'
 import GroupTagsPage from './components/GroupTagsPage.vue'
+import CategoriesPage from './components/CategoriesPage.vue'
 
 import lang from './mixins/lang'
 
@@ -425,6 +426,7 @@ function initializeJQuery() {
             'brandspage': BrandsPage,
             'skillspage': SkillsPage,
             'grouptagspage': GroupTagsPage,
+            'categoriespage': CategoriesPage,
           }
         })
       })

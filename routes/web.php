@@ -305,11 +305,11 @@ Route::middleware('auth', 'verifyUserConsent', 'ensureAPIToken')->group(function
         Route::post('/preview-deploy', [PreviewDeployController::class, 'deploy'])->name('admin.preview-deploy.deploy');
     });
 
-    //Category Controller
+    //Category Controller - update is now via /api/v2/categories/{id}; this only renders the Vue admin page
     Route::prefix('category')->group(function () {
         Route::get('/', [CategoryController::class, 'index'])->name('category');
-        Route::get('/edit/{id}', [CategoryController::class, 'getEditCategory']);
-        Route::post('/edit/{id}', [CategoryController::class, 'postEditCategory']);
+        // Legacy bookmark → admin page; pre-open the edit modal for the requested category
+        Route::get('/edit/{editId}', [CategoryController::class, 'index']);
     });
 
     //Dashboard Controller

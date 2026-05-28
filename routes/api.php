@@ -159,5 +159,15 @@ Route::prefix('v2')->group(function() {
                 Route::delete('{id}', [API\GroupTagController::class, 'deleteGroupTagv2']);
             });
         });
+
+        Route::prefix('/categories')->group(function() {
+            Route::get('/', [API\CategoryController::class, 'listCategoriesv2']);
+            Route::get('{id}', [API\CategoryController::class, 'getCategoryv2']);
+            Route::middleware('auth:api')->group(function() {
+                Route::put('{id}', [API\CategoryController::class, 'updateCategoryv2']);
+            });
+        });
+
+        Route::get('/category-clusters', [API\CategoryController::class, 'listCategoryClustersv2']);
     });
 });

@@ -8,7 +8,6 @@ return [
   'category_name' => 'Nom de catégorie',
   'co2_footprint' => 'Empreinte CO<sub>2</sub> (kg)',
   'create-new-brand' => 'Créer une nouvelle marque',
-  'create-new-category' => 'Créer une nouvelle catégorie',
   'create-new-skill' => 'Créer une nouvelle compétence',
   'skills' => 'Compétences',
   'delete-skill' => 'Effacer la compétence',
@@ -27,7 +26,6 @@ return [
   'edit-category' => 'Editer la catégorie',
   'save-skill' => 'Sauver compétence',
   'edit-skill' => 'Editer la compétence',
-  'edit-category-content' => 'Editer le contenu de la catégorie',
   'group-tags' => 'Etiquettes du groupe',
   'delete-tag' => 'Effacer l\'étiquette',
   'save-tag' => 'Sauver étiquette',
@@ -43,4 +41,5 @@ return [
   'edit-tag' => 'Modifier l\'étiquette',
   'no-group-tags' => 'Aucune étiquette de groupe pour le moment.',
   'confirm_delete_group_tag' => 'Êtes-vous sûr de vouloir supprimer l\'étiquette de groupe ":name" ?',
+  'no-categories' => 'Aucune catégorie pour le moment.',
 ];

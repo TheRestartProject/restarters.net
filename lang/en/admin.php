@@ -4,7 +4,6 @@ return [
   'categories' => 'Categories',
   'skills' => 'Skills',
   'brand' => 'Brand',
-  'create-new-category' => 'Create new category',
   'category_name' => 'Category name',
   'delete-skill' => 'Delete skill',
   'create-new-skill' => 'Create new skill',
@@ -25,7 +24,6 @@ return [
   'edit-category' => 'Edit category',
   'save-skill' => 'Save skill',
   'edit-skill' => 'Edit skill',
-  'edit-category-content' => '',
   'group-tags' => 'Group tags',
   'delete-tag' => 'Delete tag',
   'save-tag' => 'Save tag',
@@ -42,4 +40,5 @@ return [
   'edit-tag' => 'Edit tag',
   'no-group-tags' => 'No group tags yet.',
   'confirm_delete_group_tag' => 'Are you sure you want to delete the group tag ":name"?',
+  'no-categories' => 'No categories yet.',
 ];
