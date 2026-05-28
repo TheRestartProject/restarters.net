@@ -169,5 +169,12 @@ Route::prefix('v2')->group(function() {
         });
 
         Route::get('/category-clusters', [API\CategoryController::class, 'listCategoryClustersv2']);
+
+        Route::middleware('auth:api')->group(function() {
+            Route::get('/roles', [API\RoleController::class, 'listRolesv2']);
+            Route::get('/roles/{id}', [API\RoleController::class, 'getRolev2']);
+            Route::put('/roles/{id}/permissions', [API\RoleController::class, 'updateRolePermissionsv2']);
+            Route::get('/permissions', [API\RoleController::class, 'listPermissionsv2']);
+        });
     });
 });

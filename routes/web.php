@@ -393,11 +393,11 @@ Route::middleware('auth', 'verifyUserConsent', 'ensureAPIToken')->group(function
         Route::post('/update-volunteerquantity', [PartyController::class, 'updateVolunteerQuantity']);
     });
 
-    //Role Controller
+    //Role Controller - permission updates now happen via /api/v2/roles/{id}/permissions
     Route::prefix('role')->group(function () {
         Route::get('/', [RoleController::class, 'index'])->name('roles');
-        Route::get('/edit/{id}', [RoleController::class, 'edit']);
-        Route::post('/edit/{id}', [RoleController::class, 'edit']);
+        // Legacy bookmark → admin page; pre-open the edit modal for the requested role
+        Route::get('/edit/{editId}', [RoleController::class, 'index']);
     });
 
     //Brand Controller - all CRUD is now via /api/v2/brands; this only renders the Vue admin page

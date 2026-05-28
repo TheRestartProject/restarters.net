@@ -1,97 +1,55 @@
 <?php
 
-namespace Tests\Feature\Dashboard;
+namespace Tests\Feature\Role;
 
 use App\Providers\RouteServiceProvider;
 use App\Role;
-use DB;
-use Hash;
 use Illuminate\Auth\AuthenticationException;
-use Symfony\Component\DomCrawler\Crawler;
 use Tests\TestCase;
 
 class RoleTest extends TestCase
 {
-    public function testLoggedOut(): void {
+    public function testLoggedOut(): void
+    {
         $this->expectException(AuthenticationException::class);
-        $response = $this->get('/role');
+        $this->get('/role');
     }
 
-    public function testNotAdmin(): void {
+    public function testNotAdmin(): void
+    {
         $this->loginAsTestUser(Role::RESTARTER);
         $response = $this->get('/role');
         $response->assertRedirect(RouteServiceProvider::HOME);
     }
 
-    public function testBasic(): void {
+    public function testRolesAdminPageRendersWithVueData(): void
+    {
         $this->loginAsTestUser(Role::ADMINISTRATOR);
 
-        // Should see the roles-table Vue component with Host role in the data.
-        // JSON is HTML-encoded with &quot; for quotes.
         $response = $this->get('/role');
-        $response->assertSee('<roles-table', false);
-        $response->assertSee('&quot;id&quot;:3', false);
-        $response->assertSee('&quot;role&quot;:&quot;Host&quot;', false);
+        $response->assertOk();
+        $html = $response->getContent();
 
-        // Get Edit page.  Should see a list of permissions with permission 4 (Create Party).  Test environment
-        // doesn't have permissions set up so just check existance.
-        $response = $this->get('/role/edit/3');
-        $response->assertSee('name="permissions[4]"', false);
-        $response->assertSee('name="permissions[6]"', false);
+        $this->assertStringContainsString('<RolesPage', $html);
+        // Host role should be hydrated into :initial-roles
+        $this->assertMatchesRegularExpression(
+            '/:initial-roles="\[[^"]*&quot;name&quot;:&quot;Host&quot;[^"]*\]"/',
+            $html,
+            'Expected the Host role inside :initial-roles'
+        );
+        $this->assertStringContainsString(':initial-permissions=', $html);
+        $this->assertStringContainsString(':initial-edit-id="null"', $html);
+    }
 
-        // Post a change to enable 4 & 6.
-        $crawler = new Crawler($response->getContent());
+    public function testLegacyEditUrlPreOpensEditModalForRole(): void
+    {
+        $this->loginAsTestUser(Role::ADMINISTRATOR);
 
-        $tokens = $crawler->filter('input[name=_token]')->each(function (Crawler $node, $i) {
-            return $node;
-        });
+        $response = $this->get('/role/edit/' . Role::HOST);
+        $response->assertOk();
+        $html = $response->getContent();
 
-        $tokenValue = $tokens[0]->attr('value');
-
-        $tokens = $crawler->filter('input[name=formId]')->each(function (Crawler $node, $i) {
-            return $node;
-        });
-
-        $formId = $tokens[0]->attr('value');
-
-        $response = $this->post('/role/edit/3', [
-            '_token' => $tokenValue,
-            'formId' => $formId,
-            'permissions' => [
-                '4' => 4,
-                '6' => 6
-            ]
-        ]);
-
-        $response = $this->get('/role/edit/3');
-        $response->assertSee('name="permissions[4]" checked', false);
-        $response->assertSee('name="permissions[6]" checked', false);
-
-        // Remove it again.
-        $crawler = new Crawler($response->getContent());
-
-        $tokens = $crawler->filter('input[name=_token]')->each(function (Crawler $node, $i) {
-            return $node;
-        });
-
-        $tokenValue = $tokens[0]->attr('value');
-
-        $tokens = $crawler->filter('input[name=formId]')->each(function (Crawler $node, $i) {
-            return $node;
-        });
-
-        $formId = $tokens[0]->attr('value');
-
-        $response = $this->post('/role/edit/3', [
-            '_token' => $tokenValue,
-            'formId' => $formId,
-            'permissions' => [
-                '4' => 4,
-            ]
-        ]);
-
-        $response = $this->get('/role/edit/3');
-        $response->assertSee('name="permissions[4]" checked', false);
-        $response->assertSee('name="permissions[6]"  ', false);
+        $this->assertStringContainsString('<RolesPage', $html);
+        $this->assertStringContainsString(':initial-edit-id="' . Role::HOST . '"', $html);
     }
 }

@@ -42,4 +42,13 @@ return [
   'no-group-tags' => 'Aucune étiquette de groupe pour le moment.',
   'confirm_delete_group_tag' => 'Êtes-vous sûr de vouloir supprimer l\'étiquette de groupe ":name" ?',
   'no-categories' => 'Aucune catégorie pour le moment.',
+  'roles' => 'Rôles',
+  'role' => 'Rôle',
+  'role_id' => 'ID',
+  'role_permissions' => 'Permissions',
+  'edit-role' => 'Modifier le rôle',
+  'save-role' => 'Enregistrer le rôle',
+  'role_permissions_help' => 'Cochez les permissions à accorder à ce rôle. Le nom du rôle ne peut pas être modifié.',
+  'role_update_success' => 'Permissions du rôle mises à jour.',
+  'role_update_error' => 'Impossible de mettre à jour les permissions du rôle.',
 ];

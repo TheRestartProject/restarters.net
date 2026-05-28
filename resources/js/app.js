@@ -62,6 +62,7 @@ import BrandsPage from './components/BrandsPage.vue'
 import SkillsPage from './components/SkillsPage.vue'
 import GroupTagsPage from './components/GroupTagsPage.vue'
 import CategoriesPage from './components/CategoriesPage.vue'
+import RolesPage from './components/RolesPage.vue'
 
 import lang from './mixins/lang'
 
@@ -427,6 +428,7 @@ function initializeJQuery() {
             'skillspage': SkillsPage,
             'grouptagspage': GroupTagsPage,
             'categoriespage': CategoriesPage,
+            'rolespage': RolesPage,
           }
         })
       })
