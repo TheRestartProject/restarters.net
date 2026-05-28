@@ -24,55 +24,81 @@ const PASSWORD = 'passw0rd'
 // so a tester can spot rows created by the suite at a glance.
 const stamp = () => 'PW-' + Date.now().toString(36)
 
+// ---------- Helpers driving the shared AdminCrudPage UI ----------
+
+// Open `/<path>` as the admin and wait for the b-table to be present.
+async function openAdminPage(page, baseURL, path, prefix) {
+  await login(page, baseURL, ADMIN_EMAIL, PASSWORD)
+  await page.goto(baseURL + path)
+  await page.waitForLoadState('networkidle')
+  await expect(page.locator(`[data-testid="${prefix}-table"]`)).toBeVisible()
+}
+
+// Open the create modal, fill the named fields, save, and assert the displayed
+// value appears in the table. `fields` is a map from form field key to value;
+// values that look like '@select:x' fill via selectOption instead of fill.
+async function createItem(page, prefix, fields, displayValue) {
+  await page.click(`[data-testid="${prefix}-add-button"]`)
+  await page.waitForSelector(`#${prefix}-create-modal.show`)
+  await fillFields(page, prefix, 'create', fields)
+  await page.click(`#${prefix}-create-modal .modal-footer .btn-primary`)
+  await expect(page.locator(`[data-testid="${prefix}-table"]`)).toContainText(displayValue, { timeout: 5000 })
+}
+
+// Open the edit modal for the row matching `rowText`, change fields, save,
+// and assert the new displayed value appears in the table.
+async function editItem(page, prefix, rowText, fields, newDisplayValue) {
+  const row = page.locator('tr', { hasText: rowText })
+  await row.locator(`[data-testid^="${prefix}-edit-link-"]`).click()
+  await page.waitForSelector(`#${prefix}-edit-modal.show`)
+  await fillFields(page, prefix, 'edit', fields)
+  await page.click(`#${prefix}-edit-modal .modal-footer .btn-primary`)
+  await expect(page.locator(`[data-testid="${prefix}-table"]`)).toContainText(newDisplayValue, { timeout: 5000 })
+}
+
+// Click the delete button for the row matching `rowText`, confirm in the
+// ConfirmModal, and assert the row no longer appears in the table.
+async function deleteItem(page, prefix, rowText) {
+  const row = page.locator('tr', { hasText: rowText })
+  await row.locator(`[data-testid^="${prefix}-delete-"]`).click()
+  await page.waitForSelector('#confirmmodal.show')
+  await page.click('#confirmmodal .modal-footer .btn-primary')
+  await expect(page.locator(`[data-testid="${prefix}-table"]`)).not.toContainText(rowText, { timeout: 5000 })
+}
+
+// Fill a set of fields in the named modal (mode = 'create' | 'edit').
+// Values prefixed with '@select:' are sent through selectOption; everything
+// else is sent through fill.
+async function fillFields(page, prefix, mode, fields) {
+  for (const [key, value] of Object.entries(fields)) {
+    const sel = `[data-testid="${prefix}-${mode}-${key}"]`
+    if (typeof value === 'string' && value.startsWith('@select:')) {
+      await page.selectOption(sel, value.slice('@select:'.length))
+    } else {
+      await page.fill(sel, value)
+    }
+  }
+}
+
 // ---------- Brands ----------
 
 test.describe('Admin brands page', () => {
   test('renders the Vue SPA with the add button', async ({ page, baseURL }) => {
     test.slow()
-    await login(page, baseURL, ADMIN_EMAIL, PASSWORD)
-    await page.goto(baseURL + '/brands')
-    await page.waitForLoadState('networkidle')
-
-    await expect(page.locator('[data-testid="brands-table"]')).toBeVisible()
+    await openAdminPage(page, baseURL, '/brands', 'brands')
     await expect(page.locator('[data-testid="brands-add-button"]')).toBeVisible()
   })
 
   test('admin can create, edit, and delete a brand', async ({ page, baseURL }) => {
     test.slow()
-    await login(page, baseURL, ADMIN_EMAIL, PASSWORD)
-    await page.goto(baseURL + '/brands')
-    await page.waitForLoadState('networkidle')
+    await openAdminPage(page, baseURL, '/brands', 'brands')
 
     const name = stamp() + '-brand'
     const renamed = name + '-edited'
 
-    // Create
-    await page.click('[data-testid="brands-add-button"]')
-    await page.waitForSelector('#brands-create-modal.show')
-    await page.fill('[data-testid="brands-create-brand_name"]', name)
-    await page.click('#brands-create-modal .modal-footer .btn-primary')
-    await expect(page.locator('[data-testid="brands-table"]')).toContainText(name, {
-      timeout: 5000,
-    })
-
-    // Edit
-    const row = page.locator('tr', { hasText: name })
-    await row.locator('[data-testid^="brands-edit-link-"]').click()
-    await page.waitForSelector('#brands-edit-modal.show')
-    await page.fill('[data-testid="brands-edit-brand_name"]', renamed)
-    await page.click('#brands-edit-modal .modal-footer .btn-primary')
-    await expect(page.locator('[data-testid="brands-table"]')).toContainText(renamed, {
-      timeout: 5000,
-    })
-
-    // Delete (via ConfirmModal)
-    const renamedRow = page.locator('tr', { hasText: renamed })
-    await renamedRow.locator('[data-testid^="brands-delete-"]').click()
-    await page.waitForSelector('#confirmmodal.show')
-    await page.click('#confirmmodal .modal-footer .btn-primary')
-    await expect(page.locator('[data-testid="brands-table"]')).not.toContainText(renamed, {
-      timeout: 5000,
-    })
+    await createItem(page, 'brands', { brand_name: name }, name)
+    await editItem(page, 'brands', name, { brand_name: renamed }, renamed)
+    await deleteItem(page, 'brands', renamed)
   })
 })
 
@@ -81,53 +107,31 @@ test.describe('Admin brands page', () => {
 test.describe('Admin skills page', () => {
   test('renders the Vue SPA with the add button', async ({ page, baseURL }) => {
     test.slow()
-    await login(page, baseURL, ADMIN_EMAIL, PASSWORD)
-    await page.goto(baseURL + '/skills')
-    await page.waitForLoadState('networkidle')
-
-    await expect(page.locator('[data-testid="skills-table"]')).toBeVisible()
+    await openAdminPage(page, baseURL, '/skills', 'skills')
     await expect(page.locator('[data-testid="skills-add-button"]')).toBeVisible()
   })
 
   test('admin can create, edit (changing category), and delete a skill', async ({ page, baseURL }) => {
     test.slow()
-    await login(page, baseURL, ADMIN_EMAIL, PASSWORD)
-    await page.goto(baseURL + '/skills')
-    await page.waitForLoadState('networkidle')
+    await openAdminPage(page, baseURL, '/skills', 'skills')
 
     const name = stamp() + '-skill'
     const renamed = name + '-edited'
 
-    // Create with category = 1 (Organising)
-    await page.click('[data-testid="skills-add-button"]')
-    await page.waitForSelector('#skills-create-modal.show')
-    await page.fill('[data-testid="skills-create-skill_name"]', name)
-    await page.selectOption('[data-testid="skills-create-category"]', '1')
-    await page.fill('[data-testid="skills-create-description"]', 'created by playwright')
-    await page.click('#skills-create-modal .modal-footer .btn-primary')
-    await expect(page.locator('[data-testid="skills-table"]')).toContainText(name, {
-      timeout: 5000,
-    })
-
-    // Edit: rename and switch category to 2 (Technical)
-    const row = page.locator('tr', { hasText: name })
-    await row.locator('[data-testid^="skills-edit-link-"]').click()
-    await page.waitForSelector('#skills-edit-modal.show')
-    await page.fill('[data-testid="skills-edit-skill_name"]', renamed)
-    await page.selectOption('[data-testid="skills-edit-category"]', '2')
-    await page.click('#skills-edit-modal .modal-footer .btn-primary')
-    await expect(page.locator('[data-testid="skills-table"]')).toContainText(renamed, {
-      timeout: 5000,
-    })
-
-    // Delete
-    const renamedRow = page.locator('tr', { hasText: renamed })
-    await renamedRow.locator('[data-testid^="skills-delete-"]').click()
-    await page.waitForSelector('#confirmmodal.show')
-    await page.click('#confirmmodal .modal-footer .btn-primary')
-    await expect(page.locator('[data-testid="skills-table"]')).not.toContainText(renamed, {
-      timeout: 5000,
-    })
+    await createItem(
+      page,
+      'skills',
+      { skill_name: name, category: '@select:1', description: 'created by playwright' },
+      name
+    )
+    await editItem(
+      page,
+      'skills',
+      name,
+      { skill_name: renamed, category: '@select:2' },
+      renamed
+    )
+    await deleteItem(page, 'skills', renamed)
   })
 })
 
@@ -136,11 +140,7 @@ test.describe('Admin skills page', () => {
 test.describe('Admin categories page', () => {
   test('renders the Vue SPA, edit only - no add or delete buttons', async ({ page, baseURL }) => {
     test.slow()
-    await login(page, baseURL, ADMIN_EMAIL, PASSWORD)
-    await page.goto(baseURL + '/category')
-    await page.waitForLoadState('networkidle')
-
-    await expect(page.locator('[data-testid="categories-table"]')).toBeVisible()
+    await openAdminPage(page, baseURL, '/category', 'categories')
     // allowCreate=false and allowDelete=false
     await expect(page.locator('[data-testid="categories-add-button"]')).toHaveCount(0)
     await expect(page.locator('[data-testid^="categories-delete-"]')).toHaveCount(0)
@@ -148,15 +148,12 @@ test.describe('Admin categories page', () => {
 
   test('admin can edit a category', async ({ page, baseURL }) => {
     test.slow()
-    await login(page, baseURL, ADMIN_EMAIL, PASSWORD)
-    await page.goto(baseURL + '/category')
-    await page.waitForLoadState('networkidle')
+    await openAdminPage(page, baseURL, '/category', 'categories')
 
     // Open the first row's edit modal (we don't care which category for a smoke test;
     // we just want to verify the PUT round-trips and we see the new description back
     // in the row).
-    const firstEdit = page.locator('[data-testid^="categories-edit-link-"]').first()
-    await firstEdit.click()
+    await page.locator('[data-testid^="categories-edit-link-"]').first().click()
     await page.waitForSelector('#categories-edit-modal.show')
 
     const newDesc = 'pw-desc-' + Date.now().toString(36)
@@ -178,53 +175,37 @@ test.describe('Admin categories page', () => {
 test.describe('Admin roles page', () => {
   test('renders the Vue SPA with the roles table', async ({ page, baseURL }) => {
     test.slow()
-    await login(page, baseURL, ADMIN_EMAIL, PASSWORD)
-    await page.goto(baseURL + '/role')
-    await page.waitForLoadState('networkidle')
-
-    await expect(page.locator('[data-testid="roles-table"]')).toBeVisible()
-    // Bespoke page - no add / delete affordances
+    await openAdminPage(page, baseURL, '/role', 'roles')
+    // Bespoke page - no add affordance
     await expect(page.locator('[data-testid="roles-add-button"]')).toHaveCount(0)
   })
 
   test('admin can toggle a permission on a role', async ({ page, baseURL }) => {
     test.slow()
-    await login(page, baseURL, ADMIN_EMAIL, PASSWORD)
-    await page.goto(baseURL + '/role')
-    await page.waitForLoadState('networkidle')
+    await openAdminPage(page, baseURL, '/role', 'roles')
 
     // Edit the Host role specifically (id=3 - stable across environments)
-    await page.locator('[data-testid="roles-edit-link-3"]').click()
-    await page.waitForSelector('#roles-edit-modal.show')
-
-    // Grab the first checkbox in the permission group; capture its current
-    // checked state, toggle it, save, re-open and confirm.
-    const group = page.locator('[data-testid="roles-edit-permissions"]')
-    const firstBox = group.locator('input[type=checkbox]').first()
-    const wasChecked = await firstBox.isChecked()
-    if (wasChecked) {
-      await firstBox.uncheck()
-    } else {
-      await firstBox.check()
+    const openHostEdit = async () => {
+      await page.locator('[data-testid="roles-edit-link-3"]').click()
+      await page.waitForSelector('#roles-edit-modal.show')
     }
-    await page.click('#roles-edit-modal .modal-footer .btn-primary')
+    const firstCheckbox = () =>
+      page.locator('[data-testid="roles-edit-permissions"] input[type=checkbox]').first()
+    const saveModal = () => page.click('#roles-edit-modal .modal-footer .btn-primary')
 
-    // Modal closes on success
+    await openHostEdit()
+    const wasChecked = await firstCheckbox().isChecked()
+    await firstCheckbox().setChecked(!wasChecked)
+    await saveModal()
     await expect(page.locator('#roles-edit-modal.show')).toHaveCount(0, { timeout: 5000 })
 
     // Re-open and confirm the new state stuck
-    await page.locator('[data-testid="roles-edit-link-3"]').click()
-    await page.waitForSelector('#roles-edit-modal.show')
-    const reopened = group.locator('input[type=checkbox]').first()
-    await expect(reopened).toBeChecked({ checked: !wasChecked })
+    await openHostEdit()
+    await expect(firstCheckbox()).toBeChecked({ checked: !wasChecked })
 
     // Put it back so the test is idempotent
-    if (wasChecked) {
-      await reopened.check()
-    } else {
-      await reopened.uncheck()
-    }
-    await page.click('#roles-edit-modal .modal-footer .btn-primary')
+    await firstCheckbox().setChecked(wasChecked)
+    await saveModal()
   })
 
   test('non-admin is redirected away from /role', async ({ page, baseURL }) => {
