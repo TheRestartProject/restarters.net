@@ -5,6 +5,24 @@ Migrate remaining non-trivial Blade templates to Vue components. For each, intro
 
 Approach: TDD (failing PHP test → API → Vue → Playwright). Group templates into related PR-sized batches.
 
+## Workflow (per group)
+
+The PR is opened **early as a draft**, against `develop`, and CI runs continuously as work lands. Each sub-task follows this loop:
+
+1. **Implement** the sub-task to local-green (PHPUnit + vite build clean).
+2. **Commit** with a self-contained message.
+3. **`git push`** — the CI Monitor is armed against the PR; CircleCI starts.
+4. **Wait for CI** to settle (notification arrives via Monitor; do not spin polling).
+5. **If CI fails**: fix it BEFORE starting the next sub-task. Push the fix as a new commit. Repeat from step 4.
+6. **If CI green**: move to the next sub-task.
+
+When the last sub-task in a group lands and CI is green:
+- Add the Playwright spec for the group.
+- Mark the PR ready for review (`gh pr ready <num>`).
+- Open the next group on a fresh branch.
+
+CI watching is done with a Monitor task on `gh pr checks <num>` — events arrive as `<task-notification>` messages and re-enter the /loop automatically. There is no need to poll.
+
 ## Conventions Discovered
 - **API auth**: token-based (`auth:api` middleware, legacy driver). Tests pass `?api_token=...` in URL.
 - **Routes**: `/api/v2/...` in `routes/api.php`.
@@ -16,18 +34,18 @@ Approach: TDD (failing PHP test → API → Vue → Playwright). Group templates
 
 ## PR Groups
 
-### Group 1: Reference Data CRUD (active — branch `blade-vue-reference-data`)
+### Group 1: Reference Data CRUD (active — branch `blade-vue-reference-data`, draft PR #863)
 Simple admin pages for CRUDing reference data. Establishes patterns for the rest.
 
 | # | Template(s) | API endpoints | Status |
 |---|---|---|---|
-| 1.1 | `brands/index.blade.php`, `brands/edit.blade.php` | `GET/POST/PUT/DELETE /api/v2/brands` | ⬜ |
-| 1.2 | `skills/index.blade.php`, `skills/edit.blade.php` | `GET/POST/PUT/DELETE /api/v2/skills` | ⬜ |
+| 1.1 | `brands/index.blade.php`, `brands/edit.blade.php` | `GET/POST/PUT/DELETE /api/v2/brands` | ✅ |
+| 1.2 | `skills/index.blade.php`, `skills/edit.blade.php` | `GET/POST/PUT/DELETE /api/v2/skills` | ✅ |
 | 1.3 | `tags/index.blade.php`, `tags/edit.blade.php` (global group tags) | `GET/POST/PUT/DELETE /api/v2/group-tags` | ⬜ |
 | 1.4 | `category/index.blade.php`, `category/edit.blade.php` | `GET/POST/PUT/DELETE /api/v2/categories` | ⬜ |
 | 1.5 | `role/index.blade.php`, `role/edit.blade.php` (permission matrix) | `GET/POST/PUT/DELETE /api/v2/roles` + permission update | ⬜ |
 | 1.6 | Bootstrap Playwright harness + one spec per page above | n/a | ⬜ |
-| 1.7 | Open PR | n/a | ⬜ |
+| 1.7 | Mark PR #863 ready for review | n/a | ⬜ |
 
 ### Group 2: User Management
 | # | Template(s) | API endpoints | Status |
