@@ -129,5 +129,15 @@ Route::prefix('v2')->group(function() {
             Route::patch('{id}', [API\DeviceController::class, 'updateDevicev2']);
             Route::delete('{id}', [API\DeviceController::class, 'deleteDevicev2']);
         });
+
+        Route::prefix('/brands')->group(function() {
+            Route::get('/', [API\BrandController::class, 'listBrandsv2']);
+            Route::get('{id}', [API\BrandController::class, 'getBrandv2']);
+            Route::middleware('auth:api')->group(function() {
+                Route::post('/', [API\BrandController::class, 'createBrandv2']);
+                Route::put('{id}', [API\BrandController::class, 'updateBrandv2']);
+                Route::delete('{id}', [API\BrandController::class, 'deleteBrandv2']);
+            });
+        });
     });
 });
