@@ -51,7 +51,7 @@ Simple admin pages for CRUDing reference data. Establishes patterns for the rest
 | # | Template(s) | API endpoints | Status |
 |---|---|---|---|
 | 2.1 | `user/all.blade.php` (admin user list/search, 239 lines) | `GET /api/v2/users?name=&email=&location=&country=&role=&sort=&page=` (admin only) | ✅ API+Vue+Playwright in PR #866 (ready for review) |
-| 2.2 | `user/profile-edit.blade.php` (84 lines) | `GET/PATCH /api/v2/users/me`, image upload | ⬜ |
+| 2.2 | `user/profile-edit.blade.php` (84 lines shell + 5 partials) | `GET/PATCH /api/v2/users/me`, image upload | 🔄 PR #868 — `email-preferences` tab migrated (1/5); `profile` / `account` / `calendars` / `repair-directory` remain |
 
 ### Group 3: Admin Stats & Reporting
 | # | Template(s) | API endpoints | Status |
