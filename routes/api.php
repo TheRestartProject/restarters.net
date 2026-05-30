@@ -96,6 +96,7 @@ Route::prefix('v2')->group(function() {
         Route::prefix('/users/me')->middleware('auth:api')->group(function() {
             Route::get('/preferences', [API\UserController::class, 'getMyEmailPreferencesv2']);
             Route::patch('/preferences', [API\UserController::class, 'updateMyEmailPreferencesv2']);
+            Route::get('/calendars', [API\UserController::class, 'getMyCalendarsv2']);
         });
 
         Route::prefix('/networks')->group(function() {

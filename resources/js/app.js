@@ -41,6 +41,7 @@ import EventAddEdit from './components/EventAddEdit.vue'
 import EventsRequiringModeration from './components/EventsRequiringModeration.vue'
 import EventPage from './components/EventPage.vue'
 import EmailPreferencesTab from './components/EmailPreferencesTab.vue'
+import CalendarsTab from './components/CalendarsTab.vue'
 import FixometerPage from './components/FixometerPage.vue'
 import GroupsPage from './components/GroupsPage.vue'
 import GroupPage from './components/GroupPage.vue'
@@ -402,6 +403,7 @@ function initializeJQuery() {
             'eventsrequiringmoderation': EventsRequiringModeration,
             'eventpage': EventPage,
             'emailpreferencestab': EmailPreferencesTab,
+            'calendarstab': CalendarsTab,
             'fixometerpage': FixometerPage,
             'groupspage': GroupsPage,
             'grouppage': GroupPage,

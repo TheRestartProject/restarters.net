@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Group;
+use App\Helpers\Fixometer;
 use App\Http\Controllers\Controller;
 use App\User;
 use Auth;
@@ -202,6 +204,74 @@ class UserController extends Controller
         return response()->json([
             'data' => [
                 'invites' => (bool) $user->invites,
+            ],
+        ]);
+    }
+
+    /**
+     * @OA\Get(
+     *      path="/api/v2/users/me/calendars",
+     *      operationId="getMyCalendarsv2",
+     *      tags={"Users"},
+     *      summary="Get the authenticated user's calendar subscription URLs",
+     *      security={{"apiToken":{}}},
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="data", type="object",
+     *                  @OA\Property(property="user_url", type="string"),
+     *                  @OA\Property(property="groups", type="array", @OA\Items(
+     *                      @OA\Property(property="id", type="integer"),
+     *                      @OA\Property(property="name", type="string"),
+     *                      @OA\Property(property="url", type="string")
+     *                  )),
+     *                  @OA\Property(property="is_admin", type="boolean"),
+     *                  @OA\Property(property="admin_all_events_url", type="string", nullable=true),
+     *                  @OA\Property(property="group_areas", type="array", @OA\Items(type="string"))
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(response=401, description="Unauthenticated")
+     * )
+     */
+    public function getMyCalendarsv2(): JsonResponse
+    {
+        $user = Auth::user();
+
+        $groups = Group::join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
+            ->join('events', 'events.group', '=', 'groups.idgroups')
+            ->where('users_groups.user', $user->id)
+            ->select('groups.idgroups', 'groups.name')
+            ->groupBy('groups.idgroups', 'groups.name')
+            ->orderBy('groups.idgroups', 'ASC')
+            ->get();
+
+        $groupRows = $groups->map(function ($g) {
+            return [
+                'id' => (int) $g->idgroups,
+                'name' => $g->name,
+                'url' => url('/calendar/group/' . $g->idgroups),
+            ];
+        })->all();
+
+        $isAdmin = Fixometer::hasRole($user, 'Administrator');
+        $adminAllEventsUrl = $isAdmin && env('CALENDAR_HASH')
+            ? url('/calendar/all-events/' . env('CALENDAR_HASH') . '/')
+            : null;
+
+        $groupAreas = Group::whereNotNull('area')
+            ->groupBy('area')
+            ->pluck('area')
+            ->toArray();
+
+        return response()->json([
+            'data' => [
+                'user_url' => url('/calendar/user/' . $user->calendar_hash),
+                'groups' => $groupRows,
+                'is_admin' => $isAdmin,
+                'admin_all_events_url' => $adminAllEventsUrl,
+                'group_areas' => $groupAreas,
             ],
         ]);
     }
