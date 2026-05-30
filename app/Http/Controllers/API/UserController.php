@@ -2,12 +2,16 @@
 
 namespace App\Http\Controllers\API;
 
-use Illuminate\Http\JsonResponse;
+use App\Helpers\Fixometer;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\UserAdmin;
+use App\Role;
 use App\User;
 use Auth;
-use Illuminate\Http\Request;
 use Cache;
+use DB;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
@@ -131,5 +135,96 @@ class UserController extends Controller
                                     'restarters' => $restartersNotifications,
                                     'discourse' => $discourseNotifications
                                 ], 200);
+    }
+
+    /**
+     * @OA\Get(
+     *      path="/api/v2/users",
+     *      operationId="listUsersv2",
+     *      tags={"Users"},
+     *      summary="List users with optional filtering and sorting",
+     *      description="Administrator only. Paginated.",
+     *      security={{"apiToken":{}}},
+     *      @OA\Parameter(name="name", in="query", required=false, @OA\Schema(type="string")),
+     *      @OA\Parameter(name="email", in="query", required=false, @OA\Schema(type="string")),
+     *      @OA\Parameter(name="location", in="query", required=false, @OA\Schema(type="string")),
+     *      @OA\Parameter(name="country", in="query", required=false, @OA\Schema(type="string")),
+     *      @OA\Parameter(name="role", in="query", required=false, @OA\Schema(type="integer")),
+     *      @OA\Parameter(name="sort", in="query", required=false, @OA\Schema(type="string", enum={"name","email","role","location","country","created_at","updated_at"})),
+     *      @OA\Parameter(name="sortdir", in="query", required=false, @OA\Schema(type="string", enum={"asc","desc"})),
+     *      @OA\Parameter(name="page", in="query", required=false, @OA\Schema(type="integer")),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="data", type="array", @OA\Items(ref="#/components/schemas/UserAdmin")),
+     *              @OA\Property(property="meta", type="object")
+     *          )
+     *      ),
+     *      @OA\Response(response=401, description="Unauthenticated"),
+     *      @OA\Response(response=403, description="Forbidden")
+     * )
+     */
+    public function listUsersv2(Request $request): JsonResponse
+    {
+        if (!Fixometer::hasRole(Auth::user(), 'Administrator')) {
+            return response()->json(['message' => 'Forbidden'], 403);
+        }
+
+        $query = User::query()
+            ->leftJoin('roles', 'roles.idroles', '=', 'users.role')
+            ->select('users.*', 'roles.role as role_name')
+            ->withCount('groups');
+
+        if ($name = $request->input('name')) {
+            $query->where('users.name', 'like', '%' . $name . '%');
+        }
+        if ($email = $request->input('email')) {
+            $query->where('users.email', 'like', '%' . $email . '%');
+        }
+        if ($location = $request->input('location')) {
+            $query->where('users.location', 'like', '%' . $location . '%');
+        }
+        if ($country = $request->input('country')) {
+            $query->where('users.country_code', '=', $country);
+        }
+        if (($role = $request->input('role')) !== null && $role !== '') {
+            $query->where('users.role', '=', (int) $role);
+        }
+
+        $sortMap = [
+            'name' => 'users.name',
+            'email' => 'users.email',
+            'role' => 'users.role',
+            'location' => 'users.location',
+            'country' => 'users.country_code',
+            'created_at' => 'users.created_at',
+            'updated_at' => 'users.updated_at',
+        ];
+        $sort = $request->input('sort');
+        if ($sort && isset($sortMap[$sort])) {
+            $dir = strtolower($request->input('sortdir', 'asc'));
+            if (!in_array($dir, ['asc', 'desc'], true)) {
+                $dir = 'asc';
+            }
+            $query->orderBy($sortMap[$sort], $dir);
+        } else {
+            $query->orderBy('users.id', 'asc');
+        }
+
+        $perPage = (int) (env('PAGINATE') ?: 30);
+        $paginator = $query->paginate($perPage);
+
+        return response()->json([
+            'data' => UserAdmin::collection($paginator->getCollection())->toArray($request),
+            'meta' => [
+                'current_page' => $paginator->currentPage(),
+                'last_page' => $paginator->lastPage(),
+                'per_page' => $paginator->perPage(),
+                'total' => $paginator->total(),
+                'from' => $paginator->firstItem(),
+                'to' => $paginator->lastItem(),
+            ],
+        ]);
     }
 }
