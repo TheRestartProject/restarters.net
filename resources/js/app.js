@@ -43,6 +43,7 @@ import EventPage from './components/EventPage.vue'
 import EmailPreferencesTab from './components/EmailPreferencesTab.vue'
 import CalendarsTab from './components/CalendarsTab.vue'
 import RepairDirectoryTab from './components/RepairDirectoryTab.vue'
+import LanguageTab from './components/LanguageTab.vue'
 import FixometerPage from './components/FixometerPage.vue'
 import GroupsPage from './components/GroupsPage.vue'
 import GroupPage from './components/GroupPage.vue'
@@ -406,6 +407,7 @@ function initializeJQuery() {
             'emailpreferencestab': EmailPreferencesTab,
             'calendarstab': CalendarsTab,
             'repairdirectorytab': RepairDirectoryTab,
+            'languagetab': LanguageTab,
             'fixometerpage': FixometerPage,
             'groupspage': GroupsPage,
             'grouppage': GroupPage,

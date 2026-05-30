@@ -97,6 +97,8 @@ Route::prefix('v2')->group(function() {
             Route::get('/preferences', [API\UserController::class, 'getMyEmailPreferencesv2']);
             Route::patch('/preferences', [API\UserController::class, 'updateMyEmailPreferencesv2']);
             Route::get('/calendars', [API\UserController::class, 'getMyCalendarsv2']);
+            Route::get('/language', [API\UserController::class, 'getMyLanguagev2']);
+            Route::patch('/language', [API\UserController::class, 'updateMyLanguagev2']);
         });
 
         Route::middleware('auth:api')->group(function() {

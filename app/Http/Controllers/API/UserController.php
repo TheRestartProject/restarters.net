@@ -388,4 +388,87 @@ class UserController extends Controller
             ],
         ]);
     }
+
+    /**
+     * @OA\Get(
+     *      path="/api/v2/users/me/language",
+     *      operationId="getMyLanguagev2",
+     *      tags={"Users"},
+     *      summary="Get the authenticated user's preferred language",
+     *      security={{"apiToken":{}}},
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="data", type="object",
+     *                  @OA\Property(property="language", type="string", nullable=true),
+     *                  @OA\Property(property="supported", type="array", @OA\Items(
+     *                      @OA\Property(property="code", type="string"),
+     *                      @OA\Property(property="native", type="string")
+     *                  ))
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(response=401, description="Unauthenticated")
+     * )
+     */
+    public function getMyLanguagev2(): JsonResponse
+    {
+        $supported = [];
+        foreach (\LaravelLocalization::getSupportedLocales() as $code => $props) {
+            $supported[] = [
+                'code' => $code,
+                'native' => $props['native'] ?? $code,
+            ];
+        }
+
+        return response()->json([
+            'data' => [
+                'language' => Auth::user()->language,
+                'supported' => $supported,
+            ],
+        ]);
+    }
+
+    /**
+     * @OA\Patch(
+     *      path="/api/v2/users/me/language",
+     *      operationId="updateMyLanguagev2",
+     *      tags={"Users"},
+     *      summary="Update the authenticated user's preferred language",
+     *      security={{"apiToken":{}}},
+     *      @OA\RequestBody(required=true, @OA\JsonContent(
+     *          @OA\Property(property="language", type="string")
+     *      )),
+     *      @OA\Response(response=200, description="Successful operation",
+     *          @OA\JsonContent(@OA\Property(property="data", type="object",
+     *              @OA\Property(property="language", type="string")
+     *          ))
+     *      ),
+     *      @OA\Response(response=401, description="Unauthenticated"),
+     *      @OA\Response(response=422, description="Validation error")
+     * )
+     */
+    public function updateMyLanguagev2(Request $request): JsonResponse
+    {
+        $supportedCodes = array_keys(\LaravelLocalization::getSupportedLocales());
+        $validated = $request->validate([
+            'language' => 'required|string|in:' . implode(',', $supportedCodes),
+        ]);
+
+        $user = Auth::user();
+        $user->language = $validated['language'];
+        $user->save();
+
+        session()->put('locale', $validated['language']);
+        \LaravelLocalization::setLocale($validated['language']);
+        \App::setLocale($validated['language']);
+        event(new \App\Events\UserLanguageUpdated($user));
+
+        return response()->json([
+            'data' => [
+                'language' => $user->language,
+            ],
+        ]);
+    }
 }
