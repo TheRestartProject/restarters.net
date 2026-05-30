@@ -36,4 +36,5 @@ return [
   'menu_fixometer' => 'Fixometer',
   'menu_events' => 'Événements',
   'menu_groups' => 'Repair Cafés',
+  'error_occurred' => 'Une erreur est survenue. Veuillez réessayer.',
 ];
