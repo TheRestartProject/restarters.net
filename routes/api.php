@@ -99,6 +99,11 @@ Route::prefix('v2')->group(function() {
             Route::get('/calendars', [API\UserController::class, 'getMyCalendarsv2']);
         });
 
+        Route::middleware('auth:api')->group(function() {
+            Route::get('/users/{id}/repair-directory-options', [API\UserController::class, 'getRepairDirOptionsv2']);
+            Route::patch('/users/{id}/repair-directory-role', [API\UserController::class, 'updateRepairDirRolev2']);
+        });
+
         Route::prefix('/networks')->group(function() {
             Route::get('/', [API\NetworkController::class, 'getNetworksv2']);
             Route::get('{id}', [API\NetworkController::class, 'getNetworkv2']);

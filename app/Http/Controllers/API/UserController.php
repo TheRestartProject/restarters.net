@@ -5,11 +5,13 @@ namespace App\Http\Controllers\API;
 use App\Group;
 use App\Helpers\Fixometer;
 use App\Http\Controllers\Controller;
+use App\Role;
 use App\User;
 use Auth;
 use Cache;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class UserController extends Controller
 {
@@ -272,6 +274,117 @@ class UserController extends Controller
                 'is_admin' => $isAdmin,
                 'admin_all_events_url' => $adminAllEventsUrl,
                 'group_areas' => $groupAreas,
+            ],
+        ]);
+    }
+
+    private function repairDirRoleNames(): array
+    {
+        return [
+            Role::REPAIR_DIRECTORY_NONE => 'profile.repair_dir_none',
+            Role::REPAIR_DIRECTORY_EDITOR => 'profile.repair_dir_editor',
+            Role::REPAIR_DIRECTORY_REGIONAL_ADMIN => 'profile.repair_dir_regional_admin',
+            Role::REPAIR_DIRECTORY_SUPERADMIN => 'profile.repair_dir_superadmin',
+        ];
+    }
+
+    /**
+     * @OA\Get(
+     *      path="/api/v2/users/{id}/repair-directory-options",
+     *      operationId="getRepairDirOptionsv2",
+     *      tags={"Users"},
+     *      summary="List Repair Directory role options available for the target user",
+     *      security={{"apiToken":{}}},
+     *      @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="data", type="object",
+     *                  @OA\Property(property="current", type="integer"),
+     *                  @OA\Property(property="options", type="array", @OA\Items(
+     *                      @OA\Property(property="value", type="integer"),
+     *                      @OA\Property(property="key", type="string"),
+     *                      @OA\Property(property="selected", type="boolean"),
+     *                      @OA\Property(property="disabled", type="boolean")
+     *                  ))
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(response=401, description="Unauthenticated"),
+     *      @OA\Response(response=404, description="User not found")
+     * )
+     */
+    public function getRepairDirOptionsv2(int $id): JsonResponse
+    {
+        $perp = Auth::user();
+        $victim = User::find($id);
+        if (!$victim) {
+            throw new NotFoundHttpException();
+        }
+
+        $options = [];
+        foreach ($this->repairDirRoleNames() as $value => $key) {
+            $options[] = [
+                'value' => $value,
+                'key' => $key,
+                'selected' => $victim->repairdir_role() === $value,
+                'disabled' => !$perp->can('changeRepairDirRole', [$victim, $value]),
+            ];
+        }
+
+        return response()->json([
+            'data' => [
+                'current' => $victim->repairdir_role(),
+                'options' => $options,
+            ],
+        ]);
+    }
+
+    /**
+     * @OA\Patch(
+     *      path="/api/v2/users/{id}/repair-directory-role",
+     *      operationId="updateRepairDirRolev2",
+     *      tags={"Users"},
+     *      summary="Update a user's Repair Directory role (policy-gated)",
+     *      security={{"apiToken":{}}},
+     *      @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *      @OA\RequestBody(required=true,
+     *          @OA\JsonContent(@OA\Property(property="role", type="integer"))
+     *      ),
+     *      @OA\Response(response=200, description="Successful operation",
+     *          @OA\JsonContent(@OA\Property(property="data", type="object",
+     *              @OA\Property(property="role", type="integer")
+     *          ))
+     *      ),
+     *      @OA\Response(response=401, description="Unauthenticated"),
+     *      @OA\Response(response=403, description="Forbidden"),
+     *      @OA\Response(response=404, description="User not found"),
+     *      @OA\Response(response=422, description="Validation error")
+     * )
+     */
+    public function updateRepairDirRolev2(Request $request, int $id): JsonResponse
+    {
+        $perp = Auth::user();
+        $victim = User::find($id);
+        if (!$victim) {
+            throw new NotFoundHttpException();
+        }
+
+        $validated = $request->validate([
+            'role' => 'required|integer|in:' . implode(',', array_keys($this->repairDirRoleNames())),
+        ]);
+
+        if (!$perp->can('changeRepairDirRole', [$victim, $validated['role']])) {
+            return response()->json(['message' => 'Forbidden'], 403);
+        }
+
+        $victim->repairdir_role = $validated['role'];
+        $victim->save();
+
+        return response()->json([
+            'data' => [
+                'role' => $victim->repairdir_role(),
             ],
         ]);
     }
