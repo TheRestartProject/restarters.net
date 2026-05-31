@@ -58,7 +58,7 @@ export default {
       return this.group && this.group.next_event ? new moment(this.group.next_event.start).format('ddd Do MMM YYYY') : null
     },
     groupImage() {
-      return this.group && this.group.image ? ('/uploads/mid_' + this.group.group_image) : DEFAULT_PROFILE
+      return this.group && this.group.image ? ('/uploads/mid_' + this.group.image) : DEFAULT_PROFILE
     },
   },
   data: function() {
