@@ -183,7 +183,11 @@ class RoleController extends Controller
             'permissions.*' => ['integer', 'exists:permissions,idpermissions'],
         ]);
 
-        $ok = (new Role)->edit($role->idroles, array_map('intval', $validated['permissions']));
+        // Wrap the delete-then-reinsert in a transaction so a mid-update failure
+        // can't leave the role with a partial permission set.
+        $ok = DB::transaction(function () use ($role, $validated) {
+            return (new Role)->edit($role->idroles, array_map('intval', $validated['permissions']));
+        });
         if (!$ok) {
             return response()->json(['message' => 'Could not update permissions'], 500);
         }
