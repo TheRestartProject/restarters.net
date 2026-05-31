@@ -579,7 +579,10 @@ class Party extends Model implements Auditable
         $result['waste_total'] = $result['waste_powered'] + $result['waste_unpowered'];
         $result['participants'] = $this->pax ?? 0;
         $result['volunteers'] = $this->volunteers ?? 0;
-        $result['invited'] = $this->allInvited->count();
+        // Prefer the aggregate count when the caller eager-loaded it via withCount('allInvited')
+        // (e.g. bulkGroupStats) to avoid an N+1 COUNT query per event. Fall back to counting the
+        // relation directly for callers that loaded a single event without the count.
+        $result['invited'] = $this->all_invited_count ?? $this->allInvited->count();
         $result['hours_volunteered'] = $this->hoursVolunteered();
 
         return $result;
