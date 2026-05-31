@@ -258,8 +258,9 @@ class UserController extends Controller
         })->all();
 
         $isAdmin = Fixometer::hasRole($user, 'Administrator');
-        $adminAllEventsUrl = $isAdmin && env('CALENDAR_HASH')
-            ? url('/calendar/all-events/' . env('CALENDAR_HASH') . '/')
+        $calendarHash = config('restarters.calendar_hash');
+        $adminAllEventsUrl = $isAdmin && $calendarHash
+            ? url('/calendar/all-events/' . $calendarHash . '/')
             : null;
 
         $groupAreas = Group::whereNotNull('area')

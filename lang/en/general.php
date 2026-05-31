@@ -8,7 +8,6 @@ return [
   'faq_url' => 'https://therestartproject.org/faq',
   'restartproject_url' => 'https://therestartproject.org',
   'other_profile' => 'profile',
-  'email_alerts_pref1' => 'I would like to receive The Restart Project monthly newsletter',
   'email_alerts_pref2' => 'I would like to receive email notifications about events or groups near me',
   'login' => 'Login',
   'profile' => 'Your profile',

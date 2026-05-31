@@ -47,18 +47,16 @@ class APIv2UserCalendarsTest extends TestCase
         ]);
         $this->actingAs($admin);
 
-        config(['app.url' => 'http://localhost']);
-        // Ensure CALENDAR_HASH is set so the admin URL surfaces.
-        putenv('CALENDAR_HASH=test-cal-hash');
+        // Set the calendar hash via config (honoured by config(), unlike putenv()
+        // which Laravel's env() does not read) so the admin all-events URL surfaces.
+        config(['restarters.calendar_hash' => 'test-cal-hash']);
 
         $response = $this->getJson('/api/v2/users/me/calendars?api_token=admin1');
         $response->assertSuccessful();
         $data = $response->json('data');
 
         $this->assertTrue($data['is_admin']);
-        if (env('CALENDAR_HASH')) {
-            $this->assertNotNull($data['admin_all_events_url']);
-            $this->assertStringContainsString('test-cal-hash', $data['admin_all_events_url']);
-        }
+        $this->assertNotNull($data['admin_all_events_url']);
+        $this->assertStringContainsString('test-cal-hash', $data['admin_all_events_url']);
     }
 }
