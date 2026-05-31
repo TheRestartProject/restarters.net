@@ -186,7 +186,7 @@ export default {
         { key: 'country_name', label: this.__('users.country'), sortable: true, sortKey: 'country', class: 'd-none d-sm-table-cell' },
         { key: 'groups_count', label: this.__('users.groups'), class: 'd-none d-sm-table-cell' },
         { key: 'created_at', label: this.__('users.joined'), sortable: true, class: 'd-none d-sm-table-cell' },
-        { key: 'last_login_at', label: this.__('users.last_login'), class: 'd-none d-sm-table-cell' },
+        { key: 'last_login_at', label: this.__('users.last_login'), sortable: true, sortKey: 'updated_at', class: 'd-none d-sm-table-cell' },
       ]
     },
   },
