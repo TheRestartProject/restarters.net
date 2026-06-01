@@ -311,22 +311,32 @@ class Group extends Model implements Auditable
             $statsByGroup[$id] = self::getGroupStatsArrayKeys();
         }
 
-        $allEvents = Party::past()
+        // Stream events in chunks with lazy() rather than loading them all with get().
+        // A large network can have thousands of past events, each eager-loading all of its
+        // devices (joined to categories) — get() would hold every device of every event in
+        // memory at once and can exhaust it. lazy() keeps only one chunk resident at a time,
+        // releasing each batch before fetching the next, so peak memory stays bounded by the
+        // chunk size regardless of how big the network is. The accumulator below is small
+        // (one row per group), so it is safe to keep across chunks.
+        //
+        // withCount('allInvited') pre-loads the invited tally as an aggregate column, avoiding
+        // an N+1 query (one COUNT per event) inside getEventStats().
+        Party::past()
             ->with('allDevices')
+            ->withCount('allInvited')
             ->whereIn('events.group', $groupIds)
-            ->get();
-
-        foreach ($allEvents as $event) {
-            $gid = $event->group;
-            if (! isset($statsByGroup[$gid])) {
-                continue;
-            }
-            $statsByGroup[$gid]['parties']++;
-            $eventStats = $event->getEventStats($eEmissionRatio, $uEmissionratio);
-            foreach ($eventStats as $key => $value) {
-                $statsByGroup[$gid][$key] += $value;
-            }
-        }
+            ->lazy(200)
+            ->each(function ($event) use (&$statsByGroup, $eEmissionRatio, $uEmissionratio) {
+                $gid = $event->group;
+                if (! isset($statsByGroup[$gid])) {
+                    return;
+                }
+                $statsByGroup[$gid]['parties']++;
+                $eventStats = $event->getEventStats($eEmissionRatio, $uEmissionratio);
+                foreach ($eventStats as $key => $value) {
+                    $statsByGroup[$gid][$key] += $value;
+                }
+            });
 
         return $statsByGroup;
     }

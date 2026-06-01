@@ -38,8 +38,6 @@ class NetworkController extends Controller
      */
     private function statsForTag(Network $network, int $tagId): array
     {
-        $stats = \App\Group::getGroupStatsArrayKeys();
-
         $eEmissionRatio = \App\Helpers\LcaStats::getEmissionRatioPowered();
         $uEmissionratio = \App\Helpers\LcaStats::getEmissionRatioUnpowered();
 
@@ -49,9 +47,11 @@ class NetworkController extends Controller
             ->where('grouptags_groups.group_tag', $tagId)
             ->get();
 
-        foreach ($groups as $group) {
-            $singleGroupStats = $group->getGroupStats($eEmissionRatio, $uEmissionratio);
+        $allStats = \App\Group::bulkGroupStats($groups, $eEmissionRatio, $uEmissionratio);
 
+        $stats = \App\Group::getGroupStatsArrayKeys();
+
+        foreach ($allStats as $singleGroupStats) {
             foreach ($singleGroupStats as $key => $value) {
                 $stats[$key] = $stats[$key] + $value;
             }
