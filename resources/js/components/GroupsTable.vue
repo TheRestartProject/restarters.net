@@ -71,10 +71,10 @@
           <span class="small text-muted">{{ data.item.location.country }}</span>
         </div>
       </template>
-      <template slot="head(all_confirmed_hosts_count)">
+      <template slot="head(hosts)">
         <b-img :src="imageUrl('/icons/user_ico.svg')" class="mt-3 iconsmall" />
       </template>
-      <template slot="head(all_confirmed_restarters_count)">
+      <template slot="head(restarters)">
         <b-img :src="imageUrl('/icons/volunteer_ico-thick.svg')" class="mt-3 icon" />
       </template>
       <template slot="head(next_event)">
