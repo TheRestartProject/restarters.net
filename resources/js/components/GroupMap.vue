@@ -104,6 +104,22 @@ export default {
   created() {
     this.bounds = this.initialBounds
   },
+  mounted() {
+    // The map may be created inside a hidden tab, where its container is 0x0.
+    // When the tab becomes visible the container resizes; watch for that and
+    // tell Leaflet to re-measure, otherwise tiles never fill the now-visible
+    // area and most of the map shows as grey.
+    if (typeof ResizeObserver !== 'undefined') {
+      this.resizeObserver = new ResizeObserver(() => this.refreshSize())
+      this.resizeObserver.observe(this.$el)
+    }
+  },
+  beforeDestroy() {
+    if (this.resizeObserver) {
+      this.resizeObserver.disconnect()
+      this.resizeObserver = null
+    }
+  },
   beforeUnmount() {
     this.destroyed = true
   },
@@ -122,6 +138,15 @@ export default {
     }
   },
   methods: {
+    refreshSize() {
+      // Leaflet needs an explicit re-measure after the container changes size
+      // (e.g. when a hidden tab becomes visible); otherwise tiles don't fill
+      // the visible area and the map shows grey. Recompute in-bounds groups too.
+      if (this.mapObject) {
+        this.mapObject.invalidateSize()
+        this.idle()
+      }
+    },
     async ready() {
       const self = this
 
