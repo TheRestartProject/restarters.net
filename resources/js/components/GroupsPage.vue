@@ -40,7 +40,7 @@
           <div v-else class="mt-2 mb-2 text-center" v-html="__('groups.no_groups_mine')" />
         </div>
       </b-tab>
-      <b-tab class="pt-2">
+      <b-tab class="pt-2" lazy>
         <template slot="title">
           <b class="text-uppercase d-block d-lg-none">{{ __('groups.groups_title2_mobile') }}</b>
           <b class="text-uppercase d-none d-lg-block">{{ __('groups.groups_title2') }}</b>

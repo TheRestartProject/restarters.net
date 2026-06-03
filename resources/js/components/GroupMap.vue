@@ -100,6 +100,17 @@ export default {
         return found
       })
     },
+    hasLocation() {
+      // The groups page sends the inverted world box [[90,180],[-90,-180]] when
+      // the user has no location set; a real bounding box always has
+      // min_lat <= max_lat. Without a location there's no meaningful "centre" to
+      // find the nearest groups around, so we frame all groups instead.
+      const b = this.initialBounds
+      if (!Array.isArray(b) || b.length < 2 || !Array.isArray(b[0]) || !Array.isArray(b[1])) {
+        return false
+      }
+      return +b[0][0] <= +b[1][0]
+    },
   },
   created() {
     this.bounds = this.initialBounds
@@ -139,13 +150,26 @@ export default {
   },
   methods: {
     refreshSize() {
-      // Leaflet needs an explicit re-measure after the container changes size
-      // (e.g. when a hidden tab becomes visible); otherwise tiles don't fill
-      // the visible area and the map shows grey. Recompute in-bounds groups too.
-      if (this.mapObject) {
-        this.mapObject.invalidateSize()
-        this.idle()
+      // The ResizeObserver can fire before @ready has set mapObject, so resolve
+      // it from the l-map ref if needed.
+      if (!this.mapObject && this.$refs.map) {
+        this.mapObject = this.$refs.map.mapObject
       }
+      if (!this.mapObject) {
+        return
+      }
+      // Leaflet caches the container size; without invalidateSize() it still
+      // thinks it's 0x0 (created in a hidden tab) and tiles don't fill the
+      // visible area (grey map). Re-measure first so getSize() is correct.
+      this.mapObject.invalidateSize()
+      // If we couldn't frame the groups earlier (map was 0x0, so zoomToGroups
+      // skipped or centred on null island), do it now that we have a real size,
+      // unless the user has since moved the map.
+      if (!this.moved) {
+        this.zoomedToGroups = false
+        this.zoomToGroups()
+      }
+      this.idle()
     },
     async ready() {
       const self = this
@@ -243,37 +267,59 @@ export default {
     },
     zoomToGroups() {
       try {
-        if (!this.zoomedToGroups && this.mapObject && this.allGroups.length) {
+        // Only zoom once the map has a real size. If it's still 0x0 (created in a
+        // hidden/off-screen tab, or mid tab-transition) getCenter() is (0,0) and
+        // we'd fly to null island, leaving a grey map. Skipping here (without
+        // setting zoomedToGroups) means refreshSize()/idle() will retry once the
+        // container becomes visible.
+        const mapSized = this.mapObject && this.mapObject.getSize().x > 0
+        if (this.zoomedToGroups || !mapSized || !this.allGroups.length) {
+          return
+        }
+
+        this.zoomedToGroups = true
+
+        const latOf = (g) => +(g.location && g.location.lat != null ? g.location.lat : g.lat)
+        const lngOf = (g) => +(g.location && g.location.lng != null ? g.location.lng : g.lng)
+
+        let framed
+        if (this.hasLocation) {
+          // The user has a location, so the map is already centred on their area.
+          // Frame the 5 groups closest to the centre.
           const center = this.mapObject.getCenter()
-
-          this.zoomedToGroups = true
-
-          // Find the smallest box which contains 5 groups around the center.
-          const groups = this.allGroups
-
-          // Find the 5 closest groups.
-          const closest = groups
+          framed = this.allGroups
               .map((group) => {
-                const lat = group.location.lat || group.lat
-                const lng = group.location.lng || group.lng
-                const distance = Math.sqrt((lat - center.lat) ** 2 + (lng - center.lng) ** 2)
+                const distance = Math.sqrt((latOf(group) - center.lat) ** 2 + (lngOf(group) - center.lng) ** 2)
                 return { group, distance }
               })
               .sort((a, b) => a.distance - b.distance)
               .slice(0, 5)
               .map((a) => a.group)
-
-          // Get the bounding box containing these groups.
-          const bounds = new L.LatLngBounds()
-          closest.forEach((group) => {
-            const lat = group.location.lat || group.lat
-            const lng = group.location.lng || group.lng
-            bounds.extend(new L.LatLng(lat, lng))
-          })
-
-          this.bounds = bounds.pad(0.1)
-          this.mapObject.flyToBounds(this.bounds)
+        } else {
+          // No location to centre on: frame all the groups instead, so the map
+          // shows them rather than defaulting to the whole world / null island.
+          framed = this.allGroups
         }
+
+        // Get the bounding box containing the framed groups.
+        const bounds = new L.LatLngBounds()
+        framed.forEach((group) => {
+          const lat = latOf(group)
+          const lng = lngOf(group)
+          if (!isNaN(lat) && !isNaN(lng)) {
+            bounds.extend(new L.LatLng(lat, lng))
+          }
+        })
+
+        if (!bounds.isValid()) {
+          return
+        }
+
+        this.bounds = bounds.pad(0.1)
+        // Use fitBounds rather than flyToBounds for the initial framing: the
+        // animated fly fights the :bounds.sync binding and can leave the map
+        // mid-animation so tiles for the final view never settle (grey map).
+        this.mapObject.fitBounds(this.bounds)
       } catch (e) {
         console.error('Zoom to groups error', e)
       }
