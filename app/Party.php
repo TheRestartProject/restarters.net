@@ -816,21 +816,28 @@ class Party extends Model implements Auditable
             $volunteer['fullName'] = $volunteer->getFullName();
 
             if ($volunteer->volunteer) {
-                $volunteer['volunteer'] = $volunteer->volunteer;
+                $user = $volunteer->volunteer;
 
-                if (!$showEmails) {
-                    $volunteer['volunteer']['email'] = NULL;
+                // Build a minimal safe representation — never serialise the full
+                // User Eloquent model into page HTML (it carries api_token, coords, etc.).
+                $safeUser = [
+                    'id'     => $user->id,
+                    'name'   => $user->name,
+                    'email'  => $showEmails ? $user->email : null,
+                    'user_skills' => [],
+                ];
+
+                $volunteer['profilePath'] = '/uploads/thumbnail_'.$user->getProfile($user->id)->path;
+
+                foreach ($user->userSkills as $skill) {
+                    // Force-load the nested skillName relation, then emit only the
+                    // shape the frontend expects: { skill_name: { skill_name: "…" } }
+                    $safeUser['user_skills'][] = [
+                        'skill_name' => ['skill_name' => $skill->skillName->skill_name],
+                    ];
                 }
 
-                if (! empty($volunteer->volunteer)) {
-                    $volunteer['userSkills'] = $volunteer->volunteer->userSkills->all();
-                    $volunteer['profilePath'] = '/uploads/thumbnail_'.$volunteer->volunteer->getProfile($volunteer->volunteer->id)->path;
-
-                    foreach ($volunteer['userSkills'] as $skill) {
-                        // Force expansion
-                        $skill->skillName->skill_name;
-                    }
-                }
+                $volunteer['volunteer'] = $safeUser;
             }
 
             $ret[] = $volunteer;
