@@ -54,6 +54,9 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
      */
     protected $hidden = [
         'password', 'remember_token',
+        // Credentials and PII that must never appear in serialised API responses or page HTML.
+        'api_token', 'calendar_hash', 'recovery', 'recovery_expires',
+        'mediawiki', 'latitude', 'longitude',
     ];
 
     /**
