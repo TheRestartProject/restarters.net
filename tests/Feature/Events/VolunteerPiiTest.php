@@ -111,7 +111,12 @@ class VolunteerPiiTest extends TestCase
 
         $this->assertNotEmpty($expanded, 'expandVolunteers must return the volunteer');
 
-        $ev = $expanded[0];
+        // Decode via json_encode/decode — this is the actual attack surface (blade page HTML).
+        // PHP array-access reads $attributes, but json_encode calls toArray() which merges
+        // relationsToArray() LAST, so a still-loaded 'volunteer' HasOne relation would
+        // silently overwrite the safe array.  Decoding the JSON catches that bypass.
+        $decoded = json_decode(json_encode($expanded), true);
+        $ev = $decoded[0];
 
         // The nested 'volunteer' key must be an array (not an Eloquent model).
         $this->assertIsArray($ev['volunteer'], "'volunteer' must be a plain array, not an Eloquent model");
@@ -120,12 +125,18 @@ class VolunteerPiiTest extends TestCase
         $this->assertArrayHasKey('id',   $ev['volunteer']);
         $this->assertArrayHasKey('name', $ev['volunteer']);
 
-        // Sensitive fields absent.
-        $this->assertArrayNotHasKey('api_token',     $ev['volunteer'], 'api_token must not be in expanded volunteer');
-        $this->assertArrayNotHasKey('calendar_hash', $ev['volunteer'], 'calendar_hash must not be in expanded volunteer');
-        $this->assertArrayNotHasKey('recovery',      $ev['volunteer'], 'recovery must not be in expanded volunteer');
-        $this->assertArrayNotHasKey('latitude',      $ev['volunteer'], 'latitude must not be in expanded volunteer');
-        $this->assertArrayNotHasKey('longitude',     $ev['volunteer'], 'longitude must not be in expanded volunteer');
+        // Sensitive fields absent — checked in the JSON-decoded output (real attack surface).
+        $this->assertArrayNotHasKey('api_token',     $ev['volunteer'], 'api_token must not be in expanded volunteer JSON');
+        $this->assertArrayNotHasKey('calendar_hash', $ev['volunteer'], 'calendar_hash must not be in expanded volunteer JSON');
+        $this->assertArrayNotHasKey('recovery',      $ev['volunteer'], 'recovery must not be in expanded volunteer JSON');
+        $this->assertArrayNotHasKey('latitude',      $ev['volunteer'], 'latitude must not be in expanded volunteer JSON');
+        $this->assertArrayNotHasKey('longitude',     $ev['volunteer'], 'longitude must not be in expanded volunteer JSON');
+
+        // Sentinel values must not appear anywhere in the raw JSON string.
+        $json = json_encode($expanded);
+        $this->assertStringNotContainsString($this->apiToken,     $json, 'api_token sentinel must not appear in JSON output');
+        $this->assertStringNotContainsString($this->calendarHash, $json, 'calendar_hash sentinel must not appear in JSON output');
+        $this->assertStringNotContainsString($this->recovery,     $json, 'recovery sentinel must not appear in JSON output');
 
         // Email must be null when showEmails=false.
         $this->assertNull($ev['volunteer']['email'], 'email must be null when showEmails is false');

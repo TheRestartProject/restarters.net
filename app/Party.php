@@ -818,8 +818,6 @@ class Party extends Model implements Auditable
             if ($volunteer->volunteer) {
                 $user = $volunteer->volunteer;
 
-                // Build a minimal safe representation — never serialise the full
-                // User Eloquent model into page HTML (it carries api_token, coords, etc.).
                 $safeUser = [
                     'id'     => $user->id,
                     'name'   => $user->name,
@@ -830,13 +828,21 @@ class Party extends Model implements Auditable
                 $volunteer['profilePath'] = '/uploads/thumbnail_'.$user->getProfile($user->id)->path;
 
                 foreach ($user->userSkills as $skill) {
-                    // Force-load the nested skillName relation, then emit only the
-                    // shape the frontend expects: { skill_name: { skill_name: "…" } }
+                    // Guard against orphaned FK rows (deleted skill record).
+                    if (!$skill->skillName) {
+                        continue;
+                    }
+                    // Emit only the shape the frontend expects: { skill_name: { skill_name: "…" } }
                     $safeUser['user_skills'][] = [
                         'skill_name' => ['skill_name' => $skill->skillName->skill_name],
                     ];
                 }
 
+                // Unset the loaded relation before assigning the safe array.
+                // Eloquent's toArray() merges relationsToArray() LAST, so without this
+                // the full User model from the 'volunteer' HasOne would overwrite $safeUser
+                // when the blade calls json_encode($expanded_attended).
+                $volunteer->unsetRelation('volunteer');
                 $volunteer['volunteer'] = $safeUser;
             }
 
