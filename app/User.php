@@ -68,6 +68,13 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
         'number_of_logins',
         'last_login_at',
         'remember_token',
+        'password',
+        'api_token',
+        'calendar_hash',
+        'recovery',
+        'recovery_expires',
+        'latitude',
+        'longitude',
     ];
 
     /**
