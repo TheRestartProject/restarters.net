@@ -53,7 +53,7 @@ export default defineConfig({
             refresh: true,
         }),
         vue(),
-        laravelTranslations(),
+        laravelTranslations({ includeJson: true }),
         legacyCssAliases(),
         {
             name: 'jquery-global',
