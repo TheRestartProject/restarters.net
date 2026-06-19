@@ -76,20 +76,29 @@ jobs:
               echo "  MySQL attempt $i/60..."; sleep 5
             done
 
-            # Wait up to 25 minutes for the web app (docker_run.sh installs npm deps,
-            # Playwright browsers, and runs migrate:fresh --seed on every start)
-            echo "Waiting for web application (up to 25 min)..."
-            for i in $(seq 1 300); do
+            # Wait up to 35 minutes for the web app. docker_run.sh does composer
+            # install + npm install + migrate:fresh + seed on every startup.
+            # Also detect crash-loops: if the container restarts, bail immediately
+            # and print logs so we can diagnose the failure.
+            echo "Waiting for web application (up to 35 min)..."
+            initial_restart=$(docker inspect --format='{{.RestartCount}}' restarters 2>/dev/null || echo "0")
+            for i in $(seq 1 420); do
+              current_restart=$(docker inspect --format='{{.RestartCount}}' restarters 2>/dev/null || echo "0")
+              if [ "$current_restart" -gt "$initial_restart" ]; then
+                echo "❌ Container restarted ($initial_restart → $current_restart) — crash-loop detected, showing logs:"
+                docker logs restarters --tail=100 2>&1 || true
+                exit 1
+              fi
               curl -f -s http://localhost:8001 >/dev/null 2>&1 && echo "✓ Web app ready after $((i*5))s" && break
-              if [ $i -eq 300 ]; then
-                echo "❌ Web app not ready after 25 minutes — container logs:"
-                docker logs restarters --tail=50 2>&1 || true
+              if [ $i -eq 420 ]; then
+                echo "❌ Web app not ready after 35 minutes — container logs:"
+                docker logs restarters --tail=100 2>&1 || true
                 exit 1
               fi
               [ $((i % 12)) -eq 0 ] && echo "  Still waiting... ($((i*5))s elapsed)"
               sleep 5
             done
-          no_output_timeout: 28m
+          no_output_timeout: 38m
 
       # Setup database and application
       - run:
