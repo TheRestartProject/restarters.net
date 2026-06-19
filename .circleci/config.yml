@@ -60,14 +60,36 @@ jobs:
           no_output_timeout: 10m
 
       # Wait for core services to be ready (MySQL + web app). Discourse is started
-      # via docker:up-all but its readiness is checked separately (non-blocking)
-      # because it can take >10 min in CI while PHPUnit/Jest/Playwright tests do
-      # not require a live Discourse web process (PHPUnit mocks it).
+      # via docker:up-all but its readiness is checked separately (non-blocking).
+      # docker_run.sh runs npm install + npx playwright install + migrate:fresh --seed
+      # on every startup, which can take 20-25 min on cold CI machines. We poll
+      # directly here with a 25-minute ceiling rather than using the Taskfile helper
+      # (which only allows 10 min) to avoid blocking on that limit.
       - run:
           name: Wait for services
           command: |
-            task docker:wait-for-services-core
-          no_output_timeout: 15m
+            # Wait for MySQL first
+            echo "Waiting for MySQL..."
+            for i in $(seq 1 60); do
+              docker exec restarters_db mysqladmin ping -h localhost -u root -ps3cr3t --silent >/dev/null 2>&1 && echo "✓ MySQL ready" && break
+              [ $i -eq 60 ] && echo "❌ MySQL not ready" && exit 1
+              echo "  MySQL attempt $i/60..."; sleep 5
+            done
+
+            # Wait up to 25 minutes for the web app (docker_run.sh installs npm deps,
+            # Playwright browsers, and runs migrate:fresh --seed on every start)
+            echo "Waiting for web application (up to 25 min)..."
+            for i in $(seq 1 300); do
+              curl -f -s http://localhost:8001 >/dev/null 2>&1 && echo "✓ Web app ready after $((i*5))s" && break
+              if [ $i -eq 300 ]; then
+                echo "❌ Web app not ready after 25 minutes — container logs:"
+                docker logs restarters --tail=50 2>&1 || true
+                exit 1
+              fi
+              [ $((i % 12)) -eq 0 ] && echo "  Still waiting... ($((i*5))s elapsed)"
+              sleep 5
+            done
+          no_output_timeout: 28m
 
       # Setup database and application
       - run:
