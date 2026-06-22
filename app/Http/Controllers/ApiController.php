@@ -178,7 +178,9 @@ class ApiController extends Controller
     {
         $user = Auth::user();
 
-        $user->makeHidden('api_token');
+        // api_token and other credentials are in User::$hidden; makeHidden() is
+        // a belt-and-suspenders guard for any future $hidden regression.
+        $user->makeHidden(['api_token', 'calendar_hash', 'recovery', 'recovery_expires', 'mediawiki', 'latitude', 'longitude']);
 
         return response()->json($user->toArray());
     }
