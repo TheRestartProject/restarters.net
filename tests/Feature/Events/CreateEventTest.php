@@ -7,7 +7,6 @@ use App\Events\UserLeftEvent;
 use App\EventsUsers;
 use App\Group;
 use App\Helpers\Fixometer;
-use App\Helpers\Geocoder;
 use App\Helpers\RepairNetworkService;
 use App\Listeners\AddUserToDiscourseThreadForEvent;
 use App\Listeners\RemoveUserFromDiscourseThreadForEvent;
@@ -26,36 +25,8 @@ use Tests\TestCase;
 use App\Notifications\EventConfirmed;
 use Illuminate\Validation\ValidationException;
 
-class GeocoderMock extends Geocoder
-{
-    public function __construct()
-    {
-    }
-
-    public function geocode($location)
-    {
-        if ($location == 'ForceGeocodeFailure') {
-            return null;
-        }
-
-        return [
-            'latitude' => '1',
-            'longitude' => '1',
-        ];
-    }
-}
-
 class CreateEventTest extends TestCase
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->app->bind(Geocoder::class, function () {
-            return new GeocoderMock();
-        });
-    }
-
     /** @test */
     public function a_host_without_a_group_cant_create_an_event(): void
     {
