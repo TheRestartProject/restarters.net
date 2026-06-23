@@ -81,6 +81,12 @@ rm -f "$BACKUP_FILE"
 # 168 hourly backups (7 days), so the list+delete pass only needs to run daily; doing
 # it every hour just wastes Drive API calls. Between prunes the count drifts up to ~192
 # (8 days), which is harmless.
+#
+# IMPORTANT: deletion requires the backup service account to have **Content Manager**
+# (not just Contributor) on the Shared Drive. With only Contributor it can upload and
+# list but every delete is rejected (403 insufficientFilePermissions / 404), so backups
+# accumulate without bound and the hourly retry of rejected deletes becomes a Drive API
+# request storm. Grant Content Manager on the Shared Drive for this to actually prune.
 if [ "$(date -u +%H)" = "03" ]; then
     # Keep only the last 168 hourly backups on Google Drive.
     # List all backups newest-first and delete everything past the 168th.
