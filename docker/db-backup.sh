@@ -57,14 +57,13 @@ fi
 # --drive-root-folder-id targets the folder by its Drive ID (not by name path)
 # Rate-limit / retry caps (--tpslimit, --drive-pacer-min-sleep, --retries,
 # --low-level-retries) ensure a transient Drive error can never become a request
-# storm. --drive-chunk-size 64M cuts the number of upload requests ~8x vs the 8M
-# default. --drive-use-trash=false deletes permanently (also frees Shared Drive quota).
+# storm. --drive-chunk-size 64M cuts the number of upload requests ~8x vs the 8M default.
 if ! rclone copy "$BACKUP_FILE" "gdrive:" \
     --drive-root-folder-id="$GDRIVE_BACKUP_FOLDER_ID" \
     --drive-team-drive="$RCLONE_CONFIG_GDRIVE_TEAM_DRIVE" \
     --tpslimit=2 --drive-pacer-min-sleep=200ms \
     --retries=2 --low-level-retries=3 \
-    --drive-chunk-size=64M --drive-use-trash=false \
+    --drive-chunk-size=64M \
     --log-file="$LOG" \
     --log-level=INFO 2>>"$LOG"; then
     echo "$(date -u '+%Y-%m-%d %H:%M:%S UTC'): ERROR - rclone upload failed" >> "$LOG"
@@ -99,9 +98,11 @@ if [ "$(date -u +%H)" = "03" ]; then
             if [ -n "$backup" ]; then
                 echo "$(date -u '+%Y-%m-%d %H:%M:%S UTC'): Deleting old backup: $backup" >> "$LOG"
                 # `rclone deletefile` removes a single named file. (`rclone delete` treats its
-                # argument as a directory to enumerate, so for a file path it deletes nothing
-                # while still issuing API calls — the bug that let backups accumulate forever.)
-                rclone deletefile "gdrive:$backup" --drive-root-folder-id="$GDRIVE_BACKUP_FOLDER_ID" --drive-team-drive="$RCLONE_CONFIG_GDRIVE_TEAM_DRIVE" --tpslimit=2 --drive-pacer-min-sleep=200ms --retries=2 --low-level-retries=3 --drive-use-trash=false 2>>"$LOG" || true
+                # argument as a directory to enumerate, so for a file path it deletes nothing.)
+                # Deletes go to the Shared Drive trash (auto-emptied after 30 days). Do NOT add
+                # --drive-use-trash=false: permanent delete returns 404 for this service account
+                # on the Shared Drive; the trash path is what actually works.
+                rclone deletefile "gdrive:$backup" --drive-root-folder-id="$GDRIVE_BACKUP_FOLDER_ID" --drive-team-drive="$RCLONE_CONFIG_GDRIVE_TEAM_DRIVE" --tpslimit=2 --drive-pacer-min-sleep=200ms --retries=2 --low-level-retries=3 2>>"$LOG" || true
             fi
         done <<< "$BACKUPS_TO_DELETE"
     fi
