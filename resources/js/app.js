@@ -42,6 +42,7 @@ import EventsRequiringModeration from './components/EventsRequiringModeration.vu
 import EventPage from './components/EventPage.vue'
 import FixometerPage from './components/FixometerPage.vue'
 import GroupsPage from './components/GroupsPage.vue'
+import UsersPage from './components/UsersPage.vue'
 import GroupPage from './components/GroupPage.vue'
 import GroupAddEditPage from './components/GroupAddEditPage.vue'
 import GroupEventsPage from './components/GroupEventsPage.vue'
@@ -402,6 +403,7 @@ function initializeJQuery() {
             'eventpage': EventPage,
             'fixometerpage': FixometerPage,
             'groupspage': GroupsPage,
+            'userspage': UsersPage,
             'grouppage': GroupPage,
             'groupaddeditpage': GroupAddEditPage,
             'groupeventspage': GroupEventsPage,

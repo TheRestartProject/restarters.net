@@ -43,10 +43,11 @@ class UserAdminTest extends TestCase
         $response = $this->get('/user/all');
 
         if ($cansee) {
-            $response->assertSee('Create new user');
-            $response->assertSee($admin->name);
+            $response->assertSuccessful();
+            $response->assertSee('<UsersPage', false);
         } else {
-            $response->assertDontSee('Create new user');
+            // Non-admin is redirected away from the page in the new Vue flow.
+            $response->assertRedirect('/user/forbidden');
         }
     }
 
