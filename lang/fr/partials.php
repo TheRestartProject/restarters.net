@@ -62,6 +62,7 @@ return [
   'choose_barriers' => 'Choisir l\'obstacle principal à la réparation',
   'quantity' => 'Quantité',
   'cancel' => 'Annuler',
+  'delete' => 'Supprimer',
   'powered_only' => '(calculé pour les objets électriques uniquement)',
   'add_device_powered' => 'Ajouter appareil électrique',
   'add_device_unpowered' => 'Ajouter appareil non-électrique',

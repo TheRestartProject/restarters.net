@@ -1,72 +1,59 @@
 <?php
 
-namespace Tests\Feature\Dashboard;
+namespace Tests\Feature\Brands;
 
 use App\Brands;
 use App\Role;
-use DB;
-use Hash;
-use Symfony\Component\DomCrawler\Crawler;
 use Tests\TestCase;
 
 class BrandsTest extends TestCase
 {
-    public function testBasic(): void
+    public function testBrandsAdminPageRendersForAdministrator(): void
     {
         $this->loginAsTestUser(Role::ADMINISTRATOR);
 
-        // Create a brand.
-        $response = $this->post('/brands/create', [
-            'brand_name' => 'UT Brand'
-        ]);
-        $response->assertRedirect();
-        $response->assertSessionHas('success');
+        $brand = Brands::factory()->create(['brand_name' => 'UT Brand']);
 
-        // Should be listed.
         $response = $this->get('/brands');
-        $response->assertSee('UT Brand');
+        $response->assertOk();
+        $html = $response->getContent();
 
-        // Edit it.
-        $brand = Brands::latest()->first();
-        $response = $this->get('/brands/edit/' . $brand->id);
-        $response->assertSee('UT Brand');
+        // Should host the Vue admin SPA
+        $this->assertStringContainsString('<BrandsPage', $html);
 
-        $response = $this->post('/brands/edit/' . $brand->id, [
-            'brand-name' => 'UT Brand2'
-        ]);
-        $response->assertRedirect();
-        $response->assertSessionHas('success');
+        // The brand should appear in the JSON-encoded :initial-brands prop, not just anywhere
+        // on the page (which would be true even for breadcrumb / nav matches).
+        $this->assertMatchesRegularExpression(
+            '/:initial-brands="\[[^"]*&quot;brand_name&quot;:&quot;UT Brand&quot;[^"]*\]"/',
+            $html,
+            'Expected the brand to appear inside the :initial-brands prop'
+        );
 
-        // New name should show.
-        $response = $this->get('/brands');
-        $response->assertSee('UT Brand2');
-
-        // Delete
-        $response = $this->get('/brands/delete/' . $brand->id);
-        $response->assertRedirect();
-        $response->assertSessionHas('message');
+        // No edit modal pre-opened when arriving at /brands
+        $this->assertStringContainsString(':initial-edit-id="null"', $html);
     }
 
-    public function testErrors(): void {
+    public function testLegacyEditUrlPreOpensEditModalForBrand(): void
+    {
+        $this->loginAsTestUser(Role::ADMINISTRATOR);
+
+        $brand = Brands::factory()->create(['brand_name' => 'Legacy Bookmark']);
+
+        // /brands/edit/{id} used to render a server-side form; we now route bookmarks
+        // through the SPA and pass the id so the edit modal opens for the right brand.
+        $response = $this->get('/brands/edit/' . $brand->id);
+        $response->assertOk();
+        $html = $response->getContent();
+
+        $this->assertStringContainsString('<BrandsPage', $html);
+        $this->assertStringContainsString(':initial-edit-id="' . $brand->id . '"', $html);
+    }
+
+    public function testBrandsAdminPageForbiddenForRestarter(): void
+    {
         $this->loginAsTestUser(Role::RESTARTER);
 
-        $response = $this->post('/brands/create', [
-            'brand_name' => 'UT Brand'
-        ]);
-        $response->assertRedirect('/user/forbidden');
-
         $response = $this->get('/brands');
-        $response->assertRedirect('/user/forbidden');
-
-        $response = $this->get('/brands/edit/1');
-        $response->assertRedirect('/user/forbidden');
-
-        $response = $this->post('/brands/edit/1', [
-            'brand-name' => 'UT Brand2'
-        ]);
-        $response->assertRedirect('/user/forbidden');
-
-        $response = $this->get('/brands/delete/1');
         $response->assertRedirect('/user/forbidden');
     }
 }

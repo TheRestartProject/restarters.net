@@ -305,11 +305,11 @@ Route::middleware('auth', 'verifyUserConsent', 'ensureAPIToken')->group(function
         Route::post('/preview-deploy', [PreviewDeployController::class, 'deploy'])->name('admin.preview-deploy.deploy');
     });
 
-    //Category Controller
+    //Category Controller - update is now via /api/v2/categories/{id}; this only renders the Vue admin page
     Route::prefix('category')->group(function () {
         Route::get('/', [CategoryController::class, 'index'])->name('category');
-        Route::get('/edit/{id}', [CategoryController::class, 'getEditCategory']);
-        Route::post('/edit/{id}', [CategoryController::class, 'postEditCategory']);
+        // Legacy bookmark → admin page; pre-open the edit modal for the requested category
+        Route::get('/edit/{editId}', [CategoryController::class, 'index']);
     });
 
     //Dashboard Controller
@@ -393,39 +393,35 @@ Route::middleware('auth', 'verifyUserConsent', 'ensureAPIToken')->group(function
         Route::post('/update-volunteerquantity', [PartyController::class, 'updateVolunteerQuantity']);
     });
 
-    //Role Controller
+    //Role Controller - permission updates now happen via /api/v2/roles/{id}/permissions
     Route::prefix('role')->group(function () {
         Route::get('/', [RoleController::class, 'index'])->name('roles');
-        Route::get('/edit/{id}', [RoleController::class, 'edit']);
-        Route::post('/edit/{id}', [RoleController::class, 'edit']);
+        // Legacy bookmark → admin page; pre-open the edit modal for the requested role
+        Route::get('/edit/{editId}', [RoleController::class, 'index']);
     });
 
-    //Brand Controller
+    //Brand Controller - all CRUD is now via /api/v2/brands; this only renders the Vue admin page
     Route::prefix('brands')->group(function () {
         Route::get('/', [BrandsController::class, 'index'])->name('brands');
-        Route::get('/create', [BrandsController::class, 'getCreateBrand']);
-        Route::post('/create', [BrandsController::class, 'postCreateBrand']);
-        Route::get('/edit/{id}', [BrandsController::class, 'getEditBrand']);
-        Route::post('/edit/{id}', [BrandsController::class, 'postEditBrand']);
-        Route::get('/delete/{id}', [BrandsController::class, 'getDeleteBrand']);
+        // Legacy bookmarks → admin page; pre-open the edit modal for the requested brand
+        Route::get('/edit/{editId}', [BrandsController::class, 'index']);
+        Route::get('/create', [BrandsController::class, 'index']);
     });
 
-    //Skills Controller
+    //Skills Controller - all CRUD is now via /api/v2/skills; this only renders the Vue admin page
     Route::prefix('skills')->group(function () {
         Route::get('/', [SkillsController::class, 'index'])->name('skills');
-        Route::post('/create', [SkillsController::class, 'postCreateSkill']);
-        Route::get('/edit/{id}', [SkillsController::class, 'getEditSkill']);
-        Route::post('/edit/{id}', [SkillsController::class, 'postEditSkill']);
-        Route::get('/delete/{id}', [SkillsController::class, 'getDeleteSkill']);
+        // Legacy bookmarks → admin page; pre-open the edit modal for the requested skill
+        Route::get('/edit/{editId}', [SkillsController::class, 'index']);
+        Route::get('/create', [SkillsController::class, 'index']);
     });
 
-    //GroupTags Controller
+    //GroupTags Controller - all CRUD is now via /api/v2/group-tags; this only renders the Vue admin page
     Route::prefix('tags')->group(function () {
         Route::get('/', [GroupTagsController::class, 'index'])->name('tags');
-        Route::post('/create', [GroupTagsController::class, 'postCreateTag']);
-        Route::get('/edit/{id}', [GroupTagsController::class, 'getEditTag']);
-        Route::post('/edit/{id}', [GroupTagsController::class, 'postEditTag']);
-        Route::get('/delete/{id}', [GroupTagsController::class, 'getDeleteTag']);
+        // Legacy bookmarks → admin page; pre-open the edit modal for the requested tag
+        Route::get('/edit/{editId}', [GroupTagsController::class, 'index']);
+        Route::get('/create', [GroupTagsController::class, 'index']);
     });
 });
 
