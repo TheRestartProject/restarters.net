@@ -93,6 +93,19 @@ Route::prefix('v2')->group(function() {
             Route::patch('{id}', [API\EventController::class, 'updateEventv2']);
         });
 
+        Route::prefix('/users/me')->middleware('auth:api')->group(function() {
+            Route::get('/preferences', [API\UserController::class, 'getMyEmailPreferencesv2']);
+            Route::patch('/preferences', [API\UserController::class, 'updateMyEmailPreferencesv2']);
+            Route::get('/calendars', [API\UserController::class, 'getMyCalendarsv2']);
+            Route::get('/language', [API\UserController::class, 'getMyLanguagev2']);
+            Route::patch('/language', [API\UserController::class, 'updateMyLanguagev2']);
+        });
+
+        Route::middleware('auth:api')->group(function() {
+            Route::get('/users/{id}/repair-directory-options', [API\UserController::class, 'getRepairDirOptionsv2']);
+            Route::patch('/users/{id}/repair-directory-role', [API\UserController::class, 'updateRepairDirRolev2']);
+        });
+
         Route::prefix('/networks')->group(function() {
             Route::get('/', [API\NetworkController::class, 'getNetworksv2']);
             Route::get('{id}', [API\NetworkController::class, 'getNetworkv2']);

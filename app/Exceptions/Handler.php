@@ -2,6 +2,7 @@
 
 namespace App\Exceptions;
 
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Validation\ValidationException;
 use Throwable;
 use Exception;
@@ -33,6 +34,16 @@ class Handler extends ExceptionHandler
                 return response()->json(
                     ['message' => $exception->getMessage(), 'errors' => $exception->errors()],
                     422);
+            }
+
+            // An unauthenticated request (e.g. a missing/invalid api token on an
+            // auth:api route) throws AuthenticationException, which has no
+            // getStatusCode() and so would otherwise fall through to 500. Map it
+            // to the correct 401 for JSON/API clients.
+            if ($exception instanceof AuthenticationException) {
+                return response()->json(
+                    ['message' => $exception->getMessage()],
+                    401);
             }
 
             return response()->json(

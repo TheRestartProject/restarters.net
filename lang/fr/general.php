@@ -20,7 +20,6 @@ return [
   'save_repair_skills' => 'Sauvegarder les compétences',
   'email_alerts' => 'E-mails et alertes',
   'email_alerts_text' => 'Veuillez choisir le type de mise à jour par courriel que vous aimeriez recevoir. Vous pouvez les changer à tout moment. Notre politique de confidentialité est disponible <a href="https://therestartproject.org/data-and-privacy-policy/fixometer/" rel="noopener noreferrer" target="_blank">ici</a>',
-  'email_alerts_pref1' => 'Je souhaite recevoir le bulletin mensuel The Restart Project',
   'email_alerts_pref2' => 'Je souhaite recevoir des notifications par e-mail sur des événements ou des Repair Cafés proches de chez moi',
   'menu_tools' => 'Outils pour la communauté',
   'menu_discourse' => 'Forum',
@@ -36,4 +35,5 @@ return [
   'menu_fixometer' => 'Fixometer',
   'menu_events' => 'Événements',
   'menu_groups' => 'Repair Cafés',
+  'error_occurred' => 'Une erreur est survenue. Veuillez réessayer.',
 ];
