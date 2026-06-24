@@ -3,7 +3,7 @@ import laravel from 'laravel-vite-plugin';
 import vue from '@vitejs/plugin-vue2';
 import laravelTranslations from 'vite-plugin-laravel-translations';
 import { resolve, dirname } from 'path';
-import { existsSync, readFileSync, mkdirSync, copyFileSync } from 'fs';
+import { existsSync, readFileSync, readdirSync, mkdirSync, copyFileSync } from 'fs';
 
 // The MediaWiki wiki references our CSS at unhashed legacy public URLs
 // (/css/wiki.css, /global/css/app.css). These paths pre-date the Mix -> Vite
@@ -34,6 +34,47 @@ function legacyCssAliases() {
     };
 }
 
+// vite-plugin-laravel-translations@0.3.1's `includeJson` option is broken: its JSON
+// branch does `await import(`${cwd}/${absolutePath}`)` (doubled path + a missing JSON
+// import attribute), which throws on Node 18+ and crashes Vite (no assets -> app 500s).
+// Device category/cluster names live as top-level keys in lang/<locale>.json
+// (e.g. "Desktop computer": "Ordinateur de bureau") and the Vue `__()` helper looks
+// them up at the locale root. So we run the plugin for the PHP translations and
+// deep-merge the JSON files in ourselves via plain JSON.parse (no dynamic import).
+function deepMergeTranslations(a, b) {
+    if (a && b && typeof a === 'object' && typeof b === 'object'
+        && !Array.isArray(a) && !Array.isArray(b)) {
+        const out = { ...a };
+        for (const key of Object.keys(b)) {
+            out[key] = key in a ? deepMergeTranslations(a[key], b[key]) : b[key];
+        }
+        return out;
+    }
+    return b;
+}
+
+function laravelTranslationsWithJson() {
+    const DEFINE_KEY = 'import.meta.env.VITE_LARAVEL_TRANSLATIONS';
+    return {
+        name: 'laravel-translations-with-json',
+        async config() {
+            const base = await (await laravelTranslations()).config();
+            const translations = base.define[DEFINE_KEY];
+            const langDir = resolve(__dirname, 'lang');
+            for (const file of readdirSync(langDir)) {
+                if (!file.endsWith('.json')) continue;
+                const locale = file.replace(/\.json$/, '');
+                const json = JSON.parse(readFileSync(resolve(langDir, file), 'utf-8'));
+                translations[locale] = deepMergeTranslations(translations[locale] || {}, json);
+            }
+            return { define: { [DEFINE_KEY]: translations } };
+        },
+        handleHotUpdate({ file, server }) {
+            if (/lang[\\/].*\.(?:php|json)$/.test(file)) server.restart();
+        },
+    };
+}
+
 export default defineConfig({
     define: {
         'process.env': {},
@@ -53,7 +94,7 @@ export default defineConfig({
             refresh: true,
         }),
         vue(),
-        laravelTranslations({ includeJson: true }),
+        laravelTranslationsWithJson(),
         legacyCssAliases(),
         {
             name: 'jquery-global',
