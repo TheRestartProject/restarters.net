@@ -40,6 +40,7 @@ import EventAddEditPage from './components/EventAddEditPage.vue'
 import EventAddEdit from './components/EventAddEdit.vue'
 import EventsRequiringModeration from './components/EventsRequiringModeration.vue'
 import EventPage from './components/EventPage.vue'
+import CantCreateEventPage from './components/CantCreateEventPage.vue'
 import FixometerPage from './components/FixometerPage.vue'
 import GroupsPage from './components/GroupsPage.vue'
 import GroupPage from './components/GroupPage.vue'
@@ -400,6 +401,7 @@ function initializeJQuery() {
             'eventaddedit': EventAddEdit,
             'eventsrequiringmoderation': EventsRequiringModeration,
             'eventpage': EventPage,
+            'cantcreateeventpage': CantCreateEventPage,
             'fixometerpage': FixometerPage,
             'groupspage': GroupsPage,
             'grouppage': GroupPage,
