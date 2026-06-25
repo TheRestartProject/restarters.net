@@ -96,7 +96,7 @@ class UserController extends Controller
     public function notifications(Request $request, int $id): JsonResponse
     {
         $user = User::findOrFail($id);
-        $restartersNotifications = $user->unReadNotifications->count();
+        $restartersNotifications = $user->unreadNotifications()->count();
         $discourseNotifications = 0;
 
         if (config('restarters.features.discourse_integration')) {

@@ -11,6 +11,7 @@ use App\Network;
 use Auth;
 use FixometerFile;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Lang;
 
 class NetworkController extends Controller
@@ -130,13 +131,23 @@ class NetworkController extends Controller
         $this->authorize('update', $network);
 
         if ($request->hasFile('network_logo')) {
+            // Determine the correct disk to use (s3 on Fly, public_uploads in dev)
+            $disk = config('filesystems.default') === 's3' ? 's3' : 'public_uploads';
+
             // Save the file.
             $path = $request->file('network_logo')->store('network_logos', [
-                'disk' => 'public_uploads',
+                'disk' => $disk,
             ]);
 
             // Store it in the network object.
             if ($path) {
+                // Generate the _x100 sized version by copying the file
+                $sizedPath = preg_replace('/\.([^.\s]{3,4})$/', '-_x100.$1', $path);
+                $storage = Storage::disk($disk);
+
+                // Copy the uploaded file to the _x100 filename
+                $storage->copy($path, $sizedPath);
+
                 $network->logo = $path;
                 $network->save();
             } else {

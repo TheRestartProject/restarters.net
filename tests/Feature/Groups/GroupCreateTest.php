@@ -75,6 +75,26 @@ class GroupCreateTest extends TestCase
         $this->assertNull($this->createGroup('Test Group', 'https://therestartproject.org', 'zzzzzzzzzzz123', 'Some text', false));
     }
 
+    public function testCreateRejectsInvalidWebsite(): void
+    {
+        // A bare token like 'EDP' is not a valid URL. Without server-side validation
+        // we previously accepted it and then choked further down the pipeline, which
+        // surfaced as a 500 / "Request failed" hang in the UI. Validate up front.
+        $this->loginAsTestUser(Role::ADMINISTRATOR);
+
+        $this->expectException(ValidationException::class);
+        $this->assertNull($this->createGroup('Test Group', 'EDP', 'London', 'Some text.', false));
+    }
+
+    public function testCreateAcceptsBlankWebsite(): void
+    {
+        // Website is optional. Empty / null values must still be accepted.
+        $this->loginAsTestUser(Role::ADMINISTRATOR);
+
+        $idgroups = $this->createGroup('Test Group', '', 'London', 'Some text.');
+        $this->assertNotNull($idgroups);
+    }
+
     public function roles(): array {
         return [
             [ 'Administrator'],

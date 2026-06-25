@@ -2,6 +2,7 @@
 
 namespace App\Exceptions;
 
+use Illuminate\Validation\ValidationException;
 use Throwable;
 use Exception;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
@@ -28,6 +29,12 @@ class Handler extends ExceptionHandler
     public function render($request, Throwable $exception)
     {
         if ($request->wantsJson()) {
+            if ($exception instanceof ValidationException) {
+                return response()->json(
+                    ['message' => $exception->getMessage(), 'errors' => $exception->errors()],
+                    422);
+            }
+
             return response()->json(
                 ['message' => $exception->getMessage()],
                 method_exists($exception, 'getStatusCode') ? $exception->getStatusCode() : 500);

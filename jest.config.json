@@ -11,7 +11,8 @@
         "^.+\\.(js|jsx)$": "babel-jest"
     },
     "roots": [
-        "<rootDir>/resources/js/components"
+        "<rootDir>/resources/js/components",
+        "<rootDir>/resources/js/misc"
     ],
     "modulePaths": [
         "<rootDir>"

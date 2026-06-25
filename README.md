@@ -31,7 +31,15 @@ we'll make sure it ends up in the right place.)
 
 ## Tech
 
-More details on the tech side of things in the [dev wiki](https://github.com/therestartproject/restarters.net/wiki).
+Developer documentation lives in the [`docs/`](docs/) folder:
+
+- [Local development setup](docs/local-development.md)
+- [Fly.io deployment](docs/fly-deployment.md)
+- [Contributing / branching workflow](docs/contributing.md)
+- [External integrations](docs/integrations.md) (Discourse, MediaWiki, WordPress)
+- [Queue and email](docs/queue-and-email.md)
+- [Frontend architecture](docs/frontend-architecture.md) (Vue, Vite, API)
+- [Operational procedures](docs/operations.md)
 
 ## Methodology
 

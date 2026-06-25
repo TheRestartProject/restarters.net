@@ -58,6 +58,7 @@ import { DEFAULT_PROFILE, HOST, RESTARTER } from '../constants'
 import images from '../mixins/images'
 import ConfirmModal from './ConfirmModal.vue'
 import volunteers from '../store/volunteers'
+import { apiErrorMessage } from '../misc/apiError'
 
 export default {
   components: {ConfirmModal},
@@ -130,7 +131,7 @@ export default {
           eventId: this.volunteer.event,
         })
       } catch (e) {
-        this.error = e.message
+        this.error = apiErrorMessage(e)
       }
     },
     removeVolunteer() {
@@ -140,21 +141,21 @@ export default {
       try {
         await this.$store.dispatch('volunteers/remove', this.volunteer.id)
       } catch (e) {
-        this.error = e.message
+        this.error = apiErrorMessage(e)
       }
     },
     async makeVolunteerHost() {
       try {
         await this.$store.dispatch('volunteers/makehost', this.volunteer.id)
       } catch (e) {
-        this.error = e.message
+        this.error = apiErrorMessage(e)
       }
     },
     async removeHostRole() {
       try {
         await this.$store.dispatch('volunteers/removehost', this.volunteer.id)
       } catch (e) {
-        this.error = e.message
+        this.error = apiErrorMessage(e)
       }
     },
     confirm() {

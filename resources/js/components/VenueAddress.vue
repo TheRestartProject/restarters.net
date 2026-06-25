@@ -3,14 +3,13 @@
     <b-col md="7">
       <div class="form-group">
         <label :for="$id('address-autocomplete')">{{ __('events.field_event_venue') }}:</label>
-        <vue-google-autocomplete
+        <places-autocomplete
             :id="$id('address-autocomplete')"
             name="location"
             classname="form-control"
             :placeholder="__('events.field_venue_placeholder')"
             @placechanged="placeChanged"
             @change="resetValues"
-            aria-describedby="locationHelpBlock"
             types="geocode"
             ref="autocomplete"
             :class="{ hasError: hasError, 'm-0': true }"
@@ -44,7 +43,7 @@
 </template>
 <script>
 import Vue from 'vue'
-import VueGoogleAutocomplete from 'vue-google-autocomplete'
+import PlacesAutocomplete from './PlacesAutocomplete.vue'
 import UniqueId from 'vue-unique-id';
 import map from '../mixins/map'
 
@@ -90,7 +89,7 @@ export default {
     }
   },
   components: {
-    VueGoogleAutocomplete
+    PlacesAutocomplete
   },
   data () {
     return {

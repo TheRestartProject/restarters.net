@@ -49,6 +49,7 @@
 import { DEFAULT_PROFILE, HOST } from '../constants'
 import ConfirmModal from './ConfirmModal.vue'
 import images from '../mixins/images'
+import { apiErrorMessage } from '../misc/apiError'
 
 export default {
   components: {ConfirmModal},
@@ -136,7 +137,7 @@ export default {
           id: this.attendee.idevents_users
         })
       } catch (e) {
-        this.error = e.message
+        this.error = apiErrorMessage(e)
       }
     },
     confirm() {

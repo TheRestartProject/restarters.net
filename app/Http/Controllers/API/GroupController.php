@@ -1102,11 +1102,13 @@ class GroupController extends Controller
                                    'name' => ['required', 'unique:groups', 'max:255'],
                                    'location' => ['required', 'max:255'],
                                    'description' => ['required'],
+                                   'website' => ['nullable', 'url', 'max:255'],
                                ]);
         } else {
             $request->validate([
                                    'name' => ['max:255'],
                                    'location' => ['max:255'],
+                                   'website' => ['nullable', 'url', 'max:255'],
                                    'archived_at' => ['nullable', 'date'],
                                ]);
         }

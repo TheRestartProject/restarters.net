@@ -7,9 +7,12 @@ use Cookie;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use Mediawiki\Api\ApiUser;
-use Mediawiki\Api\MediawikiApi;
-use Mediawiki\Api\Service\UserCreator;
+use Addwiki\Mediawiki\Api\Client\Action\ActionApi;
+use Addwiki\Mediawiki\Api\Client\Auth\UserAndPassword;
+use Addwiki\Mediawiki\Api\Client\MediaWiki;
+use Addwiki\Mediawiki\Api\Guzzle\ClientFactory;
+use Addwiki\Mediawiki\Api\Service\UserCreator;
+use GuzzleHttp\Cookie\CookieJar;
 
 // Don't extend BaseEvent - we don't want to queue because this needs to happen before we return to the client.
 class LogInToWiki
@@ -85,15 +88,13 @@ class LogInToWiki
     {
         try {
             Log::info("Log in to wiki $user->mediawiki");
-            $api = MediawikiApi::newFromApiEndpoint(env('WIKI_URL').'/api.php');
-            $api->login(new ApiUser($user->mediawiki, $user->password));
+            $cookieJar = new CookieJar();
+            $guzzleClient = (new ClientFactory(['cookies' => $cookieJar, 'timeout' => 10, 'connect_timeout' => 5]))->getClient();
+            $auth = new UserAndPassword($user->mediawiki, $user->password);
+            $api = new ActionApi(env('WIKI_URL').'/api.php', $auth, $guzzleClient);
+            $api->getToken('csrf');
             Log::info("Logged in to wiki $user->mediawiki");
 
-            // NGM: it appears that right from the beginning MediawikiApi->getClient access modifier was changed
-            // in our vendor folder from private to public in order to access the underlying client for the cookies.
-            // This is really bad, as obviously when we update the package via composer the method changes back to private.
-            // Stuck with that until we can figure out an alternative way to access the client.
-            $cookieJar = $api->getClient()->getConfig('cookies');
             $cookieJarArray = $cookieJar->toArray();
 
             if (! empty($cookieJarArray)) {

@@ -24,7 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Restarters Dev</title>
+    <title><?= htmlspecialchars(getenv('APP_NAME') ?: 'Restarters') ?></title>
     <style>
         body { font-family: sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; background: #f0f0f0; }
         .box { background: #fff; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,.15); width: 300px; }
@@ -37,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 <body>
 <div class="box">
-    <h1>Restarters Dev</h1>
+    <h1><?= htmlspecialchars(getenv('APP_NAME') ?: 'Restarters') ?></h1>
     <?php if ($error): ?><p class="err"><?= htmlspecialchars($error) ?></p><?php endif; ?>
     <form method="POST">
         <input type="hidden" name="next" value="<?= htmlspecialchars($next) ?>">

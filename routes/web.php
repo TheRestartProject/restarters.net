@@ -3,6 +3,7 @@
 use App\Http\Controllers\DeviceUrlController;
 use App\Http\Controllers\InformationAlertCookieController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\PreviewDeployController;
 use App\Http\Controllers\BattcatOraController;
 use App\Http\Controllers\BrandsController;
 use App\Http\Controllers\CalendarEventsController;
@@ -27,6 +28,7 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SkillsController;
 use App\Http\Controllers\StyleController;
 use App\Http\Controllers\TabicatOraController;
+use App\Http\Controllers\MapsProxyController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -299,6 +301,8 @@ Route::middleware('auth', 'verifyUserConsent', 'ensureAPIToken')->group(function
     //Admin Controller
     Route::prefix('admin')->group(function () {
         Route::get('/stats', [AdminController::class, 'stats']);
+        Route::get('/preview-deploy', [PreviewDeployController::class, 'show'])->name('admin.preview-deploy.show');
+        Route::post('/preview-deploy', [PreviewDeployController::class, 'deploy'])->name('admin.preview-deploy.deploy');
     });
 
     //Category Controller
@@ -316,6 +320,12 @@ Route::middleware('auth', 'verifyUserConsent', 'ensureAPIToken')->group(function
 
     Route::prefix('fixometer')->group(function () {
         Route::get('/', [DeviceController::class, 'index'])->name('devices');
+    });
+
+    // Maps proxy — keeps the Google API key server-side
+    Route::prefix('maps')->group(function () {
+        Route::get('/autocomplete', [MapsProxyController::class, 'autocomplete']);
+        Route::get('/place-details', [MapsProxyController::class, 'placeDetails']);
     });
 
     // TODO: the rest of these to be redirected properly.
