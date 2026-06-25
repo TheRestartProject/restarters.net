@@ -37,7 +37,7 @@ class CheckGroupLocations extends Command
     public function handle(): void
     {
         $groups = Group::where('approved', true)->get();
-        $geocoder = new \App\Helpers\Geocoder();
+        $geocoder = app(\App\Helpers\Geocoder::class);
 
         foreach ($groups as $group) {
             if (! $group->location) {
