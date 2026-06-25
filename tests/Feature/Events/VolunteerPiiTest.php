@@ -31,7 +31,12 @@ class VolunteerPiiTest extends TestCase
             'event_start_utc' => '2130-01-01T10:00:00+00:00',
             'event_end_utc'   => '2130-01-01T12:00:00+00:00',
         ]);
-        $volunteer = User::factory()->restarter()->create();
+        // Force a name with no characters that change under json_encode + Blade's
+        // HTML escaping. The event page embeds the attendee list as
+        // `:attendance="{{ json_encode(...) }}"`, so a faker name containing an
+        // apostrophe ("O'Brien" -> "O&#039;Brien") or an accent ("José" -> "José")
+        // would not match the raw-name assertion below — an intermittent failure.
+        $volunteer = User::factory()->restarter()->create(['name' => 'Volunteer McTestface']);
 
         // Bypass $fillable to inject the sentinel values directly.
         \DB::table('users')->where('id', $volunteer->id)->update([
