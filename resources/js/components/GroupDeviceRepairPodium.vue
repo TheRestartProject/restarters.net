@@ -24,7 +24,7 @@
           {{ device.counter }}
         </span>
         <span class="font-weight-bold align-content-center mt-2">
-          {{ device.name }}
+          {{ translatedName }}
         </span>
       </div>
     </div>

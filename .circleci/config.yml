@@ -59,11 +59,46 @@ jobs:
             task docker:up-all
           no_output_timeout: 10m
 
-      # Wait for services to be ready (includes build completion and restart detection)
+      # Wait for core services to be ready (MySQL + web app). Discourse is started
+      # via docker:up-all but its readiness is checked separately (non-blocking).
+      # docker_run.sh runs npm install + npx playwright install + migrate:fresh --seed
+      # on every startup, which can take 20-25 min on cold CI machines. We poll
+      # directly here with a 25-minute ceiling rather than using the Taskfile helper
+      # (which only allows 10 min) to avoid blocking on that limit.
       - run:
           name: Wait for services
           command: |
-            task docker:wait-for-services-all
+            # Wait for MySQL first
+            echo "Waiting for MySQL..."
+            for i in $(seq 1 60); do
+              docker exec restarters_db mysqladmin ping -h localhost -u root -ps3cr3t --silent >/dev/null 2>&1 && echo "✓ MySQL ready" && break
+              [ $i -eq 60 ] && echo "❌ MySQL not ready" && exit 1
+              echo "  MySQL attempt $i/60..."; sleep 5
+            done
+
+            # Wait up to 35 minutes for the web app. docker_run.sh does composer
+            # install + npm install + migrate:fresh + seed on every startup.
+            # Also detect crash-loops: if the container restarts, bail immediately
+            # and print logs so we can diagnose the failure.
+            echo "Waiting for web application (up to 35 min)..."
+            initial_restart=$(docker inspect --format='{{.RestartCount}}' restarters 2>/dev/null || echo "0")
+            for i in $(seq 1 420); do
+              current_restart=$(docker inspect --format='{{.RestartCount}}' restarters 2>/dev/null || echo "0")
+              if [ "$current_restart" -gt "$initial_restart" ]; then
+                echo "❌ Container restarted ($initial_restart → $current_restart) — crash-loop detected, showing logs:"
+                docker logs restarters --tail=100 2>&1 || true
+                exit 1
+              fi
+              curl -f -s http://localhost:8001 >/dev/null 2>&1 && echo "✓ Web app ready after $((i*5))s" && break
+              if [ $i -eq 420 ]; then
+                echo "❌ Web app not ready after 35 minutes — container logs:"
+                docker logs restarters --tail=100 2>&1 || true
+                exit 1
+              fi
+              [ $((i % 12)) -eq 0 ] && echo "  Still waiting... ($((i*5))s elapsed)"
+              sleep 5
+            done
+          no_output_timeout: 38m
 
       # Setup database and application
       - run:
@@ -82,15 +117,29 @@ jobs:
             # Generate additional Laravel artifacts for testing
             docker exec restarters php artisan l5-swagger:generate
 
-      # Setup Discourse API
+      # Setup Discourse API (PostgreSQL must be ready; Discourse web app not required)
       - run:
           name: Setup Discourse
           command: |
+            # Wait for PostgreSQL (separate from Discourse web app - starts faster)
+            echo "Waiting for PostgreSQL..."
+            attempt=0
+            until docker exec postgresql pg_isready -U postgres >/dev/null 2>&1; do
+              attempt=$((attempt + 1))
+              if [ $attempt -ge 60 ]; then
+                echo "PostgreSQL did not become ready in time - skipping Discourse setup"
+                exit 0
+              fi
+              echo "  PostgreSQL not ready, waiting... (attempt $attempt/60)"
+              sleep 5
+            done
+            echo "✓ PostgreSQL is ready"
+
             # Add API key to Discourse - run directly on PostgreSQL container
             docker exec postgresql psql -U postgres -c "INSERT INTO api_keys (id, user_id, created_by_id, created_at, updated_at, allowed_ips, hidden, last_used_at, revoked_at, description, key_hash, truncated_key) VALUES (1, NULL, 1, '2021-10-25 13:56:20.033338', '2021-10-25 13:56:20.033338', NULL, false, NULL, NULL, 'Restarters', 'd89e9dfacfb611fbaf004807648187ce7ed474df44dcb0ada230fab5c8dd6a5b', '9fd7');" bitnami_discourse
-            
-            # Configure Discourse settings
-            docker exec restarters php artisan discourse:setting personal_message_enabled_groups 10
+
+            # Configure Discourse settings (only if Discourse web app is up)
+            docker exec restarters php artisan discourse:setting personal_message_enabled_groups 10 || echo "Warning: discourse:setting failed - Discourse may not be fully started"
 
       # Run PHPUnit tests
       - run:
