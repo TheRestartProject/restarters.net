@@ -861,7 +861,7 @@ class UserController extends Controller
 
     public function postRegister(Request $request, $hash = null): RedirectResponse
     {
-        $geocoder = new \App\Helpers\Geocoder();
+        $geocoder = app(\App\Helpers\Geocoder::class);
 
         if (Auth::check()) { //Existing users don't need all the same rules
             $rules = [
