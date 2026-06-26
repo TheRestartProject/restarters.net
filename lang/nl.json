@@ -12,7 +12,7 @@
     "Software update": "Software-update",
     "Storage problem": "Opslagprobleem",
     "USB\/charging port": "USB\/oplader poort",
-    "Sim card slot": "SIM card slot",
+    "Sim card slot": "SIM-kaartslot",
     "Microphone": "Microfoon",
     "Bluetooth": "Bluetooth",
     "Memory card slot": "Geheugenkaartsleuf",
@@ -52,7 +52,7 @@
     "All rights reserved.": "Alle rechten voorbehouden.",
     "Bicycle": "Fiets",
     "Changing a fuse": "Een zekering vervangen",
-    "Clothing\/textile": "Schoonmaak",
+    "Clothing\/textile": "Kleding\/textiel",
     "Computers and Home Office": "Computers en thuiskantoor",
     "Confirm Password": "Wachtwoord bevestigen",
     "Data volunteering": "Data-analyse",
@@ -153,8 +153,9 @@
     "Replace the charger or charging cable": "Vervang de oplader of de oplaadkabel",
     "Replace with new battery": "Vervang door een nieuwe batterij\/accu",
     "Unrepairable corrosion or leakage": "Onherstelbare corrosie of lekkage",
-    "Coffee maker": "Coffee maker",
-    "Iron": "Iron",
-    "Hand tool": "Hand tool",
-    "Jewellery": "Jewellery"
+    "Coffee maker": "Koffiezetapparaat",
+    "Iron": "Strijkijzer",
+    "Hand tool": "Handgereedschap",
+    "Jewellery": "Sieraden",
+    "Recruiting volunteers ": "Vrijwilligers werven"
 }
