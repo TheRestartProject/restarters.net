@@ -31,6 +31,10 @@ function getLocale() {
   return el.innerText.trim()
 }
 
+// Module-scoped map of in-flight `groups/fetch` promises, keyed by
+// `${id}|${includeStats}`. Used by the action to de-dup concurrent callers.
+const inFlight = new Map()
+
 export default {
   namespaced: true,
   state: {
@@ -63,7 +67,7 @@ export default {
   },
   mutations: {
     set(state, params) {
-      Vue.set(state.list, params.idgroups, params)
+      Vue.set(state.list, params.id || params.idgroups, params)
     },
     setList(state, params) {
       let list = {}
@@ -132,9 +136,20 @@ export default {
         commit('setModerate', ret.data)
       }
     },
-    async list({commit}) {
-      let ret = await axios.get('/api/v2/groups/names?locale=' + getLocale())
-      if (ret && ret.data) {
+    async list({commit}, params) {
+      let url
+
+      if (params && params.details) {
+        // We want more details.
+        url = '/api/v2/groups/summary?locale=' + getLocale() + '&includeNextEvent=true&includeCounts=true'
+      } else {
+        // Just the name and lat/lng.
+        url = '/api/v2/groups/names?locale=' + getLocale()
+      }
+
+      let ret = await axios.get(url)
+
+      if (ret) {
         commit('setList', {
           groups: ret.data.data
         })
@@ -213,14 +228,38 @@ export default {
       return id
     },
     async fetch({ rootGetters, commit }, params) {
+      // De-dup concurrent fetches for the same (id, includeStats) so callers
+      // like GroupsPage's mounted loop don't fire N parallel requests when
+      // the user has many groups. The cache key includes includeStats because
+      // the two responses have different shapes.
+      const key = params.id + '|' + (params.hasOwnProperty('includeStats') ? String(params.includeStats) : '')
+      if (inFlight.has(key)) {
+        return inFlight.get(key)
+      }
+
+      const request = (async () => {
+        try {
+          let url = '/api/v2/groups/' + params.id + '?api_token=' + rootGetters['auth/apiToken'] + '&locale=' + getLocale()
+
+          if (params.hasOwnProperty('includeStats')) {
+             url += '&includeStats=' + params.includeStats
+          }
+
+          let ret = await axios.get(url)
+
+          commit('set', ret.data.data)
+
+          return ret.data.data
+        } catch (e) {
+          console.error("Group fetch failed", e)
+        }
+      })()
+
+      inFlight.set(key, request)
       try {
-        let ret = await axios.get('/api/v2/groups/' + params.id + '?api_token=' + rootGetters['auth/apiToken'] + '&locale=' + getLocale())
-
-        commit('set', ret.data.data)
-
-        return ret.data.data
-      } catch (e) {
-        console.error("Group fetch failed", e)
+        return await request
+      } finally {
+        inFlight.delete(key)
       }
     }
   },

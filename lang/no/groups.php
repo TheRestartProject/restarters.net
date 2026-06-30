@@ -3,14 +3,12 @@
 return [
   'group' => 'Group',
   'groups' => 'Groups',
-  'all_groups' => 'All groups',
-  'search_name' => 'Search name',
   'add_groups' => 'Add a group',
   'add_groups_content' => 'Tell us more about your group, so we can create a page for you and help you publicise to potential volunteers and participants.',
   'create_groups' => 'Create new group',
   'create_group' => 'Create group',
   'groups_title1' => 'Your groups',
-  'groups_title2' => 'Groups nearest to you',
+  'groups_title2' => 'Other groups',
   'groups_name' => 'Name',
   'groups_name_of' => 'Name of group',
   'groups_about_group' => 'Tell us about your group',
@@ -51,4 +49,7 @@ return [
   'tag-6' => 'Tag 6',
   'tag-7' => 'Tag 7',
   'tag-8' => 'Tag 8',
+  'marker_title' => 'Click for more information',
+  'goto_group' => 'Go to group',
+  'next_event' => 'Next event',
 ];
