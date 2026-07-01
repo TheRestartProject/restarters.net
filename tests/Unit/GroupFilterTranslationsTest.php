@@ -2,6 +2,7 @@
 
 namespace Tests\Unit;
 
+use Illuminate\Filesystem\Filesystem;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -29,7 +30,10 @@ class GroupFilterTranslationsTest extends TestCase
             $path = dirname(__DIR__, 2) . "/lang/$locale/groups.php";
             $this->assertFileExists($path, "Missing lang file for locale '$locale'");
 
-            $translations = require $path;
+            // Read via the filesystem helper rather than require(): the lang
+            // file may already have been included elsewhere, in which case
+            // require_once would return true instead of the translations array.
+            $translations = (new Filesystem())->getRequire($path);
 
             foreach ($keys as $key) {
                 $this->assertArrayHasKey(
