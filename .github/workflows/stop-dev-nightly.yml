@@ -1,0 +1,45 @@
+name: Stop restarters-dev nightly
+
+# Stops the restarters-dev Fly machine(s) every night to avoid paying for the
+# dev/staging box while it sits idle overnight.
+#
+# How it stays cheap but stays usable:
+#   * fly.dev.toml has auto_stop_machines = "off", so Fly never auto-stops the
+#     box during the day AND never auto-restarts a machine we stop here
+#     (min_machines_running is only enforced when auto_stop is enabled, so it is
+#     inert for us — verified: a manual `fly machine stop` stays stopped).
+#   * fly.dev.toml has auto_start_machines = true, so the machine boots again
+#     automatically the first time anyone makes a request in the morning.
+#
+# Net effect: off overnight (no CPU billing), back on demand. A stopped machine
+# still keeps its volume, so no data is lost.
+#
+# NOTE ON TIME: GitHub Actions cron is UTC and does NOT follow BST/DST.
+#   0 2 * * *  ==  02:00 UTC  ==  03:00 London in summer (BST) / 02:00 in winter.
+# Adjust the cron if you want exactly 02:00 London year-round.
+
+on:
+  schedule:
+    - cron: '0 2 * * *'   # 02:00 UTC daily
+  workflow_dispatch: {}   # allow manual runs from the Actions tab
+
+jobs:
+  stop-dev:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+      - name: Stop all restarters-dev machines
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+        run: |
+          set -euo pipefail
+          ids=$(flyctl machine list -a restarters-dev --json | jq -r '.[].id')
+          if [ -z "$ids" ]; then
+            echo "No machines found for restarters-dev — nothing to stop."
+            exit 0
+          fi
+          for id in $ids; do
+            echo "Stopping machine $id"
+            flyctl machine stop "$id" -a restarters-dev
+          done
+          echo "Done. Machines will auto-start on the next request."
