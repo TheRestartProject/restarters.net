@@ -1,7 +1,7 @@
 # =============================================================================
 # Stage 1: Build assets (Node + Composer)
 # =============================================================================
-FROM php:8.2-cli AS builder
+FROM php:8.4-cli AS builder
 
 # Install system dependencies for building
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -16,6 +16,7 @@ RUN pecl install channel://pecl.php.net/xmlrpc-1.0.0RC3 && docker-php-ext-enable
 
 # Install composer
 COPY --from=composer/composer:2-bin /composer /usr/bin/composer
+ENV COMPOSER_ALLOW_SUPERUSER=1
 
 # Install Node 18
 RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
@@ -24,8 +25,9 @@ RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
 
 WORKDIR /build
 
-# Copy composer files first for layer caching
+# Copy composer files and patches for layer caching
 COPY composer.json composer.lock ./
+COPY patches/ ./patches/
 RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist
 
 # Copy package files for npm layer caching
@@ -62,7 +64,7 @@ RUN rm -f .env
 # =============================================================================
 # Stage 2: Production image (Nginx + PHP-FPM + Supervisord + Cron)
 # =============================================================================
-FROM php:8.2-fpm
+FROM php:8.4-fpm
 
 # yesterday mode adds mariadb-server (co-located DB for restored snapshots).
 ARG STARTUP_SCRIPT=startup.sh
@@ -73,7 +75,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     gettext-base \
     redis-server \
     procps \
-    util-linux \
     default-mysql-client \
     rclone \
     libpng-dev libjpeg62-turbo-dev libfreetype6-dev libzip-dev libicu-dev libxml2-dev \
@@ -137,8 +138,7 @@ COPY docker/restart-yesterday.sh /usr/local/bin/restart-yesterday.sh
 RUN chmod +x /usr/local/bin/db-backup.sh /usr/local/bin/restart-yesterday.sh
 
 # Set up cron: Laravel scheduler + queue watchdog + hourly DB backup + daily yesterday restart (5am UTC)
-# flock -n guards the backup so a slow run can never overlap with the next hourly invocation.
-RUN printf '* * * * * cd /var/www && php artisan schedule:run >> /dev/null 2>&1\n* * * * * /usr/local/bin/queue-watchdog.sh\n0 * * * * flock -n /tmp/db-backup.lock /usr/local/bin/db-backup.sh\n0 5 * * * /usr/local/bin/restart-yesterday.sh\n' | crontab -
+RUN printf '* * * * * cd /var/www && php artisan schedule:run >> /dev/null 2>&1\n* * * * * /usr/local/bin/queue-watchdog.sh\n0 * * * * /usr/local/bin/db-backup.sh\n0 5 * * * /usr/local/bin/restart-yesterday.sh\n' | crontab -
 
 # Set working directory
 WORKDIR /var/www

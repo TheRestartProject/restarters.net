@@ -14,7 +14,7 @@
     <form action="/profile/edit-info" method="post">
     @csrf
 
-    {{ Form::hidden('id', $user->id) }}
+    <input type="hidden" name="id" value="{{ $user->id }}">
 
     <div class="form-row">
         <div class="form-group col-lg-6">
@@ -97,7 +97,7 @@
 
         @csrf
 
-        {{ Form::hidden('id', $user->id) }}
+        <input type="hidden" name="id" value="{{ $user->id }}">
 
         <div class="form-group">
             <label for="tags[]">@lang('general.your_repair_skills'):</label>
@@ -138,7 +138,7 @@
         <form action="/profile/edit-photo" method="post" enctype="multipart/form-data">
         @csrf
 
-        {{ Form::hidden('id', $user->id) }}
+        <input type="hidden" name="id" value="{{ $user->id }}">
 
         <div class="form-row">
             <div class="form-group col-lg-12">
