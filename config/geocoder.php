@@ -1,9 +1,9 @@
 <?php
 
+use Geocoder\Laravel\Http\LaravelHttpClient;
 use Geocoder\Provider\Chain\Chain;
 use Geocoder\Provider\GeoPlugin\GeoPlugin;
 use Geocoder\Provider\Mapbox\Mapbox;
-use Http\Client\Curl\Client;
 
 return [
     'cache' => [
@@ -36,6 +36,15 @@ return [
         */
 
         'duration' => 9999999,
+
+        // Leave false. When true, geocoder-laravel overwrites the (unrestricted)
+        // cache.serializable_classes config with an allowlist of ONLY its own
+        // provider model classes. That allowlist then applies to the whole file
+        // cache, so any other cached object (e.g. the stdClass DB rows cached by
+        // Fixometer::computeStats()) unserialises to __PHP_Incomplete_Class and
+        // every page that reads those stats 500s. Keeping it false preserves
+        // Laravel's default unrestricted unserialize (as on Laravel 10).
+        'auto_register_serializable_classes' => false,
     ],
 
     /*
@@ -78,7 +87,7 @@ return [
     | Default: Client::class (FQCN for CURL adapter)
     |
     */
-    'adapter'  => Client::class,
+    'adapter'  => LaravelHttpClient::class,
 
     /*
     |---------------------------------------------------------------------------
