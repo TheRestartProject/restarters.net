@@ -60,8 +60,6 @@ return [
     'add_groups_success' => '{1} :number repair café ajouté.|[2,*] :number repair cafés ajoutés.',
     'add_groups_warning_none_selected' => 'Pas de repair café(s) sélectionné(s)',
     'view_groups_menuitem' => 'Voir les repair cafés',
-    'groups_count' => '{0} Il n\'y a actuellement aucun repair café dans le réseau :name.|{1} Il y a actuellement :count repair café dans le réseau :name.|[2,*] Il y a actuellement :count repair cafés dans le réseau :name.',
-    'view_groups_link' => 'Voir ces repair cafés.',
     'none' => 'Aucun',
   ],
 ];

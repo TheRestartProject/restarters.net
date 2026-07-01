@@ -3,14 +3,12 @@
 return [
   'group' => 'Gruppo',
   'groups' => 'Gruppi',
-  'all_groups' => 'Tutti i gruppi',
-  'search_name' => 'Cerca nome',
   'add_groups' => 'Aggiungi un gruppo',
   'add_groups_content' => 'Raccontaci di più sul tuo gruppo, in modo che possiamo creare una pagina per te e aiutarti a trovare volontari e partecipanti.',
   'create_groups' => 'Crea nuovo gruppo',
   'create_group' => 'Crea gruppo',
   'groups_title1' => 'Tuoi gruppi',
-  'groups_title2' => 'Gruppi vicini a te',
+  'groups_title2' => 'Altri gruppi',
   'groups_name' => 'Nome',
   'groups_name_of' => 'Nome del gruppo',
   'groups_about_group' => 'Parlaci del tuo gruppo',
@@ -61,4 +59,7 @@ return [
   'shareable_link_box' => 'Invita attraverso link condivisibile',
   'type_shareable_link_message' => 'Condividi il link sopra per invitare le persone a unirsi a questo gruppo. Se una persona con cui condividi il collegamento non ha ancora un account, le verrà richiesto di registrarsi.',
   'upcoming_none_planned' => 'Nessuno pianificato',
+  'marker_title' => 'Click for more information',
+  'goto_group' => 'Go to group',
+  'next_event' => 'Next event',
 ];
