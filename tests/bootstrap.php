@@ -5,7 +5,7 @@
 // loaded as a Composer autoload file. Suppress E_DEPRECATED only during
 // the autoload phase so the deprecations don't reach the test error handler.
 $prevReporting = error_reporting(error_reporting() & ~E_DEPRECATED);
-require __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/../vendor/autoload.php';
 error_reporting($prevReporting);
 
 // Clear the config cache to ensure tests run with APP_ENV=testing and not a cached 'local' environment.
