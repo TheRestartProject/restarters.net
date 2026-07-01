@@ -37,7 +37,14 @@ return [
 
         'duration' => 9999999,
 
-        'auto_register_serializable_classes' => true,
+        // Leave false. When true, geocoder-laravel overwrites the (unrestricted)
+        // cache.serializable_classes config with an allowlist of ONLY its own
+        // provider model classes. That allowlist then applies to the whole file
+        // cache, so any other cached object (e.g. the stdClass DB rows cached by
+        // Fixometer::computeStats()) unserialises to __PHP_Incomplete_Class and
+        // every page that reads those stats 500s. Keeping it false preserves
+        // Laravel's default unrestricted unserialize (as on Laravel 10).
+        'auto_register_serializable_classes' => false,
     ],
 
     /*
