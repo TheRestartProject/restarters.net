@@ -1061,7 +1061,7 @@ class UserController extends Controller
         $user = Auth::user();
 
         $request->validate([
-            'profilePhoto' => 'required|image|mimes:jpeg,png,gif,webp|max:2048',
+            'profilePhoto' => 'required|image|mimes:jpeg,png,gif|max:2048',
         ]);
 
         $file = new \FixometerFile();

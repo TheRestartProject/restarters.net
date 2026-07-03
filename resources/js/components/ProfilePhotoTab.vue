@@ -16,7 +16,7 @@
               ref="fileInput"
               type="file"
               class="form-control"
-              accept="image/jpeg,image/png,image/gif,image/webp"
+              accept="image/jpeg,image/png,image/gif"
               data-testid="photo-file-input"
               @change="onFileChange"
           >
