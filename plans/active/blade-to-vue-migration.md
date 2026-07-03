@@ -51,7 +51,7 @@ Simple admin pages for CRUDing reference data. Establishes patterns for the rest
 | # | Template(s) | API endpoints | Status |
 |---|---|---|---|
 | 2.1 | `user/all.blade.php` (admin user list/search, 239 lines) | `GET /api/v2/users?name=&email=&location=&country=&role=&sort=&page=` (admin only) | ✅ API+Vue+Playwright in PR #866 (ready for review) |
-| 2.2 | `user/profile-edit.blade.php` (84 lines shell + 5 partials) | `GET/PATCH /api/v2/users/me`, image upload | 🔄 PR #868 — `email-preferences` + `calendars` + `repair-directory` + `account/language` (4 sub-tasks); `profile` (bio/skills/image upload) + `account/password,admin-matrix,soft-delete` remain — sensitive surfaces, defer pending adversarial review  |
+| 2.2 | `user/profile-edit.blade.php` (84 lines shell + 5 partials) | `GET/PATCH /api/v2/users/me`, image upload | ✅ PR #868 — all 5 tabs migrated: `email-preferences`, `calendars`, `repair-directory`, `account/language`, and `profile` (name/country/email/town/age/gender/bio + repair skills). **Deferred (needs security review, left as Blade):** the profile-photo upload form, and `account/password,admin-matrix,soft-delete`. CI green (2026-07-03). |
 
 ### Group 3: Admin Stats & Reporting
 | # | Template(s) | API endpoints | Status |
@@ -90,16 +90,25 @@ includes:
 
 The list of templates that genuinely benefit from "Vue + API" is the ~12
 sub-tasks in the Groups above. Of those:
-- 7 are done (1.1–1.7, 2.1, 5.2) across PRs #863, #866, #867.
+- 8 are done (1.1–1.7, 2.1, 5.2, and 2.2) across PRs #863, #866, #867, #868 —
+  all four rebased onto current develop and CI-green as of 2026-07-03.
 - 1 (4.3) was already a thin Vue shell on develop — marked ✅.
 - 3 (3.1, 4.2, 5.1) are iframe widgets embedded on external sites where
   loading the SPA bundle would regress page-load for embedders. Leaving
   them server-rendered is a deliberate architectural choice.
-- 1 (3.2) is dead code (route hits a non-existent controller method).
+- 1 (3.2) was dead code (route hit a non-existent controller method) —
+  removed in PR #891.
 - 1 (4.1) is a Vue shell that uses server hydration rather than API
-  fetch — a refactor opportunity, not a migration gap.
-- 1 (2.2) is genuinely unstarted and the heaviest sub-task: profile-edit
-  shell + 5 partials (~626 lines).
+  fetch. NOTE: its GroupPage props are almost all server-computed per-user
+  permission flags (canedit/candemote/canPerformDelete/…). Moving those to a
+  client API fetch is security-sensitive and needs review — treat like the
+  other deferred sensitive surfaces, not a quick refactor.
+- 2.2 (profile-edit) is now COMPLETE except the deliberately-deferred
+  sensitive surfaces (profile-photo upload; account password / admin-matrix /
+  soft-delete), which stay as Blade pending an adversarial security review.
+
+**Net: the safe, in-scope Blade→Vue migration work is essentially done.** What
+remains is sensitive (needs security review) or deliberately server-rendered.
 
 Adversarial review is invoked via `/code-review ultra <PR#>` (user-triggered;
 this skill cannot launch it). Ping with the PR number when each batch is
