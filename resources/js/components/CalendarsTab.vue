@@ -31,16 +31,20 @@
         <CopyLinkRow :url="data.admin_all_events_url" />
       </template>
 
-      <h5 class="mb-3">{{ __('profile.calendars.events_by_area') }}</h5>
+      <h5 id="calendars-events-by-area-heading" class="mb-3">{{ __('profile.calendars.events_by_area') }}</h5>
       <div class="input-group mb-3">
+        <label class="sr-only" for="calendars-area-select">{{ __('profile.calendars.events_by_area') }}</label>
         <select
+            id="calendars-area-select"
             v-model="selectedArea"
             class="form-control"
             data-testid="calendars-area-select"
         >
           <option v-for="area in data.group_areas" :key="area" :value="area">{{ area }}</option>
         </select>
+        <label class="sr-only" for="calendars-area-url">{{ __('profile.calendars.events_by_area') }}</label>
         <input
+            id="calendars-area-url"
             v-if="selectedArea"
             type="text"
             class="form-control"
