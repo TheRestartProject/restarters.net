@@ -35,6 +35,17 @@ class Handler extends ExceptionHandler
                     422);
             }
 
+            // AuthenticationException / AuthorizationException don't implement
+            // getStatusCode(), so without these the generic branch below rendered
+            // them as 500 instead of the correct 401/403 for JSON API requests.
+            if ($exception instanceof \Illuminate\Auth\AuthenticationException) {
+                return response()->json(['message' => $exception->getMessage()], 401);
+            }
+
+            if ($exception instanceof \Illuminate\Auth\Access\AuthorizationException) {
+                return response()->json(['message' => $exception->getMessage()], 403);
+            }
+
             return response()->json(
                 ['message' => $exception->getMessage()],
                 method_exists($exception, 'getStatusCode') ? $exception->getStatusCode() : 500);
