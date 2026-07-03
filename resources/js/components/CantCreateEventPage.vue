@@ -11,7 +11,7 @@
 
           <img
               class="d-none d-md-block img-fluid img-thumbnail mb-4"
-              src="/images/dashboard/dashboard__getting-started-in-community-repair-1.png"
+              :src="'/images/dashboard/dashboard__getting-started-in-community-repair-1.png'"
               :alt="__('cantcreate.image_alt')"
           >
 
