@@ -77,6 +77,8 @@ class UserController extends Controller
             'access_group_tag_id',
             'mediawiki',
             'wiki_sync_status',
+            'latitude',
+            'longitude',
         ]);
 
         $userChange = $user->toArray();
