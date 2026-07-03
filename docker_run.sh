@@ -78,9 +78,14 @@ php artisan migrate:fresh --seed
 npm install --legacy-peer-deps
 npm rebuild node-sass
 
-# Install Playwright for testing (system deps already in Dockerfile)
-npm install -D @playwright/test
-npx playwright install
+# Install Playwright for testing (system deps already in Dockerfile).
+# In CI, skip browser download — Playwright tests run in the dedicated
+# restarters_playwright container (mcr.microsoft.com/playwright) which
+# ships pre-installed browsers. Downloading here saves 10-15 min on CI.
+if [ "${CIRCLECI}" != "true" ]; then
+    npm install -D @playwright/test
+    npx playwright install
+fi
 
 # Start Vite dev server in the background with logging
 echo "Starting Vite dev server..."

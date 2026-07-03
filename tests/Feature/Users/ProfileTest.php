@@ -60,47 +60,29 @@ class ProfileTest extends TestCase
             // Success case.
         }
 
-        // TODO These are the behaviours as coded, but they seem weird.
-        //
-        // As yourself.
+        // Let the framework render authorization failures as HTTP 403 responses.
+        $this->withExceptionHandling();
+
+        // As yourself - returns an empty response.
         $this->actingAs($user1);
-
         $response = $this->post('/user/edit/'.$user1->id, $editdata);
-
         $this->assertEquals('', $response->getContent());
 
-        // A restart acting on another restart - should be unauthorized.
+        // A restarter acting on another restarter - should be unauthorized.
         $this->actingAs($user2);
+        $this->post('/user/edit/'.$user1->id, $editdata)->assertStatus(403);
 
-        try {
-            $response = $this->post('/user/edit/'.$user1->id, $editdata);
-            $this->assertFalse(true); // Should not reach here
-        } catch (\Symfony\Component\HttpKernel\Exception\HttpException $e) {
-            $this->assertEquals(403, $e->getStatusCode());
-        }
-
-        // A host acting on a restarter - can.
+        // A host acting on an unrelated restarter - should be unauthorized (F002 account-takeover fix).
         $this->actingAs($host);
-
-        $response = $this->post('/user/edit/'.$user1->id, $editdata);
-
-        $response->assertSee('Edit User');
+        $this->post('/user/edit/'.$user1->id, $editdata)->assertStatus(403);
 
         // A network coordinator acting on a restarter - should be unauthorized.
         $this->actingAs($nc);
-
-        try {
-            $response = $this->post('/user/edit/'.$user1->id, $editdata);
-            $this->assertFalse(true); // Should not reach here
-        } catch (\Symfony\Component\HttpKernel\Exception\HttpException $e) {
-            $this->assertEquals(403, $e->getStatusCode());
-        }
+        $this->post('/user/edit/'.$user1->id, $editdata)->assertStatus(403);
 
         // An administrator acting on a restarter - can.
         $this->actingAs($admin);
-
         $response = $this->post('/user/edit/'.$user1->id, $editdata);
-
         $response->assertSee('Edit User');
     }
 
@@ -108,7 +90,8 @@ class ProfileTest extends TestCase
     {
         $GLOBALS['_FILES'] = [];
         $user1 = User::factory()->restarter()->create();
-        $host = User::factory()->host()->create();
+        // An administrator is authorised to edit the user, so reaches the password-mismatch path.
+        $admin = User::factory()->administrator()->create();
 
         $editdata = [
             'id' => $user1->id,
@@ -119,7 +102,7 @@ class ProfileTest extends TestCase
             'password-confirm' => 'test2',
         ];
 
-        $this->actingAs($host);
+        $this->actingAs($admin);
         $response = $this->post('/user/edit/'.$user1->id, $editdata);
 
         $response->assertSee('The passwords are not identical!');
