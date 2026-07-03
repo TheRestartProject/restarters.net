@@ -3,7 +3,6 @@
 return [
   'login' => 'Login',
   'profile' => 'Your profile',
-  'other_profile' => 'profile',
   'profile_content' => 'Please share some information about yourself, so you can connect with other organisers and fixers, and so we can understand the community better',
   'logout' => 'Logout',
   'new_group' => 'Create a new group',

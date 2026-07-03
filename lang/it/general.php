@@ -3,7 +3,6 @@
 return [
   'login' => 'Entra',
   'profile' => 'Tuo profilo',
-  'other_profile' => 'profilo',
   'profile_content' => 'Condividi per favore alcune informazioni su di te, per presentarti agli organizzatori e riparatori, e in modo che possiamo capire meglio chi fa parte della nostra comunità',
   'logout' => 'Esci',
   'new_group' => 'Crea un nuovo gruppo',

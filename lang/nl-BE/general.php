@@ -20,7 +20,6 @@ return [
   'menu_tools' => 'Gemeenschapstools',
   'menu_wiki' => 'Wiki',
   'new_group' => 'Een nieuwe groep maken',
-  'other_profile' => 'profiel',
   'profile' => 'Jouw profiel',
   'profile_content' => 'Schrijf hier wat info over jezelf. Zo leg je  makkelijker contact met andere  organisatoren en herstellers. Je info geeft ons ook meer inzicht in de Repair Community.',
   'repair_skills' => 'Competenties',
