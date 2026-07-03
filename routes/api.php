@@ -99,6 +99,10 @@ Route::prefix('v2')->group(function() {
             Route::get('/calendars', [API\UserController::class, 'getMyCalendarsv2']);
             Route::get('/language', [API\UserController::class, 'getMyLanguagev2']);
             Route::patch('/language', [API\UserController::class, 'updateMyLanguagev2']);
+            Route::get('/profile', [API\UserController::class, 'getMyProfilev2']);
+            Route::patch('/profile', [API\UserController::class, 'updateMyProfilev2']);
+            Route::get('/skills', [API\UserController::class, 'getMySkillsv2']);
+            Route::patch('/skills', [API\UserController::class, 'updateMySkillsv2']);
         });
 
         Route::middleware('auth:api')->group(function() {

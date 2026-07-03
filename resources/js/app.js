@@ -44,6 +44,8 @@ import EmailPreferencesTab from './components/EmailPreferencesTab.vue'
 import CalendarsTab from './components/CalendarsTab.vue'
 import RepairDirectoryTab from './components/RepairDirectoryTab.vue'
 import LanguageTab from './components/LanguageTab.vue'
+import ProfileInfoTab from './components/ProfileInfoTab.vue'
+import SkillsTab from './components/SkillsTab.vue'
 import FixometerPage from './components/FixometerPage.vue'
 import GroupsPage from './components/GroupsPage.vue'
 import GroupPage from './components/GroupPage.vue'
@@ -408,6 +410,8 @@ function initializeJQuery() {
             'calendarstab': CalendarsTab,
             'repairdirectorytab': RepairDirectoryTab,
             'languagetab': LanguageTab,
+            'profileinfotab': ProfileInfoTab,
+            'skillstab': SkillsTab,
             'fixometerpage': FixometerPage,
             'groupspage': GroupsPage,
             'grouppage': GroupPage,

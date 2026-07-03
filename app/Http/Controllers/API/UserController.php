@@ -4,9 +4,11 @@ namespace App\Http\Controllers\API;
 
 use App\Group;
 use App\Helpers\Fixometer;
+use App\Helpers\Geocoder;
 use App\Http\Controllers\Controller;
 use App\Role;
 use App\User;
+use App\UsersSkills;
 use Auth;
 use Cache;
 use Illuminate\Http\JsonResponse;
@@ -471,6 +473,291 @@ class UserController extends Controller
         return response()->json([
             'data' => [
                 'language' => $user->language,
+            ],
+        ]);
+    }
+
+    private function profileCountryOptions(): array
+    {
+        $options = [];
+        foreach (Fixometer::getAllCountries() as $code => $name) {
+            $options[] = [
+                'code' => $code,
+                'name' => $name,
+            ];
+        }
+
+        return $options;
+    }
+
+    private function profileAgeOptions(): array
+    {
+        // Includes a leading '' entry (matching the legacy blade select), so the
+        // dropdown can show no selection until the user picks a year of birth.
+        // Cast to strings for a consistent JSON type (option values are strings
+        // in the HTML select either way).
+        return array_map('strval', array_values(Fixometer::allAges()));
+    }
+
+    /**
+     * @OA\Get(
+     *      path="/api/v2/users/me/profile",
+     *      operationId="getMyProfilev2",
+     *      tags={"Users"},
+     *      summary="Get the authenticated user's profile info",
+     *      security={{"apiToken":{}}},
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="data", type="object",
+     *                  @OA\Property(property="name", type="string"),
+     *                  @OA\Property(property="email", type="string"),
+     *                  @OA\Property(property="country_code", type="string", nullable=true),
+     *                  @OA\Property(property="location", type="string", nullable=true),
+     *                  @OA\Property(property="age", type="string", nullable=true),
+     *                  @OA\Property(property="gender", type="string", nullable=true),
+     *                  @OA\Property(property="biography", type="string", nullable=true),
+     *                  @OA\Property(property="countries", type="array", @OA\Items(
+     *                      @OA\Property(property="code", type="string"),
+     *                      @OA\Property(property="name", type="string")
+     *                  )),
+     *                  @OA\Property(property="ages", type="array", @OA\Items(type="string"))
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(response=401, description="Unauthenticated")
+     * )
+     */
+    public function getMyProfilev2(): JsonResponse
+    {
+        $user = Auth::user();
+
+        return response()->json([
+            'data' => [
+                'name' => $user->name,
+                'email' => $user->email,
+                'country_code' => $user->country_code,
+                'location' => $user->location,
+                'age' => $user->age,
+                'gender' => $user->gender,
+                'biography' => $user->biography,
+                'countries' => $this->profileCountryOptions(),
+                'ages' => $this->profileAgeOptions(),
+            ],
+        ]);
+    }
+
+    /**
+     * @OA\Patch(
+     *      path="/api/v2/users/me/profile",
+     *      operationId="updateMyProfilev2",
+     *      tags={"Users"},
+     *      summary="Update the authenticated user's profile info",
+     *      security={{"apiToken":{}}},
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent(
+     *              required={"name", "email", "age", "country"},
+     *              @OA\Property(property="name", type="string"),
+     *              @OA\Property(property="email", type="string"),
+     *              @OA\Property(property="age", type="string"),
+     *              @OA\Property(property="country", type="string"),
+     *              @OA\Property(property="townCity", type="string", nullable=true),
+     *              @OA\Property(property="gender", type="string", nullable=true),
+     *              @OA\Property(property="biography", type="string", nullable=true)
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="data", type="object",
+     *                  @OA\Property(property="name", type="string"),
+     *                  @OA\Property(property="email", type="string"),
+     *                  @OA\Property(property="country_code", type="string", nullable=true),
+     *                  @OA\Property(property="location", type="string", nullable=true),
+     *                  @OA\Property(property="age", type="string", nullable=true),
+     *                  @OA\Property(property="gender", type="string", nullable=true),
+     *                  @OA\Property(property="biography", type="string", nullable=true)
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(response=401, description="Unauthenticated"),
+     *      @OA\Response(response=422, description="Validation error")
+     * )
+     */
+    public function updateMyProfilev2(Request $request, Geocoder $geocoder): JsonResponse
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255',
+            'age' => 'required',
+            'country' => 'required',
+        ]);
+
+        $user = Auth::user();
+
+        $user->update([
+            'name' => $request->input('name'),
+            'email' => $request->input('email'),
+            'country_code' => $request->input('country'),
+            'location' => $request->input('townCity'),
+            'age' => $request->input('age'),
+            'gender' => $request->input('gender'),
+            'biography' => $request->input('biography'),
+        ]);
+
+        $user = $user->fresh();
+
+        if (! empty($user->location)) {
+            $geocoded = $geocoder->geocode("{$user->location}, " . Fixometer::getCountryFromCountryCode($user->country_code));
+            if (! empty($geocoded)) {
+                $user->latitude = $geocoded['latitude'];
+                $user->longitude = $geocoded['longitude'];
+            } else {
+                $user->latitude = null;
+                $user->longitude = null;
+            }
+        } else {
+            $user->latitude = null;
+            $user->longitude = null;
+        }
+
+        $user->save();
+
+        return response()->json([
+            'data' => [
+                'name' => $user->name,
+                'email' => $user->email,
+                'country_code' => $user->country_code,
+                'location' => $user->location,
+                'age' => $user->age,
+                'gender' => $user->gender,
+                'biography' => $user->biography,
+            ],
+        ]);
+    }
+
+    /**
+     * @OA\Get(
+     *      path="/api/v2/users/me/skills",
+     *      operationId="getMySkillsv2",
+     *      tags={"Users"},
+     *      summary="Get the repair-skills catalogue and the authenticated user's current selection",
+     *      security={{"apiToken":{}}},
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="data", type="object",
+     *                  @OA\Property(property="categories", type="array", @OA\Items(
+     *                      @OA\Property(property="id", type="integer"),
+     *                      @OA\Property(property="label", type="string"),
+     *                      @OA\Property(property="skills", type="array", @OA\Items(
+     *                          @OA\Property(property="id", type="integer"),
+     *                          @OA\Property(property="name", type="string")
+     *                      ))
+     *                  )),
+     *                  @OA\Property(property="selected", type="array", @OA\Items(type="integer"))
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(response=401, description="Unauthenticated")
+     * )
+     */
+    public function getMySkillsv2(): JsonResponse
+    {
+        $user = Auth::user();
+
+        $selected = UsersSkills::where('user', $user->id)
+            ->pluck('skill')
+            ->map(fn ($id) => (int) $id)
+            ->values()
+            ->all();
+
+        $allSkills = Fixometer::allSkills();
+
+        $categories = [];
+        foreach (Fixometer::skillCategories() as $key => $label) {
+            $skillsForCategory = [];
+            if (isset($allSkills[$key])) {
+                foreach ($allSkills[$key] as $skill) {
+                    $skillsForCategory[] = [
+                        'id' => (int) $skill->id,
+                        'name' => $skill->skill_name,
+                    ];
+                }
+            }
+            $categories[] = [
+                'id' => (int) $key,
+                'label' => $label,
+                'skills' => $skillsForCategory,
+            ];
+        }
+
+        return response()->json([
+            'data' => [
+                'categories' => $categories,
+                'selected' => $selected,
+            ],
+        ]);
+    }
+
+    /**
+     * @OA\Patch(
+     *      path="/api/v2/users/me/skills",
+     *      operationId="updateMySkillsv2",
+     *      tags={"Users"},
+     *      summary="Replace the authenticated user's repair skills",
+     *      security={{"apiToken":{}}},
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent(
+     *              @OA\Property(property="tags", type="array", @OA\Items(type="integer"))
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="data", type="object",
+     *                  @OA\Property(property="tags", type="array", @OA\Items(type="integer"))
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(response=401, description="Unauthenticated"),
+     *      @OA\Response(response=422, description="Validation error")
+     * )
+     */
+    public function updateMySkillsv2(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'tags' => 'nullable|array',
+            'tags.*' => 'integer',
+        ]);
+
+        $user = Auth::user();
+        $skills = $validated['tags'] ?? [];
+
+        $user->skillsold()->sync($skills);
+        $user->refresh();
+
+        $roleBasedOnSkills = Fixometer::skillsDetermineRole($skills);
+
+        if ($roleBasedOnSkills == Role::HOST) {
+            $user->convertToHost();
+        }
+
+        $currentSkillIds = UsersSkills::where('user', $user->id)
+            ->pluck('skill')
+            ->map(fn ($id) => (int) $id)
+            ->values()
+            ->all();
+
+        return response()->json([
+            'data' => [
+                'tags' => $currentSkillIds,
             ],
         ]);
     }
