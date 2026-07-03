@@ -89,10 +89,10 @@ export default {
         return null
       } else if (ret.length === 1) {
         // events.not_counting, groups.not_counting
-        const intro = this.__(langSource + '.not_counting', { count: this.stats.no_weight })
+        const intro = this.__(langSource + '.not_counting', { count: ret.length })
         return intro + ' ' + ret[0] + '.'
       } else {
-        const intro = this.__(langSource + '.not_counting', { count: this.stats.no_weight })
+        const intro = this.__(langSource + '.not_counting', { count: ret.length })
         const first = ret.slice(0, -1)
         const last = ret[ret.length - 1]
 
