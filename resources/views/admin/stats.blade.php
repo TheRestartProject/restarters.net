@@ -44,7 +44,7 @@
             </div>
 
             <div class="col-md-12">
-                <h2><span class="title-text">Most Repaired Devices</span></h2>
+                <h2><span class="title-text">@lang('groups.most_repaired_devices')</span></h2>
 
                 <div class="row">
                     <div class="col-xs-4 col-sm-4 col-md-4"><div class="topper  text-center"><?php echo $top[0]['name'] . ' [' . $top[0]['counter'] . ']'; ?></div></div>
