@@ -46,6 +46,14 @@ class Handler extends ExceptionHandler
                     401);
             }
 
+            // An authorization failure (e.g. $this->authorize() / a Policy denial)
+            // throws AuthorizationException, which also has no getStatusCode() and
+            // so would otherwise fall through to 500. Map it to 403 for JSON/API
+            // clients.
+            if ($exception instanceof \Illuminate\Auth\Access\AuthorizationException) {
+                return response()->json(['message' => $exception->getMessage()], 403);
+            }
+
             return response()->json(
                 ['message' => $exception->getMessage()],
                 method_exists($exception, 'getStatusCode') ? $exception->getStatusCode() : 500);

@@ -2,17 +2,24 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Events\PasswordChanged;
 use App\Group;
 use App\Helpers\Fixometer;
 use App\Helpers\Geocoder;
 use App\Http\Controllers\Controller;
+use App\Permissions;
+use App\Preferences;
 use App\Role;
 use App\User;
+use App\UserGroups;
 use App\UsersSkills;
 use Auth;
 use Cache;
+use DB;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class UserController extends Controller
@@ -758,6 +765,317 @@ class UserController extends Controller
         return response()->json([
             'data' => [
                 'tags' => $currentSkillIds,
+            ],
+        ]);
+    }
+
+    /**
+     * @OA\Patch(
+     *      path="/api/v2/users/me/password",
+     *      operationId="updateMyPasswordv2",
+     *      tags={"Users"},
+     *      summary="Change the authenticated user's password",
+     *      security={{"apiToken":{}}},
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent(
+     *              required={"current_password", "new_password", "new_password_confirmation"},
+     *              @OA\Property(property="current_password", type="string"),
+     *              @OA\Property(property="new_password", type="string"),
+     *              @OA\Property(property="new_password_confirmation", type="string")
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="data", type="object",
+     *                  @OA\Property(property="success", type="boolean")
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(response=401, description="Unauthenticated"),
+     *      @OA\Response(response=422, description="Validation error")
+     * )
+     */
+    public function updateMyPasswordv2(Request $request): JsonResponse
+    {
+        $validated = $request->validate([
+            'current_password' => 'required|string',
+            'new_password' => 'required|string',
+            'new_password_confirmation' => 'required|string',
+        ]);
+
+        // This endpoint always operates on the authenticated user - there is no id
+        // parameter, so there is no possibility of targeting another user's password.
+        $user = Auth::user();
+
+        if ($validated['new_password'] !== $validated['new_password_confirmation']) {
+            throw ValidationException::withMessages([
+                'new_password_confirmation' => [__('profile.password_new_mismatch')],
+            ]);
+        }
+
+        if (! Hash::check($validated['current_password'], $user->password)) {
+            throw ValidationException::withMessages([
+                'current_password' => [__('profile.password_old_mismatch')],
+            ]);
+        }
+
+        $oldPassword = $user->password;
+        $user->setPassword(Hash::make($validated['new_password']));
+        $user->save();
+
+        $user->update([
+            'recovery' => substr(bin2hex(openssl_random_pseudo_bytes(32)), 0, 24),
+            'recovery_expires' => strftime('%Y-%m-%d %X', time() + (24 * 60 * 60)),
+        ]);
+
+        event(new PasswordChanged($user, $oldPassword));
+
+        return response()->json([
+            'data' => [
+                'success' => true,
+            ],
+        ]);
+    }
+
+    /**
+     * @OA\Get(
+     *      path="/api/v2/users/{id}/admin-settings",
+     *      operationId="getAdminSettingsv2",
+     *      tags={"Users"},
+     *      summary="Administrator-only: get a user's role, groups, preferences, permissions and the available options",
+     *      security={{"apiToken":{}}},
+     *      @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="data", type="object",
+     *                  @OA\Property(property="role", type="integer", nullable=true),
+     *                  @OA\Property(property="assigned_groups", type="array", @OA\Items(type="integer")),
+     *                  @OA\Property(property="preferences", type="array", @OA\Items(type="integer")),
+     *                  @OA\Property(property="permissions", type="array", @OA\Items(type="integer")),
+     *                  @OA\Property(property="roles", type="array", @OA\Items(
+     *                      @OA\Property(property="value", type="integer"),
+     *                      @OA\Property(property="label", type="string")
+     *                  )),
+     *                  @OA\Property(property="groups", type="array", @OA\Items(
+     *                      @OA\Property(property="id", type="integer"),
+     *                      @OA\Property(property="name", type="string")
+     *                  )),
+     *                  @OA\Property(property="preferences_options", type="array", @OA\Items(
+     *                      @OA\Property(property="id", type="integer"),
+     *                      @OA\Property(property="name", type="string"),
+     *                      @OA\Property(property="purpose", type="string", nullable=true)
+     *                  )),
+     *                  @OA\Property(property="permissions_options", type="array", @OA\Items(
+     *                      @OA\Property(property="id", type="integer"),
+     *                      @OA\Property(property="name", type="string"),
+     *                      @OA\Property(property="purpose", type="string", nullable=true)
+     *                  ))
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(response=401, description="Unauthenticated"),
+     *      @OA\Response(response=403, description="Forbidden"),
+     *      @OA\Response(response=404, description="User not found")
+     * )
+     */
+    public function getAdminSettingsv2(int $id): JsonResponse
+    {
+        if (! Auth::user()->hasRole('Administrator')) {
+            abort(403);
+        }
+
+        $user = User::find($id);
+        if (! $user) {
+            throw new NotFoundHttpException();
+        }
+
+        $roles = Role::all()->map(fn ($r) => [
+            'value' => (int) $r->idroles,
+            'label' => $r->role,
+        ])->values()->all();
+
+        $groups = Group::orderBy('name')->get()->map(fn ($g) => [
+            'id' => (int) $g->idgroups,
+            'name' => $g->name,
+        ])->values()->all();
+
+        $preferencesOptions = Preferences::all()->map(fn ($p) => [
+            'id' => (int) $p->id,
+            'name' => $p->name,
+            'purpose' => $p->purpose,
+        ])->values()->all();
+
+        $permissionsOptions = Permissions::all()->map(fn ($p) => [
+            'id' => (int) $p->idpermissions,
+            'name' => $p->permission,
+            'purpose' => $p->purpose,
+        ])->values()->all();
+
+        return response()->json([
+            'data' => [
+                'role' => $user->role,
+                'assigned_groups' => $user->groups()->pluck('idgroups')->map(fn ($v) => (int) $v)->values()->all(),
+                'preferences' => DB::table('users_preferences')->where('user_id', $user->id)->pluck('preference_id')->map(fn ($v) => (int) $v)->values()->all(),
+                'permissions' => DB::table('users_permissions')->where('user_id', $user->id)->pluck('permission_id')->map(fn ($v) => (int) $v)->values()->all(),
+                'roles' => $roles,
+                'groups' => $groups,
+                'preferences_options' => $preferencesOptions,
+                'permissions_options' => $permissionsOptions,
+            ],
+        ]);
+    }
+
+    /**
+     * @OA\Patch(
+     *      path="/api/v2/users/{id}/admin-settings",
+     *      operationId="updateAdminSettingsv2",
+     *      tags={"Users"},
+     *      summary="Administrator-only: update a user's role, groups, preferences and permissions",
+     *      security={{"apiToken":{}}},
+     *      @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent(
+     *              required={"user_role"},
+     *              @OA\Property(property="user_role", type="integer"),
+     *              @OA\Property(property="assigned_groups", type="array", @OA\Items(type="integer")),
+     *              @OA\Property(property="preferences", type="array", @OA\Items(type="integer")),
+     *              @OA\Property(property="permissions", type="array", @OA\Items(type="integer"))
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="data", type="object",
+     *                  @OA\Property(property="role", type="integer")
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(response=401, description="Unauthenticated"),
+     *      @OA\Response(response=403, description="Forbidden"),
+     *      @OA\Response(response=404, description="User not found"),
+     *      @OA\Response(response=422, description="Validation error")
+     * )
+     */
+    public function updateAdminSettingsv2(Request $request, int $id): JsonResponse
+    {
+        // Administrator-only. Matches the web handler's exact check (postAdminEdit) -
+        // this is a critical privilege-escalation guard, so it is deliberately kept as
+        // simple and explicit as the code it replaces.
+        if (! Auth::user()->hasRole('Administrator')) {
+            abort(403);
+        }
+
+        $user = User::find($id);
+        if (! $user) {
+            throw new NotFoundHttpException();
+        }
+
+        $validated = $request->validate([
+            'user_role' => 'required|integer',
+            'assigned_groups' => 'nullable|array',
+            'assigned_groups.*' => 'integer',
+            'preferences' => 'nullable|array',
+            'preferences.*' => 'integer',
+            'permissions' => 'nullable|array',
+            'permissions.*' => 'integer',
+        ]);
+
+        $groups = $validated['assigned_groups'] ?? [];
+        $preferences = $validated['preferences'] ?? [];
+        $permissions = $validated['permissions'] ?? [];
+
+        $oldRole = $user->role;
+
+        // Set role directly - role is not mass-assignable (security: see UserController::postAdminEdit).
+        $user->role = $validated['user_role'];
+        $user->save();
+
+        // If we are demoting from NetworkCoordinator, remove them from the list of coordinators for
+        // any networks they are currently coordinating.
+        if ($oldRole == Role::NETWORK_COORDINATOR && ($user->role == Role::HOST || $user->role == Role::RESTARTER)) {
+            $user->networks()->detach();
+        }
+
+        // The user may have previously been removed from a group, which will mean they have an entry in
+        // users_groups with deleted_at set. Restore it so that sync() then works - sync() doesn't handle
+        // soft deletes itself.
+        foreach ($groups as $idgroups) {
+            $inGroup = UserGroups::where('user', $id)->where('group', $idgroups)->withTrashed()->first();
+
+            if ($inGroup && $inGroup->trashed()) {
+                $inGroup->restore();
+            }
+        }
+
+        $user->groups()->sync($groups);
+        $user->preferences()->sync($preferences);
+        $user->permissions()->sync($permissions);
+
+        return response()->json([
+            'data' => [
+                'role' => $user->fresh()->role,
+            ],
+        ]);
+    }
+
+    /**
+     * @OA\Post(
+     *      path="/api/v2/users/me/photo",
+     *      operationId="updateMyPhotov2",
+     *      tags={"Users"},
+     *      summary="Upload the authenticated user's profile photo",
+     *      security={{"apiToken":{}}},
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\MediaType(
+     *              mediaType="multipart/form-data",
+     *              @OA\Schema(
+     *                  @OA\Property(property="profilePhoto", type="string", format="binary")
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="data", type="object",
+     *                  @OA\Property(property="path", type="string")
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(response=401, description="Unauthenticated"),
+     *      @OA\Response(response=422, description="Validation error")
+     * )
+     */
+    public function updateMyPhotov2(Request $request): JsonResponse
+    {
+        // This endpoint always operates on Auth::user() - there is no id parameter, so
+        // there is no possibility of uploading a photo on behalf of another user.
+        $user = Auth::user();
+
+        $request->validate([
+            'profilePhoto' => 'required|image|mimes:jpeg,png,gif,webp|max:2048',
+        ]);
+
+        $file = new \FixometerFile();
+        $filename = $file->upload('profilePhoto', 'image', $user->id, env('TBL_USERS'), false, true);
+
+        if (! $filename) {
+            throw ValidationException::withMessages([
+                'profilePhoto' => [__('profile.picture_error')],
+            ]);
+        }
+
+        return response()->json([
+            'data' => [
+                'path' => $filename,
             ],
         ]);
     }

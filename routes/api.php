@@ -103,11 +103,15 @@ Route::prefix('v2')->group(function() {
             Route::patch('/profile', [API\UserController::class, 'updateMyProfilev2']);
             Route::get('/skills', [API\UserController::class, 'getMySkillsv2']);
             Route::patch('/skills', [API\UserController::class, 'updateMySkillsv2']);
+            Route::patch('/password', [API\UserController::class, 'updateMyPasswordv2']);
+            Route::post('/photo', [API\UserController::class, 'updateMyPhotov2']);
         });
 
         Route::middleware('auth:api')->group(function() {
             Route::get('/users/{id}/repair-directory-options', [API\UserController::class, 'getRepairDirOptionsv2']);
             Route::patch('/users/{id}/repair-directory-role', [API\UserController::class, 'updateRepairDirRolev2']);
+            Route::get('/users/{id}/admin-settings', [API\UserController::class, 'getAdminSettingsv2']);
+            Route::patch('/users/{id}/admin-settings', [API\UserController::class, 'updateAdminSettingsv2']);
         });
 
         Route::prefix('/networks')->group(function() {

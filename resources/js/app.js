@@ -46,6 +46,9 @@ import RepairDirectoryTab from './components/RepairDirectoryTab.vue'
 import LanguageTab from './components/LanguageTab.vue'
 import ProfileInfoTab from './components/ProfileInfoTab.vue'
 import SkillsTab from './components/SkillsTab.vue'
+import PasswordTab from './components/PasswordTab.vue'
+import AdminSettingsTab from './components/AdminSettingsTab.vue'
+import ProfilePhotoTab from './components/ProfilePhotoTab.vue'
 import FixometerPage from './components/FixometerPage.vue'
 import GroupsPage from './components/GroupsPage.vue'
 import GroupPage from './components/GroupPage.vue'
@@ -412,6 +415,9 @@ function initializeJQuery() {
             'languagetab': LanguageTab,
             'profileinfotab': ProfileInfoTab,
             'skillstab': SkillsTab,
+            'passwordtab': PasswordTab,
+            'adminsettingstab': AdminSettingsTab,
+            'profilephototab': ProfilePhotoTab,
             'fixometerpage': FixometerPage,
             'groupspage': GroupsPage,
             'grouppage': GroupPage,
