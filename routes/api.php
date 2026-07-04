@@ -33,10 +33,11 @@ Route::get('/outbound/info/{type}/{id}/{format?}', function ($type, $id, $format
 });
 
 // Tus resumable-upload protocol endpoint. Deliberately NOT behind auth:api - see
-// TusController for why - and CSRF-exempt (see VerifyCsrfToken::$except) because tus
-// clients (Uppy) issue POST/PATCH/HEAD/DELETE requests that cannot carry a Laravel
-// CSRF token. The uploaded file only becomes "attached" to a user once a separate,
-// authenticated call (e.g. POST /api/v2/users/me/photo) references its upload key.
+// TusController for why. It lives in routes/api.php, so it uses the "api" middleware
+// group which does not include CSRF verification at all (tus clients like Uppy issue
+// POST/PATCH/HEAD/DELETE requests that cannot carry a Laravel CSRF token anyway). The
+// uploaded file only becomes "attached" to a user once a separate, authenticated call
+// (e.g. POST /api/v2/users/me/photo) references its upload key.
 Route::match(['get', 'post', 'patch', 'head', 'delete', 'options'], '/tus', [App\Http\Controllers\TusController::class, 'serve']);
 Route::match(['get', 'post', 'patch', 'head', 'delete', 'options'], '/tus/{any}', [App\Http\Controllers\TusController::class, 'serve'])->where('any', '.*');
 
