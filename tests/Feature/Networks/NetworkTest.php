@@ -336,27 +336,19 @@ class NetworkTest extends TestCase
         $coordinator = User::factory()->networkCoordinator()->create();
         $network->addCoordinator($coordinator);
 
+        $admin->api_token = 'nctok';
+        $admin->save();
         $this->actingAs($admin);
 
-        $response = $this->get('/user/edit/' . $coordinator->id);
-        $response->assertStatus(200);
-
-        $crawler = new Crawler($response->getContent());
-
-        $tokens = $crawler->filter('input[name=_token]')->each(function (Crawler $node, $i) {
-            return $node;
-        });
-
-        $tokenValue = $tokens[0]->attr('value');
-
-        $response = $this->post('/profile/edit-admin-settings', [
-            '_token' => $tokenValue,
-            'id' => $coordinator->id,
-            'assigned_groups' => [],
+        // The admin-settings form on /user/edit is now the AdminSettingsTab Vue
+        // component, which PATCHes this endpoint.
+        $response = $this->patchJson('/api/v2/users/' . $coordinator->id . '/admin-settings?api_token=nctok', [
             'user_role' => Role::HOST,
+            'assigned_groups' => [],
+            'preferences' => [],
+            'permissions' => [],
         ]);
-        $response->assertSessionHas('message');
-        $this->assertTrue($response->isRedirection());
+        $response->assertStatus(200);
 
         // Demoting to host should remove as a network coordinator.
         $this->assertFalse($network->coordinators->contains($coordinator));
