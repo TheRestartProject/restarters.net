@@ -11,6 +11,7 @@
         "php": "^8.1",
         "addwiki/mediawiki-api": "^3.1.0",
         "addwiki/mediawiki-api-base": "^3.1.0",
+        "ankitpokhrel/tus-php": "^2.4",
         "barryvdh/laravel-translation-manager": "^0.6.2",
         "bkwld/croppa": "^6.0.1",
         "caseyamcl/guzzle_retry_middleware": "^2.6",

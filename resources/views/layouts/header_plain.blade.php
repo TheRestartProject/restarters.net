@@ -63,6 +63,7 @@
         <script>
          window.restarters = {};
          restarters.cookie_domain = '{{ env('SESSION_DOMAIN') }}';
+         restarters.tusEndpoint = '{{ config('services.tus.endpoint') }}';
          var gdprCookiesCheck = Cookies;
          var gdprCurrentCookiesSelection = gdprCookiesCheck.getJSON('gdprcookienotice');
          restarters.analyticsCookieEnabled = (typeof gdprCurrentCookiesSelection !== 'undefined' && gdprCurrentCookiesSelection['analytics']);

@@ -62,107 +62,148 @@ class FixometerFile extends Model
 
         /** if we have no error, proceed to elaborate and upload **/
         if ($error == UPLOAD_ERR_OK) {
-            $filename = $this->filename($tmp_name);
-            $this->file = $filename;
-            $lpath = $_SERVER['DOCUMENT_ROOT'].'/uploads/'.$filename;
-
-            // Attempt the move BEFORE touching existing records — if the move fails
-            // (e.g. uploads directory missing/unwritable) we preserve the old image.
-            if (!$this->move($tmp_name, $lpath)) {
-                return false;
-            }
-
-            // Move succeeded — safe to remove previous image records.
-            if ($clear) {
-                Xref::where('reference', $reference)
-                      ->where('reference_type', $referenceType)
-                        ->forceDelete();
-            }
-
-            $data = [];
-            $this->path = $lpath;
-            $data['path'] = $this->file;
-
-            // Fix orientation
-            Image::make($lpath)->orientate()->save($lpath);
-
-            if ($type !== 'image') {
-                $this->syncToCloud($filename);
-            }
-
-            if ($type === 'image') {
-                $size = getimagesize($this->path);
-                $data['width'] = $size[0];
-                $data['height'] = $size[1];
-
-                if ($profile) {
-                    $data['alt_text'] = 'Profile Picture';
-                }
-
-                if ($data['width'] > $data['height']) {
-                    $biggestSide = $data['width'];
-                    $resize_height = true;
-                } else {
-                    $biggestSide = $data['height'];
-                    $resize_height = false;
-                }
-
-                $thumbSize = 80;
-                $midSize = 260;
-
-                // Let's make images, which we will resize or crop
-                $thumb = Image::make($lpath);
-                $mid = Image::make($lpath);
-
-                if ($resize_height) { // Resize before crop
-                    $thumb->resize(null, $thumbSize, function ($constraint) {
-                        $constraint->aspectRatio();
-                    });
-
-                    $mid->resize(null, $midSize, function ($constraint) {
-                        $constraint->aspectRatio();
-                    });
-                } else {
-                    $thumb->resize($thumbSize, null, function ($constraint) {
-                        $constraint->aspectRatio();
-                    });
-
-                    $mid->resize($midSize, null, function ($constraint) {
-                        $constraint->aspectRatio();
-                    });
-                }
-
-                if ($crop) {
-                    $thumb->crop($thumbSize, $thumbSize);
-                    $mid->crop($midSize, $midSize);
-                }
-
-                $thumb->save($_SERVER['DOCUMENT_ROOT'].'/uploads/'.'thumbnail_'.$filename, 85);
-                $mid->save($_SERVER['DOCUMENT_ROOT'].'/uploads/'.'mid_'.$filename, 85);
-
-                $this->syncToCloud($filename);
-                $this->syncToCloud('thumbnail_'.$filename);
-                $this->syncToCloud('mid_'.$filename);
-
-                $this->table = 'images';
-                $Images = new Images;
-
-                $image = $Images->create($data)->id;
-
-                if (is_numeric($image) && ! is_null($reference) && ! is_null($referenceType)) {
-                    Xref::create([
-                        'object' => $image,
-                        'object_type' => env('TBL_IMAGES'),
-                        'reference' => $reference,
-                        'reference_type' => $referenceType,
-                    ]);
-                }
-            }
-
-            return $filename;
+            return $this->processLocalFile($tmp_name, $type, $reference, $referenceType, $clear, $profile, $crop, true);
         }
 
         return null;
+    }
+
+    /**
+     * Ingest a file that is already sitting on local disk (i.e. NOT a PHP/HTTP
+     * upload for the current request, so move_uploaded_file() would refuse it) -
+     * e.g. a file assembled by a tus resumable-upload server. Runs the same
+     * validation/thumbnailing/DB-record pipeline as upload(), but copies the
+     * source file into place instead of using move_uploaded_file().
+     *
+     * The caller is responsible for having already validated $localPath is a
+     * real, acceptable image before calling this (this method still re-checks
+     * the MIME type itself via filename(), same as upload() does).
+     */
+    public function uploadLocalFile(string $localPath, $type, $reference = null, $referenceType = null, $profile = false, $crop = true)
+    {
+        if (! is_file($localPath)) {
+            return null;
+        }
+
+        return $this->processLocalFile($localPath, $type, $reference, $referenceType, true, $profile, $crop, false);
+    }
+
+    /**
+     * Shared tail-end of upload()/uploadLocalFile(): validate the MIME type,
+     * move/copy the source file into the uploads directory, generate
+     * thumbnails, and create the images/xref DB records.
+     *
+     * @param bool $useUploadedFileMove true for real PHP uploads (move_uploaded_file(),
+     *                                  or copy() under FixometerFile::$uploadTesting),
+     *                                  false to always use a plain copy() (tus/local files).
+     */
+    protected function processLocalFile(string $tmp_name, $type, $reference, $referenceType, bool $clear, bool $profile, bool $crop, bool $useUploadedFileMove)
+    {
+        $filename = $this->filename($tmp_name);
+
+        if (! $filename) {
+            return false;
+        }
+
+        $this->file = $filename;
+        $lpath = $_SERVER['DOCUMENT_ROOT'].'/uploads/'.$filename;
+
+        // Attempt the move BEFORE touching existing records — if the move fails
+        // (e.g. uploads directory missing/unwritable) we preserve the old image.
+        $moved = $useUploadedFileMove ? $this->move($tmp_name, $lpath) : @copy($tmp_name, $lpath);
+
+        if (! $moved) {
+            return false;
+        }
+
+        // Move succeeded — safe to remove previous image records.
+        if ($clear) {
+            Xref::where('reference', $reference)
+                  ->where('reference_type', $referenceType)
+                    ->forceDelete();
+        }
+
+        $data = [];
+        $this->path = $lpath;
+        $data['path'] = $this->file;
+
+        // Fix orientation
+        Image::make($lpath)->orientate()->save($lpath);
+
+        if ($type !== 'image') {
+            $this->syncToCloud($filename);
+        }
+
+        if ($type === 'image') {
+            $size = getimagesize($this->path);
+            $data['width'] = $size[0];
+            $data['height'] = $size[1];
+
+            if ($profile) {
+                $data['alt_text'] = 'Profile Picture';
+            }
+
+            if ($data['width'] > $data['height']) {
+                $biggestSide = $data['width'];
+                $resize_height = true;
+            } else {
+                $biggestSide = $data['height'];
+                $resize_height = false;
+            }
+
+            $thumbSize = 80;
+            $midSize = 260;
+
+            // Let's make images, which we will resize or crop
+            $thumb = Image::make($lpath);
+            $mid = Image::make($lpath);
+
+            if ($resize_height) { // Resize before crop
+                $thumb->resize(null, $thumbSize, function ($constraint) {
+                    $constraint->aspectRatio();
+                });
+
+                $mid->resize(null, $midSize, function ($constraint) {
+                    $constraint->aspectRatio();
+                });
+            } else {
+                $thumb->resize($thumbSize, null, function ($constraint) {
+                    $constraint->aspectRatio();
+                });
+
+                $mid->resize($midSize, null, function ($constraint) {
+                    $constraint->aspectRatio();
+                });
+            }
+
+            if ($crop) {
+                $thumb->crop($thumbSize, $thumbSize);
+                $mid->crop($midSize, $midSize);
+            }
+
+            $thumb->save($_SERVER['DOCUMENT_ROOT'].'/uploads/'.'thumbnail_'.$filename, 85);
+            $mid->save($_SERVER['DOCUMENT_ROOT'].'/uploads/'.'mid_'.$filename, 85);
+
+            $this->syncToCloud($filename);
+            $this->syncToCloud('thumbnail_'.$filename);
+            $this->syncToCloud('mid_'.$filename);
+
+            $this->table = 'images';
+            $Images = new Images;
+
+            $image = $Images->create($data)->id;
+
+            if (is_numeric($image) && ! is_null($reference) && ! is_null($referenceType)) {
+                Xref::create([
+                    'object' => $image,
+                    'object_type' => env('TBL_IMAGES'),
+                    'reference' => $reference,
+                    'reference_type' => $referenceType,
+                ]);
+            }
+        }
+
+        return $filename;
     }
 
     /**

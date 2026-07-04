@@ -6,6 +6,7 @@ use App\Events\PasswordChanged;
 use App\Group;
 use App\Helpers\Fixometer;
 use App\Helpers\Geocoder;
+use App\Helpers\Tus;
 use App\Http\Controllers\Controller;
 use App\Permissions;
 use App\Preferences;
@@ -1030,15 +1031,13 @@ class UserController extends Controller
      *      path="/api/v2/users/me/photo",
      *      operationId="updateMyPhotov2",
      *      tags={"Users"},
-     *      summary="Upload the authenticated user's profile photo",
+     *      summary="Attach a completed tus upload as the authenticated user's profile photo",
      *      security={{"apiToken":{}}},
      *      @OA\RequestBody(
      *          required=true,
-     *          @OA\MediaType(
-     *              mediaType="multipart/form-data",
-     *              @OA\Schema(
-     *                  @OA\Property(property="profilePhoto", type="string", format="binary")
-     *              )
+     *          @OA\JsonContent(
+     *              required={"upload_key"},
+     *              @OA\Property(property="upload_key", type="string", description="The tus upload key/id returned by the tus server once the upload completed")
      *          )
      *      ),
      *      @OA\Response(
@@ -1060,16 +1059,62 @@ class UserController extends Controller
         // there is no possibility of uploading a photo on behalf of another user.
         $user = Auth::user();
 
-        $request->validate([
-            'profilePhoto' => 'required|image|mimes:jpeg,png,gif|max:2048',
+        $validated = $request->validate([
+            'upload_key' => 'required|string',
         ]);
 
+        $cache = Tus::buildCache();
+        $meta = $cache->get($validated['upload_key']);
+
+        $filePath = $meta['file_path'] ?? null;
+
+        if (! $meta || ! $filePath || ! is_file($filePath)) {
+            throw ValidationException::withMessages([
+                'upload_key' => [__('profile.picture_error')],
+            ]);
+        }
+
+        // Confirm the tus upload actually finished (offset === size), not just started.
+        if (($meta['offset'] ?? null) !== ($meta['size'] ?? null)) {
+            throw ValidationException::withMessages([
+                'upload_key' => [__('profile.picture_error')],
+            ]);
+        }
+
+        // Max 2MB, matching the previous multipart contract.
+        if (filesize($filePath) > 2 * 1024 * 1024) {
+            $cache->delete($validated['upload_key']);
+            @unlink($filePath);
+
+            throw ValidationException::withMessages([
+                'upload_key' => [__('profile.picture_error')],
+            ]);
+        }
+
+        // Validate it's really an image FixometerFile knows how to handle (jpeg/png/gif -
+        // matches the whitelist in FixometerFile::filename()), before we touch any DB state.
+        $mime = @finfo_file(finfo_open(FILEINFO_MIME_TYPE), $filePath);
+
+        if (! in_array($mime, ['image/jpeg', 'image/png', 'image/gif'], true)) {
+            $cache->delete($validated['upload_key']);
+            @unlink($filePath);
+
+            throw ValidationException::withMessages([
+                'upload_key' => [__('profile.picture_error')],
+            ]);
+        }
+
         $file = new \FixometerFile();
-        $filename = $file->upload('profilePhoto', 'image', $user->id, env('TBL_USERS'), false, true);
+        $filename = $file->uploadLocalFile($filePath, 'image', $user->id, env('TBL_USERS'), true);
+
+        // Whether it succeeded or not, the tus temp file has served its purpose - remove it
+        // and its cache entry so it isn't left behind (and can't be replayed against /photo).
+        $cache->delete($validated['upload_key']);
+        @unlink($filePath);
 
         if (! $filename) {
             throw ValidationException::withMessages([
-                'profilePhoto' => [__('profile.picture_error')],
+                'upload_key' => [__('profile.picture_error')],
             ]);
         }
 
