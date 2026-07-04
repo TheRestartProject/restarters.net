@@ -1079,4 +1079,40 @@ class UserController extends Controller
             ],
         ]);
     }
+
+    /**
+     * @OA\Delete(
+     *      path="/api/v2/users/me",
+     *      operationId="deleteMyAccountv2",
+     *      tags={"Users"},
+     *      summary="Soft-delete (and anonymise) the authenticated user's account",
+     *      security={{"apiToken":{}}},
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="data", type="object",
+     *                  @OA\Property(property="success", type="boolean")
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(response=401, description="Unauthenticated")
+     * )
+     */
+    public function deleteMyAccountv2(Request $request): JsonResponse
+    {
+        // This endpoint always operates on Auth::user() - there is no id parameter, so a
+        // user can only ever delete their own account via this route.
+        $user = Auth::user();
+
+        $this->authorize('delete', $user);
+
+        $user->delete(); // Will be anonymised automatically by event handlers (see postSoftDeleteUser).
+
+        return response()->json([
+            'data' => [
+                'success' => true,
+            ],
+        ]);
+    }
 }

@@ -105,6 +105,7 @@ Route::prefix('v2')->group(function() {
             Route::patch('/skills', [API\UserController::class, 'updateMySkillsv2']);
             Route::patch('/password', [API\UserController::class, 'updateMyPasswordv2']);
             Route::post('/photo', [API\UserController::class, 'updateMyPhotov2']);
+            Route::delete('/', [API\UserController::class, 'deleteMyAccountv2']);
         });
 
         Route::middleware('auth:api')->group(function() {

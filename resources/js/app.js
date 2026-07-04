@@ -49,6 +49,7 @@ import SkillsTab from './components/SkillsTab.vue'
 import PasswordTab from './components/PasswordTab.vue'
 import AdminSettingsTab from './components/AdminSettingsTab.vue'
 import ProfilePhotoTab from './components/ProfilePhotoTab.vue'
+import DeleteAccountTab from './components/DeleteAccountTab.vue'
 import FixometerPage from './components/FixometerPage.vue'
 import GroupsPage from './components/GroupsPage.vue'
 import GroupPage from './components/GroupPage.vue'
@@ -418,6 +419,7 @@ function initializeJQuery() {
             'passwordtab': PasswordTab,
             'adminsettingstab': AdminSettingsTab,
             'profilephototab': ProfilePhotoTab,
+            'deleteaccounttab': DeleteAccountTab,
             'fixometerpage': FixometerPage,
             'groupspage': GroupsPage,
             'grouppage': GroupPage,
