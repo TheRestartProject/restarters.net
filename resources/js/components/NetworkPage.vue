@@ -76,13 +76,17 @@
       <div v-if="eventsModerationEmpty" class="text-muted">{{ __('networks.show.none') }}</div>
     </section>
 
-    <!-- Groups -->
+    <!-- Groups: map + list of the groups in this network, starting zoomed out
+         so every group in the network is in view. -->
     <section class="groups-section mb-4">
       <h2>{{ __('networks.general.groups') }}</h2>
-      <div class="groups-info border p-3">
-        {{ __('networks.show.groups_count', { count: stats.groups || 0, name: network.name }) }}
-        <a :href="'/group/network/' + network.id">{{ __('networks.show.view_groups_link') }}</a>
-      </div>
+      <GroupMapAndList
+          :initial-bounds="worldBounds"
+          :network="network.id"
+          show-filters
+          :can-manage-tags="canManageTags"
+          :available-tags="groupFilterTags"
+      />
     </section>
 
     <div class="row">
@@ -171,10 +175,11 @@
 import axios from 'axios'
 import GroupsRequiringModeration from './GroupsRequiringModeration.vue'
 import EventsRequiringModeration from './EventsRequiringModeration.vue'
+import GroupMapAndList from './GroupMapAndList.vue'
 import images from '../mixins/images'
 
 export default {
-  components: { GroupsRequiringModeration, EventsRequiringModeration },
+  components: { GroupsRequiringModeration, EventsRequiringModeration, GroupMapAndList },
   mixins: [images],
   props: {
     network: {
@@ -230,6 +235,16 @@ export default {
     }
   },
   computed: {
+    worldBounds() {
+      // The inverted whole-world box: GroupMap treats it as "no location", so
+      // it frames all the (network-filtered) groups instead.
+      return [[90, 180], [-90, -180]]
+    },
+    groupFilterTags() {
+      // The network tags API uses `name`; the group tag filter multiselect
+      // labels by `tag_name`. Provide both.
+      return this.tags.map(t => ({ ...t, tag_name: t.name }))
+    },
     truncatedDescription() {
       if (!this.network.description) return ''
       const stripped = this.network.description.replace(/<[^>]*>/g, '')
@@ -427,12 +442,6 @@ export default {
       font-weight: 500;
       white-space: nowrap;
     }
-  }
-}
-
-.groups-section {
-  .groups-info {
-    background: $white;
   }
 }
 

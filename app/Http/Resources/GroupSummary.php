@@ -51,6 +51,17 @@ use Cache;
  *         )
  *     ),
  *     @OA\Property(
+ *         property="group_tags_full",
+ *         title="group_tags_full",
+ *         description="Tags on this group.  Only present on calls which load them, e.g. the summary list.",
+ *         type="array",
+ *         @OA\Items(
+ *            @OA\Property(property="id", type="integer"),
+ *            @OA\Property(property="name", type="string"),
+ *            @OA\Property(property="network_id", type="integer", nullable=true),
+ *         )
+ *     ),
+ *     @OA\Property(
  *          property="updated_at",
  *          title="updated_at",
  *          description="The last change to this group.  This includes changes which affect the stats.",
@@ -104,6 +115,18 @@ class GroupSummary extends JsonResource
             'image' => $this->groupImage && is_object($this->groupImage) && is_object($this->groupImage->image) ? $this->groupImage->image->path : null,
             'location' => new GroupLocation($this),
             'networks' => new NetworkSummaryCollection($this->resource->networks),
+            // Tags drive the badges and the tag filter on the groups list.
+            // Only included when the caller eager-loaded them, so other users
+            // of this resource don't pick up an N+1.
+            'group_tags_full' => $this->whenLoaded('group_tags', function () {
+                return $this->resource->group_tags->map(function ($tag) {
+                    return [
+                        'id' => $tag->id,
+                        'name' => $tag->tag_name,
+                        'network_id' => $tag->network_id,
+                    ];
+                });
+            }),
             'updated_at' => Carbon::parse($this->updated_at)->toIso8601String(),
             'archived_at' => $this->archived_at ? Carbon::parse($this->archived_at)->toIso8601String() : null,
             'summary' => true

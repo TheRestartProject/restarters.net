@@ -158,3 +158,14 @@ h2 {
     transform: rotate(360deg);
   }
 }
+
+// Group map markers: only the stock blue Leaflet marker image ships in
+// public/images, so recolour it for the "your group" and hover states.
+// The stock marker is blue (hue ~207deg): +273deg lands on green, +153deg on red.
+.group-marker-yours {
+  filter: hue-rotate(273deg);
+}
+
+.group-marker-hover {
+  filter: hue-rotate(153deg) saturate(1.5);
+}

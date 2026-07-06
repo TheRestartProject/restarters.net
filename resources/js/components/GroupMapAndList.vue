@@ -21,10 +21,10 @@
           :groupids="effectiveGroupIds"
           class="mt-3"
           count
-          your-area="yourArea"
           :your-groups="yourGroups"
           :hover.sync="hover"
           :search="showFilters"
+          :networks="networks"
           :all-group-tags="availableTags"
           :show-tags="canManageTags"
       />
@@ -83,11 +83,18 @@ export default {
       required: false,
       default: () => [],
     },
+    networks: {
+      type: Array,
+      required: false,
+      default: null,
+    },
   },
   data() {
     return {
       infiniteId: +new Date(),
-      groupidsInBounds: [],
+      // null = the map hasn't told us what's in view yet; an empty array is a
+      // real answer (nothing in view) and must not fall back to all groups.
+      groupidsInBounds: null,
       mapready: false,
       bounds: null,
       hover: null,
@@ -96,7 +103,7 @@ export default {
   },
   computed: {
     effectiveGroupIds() {
-      if (this.groupidsInBounds.length) {
+      if (this.groupidsInBounds !== null) {
         return this.groupidsInBounds
       }
       const allGroups = this.$store.getters['groups/list']

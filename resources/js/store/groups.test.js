@@ -96,3 +96,61 @@ test('fetches with the same id but different includeStats are independent reques
   expect(axios.get.mock.calls[0][0]).toContain('includeStats=false')
   expect(axios.get.mock.calls[1][0]).toContain('includeStats=true')
 })
+
+test('the details list fetch asks for archived groups (shown with a badge, as the old page did)', async () => {
+  axios.get.mockResolvedValueOnce({ data: { data: [] } })
+
+  await groups.actions.list({ commit }, { details: true })
+
+  expect(axios.get.mock.calls[0][0]).toContain('archived=true')
+})
+
+// GroupsTable renders its rows from the groups/list store; groups that only
+// exist in the moderate store never showed up, so the "groups requiring
+// moderation" section rendered an empty table.
+describe('getModerationRequired', () => {
+  const Vue = require('vue')
+  const Vuex = require('vuex')
+  Vue.use(Vuex)
+
+  function makeRealStore() {
+    return new Vuex.Store({
+      modules: {
+        groups: {
+          ...groups,
+          state: { list: {}, moderate: {}, tags: {}, stats: {} },
+        },
+        auth: {
+          namespaced: true,
+          getters: { apiToken: () => 'TEST' },
+        },
+      },
+    })
+  }
+
+  test('moderation groups become renderable by GroupsTable (in the list store, with an id)', async () => {
+    axios.get.mockResolvedValueOnce({
+      data: [{ id: 7, name: 'Mod Group', location: 'Somewhere', country: 'UK', networks: [] }],
+    })
+    const store = makeRealStore()
+
+    await store.dispatch('groups/getModerationRequired')
+
+    expect(store.getters['groups/getModerate'][7]).toBeTruthy()
+    const listed = store.getters['groups/list'].find(g => g.id === 7)
+    expect(listed).toBeTruthy()
+    expect(listed.idgroups).toBe(7)
+  })
+
+  test('does not clobber a richer entry already in the list store', async () => {
+    const store = makeRealStore()
+    store.commit('groups/set', { id: 7, name: 'Rich', location: { lat: 1, lng: 2 } })
+    axios.get.mockResolvedValueOnce({
+      data: [{ id: 7, name: 'Mod Group', networks: [] }],
+    })
+
+    await store.dispatch('groups/getModerationRequired')
+
+    expect(store.getters['groups/get'](7).location).toEqual({ lat: 1, lng: 2 })
+  })
+})

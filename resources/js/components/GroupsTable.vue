@@ -43,7 +43,7 @@
         <span />
       </template>
       <template slot="cell(group_image)" slot-scope="data">
-        <b-img-lazy :src="data.item.image" class="profile" @error.native="brokenProfileImage" v-if="data.item.image" />
+        <b-img-lazy :src="groupImage(data.item)" class="profile" @error.native="brokenProfileImage" v-if="groupImage(data.item)" />
         <b-img-lazy :src="defaultProfile" class="profile" v-else />
       </template>
       <template slot="head(group_name)">
@@ -83,7 +83,7 @@
       <template slot="cell(next_event)" slot-scope="data">
         <div>
           <div v-if="data.item.next_event">
-            {{ formatDate(data.item.next_event.start) }}
+            {{ formatDate(data.item.next_event) }}
           </div>
           <div v-else>
             {{ __('groups.upcoming_none_planned') }}
@@ -234,6 +234,11 @@ export default {
         items = items.filter(g => g.location && g.location.country === this.searchCountry.country)
       }
 
+      if (this.searchNetwork) {
+        // Groups may hold networks as summary objects ([{id}]) or as plain ids.
+        items = items.filter(g => (g.networks || []).some(n => (n && n.id !== undefined ? n.id : n) === this.searchNetwork))
+      }
+
       if (this.searchTags && this.searchTags.length) {
         const tagIds = this.searchTags.map(t => t.id)
         items = items.filter(g => {
@@ -245,13 +250,13 @@ export default {
       return items
     },
     itemsToShow() {
-      const items = this.filteredItems.slice(0, this.show)
-
-      items.sort((a, b) => {
+      // Sort before slicing so the first page is the alphabetically-first
+      // groups, not whatever happened to be first in the store.
+      const items = [...this.filteredItems].sort((a, b) => {
         return a.name.localeCompare(b.name)
       })
 
-      return items
+      return items.slice(0, this.show)
     },
     translatedGroupCount() {
       return this.__('groups.group_count', {
@@ -278,11 +283,25 @@ export default {
     }
   },
   methods: {
+    eventStart(event) {
+      // next_event is an object ({start}) from the v2 APIs but a plain date
+      // string in the moderation store (newToOld).
+      return event && event.start ? event.start : event
+    },
     formatDate(date) {
-      return new moment(date).format('ddd Do MMM YYYY')
+      return new moment(this.eventStart(date)).format('ddd Do MMM YYYY')
     },
     brokenProfileImage(event) {
       event.target.src = DEFAULT_PROFILE
+    },
+    groupImage(item) {
+      // The v2 APIs return a bare path; the moderation store and old
+      // server-rendered data are already prefixed.
+      if (!item.image) {
+        return null
+      }
+
+      return item.image.startsWith('/') || item.image.startsWith('http') ? item.image : '/uploads/mid_' + item.image
     },
     sortCompare(aRow, bRow, key, sortDesc, formatter, compareOptions, compareLocale) {
       const a = aRow[key]
@@ -290,7 +309,7 @@ export default {
 
       if (key === 'group_name') {
         // We need a custom sort because we are putting a link into the group field.
-        return b.name.localeCompare(a.name, compareLocale, compareOptions)
+        return aRow.name.localeCompare(bRow.name, compareLocale, compareOptions)
       } else if (key === 'next_event') {
         // Sort no events to the end.
         if (!aRow.next_event && !bRow.next_event) {
@@ -300,7 +319,7 @@ export default {
         } else if (bRow.next_event && !aRow.next_event) {
           return 1
         } else {
-          return new moment(aRow.next_event).unix() - new moment(bRow.next_event).unix()
+          return new moment(this.eventStart(aRow.next_event)).unix() - new moment(this.eventStart(bRow.next_event)).unix()
         }
       } else if (key === 'hosts' || key === 'restarters') {
         if (parseInt(a) < parseInt(b)) {
@@ -311,7 +330,7 @@ export default {
           return 0
         }
       } else {
-        return toString(a).localeCompare(toString(b), compareLocale, compareOptions)
+        return String(a).localeCompare(String(b), compareLocale, compareOptions)
       }
     },
     loadMore($state) {
@@ -340,7 +359,12 @@ export default {
       }
     },
     yourGroup(id) {
-      return this.yourGroups.includes(id)
+      // `left` tracks groups unfollowed in this session, so the button flips
+      // without waiting for fresh server data.
+      return this.yourGroups.includes(id) && !this.left.includes(id)
+    },
+    toggleFilters() {
+      this.searchShow = !this.searchShow
     },
     rowHovered(item, index, event) {
       this.$emit('update:hover', item.id)

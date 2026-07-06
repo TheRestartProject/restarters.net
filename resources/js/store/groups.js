@@ -10,6 +10,8 @@ function newToOld(e) {
   // new API completely, we can then migrate the Vue components to use the new field names and retire this function.
   // Similar code in event and device store.
   let ret = {
+    // Keep both id styles: components (e.g. GroupsTable) match rows on `id`.
+    id: e.id,
     idgroups: e.id,
     name: e.name,
     location: e.location,
@@ -127,21 +129,31 @@ export default {
         commit('set', group)
       }
     },
-    async getModerationRequired({commit, rootGetters}, params) {
+    async getModerationRequired({commit, rootGetters, state}, params) {
       const apiToken = rootGetters['auth/apiToken']
 
       let ret = await axios.get('/api/v2/moderate/groups?api_token=' + apiToken + '&locale=' + getLocale())
 
       if (ret && ret.data) {
         commit('setModerate', ret.data)
+
+        // GroupsTable renders its rows from the list store, so moderation
+        // groups must be there too. Don't clobber a richer entry (e.g. from
+        // the summary fetch).
+        ret.data.forEach(e => {
+          if (!state.list[e.id]) {
+            commit('set', newToOld(e))
+          }
+        })
       }
     },
     async list({commit}, params) {
       let url
 
       if (params && params.details) {
-        // We want more details.
-        url = '/api/v2/groups/summary?locale=' + getLocale() + '&includeNextEvent=true&includeCounts=true'
+        // We want more details.  Ask for archived groups too: the list shows
+        // them with an "archived" badge, as the old server-rendered page did.
+        url = '/api/v2/groups/summary?locale=' + getLocale() + '&includeNextEvent=true&includeCounts=true&archived=true'
       } else {
         // Just the name and lat/lng.
         url = '/api/v2/groups/names?locale=' + getLocale()

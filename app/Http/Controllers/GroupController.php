@@ -32,11 +32,9 @@ use DB;
 use FixometerFile;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
 use Notification;
 use Spatie\ValidationRules\Rules\Delimited;
-use Carbon\Carbon;
 
 class GroupController extends Controller
 {
@@ -506,67 +504,6 @@ class GroupController extends Controller
         } else {
             return redirect('/user/forbidden');
         }
-    }
-
-    public static function expandGroups($groups, $your_groupids)
-    {
-        $ret = [];
-        $user = Auth::user();
-
-        if ($groups) {
-            foreach ($groups as $group) {
-                $group_image = $group->groupImage;
-
-                $event = $group->nextUpcomingParty;
-
-                // We want to return the distance from our own location.
-                $distance = null;
-                $grouplat = $group->latitude;
-                $grouplng = $group->longitude;
-                $userlat = $user->latitude;
-                $userlng = $user->longitude;
-
-                if ($grouplat !== null && $grouplng !== null && $userlat !== null && $userlng !== null) {
-                    if ($grouplat == $userlat && $grouplng == $userlng) {
-                        $distance = 0;
-                    } else {
-                        $distance = 6371 * acos( cos(deg2rad($userlat)) * cos(deg2rad($grouplat)) * cos(deg2rad($grouplng) -
-                                                                                                        deg2rad($userlng)) + sin(deg2rad($userlat) ) * sin(deg2rad($grouplat)));
-                    }
-                }
-
-                $ret[] = [
-                    'idgroups' => $group->idgroups,
-                    'name' => $group->name,
-                    'image' => (is_object($group_image) && is_object($group_image->image)) ?
-                        asset('uploads/mid_'.$group_image->image->path) : null,
-                    'location' => [
-                        'location' => rtrim($group->location),
-                        'country' => Fixometer::getCountryFromCountryCode($group->country_code),
-                        'country_code' => $group->country_code,
-                        'distance' => $distance,
-                    ],
-                    'next_event' => $event ? $event->event_date_local : null,
-                    'all_restarters_count' => $group->all_restarters_count,
-                    'all_hosts_count' => $group->all_hosts_count,
-                    'all_confirmed_restarters_count' => $group->all_confirmed_restarters_count,
-                    'all_confirmed_hosts_count' => $group->all_confirmed_hosts_count,
-                    'networks' => \Illuminate\Support\Arr::pluck($group->networks, 'id'),
-                    'group_tags' => $group->group_tags->pluck('id'),
-                    'group_tags_full' => $group->group_tags->map(function($tag) {
-                        return [
-                            'id' => $tag->id,
-                            'name' => $tag->tag_name,
-                            'network_id' => $tag->network_id,
-                        ];
-                    }),
-                    'following' => in_array($group->idgroups, $your_groupids),
-                    'archived_at' => $group->archived_at ? Carbon::parse($group->archived_at)->toIso8601String() : null
-                ];
-            }
-        }
-
-        return $ret;
     }
 
     public static function stats($id, $format = 'row')

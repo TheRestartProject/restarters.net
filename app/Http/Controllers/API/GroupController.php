@@ -302,9 +302,9 @@ class GroupController extends Controller
      *      summary="Get list of groups with summary information",
      *      @OA\Parameter(
      *          name="archived",
-     *          description="Include archived groups",
+     *          description="Include archived groups.  Default false.",
      *          required=false,
-     *          in="path",
+     *          in="query",
      *          @OA\Schema(
      *              type="boolean"
      *          )
@@ -352,9 +352,15 @@ class GroupController extends Controller
             'archived' => ['string', 'in:true,false'],
         ]);
 
-        $query = Group::all();
+        // Eager-load everything the GroupSummary resource touches, otherwise
+        // each group lazy-loads its relations and the call scales O(N).
+        $query = Group::with(['networks', 'groupImage.image', 'group_tags']);
 
-        $groups = $query->all();
+        if ($request->get('archived', 'false') !== 'true') {
+            $query = $query->whereNull('archived_at');
+        }
+
+        $groups = $query->get();
 
         return [
             'data' => \App\Http\Resources\GroupSummaryCollection::make($groups)

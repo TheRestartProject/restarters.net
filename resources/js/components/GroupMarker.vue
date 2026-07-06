@@ -1,7 +1,9 @@
 <template>
   <div v-if="group">
+    <!-- Markers must stay interactive: click opens the info modal and
+         mouseover drives the highlight. -->
     <l-marker
-        :lat-lng="[lat, lng]" :interactive="false" :options="{
+        :lat-lng="[lat, lng]" :options="{
           title: group.name + ' - ' + __('groups.marker_title'),
         }" :icon="icon"
         @click="openModal"
@@ -37,7 +39,9 @@ export default {
   data() {
     return {
       showModal: false,
-      hovering: false
+      // Seed from the prop: the watcher below only fires on change, so a
+      // marker created while its row is already hovered must start red.
+      hovering: this.hover
     }
   },
   watch: {
@@ -47,16 +51,19 @@ export default {
   },
   computed: {
     icon() {
-      let icon = "/images/vendor/leaflet/dist/marker-icon.png"
+      // Only the stock blue marker ships in public/images; recolour it with a
+      // CSS hue-rotate class rather than referencing images we don't have.
+      let className = ''
 
       if (this.hovering) {
-        icon = "/images/vendor/leaflet/dist/marker-icon-red.png"
+        className = 'group-marker-hover'
       } else if (this.highlight) {
-        icon = "/images/vendor/leaflet/dist/marker-icon-green.png"
+        className = 'group-marker-yours'
       }
 
       return L.icon({
-        iconUrl: icon,
+        iconUrl: '/images/vendor/leaflet/dist/marker-icon.png',
+        className: className,
       })
     },
     group() {

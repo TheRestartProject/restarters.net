@@ -126,4 +126,44 @@ describe('GroupMap.zoomToGroups', () => {
     expect(bounds.contains([51.5, -0.1])).toBe(true)
     expect(bounds.contains([55.9, -3.2])).toBe(true)
   })
+
+  // A group with no geocode has null lat/lng; +null is 0, so it used to be
+  // framed as if it sat at null island (0,0), dragging the view out to sea.
+  test('ignores groups without coordinates when framing', () => {
+    const wrapper = mountMap(WORLD, [...groups, { id: 4, location: { lat: null, lng: null } }])
+    const map = fakeMap({ x: 688, y: 400 })
+    wrapper.vm.mapObject = map
+    wrapper.vm.$refs.map = { mapObject: map }
+    wrapper.vm.zoomedToGroups = false
+
+    wrapper.vm.zoomToGroups()
+
+    const bounds = map.fitBounds.mock.calls[0][0]
+    expect(bounds.contains([0, 0])).toBe(false)
+  })
+})
+
+describe('GroupMap options', () => {
+  // Regression: dragging was `!!window?.L?.Browser?.mobile`, i.e. enabled
+  // ONLY on mobile — desktop users could not pan the map at all.
+  test('allows dragging the map on desktop', () => {
+    expect(mountMap(WORLD, []).vm.mapOptions.dragging).toBe(true)
+  })
+
+  test('does not set gestureHandling (the plugin is not installed)', () => {
+    expect('gestureHandling' in mountMap(WORLD, []).vm.mapOptions).toBe(false)
+  })
+})
+
+describe('GroupMap markers', () => {
+  test('only renders markers for groups with coordinates', () => {
+    const wrapper = mountMap(WORLD, [
+      { id: 1, location: { lat: 51.5, lng: -0.1 } },
+      { id: 2, location: { lat: null, lng: null } },
+      { id: 3, lat: 53.4, lng: -2.2 },
+      { id: 4 },
+    ])
+
+    expect(wrapper.vm.mappableGroups.map(g => g.id)).toEqual([1, 3])
+  })
 })

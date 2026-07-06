@@ -13,7 +13,7 @@
         @moveend="idle"
         @dragend="dragEnd"
     >
-      <GroupMarker :key='"marker-" + group.id' v-for="group in allGroups" :id="group.id" :highlight="yourGroup(group.id)" :hover="group.id === hover" />
+      <GroupMarker :key='"marker-" + group.id' v-for="group in mappableGroups" :id="group.id" :highlight="yourGroup(group.id)" :hover="group.id === hover" />
       <l-tile-layer :url="tiles" :attribution="attribution" />
     </l-map>
   </div>
@@ -76,28 +76,28 @@ export default {
     mapOptions() {
       return {
         zoomControl: true,
-        dragging: !!window?.L?.Browser?.mobile,
+        dragging: true,
         touchZoom: true,
         scrollWheelZoom: false,
         bounceAtZoomLimits: true,
-        gestureHandling: true,
       }
     },
     allGroups() {
       const groups = this.$store.getters['groups/list']
-      return groups.filter((g) => {
-        if (!this.network) {
-          return true
-        }
 
-        let found = false
-        g.networks.forEach((n) => {
-          if (n.id === this.network) {
-            found = true
-          }
-        })
+      if (!this.network) {
+        return groups
+      }
 
-        return found
+      return groups.filter((g) => (g.networks || []).some((n) => n.id === this.network))
+    },
+    mappableGroups() {
+      // A group with no geocode would put a marker at null island (0,0) —
+      // L.marker coerces null coordinates to 0. Leave those off the map.
+      return this.allGroups.filter((g) => {
+        const lat = g.location && g.location.lat != null ? g.location.lat : g.lat
+        const lng = g.location && g.location.lng != null ? g.location.lng : g.lng
+        return lat != null && lng != null && !isNaN(+lat) && !isNaN(+lng)
       })
     },
     hasLocation() {

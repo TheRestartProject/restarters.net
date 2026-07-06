@@ -285,9 +285,19 @@ class NetworkTest extends TestCase
         ]);
         $response->assertRedirect();
 
-        // Group won't show on network page as groups are now retrieved via API
-        // (the groups page loads its list client-side from /api/v2/groups/summary,
-        // so the network filter is no longer embedded server-side).
+        // Groups are now fetched client-side from /api/v2/groups/summary, so
+        // the group name is no longer server-rendered here. The network scope
+        // must still reach the Vue layer: /group/network/{id} passes the
+        // network id, which GroupsPage forwards to the map/list to filter by.
+        $response = $this->get('/group/network/' . $network->id);
+        $response->assertSuccessful();
+        $response->assertSee(':network="' . $network->id . '"', false);
+
+        // And the group must be in the API data the page will fetch.
+        $response = $this->get('/api/v2/groups/summary');
+        $summary = collect($response->json('data'))->firstWhere('id', $group->idgroups);
+        $this->assertNotNull($summary);
+        $this->assertEquals($network->id, collect($summary['networks'])->first()['id']);
 
         // All networks list visible to admin.
         $this->loginAsTestUser(Role::ADMINISTRATOR);

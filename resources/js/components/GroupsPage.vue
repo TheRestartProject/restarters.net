@@ -30,8 +30,8 @@
                 :groupids="yourGroups"
                 class="mt-3"
                 :tab="currentTab"
-                @nearest="currentTab = 1"
                 :your-area="yourArea"
+                :your-groups="yourGroups"
                 :networks="networks"
                 :all-group-tags="allGroupTags"
                 :show-tags="showTags"
@@ -40,13 +40,24 @@
           <div v-else class="mt-2 mb-2 text-center" v-html="__('groups.no_groups_mine')" />
         </div>
       </b-tab>
-      <b-tab class="pt-2" lazy>
+      <!-- Only lazy until first shown: a plain `lazy` tab destroys its content
+           on every switch away, which would throw away the map and re-fetch
+           all the groups each time the user tabs back. -->
+      <b-tab class="pt-2" :lazy="!mapTabVisited">
         <template slot="title">
           <b class="text-uppercase d-block d-lg-none">{{ __('groups.groups_title2_mobile') }}</b>
           <b class="text-uppercase d-none d-lg-block">{{ __('groups.groups_title2') }}</b>
         </template>
         <div v-if="nearbyGroups.length">
-          <GroupMapAndList :initial-bounds="nearbyGroups" :yourGroups="yourGroups"/>
+          <GroupMapAndList
+              :initial-bounds="nearbyGroups"
+              :your-groups="yourGroups"
+              :network="network"
+              show-filters
+              :can-manage-tags="showTags"
+              :available-tags="allGroupTags"
+              :networks="network ? null : networks"
+          />
         </div>
         <div v-else class="mt-2 mb-2 text-center">
           <div v-if="yourArea" v-html="__('groups.no_groups_nearest_with_location')" />
@@ -112,27 +123,18 @@ export default {
     // Initialize directly from prop so lazy b-tab renders correctly on first mount.
     // Setting this in created() causes lazy tabs to miss the initial activation.
     const tabToIndex = ['all', 'network', 'nearby', 'other']
+    const currentTab = tabToIndex.includes(this.tab) ? 1 : 0
     return {
-      currentTab: tabToIndex.includes(this.tab) ? 1 : 0
-    }
-  },
-  computed: {
-    groups() {
-      let groups = this.$store.getters['groups/list']
-
-      return groups ? groups.sort((a, b) => {
-        return a.name.localeCompare(b.name)
-      }) : []
-    },
-    nearestGroups() {
-      return this.__('groups.nearest_groups', {
-        location: this.yourArea
-      })
+      currentTab,
+      mapTabVisited: currentTab === 1
     }
   },
   watch: {
     currentTab: {
       handler: function (newVal) {
+        if (newVal === 1) {
+          this.mapTabVisited = true
+        }
         // We want to update the URL in the browser.  In a full app this would be done by the router, but hack it in
         // here.
         try {
