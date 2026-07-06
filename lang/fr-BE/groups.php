@@ -146,7 +146,6 @@ Vous trouverez la page principale du Repair Café ici : :link.
 
 Apprenez à utiliser ce groupe ici : :help.',
   'invitation_pending' => 'Vous avez une invitation à rejoindre ce Repair Café. Cliquez <a href=":accept">ici</a> si vous voulez le rejoindre.',
-  'nearest_groups' => 'Ce sont les Repair Cafés qui se trouvent dans un rayon de 50km autour de :location',
   'talk_group' => 'Voir la conversation de Repair Café',
   'talk_group_add_title' => 'Bienvenue sur :group_name',
   'editing' => 'Modification de',

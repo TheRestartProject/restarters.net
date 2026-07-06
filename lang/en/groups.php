@@ -137,7 +137,6 @@ return [
   'delete_group_confirm' => 'Please confirm that you want to delete :name.',
   'archive_group_confirm' => 'Please confirm that you want to archive :name.',
   'delete_succeeded' => 'Group <strong>:name</strong> has been deleted.',
-  'nearest_groups' => 'These are the groups that are within 50 km of :location',
   'invitation_pending' => 'You have an invitation to this group.  Please click <a href=":accept">here</a> if you would like to join.',
   'geocode_failed' => 'Location not found. If you are unable to find the location of your group, please try a more general location (such as village/town), or a specific street address, rather than a building name.',
   'discourse_title' => 'This is a discussion group for anyone who follows :group.
