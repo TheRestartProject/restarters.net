@@ -61,7 +61,7 @@ with the PR number left **empty**.
 | GitHub environment `preview` | required reviewer: edwh; holds `FLY_ORG_TOKEN`, `FLY_PREVIEW_SECRETS` |
 | GitHub environment `preview-cleanup` | no reviewers; deployment branches restricted to `develop`; holds `FLY_ORG_TOKEN` |
 | Restore identity | `restarters-preview-restore@restarters-previews.iam.gserviceaccount.com` (GCP project `restarters-previews`, owned by edward@therestartproject.org; Drive API enabled). Needs **Viewer** on the backups folder — it must never be able to delete backups. |
-| Tigris | previews use a **read-only** access key for `restarters-uploads` (create via `fly storage dashboard restarters-uploads` → Access Keys) |
+| Tigris | currently reusing production's **read-write** key (accepted interim, 2026-07-13): the `FEATURE__IMAGE_UPLOAD` flag is the only upload block, so the approval gate must catch malicious PRs. TODO: swap to a read-only key (`fly storage dashboard restarters-uploads` → Access Keys) and update `FLY_PREVIEW_SECRETS`. |
 | Label | `preview` |
 
 Secrets template: `fly.pr-secrets.example.env`. To rotate or complete the
@@ -76,8 +76,10 @@ shred -u ~/preview-secrets.env
 ## Security model (short version)
 
 - Previews run arbitrary PR code holding a full live-DB copy, so they get
-  **no production-capable credentials**: fresh per-app `APP_KEY`, read-only
-  Tigris, read-only Drive SA, no mail/Discourse/wiki/WordPress/Drip secrets.
+  **no production-capable credentials** where practical: fresh per-app
+  `APP_KEY`, read-only Drive SA, no mail/Discourse/wiki/WordPress/Drip
+  secrets. Exception: the Tigris key is currently production's read-write
+  one (see table above).
 - The `preview` environment's required-reviewer gate is what stands between
   a pushed commit and the credentials — hence the pre-approval glance at
   infra files.
