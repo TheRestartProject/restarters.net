@@ -229,7 +229,8 @@ Previews hold **no production-capable credentials**:
      `develop` only; holds `FLY_ORG_TOKEN`.
 3. **Repository variable** `FLY_ORG` = the Fly organisation slug.
 4. **`FLY_PREVIEW_SECRETS`** (env-file format, one `KEY=value` per line) in
-   the `preview` environment:
+   the `preview` environment — start from the annotated template
+   `fly.pr-secrets.example.env` in the repo root:
    - `BASIC_AUTH_PASSWORD` — a fresh value (the old committed one is public
      in git history; rotate, don't reuse)
    - `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` / `AWS_BUCKET` — a

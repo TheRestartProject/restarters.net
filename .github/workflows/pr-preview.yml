@@ -152,7 +152,10 @@ jobs:
           else
             flyctl apps create "$APP" --org "$FLY_ORG"
             # Shared read-only credentials (Tigris RO, Drive RO, gate password...)
-            echo "$FLY_PREVIEW_SECRETS" | flyctl secrets import --app "$APP" --stage
+            # Strip comments/blank lines so the fly.pr-secrets.example.env
+            # template can be filled in and pasted as-is.
+            echo "$FLY_PREVIEW_SECRETS" | grep -vE '^\s*(#|$)' \
+              | flyctl secrets import --app "$APP" --stage
             # Fresh per-app key - previews must never hold the production APP_KEY.
             flyctl secrets set "APP_KEY=base64:$(openssl rand -base64 32)" \
               --app "$APP" --stage
