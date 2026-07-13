@@ -29,10 +29,6 @@ on:
   schedule:
     - cron: '43 2,8,14,20 * * *'  # cleanup sweep, 4x daily
 
-permissions:
-  contents: read
-  pull-requests: write
-
 jobs:
   deploy:
     name: Deploy preview
@@ -43,6 +39,9 @@ jobs:
        github.event.pull_request.head.repo.full_name == github.repository)
     runs-on: ubuntu-latest
     environment: preview
+    permissions:
+      contents: read
+      pull-requests: write
     concurrency:
       group: pr-preview-${{ github.event.pull_request.number || github.event.inputs.pr_number }}
       cancel-in-progress: true
@@ -135,7 +134,7 @@ jobs:
           fi
 
       - name: Set up flyctl
-        uses: superfly/flyctl-actions/setup-flyctl@master
+        uses: superfly/flyctl-actions/setup-flyctl@ed8efb33836e8b2096c7fd3ba1c8afe303ebbff1 # master 2026-04-08
 
       - name: Create app and set secrets (first deploy only)
         env:
@@ -240,6 +239,9 @@ jobs:
     if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && github.event.inputs.pr_number == '')
     runs-on: ubuntu-latest
     environment: preview-cleanup
+    permissions:
+      contents: read
+      pull-requests: read
     concurrency:
       group: pr-preview-sweep
     env:
@@ -247,7 +249,7 @@ jobs:
       FLY_API_TOKEN: ${{ secrets.FLY_ORG_TOKEN }}
     steps:
       - name: Set up flyctl
-        uses: superfly/flyctl-actions/setup-flyctl@master
+        uses: superfly/flyctl-actions/setup-flyctl@ed8efb33836e8b2096c7fd3ba1c8afe303ebbff1 # master 2026-04-08
 
       - name: Sweep
         run: |

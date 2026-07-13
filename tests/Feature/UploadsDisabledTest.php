@@ -7,6 +7,7 @@ use App\Network;
 use App\User;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Testing\TestResponse;
 use Tests\TestCase;
 
 /**
@@ -26,29 +27,9 @@ class UploadsDisabledTest extends TestCase
     {
         config(['restarters.features.image_upload' => false]);
 
-        $group = Group::factory()->create();
-        $host = User::factory()->host()->create();
-        $group->addVolunteer($host);
-        $group->makeMemberAHost($host);
-        $this->actingAs($host);
-
-        $_SERVER['DOCUMENT_ROOT'] = getcwd();
-        \FixometerFile::$uploadTesting = true;
-        file_put_contents('/tmp/UT_disabled.jpg', file_get_contents(public_path() . '/images/community.jpg'));
-
-        $_FILES = [
-            'file' => [
-                'error' => '0',
-                'name' => 'UT_disabled.jpg',
-                'size' => 123,
-                'tmp_name' => ['/tmp/UT_disabled.jpg'],
-                'type' => 'image/jpg',
-            ],
-        ];
-
         $imagesBefore = \DB::table('images')->count();
 
-        $response = $this->json('POST', '/group/image-upload/' . $group->idgroups, []);
+        $response = $this->postGroupImage('UT_disabled.jpg');
         $response->assertOk();
         $this->assertStringStartsWith('fail - image could not be uploaded', $response->getContent());
         $this->assertStringContainsString('disabled', $response->getContent());
@@ -61,27 +42,7 @@ class UploadsDisabledTest extends TestCase
     {
         config(['restarters.features.image_upload' => true]);
 
-        $group = Group::factory()->create();
-        $host = User::factory()->host()->create();
-        $group->addVolunteer($host);
-        $group->makeMemberAHost($host);
-        $this->actingAs($host);
-
-        $_SERVER['DOCUMENT_ROOT'] = getcwd();
-        \FixometerFile::$uploadTesting = true;
-        file_put_contents('/tmp/UT_enabled.jpg', file_get_contents(public_path() . '/images/community.jpg'));
-
-        $_FILES = [
-            'file' => [
-                'error' => '0',
-                'name' => 'UT_enabled.jpg',
-                'size' => 123,
-                'tmp_name' => ['/tmp/UT_enabled.jpg'],
-                'type' => 'image/jpg',
-            ],
-        ];
-
-        $response = $this->json('POST', '/group/image-upload/' . $group->idgroups, []);
+        $response = $this->postGroupImage('UT_enabled.jpg');
         $response->assertOk();
         $this->assertEquals('success - image uploaded', $response->getContent());
     }
@@ -90,15 +51,8 @@ class UploadsDisabledTest extends TestCase
     public function network_logo_upload_rejected_when_uploads_disabled(): void
     {
         config(['restarters.features.image_upload' => false]);
-        Storage::fake('public_uploads');
 
-        $network = Network::factory()->create();
-        $admin = User::factory()->administrator()->create();
-        $this->actingAs($admin);
-
-        $response = $this->put(route('networks.update', $network), [
-            'network_logo' => UploadedFile::fake()->image('logo.png'),
-        ]);
+        [$network, $response] = $this->putNetworkLogo();
 
         $response->assertRedirect(route('networks.edit', $network));
         $response->assertSessionHas('warning');
@@ -109,6 +63,51 @@ class UploadsDisabledTest extends TestCase
     public function network_logo_upload_allowed_when_uploads_enabled(): void
     {
         config(['restarters.features.image_upload' => true]);
+
+        [$network, $response] = $this->putNetworkLogo();
+
+        $response->assertRedirect(route('networks.edit', $network));
+        $logo = $network->fresh()->logo;
+        $this->assertNotNull($logo);
+        $this->assertStringStartsWith('network_logos/', $logo);
+    }
+
+    /**
+     * Post an image to the group image-upload endpoint as a host, using the
+     * legacy $_FILES mechanism the endpoint expects.
+     */
+    private function postGroupImage(string $filename): TestResponse
+    {
+        $group = Group::factory()->create();
+        $host = User::factory()->host()->create();
+        $group->addVolunteer($host);
+        $group->makeMemberAHost($host);
+        $this->actingAs($host);
+
+        $_SERVER['DOCUMENT_ROOT'] = getcwd();
+        \FixometerFile::$uploadTesting = true;
+        file_put_contents('/tmp/' . $filename, file_get_contents(public_path() . '/images/community.jpg'));
+
+        $_FILES = [
+            'file' => [
+                'error' => '0',
+                'name' => $filename,
+                'size' => 123,
+                'tmp_name' => ['/tmp/' . $filename],
+                'type' => 'image/jpg',
+            ],
+        ];
+
+        return $this->json('POST', '/group/image-upload/' . $group->idgroups, []);
+    }
+
+    /**
+     * Upload a network logo as an administrator.
+     *
+     * @return array{0: Network, 1: TestResponse}
+     */
+    private function putNetworkLogo(): array
+    {
         Storage::fake('public_uploads');
 
         $network = Network::factory()->create();
@@ -119,9 +118,6 @@ class UploadsDisabledTest extends TestCase
             'network_logo' => UploadedFile::fake()->image('logo.png'),
         ]);
 
-        $response->assertRedirect(route('networks.edit', $network));
-        $logo = $network->fresh()->logo;
-        $this->assertNotNull($logo);
-        $this->assertStringStartsWith('network_logos/', $logo);
+        return [$network, $response];
     }
 }
