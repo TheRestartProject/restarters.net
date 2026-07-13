@@ -176,6 +176,11 @@ the live database.
 
 ### How it works
 
+- The deploy builds the PR's **merge result** with its base branch (like CI
+  tests), so a stale branch is previewed as it would actually land, and the
+  code is never older than the schema in the restored backup. Conflicted PRs
+  fail fast with "resolve conflicts first"; the PR comment notes how far the
+  branch is behind. Pushing after a rebase redeploys with a fresh restore.
 - Same image build as production (`Dockerfile.fly`), with an embedded local
   MariaDB (the `restarters-yesterday` pattern). `docker/preview-startup.sh`
   serves a static "warming up" page within seconds of boot, restores the
