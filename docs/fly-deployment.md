@@ -159,6 +159,9 @@ The `production` branch deploy runs without waiting for tests (it is triggered b
 
 ## PR Previews
 
+Operating guide and concrete setup record: `PREVIEW-ENVIRONMENTS.md` in the
+repo root. Technical design below.
+
 Any PR can be deployed as a self-contained test site at
 `https://restarters-pr-<N>.fly.dev`, running the PR's code against a copy of
 the live database.
