@@ -1,230 +1,249 @@
-# Usage instrumentation → Loki → AI flow-coverage analysis
+# Usage instrumentation → flow mining → AI test-coverage analysis
 
-Status: **approved design** (2026-07-14). Implementation follows in phased PRs
-(see Phasing). Decisions taken by Edward are marked ✔.
+Status: **approved design v2** (2026-07-14). Implementation follows in phased PRs.
+Decisions by Edward marked ✔.
+
+Two adversarial review rounds shaped this document. Round 1 (privacy/GDPR,
+signal quality, operations, frontend feasibility — 27 findings) hardened the
+original bespoke pipeline. Round 2 attacked the build-vs-buy premise and the
+flow→test matching feasibility with a worked example from the real codebase;
+it split the design: the client capture layer now rides the already-deployed
+Matomo tracker (✔), while the server-side stream, mining, and coverage
+matching remain custom because no off-the-shelf product addresses them
+(verified against Matomo, PostHog, OpenReplay, Countly, Snowplow, Jitsu,
+RudderStack, Faro, Umami, Plausible, Highlight.io; "ClickTail" does not exist
+as a maintained 2026 project).
 
 ## Goal
 
 Capture the flows real users actually perform (client actions + API calls),
-store them in a self-hosted Loki, and provide tooling that lets an AI mine
-those events into canonical flows, compare them against the existing test
-estate (Playwright / PHPUnit API / Jest), and produce the missing golden-flow
-tests. No third-party SaaS (no Hotjar/Clicktale-style tools).
+mine them into canonical flows, compare against the existing test estate
+(Playwright / PHPUnit API / Jest), and have an AI produce the missing
+golden-flow tests — ranked by real usage, validated by a round-trip gate
+before any generated test is trusted.
 
-This design was produced from three research strands (the Freegle
-client→Loki pipeline, a full inventory of this codebase, and 2025–26 state of
-the art for behavioural capture and trace-based test generation) followed by a
-four-lens adversarial review (privacy/GDPR, signal quality, operations,
-frontend feasibility — 27 findings incorporated).
+## Ground truth (corrected in round 2)
 
-## Ground truth this design rests on
-
-- restarters.net is **not an SPA**: 221 blade views; Vue 2 (v2.7) islands —
-  ~118 components mounted per-element with no vue-router. Whole flows are
-  blade-only (all 14 user/profile views, registration, password reset).
-  **Verified**: the main JS bundle IS loaded on those blade-only pages, so one
-  DOM-level capture layer covers both worlds. (The 4 iframe/stat-embed views
-  don't load it — explicitly out of scope, they are non-interactive.)
-- Document capture-phase listeners see events before any jQuery
-  `stopPropagation` (verified); `el.__vue__` is present in Vue 2.7 (verified).
-- The existing consent flag (`analyticsCookieEnabled`) is currently read once
-  at page parse, **does not actually gate Matomo** (only Sentry's beforeSend
-  reads it), and nothing reacts to the banner's `gdprCookiesEnabled` event.
-  Phase 1 fixes this rather than inheriting it.
-- `api_token` travels in query strings → server-side logging must strip query
+- **Matomo Cloud — not self-hosted — is already wired into every page**
+  (`restartproject.matomo.cloud`, AWS Frankfurt, InnoCraft DPA). Google Tag
+  Manager's noscript iframe is also present. The original "no third-party
+  SaaS" framing was therefore already breached by the status quo; the
+  operative non-goal is **no NEW SaaS dependencies** (✔ continued Matomo
+  Cloud use accepted; migrating to self-hosted Matomo remains a separately
+  costed option that would not change this design's shape).
+- The site is not an SPA: 221 blade views, Vue 2.7 islands, no vue-router;
+  whole flows are blade-only (user/profile ×14, registration, password
+  reset). The main JS bundle IS loaded on those pages (verified), so one
+  client capture layer covers both worlds. The 4 iframe/stat embeds don't
+  load it — out of scope.
+- The consent flag (`analyticsCookieEnabled`) is read once at page parse and
+  **does not currently gate Matomo** (only Sentry's beforeSend consumes it);
+  nothing reacts to the banner's `gdprCookiesEnabled` event. Fixed in
+  phase 1 via Matomo's native consent API.
+- `api_token` travels in query strings → server-side logging strips query
   strings everywhere.
-- Freegle's proven pipeline shape is adopted (client batch → own-API relay →
-  NDJSON file → Alloy tail → Loki; low-cardinality labels; per-stream
-  retention) with its known gaps closed: no raw IPs, real consent handling,
-  Loki never publicly reachable.
+- Laravel's method override (`_method=PATCH` in POSTed forms) is applied
+  before any middleware runs, so wire method ≠ effective method for exactly
+  the save calls that matter (verified: Kernel.php `enableHttpMethodParameterOverride`,
+  and the Vuex store's edit action posts `_method: PATCH`).
 
 ## Architecture
 
 ```
-Browser (all pages; module in the main bundle, init at DOMContentLoaded —
-         NOT inside the jQuery/Leaflet polling gate)
-  flowcap module (neutral naming; "usage"/"analytics"/"track" attract adblockers)
+Browser (all pages)
+  flow-delegator module (small; init at DOMContentLoaded, NOT inside the
+  jQuery/Leaflet polling gate)
     - document capture-phase listeners: click, submit, change
-    - element identity, priority order:
-        1. nearest [data-flow="area.step"]           ← PRIMARY (✔ committed)
-        2. sanitized elements_chain descriptor (PostHog-style ancestor walk;
-           strips data-v-* hashes, __BVID__*/__BV_* generated ids, noise classes)
-        3. nearest meaningful Vue component via el.__vue__ walk, skipping a
-           denylist of library internals — supplementary signal only
-    - page_view on DOMContentLoaded + pageshow (bfcache restores flagged)
-    - form fields: identity + emptiness/length only; NEVER values;
-      password fields suppressed entirely
-    - no mouse movements, no scroll, no keystrokes
-      (optional later: rage-click derived event)
-    - context: session_id (sessionStorage, mirrored into a SameSite=Lax cookie
-      so native blade form POSTs and Dropzone uploads correlate),
-      trace_id per interaction (JS-only), numeric user id,
-      page id via <meta name="page">, page_load_phase state machine
-    - queue ≤10 events / 5s; flush via navigator.sendBeacon on
-      pagehide/visibilitychange (fetch keepalive fallback; byte-capped;
-      never unload/beforeunload — they break bfcache)
-    - axios + jQuery ajax interceptors add X-Session-ID / X-Trace-ID
-        │ POST /api/session-events
+    - TAGGED events: nearest [data-flow="area.step"] →
+        _paq.push(['trackEvent', 'flow', '<area.step>', <page-id>])
+    - DISCOVERY events (✔ always-on): untagged interactive elements →
+        sanitized elements_chain descriptor (strips data-v-* hashes,
+        __BVID__*/__BV_* generated ids, noise classes; supplementary
+        el.__vue__ walk skipping library internals) →
+        _paq.push(['trackEvent', 'discovery', '<descriptor>', <page-id>])
+      Volume note: discovery events count as Matomo Cloud hits — phase 1
+      checks plan headroom and includes a sampling knob (default 100%).
+    - form fields: identity + emptiness only, never values; password fields
+      suppressed entirely. No mouse paths, scroll, or keystrokes.
+    - session_id: sessionStorage, mirrored into a SameSite=Lax cookie AND
+      pushed to Matomo as a custom dimension — the join key across streams.
+      (Native blade form POSTs and Dropzone uploads correlate via the cookie.)
+    - page identity: <meta name="page"> added to layouts (does not exist yet
+      — phase 1 deliverable; URL prefixes are NOT a usable discriminator:
+      /group/create, /group/edit/{id}, /group/view/{id} share a prefix but
+      are different flows)
+    - consent: Matomo native requireConsent()/setConsentGiven()/
+      forgetConsentGiven(), wired to the existing gdprCookiesEnabled event —
+      withdrawal stops tracking within the page view. This REPLACES the
+      currently-broken arrangement where Matomo fires regardless of consent.
+    - transport: Matomo tracker (alwaysUseSendBeacon). There is NO bespoke
+      ingestion endpoint — /api/session-events and all its hardening are
+      deleted from the design.
         ▼
-Laravel
-  - SessionEventsController: loose validation, enrichment (user id, coarse UA
-    class, NO raw IP), append NDJSON via a dedicated Monolog channel to
-    /var/log/usage/*.log; always 204 (fire-and-forget)
-  - RecordApiUsage middleware (web + api groups, EXCLUDING the ingestion route):
-    method, route PATTERN (no raw URLs; query strings stripped), status,
-    duration_ms, user id, session id (header, cookie fallback) → same stream
-        │ logrotate: 3–7 days local retention (Loki holds the long copy)
-        ▼
-Grafana Alloy (new supervisord program on production and restarters-dev ONLY —
-  per-PR preview apps are excluded: no /var/log volume, 2GB no-swap suspend
-  contract, and their traffic is synthetic anyway; FEATURE__USAGE_TELEMETRY is
-  forced off there)
-  - Loki labels: {app, env, source, event_type} ONLY; session/user/trace ids go
-    to structured metadata (never labels — cardinality)
-  - WAL buffering rides out Loki outages
-        ▼
-Loki — new Fly app `restarters-loki` (✔ Loki is the single store of record)
-  - private 6PN only, NO public IP; shared-cpu-1x; small volume; version pinned
-  - retention_stream: usage streams 90d
-  - volume not backed up — accepted risk (losing it restarts collection)
-        ▼
-flowmine — PHP artisan commands (✔) under the app (operator tooling)
-  1. flowmine:export  — paginated pull from Loki HTTP API over ≤30-day windows
-                        (✔ 30-day mining window accepted) into local SQLite
-  2. flowmine:mine    — sessionize (session_id = case id) and build a
-                        directly-follows graph; flow variants ranked by
-                        frequency (DFG + variant counting is a few hundred
-                        lines of PHP; no external mining library needed)
-  3. flowmine:manifest— regenerate the test-coverage manifest (below)
-  4. flowmine:report  — ranked gap list (flow frequency × missing coverage);
-                        k-anonymity floor: a variant needs ≥5 distinct sessions
-                        to appear in any export; rarer flows are flagged for
-                        human-only review. The LLM-facing brief contains
-                        aggregates only — no trace ids, nothing Sentry-joinable
-        ▼
-Claude consumes the brief and writes the missing Playwright / API / Jest tests
-as ordinary human-reviewed PRs.
+Matomo Cloud (existing)                    Laravel RecordApiUsage middleware
+  events queryable via                       (web+api): route PATTERN, status,
+  Live.getLastVisitsDetails                  duration_ms, BOTH wire method
+  (per-visit action sequences,               (getRealMethod) and effective
+  paginated, 200 req/min —                   method, user id, session id
+  ample at this volume)                      (header, cookie fallback);
+        │                                    NDJSON → /var/log/usage/*.log
+        │                                    (logrotate 3–7d) → Alloy tail →
+        │                                    Loki (restarters-loki Fly app,
+        │                                    private 6PN, labels {app,env,
+        │                                    source,event_type} only, 90d)
+        │                                    Consent tier: runs for everyone
+        │                                    (legitimate interest, route-level
+        │                                    only ✔); session/user correlation
+        │                                    fields ONLY with analytics consent
+        └──────────────┬─────────────────────┘
+                       ▼
+flowmine — PHP artisan commands (✔)
+  flowmine:export   pulls BOTH streams (Matomo Live API + Loki HTTP API,
+                    ≤30-day windows ✔) into local SQLite, joined on
+                    session_id custom dimension + time
+  flowmine:mine     sessionize → directly-follows graph → variant ranking,
+                    with the noise controls listed below
+  flowmine:manifest test-coverage manifest (below)
+  flowmine:report   ranked gaps (frequency × missing coverage), k≥5 distinct
+                    sessions per exported variant; LLM brief is aggregate-only
+  flowmine:lint     data-flow registry CI check (below)
+                       ▼
+Claude writes missing Playwright / API / Jest tests → human-reviewed PRs
 ```
 
-## The `data-flow` convention (✔ committed, with decay protection)
+## Mining correctness (round-2 fitness findings, all binding)
 
-CSS-path descriptors fragment even within a single release (permission- and
-viewport-dependent DOM, BootstrapVue's mount-order `__BVID__` ids,
-scoped-style `data-v-*` hashes). Therefore:
+The paper simulation of the group-create flow showed naive matching fails
+(route-set Jaccard ≈ 0.17 vs its own covering test). These rules are part of
+the design, not optional tuning:
 
-- Phase 1 adds `data-flow="area.step"` (e.g. `group.create.save`,
-  `event.add-device.submit`) to the ~30–40 highest-traffic interactive
-  elements (group/event forms, EventActions, dashboard actions, auth +
-  registration blade forms). Descriptor capture still runs everywhere as
-  discovery for elements not yet annotated.
-- Playwright specs standardise on `[data-flow=...]` selectors for
-  flow-defining steps, so the coverage manifest and production events key off
-  identical strings.
-- **Decay protection (✔ requested)**: a checked-in `tests/flow-registry.json`
-  lists every canonical `data-flow` value and the template file(s) expected to
-  carry it. A CI check (`flowmine:lint`, run in the existing test workflow):
-  - fails if a registry entry no longer appears in any template (attribute
-    removed/renamed without updating the registry);
-  - fails on malformed values (must match `^[a-z0-9-]+(\.[a-z0-9-]+)+$`);
-  - fails if a Playwright spec references a `data-flow` value absent from the
-    registry;
-  - warns (not fails) on template `data-flow` values missing from the registry,
-    so adding new annotations is frictionless but deleting tracked ones is loud.
-  It scans both `.vue` templates and blade files (plain text scan — no fragile
-  AST work), so the convention cannot silently rot in either world.
-
-## Consent & privacy (✔ two-tier)
-
-1. **Server-side operational logging** (RecordApiUsage): route pattern,
-   status, duration, coarse UA class — runs for everyone under **legitimate
-   interest** (equivalent to the nginx access logs that already exist, which
-   record strictly more). Contains no behavioural detail. User/session
-   correlation fields are populated ONLY when analytics consent exists — the
-   middleware checks the consent cookie server-side; absent consent, those
-   fields are omitted.
-2. **Client behavioural capture** (flowcap): consent-gated and **reactive** —
-   flowcap subscribes to the banner's `gdprCookiesEnabled` event; withdrawal
-   stops queueing and flushing within the same page view. Phase 1 also fixes
-   the pre-existing bug that Matomo ignores the consent flag.
-
-Accepted consequence: pre-consent flows (registration, first visit) are
-under-observed by client capture; they remain visible at page granularity in
-tier-1 logs and stay covered by hand-written tests.
-
-Additional controls:
-- No raw IPs anywhere in the pipeline; numeric user ids only; 64-char string
-  truncation; descriptor depth caps.
-- **Erasure runbook** (GDPR Art. 17): raw NDJSON files are user-id-filterable
-  for their short local window (documented rewrite script); Loki entries age
-  out at ≤90d; LLM-facing exports are k≥5 aggregates with no identifiers.
-- Privacy policy page updated in phase 1 (user-facing copy).
-- The LLM step: only the aggregate gap brief leaves the machine; Anthropic
-  API no-training/no-retention terms cited in the phase-3 docs.
-
-## Ingestion endpoint hardening
-
-- nginx: dedicated `location = /api/session-events` with
-  `client_max_body_size 8k` and per-IP `limit_req` (same zero-FPM-cost pattern
-  as the existing `/_login` limit) — abuse is rejected before PHP-FPM.
-  Laravel throttle as a second layer.
-- Origin/Sec-Fetch-Site same-site check (endpoint is CSRF-exempt but not
-  cross-site-open). Client-supplied session_id is never trusted for rate
-  limiting (per-IP only).
-- Poisoning damping: the k≥5 distinct-session floor in flowmine means forged
-  traffic must sustain many distinct sessions through nginx rate limits to
-  influence the gap report; the report is also human-reviewed before any test
-  is written.
+1. **Ambient-route denylist**: routes fired unconditionally from mounted()/
+   created() hooks (audit found e.g. `api/timezones`, `api/v2/groups/names`,
+   `api/users/{id}/notifications` on the create page alone) are excluded from
+   flow identity. Seeded by a one-off audit of Vue mounted() hooks;
+   maintained in a checked-in list.
+2. **Dual HTTP method fields**: server events record wire + effective method;
+   matching uses effective (aligns with route patterns), wire retained for
+   client-side reconciliation.
+3. **Flow segmentation rule**: a flow ends at the first state-changing API
+   response after a page_view; a navigation that is the direct redirect
+   target of that response (e.g. create → /group/edit/{id}) continues the
+   same flow, otherwise a new candidate begins. Auth is segmented out as its
+   own sub-flow prefix (sessionStorage session ids make login a near-always
+   prefix in test-driven sessions but not production ones).
+4. **Variant normalization**: optional-field interactions collapse into
+   field-group abstractions before variant counting; role-gated UI
+   (canApprove/canNetwork etc.) is a labelled dimension, not separate flows.
+5. **Known-unmatchable classes**: bare positional selectors
+   (`nth-child`-only) and third-party-widget-generated classes are scored as
+   unmatchable in the manifest, not silently counted against similarity.
+   The Google Places autocomplete step is a documented capture blind spot
+   (Google-injected DOM + custom events) — the gap report must not claim
+   coverage judgement over it.
 
 ## Test-coverage manifest
 
-- **PHPUnit**: a test listener records route patterns hit per test,
-  distinguishing scaffolding from subject (calls during setUp()/helpers are
-  tagged via stack inspection — ~28% of Feature tests hit routes as
-  scaffolding and must not count as coverage).
-- **Playwright**: extractor reads `data-flow` selectors + `page.goto` targets;
-  residual `hasText` locators resolved through the lang files.
+- **PHPUnit**: a listener records route patterns per test. Simple stack
+  inspection is NOT sufficient — 58 call sites across 23 files share the
+  identical `TestCase::createGroup()` helper, including the one real
+  create-group test. The disambiguation rule (first state-changing call in
+  the test body of a test whose class/method name matches the route's domain
+  noun, plus explicit override annotations where needed) is specified and
+  unit-tested against that exact corpus before its output is trusted.
+- **Playwright**: extractor reads `[data-flow]` selectors + page.goto
+  targets. Precondition (phase 3): audit-and-rewrite pass converting
+  `page.evaluate()`-driven interactions (the existing group spec's submit is
+  one) to locator-based calls; a lint flags evaluate() blocks containing
+  `.click()` as unextractable.
 - **Jest**: component-name map.
 - Output: `tests/coverage-manifest.json`, regenerated in CI.
 
+## The data-flow convention (✔, with decay protection)
+
+- Phase 1 adds `data-flow="area.step"` to the ~30–40 highest-traffic
+  interactive elements; the same attributes become the Playwright selector
+  convention (zero `data-flow` exists today anywhere, including the 6 specs —
+  the retrofit is a hard precondition of the round-trip gate).
+- `tests/flow-registry.json` + `flowmine:lint` in CI: removing/renaming a
+  registered attribute fails; malformed values fail; Playwright references
+  to unregistered flows fail; new unregistered template attributes warn.
+  Scans .vue AND blade templates (plain text scan).
+
+## Round-trip validation gate (phase 3 exit criterion)
+
+Run the 6 existing Playwright spec files (51 test blocks; each test = one
+isolated session) against a locally instrumented build with capture on;
+flowmine mines ONLY those events against a hand-authored, checked-in
+`(spec, test title) → expected flow` ground-truth map. Pass requires:
+≥90% of test-driven sessions attributed to the correct flow name, zero
+cross-matches between different flows, and the create/edit ambiguity
+(group.test.js deliberately straddles it) resolved by the segmentation rule.
+Production mining output is not trusted until this gate passes.
+
+## Privacy posture
+
+- Client capture (tagged + discovery): consent-gated via Matomo's native
+  consent API, reactive to withdrawal (✔ two-tier model).
+- Server stream: route-level operational logging for everyone under
+  legitimate interest (no behavioural detail; strictly less than existing
+  nginx access logs); session/user correlation fields only with consent.
+- No raw IPs in the server stream; numeric user ids only; 64-char
+  truncation; descriptor depth caps. Matomo Cloud's own IP handling follows
+  the existing DPA (anonymization settings reviewed in phase 1).
+- Erasure: Matomo Cloud provides GDPR deletion tooling for its side; the
+  server-side raw NDJSON window is short (3–7d, user-id filterable,
+  documented script); Loki entries age out ≤90d; flowmine exports are k≥5
+  aggregates with no identifiers, and the LLM-facing brief contains nothing
+  Sentry-joinable.
+- Privacy policy page updated in phase 1.
+
 ## Deployment & cost
 
-- `restarters-loki`: ~$3–4/month. Alloy: ~50–100MB RSS on prod (4GB box) and
-  restarters-dev. Previews: telemetry off, no Alloy.
-- Volume: before committing Loki sizing, phase 1 measures a week of real
-  traffic (nginx access-log counts approximate the server-event stream —
-  the middleware logs every request sitewide, not just client events).
-- Local dev: file-only, no Alloy; `flowmine:tail` helper; /var/log/usage
-  bootstrap in the local entrypoint.
-- Feature flag `FEATURE__USAGE_TELEMETRY` (default off): dev → production.
+- New infra: `restarters-loki` only (~$3–4/month, private, version pinned,
+  volume explicitly unbacked-up — losing it restarts collection). Alloy on
+  prod + restarters-dev; per-PR previews excluded (no volume, no-swap
+  suspend contract, synthetic traffic) — FEATURE__USAGE_TELEMETRY forced off.
+- Matomo Cloud: phase 1 verifies plan hit-volume headroom for always-on
+  discovery events; sampling knob available if needed.
+- Volume gate: a week of nginx access-log counts sizes the server stream
+  before Loki sizing is committed.
+- Local dev: file-only server stream + `flowmine:tail`; Matomo events to a
+  dev site id or logged locally via a stub.
 
-## Phasing (each phase a separate PR)
+## Phasing (each phase its own PR)
 
-1. **Capture + ship**: flowcap module, /api/session-events + nginx hardening,
-   RecordApiUsage, data-flow attributes on the top ~30–40 elements +
-   flow-registry + flowmine:lint CI check, reactive consent (+ Matomo consent
-   bugfix), Alloy + restarters-loki, logrotate, privacy-policy copy, docs.
-   Exit: events flowing from dev; no measurable page-perf regression; real
-   volume numbers collected.
-2. **flowmine export/mine**: Loki export → SQLite → DFG mining → first real
-   usage report over ≥2 weeks of production data.
-3. **Coverage manifest + gap report**: PHPUnit listener, Playwright/Jest
-   extraction, matcher, k≥5 floor, LLM brief format.
-4. **First golden-flow tests** generated from the brief; the loop documented
-   as a repeatable (e.g. quarterly) process.
+1. **Capture**: data-flow attributes + registry + flowmine:lint; the
+   flow-delegator module (tagged + discovery via Matomo); Matomo consent fix
+   (native API, reactive); `<meta name="page">` in layouts; session-id
+   custom dimension + cookie; RecordApiUsage (dual methods, query
+   stripping); NDJSON + Alloy + restarters-loki + logrotate; mounted()-hook
+   ambient-route audit; Matomo plan headroom check; privacy-policy copy.
+2. **flowmine export/mine**: Matomo Live API + Loki export → SQLite; DFG
+   mining with denylist/segmentation/normalization; first usage report over
+   ≥2 weeks of production data.
+3. **Manifest + matching + round-trip gate**: PHPUnit listener (tested
+   against the 58-call-site corpus), Playwright spec rewrite + extractor,
+   Jest map, matcher, k≥5 floor, the round-trip gate. Gate passes before any
+   production gap report is issued.
+4. **Golden-flow tests**: Claude consumes the gap brief; top uncovered flows
+   land as reviewed tests; the loop documented as repeatable.
 
-## Decisions taken (Edward, 2026-07-14)
+## Decisions taken (Edward)
 
 | Decision | Choice |
 |---|---|
-| Consent model | Two-tier: LI for server route logs, consent-gated client capture |
-| Store of record | Loki only; 30-day mining windows accepted |
-| Element identity | `data-flow` attributes primary, with registry + CI lint against decay |
-| flowmine language | PHP artisan commands |
-| Grafana UI | Not initially (analysis is CLI/AI-driven; revisit if needed) |
+| Consent model | Two-tier: LI server route logs; consent-gated client capture |
+| Client transport | Matomo (existing tracker; native consent API; Live API export) |
+| Discovery capture | Always-on via Matomo discovery events (plan-volume checked) |
+| Store of record | Loki (server stream) + Matomo (client stream), joined in flowmine's SQLite; 30-day windows |
+| Element identity | data-flow primary + registry + CI lint against decay |
+| flowmine language | PHP artisan |
+| Grafana UI | Not initially |
+| Matomo Cloud | Continued use accepted; self-hosting it = separate future decision |
 
 ## Non-goals
 
-Session replay / DOM recording; keystroke or mouse-path capture; replacing
-Matomo or Sentry; real-time dashboards or alerting; instrumenting iframe stat
-embeds; capture on per-PR preview apps; instrumenting legacy raw jQuery code
-beyond what DOM-level capture already observes.
+Session replay / DOM recording; keystroke or mouse-path capture; a new
+ingestion endpoint or any NEW SaaS dependency; replacing Sentry; real-time
+dashboards; instrumenting iframe stat embeds; capture on per-PR preview
+apps.
