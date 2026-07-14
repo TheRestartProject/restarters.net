@@ -327,6 +327,15 @@ class GroupController extends Controller
      *              type="boolean"
      *          )
      *      ),
+     *      @OA\Parameter(
+     *          name="minimal",
+     *          description="Trim each group to the fields the groups map page uses: networks become plain ids, next_event keeps only id/start/title, and location keeps only location/country/lat/lng.  Default false.",
+     *          required=false,
+     *          in="query",
+     *          @OA\Schema(
+     *              type="boolean"
+     *          )
+     *      ),
      *      @OA\Response(
      *          response=200,
      *          description="Successful operation",

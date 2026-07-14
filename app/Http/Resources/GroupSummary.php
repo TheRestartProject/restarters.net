@@ -44,10 +44,13 @@ use Cache;
  *     @OA\Property(
  *         property="networks",
  *         title="networks",
- *         description="An array of networks of which the group is a member.",
+ *         description="An array of networks of which the group is a member.  With minimal=true this is an array of network ids only.",
  *         type="array",
  *         @OA\Items(
- *            ref="#/components/schemas/NetworkSummary"
+ *            oneOf={
+ *               @OA\Schema(ref="#/components/schemas/NetworkSummary"),
+ *               @OA\Schema(type="integer")
+ *            }
  *         )
  *     ),
  *     @OA\Property(
@@ -109,12 +112,24 @@ class GroupSummary extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        // minimal=true trims the response to what the groups map page actually
+        // consumes: on a production-sized dataset the full shape is ~2x the
+        // bytes and a large share of the serialisation time.
+        $minimal = $request->get('minimal', false);
+
         $ret = [
             'id' => $this->idgroups,
             'name' => $this->name,
             'image' => $this->groupImage && is_object($this->groupImage) && is_object($this->groupImage->image) ? $this->groupImage->image->path : null,
-            'location' => new GroupLocation($this),
-            'networks' => new NetworkSummaryCollection($this->resource->networks),
+            'location' => $minimal ? [
+                'location' => $this->location,
+                'country' => \App\Helpers\Fixometer::getCountryFromCountryCode($this->country_code),
+                'lat' => $this->latitude,
+                'lng' => $this->longitude,
+            ] : new GroupLocation($this),
+            'networks' => $minimal
+                ? $this->resource->networks->pluck('id')->all()
+                : new NetworkSummaryCollection($this->resource->networks),
             // Tags drive the badges and the tag filter on the groups list.
             // Only included when the caller eager-loaded them, so other users
             // of this resource don't pick up an N+1.
@@ -127,10 +142,13 @@ class GroupSummary extends JsonResource
                     ];
                 });
             }),
-            'updated_at' => Carbon::parse($this->updated_at)->toIso8601String(),
             'archived_at' => $this->archived_at ? Carbon::parse($this->archived_at)->toIso8601String() : null,
             'summary' => true
         ];
+
+        if (! $minimal) {
+            $ret['updated_at'] = Carbon::parse($this->updated_at)->toIso8601String();
+        }
 
         if ($request->get('includeCounts', false)) {
             $ret['hosts'] = $this->resource->all_confirmed_hosts_count;
@@ -177,6 +195,17 @@ class GroupSummary extends JsonResource
                     break;
                 }
             }
+
+           if ($minimal && $nextevent) {
+               // Only what the list and modal display; id/summary are kept
+               // because the EventSummary schema requires them.
+               $nextevent = [
+                   'id' => $nextevent['id'],
+                   'start' => $nextevent['start'],
+                   'title' => $nextevent['title'],
+                   'summary' => true,
+               ];
+           }
 
            $ret['next_event'] = $nextevent;
         }

@@ -153,7 +153,7 @@ export default {
       if (params && params.details) {
         // We want more details.  Ask for archived groups too: the list shows
         // them with an "archived" badge, as the old server-rendered page did.
-        url = '/api/v2/groups/summary?locale=' + getLocale() + '&includeNextEvent=true&includeCounts=true&archived=true'
+        url = '/api/v2/groups/summary?locale=' + getLocale() + '&includeNextEvent=true&includeCounts=true&archived=true&minimal=true'
       } else {
         // Just the name and lat/lng.
         url = '/api/v2/groups/names?locale=' + getLocale()
