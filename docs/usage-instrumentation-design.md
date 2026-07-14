@@ -3,6 +3,12 @@
 Status: **approved design v2** (2026-07-14). Implementation follows in phased PRs.
 Decisions by Edward marked ✔.
 
+An executed matching dry-run accompanies this design: see
+`usage-instrumentation-worked-example.md` and the runnable prototype in
+`flowmine-demo/` (mined group-create correctly matched to group.test.js with
+duplicate avoided; uncovered registration flow detected and a candidate spec
+generated).
+
 Two adversarial review rounds shaped this document. Round 1 (privacy/GDPR,
 signal quality, operations, frontend feasibility — 27 findings) hardened the
 original bespoke pipeline. Round 2 attacked the build-vs-buy premise and the
@@ -151,10 +157,15 @@ the design, not optional tuning:
   noun, plus explicit override annotations where needed) is specified and
   unit-tested against that exact corpus before its output is trusted.
 - **Playwright**: extractor reads `[data-flow]` selectors + page.goto
-  targets. Precondition (phase 3): audit-and-rewrite pass converting
-  `page.evaluate()`-driven interactions (the existing group spec's submit is
-  one) to locator-based calls; a lint flags evaluate() blocks containing
-  `.click()` as unextractable.
+  targets, resolving shared helpers (utils.js) into their page/selector/route
+  effects. Helper-derived evidence is weighted as SCAFFOLDING (0.25) unless a
+  test title in the spec shares the flow's domain tokens — the worked example
+  (docs/usage-instrumentation-worked-example.md) showed flat scoring
+  mis-attributes group-create to device.test.js, which uses the same
+  createGroup() helper as setup. Precondition (phase 3): audit-and-rewrite
+  pass converting `page.evaluate()`-driven interactions (the existing group
+  spec's submit is one) to locator-based calls; a lint flags evaluate()
+  blocks containing `.click()` as unextractable.
 - **Jest**: component-name map.
 - Output: `tests/coverage-manifest.json`, regenerated in CI.
 
