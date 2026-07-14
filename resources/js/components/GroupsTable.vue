@@ -37,6 +37,7 @@
     </div>
     <hr class="d-block d-md-none" />
     <b-table :fields="fields" :items="itemsToShow" sort-null-last thead-tr-class="d-none d-md-table-row" :sort-compare="sortCompare"
+             :tbody-tr-class="rowClass"
              @row-hovered="rowHovered" @row-unhovered="rowUnhovered"
     >
       <template slot="head(group_image)">
@@ -139,6 +140,12 @@ export default {
     groupids: {
       type: Array,
       required: true
+    },
+    // Group id whose row should be highlighted (set when its map pin is hovered).
+    hover: {
+      type: Number,
+      required: false,
+      default: null
     },
     count: {
       type: Boolean,
@@ -372,6 +379,9 @@ export default {
     rowUnhovered(item, index, event) {
       this.$emit('update:hover', null)
     },
+    rowClass(item, type) {
+      return item && type === 'row' && item.id === this.hover ? 'group-row-hover' : ''
+    },
     visibleTags(tags) {
       // Filter tags to only show those the user has access to view
       // allGroupTags contains the tags the user can see (admin sees all, NC sees their networks)
@@ -451,5 +461,11 @@ export default {
   font-size: 0.75rem;
   font-weight: normal;
   padding: 0.2em 0.5em;
+}
+
+// Row whose map pin is hovered. ::v-deep because the tr is rendered inside
+// b-table, outside this component's scope attribute.
+::v-deep .group-row-hover td {
+  background-color: #fff3cd;
 }
 </style>

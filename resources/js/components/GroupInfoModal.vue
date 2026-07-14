@@ -5,13 +5,14 @@
       no-stacking
   >
     <template slot="modal-title">
-      <div class="d-flex w-100">
+      <!-- Logo and name navigate to the group, same as the Go to group button. -->
+      <a :href="'/group/view/' + group.id" class="d-flex w-100 text-reset text-decoration-none group-link">
         <b-img @error="brokenGroupImage" :src="groupImage" class="groupImage mr-4" />
         <div>
           <div>{{ group.name }}</div>
           <div class="small text-muted" v-if="group.location">{{ group.location.location }}</div>
         </div>
-      </div>
+      </a>
     </template>
     <template slot="default">
       <div class="d-flex flex-wrap">

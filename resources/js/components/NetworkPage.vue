@@ -12,7 +12,6 @@
       </div>
       <div class="network-actions" v-if="isLoggedIn">
         <b-dropdown right variant="primary" :text="__('networks.general.actions')">
-          <b-dropdown-item :href="'/group/network/' + network.id">{{ __('networks.show.view_groups_menuitem') }}</b-dropdown-item>
           <b-dropdown-item v-if="canAssociateGroups" @click="showAddGroupModal">{{ __('networks.show.add_groups_menuitem') }}</b-dropdown-item>
           <b-dropdown-item :href="'/export/networks/' + network.id + '/events'">{{ __('groups.export_event_list') }}</b-dropdown-item>
         </b-dropdown>

@@ -52,7 +52,6 @@ return [
     'add_groups_save_button' => 'Add',
     'add_groups_warning_none_selected' => 'No groups selected.',
     'add_groups_success' => '{1} :number group added.|[2,*] :number groups added.',
-    'view_groups_menuitem' => 'View groups',
     'none' => 'None',
   ],
   'edit' => [

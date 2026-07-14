@@ -59,7 +59,6 @@ return [
     'add_groups_select_label' => 'Choisissez des repair cafés à ajouter',
     'add_groups_success' => '{1} :number repair café ajouté.|[2,*] :number repair cafés ajoutés.',
     'add_groups_warning_none_selected' => 'Pas de repair café(s) sélectionné(s)',
-    'view_groups_menuitem' => 'Voir les repair cafés',
     'none' => 'Aucun',
   ],
 ];

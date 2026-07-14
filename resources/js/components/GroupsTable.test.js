@@ -200,3 +200,16 @@ describe('GroupsTable follow/unfollow button', () => {
     expect(wrapper.find('tbody tr').text()).toContain('groups.join_group_button')
   })
 })
+
+// Neil's PR feedback: hovering a map pin should highlight the matching row.
+describe('GroupsTable pin-hover row highlight', () => {
+  test('row gets the highlight class when hover matches its id', () => {
+    const wrapper = mountTable([group], { hover: 1 })
+    expect(wrapper.find('tbody tr').classes()).toContain('group-row-hover')
+  })
+
+  test('no highlight when hover is another id or null', () => {
+    expect(mountTable([group], { hover: 999 }).find('tbody tr').classes()).not.toContain('group-row-hover')
+    expect(mountTable([group]).find('tbody tr').classes()).not.toContain('group-row-hover')
+  })
+})

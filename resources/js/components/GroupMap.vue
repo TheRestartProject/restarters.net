@@ -13,7 +13,7 @@
         @moveend="idle"
         @dragend="dragEnd"
     >
-      <GroupMarker :key='"marker-" + group.id' v-for="group in mappableGroups" :id="group.id" :highlight="yourGroup(group.id)" :hover="group.id === hover" />
+      <GroupMarker :key='"marker-" + group.id' v-for="group in mappableGroups" :id="group.id" :highlight="yourGroup(group.id)" :hover="group.id === hover" @update:hover="$emit('update:hover', $event)" />
       <l-tile-layer :url="tiles" :attribution="attribution" />
     </l-map>
   </div>

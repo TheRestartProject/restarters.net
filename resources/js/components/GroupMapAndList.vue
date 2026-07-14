@@ -15,6 +15,7 @@
           :network="network"
           :your-groups="yourGroups"
           :hover="hover"
+          @update:hover="hover = $event"
           @groups="groupsChanged($event)"
       />
       <GroupsTable

@@ -7,8 +7,8 @@
           title: group.name + ' - ' + __('groups.marker_title'),
         }" :icon="icon"
         @click="openModal"
-        @mouseover="hovering = true"
-        @mouseout="hovering = false"
+        @mouseover="markerHover(true)"
+        @mouseout="markerHover(false)"
     />
     <GroupInfoModal v-if="showModal" ref="modal" :id="group.id" @close="showModal = false "/>
   </div>
@@ -79,6 +79,12 @@ export default {
   methods: {
     openModal() {
       this.showModal = true
+    },
+    markerHover(over) {
+      this.hovering = over
+      // Tell the list so the matching row highlights (the reverse of the
+      // row-hover → red pin direction).
+      this.$emit('update:hover', over ? this.id : null)
     }
   }
 }

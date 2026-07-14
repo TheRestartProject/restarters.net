@@ -53,3 +53,23 @@ describe('GroupMarker icon', () => {
     expect(mountMarker({ hover: true, highlight: true }).vm.icon.options.className).toBe('group-marker-hover')
   })
 })
+
+// Neil's PR feedback: hovering a pin should highlight the matching list row
+// (the reverse of row-hover → red pin).
+describe('GroupMarker hover emission', () => {
+  test('mouseover emits update:hover with the group id, mouseout clears it', async () => {
+    const wrapper = mountMarker()
+
+    wrapper.vm.markerHover(true)
+    expect(wrapper.emitted('update:hover').pop()).toEqual([1])
+
+    wrapper.vm.markerHover(false)
+    expect(wrapper.emitted('update:hover').pop()).toEqual([null])
+  })
+
+  test('marker hover also turns its own pin red', () => {
+    const wrapper = mountMarker()
+    wrapper.vm.markerHover(true)
+    expect(wrapper.vm.icon.options.className).toBe('group-marker-hover')
+  })
+})

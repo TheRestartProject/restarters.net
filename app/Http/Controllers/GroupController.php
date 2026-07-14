@@ -130,7 +130,9 @@ class GroupController extends Controller
 
     public function network($id)
     {
-        return $this->indexVariations('all', $id);
+        // Retired: network coordinators now see their groups on the network
+        // page itself (map + list). Kept as a redirect for old links.
+        return redirect('/networks/' . $id);
     }
 
     public function create(Request $request)

@@ -264,10 +264,6 @@ class NetworkTest extends TestCase
         $response = $this->get('/networks/' . $network->id);
         $response->assertSee($coordinator->name);
 
-        // Group should not show on network page yet.
-        $response = $this->get('/group/network/' . $network->id);
-        $response->assertDontSee('&quot;networks&quot;:[' . $network->id . ']');
-
         // Add the group.
         $response = $this->get('/networks/' . $network->id);
         $crawler = new Crawler($response->getContent());
@@ -285,13 +281,15 @@ class NetworkTest extends TestCase
         ]);
         $response->assertRedirect();
 
-        // Groups are now fetched client-side from /api/v2/groups/summary, so
-        // the group name is no longer server-rendered here. The network scope
-        // must still reach the Vue layer: /group/network/{id} passes the
-        // network id, which GroupsPage forwards to the map/list to filter by.
+        // /group/network/{id} is retired: coordinators see their groups on the
+        // network page itself (map + list). Old links redirect there.
         $response = $this->get('/group/network/' . $network->id);
+        $response->assertRedirect('/networks/' . $network->id);
+
+        // The network page embeds the map/list scoped to this network.
+        $response = $this->get('/networks/' . $network->id);
         $response->assertSuccessful();
-        $response->assertSee(':network="' . $network->id . '"', false);
+        $response->assertSee(':network="{&quot;id&quot;:' . $network->id, false);
 
         // And the group must be in the API data the page will fetch.
         $response = $this->get('/api/v2/groups/summary');

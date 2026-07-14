@@ -121,3 +121,16 @@ describe('effectiveGroupIds', () => {
     expect(wrapper.vm.effectiveGroupIds).toEqual([2])
   })
 })
+
+// Neil's PR feedback: pin hover flows back up from the map and down into the
+// table, so the matching row highlights.
+test('map update:hover lands in the table hover prop', async () => {
+  const wrapper = await makeWrapper()
+  wrapper.findComponent({ name: 'GroupMap' }).vm.$emit('update:hover', 42)
+  await wrapper.vm.$nextTick()
+  expect(wrapper.vm.hover).toBe(42)
+
+  wrapper.findComponent({ name: 'GroupMap' }).vm.$emit('update:hover', null)
+  await wrapper.vm.$nextTick()
+  expect(wrapper.vm.hover).toBe(null)
+})
