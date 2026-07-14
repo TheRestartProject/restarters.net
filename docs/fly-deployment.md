@@ -14,6 +14,7 @@ How the application is built, run, and deployed on Fly.io.
 | `restarters-db` | `fly-mysql.toml` | internal only | — |
 | `restarters-pma` | `fly-pma.toml` | via `flyctl proxy` only | — |
 | `restarters-yesterday` | `fly-yesterday.toml` | `yesterday.restarters.net` (sleeps when idle) | — |
+| `restarters-pr-<N>` | `fly.pr.toml` (template) | `restarters-pr-<N>.fly.dev` (sleeps when idle) | any PR labeled `preview` |
 
 All apps run in the `lhr` (London) region. The DB is on a private 6PN network (`restarters-db.internal`) — only reachable by other apps in the same Fly organisation, not from the public internet.
 
@@ -153,6 +154,102 @@ Both environments auto-deploy via CircleCI (`.circleci/config.yml`):
 The `production` branch deploy runs without waiting for tests (it is triggered by a merge from `master`, which already passed CI). `FLY_API_TOKEN` is set in CircleCI project settings.
 
 > **Important:** always merge `master → production` before deploying. Never deploy `develop` or `master` directly to the `restarters` app.
+
+---
+
+## PR Previews
+
+Operating guide and concrete setup record: `PREVIEW-ENVIRONMENTS.md` in the
+repo root. Technical design below.
+
+Any PR can be deployed as a self-contained test site at
+`https://restarters-pr-<N>.fly.dev`, running the PR's code against a copy of
+the live database.
+
+### Using it
+
+1. Add the `preview` label to the PR (or run the **PR preview** workflow
+   manually with the PR number). Every push to a labeled PR redeploys.
+2. Each deploy waits for approval (GitHub Environment `preview`). **Before
+   approving, glance at the PR's diff to `.github/workflows/`,
+   `fly.pr.toml`, `Dockerfile.fly` and `docker/*.sh`** — the deploy runs the
+   PR's own code with the preview credentials.
+3. The workflow comments on the PR with the URL and the restore/migration
+   result. The site is behind the usual cookie gate.
+
+### How it works
+
+- The deploy builds the PR's **merge result** with its base branch (like CI
+  tests), so a stale branch is previewed as it would actually land, and the
+  code is never older than the schema in the restored backup. Conflicted PRs
+  fail fast with "resolve conflicts first"; the PR comment notes how far the
+  branch is behind. Pushing after a rebase redeploys with a fresh restore.
+- Same image build as production (`Dockerfile.fly`), with an embedded local
+  MariaDB (the `restarters-yesterday` pattern). `docker/preview-startup.sh`
+  serves a static "warming up" page within seconds of boot, restores the
+  most recent hourly production backup, truncates the restored `jobs` /
+  `failed_jobs` tables (production's in-flight jobs must not run here), then
+  runs `php artisan migrate --force` — so a PR's migrations are exercised
+  against real data before merge. Progress is reported at
+  `/_preview_status` (no auth, no PII).
+- The machine **suspends** after ~5 min idle (whole-VM snapshot; MariaDB
+  stays loaded) and resumes sub-second on the next request. If Fly discards
+  the snapshot, the next visitor gets the warming page while the machine
+  cold-boots and re-restores. This is why `fly.pr.toml` has no
+  `swap_size_mb`: swap disables suspend.
+- Cost: ~$0.09/hour only while someone is browsing; rootfs storage only
+  (well under $1/month) while suspended; nothing once destroyed.
+- A sweep (4x daily, and on manual dispatch with an empty PR number)
+  destroys apps whose PR is closed or no longer labeled. Cleanup
+  deliberately does **not** run on `pull_request` events: those execute the
+  PR's modified workflow file, which must never reach the org token without
+  approval. The sweep runs default-branch code via the `preview-cleanup`
+  environment, which is restricted to the `develop` branch.
+
+### Environment isolation
+
+Previews hold **no production-capable credentials**:
+
+- Fresh `APP_KEY` generated per app (never production's — that key can forge
+  production session cookies).
+- Read-only Tigris credentials; `FEATURE__IMAGE_UPLOAD=false` gives users a
+  clean error instead of an IAM failure. Image *reads* come from the shared
+  live bucket.
+- Read-only Google Drive service account for the backup restore (the
+  production backup SA can delete backups; that one never leaves production).
+- `FEATURE__WIKI/DISCOURSE/WORDPRESS_INTEGRATION` all `false`; mail goes to
+  the shared Mailpit (`restarters-dev-mail`).
+
+### One-time setup
+
+1. **Fly org token**: `fly tokens create org` → GitHub secret
+   `FLY_ORG_TOKEN` in **both** the `preview` and `preview-cleanup`
+   environments (not repo-level).
+2. **GitHub environments**:
+   - `preview` — required reviewers: the maintainers; holds `FLY_ORG_TOKEN`
+     and `FLY_PREVIEW_SECRETS`.
+   - `preview-cleanup` — no reviewers; deployment branches restricted to
+     `develop` only; holds `FLY_ORG_TOKEN`.
+3. **Repository variable** `FLY_ORG` = the Fly organisation slug.
+4. **`FLY_PREVIEW_SECRETS`** (env-file format, one `KEY=value` per line) in
+   the `preview` environment — start from the annotated template
+   `fly.pr-secrets.example.env` in the repo root:
+   - `BASIC_AUTH_PASSWORD` — a fresh value (the old committed one is public
+     in git history; rotate, don't reuse)
+   - `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` / `AWS_BUCKET` — a
+     **read-only** Tigris access key for the shared bucket
+   - `GDRIVE_BACKUP_FOLDER_ID`, `RCLONE_CONFIG_GDRIVE_TYPE=drive`,
+     `RCLONE_CONFIG_GDRIVE_SCOPE=drive.readonly`,
+     `RCLONE_CONFIG_GDRIVE_TEAM_DRIVE`,
+     `RCLONE_CONFIG_GDRIVE_SERVICE_ACCOUNT_CREDENTIALS` — a **new** service
+     account with only Viewer access to the backup folder
+   - `MAPBOX_TOKEN`, `GOOGLE_API_CONSOLE_KEY` (optional: `SENTRY_LARAVEL_DSN`)
+   - Never any production-only key (`MAIL_*`, `DISCOURSE_*`, `WIKI_*`,
+     `WP_*`, `DRIP_*`, analytics).
+5. **Label**: create the `preview` label on the repo.
+
+Note: previews contain an unscrubbed copy of live data behind the cookie
+gate — treat preview URLs and the gate password accordingly.
 
 ---
 

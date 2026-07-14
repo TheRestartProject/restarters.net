@@ -131,6 +131,11 @@ class NetworkController extends Controller
         $this->authorize('update', $network);
 
         if ($request->hasFile('network_logo')) {
+            if (! config('restarters.features.image_upload')) {
+                return redirect()->route('networks.edit', [$network])
+                    ->withWarning('Image uploads are disabled on this site.');
+            }
+
             // Determine the correct disk to use (s3 on Fly, public_uploads in dev)
             $disk = config('filesystems.default') === 's3' ? 's3' : 'public_uploads';
 

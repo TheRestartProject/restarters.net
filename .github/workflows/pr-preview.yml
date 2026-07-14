@@ -1,0 +1,285 @@
+# Per-PR preview deployments on Fly.io.
+#
+# Deploy:  label a PR with 'preview' (or re-push while labeled, or run this
+#          workflow manually with a PR number). Every deploy waits for
+#          approval via the 'preview' GitHub Environment — approvers should
+#          glance at the PR's diff to .github/workflows/, fly.pr.toml,
+#          Dockerfile.fly and docker/*.sh before approving, since the deploy
+#          runs the PR's own code.
+# Cleanup: a 6-hourly sweep destroys apps whose PR is closed or no longer
+#          labeled. It deliberately does NOT run on pull_request events:
+#          those execute the PR's modified workflow file, which must never
+#          reach the org token without approval. The sweep runs from the
+#          default branch via the 'preview-cleanup' environment (restricted
+#          to the develop branch, no reviewers).
+#
+# One-time setup is documented in docs/fly-deployment.md (environments,
+# FLY_ORG_TOKEN, FLY_PREVIEW_SECRETS, FLY_ORG repo variable, preview label).
+
+name: PR preview
+
+on:
+  pull_request:
+    types: [labeled, synchronize, reopened]
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: 'PR number to deploy a preview for (leave empty to run the cleanup sweep instead)'
+        required: false
+  schedule:
+    - cron: '43 2,8,14,20 * * *'  # cleanup sweep, 4x daily
+
+jobs:
+  deploy:
+    name: Deploy preview
+    if: >
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.pr_number != '') ||
+      (github.event_name == 'pull_request' &&
+       contains(github.event.pull_request.labels.*.name, 'preview') &&
+       github.event.pull_request.head.repo.full_name == github.repository)
+    runs-on: ubuntu-latest
+    environment: preview
+    permissions:
+      contents: read
+      pull-requests: write
+    concurrency:
+      group: pr-preview-${{ github.event.pull_request.number || github.event.inputs.pr_number }}
+      cancel-in-progress: true
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Resolve PR details
+        id: pr
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            PR="${{ github.event.inputs.pr_number }}"
+          else
+            PR="${{ github.event.pull_request.number }}"
+          fi
+          INFO=$(gh pr view "$PR" --repo "$GITHUB_REPOSITORY" \
+            --json state,headRefOid,headRepository,headRepositoryOwner,labels,baseRefName)
+          STATE=$(echo "$INFO" | jq -r .state)
+          HEAD_SHA=$(echo "$INFO" | jq -r .headRefOid)
+          BASE_REF=$(echo "$INFO" | jq -r .baseRefName)
+          HEAD_REPO="$(echo "$INFO" | jq -r .headRepositoryOwner.login)/$(echo "$INFO" | jq -r .headRepository.name)"
+
+          # Fork guard. The pull_request trigger already enforces this via the
+          # job-level `if`, but workflow_dispatch takes a raw PR number, so a
+          # fork PR could otherwise be deployed with full secrets.
+          if [ "$HEAD_REPO" != "$GITHUB_REPOSITORY" ]; then
+            echo "::error::PR #$PR head is in fork '$HEAD_REPO' - previews only deploy same-repo branches."
+            exit 1
+          fi
+          if [ "$STATE" != "OPEN" ]; then
+            echo "::error::PR #$PR is $STATE - not deploying."
+            exit 1
+          fi
+
+          # We deploy the MERGE RESULT (PR + current base), like CI tests, so a
+          # stale branch is previewed as it would actually land. GitHub only
+          # provides the merge ref while the PR is conflict-free; mergeable is
+          # UNKNOWN briefly after a push, so retry before giving up.
+          MERGEABLE="UNKNOWN"
+          for _ in $(seq 1 10); do
+            MERGEABLE=$(gh pr view "$PR" --repo "$GITHUB_REPOSITORY" --json mergeable --jq .mergeable)
+            [ "$MERGEABLE" != "UNKNOWN" ] && break
+            sleep 10
+          done
+          if [ "$MERGEABLE" = "CONFLICTING" ]; then
+            echo "::error::PR #$PR has conflicts with $BASE_REF - resolve them before previewing."
+            exit 1
+          fi
+
+          echo "number=$PR" >> "$GITHUB_OUTPUT"
+          echo "sha=$HEAD_SHA" >> "$GITHUB_OUTPUT"
+          echo "base=$BASE_REF" >> "$GITHUB_OUTPUT"
+          echo "app=restarters-pr-$PR" >> "$GITHUB_OUTPUT"
+
+      - name: Checkout PR merged with base
+        uses: actions/checkout@v4
+        with:
+          ref: refs/pull/${{ steps.pr.outputs.number }}/merge
+          fetch-depth: 0
+
+      - name: Measure staleness against base
+        id: stale
+        run: |
+          git fetch origin "${{ steps.pr.outputs.base }}"
+          BEHIND=$(git rev-list --count "${{ steps.pr.outputs.sha }}..origin/${{ steps.pr.outputs.base }}" 2>/dev/null || echo 0)
+          MIG_BEHIND=$(git log --oneline "${{ steps.pr.outputs.sha }}..origin/${{ steps.pr.outputs.base }}" -- database/migrations 2>/dev/null | wc -l)
+          echo "behind=$BEHIND" >> "$GITHUB_OUTPUT"
+          echo "mig_behind=$MIG_BEHIND" >> "$GITHUB_OUTPUT"
+
+      # Merging with the base normally brings these files in; this only fires
+      # for PRs whose base branch predates preview support.
+      - name: Overlay preview infra files from develop if still missing
+        run: |
+          git fetch origin develop --depth=1
+          for f in fly.pr.toml docker/preview-startup.sh; do
+            if [ ! -f "$f" ]; then
+              echo "Branch lacks $f - taking it from develop"
+              git show origin/develop:"$f" > "$f"
+            fi
+          done
+          chmod +x docker/preview-startup.sh
+          # Older Dockerfile.fly / nginx config don't know about the preview
+          # startup script or status endpoint - overlay them too.
+          if ! grep -q 'preview-startup.sh' Dockerfile.fly; then
+            echo "Branch Dockerfile.fly predates preview support - taking develop's"
+            git show origin/develop:Dockerfile.fly > Dockerfile.fly
+          fi
+          if ! grep -q '_preview_status' docker/nginx-fly.conf; then
+            echo "Branch nginx-fly.conf predates preview support - taking develop's"
+            git show origin/develop:docker/nginx-fly.conf > docker/nginx-fly.conf
+          fi
+
+      - name: Set up flyctl
+        uses: superfly/flyctl-actions/setup-flyctl@ed8efb33836e8b2096c7fd3ba1c8afe303ebbff1 # master 2026-04-08
+
+      - name: Create app and set secrets (first deploy only)
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_ORG_TOKEN }}
+          FLY_PREVIEW_SECRETS: ${{ secrets.FLY_PREVIEW_SECRETS }}
+          FLY_ORG: ${{ vars.FLY_ORG }}
+        run: |
+          APP="${{ steps.pr.outputs.app }}"
+          if [ -z "$FLY_ORG" ]; then
+            echo "::error::Repository variable FLY_ORG is not set (Fly organisation slug)."
+            exit 1
+          fi
+          if flyctl status --app "$APP" > /dev/null 2>&1; then
+            echo "App $APP already exists."
+          else
+            flyctl apps create "$APP" --org "$FLY_ORG"
+            # Shared read-only credentials (Tigris RO, Drive RO, gate password...)
+            # Strip comments/blank lines so the fly.pr-secrets.example.env
+            # template can be filled in and pasted as-is.
+            echo "$FLY_PREVIEW_SECRETS" | grep -vE '^\s*(#|$)' \
+              | flyctl secrets import --app "$APP" --stage
+            # Fresh per-app key - previews must never hold the production APP_KEY.
+            flyctl secrets set "APP_KEY=base64:$(openssl rand -base64 32)" \
+              --app "$APP" --stage
+          fi
+
+      - name: Deploy
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_ORG_TOKEN }}
+        run: |
+          APP="${{ steps.pr.outputs.app }}"
+          PR="${{ steps.pr.outputs.number }}"
+          sed "s/__PR_NUMBER__/$PR/g" fly.pr.toml > fly.pr.generated.toml
+          flyctl deploy --config fly.pr.generated.toml --app "$APP" \
+            --remote-only --ha=false
+          # --ha=false has a history of not reliably keeping one machine.
+          flyctl scale count 1 --app "$APP" --yes
+
+      - name: Wait for restore and migrations
+        id: status
+        run: |
+          APP="${{ steps.pr.outputs.app }}"
+          URL="https://$APP.fly.dev/_preview_status"
+          PHASE=""
+          for i in $(seq 1 80); do
+            BODY=$(curl -fsS --max-time 10 "$URL" 2>/dev/null) || BODY=""
+            PHASE=$(echo "$BODY" | jq -r '.phase // empty' 2>/dev/null) || PHASE=""
+            echo "poll $i: phase='${PHASE:-n/a}'"
+            case "$PHASE" in
+              ready|failed) break ;;
+            esac
+            sleep 15
+          done
+          echo "phase=${PHASE:-unknown}" >> "$GITHUB_OUTPUT"
+          echo "detail=$(echo "$BODY" | jq -r '.detail // empty' 2>/dev/null)" >> "$GITHUB_OUTPUT"
+
+      - name: Comment on PR
+        run: |
+          PR="${{ steps.pr.outputs.number }}"
+          APP="${{ steps.pr.outputs.app }}"
+          PHASE="${{ steps.status.outputs.phase }}"
+          DETAIL="${{ steps.status.outputs.detail }}"
+          case "$PHASE" in
+            ready)   STATUS_LINE=":white_check_mark: Ready - restore and migrations succeeded." ;;
+            failed)  STATUS_LINE=":x: Deploy completed but startup reported a failure: ${DETAIL:-see \`flyctl logs --app $APP\`}." ;;
+            *)       STATUS_LINE=":warning: Deployed, but the status endpoint did not report readiness - check \`flyctl logs --app $APP\`." ;;
+          esac
+          BEHIND="${{ steps.stale.outputs.behind }}"
+          MIG_BEHIND="${{ steps.stale.outputs.mig_behind }}"
+          STALE_LINE=""
+          if [ "${BEHIND:-0}" -gt 0 ]; then
+            STALE_LINE="- Branch is $BEHIND commit(s) behind \`${{ steps.pr.outputs.base }}\` ($MIG_BEHIND touching migrations); the preview is built from the **merge** with current \`${{ steps.pr.outputs.base }}\`."
+          fi
+          MARKER="<!-- pr-preview-comment -->"
+          BODY=$(cat <<EOF
+          $MARKER
+          ### Preview: https://$APP.fly.dev
+
+          $STATUS_LINE
+          $STALE_LINE
+
+          - Password-protected test environment (usual dev gate password); commit \`${{ steps.pr.outputs.sha }}\` merged with \`${{ steps.pr.outputs.base }}\`.
+          - If you see a "warming up" page, give it a few minutes - it refreshes itself.
+          - The preview database is refreshed on every deploy and may reset at any time; anything you create here is disposable.
+          - Emails go to [shared Mailpit](https://restarters-dev-mail.fly.dev), never to real recipients. Image uploads are disabled.
+          - The app suspends when idle; the first request after a pause can take a moment.
+          EOF
+          )
+          EXISTING=$(gh api "repos/$GITHUB_REPOSITORY/issues/$PR/comments" --paginate \
+            --jq ".[] | select(.body | startswith(\"$MARKER\")) | .id" | head -1)
+          if [ -n "$EXISTING" ]; then
+            gh api -X PATCH "repos/$GITHUB_REPOSITORY/issues/comments/$EXISTING" -f body="$BODY" > /dev/null
+          else
+            gh api "repos/$GITHUB_REPOSITORY/issues/$PR/comments" -f body="$BODY" > /dev/null
+          fi
+
+      - name: Fail the run if startup failed
+        if: steps.status.outputs.phase != 'ready'
+        run: |
+          echo "::error::Preview startup phase: ${{ steps.status.outputs.phase }}"
+          exit 1
+
+  cleanup:
+    name: Destroy previews for closed/unlabeled PRs
+    if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && github.event.inputs.pr_number == '')
+    runs-on: ubuntu-latest
+    environment: preview-cleanup
+    permissions:
+      contents: read
+      pull-requests: read
+    concurrency:
+      group: pr-preview-sweep
+    env:
+      GH_TOKEN: ${{ github.token }}
+      FLY_API_TOKEN: ${{ secrets.FLY_ORG_TOKEN }}
+    steps:
+      - name: Set up flyctl
+        uses: superfly/flyctl-actions/setup-flyctl@ed8efb33836e8b2096c7fd3ba1c8afe303ebbff1 # master 2026-04-08
+
+      - name: Sweep
+        run: |
+          FAILED=0
+          APPS=$(flyctl apps list --json | jq -r '.[] | .Name // .name' | grep -E '^restarters-pr-[0-9]+$' || true)
+          if [ -z "$APPS" ]; then
+            echo "No preview apps found."
+            exit 0
+          fi
+          for APP in $APPS; do
+            PR="${APP#restarters-pr-}"
+            INFO=$(gh pr view "$PR" --repo "$GITHUB_REPOSITORY" --json state,labels 2>/dev/null) || INFO=""
+            if [ -z "$INFO" ]; then
+              # Never destroy on a failed lookup - it might be transient.
+              echo "::warning::Could not look up PR #$PR - skipping $APP this sweep."
+              FAILED=1
+              continue
+            fi
+            STATE=$(echo "$INFO" | jq -r '.state // "UNKNOWN"')
+            HAS_LABEL=$(echo "$INFO" | jq -r '[.labels[].name] | contains(["preview"])')
+            echo "$APP: PR state=$STATE preview-label=$HAS_LABEL"
+            if [ "$STATE" != "OPEN" ] || [ "$HAS_LABEL" != "true" ]; then
+              echo "Destroying $APP..."
+              if ! flyctl apps destroy "$APP" --yes; then
+                echo "::error::Failed to destroy $APP - it is still incurring storage cost."
+                FAILED=1
+              fi
+            fi
+          done
+          exit $FAILED
