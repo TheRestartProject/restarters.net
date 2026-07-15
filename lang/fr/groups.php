@@ -78,6 +78,7 @@ return [
   'share_group_stats' => 'Partager les statistiques du Repair Café',
   'total_devices' => 'Total des éléments qui ont été pris en charge',
   'participants' => 'participants',
+  'parties_thrown' => 'événements organisés',
   'hours_volunteered' => 'heures de bénévolat',
   'years_volunteered' => 'années de bénévolat',
   'waste_prevented' => 'Déchets évités',

@@ -71,6 +71,7 @@ return [
   'volunteers' => 'Volunteers',
   'invite_to_group' => 'Invite to group',
   'participants' => 'participants',
+  'parties_thrown' => 'parties thrown',
   'hours_volunteered' => 'hours volunteered',
   'years_volunteered' => 'years volunteered',
   'waste_prevented' => 'Waste prevented',
