@@ -39,7 +39,7 @@ Status: ⬜ pending · 🔄 in progress · ✅ done · ❌ blocked
 | B5 | Pages: /group/view/{id} (stats, events, volunteers, permissions from #892) + vitest | ✅ | |
 | B6 | Pages: /group/create + /group/edit/{id} (geocode via /api/v2/maps proxy ported here; Quill wrapper; tus image upload) + vitest | ✅ | MapsProxy → /api/v2/maps/* done here; RichTextEditor (Quill 2) + LocationPicker + TusImageUpload components |
 | B7 | Group map page (port RES-1995 map work) | ⬜ | @vue-leaflet/vue-leaflet + leaflet.markercluster + leaflet-control-geocoder (Photon) + CARTO tiles — port GroupMap.vue as-is (NOT MapLibre; design §2); names-index + summary?ids= split fetch |
-| B8 | Playwright: group.test.js flows ported (create, unfollow, image upload) + dashboard smoke | 🔄 | client/e2e/group.test.js (3 flows + smoke); data-testid selectors; deterministic waits (waitForResponse) |
+| B8 | Playwright: group.test.js flows ported (create, unfollow, image upload) + dashboard smoke | ✅ | client/e2e/group.test.js (3 flows + smoke); data-testid selectors; deterministic waits (waitForResponse) |
 
 ## Phase C — Events + Devices slice
 
