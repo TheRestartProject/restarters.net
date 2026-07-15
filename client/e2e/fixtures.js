@@ -1,4 +1,4 @@
-const base = require('@playwright/test')
+import * as base from '@playwright/test'
 
 // The API origin as seen from the browser running the tests. In containers
 // this is www.example.com:8001 (host-gateway); on a host browser the same
@@ -13,7 +13,7 @@ const API_URL = process.env.PLAYWRIGHT_API_URL || 'http://www.example.com:8001'
  *   by origin rather than a hardcoded Docker hostname.
  * - Abort Google Maps requests so headless runs never hang on tiles.
  */
-exports.test = base.test.extend({
+export const test = base.test.extend({
   page: async ({ page }, use) => {
     await page.addInitScript(() => {
       window.PLAYWRIGHT_TEST = true
@@ -44,5 +44,5 @@ exports.test = base.test.extend({
   },
 })
 
-exports.expect = base.expect
-exports.API_URL = API_URL
+export const expect = base.expect
+export { API_URL }

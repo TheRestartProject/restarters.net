@@ -102,6 +102,12 @@ describe('useAuth: user/loggedIn/login/logout sugar', () => {
     }
 
     vi.stubGlobal('useNuxtApp', () => ({ $api: mockApi }))
+
+    if (mockApi.session?.fetch) {
+      mockApi.session.fetch.mockResolvedValue({
+        data: { user: { id: 1, name: 'Jane', role_name: 'Restarter' }, config: {}, flags: {} },
+      })
+    }
   })
 
   it('user/loggedIn reflect the auth store reactively', () => {

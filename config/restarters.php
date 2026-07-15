@@ -32,6 +32,10 @@ return [
     // email deep-link redirectors) and surfaced to the client via /api/v2/session.
     'frontend_url' => env('FRONTEND_URL', 'http://localhost:3000'),
 
+    // Per-minute rate limit for login/register/password endpoints (per IP).
+    // Test runs raise it via AUTH_RATE_LIMIT to allow Playwright bursts.
+    'auth_rate_limit' => env('AUTH_RATE_LIMIT', 10),
+
     // Client-visible config surfaced through GET /api/v2/session (replaces the
     // env() values previously inlined into Blade layouts).
     'client' => [

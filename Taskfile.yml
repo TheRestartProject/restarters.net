@@ -288,9 +288,9 @@ tasks:
       - mkdir -p /tmp/test-results/playwright
       - task: playwright:seed-data
       - |
-        # Relax API rate limits for test bursts (mirrors the legacy suite's
-        # throttle removal; container copy only, never committed).
-        docker exec restarters bash -c "sed -i 's/throttle:10,1/throttle:1000,1/g' /var/www/routes/api.php && php artisan route:clear && php artisan config:clear"
+        # Relax the auth-endpoint rate limit for test bursts (named limiter
+        # reads AUTH_RATE_LIMIT; .env edits are the established pattern here).
+        docker exec restarters bash -c "grep -q '^AUTH_RATE_LIMIT' /var/www/.env && sed -i 's/^AUTH_RATE_LIMIT=.*/AUTH_RATE_LIMIT=1000/' /var/www/.env || echo 'AUTH_RATE_LIMIT=1000' >> /var/www/.env; php artisan config:clear"
       - docker exec restarters_playwright bash -c "npx playwright install chromium"
       - |
         docker exec restarters_playwright bash -c "

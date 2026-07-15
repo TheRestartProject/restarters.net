@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia'
+import { useSessionStore } from './session.js'
 
 /**
  * Auth token + user summary. Only the token is persisted (see
@@ -23,6 +24,10 @@ export const useAuthStore = defineStore('auth', {
       this.token = data.token
       this.user = data.user
 
+      // The navbar and role gates render from the session store; refresh it
+      // now that requests carry the new token.
+      await useSessionStore().fetch()
+
       return data
     },
 
@@ -32,6 +37,8 @@ export const useAuthStore = defineStore('auth', {
 
       this.token = data.token
       this.user = data.user
+
+      await useSessionStore().fetch()
 
       return data
     },
@@ -76,6 +83,10 @@ export const useAuthStore = defineStore('auth', {
     clear() {
       this.token = null
       this.user = null
+
+      // Downgrade the session context to a guest view. Config/flags keep
+      // their last values (they are not user-specific).
+      useSessionStore().user = null
     },
   },
 

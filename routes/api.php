@@ -89,7 +89,7 @@ Route::prefix('v2')->middleware(\App\Http\Middleware\VerifyUserConsentApi::class
         // Token-based auth for the SPA. No session, no CSRF — see AuthController.
         Route::prefix('/auth')->group(function() {
             Route::middleware('auth:sanctum,api')->post('/consent', [API\AuthController::class, 'consentv2']);
-            Route::middleware('throttle:10,1')->group(function() {
+            Route::middleware('throttle:auth')->group(function() {
                 Route::post('/login', [API\AuthController::class, 'loginv2']);
                 Route::post('/register', [API\AuthController::class, 'registerv2']);
                 Route::post('/password/forgot', [API\AuthController::class, 'forgotPasswordv2']);

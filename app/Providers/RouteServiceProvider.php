@@ -51,6 +51,12 @@ class RouteServiceProvider extends ServiceProvider
             return Limit::perMinute(300)->by($request->user()?->id ?: $request->ip());
         });
 
+        // Login/register/password endpoints. Env-configurable so test runs
+        // (Playwright bursts) can relax it without editing source files.
+        RateLimiter::for('auth', function (Request $request) {
+            return Limit::perMinute((int) config('restarters.auth_rate_limit'))->by($request->ip());
+        });
+
         $this->routes(function () {
             $this->mapApiRoutes();
             $this->mapWebRoutes();

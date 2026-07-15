@@ -1,5 +1,5 @@
-const { test, expect } = require('./fixtures')
-const { USERS, login, logout } = require('./utils')
+import { test, expect } from './fixtures'
+import { USERS, login, logout } from './utils'
 
 test.describe('authentication', () => {
   test('can log in as admin and reach the dashboard', async ({ page }) => {
