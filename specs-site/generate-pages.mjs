@@ -56,7 +56,7 @@ function generateFeaturePages(manifest) {
   ensureDir(featuresDir)
 
   // Index page
-  const featureNames = Object.keys(manifest.features).sort()
+  const featureNames = Object.keys(manifest.features).sort((a, b) => a.localeCompare(b))
   let indexContent = `# Features\n\nRestarters.net functionality organised by feature area.\n\n`
   indexContent += `| Feature | Stories | Personas | Coverage |\n|---------|---------|----------|----------|\n`
 
@@ -119,7 +119,7 @@ function generateFeaturePages(manifest) {
 
     // Sources
     content += `## Source Files\n\n`
-    for (const source of f.sources.sort()) {
+    for (const source of f.sources.sort((a, b) => a.localeCompare(b))) {
       content += `- [\`${source}\`](${GITHUB_BASE}/${source})\n`
     }
 
@@ -131,7 +131,7 @@ function generatePersonaPages(manifest) {
   ensureDir(personasDir)
 
   // Index page
-  const personaNames = Object.keys(manifest.personas).sort()
+  const personaNames = Object.keys(manifest.personas).sort((a, b) => a.localeCompare(b))
   let indexContent = `# Personas\n\nRestarters.net functionality organised by user persona.\n\n`
   indexContent += `| Persona | Features | Stories | Coverage |\n|---------|----------|---------|----------|\n`
 
@@ -166,7 +166,7 @@ function generatePersonaPages(manifest) {
     let content = `# ${name}\n\n`
     content += `**${p.storyCount} stories** across ${p.features.length} features\n\n`
 
-    for (const featureName of p.features.sort()) {
+    for (const featureName of p.features.sort((a, b) => a.localeCompare(b))) {
       const feature = manifest.features[featureName]
       if (!feature) continue
 
@@ -246,7 +246,7 @@ This site is the living specification — every user story listed here is extrac
 
 `
 
-  for (const name of Object.keys(manifest.features).sort()) {
+  for (const name of Object.keys(manifest.features).sort((a, b) => a.localeCompare(b))) {
     const f = manifest.features[name]
     const slug = name.toLowerCase().replace(/\s+/g, '-')
     content += `- [**${name}**](/features/${slug}) — ${f.description || `${f.storyCount} stories`} (${f.storyCount} stories)\n`
@@ -254,7 +254,7 @@ This site is the living specification — every user story listed here is extrac
 
   content += `\n## Personas\n\n`
 
-  for (const name of Object.keys(manifest.personas).sort()) {
+  for (const name of Object.keys(manifest.personas).sort((a, b) => a.localeCompare(b))) {
     const p = manifest.personas[name]
     const slug = name.toLowerCase().replace(/\s+/g, '-')
     content += `- [**${name}**](/personas/${slug}) — ${p.storyCount} stories across ${p.features.join(', ')}\n`

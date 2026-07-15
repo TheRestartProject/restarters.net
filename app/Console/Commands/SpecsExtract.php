@@ -140,8 +140,8 @@ class SpecsExtract extends Command
 
             private function findFeatureAttribute(Node\Stmt\Class_ $node): ?array
             {
-                foreach ($node->attrGroups as $attrGroup) {
-                    foreach ($attrGroup->attrs as $attr) {
+                foreach ($node->attrGroups ?? [] as $attrGroup) {
+                    foreach ($attrGroup->attrs ?? [] as $attr) {
                         $name = $attr->name->toString();
                         if ($name === 'Feature' || str_ends_with($name, '\\Feature')) {
                             $args = $this->parseAttributeArgs($attr);
@@ -158,8 +158,8 @@ class SpecsExtract extends Command
             private function findUserStoryAttributes(Node\Stmt\ClassMethod $node): array
             {
                 $stories = [];
-                foreach ($node->attrGroups as $attrGroup) {
-                    foreach ($attrGroup->attrs as $attr) {
+                foreach ($node->attrGroups ?? [] as $attrGroup) {
+                    foreach ($attrGroup->attrs ?? [] as $attr) {
                         $name = $attr->name->toString();
                         if ($name === 'UserStory' || str_ends_with($name, '\\UserStory')) {
                             $args = $this->parseAttributeArgs($attr);
@@ -177,8 +177,8 @@ class SpecsExtract extends Command
 
             private function findNoStoryAttribute(Node\Stmt\ClassMethod $node): ?string
             {
-                foreach ($node->attrGroups as $attrGroup) {
-                    foreach ($attrGroup->attrs as $attr) {
+                foreach ($node->attrGroups ?? [] as $attrGroup) {
+                    foreach ($attrGroup->attrs ?? [] as $attr) {
                         $name = $attr->name->toString();
                         if ($name === 'NoStory' || str_ends_with($name, '\\NoStory')) {
                             $args = $this->parseAttributeArgs($attr);
@@ -193,7 +193,7 @@ class SpecsExtract extends Command
             {
                 $args = [];
                 $positional = 0;
-                foreach ($attr->args as $arg) {
+                foreach ($attr->args ?? [] as $arg) {
                     $value = $this->resolveValue($arg->value);
                     if ($arg->name) {
                         $args[$arg->name->toString()] = $value;
