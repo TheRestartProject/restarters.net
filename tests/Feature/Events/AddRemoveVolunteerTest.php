@@ -237,39 +237,24 @@ class AddRemoveVolunteerTest extends TestCase
         $ret = json_decode($response->getContent(), true);
         $this->assertTrue($ret['success']);
 
-        // Admin re-add from user account page.
-        $admin = User::factory()->administrator()->create();
+        // Admin re-adds the host to the group via the admin-settings API (the
+        // admin settings form on /user/edit is now the AdminSettingsTab Vue
+        // component, which PATCHes this endpoint).
+        $admin = User::factory()->administrator()->create(['api_token' => 'admintok']);
         $this->actingAs($admin);
 
-        $response = $this->get('/user/edit/' . $host->id);
-        $response->assertStatus(200);
-
-        $crawler = new Crawler($response->getContent());
-
-        $tokens = $crawler->filter('input[name=_token]')->each(function (Crawler $node, $i) {
-            return $node;
-        });
-
-        $tokenValue = $tokens[0]->attr('value');
-
-        $response = $this->post('/profile/edit-admin-settings', [
-            '_token' => $tokenValue,
-            'id' => $host->id,
+        $response = $this->patchJson('/api/v2/users/' . $host->id . '/admin-settings?api_token=admintok', [
             'user_role' => Role::ADMINISTRATOR,
-            'assigned_groups' => [
-                $idgroups
-            ],
-            'preferences' => [
-                3, 12
-            ]
+            'assigned_groups' => [$idgroups],
+            'preferences' => [3, 12],
+            'permissions' => [],
         ]);
-        $response->assertSessionHas('message');
-        $this->assertTrue($response->isRedirection());
-
-        // Should now see the group.
-        $response = $this->get('/user/edit/' . $host->id);
         $response->assertStatus(200);
-        $response->assertSee('<option value="' . $idgroups . '" selected>Test Group0</option>', false);
+
+        // The host should now be a member of the group again.
+        $this->assertTrue(
+            $host->fresh()->groups()->where('idgroups', $idgroups)->exists()
+        );
     }
 
     /**

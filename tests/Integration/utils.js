@@ -172,6 +172,16 @@ exports.createEvent = async function(page, baseURL, idgroups, past) {
     log('Setting past date - going back a month')
     // Go back a month
     await page.locator('[aria-label="Previous month"]').click()
+  } else {
+    // Go forward a month so the event is always comfortably in the future.
+    // Selecting the last day of the *current* month makes the event fall on
+    // "today" whenever the suite runs on the last day of the month; if that run
+    // happens after the event's time (13:00-14:00) the event is already
+    // finished, so it is no longer "upcoming" and the "Invite Volunteers"
+    // action is correctly hidden — making event.test.js fail by time-of-day.
+    // Picking a day in the next month avoids this calendar edge entirely.
+    log('Setting future date - going forward a month')
+    await page.locator('[aria-label="Next month"]').click()
   }
 
   await page.click('#event_date .b-calendar-grid > .b-calendar-grid-body > .row:last-child .btn:last-child')

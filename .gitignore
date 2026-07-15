@@ -32,6 +32,8 @@ restarters-anonymised.sql
 /.claude/settings.local.json
 /public/build/
 /storage/api-docs/api-docs.json
+/storage/app/tus
+/storage/app/tus-cache
 /.phpunit.result.cache
 /playwright-report/
 /events.csv

@@ -41,6 +41,16 @@ import EventAddEdit from './components/EventAddEdit.vue'
 import EventsRequiringModeration from './components/EventsRequiringModeration.vue'
 import EventPage from './components/EventPage.vue'
 import CantCreateEventPage from './components/CantCreateEventPage.vue'
+import EmailPreferencesTab from './components/EmailPreferencesTab.vue'
+import CalendarsTab from './components/CalendarsTab.vue'
+import RepairDirectoryTab from './components/RepairDirectoryTab.vue'
+import LanguageTab from './components/LanguageTab.vue'
+import ProfileInfoTab from './components/ProfileInfoTab.vue'
+import SkillsTab from './components/SkillsTab.vue'
+import PasswordTab from './components/PasswordTab.vue'
+import AdminSettingsTab from './components/AdminSettingsTab.vue'
+import ProfilePhotoTab from './components/ProfilePhotoTab.vue'
+import DeleteAccountTab from './components/DeleteAccountTab.vue'
 import FixometerPage from './components/FixometerPage.vue'
 import GroupsPage from './components/GroupsPage.vue'
 import UsersPage from './components/UsersPage.vue'
@@ -408,6 +418,16 @@ function initializeJQuery() {
             'eventsrequiringmoderation': EventsRequiringModeration,
             'eventpage': EventPage,
             'cantcreateeventpage': CantCreateEventPage,
+            'emailpreferencestab': EmailPreferencesTab,
+            'calendarstab': CalendarsTab,
+            'repairdirectorytab': RepairDirectoryTab,
+            'languagetab': LanguageTab,
+            'profileinfotab': ProfileInfoTab,
+            'skillstab': SkillsTab,
+            'passwordtab': PasswordTab,
+            'adminsettingstab': AdminSettingsTab,
+            'profilephototab': ProfilePhotoTab,
+            'deleteaccounttab': DeleteAccountTab,
             'fixometerpage': FixometerPage,
             'groupspage': GroupsPage,
             'userspage': UsersPage,

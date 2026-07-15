@@ -8,6 +8,7 @@ use App\Helpers\Fixometer;
 use App\Role;
 use App\Skills;
 use App\User;
+use App\UsersSkills;
 use Carbon\Carbon;
 use DB;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -168,10 +169,16 @@ class EditProfileTest extends TestCase
         $this->assertTrue($response->isRedirection());
         $response->assertSessionHas('message');
 
-        // Check it shows.
+        // Check it persisted. The skills selector on /profile/edit is now a Vue
+        // component (SkillsTab) that loads its state from the API rather than the
+        // server-rendered <select>, so we assert against the data directly rather
+        // than scraping HTML for a "selected" option.
         $response2 = $this->get('/profile/edit');
-        $response2->assertSee('selected>UT1</option>', false);
-        $response2->assertSee('selected>UT2</option>', false);
+        $response2->assertSuccessful();
+
+        $userSkillIds = UsersSkills::where('user', $user->id)->pluck('skill')->toArray();
+        $this->assertContains($skill1->id, $userSkillIds);
+        $this->assertContains($skill2->id, $userSkillIds);
 
         // Should have promoted to host because we have a category 1 skill.
         $user->refresh();

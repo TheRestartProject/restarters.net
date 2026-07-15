@@ -32,6 +32,15 @@ Route::get('/outbound/info/{type}/{id}/{format?}', function ($type, $id, $format
     return App\Http\Controllers\OutboundController::info($type, $id, $format);
 });
 
+// Tus resumable-upload protocol endpoint. Deliberately NOT behind auth:api - see
+// TusController for why. It lives in routes/api.php, so it uses the "api" middleware
+// group which does not include CSRF verification at all (tus clients like Uppy issue
+// POST/PATCH/HEAD/DELETE requests that cannot carry a Laravel CSRF token anyway). The
+// uploaded file only becomes "attached" to a user once a separate, authenticated call
+// (e.g. POST /api/v2/users/me/photo) references its upload key.
+Route::match(['get', 'post', 'patch', 'head', 'delete', 'options'], '/tus', [App\Http\Controllers\TusController::class, 'serve']);
+Route::match(['get', 'post', 'patch', 'head', 'delete', 'options'], '/tus/{any}', [App\Http\Controllers\TusController::class, 'serve'])->where('any', '.*');
+
 Route::middleware('auth:api')->group(function () {
     Route::get('/users/me', [ApiController::class, 'getUserInfo']); // Not used but worth keeping and tested.
     Route::get('/users', [ApiController::class, 'getUserList']);  // Not used but worth keeping and tested.
@@ -97,6 +106,28 @@ Route::prefix('v2')->group(function() {
             Route::middleware('auth:api')->group(function() {
                 Route::get('', [API\UserController::class, 'listUsersv2']);
             });
+        });
+
+        Route::prefix('/users/me')->middleware('auth:api')->group(function() {
+            Route::get('/preferences', [API\UserController::class, 'getMyEmailPreferencesv2']);
+            Route::patch('/preferences', [API\UserController::class, 'updateMyEmailPreferencesv2']);
+            Route::get('/calendars', [API\UserController::class, 'getMyCalendarsv2']);
+            Route::get('/language', [API\UserController::class, 'getMyLanguagev2']);
+            Route::patch('/language', [API\UserController::class, 'updateMyLanguagev2']);
+            Route::get('/profile', [API\UserController::class, 'getMyProfilev2']);
+            Route::patch('/profile', [API\UserController::class, 'updateMyProfilev2']);
+            Route::get('/skills', [API\UserController::class, 'getMySkillsv2']);
+            Route::patch('/skills', [API\UserController::class, 'updateMySkillsv2']);
+            Route::patch('/password', [API\UserController::class, 'updateMyPasswordv2']);
+            Route::post('/photo', [API\UserController::class, 'updateMyPhotov2']);
+            Route::delete('/', [API\UserController::class, 'deleteMyAccountv2']);
+        });
+
+        Route::middleware('auth:api')->group(function() {
+            Route::get('/users/{id}/repair-directory-options', [API\UserController::class, 'getRepairDirOptionsv2']);
+            Route::patch('/users/{id}/repair-directory-role', [API\UserController::class, 'updateRepairDirRolev2']);
+            Route::get('/users/{id}/admin-settings', [API\UserController::class, 'getAdminSettingsv2']);
+            Route::patch('/users/{id}/admin-settings', [API\UserController::class, 'updateAdminSettingsv2']);
         });
 
         Route::prefix('/networks')->group(function() {
