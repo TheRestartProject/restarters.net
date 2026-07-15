@@ -2,56 +2,40 @@
 
 namespace App\Helpers;
 
+use Geocoder\Provider\Mapbox\Mapbox;
+use Geocoder\Query\GeocodeQuery;
+
 class Geocoder
 {
     public function __construct()
     {
     }
 
-    private function googleKey()
-    {
-        // We have this so that we can change the key in testing.
-        return config('GOOGLE_API_CONSOLE_KEY') ?? env('GOOGLE_API_CONSOLE_KEY');
-    }
-
     public function geocode($location)
     {
         if ($location != 'ForceGeocodeFailure') {
-            $json = file_get_contents('https://maps.googleapis.com/maps/api/geocode/json?address='.urlencode($location).'&key='.$this->googleKey());
+            // Use the geocoder configured in config/geocoder.php - a chain of Mapbox (primary) and GeoPlugin
+            // (fallback), resolved via the container so tests can bind a mock Geocoder instead. This is the
+            // same pattern used by App\Console\Commands\SetPlaceNetworkData for reverse geocoding.
+            $geocodeResponse = app('geocoder')->geocodeQuery(
+                GeocodeQuery::create($location)->withData('location_type', [Mapbox::TYPE_PLACE, Mapbox::TYPE_ADDRESS])
+            );
+            $addressCollection = $geocodeResponse->get();
+            $address = $addressCollection->get(0);
 
-            if ($json) {
-                $res = json_decode($json);
+            if ($address && $address->getCoordinates()) {
+                // The provider gives us both the country name and its ISO code - use the code directly rather
+                // than trying to match the name against our own country list.
+                $country = $address->getCountry();
 
-                if ($res && $res->results && count($res->results)) {
-                    $decoded = json_decode($json)->results[0];
-
-                    $latitude = $decoded->{'geometry'}->{'location'}->lat;
-                    $longitude = $decoded->{'geometry'}->{'location'}->lng;
-
-                    foreach ($decoded->{'address_components'} as $component) {
-                        if ($component->types && count($component->types) && $component->types[0] === 'country') {
-                            $country_code = $component->short_name;
-                        }
-                    }
-
-                    return [
-                        'latitude' => $latitude,
-                        'longitude' => $longitude,
-                        'country_code' => $country_code,
-                    ];
-                }
+                return [
+                    'latitude' => $address->getCoordinates()->getLatitude(),
+                    'longitude' => $address->getCoordinates()->getLongitude(),
+                    'country_code' => $country ? $country->getCode() : null,
+                ];
             }
         }
 
         return false;
-    }
-
-    public function reverseGeocode($lat, $lng)
-    {
-        $json = file_get_contents("https://maps.googleapis.com/maps/api/geocode/json?latlng=$lat,$lng&key=".$this->googleKey());
-
-        $decoded = json_decode($json)->results[0];
-
-        return $decoded;
     }
 }
