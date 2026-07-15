@@ -57,9 +57,14 @@ browser ── http://localhost:3000 ──► restarters_client (node:22, nuxi 
 ```
 
 - Cross-origin is safe because auth is **header-token based** (§4) — no credentialed
-  CORS, no third-party-cookie/ITP concerns. `config/cors.php` is rewritten with the
-  explicit dev/prod origins; the hand-rolled `AddCorsHeaders` middleware
-  (`Access-Control-Allow-Origin: *`, GET-only preflight) is deleted.
+  CORS, no third-party-cookie/ITP concerns. CORS moves to Laravel's standard
+  `HandleCors` + `config/cors.php`; the hand-rolled `AddCorsHeaders` middleware
+  (GET-only preflight) is deleted. Origins stay `*` **deliberately**: partner
+  sites (therestartproject.org widgets/share plugins) fetch the API from their
+  own origins in browsers, and with `supports_credentials=false` + bearer-header
+  auth a wildcard exposes nothing a public browser couldn't already read. The
+  wildcard must never be combined with credentialed CORS (documented in the
+  config file).
 - Production topology (Fly.io) is **out of scope for this branch** (flagged): the
   natural shape is nginx-fly serving the static `nuxi generate` output at `/` and
   proxying `/api` to php-fpm in the same image, which keeps one Fly app and makes
