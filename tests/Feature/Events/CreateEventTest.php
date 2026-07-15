@@ -36,7 +36,10 @@ class CreateEventTest extends TestCase
         $this->actingAs($host);
 
         $response = $this->get('/party/create');
-        $response->assertSee('You need to be a host of a group in order to create a new event listing');
+        // The "can't create" page is now the CantCreateEventPage Vue component;
+        // its copy (cantcreate.intro) is rendered client-side, so assert the
+        // component mounts rather than the translated text (see CantCreateEventPageTest).
+        $response->assertSee('<CantCreateEventPage', false);
     }
 
     /**
