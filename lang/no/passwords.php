@@ -1,9 +1,14 @@
 <?php
 
 return [
-  'reset' => 'Your password has been reset!',
-  'sent' => 'We have e-mailed your password reset link!',
-  'token' => 'This password reset token is invalid.',
-  'user' => 'We can\'t find a user with that e-mail address.',
-  'password' => 'Passwords must be at least six characters and match the confirmation.',
+  'sent' => 'Vi har sendt deg lenke for tilbakestilling av passord på e-post!',
+  'user' => 'Vi finner ingen bruker med den e-postadressen.',
+  'invalid' => 'Vennligst skriv inn en gyldig e-post.',
+  'recover_title' => 'Kontogjenoppretting',
+  'match' => 'Passordene stemmer ikke overens',
+  'updated' => 'Passord oppdatert, vennligst logg inn for å fortsette.',
+  'failed' => 'Kunne ikke oppdatere passordet.',
+  'reset' => 'Passordet ditt er tilbakestilt!',
+  'token' => 'Dette tilbakestillingstoken for passord er ugyldig.',
+  'password' => 'Passord må være minst seks tegn og stemme overens med bekreftelsen.',
 ];

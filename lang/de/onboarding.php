@@ -1,13 +1,13 @@
 <?php
 
 return [
-  'slide1_heading' => 'Welcome!',
-  'slide1_content' => '<p>Thank you for being a part of our community space.</p><p>And <strong>thank you</strong> for being a beta tester!  With your feedback we can help improve the platform for everyone.</p>',
-  'slide2_heading' => 'Your gateway to community repair',
-  'slide2_content' => '<p>In the community space you can:</p> <ul><li>chat with other Restarters</li><li>join repair groups</li><li>share your repair knowledge</li><li>create and RSVP to events</li><li>log the devices you fix at events</li><li>help bring down the barriers to repair</li><p></p></ul>',
-  'slide3_heading' => 'Let\'s get started!',
-  'slide3_content' => '<p>Your starting point is the <strong>community dashboard</strong>.</p><p>Your dashboard gives you at a glance info on the latest happenings in the community, as well as quick access to common actions.</p><p>A good place to start is the <strong>Getting Started</strong> section.</p>',
-  'finishing_action' => 'To the dashboard',
-  'previous' => 'Previous',
-  'next' => 'Next',
+  'slide1_content' => '<p>Danke, dass Sie unserer Community beigetreten sind.</p>',
+  'slide2_content' => '<p>In der Community können Sie:</p> <ul><li>Mit anderen Freiwilligen chatten</li><li>Reparaturgruppen beitreten</li><li>Ihr Reparaturwissen teilen</li><li>Veranstaltungen erstellen und zusagen</li><li>Geräte erfassen, die Sie bei Veranstaltungen reparieren</li><li>Dazu beitragen, Hindernisse bei der Reparatur abzubauen</li><p></p></ul>',
+  'slide3_content' => '<p>Ihr Ausgangspunkt ist das <strong>Community-Dashboard</strong>.</p><p>Ihr Dashboard gibt Ihnen auf einen Blick Informationen über das Neueste in der Community sowie schnellen Zugriff auf häufige Aktionen.</p><p>Ein guter Startpunkt ist der Bereich <strong>Erste Schritte</strong>.</p>',
+  'previous' => 'Zurück',
+  'slide1_heading' => 'Willkommen!',
+  'slide2_heading' => 'Ihr Zugang zur Gemeinschaftsreparatur',
+  'slide3_heading' => 'Los geht\'s!',
+  'finishing_action' => 'Zum Dashboard',
+  'next' => 'Weiter',
 ];
