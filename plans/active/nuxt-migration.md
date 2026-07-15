@@ -46,10 +46,10 @@ Status: ⬜ pending · 🔄 in progress · ✅ done · ❌ blocked
 | # | Task | Status | Notes |
 |---|------|--------|-------|
 | C1 | API: RSVP family + `GET /events/{id}/attendees` + per-user `attending` flag on v2 event resource, volunteer PATCH/invite, event devices list, images, DELETE event, moderation approve + phpunit | ⬜ | useEventComputed(event) + useEventAttendance(id) composable pair depends on these |
-| C2 | Pages: /party (list mine), /party/all, /party/all-past, group events tab + stores/events + vitest | ⬜ | EventsTable/EventCard/EventFilters; joined/hosted badges |
+| C2 | Pages: /party (list mine), /party/all + /party/all-past (DEAD legacy routes — build minimal per contracts doc over GET users/me/events), group events tab + stores/events + vitest | ⬜ | EventsTable/EventCard/EventFilters; joined/hosted badges |
 | C3 | Pages: /party/view/{id} (RSVP, volunteers, devices readonly, calendar links, share) + vitest | ⬜ | ics links stay Laravel /calendar/* |
 | C4 | Pages: /party/create /party/edit/{id} /party/duplicate/{id} (b-calendar→vue-datepicker-next, venue/group-location picker, moderation approve UI) + vitest | ⬜ | .event-approve select preserved as data-testid=event-approve |
-| C5 | API+pages: device CRUD on event page (item type autocomplete/category suggestion port of items store, spare parts, barriers, photos via tus) + vitest | ⬜ | /api/v2/devices/options endpoint (brands/barriers/spareparts/itemtypes); DeviceForm + DeviceRow + useCategorySuggestion (fuse.js scoring port of items.js); addDevice/updateDevice/deleteDevice + photo attach via tus; multiselect keyboard UX preserved |
+| C5 | API+pages: device CRUD on event page (item type autocomplete/category suggestion port of items store, spare parts, barriers, photos via tus) + vitest | ⬜ | /api/v2/devices/options endpoint (brands/barriers/spareparts/itemtypes); DeviceForm + DeviceRow + useCategorySuggestion (exact-match port of items.js — legacy has NO fuzzy matching; keep parity); addDevice/updateDevice/deleteDevice + photo attach via tus; multiselect keyboard UX preserved |
 | C6 | Pages: /fixometer (home), device search/list, impact stats + vitest | ⬜ | fixometer dashboard page + /device/search page + ImpactStats components; GET /api/v2/devices paginated+filters endpoint added (APIv2DevicesListTest) |
 | C7 | Playwright: event.test.js + device.test.js flows ported | ⬜ | client/e2e/event.test.js (create future/past, invite modal), device.test.js (5 flows incl. photo + category suggestion excluded-slow) |
 
