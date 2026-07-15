@@ -13,6 +13,9 @@ describe('stores/session', () => {
       session: {
         fetch: vi.fn(),
       },
+      user: {
+        dismissOnboarding: vi.fn(),
+      },
     }
 
     // useNuxtApp is stubbed globally in tests/setup.ts; override its return
@@ -78,5 +81,41 @@ describe('stores/session', () => {
 
     expect(store.user).toBeNull()
     expect(store.loaded).toBe(true)
+  })
+
+  describe('dismissOnboarding', () => {
+    it('flips flags.onboarding to false immediately and calls the API', async () => {
+      mockApi.user.dismissOnboarding.mockResolvedValueOnce({ data: { onboarding: false } })
+
+      const store = useSessionStore()
+      store.flags = { onboarding: true }
+
+      await store.dismissOnboarding()
+
+      expect(store.flags.onboarding).toBe(false)
+      expect(mockApi.user.dismissOnboarding).toHaveBeenCalledTimes(1)
+    })
+
+    it('still clears the flag locally when the API call fails (endpoint is a recorded gap)', async () => {
+      mockApi.user.dismissOnboarding.mockRejectedValueOnce({ status: 404 })
+
+      const store = useSessionStore()
+      store.flags = { onboarding: true }
+
+      await expect(store.dismissOnboarding()).resolves.toBeUndefined()
+
+      expect(store.flags.onboarding).toBe(false)
+    })
+
+    it('is a no-op on flags when flags has not been loaded yet', async () => {
+      mockApi.user.dismissOnboarding.mockResolvedValueOnce({ data: {} })
+
+      const store = useSessionStore()
+      expect(store.flags).toBeNull()
+
+      await store.dismissOnboarding()
+
+      expect(store.flags).toBeNull()
+    })
   })
 })

@@ -30,5 +30,25 @@ export const useSessionStore = defineStore('session', {
 
       return data
     },
+
+    // Dismisses the onboarding modal (design.md §6.2 task brief: session
+    // flags.onboarding). Flips the flag immediately so the modal closes
+    // regardless of the API call's outcome - the dismiss endpoint is a
+    // recorded gap (docs/nuxt-migration/api-gaps.md) and does not exist
+    // server-side yet, so a failure here must not trap the user behind the
+    // modal.
+    async dismissOnboarding() {
+      if (this.flags) {
+        this.flags.onboarding = false
+      }
+
+      const { $api } = useNuxtApp()
+
+      try {
+        await $api.user.dismissOnboarding()
+      } catch {
+        // Best-effort - see comment above.
+      }
+    },
   },
 })

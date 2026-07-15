@@ -4,6 +4,9 @@ import GroupAPI from './GroupAPI.js'
 import EventAPI from './EventAPI.js'
 import UserAPI from './UserAPI.js'
 import NetworkAPI from './NetworkAPI.js'
+import DashboardAPI from './DashboardAPI.js'
+import MapsAPI from './MapsAPI.js'
+import ConfigAPI from './ConfigAPI.js'
 
 /**
  * Factory: one instance of each resource class, sharing the same config
@@ -17,4 +20,7 @@ export default (config) => ({
   event: new EventAPI(config),
   user: new UserAPI(config),
   network: new NetworkAPI(config),
+  dashboard: new DashboardAPI(config),
+  maps: new MapsAPI(config),
+  config: new ConfigAPI(config),
 })
