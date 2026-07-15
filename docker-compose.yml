@@ -115,7 +115,8 @@ services:
     container_name: restarters_client
     restart: unless-stopped
     ports:
-      - "3000:3000"
+      # Host port overridable for machines where 3000 is taken (CLIENT_PORT in .env).
+      - "${CLIENT_PORT:-3000}:3000"
     environment:
       NUXT_DEV_MODE: ${NUXT_DEV_MODE:-true}
       NUXT_PUBLIC_API_BASE: ${NUXT_PUBLIC_API_BASE:-http://www.example.com:8001}

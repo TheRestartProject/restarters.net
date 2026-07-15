@@ -242,7 +242,7 @@ tasks:
   docker:client:restart:
     desc: Restart the Nuxt client container (e.g. after changing client env vars).
     cmds:
-      - docker compose --profile core restart restarters_client
+      - "{{.DOCKER_CMD}} --profile core restart restarters_client"
 
   docker:test:vitest:
     desc: Run the client Vitest suite in the client container.

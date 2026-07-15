@@ -1,0 +1,27 @@
+const { expect } = require('@playwright/test')
+
+// Seeded by Taskfile's playwright:seed-data (same fixed users as the legacy
+// suite): jane@bloggs.net (Admin), nc@test.net (NetworkCoordinator),
+// host@test.net (Host), all with password passw0rd.
+const USERS = {
+  admin: { email: 'jane@bloggs.net', password: 'passw0rd' },
+  nc: { email: 'nc@test.net', password: 'passw0rd' },
+  host: { email: 'host@test.net', password: 'passw0rd' },
+}
+
+async function login(page, { email, password } = USERS.admin) {
+  await page.goto('/login')
+  await page.getByTestId('login-email').fill(email)
+  await page.getByTestId('login-password').fill(password)
+  await page.getByTestId('login-submit').click()
+  await page.waitForURL('**/dashboard')
+  await expect(page.getByTestId('nav-user-menu')).toBeVisible()
+}
+
+async function logout(page) {
+  await page.getByTestId('nav-user-menu').click()
+  await page.getByTestId('nav-logout').click()
+  await expect(page.getByTestId('nav-login')).toBeVisible()
+}
+
+module.exports = { USERS, login, logout }
