@@ -177,6 +177,8 @@ Learn how to use this group here: :help.',
   'export.events.items_kg_waste_prevented' => 'kg waste prevented',
   'export.events.items_kg_co2_prevent' => 'kg CO2 prevented',
   'marker_title' => 'Click for more information',
+  'search_place' => 'Search for a place...',
+  'search_nothing_found' => 'Nothing found.',
   'goto_group' => 'Go to group',
   'next_event' => 'Next event',
 ];

@@ -180,6 +180,8 @@ Apprenez à utiliser ce groupe ici : :help.',
   'export.events.items_kg_waste_prevented' => 'kg déchets évités',
   'export.events.items_kg_co2_prevent' => 'kg emissions de CO2 évitées',
   'marker_title' => 'Cliquez pour plus d\'informations',
+  'search_place' => 'Rechercher un lieu...',
+  'search_nothing_found' => 'Aucun résultat.',
   'goto_group' => 'Aller au Repair Café',
   'next_event' => 'Prochain événement',
 ];

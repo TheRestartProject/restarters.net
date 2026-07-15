@@ -22,6 +22,9 @@
 import map from '../mixins/map'
 import { Geocoder } from 'leaflet-control-geocoder/src/control'
 import { Photon } from 'leaflet-control-geocoder/src/geocoders/photon'
+// The control builds its "nothing found" element at init; this stylesheet is
+// what keeps it hidden until a search actually fails (and styles the button).
+import 'leaflet-control-geocoder/dist/Control.Geocoder.css'
 import GroupMarker from './GroupMarker.vue'
 
 export default {
@@ -181,7 +184,8 @@ export default {
       if (this.mapObject) {
         try {
           new Geocoder({
-            placeholder: 'Search for a place...',
+            placeholder: this.__('groups.search_place'),
+            errorMessage: this.__('groups.search_nothing_found'),
             defaultMarkGeocode: false,
             geocoder: new Photon({
               nameProperties: [
@@ -345,6 +349,19 @@ export default {
 
 :deep(.leaflet-control-geocoder) {
   right: 30px;
+}
+
+// Belt and braces over the plugin CSS: never show the error element unless
+// the control has flagged a failed search.
+:deep(.leaflet-control-geocoder-form-no-error) {
+  display: none;
+}
+
+:deep(.leaflet-control-geocoder-error) {
+  display: block;
+  padding: 0.375rem 1rem 0.5rem;
+  font-size: 0.875rem;
+  color: #6c757d;
 }
 
 @media screen and (max-width: 360px) {
