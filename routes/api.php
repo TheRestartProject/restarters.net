@@ -80,6 +80,22 @@ Route::get('/timezones', [App\Http\Controllers\ApiController::class, 'timezones'
 // We are working towards a new and more coherent API.
 Route::prefix('v2')->group(function() {
     Route::middleware(\App\Http\Middleware\APISetLocale::class)->group(function() {
+        // Token-based auth for the SPA. No session, no CSRF — see AuthController.
+        Route::prefix('/auth')->group(function() {
+            Route::middleware('throttle:10,1')->group(function() {
+                Route::post('/login', [API\AuthController::class, 'loginv2']);
+                Route::post('/register', [API\AuthController::class, 'registerv2']);
+                Route::post('/password/forgot', [API\AuthController::class, 'forgotPasswordv2']);
+                Route::post('/password/reset', [API\AuthController::class, 'resetPasswordv2']);
+            });
+            Route::get('/email-available', [API\AuthController::class, 'emailAvailablev2']);
+            Route::middleware('auth:sanctum,api')->group(function() {
+                Route::post('/logout', [API\AuthController::class, 'logoutv2']);
+            });
+        });
+
+        Route::middleware('auth:sanctum,api')->post('/invites/claim', [API\AuthController::class, 'claimInvitev2']);
+
         Route::prefix('/groups')->group(function() {
             Route::get('/names', [API\GroupController::class, 'listNamesv2']);
             Route::get('/tags', [API\GroupController::class, 'listTagsv2']);
