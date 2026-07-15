@@ -1,0 +1,84 @@
+<?php
+
+namespace Tests\Feature\Groups;
+
+use App\User;
+use Auth;
+use Illuminate\Support\Str;
+use Tests\TestCase;
+
+/**
+ * Covers the shareable_link/is_member fields added to app/Http/Resources/Group.php for
+ * the Nuxt client (api-gaps.md B4/B5 gaps).
+ */
+class APIv2GroupResourceFieldsTest extends TestCase
+{
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->withExceptionHandling();
+    }
+
+
+    private function createGroupAsHost(User $host): int
+    {
+        $this->actingAs($host);
+
+        return $this->createGroup(
+            'Resource Fields Group '.Str::random(8),
+            'https://therestartproject.org',
+            'London'
+        );
+    }
+
+    public function testShareableLinkPointsAtTheFrontend(): void
+    {
+        $host = User::factory()->host()->create();
+        $idgroups = $this->createGroupAsHost($host);
+
+        $response = $this->get("/api/v2/groups/$idgroups");
+        $response->assertSuccessful();
+
+        $link = $response->json('data.shareable_link');
+        $this->assertStringStartsWith(rtrim(config('restarters.frontend_url'), '/').'/group/invite/', $link);
+    }
+
+    public function testIsMemberNullForAnonymousUser(): void
+    {
+        $host = User::factory()->host()->create();
+        $idgroups = $this->createGroupAsHost($host);
+        Auth::logout();
+
+        $response = $this->get("/api/v2/groups/$idgroups");
+        $response->assertSuccessful();
+
+        $this->assertNull($response->json('data.is_member'));
+    }
+
+    public function testIsMemberTrueForAHost(): void
+    {
+        $host = User::factory()->host()->create(['api_token' => 'resfields-tok-1']);
+        $idgroups = $this->createGroupAsHost($host);
+
+        $response = $this->get("/api/v2/groups/$idgroups?api_token=resfields-tok-1");
+        $response->assertSuccessful();
+
+        $this->assertTrue($response->json('data.is_member'));
+    }
+
+    public function testIsMemberFalseForANonMemberRestarter(): void
+    {
+        $host = User::factory()->host()->create();
+        $idgroups = $this->createGroupAsHost($host);
+        Auth::logout();
+
+        $restarter = User::factory()->restarter()->create(['api_token' => 'resfields-tok-2']);
+        $this->app['auth']->forgetGuards();
+        $this->actingAs($restarter);
+
+        $response = $this->get("/api/v2/groups/$idgroups?api_token=resfields-tok-2");
+        $response->assertSuccessful();
+
+        $this->assertFalse($response->json('data.is_member'));
+    }
+}

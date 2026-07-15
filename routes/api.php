@@ -86,6 +86,16 @@ Route::prefix('v2')->middleware(\App\Http\Middleware\VerifyUserConsentApi::class
         Route::get('/session', [API\SessionController::class, 'getSessionv2']);
         Route::middleware('auth:sanctum,api')->patch('/session', [API\SessionController::class, 'patchSessionv2']);
 
+        // Dashboard: the current user's groups, nearby groups and upcoming events.
+        Route::middleware('auth:sanctum,api')->get('/dashboard', [API\DashboardController::class, 'indexv2']);
+
+        // Maps proxy — keeps the Google API key server-side. Same controller/params as the
+        // session-auth /maps/* routes in routes/web.php (kept working until cutover).
+        Route::middleware('auth:sanctum,api')->prefix('/maps')->group(function() {
+            Route::get('/autocomplete', [App\Http\Controllers\MapsProxyController::class, 'autocomplete']);
+            Route::get('/place-details', [App\Http\Controllers\MapsProxyController::class, 'placeDetails']);
+        });
+
         // Token-based auth for the SPA. No session, no CSRF — see AuthController.
         Route::prefix('/auth')->group(function() {
             Route::middleware('auth:sanctum,api')->post('/consent', [API\AuthController::class, 'consentv2']);
@@ -105,9 +115,14 @@ Route::prefix('v2')->middleware(\App\Http\Middleware\VerifyUserConsentApi::class
         Route::middleware('auth:sanctum,api')->post('/invites/claim', [API\AuthController::class, 'claimInvitev2']);
 
         Route::prefix('/groups')->group(function() {
+            // Must be registered before the {id} routes below, or "nearby" would be captured
+            // as an {id} value.
+            Route::middleware('auth:sanctum,api')->get('/nearby', [API\GroupMembershipController::class, 'nearbyv2']);
+
             Route::get('/names', [API\GroupController::class, 'listNamesv2']);
             Route::get('/tags', [API\GroupController::class, 'listTagsv2']);
             Route::get('{id}/events', [API\GroupController::class, 'getEventsForGroupv2']);
+            Route::get('{id}/stats', [API\GroupMembershipController::class, 'statsv2']);
             Route::get('{id}', [API\GroupController::class, 'getGroupv2']);
             Route::post('', [API\GroupController::class, 'createGroupv2']);
             Route::patch('{id}', [API\GroupController::class, 'updateGroupv2']);
@@ -117,6 +132,13 @@ Route::prefix('v2')->middleware(\App\Http\Middleware\VerifyUserConsentApi::class
             {
                 Route::patch('{id}/volunteers/{iduser}', [API\GroupController::class, 'patchVolunteerForGroupv2']);
                 Route::delete('{id}/volunteers/{iduser}', [API\GroupController::class, 'deleteVolunteerForGroupv2']);
+
+                Route::post('{id}/members/me', [API\GroupMembershipController::class, 'joinv2']);
+                Route::delete('{id}/members/me', [API\GroupMembershipController::class, 'leavev2']);
+                Route::post('{id}/invites', [API\GroupMembershipController::class, 'invitesv2']);
+                Route::delete('{id}', [API\GroupMembershipController::class, 'archivev2']);
+                Route::post('{id}/images', [API\GroupMembershipController::class, 'uploadImagev2']);
+                Route::delete('{id}/images/{idimages}', [API\GroupMembershipController::class, 'deleteImagev2']);
             });
         });
 
@@ -133,6 +155,8 @@ Route::prefix('v2')->middleware(\App\Http\Middleware\VerifyUserConsentApi::class
         });
 
         Route::prefix('/users/me')->middleware('auth:sanctum,api')->group(function() {
+            Route::post('/onboarding-complete', [API\UserController::class, 'onboardingCompletev2']);
+            Route::get('/groups', [API\UserController::class, 'getMyGroupsv2']);
             Route::get('/preferences', [API\UserController::class, 'getMyEmailPreferencesv2']);
             Route::patch('/preferences', [API\UserController::class, 'updateMyEmailPreferencesv2']);
             Route::get('/calendars', [API\UserController::class, 'getMyCalendarsv2']);

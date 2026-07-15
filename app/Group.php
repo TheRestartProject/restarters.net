@@ -382,7 +382,10 @@ class Group extends Model implements Auditable
     public function getShareableLinkAttribute()
     {
         if (! empty($this->shareable_code)) {
-            return url("group/invite/{$this->shareable_code}");
+            // Points at the SPA, not this Laravel app: the client claims it statelessly via
+            // POST /api/v2/invites/claim (or the invite_code param on login/register) - see
+            // App\Http\Controllers\API\AuthController::claimShareableCode().
+            return rtrim(config('restarters.frontend_url'), '/')."/group/invite/{$this->shareable_code}";
         }
 
         return '';
@@ -436,6 +439,35 @@ class Group extends Model implements Auditable
         }
 
         return url('/uploads/mid_1474993329ef38d3a4b9478841cc2346f8e131842fdcfd073b307.jpg');
+    }
+
+    /**
+     * Unlike groupImagePath(), returns null (rather than a placeholder image) when the group
+     * has no image of its own - callers that want to distinguish "no image" from "has an image"
+     * (e.g. the v2 dashboard/nearby-groups API shapes) should use this instead.
+     */
+    public function realImageUrl(): ?string
+    {
+        if (is_object($this->groupImage) && is_object($this->groupImage->image)) {
+            return url('/uploads/mid_'.$this->groupImage->image->path);
+        }
+
+        return null;
+    }
+
+    /**
+     * The {id, name, distance, location, image_url} shape used by the v2 dashboard/nearby-groups
+     * endpoints. Requires $this->distance to have been set (see User::groupsNearby()).
+     */
+    public function toNearbySummary(): array
+    {
+        return [
+            'id' => $this->idgroups,
+            'name' => $this->name,
+            'distance' => $this->distance,
+            'location' => $this->location,
+            'image_url' => $this->realImageUrl(),
+        ];
     }
 
     public function nextUpcomingParty(): HasOne

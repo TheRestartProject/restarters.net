@@ -262,6 +262,20 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *          format="date-time",
  *     ),
  *     @OA\Property(
+ *          property="shareable_link",
+ *          title="shareable_link",
+ *          description="A link that can be shared to let people join this group directly, without an email invite.",
+ *          format="string",
+ *          example="https://app.restarters.net/group/invite/abc123"
+ *     ),
+ *     @OA\Property(
+ *          property="is_member",
+ *          title="is_member",
+ *          description="Whether the currently authenticated user is a confirmed member of this group. null when there is no authenticated user.",
+ *          type="boolean",
+ *          nullable=true
+ *     ),
+ *     @OA\Property(
  *          property="permissions",
  *          title="permissions",
  *          description="UI show/hide permission flags for the currently authenticated user (only present on the single-group endpoint).  These are for UI purposes only - the edit/delete/archive endpoints enforce their own authorization independently.  When there is no authenticated user, every flag is false.",
@@ -345,6 +359,16 @@ class Group extends JsonResource
 
         $ret['hosts'] = $this->resource->all_confirmed_hosts_count;
         $ret['restarters'] = $this->resource->all_confirmed_restarters_count;
+
+        $ret['shareable_link'] = $this->resource->shareable_link;
+
+        // Same auth-resolution order as API\GroupController::getGroupv2() (this endpoint is not
+        // behind auth:api, so the request may be anonymous, session-authenticated, or bearer/API
+        // token authenticated).
+        $user = \Illuminate\Support\Facades\Auth::user()
+            ?? auth('sanctum')->user()
+            ?? auth('api')->user();
+        $ret['is_member'] = $user ? $this->resource->isVolunteer($user->id) : null;
 
         // Get next approved event for group
         $nextevent = \App\Group::find($this->idgroups)->getNextUpcomingEvent();

@@ -224,6 +224,83 @@ class UserController extends Controller
     }
 
     /**
+     * @OA\Post(
+     *      path="/api/v2/users/me/onboarding-complete",
+     *      operationId="onboardingCompletev2",
+     *      tags={"Users"},
+     *      summary="Mark the post-registration onboarding modal as seen",
+     *      description="Port of the legacy GET /user/onboarding-complete (UserController::getOnboardingComplete): bumps number_of_logins to at least 2 so GET /api/v2/session's flags.onboarding is false from the next call onwards.",
+     *      security={{"apiToken":{}}},
+     *      @OA\Response(
+     *          response=200,
+     *          description="Onboarding dismissed",
+     *          @OA\JsonContent(@OA\Property(property="data", type="object",
+     *              @OA\Property(property="onboarding", type="boolean")
+     *          ))
+     *      ),
+     *      @OA\Response(response=401, description="Unauthenticated"),
+     *      @OA\Response(response=403, description="Data consent required")
+     * )
+     */
+    public function onboardingCompletev2(): JsonResponse
+    {
+        $user = Auth::user();
+
+        if ($user->number_of_logins < 2) {
+            $user->number_of_logins += 1;
+            $user->save();
+        }
+
+        return response()->json(['data' => ['onboarding' => false]]);
+    }
+
+    /**
+     * @OA\Get(
+     *      path="/api/v2/users/me/groups",
+     *      operationId="getMyGroupsv2",
+     *      tags={"Users"},
+     *      summary="All of the authenticated user's group memberships",
+     *      description="Unlike GET /api/v2/dashboard's your_groups (capped at 5), this returns every group the user has a users_groups pivot row for.",
+     *      security={{"apiToken":{}}},
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(@OA\Property(property="data", type="array", @OA\Items(
+     *              @OA\Property(property="id", type="integer"),
+     *              @OA\Property(property="name", type="string"),
+     *              @OA\Property(property="role", type="integer"),
+     *              @OA\Property(property="archived", type="boolean"),
+     *              @OA\Property(property="image_url", type="string", nullable=true)
+     *          )))
+     *      ),
+     *      @OA\Response(response=401, description="Unauthenticated")
+     * )
+     */
+    public function getMyGroupsv2(): JsonResponse
+    {
+        $user = Auth::user();
+
+        $groups = Group::join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
+            ->where('users_groups.user', $user->id)
+            ->whereNull('users_groups.deleted_at')
+            ->orderBy('groups.name', 'ASC')
+            ->groupBy('groups.idgroups', 'groups.name', 'users_groups.role', 'groups.archived_at')
+            ->select(['groups.idgroups', 'groups.name', 'users_groups.role', 'groups.archived_at'])
+            ->with('groupImage.image')
+            ->get();
+
+        return response()->json([
+            'data' => $groups->map(fn ($group) => [
+                'id' => $group->idgroups,
+                'name' => $group->name,
+                'role' => (int) $group->role,
+                'archived' => ! is_null($group->archived_at),
+                'image_url' => $group->realImageUrl(),
+            ])->values()->all(),
+        ]);
+    }
+
+    /**
      * @OA\Get(
      *      path="/api/v2/users/me/calendars",
      *      operationId="getMyCalendarsv2",

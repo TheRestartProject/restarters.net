@@ -872,6 +872,7 @@
         "invite_invalid": "Un problème est survenu - cette invitation n'est pas valide ou a expiré.",
         "invite_confirmed": "Excellent ! Vous avez rejoint le Repair Café.",
         "follow_group_error": "N'a pas réussi à suivre ce Repair Café.",
+        "image_upload_error": "Échec du téléchargement de l'image du Repair Café !",
         "create_event_first": "Veuillez d'abord créer un événement afin d'ajouter des données de réparation.",
         "follow_group_first": "Les données de réparation sont ajoutées aux événements de réparation de la communauté. Veuillez d'abord suivre un Repair Café, puis choisir un événement afin d'ajouter des données de réparation.",
         "export_event_list": "Télécharger le bilan",

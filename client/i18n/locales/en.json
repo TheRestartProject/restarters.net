@@ -1108,6 +1108,7 @@
         "invite_invalid": "Something went wrong - this invite is invalid or has expired.",
         "invite_confirmed": "Excellent! You have joined the group.",
         "follow_group_error": "Failed to follow this group.",
+        "image_upload_error": "Failed to upload group picture!",
         "create_event_first": "Please first create an event in order to add repair data.",
         "follow_group_first": "Repair data is added to community repair events. Please first follow a group and then choose an event in order to add repair data.",
         "export_event_list": "Download event list",
