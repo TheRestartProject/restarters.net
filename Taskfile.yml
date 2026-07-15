@@ -234,6 +234,26 @@ tasks:
           echo "COVERALLS_REPO_TOKEN not set, skipping coverage upload"
         fi
 
+  docker:client:logs:
+    desc: Tail the Nuxt client container logs.
+    cmds:
+      - docker logs --follow restarters_client
+
+  docker:client:restart:
+    desc: Restart the Nuxt client container (e.g. after changing client env vars).
+    cmds:
+      - docker compose --profile core restart restarters_client
+
+  docker:test:vitest:
+    desc: Run the client Vitest suite in the client container.
+    summary: |
+      Runs the Nuxt client's unit tests with JUnit output for CI integration,
+      mirroring docker:test:jest for the legacy suite.
+    cmds:
+      - mkdir -p /tmp/test-results/vitest
+      - docker exec restarters_client npx vitest run --reporter=default --reporter=junit --outputFile=test-results/vitest.xml
+      - cp client/test-results/vitest.xml /tmp/test-results/vitest/results.xml
+
   docker:test:jest:
     desc: Run Jest tests in the core application container.
     summary: |

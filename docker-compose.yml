@@ -102,6 +102,29 @@ services:
     networks:
       - app-network
 
+  # Nuxt SPA client. The browser talks to this on :3000 and to the Laravel API
+  # on :8001 directly (cross-origin, token auth — no shared nginx needed).
+  # NUXT_PUBLIC_API_BASE defaults to www.example.com (the /etc/hosts mapping
+  # this stack already requires) so the same value works from a host browser
+  # and from the Playwright container (which resolves it via host-gateway).
+  restarters_client:
+    profiles: ["core", "debug", "discourse"]
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: restarters_client
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      NUXT_DEV_MODE: ${NUXT_DEV_MODE:-true}
+      NUXT_PUBLIC_API_BASE: ${NUXT_PUBLIC_API_BASE:-http://www.example.com:8001}
+    volumes:
+      - ./client:/app:rw
+      - client_node_modules:/app/node_modules
+    networks:
+      - app-network
+
   restarters_nginx:
     profiles: ["core", "debug", "discourse"]
     image: nginx:latest
@@ -182,6 +205,10 @@ services:
       - restarters_nginx
     environment:
       - PLAYWRIGHT_BASE_URL=http://restarters_nginx
+    extra_hosts:
+      # Lets browser JS inside this container reach the API/SPA via the same
+      # www.example.com hostname a host browser uses (published ports).
+      - "www.example.com:host-gateway"
     # Install Playwright browsers after npm install to ensure version match
     command: /bin/sh -c "npx playwright install chromium && tail -f /dev/null"
 
@@ -271,6 +298,8 @@ networks:
 
 volumes:
   dbdata:
+    driver: local
+  client_node_modules:
     driver: local
   postgresql_data:
     driver: local
