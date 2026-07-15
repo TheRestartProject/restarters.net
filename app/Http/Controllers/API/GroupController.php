@@ -383,7 +383,59 @@ class GroupController extends Controller
      */
     public static function getGroupv2(Request $request, $idgroups) {
         $group = Group::findOrFail($idgroups);
-        return \App\Http\Resources\Group::make($group);
+
+        // This endpoint is not behind auth:api, so the request may be anonymous.  Try session auth first (the
+        // group view page is loaded via a normal browser session), then fall back to API token auth.  If there is
+        // no authenticated user at all, every permission flag is false.
+        $user = Auth::user();
+        if (! $user) {
+            $user = auth('api')->user();
+        }
+
+        $permissions = self::groupPermissionsFor($user, $group);
+
+        return \App\Http\Resources\Group::make($group)->additional([
+            'data' => [
+                'permissions' => $permissions,
+            ],
+        ]);
+    }
+
+    /**
+     * Compute the UI show/hide permission flags for a given (possibly null) user against a group.
+     *
+     * These flags are for UI purposes only - the actual edit/delete/archive endpoints enforce their own
+     * authorization independently.  Mirrors the logic previously computed server-side in group/view.blade.php.
+     */
+    private static function groupPermissionsFor(?User $user, Group $group): array
+    {
+        if (! $user) {
+            return [
+                'can_edit' => false,
+                'can_demote' => false,
+                'can_see_delete' => false,
+                'can_perform_delete' => false,
+                'can_perform_archive' => false,
+            ];
+        }
+
+        $isAdministrator = Fixometer::hasRole($user, 'Administrator');
+        $isCoordinatorForGroup = $user->isCoordinatorForGroup($group);
+        $isHostOfGroup = Fixometer::userHasEditGroupPermission($group->idgroups, $user->id);
+
+        $canEdit = $isAdministrator || $isCoordinatorForGroup || $isHostOfGroup;
+        $canDemote = $isAdministrator || $isCoordinatorForGroup;
+        $canSeeDelete = $isAdministrator;
+        $canPerformDelete = $canSeeDelete && $group->canDelete();
+        $canPerformArchive = $isAdministrator || $isCoordinatorForGroup;
+
+        return [
+            'can_edit' => $canEdit,
+            'can_demote' => $canDemote,
+            'can_see_delete' => $canSeeDelete,
+            'can_perform_delete' => $canPerformDelete,
+            'can_perform_archive' => $canPerformArchive,
+        ];
     }
 
     /**

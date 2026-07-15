@@ -260,6 +260,42 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *          title="archived_at",
  *          description="If present, this group has been archived and is no longer active.",
  *          format="date-time",
+ *     ),
+ *     @OA\Property(
+ *          property="permissions",
+ *          title="permissions",
+ *          description="UI show/hide permission flags for the currently authenticated user (only present on the single-group endpoint).  These are for UI purposes only - the edit/delete/archive endpoints enforce their own authorization independently.  When there is no authenticated user, every flag is false.",
+ *          format="object",
+ *          @OA\Property(
+ *              property="can_edit",
+ *              title="can_edit",
+ *              description="Whether the user can see group editing controls (administrator, network coordinator for the group, or host of the group).",
+ *              type="boolean",
+ *          ),
+ *          @OA\Property(
+ *              property="can_demote",
+ *              title="can_demote",
+ *              description="Whether the user can demote/manage volunteer roles (administrator or network coordinator for the group).",
+ *              type="boolean",
+ *          ),
+ *          @OA\Property(
+ *              property="can_see_delete",
+ *              title="can_see_delete",
+ *              description="Whether the user can see the delete-group control (administrator only).",
+ *              type="boolean",
+ *          ),
+ *          @OA\Property(
+ *              property="can_perform_delete",
+ *              title="can_perform_delete",
+ *              description="Whether the group can actually be deleted by this user (can_see_delete and the group has no events with devices).",
+ *              type="boolean",
+ *          ),
+ *          @OA\Property(
+ *              property="can_perform_archive",
+ *              title="can_perform_archive",
+ *              description="Whether the user can archive the group (administrator or network coordinator for the group).",
+ *              type="boolean",
+ *          ),
  *     )
  * )
 */

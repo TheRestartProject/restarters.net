@@ -73,14 +73,18 @@ class InviteGroupTest extends TestCase
         // Small delay to ensure any database commits or cache invalidations are complete
         usleep(100000); // 100ms
 
-        $props = $this->assertVueProperties($response2, [
+        $this->assertVueProperties($response2, [
             [],
             [
                 ':idgroups' => $group->idgroups,
             ],
         ]);
 
-        $initialGroup = json_decode($props[1][':initial-group'], true);
+        // Check the group membership counts directly on the model (these are no longer exposed to the Blade
+        // view/Vue props - GroupPage.vue now gets group data, including confirmed hosts/restarters counts, from
+        // GET /api/v2/groups/{id} - but the underlying counting logic being tested here (an invited-but-not-yet-
+        // accepted restarter shouldn't count as confirmed) is independent of how it's surfaced to the page).
+        $freshGroup = Group::find($group->idgroups);
 
         // Debug info for CI failures - collect group membership state
         $groupMembers = DB::table('users_groups')
@@ -91,18 +95,25 @@ class InviteGroupTest extends TestCase
             })
             ->implode('; ');
         $debugInfo = sprintf(
-            "Group ID: %d, Host ID: %d, User ID: %d, Members: [%s], Initial group data: %s",
+            "Group ID: %d, Host ID: %d, User ID: %d, Members: [%s]",
             $group->idgroups,
             $host->id,
             $user->id,
-            $groupMembers,
-            json_encode($initialGroup)
+            $groupMembers
         );
 
-        $this->assertEquals(1, $initialGroup['all_hosts_count'], "all_hosts_count mismatch. Debug: $debugInfo");
-        $this->assertEquals(1, $initialGroup['all_confirmed_hosts_count'], "all_confirmed_hosts_count mismatch. Debug: $debugInfo");
-        $this->assertEquals(1, $initialGroup['all_restarters_count'], "all_restarters_count mismatch. Debug: $debugInfo");
-        $this->assertEquals(0, $initialGroup['all_confirmed_restarters_count'], "all_confirmed_restarters_count mismatch. Debug: $debugInfo");
+        $this->assertEquals(1, $freshGroup->all_hosts_count, "all_hosts_count mismatch. Debug: $debugInfo");
+        $this->assertEquals(1, $freshGroup->all_confirmed_hosts_count, "all_confirmed_hosts_count mismatch. Debug: $debugInfo");
+        $this->assertEquals(1, $freshGroup->all_restarters_count, "all_restarters_count mismatch. Debug: $debugInfo");
+        $this->assertEquals(0, $freshGroup->all_confirmed_restarters_count, "all_confirmed_restarters_count mismatch. Debug: $debugInfo");
+
+        // The API endpoint GroupPage.vue fetches from should also reflect the confirmed counts (unconfirmed
+        // members are not exposed there, matching what the page displays to end users).
+        $apiResponse = $this->get("/api/v2/groups/{$group->idgroups}");
+        $apiResponse->assertSuccessful();
+        $apiGroup = json_decode($apiResponse->getContent(), true)['data'];
+        $this->assertEquals(1, $apiGroup['hosts'], "API hosts mismatch. Debug: $debugInfo");
+        $this->assertEquals(0, $apiGroup['restarters'], "API restarters mismatch. Debug: $debugInfo");
 
         // Now accept the invite.
         preg_match('/href="(\/group\/accept-invite.*?)"/', $response2->getContent(), $matches);
@@ -128,18 +139,24 @@ class InviteGroupTest extends TestCase
 
         // Check the counts have changed.
         $response4 = $this->get('/group/view/'.$group->idgroups);
-        $props = $this->assertVueProperties($response4, [
+        $this->assertVueProperties($response4, [
             [],
             [
                 ':idgroups' => $group->idgroups,
             ],
         ]);
 
-        $initialGroup = json_decode($props[1][':initial-group'], true);
-        $this->assertEquals(1, $initialGroup['all_hosts_count']);
-        $this->assertEquals(1, $initialGroup['all_confirmed_hosts_count']);
-        $this->assertEquals(1, $initialGroup['all_restarters_count']);
-        $this->assertEquals(1, $initialGroup['all_confirmed_restarters_count']);
+        $freshGroup = Group::find($group->idgroups);
+        $this->assertEquals(1, $freshGroup->all_hosts_count);
+        $this->assertEquals(1, $freshGroup->all_confirmed_hosts_count);
+        $this->assertEquals(1, $freshGroup->all_restarters_count);
+        $this->assertEquals(1, $freshGroup->all_confirmed_restarters_count);
+
+        $apiResponse = $this->get("/api/v2/groups/{$group->idgroups}");
+        $apiResponse->assertSuccessful();
+        $apiGroup = json_decode($apiResponse->getContent(), true)['data'];
+        $this->assertEquals(1, $apiGroup['hosts']);
+        $this->assertEquals(1, $apiGroup['restarters']);
 
         // Create another event.  Should now generate a notification.
         $this->actingAs($host);
