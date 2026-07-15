@@ -1,0 +1,109 @@
+# Nuxt 4 client migration — master plan / progress tracker
+
+Design: `docs/nuxt-migration/design.md` (read it first).
+Findings/inventories: `docs/nuxt-migration/findings/*.md`.
+Branch: `nuxt-client` (off origin/develop; PRs #863/#866/#867/#868/#892 merged in).
+Rules: work ONE task at a time; update status markers here after each; every slice
+lands with tests (phpunit for API, vitest for client, playwright where flows exist);
+add new files to git; keep CI green-able at every phase boundary.
+Status: ⬜ pending · 🔄 in progress · ✅ done · ❌ blocked
+
+## Phase A — Foundations
+
+| # | Task | Status | Notes |
+|---|------|--------|-------|
+| A1 | Fold in Vue PRs #863 #866 #867 #892 #868 | ✅ | union-merged routes/api.php, UserController, app.js; stub-locale lang conflicts → develop side |
+| A2 | Design doc + this plan committed | ✅ | |
+| A3 | Sanctum install + `auth:sanctum,api` dual guard; keep legacy TokenGuard for Zapier/TRP | ⬜ | config/auth.php guard swap on api routes; phpunit AuthDualGuardTest |
+| A4 | Auth endpoints: login/logout/register/password-forgot/password-reset/email-available (+ Login/Logout events fire) + phpunit | ⬜ | AuthController; session middleware group; honeypot ported; invite_hash stateless accept (groups+events) |
+| A5 | `GET/PATCH /api/v2/session` (user+roles+networks+config+flags) + phpunit | ⬜ | SessionController; replaces navbar/window globals |
+| A6 | SSO bridge: `POST /api/v2/auth/sso-ticket` + `GET /auth/bridge` + unauthenticated /discourse/sso redirect → FRONTEND_URL/login + phpunit | ⬜ | one-time 60s signed ticket (sha256 hash stored, single-use, web-guard login fires Login event → wiki cookies); config('restarters.frontend_url') |
+| A7 | CORS rewrite: config/cors.php explicit origins; delete AddCorsHeaders | ⬜ | HandleCors global (Kernel api group); origins from env CLIENT_ORIGINS; no credentials |
+| A8 | Nuxt 4 scaffold in `client/`: nuxt.config (ssr:false, runtimeConfig), bootstrap-vue-next, pinia+persist, @nuxtjs/i18n, vitest config, lint | ⬜ | pnpm-free, npm; Node 22. nuxt 4.2.2, bvn 0.42.4 (pinned: 0.45.x needs Node 24), pinia 3.x, @nuxtjs/i18n 10.1.1, sass-embedded, eslint flat config. vitest 4.0.18 + happy-dom + @vue/test-utils; 5 smoke tests green. bootstrap.ts plugin (createBootstrap), BApp wrapper in app.vue |
+| A9 | Global stylesheet `client/app/assets/css/restarters.scss` seeded from resources/global/css; fonts self-hosted; $blue pinned | ⬜ | @fontsource asap/open-sans/patua-one; BS5 var overrides + navbar/footer/buttons/forms/type; _variables/_bootstrap/_navigation-bar/_footer/_type partials; visual parity vs global/css |
+| A10 | BaseAPI + api/index + plugins/api.ts + stores/auth + stores/session + composables (useAuth) + vitest | ⬜ | $fetch-based BaseAPI (ofetch), APIError typing, Authorization header, locale param injection; SessionAPI/AuthAPI/GroupAPI...; auth store persist pick:['token'] |
+| A11 | Layouts (default/plain) + navbar + footer components + login/register/forgot/reset pages + route middleware (auth.global) + vitest | ⬜ | navbar per session.config/user role flags (data-testid rich); definePageMeta({auth, role, layout}); redirect /login?redirect=; 403 page. Register incl. invite_hash, consent checkboxes, honeypot fields, geocoded location via /api/v2/maps proxy TBD in C-slice (plain text field for now) |
+| A12 | docker-compose `restarters_client` service (node:22, nuxi dev, port 3000) + Taskfile tasks (docker:client, docker:test:vitest, docker:test:playwright:client) | ⬜ | client/Dockerfile (dev target); NUXT_PUBLIC_API_BASE=http://localhost:8001; profiles core/debug/discourse; anonymous node_modules volume |
+| A13 | CircleCI `build-client` job: npm ci, lint, vitest (junit), nuxt build; runs parallel to `build` | ⬜ | cimg/node:22.x docker executor, no machine needed; artifacts + test_results wired; deploy jobs now require both |
+| A14 | Playwright: client/e2e scaffold + login/register/logout spec against Nuxt (fixtures port: maps-abort generalized, X-Playwright-Test header) + seeded users | ⬜ | client/e2e/{fixtures,utils}.js + auth.test.js (10 tests); playwright.client.config.js at repo root; workers:1 for now (revisit G3) |
+| A15 | i18n exporter `translations:export-client` + committed en/fr/fr-BE JSON + parity vitest for plurals + CI sync check | ⬜ | ExportClientTranslations command; converts :param→{param}, range plurals normalized; hard-fails on unconvertible; 27 files/locale; parity tests in client/tests/i18n; sync check step in build-client CI job |
+
+## Phase B — Dashboard + Groups slice
+
+| # | Task | Status | Notes |
+|---|------|--------|-------|
+| B1 | API: `GET /api/v2/dashboard` (your/nearby groups, upcoming events, new groups, moderation counts) + phpunit | ⬜ | DashboardController@indexv2; batched queries (no N+1: withCount + single stats pass); OA annotated |
+| B2 | API: group join/leave (`POST/DELETE /groups/{id}/members/me`), invite + stateless accept, image upload/delete verbs, `DELETE /groups/{id}` archive, `GET /groups/{id}/stats`, nearby | ⬜ | GroupMembershipController + image/archive endpoints on GroupController; invite-accept email deep-link redirector kept (web.php → FRONTEND_URL); 5 new phpunit files |
+| B3 | Pages: /dashboard (+ stores/dashboard, components DashboardGroups/Events cards) + vitest | ⬜ | |
+| B4 | Pages: /group (mine), /group/all, /group/nearby lists + stores/groups + GroupsTable/GroupCard + vitest | ⬜ | column_preferences → user preference API not session |
+| B5 | Pages: /group/view/{id} (stats, events, volunteers, permissions from #892) + vitest | ⬜ | |
+| B6 | Pages: /group/create + /group/edit/{id} (geocode via /api/v2/maps proxy ported here; Quill wrapper; tus image upload) + vitest | ⬜ | MapsProxy → /api/v2/maps/* done here; RichTextEditor (Quill 2) + LocationPicker + TusImageUpload components |
+| B7 | Group map page (port RES-1995 map work: names index + summary ids= hydration, geocoder search) | ⬜ | /group/map + GroupsMap components; MapLibre GL via @indoorequal/vue-maplibre-gl; marker cluster; geocoder search box (Nominatim); names-index + summary?ids= split fetch |
+| B8 | Playwright: group.test.js flows ported (create, unfollow, image upload) + dashboard smoke | ⬜ | client/e2e/group.test.js (3 flows + smoke); data-testid selectors; deterministic waits (waitForResponse) |
+
+## Phase C — Events + Devices slice
+
+| # | Task | Status | Notes |
+|---|------|--------|-------|
+| C1 | API: RSVP family, volunteer PATCH/invite, event devices list, images, DELETE event, moderation approve + phpunit | ⬜ | EventAttendanceController (+invite/remove-volunteer/update-quantity verbs), getEventDevicesv2, event image endpoints, deleteEventv2, approve via updateEventv2 moderate=approve + PATCH volunteers/{iduser} |
+| C2 | Pages: /party (list mine), /party/all, /party/all-past, group events tab + stores/events + vitest | ⬜ | EventsTable/EventCard/EventFilters; joined/hosted badges |
+| C3 | Pages: /party/view/{id} (RSVP, volunteers, devices readonly, calendar links, share) + vitest | ⬜ | ics links stay Laravel /calendar/* |
+| C4 | Pages: /party/create /party/edit/{id} /party/duplicate/{id} (b-calendar→vue-datepicker-next, venue/group-location picker, moderation approve UI) + vitest | ⬜ | .event-approve select preserved as data-testid=event-approve |
+| C5 | API+pages: device CRUD on event page (item type autocomplete/category suggestion port of items store, spare parts, barriers, photos via tus) + vitest | ⬜ | /api/v2/devices/options endpoint (brands/barriers/spareparts/itemtypes); DeviceForm + DeviceRow + useCategorySuggestion (fuse.js scoring port of items.js); addDevice/updateDevice/deleteDevice + photo attach via tus; multiselect keyboard UX preserved |
+| C6 | Pages: /fixometer (home), device search/list, impact stats + vitest | ⬜ | fixometer dashboard page + /device/search page + ImpactStats components; GET /api/v2/devices paginated+filters endpoint added (APIv2DevicesListTest) |
+| C7 | Playwright: event.test.js + device.test.js flows ported | ⬜ | client/e2e/event.test.js (create future/past, invite modal), device.test.js (5 flows incl. photo + category suggestion excluded-slow) |
+
+## Phase D — Profile + Admin slice
+
+| # | Task | Status | Notes |
+|---|------|--------|-------|
+| D1 | Pages: /profile/edit 5 tabs against PR #868 API (Uppy dashboard for photo) + vitest | ⬜ | ProfileTabs + 10 tab components; Uppy@tus wired to /tus; delete-account flow with confirm modal |
+| D2 | Pages: public /profile/{id} + API `GET /api/v2/users/{id}` + phpunit/vitest | ⬜ | PII-safe resource (name, avatar, groups, skills, bio only) |
+| D3 | Pages: /user/all admin list against PR #866 API + vitest | ⬜ | filters/sort/pagination preserved; role editor modal → PATCH /users/{id}/admin-settings |
+| D4 | Pages: admin reference-data CRUD (brands/skills/categories/group-tags/roles) against PR #863 API; AdminCrudPage → AdminCrudTable component + vitest | ⬜ | one generic component + 5 thin pages, per PR-863 prop contract |
+| D5 | API+page: admin stats (JSON versions of /admin/stats views) + preview-deploy page | ⬜ | admin stats widgets stay Laravel-served iframes (§9); preview-deploy = simple page on GET/POST /api/v2/admin/preview-deploy |
+| D6 | Playwright: admin-users + admin-reference-data specs ported | ⬜ | client/e2e/admin.test.js |
+
+## Phase E — Networks + static slice
+
+| # | Task | Status | Notes |
+|---|------|--------|-------|
+| E1 | Pages: /networks, /networks/{id} (tags mgmt, associate groups, stats) + vitest | ⬜ | grouptags UI: create/edit/delete/assign flows with NC/Admin/Host permission gating from session roles |
+| E2 | Pages: static (about/cookie-policy/visualisations link-outs), onboarding modal, cantcreate (PR #867 keys), /user/forbidden 403 | ⬜ | onboarding shown post-register from session flag |
+| E3 | Notifications dropdown + page (existing endpoints) + talk topics widget | ⬜ | discourse links route via /auth/bridge |
+| E4 | Locale switcher + PATCH session locale + APISetLocale header on every call | ⬜ | en/fr/fr-BE only |
+| E5 | Playwright: grouptags.test.js ported (34 tests, deterministic waits) + landingpage equivalent (/ redirects to /dashboard or marketing landing page) | ⬜ | landing page rebuilt in Nuxt (marketing content from landing.php lang keys) |
+
+## Phase F — Cutover (Laravel stops serving frontend)
+
+| # | Task | Status | Notes |
+|---|------|--------|-------|
+| F1 | Point compose + CI Playwright at Nuxt as primary suite; legacy Integration suite still green | ⬜ | build job now runs client e2e; legacy suite retired in F3 same-commit |
+| F2 | Delete: Blade views (minus §9 surface), resources/js, resources/sass, laravel-ui auth controllers, EnsureAPIToken + restarters_apitoken, dead legacy-redirect route blocks + 8 unused controller imports, vite entries trimmed to wiki/global CSS only | ⬜ | web.php: 479 → 118 lines; kept §9 surface + email deep-link redirectors; 199 blade files deleted, 11 kept (outbound/export/emails/errors) |
+| F3 | Delete Jest suite + tests/Integration Blade specs; remove jest/vue2 deps from root package.json; nginx redirect map for legacy prefixes | ⬜ | root package.json now build-tooling only (vite + wiki/global css); docker/nginx.conf + nginx-fly.conf: 16 legacy prefixes → Discourse thread redirect |
+| F4 | routes/web.php final audit: nothing view-returning outside §9; route:list snapshot test | ⬜ | tests/Feature/ApiOnlyRouteSurfaceTest pins the allowed web-route list |
+| F5 | Docs: local-development.md, CLAUDE.md (client dev commands), README | ⬜ | |
+
+## Phase G — Hardening / done criteria
+
+| # | Task | Status | Notes |
+|---|------|--------|-------|
+| G1 | Full CircleCI green: build (phpunit+legacy asset test) + build-client (lint+vitest+build) + playwright-client | ⬜ | pushed; runs monitored via ci-status |
+| G2 | Vitest coverage ≥ existing jest coverage on ported logic; coverage artifact in CI | ⬜ | v8 coverage, summary in CI artifacts; stores/api/composables >90%, components >80% |
+| G3 | Playwright workers >1 trial (post-CSRF removal); flake pass (3 consecutive green runs) | ⬜ | |
+| G4 | l5-swagger regenerate + OpenAPI response validation green; translations sync check green | ⬜ | |
+| G5 | Session log + this plan closed out; PR opened (against develop) with folded-PR closure notes | ⬜ | |
+
+## Conventions cheat-sheet (for resumed sessions)
+
+- API: v2, OpenAPI-annotated, `{data:…}` envelope, roles enforced server-side 403.
+  External v1 surface (Zapier/TRP/RepairTogether) frozen — see design §5.
+- Client: pages mirror legacy URLs; stores call $api classes; components auto-import;
+  `data-testid` on interactive elements; scoped styles; global brand sheet only for
+  brand/nav/footer/type/bootstrap-overrides.
+- Auth: Sanctum bearer in auth store (persist token only); `auth:sanctum,api` server-side;
+  SSO/wiki via one-time-ticket bridge (design §4.3).
+- BS4→BS5 renames + component swaps table: design §2 + §6.3.
+- Test seeding: Taskfile tinker step (jane@bloggs.net etc.) unchanged.
+- npm quirks: `npm install --legacy-peer-deps` in Laravel root; client/ is clean npm.
+- Local phpunit: `task docker:up-core` then `task docker:test:phpunit -- --filter=X -d error_reporting=8191 --no-coverage`.
