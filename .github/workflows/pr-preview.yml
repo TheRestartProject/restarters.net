@@ -57,7 +57,7 @@ jobs:
             PR="${{ github.event.pull_request.number }}"
           fi
           INFO=$(gh pr view "$PR" --repo "$GITHUB_REPOSITORY" \
-            --json state,headRefOid,headRepository,headRepositoryOwner,labels,baseRefName)
+            --json state,headRefOid,headRepository,headRepositoryOwner,labels,baseRefName,title)
           STATE=$(echo "$INFO" | jq -r .state)
           HEAD_SHA=$(echo "$INFO" | jq -r .headRefOid)
           BASE_REF=$(echo "$INFO" | jq -r .baseRefName)
@@ -90,6 +90,7 @@ jobs:
             exit 1
           fi
 
+          echo "title=$(echo "$INFO" | jq -r .title)" >> "$GITHUB_OUTPUT"
           echo "number=$PR" >> "$GITHUB_OUTPUT"
           echo "sha=$HEAD_SHA" >> "$GITHUB_OUTPUT"
           echo "base=$BASE_REF" >> "$GITHUB_OUTPUT"
@@ -164,9 +165,12 @@ jobs:
       - name: Deploy
         env:
           FLY_API_TOKEN: ${{ secrets.FLY_ORG_TOKEN }}
+          PR_TITLE: ${{ steps.pr.outputs.title }}
         run: |
           APP="${{ steps.pr.outputs.app }}"
           PR="${{ steps.pr.outputs.number }}"
+          # Shown on the cookie-gate login page so testers know which PR this is.
+          flyctl secrets set PREVIEW_PR_TITLE="$PR_TITLE" --app "$APP" --stage
           sed "s/__PR_NUMBER__/$PR/g" fly.pr.toml > fly.pr.generated.toml
           flyctl deploy --config fly.pr.generated.toml --app "$APP" \
             --remote-only --ha=false
