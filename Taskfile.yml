@@ -264,6 +264,44 @@ tasks:
       - mkdir -p /tmp/test-results/jest
       - docker exec restarters bash -c "npm i jest-junit; JEST_JUNIT_OUTPUT_DIR=/tmp/test-results npm run jest -- --testResultsProcessor=jest-junit"
 
+  playwright:seed-data:
+    desc: Seed the fixed users/network/group the Playwright suites depend on.
+    internal: true
+    cmds:
+      - docker exec restarters bash -c "php artisan cache:clear"
+      - docker exec restarters bash -c "echo \"DB::statement('SET foreign_key_checks=0'); App\\\\Device::truncate(); DB::statement('SET foreign_key_checks=1');\" | php artisan tinker" || true
+      - docker exec restarters bash -c "echo \"\\\$u=App\\\\User::firstOrCreate(['email'=>'jane@bloggs.net'], ['name'=>'Jane Bloggs','password'=>Hash::make('passw0rd'),'consent_past_data'=>'2021-01-01','consent_future_data'=>'2021-01-01','consent_gdpr'=>'2021-01-01']);\\\$u->role=2;\\\$u->save();\" | php artisan tinker" || true
+      - |
+        # Create test data for group tags tests (NC user, host user, network, group)
+        docker exec restarters php artisan tinker --execute='$nc = App\User::firstOrCreate(["email"=>"nc@test.net"], ["name"=>"NC User","password"=>Hash::make("passw0rd"),"consent_past_data"=>"2021-01-01","consent_future_data"=>"2021-01-01","consent_gdpr"=>"2021-01-01"]); $nc->role=6; $nc->save(); $host = App\User::firstOrCreate(["email"=>"host@test.net"], ["name"=>"Host User","password"=>Hash::make("passw0rd"),"consent_past_data"=>"2021-01-01","consent_future_data"=>"2021-01-01","consent_gdpr"=>"2021-01-01"]); $host->role=3; $host->save(); $network = App\Network::where("name","Test London")->first(); if (!$network) { $network = new App\Network(); $network->name="Test London"; $network->shortname="testlondon"; $network->description="Test network"; $network->default_language="en"; $network->save(); } DB::table("user_network")->insertOrIgnore(["user_id"=>$nc->id,"network_id"=>$network->id]); $group = App\Group::firstOrCreate(["name"=>"Tag Test Group"], ["website"=>"https://test.example.com","location"=>"London","area"=>"London","postcode"=>"SW1A 1AA","latitude"=>51.5,"longitude"=>-0.1,"free_text"=>"Test group","approved"=>true]); DB::table("group_network")->insertOrIgnore(["group_id"=>$group->idgroups,"network_id"=>$network->id]); DB::table("users_groups")->insertOrIgnore(["user"=>$host->id,"group"=>$group->idgroups,"role"=>3,"status"=>1]); echo "Group tags test data: NC=".$nc->id." Host=".$host->id." Network=".$network->id." Group=".$group->idgroups;' || true
+      - docker exec restarters bash -c "sed -i 's/APP_DEBUG=.*$/APP_DEBUG=false/g' /var/www/.env"
+      - docker exec restarters bash -c "sed -i 's/QUEUE_CONNECTION=.*/QUEUE_CONNECTION=sync/g' /var/www/.env"
+      - docker exec restarters bash -c "sed -i 's/MAIL_MAILER=.*/MAIL_MAILER=log/g' /var/www/.env"
+
+  docker:test:playwright:client:
+    desc: Run the client Playwright suite against the Nuxt container.
+    summary: |
+      End-to-end tests for the Nuxt SPA (client/e2e, playwright.client.config.js).
+      The browser loads the SPA from the restarters_client container and the SPA
+      calls the Laravel API via www.example.com:8001 (host-gateway).
+    cmds:
+      - mkdir -p /tmp/test-results/playwright
+      - task: playwright:seed-data
+      - |
+        # Relax API rate limits for test bursts (mirrors the legacy suite's
+        # throttle removal; container copy only, never committed).
+        docker exec restarters bash -c "sed -i 's/throttle:10,1/throttle:1000,1/g' /var/www/routes/api.php && php artisan route:clear && php artisan config:clear"
+      - docker exec restarters_playwright bash -c "npx playwright install chromium"
+      - |
+        docker exec restarters_playwright bash -c "
+          export PLAYWRIGHT_TEST=true
+          export PLAYWRIGHT_BASE_URL=http://restarters_client:3000
+          export PLAYWRIGHT_API_URL=http://www.example.com:8001
+          export PW_TEST_HTML_REPORT_OPEN=never
+          export FORCE_COLOR=1
+          stdbuf -oL -eL npx playwright test --config=playwright.client.config.js --reporter=html
+        "
+
   docker:test:playwright:
     desc: Run Playwright tests in dedicated playwright container.
     summary: |
