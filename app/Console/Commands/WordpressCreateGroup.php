@@ -37,6 +37,12 @@ class WordpressCreateGroup extends Command
      */
     public function handle(): void
     {
+        if (! config('restarters.features.wordpress_integration')) {
+            $this->error('WordPress integration is disabled on this site.');
+
+            return;
+        }
+
         $id = $this->argument('id');
         $group = Group::findOrFail($id);
 

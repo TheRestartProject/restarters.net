@@ -42,6 +42,12 @@ class SyncDiscourseUsernames extends Command
      */
     public function handle(): int
     {
+        if (! config('restarters.features.discourse_integration')) {
+            $this->info('Discourse integration is disabled on this site - skipping.');
+
+            return 0;
+        }
+
         $discourseApiKey = env('DISCOURSE_APIKEY');
         $discourseApiUser = env('DISCOURSE_APIUSER');
 

@@ -4,6 +4,9 @@ return [
 
     'features' => [
         'discourse_integration' => env('FEATURE__DISCOURSE_INTEGRATION', true) && !empty(env('DISCOURSE_URL')),
+        // Disabled on preview/staging apps, which share the production image bucket.
+        'image_upload' => env('FEATURE__IMAGE_UPLOAD', true),
+        'wordpress_integration' => env('FEATURE__WORDPRESS_INTEGRATION', true) && !empty(env('WP_XMLRPC_ENDPOINT')),
     ],
 
     'wiki' => [

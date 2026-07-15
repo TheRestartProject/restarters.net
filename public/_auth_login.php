@@ -38,6 +38,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body>
 <div class="box">
     <h1><?= htmlspecialchars(getenv('APP_NAME') ?: 'Restarters') ?></h1>
+    <?php if (getenv('PREVIEW_PR_TITLE')): ?>
+        <p style="color: #555; margin-top: -0.5em;"><?= htmlspecialchars(getenv('PREVIEW_PR_TITLE')) ?></p>
+    <?php endif; ?>
     <?php if ($error): ?><p class="err"><?= htmlspecialchars($error) ?></p><?php endif; ?>
     <form method="POST">
         <input type="hidden" name="next" value="<?= htmlspecialchars($next) ?>">
