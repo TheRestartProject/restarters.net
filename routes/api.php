@@ -129,5 +129,52 @@ Route::prefix('v2')->group(function() {
             Route::patch('{id}', [API\DeviceController::class, 'updateDevicev2']);
             Route::delete('{id}', [API\DeviceController::class, 'deleteDevicev2']);
         });
+
+        Route::prefix('/brands')->group(function() {
+            Route::get('/', [API\BrandController::class, 'listBrandsv2']);
+            Route::get('{id}', [API\BrandController::class, 'getBrandv2']);
+            Route::middleware('auth:api')->group(function() {
+                Route::post('/', [API\BrandController::class, 'createBrandv2']);
+                Route::put('{id}', [API\BrandController::class, 'updateBrandv2']);
+                Route::delete('{id}', [API\BrandController::class, 'deleteBrandv2']);
+            });
+        });
+
+        Route::prefix('/skills')->group(function() {
+            Route::get('/', [API\SkillController::class, 'listSkillsv2']);
+            Route::get('{id}', [API\SkillController::class, 'getSkillv2']);
+            Route::middleware('auth:api')->group(function() {
+                Route::post('/', [API\SkillController::class, 'createSkillv2']);
+                Route::put('{id}', [API\SkillController::class, 'updateSkillv2']);
+                Route::delete('{id}', [API\SkillController::class, 'deleteSkillv2']);
+            });
+        });
+
+        Route::prefix('/group-tags')->group(function() {
+            Route::get('/', [API\GroupTagController::class, 'listGroupTagsv2']);
+            Route::get('{id}', [API\GroupTagController::class, 'getGroupTagv2']);
+            Route::middleware('auth:api')->group(function() {
+                Route::post('/', [API\GroupTagController::class, 'createGroupTagv2']);
+                Route::put('{id}', [API\GroupTagController::class, 'updateGroupTagv2']);
+                Route::delete('{id}', [API\GroupTagController::class, 'deleteGroupTagv2']);
+            });
+        });
+
+        Route::prefix('/categories')->group(function() {
+            Route::get('/', [API\CategoryController::class, 'listCategoriesv2']);
+            Route::get('{id}', [API\CategoryController::class, 'getCategoryv2']);
+            Route::middleware('auth:api')->group(function() {
+                Route::put('{id}', [API\CategoryController::class, 'updateCategoryv2']);
+            });
+        });
+
+        Route::get('/category-clusters', [API\CategoryController::class, 'listCategoryClustersv2']);
+
+        Route::middleware('auth:api')->group(function() {
+            Route::get('/roles', [API\RoleController::class, 'listRolesv2']);
+            Route::get('/roles/{id}', [API\RoleController::class, 'getRolev2']);
+            Route::put('/roles/{id}/permissions', [API\RoleController::class, 'updateRolePermissionsv2']);
+            Route::get('/permissions', [API\RoleController::class, 'listPermissionsv2']);
+        });
     });
 });

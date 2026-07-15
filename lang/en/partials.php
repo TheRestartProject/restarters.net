@@ -80,6 +80,7 @@ return [
   'copied_to_clipboard' => 'Copied to clipboard.',
   'total' => 'total',
   'remove' => 'remove',
+  'delete' => 'Delete',
   'please_choose' => 'Please choose...',
   'notification_greeting' => 'Hello!',
   'confirm' => 'Confirm',

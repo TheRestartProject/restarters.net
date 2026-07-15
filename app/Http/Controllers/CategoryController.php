@@ -2,107 +2,70 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\View\View;
-use Illuminate\Http\RedirectResponse;
-use App\Category;
 use App\Helpers\Fixometer;
-use App\User;
 use Auth;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Redirect;
+use DB;
+use Illuminate\View\View;
 
 class CategoryController extends Controller
 {
-    public function index(): View
+    /**
+     * Render the categories admin page (a Vue SPA that talks to /api/v2/categories).
+     * Public list view; edit/save require administrator and happen via the API.
+     */
+    public function index($editId = null): View
     {
-        $Category = new Category;
-        $list = $Category->findAll();
-        $clusters = $Category->listed();
+        // Fetch categories joined with cluster name, scoped to the current revision
+        // (mirrors API\CategoryController). Doing it here means the Vue admin doesn't
+        // have to round-trip the API on first paint.
+        $categories = DB::select(<<<'SQL'
+            SELECT c.idcategories AS id,
+                   c.name,
+                   c.powered,
+                   c.weight,
+                   c.footprint,
+                   c.footprint_reliability,
+                   c.cluster,
+                   c.description_short,
+                   cl.name AS cluster_name
+              FROM categories c
+              LEFT JOIN clusters cl ON cl.idclusters = c.cluster
+             WHERE c.revision = (SELECT MAX(revision) FROM categories)
+             ORDER BY c.name ASC
+        SQL);
 
-        // Prepare data for Vue table
-        $tableData = [];
-        foreach ($list as $category) {
-            // Find cluster name
-            $clusterName = null;
-            if (!empty($category->cluster)) {
-                foreach ($clusters as $cluster) {
-                    if ($cluster->idclusters == $category->cluster) {
-                        $clusterName = $cluster->name;
-                        break;
-                    }
-                }
-            }
-
-            // Prepare reliability badge HTML
-            $reliability = $category->footprint_reliability ?? 6;
-            $colors = [
-                1 => '#AD2C1C',
-                2 => '#FF1B00',
-                3 => '#FFBA00',
-                4 => '#43B136',
-                5 => '#26781C',
-                6 => '#FFBA00',
+        $categoriesForVue = array_map(function ($row) {
+            return [
+                'id' => (int) $row->id,
+                'name' => $row->name,
+                'powered' => $row->powered !== null ? (bool) $row->powered : null,
+                'weight' => $row->weight !== null ? (float) $row->weight : null,
+                'footprint' => $row->footprint !== null ? (float) $row->footprint : null,
+                'footprint_reliability' => $row->footprint_reliability !== null ? (int) $row->footprint_reliability : null,
+                'cluster' => $row->cluster !== null ? (int) $row->cluster : null,
+                'cluster_name' => $row->cluster_name,
+                'description_short' => $row->description_short,
             ];
-            $color = $colors[$reliability] ?? '#FFBA00';
-            $reliabilityHtml = '<span class="badge indicator-' . $reliability . '" style="background-color: ' . $color . '">' . __('admin.reliability-' . $reliability) . '</span>';
+        }, $categories);
 
-            $tableData[] = [
-                'idcategories' => $category->idcategories,
-                'name' => $category->name,
-                'cluster' => $clusterName,
-                'cluster_name' => $clusterName,
-                'weight' => $category->weight,
-                'footprint' => $category->footprint,
-                'footprint_html' => $category->footprint,
-                'reliability' => $reliabilityHtml,
-            ];
+        $clusters = array_map(
+            fn ($r) => ['id' => (int) $r->idclusters, 'name' => $r->name],
+            DB::select('SELECT idclusters, name FROM clusters ORDER BY idclusters ASC')
+        );
+
+        $reliabilityOptions = [];
+        foreach (Fixometer::footprintReliability() as $k => $_v) {
+            $reliabilityOptions[$k] = __('admin.reliability-' . $k);
         }
+
+        $user = Auth::user();
 
         return view('category.index', [
-            'list' => $list,
-            'categories' => $clusters,
-            'tableData' => $tableData,
+            'categoriesForVue' => $categoriesForVue,
+            'clusters' => $clusters,
+            'reliabilityOptions' => $reliabilityOptions,
+            'apiToken' => $user ? $user->api_token : '',
+            'editId' => $editId !== null ? (int) $editId : null,
         ]);
-    }
-
-    public function getEditCategory($id)
-    {
-        if (! Fixometer::hasRole(Auth::user(), 'Administrator')) {
-            return redirect('/user/forbidden');
-        }
-
-        $category = Category::find($id);
-
-        $c = new Category;
-        $categories = $c->listed();
-
-        return view('category.edit', [
-        'title' => 'Edit Category',
-        'category'   => $category,
-        'categories'  => $categories,
-        ]);
-    }
-
-    public function postEditCategory($id, Request $request): RedirectResponse
-    {
-        if (! Fixometer::hasRole(Auth::user(), 'Administrator')) {
-            return redirect('/user/forbidden');
-        }
-
-        try {
-            $category = Category::find($id);
-            $category->update([
-            'name' => $request->input('category_name'),
-            'weight' => $request->input('weight'),
-            'footprint' => $request->input('co2_footprint'),
-            'footprint_reliability' => $request->input('reliability'),
-            'cluster' => $request->input('category_cluster'),
-            'description_short' => $request->input('categories_desc')
-            ]);
-        } catch (\Exception $e) {
-            return redirect()->back()->with('danger', __('category.update_error'));
-        }
-
-        return redirect()->back()->with('success', __('category.update_success'));
     }
 }

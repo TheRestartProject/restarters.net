@@ -3,100 +3,59 @@
 namespace Tests\Feature;
 
 use App\GroupTags;
+use App\Network;
 use App\Role;
-use Carbon\Carbon;
-use DB;
-use HieuLe\WordpressXmlrpcClient\WordpressClient;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\Notification;
-use Mockery;
 use Tests\TestCase;
 
 class GroupTagsTest extends TestCase
 {
-    public function testList(): void
+    public function testGroupTagsAdminPageRendersForAdministrator(): void
     {
-        $admin = $this->loginAsTestUser(Role::RESTARTER);
-        $response = $this->get('/tags');
-        $response->assertRedirect('/user/forbidden');
+        $this->loginAsTestUser(Role::RESTARTER);
+        $this->get('/tags')->assertRedirect('/user/forbidden');
 
-        $admin = $this->loginAsTestUser(Role::ADMINISTRATOR);
-        $tag = GroupTags::factory()->create();
+        $tag = GroupTags::factory()->create(['tag_name' => 'Scotland', 'network_id' => null]);
 
+        $this->loginAsTestUser(Role::ADMINISTRATOR);
         $response = $this->get('/tags');
-        $response->assertSuccessful();
-        $response->assertSeeText($tag->tag_name);
+        $response->assertOk();
+        $html = $response->getContent();
+
+        $this->assertStringContainsString('<GroupTagsPage', $html);
+        $this->assertMatchesRegularExpression(
+            '/:initial-tags="\[[^"]*&quot;name&quot;:&quot;Scotland&quot;[^"]*\]"/',
+            $html,
+            'Expected the global tag to appear inside the :initial-tags prop'
+        );
+        $this->assertStringContainsString(':initial-edit-id="null"', $html);
     }
 
-    public function testCreate(): void
+    public function testAdminPageExcludesNetworkScopedTags(): void
     {
-        $tag = GroupTags::factory()->create();
+        $this->loginAsTestUser(Role::ADMINISTRATOR);
+        $network = Network::factory()->create();
+        GroupTags::factory()->create(['tag_name' => 'NetworkOnly', 'network_id' => $network->id]);
+        GroupTags::factory()->create(['tag_name' => 'GlobalOne', 'network_id' => null]);
 
-        $admin = $this->loginAsTestUser(Role::RESTARTER);
-        $response = $this->post('/tags/create', [
-            'tag-name' => $tag->tag_name,
-            'tag-description' => $tag->tag_description,
-        ]);
-        $response->assertRedirect('/user/forbidden');
+        $response = $this->get('/tags');
+        $html = $response->getContent();
 
-        $admin = $this->loginAsTestUser(Role::ADMINISTRATOR);
-
-        $response = $this->post('/tags/create', [
-            'tag-name' => $tag->tag_name,
-            'tag-description' => $tag->tag_description,
-        ]);
-        $response->assertRedirect();
-        $response->assertSessionHas('success');
+        $this->assertStringContainsString('GlobalOne', $html);
+        // Network-scoped tags live on the per-network page, not here
+        $this->assertStringNotContainsString('NetworkOnly', $html);
     }
 
-    public function testGetEdit(): void
+    public function testLegacyEditUrlPreOpensEditModalForGlobalTag(): void
     {
-        $tag = GroupTags::factory()->create();
+        $this->loginAsTestUser(Role::ADMINISTRATOR);
 
-        $admin = $this->loginAsTestUser(Role::RESTARTER);
-        $response = $this->get('/tags/edit/' . $tag->id);
-        $response->assertRedirect('/user/forbidden');
-
-        $admin = $this->loginAsTestUser(Role::ADMINISTRATOR);
+        $tag = GroupTags::factory()->create(['tag_name' => 'Bookmark target', 'network_id' => null]);
 
         $response = $this->get('/tags/edit/' . $tag->id);
-        $response->assertSuccessful();
-        $response->assertSeeText($tag->tag_name);
-    }
+        $response->assertOk();
+        $html = $response->getContent();
 
-    public function testEdit(): void
-    {
-        $tag = GroupTags::factory()->create();
-
-        $admin = $this->loginAsTestUser(Role::RESTARTER);
-        $response = $this->post('/tags/edit/' . $tag->id, [
-            'tag-name' => $tag->tag_name,
-            'tag-description' => $tag->tag_description,
-        ]);
-        $response->assertRedirect('/user/forbidden');
-
-        $admin = $this->loginAsTestUser(Role::ADMINISTRATOR);
-
-        $response = $this->post('/tags/edit/' . $tag->id, [
-            'tag-name' => $tag->tag_name . '2',
-            'tag-description' => $tag->tag_description . '2',
-        ]);
-        $response->assertRedirect();
-        $response->assertSessionHas('success');
-    }
-
-    public function testDelete(): void {
-        $tag = GroupTags::factory()->create();
-
-        $admin = $this->loginAsTestUser(Role::RESTARTER);
-        $response = $this->get('/tags/delete/' . $tag->id);
-        $response->assertRedirect('/user/forbidden');
-
-        $admin = $this->loginAsTestUser(Role::ADMINISTRATOR);
-
-        $response = $this->get('/tags/delete/' . $tag->id);
-        $response->assertRedirect();
-        $response->assertSessionHas('success');
+        $this->assertStringContainsString('<GroupTagsPage', $html);
+        $this->assertStringContainsString(':initial-edit-id="' . $tag->id . '"', $html);
     }
 }

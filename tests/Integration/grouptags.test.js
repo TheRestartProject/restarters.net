@@ -804,14 +804,19 @@ test('Admin can filter groups by tag', async ({page, baseURL}) => {
 
 // ---------- Admin: Global tag management (/tags page) ----------
 
+// The admin global-tags page is now a Vue SPA (GroupTagsPage / AdminCrudPage)
+// instead of a multi-page Blade flow. Modal lifecycle is handled by
+// bootstrap-vue and CRUD goes through /api/v2/group-tags, so these tests
+// drive the page via the data-testid hooks the component exposes.
+
 test('Admin can view global tags page', async ({page, baseURL}) => {
   test.slow()
   await login(page, baseURL, ADMIN_EMAIL, PASSWORD)
   await page.goto(baseURL + '/tags')
   await page.waitForLoadState('networkidle')
 
-  // Should see the tags table
-  await expect(page.locator('#tags-table, table').first()).toBeVisible()
+  await expect(page.locator('[data-testid="group-tags-table"]')).toBeVisible()
+  await expect(page.locator('[data-testid="group-tags-add-button"]')).toBeVisible()
 })
 
 test('Admin can add a global tag', async ({page, baseURL}) => {
@@ -820,24 +825,20 @@ test('Admin can add a global tag', async ({page, baseURL}) => {
   await page.goto(baseURL + '/tags')
   await page.waitForLoadState('networkidle')
 
-  // Click create button to open modal
-  await page.click('button[data-target="#add-new-tag"], .btn-save')
-  await page.waitForSelector('#add-new-tag.show, .modal.show')
+  await page.click('[data-testid="group-tags-add-button"]')
+  await page.waitForSelector('#group-tags-create-modal.show')
 
-  // Fill in the form
-  await page.fill('#tag-name', 'PW Global Tag')
-  await page.fill('#tag-description', 'Created by Playwright')
-  await page.click('#add-new-tag .btn-primary, .modal.show button[type="submit"]')
+  await page.fill('[data-testid="group-tags-create-name"]', 'PW Global Tag')
+  await page.fill('[data-testid="group-tags-create-description"]', 'Created by Playwright')
 
-  await page.waitForLoadState('networkidle')
+  // OK button in the bootstrap-vue modal footer
+  await page.click('#group-tags-create-modal .modal-footer .btn-primary')
 
-  // After creation, redirects to edit page with success message
+  // Modal closes on success; success alert appears at the top of the page
   await expect(page.locator('text=successfully created')).toBeVisible({ timeout: 5000 })
 
-  // Navigate back to tags list and verify it's there
-  await page.goto(baseURL + '/tags')
-  await page.waitForLoadState('networkidle')
-  await expect(page.locator('#tags-table, table').first()).toContainText('PW Global Tag')
+  // Row is in the list (no page reload needed - it appears in-place)
+  await expect(page.locator('[data-testid="group-tags-table"]')).toContainText('PW Global Tag')
 })
 
 test('Admin can edit a global tag', async ({page, baseURL}) => {
@@ -846,25 +847,19 @@ test('Admin can edit a global tag', async ({page, baseURL}) => {
   await page.goto(baseURL + '/tags')
   await page.waitForLoadState('networkidle')
 
-  // Click on the tag name link to go to edit page
-  await page.locator('a[href*="/tags/edit/"]', { hasText: 'PW Global Tag' }).first().click()
-  await page.waitForLoadState('networkidle')
+  // Click the tag name to open the edit modal (uses the data-testid that
+  // the AdminCrudPage emits per item: group-tags-edit-link-<id>).
+  await page.locator('[data-testid^="group-tags-edit-link-"]', { hasText: 'PW Global Tag' }).first().click()
+  await page.waitForSelector('#group-tags-edit-modal.show')
 
-  // Should be on the edit page
-  await expect(page.locator('#tag-name')).toBeVisible()
+  // Field is pre-filled; change it and save
+  const nameInput = page.locator('[data-testid="group-tags-edit-name"]')
+  await expect(nameInput).toBeVisible()
+  await nameInput.fill('PW Global Tag Edited')
+  await page.click('#group-tags-edit-modal .modal-footer .btn-primary')
 
-  // Change the name
-  await page.fill('#tag-name', 'PW Global Tag Edited')
-  await page.click('.btn-create, button[type="submit"]')
-  await page.waitForLoadState('networkidle')
-
-  // After save, stays on edit page with success message
   await expect(page.locator('text=successfully updated')).toBeVisible({ timeout: 5000 })
-
-  // Navigate back to tags list and verify updated name
-  await page.goto(baseURL + '/tags')
-  await page.waitForLoadState('networkidle')
-  await expect(page.locator('#tags-table, table').first()).toContainText('PW Global Tag Edited')
+  await expect(page.locator('[data-testid="group-tags-table"]')).toContainText('PW Global Tag Edited')
 })
 
 test('Admin can delete a global tag', async ({page, baseURL}) => {
@@ -873,14 +868,16 @@ test('Admin can delete a global tag', async ({page, baseURL}) => {
   await page.goto(baseURL + '/tags')
   await page.waitForLoadState('networkidle')
 
-  // Click on the tag to go to edit page
-  await page.locator('a[href*="/tags/edit/"]', { hasText: 'PW Global Tag Edited' }).click()
-  await page.waitForLoadState('networkidle')
+  // Find the row, grab the delete button (data-testid is suffixed with the
+  // item's id, so we match by prefix and scope it to the row containing
+  // the tag name).
+  const row = page.locator('tr', { hasText: 'PW Global Tag Edited' })
+  await row.locator('[data-testid^="group-tags-delete-"]').click()
 
-  // Click delete button
-  await page.click('.btn-danger')
-  await page.waitForLoadState('networkidle')
+  // ConfirmModal opens; click the Confirm button
+  await page.waitForSelector('#confirmmodal.show')
+  await page.click('#confirmmodal .modal-footer .btn-primary')
 
-  // Should redirect to tags list, tag should be gone
-  await expect(page.locator('#tags-table, table').first()).not.toContainText('PW Global Tag Edited')
+  await expect(page.locator('text=deleted')).toBeVisible({ timeout: 5000 })
+  await expect(page.locator('[data-testid="group-tags-table"]')).not.toContainText('PW Global Tag Edited')
 })
