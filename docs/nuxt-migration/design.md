@@ -25,18 +25,18 @@ A branch (`nuxt-client`) where:
 | Concern | Choice | Notes |
 |---|---|---|
 | Framework | Nuxt 4 (`nuxt@^4`, `app/` dir structure) | User requirement; Freegle is on Nuxt 3.21 — same conventions, newer layout |
-| UI kit | bootstrap-vue-next (Nuxt module, `css:false`) + Bootstrap 5.3 SCSS | Freegle model |
+| UI kit | `bootstrap-vue-next` **plus** `@bootstrap-vue-next/nuxt` (the module is a separate package; `css:false`) + Bootstrap 5.3 SCSS | Freegle model; verified building under Nuxt 4 + ssr:false |
 | State | Pinia + `@pinia/nuxt` + `pinia-plugin-persistedstate` | Options-style stores (Freegle model); persist **only** auth tokens + locale via `pick` |
 | API client | `BaseAPI` class + one `<Resource>API` class per resource + plugin-injected `$api` | Freegle model (api/BaseAPI.js); `$fetch`-based (Node 18 fetch bugs that made Freegle avoid it are gone on Node 22) |
 | i18n | `@nuxtjs/i18n`, lazy JSON locales generated from `lang/*.php` | §7 |
 | Testing | Vitest + @vue/test-utils + happy-dom; Playwright e2e | §8 |
 | Icons | Inline SVG components ported from `partials/svg-icons/*.blade.php` + `bootstrap-icons` | vue-awesome has no Vue 3 build |
-| Maps | `@vue-leaflet/vue-leaflet` (Leaflet 1.9, CARTO tiles as today) | replaces vue2-leaflet |
+| Maps | `@vue-leaflet/vue-leaflet` (Leaflet 1.9, CARTO tiles) + `leaflet.markercluster` + `leaflet-control-geocoder` (Photon) — porting the RES-1995 GroupMap work as-is | replaces vue2-leaflet. Package is stale (0.10.1, 2023) but thin and proven (Freegle ships it); accepted knowingly |
 | Rich text | Quill via a thin Vue 3 wrapper | replaces vue2-editor; keep Quill semantics (`.ql-editor` selectors live in Playwright) |
 | Uploads | Uppy + tus (client) → existing `TusController` (server) | PR #868's subsystem becomes the canonical mechanism (§5.4) |
 | Validation | `@vuelidate/core` | replaces vuelidate 0.x |
 | Multiselect | `vue-multiselect` v3 (Vue 3 release) | keeps UX + `.multiselect__*` selector family |
-| Date picking | `vue-datepicker-next` | b-form-datepicker has no bootstrap-vue-next equivalent; Freegle uses this package |
+| Date picking | `vue-datepicker-next` | b-form-datepicker has no bootstrap-vue-next equivalent; Freegle ships this package. Unmaintained-but-proven (last release 2023) — accepted knowingly |
 
 Version pins are recorded in `client/package.json`; expect to pin vue/pinia versions
 if instability appears (Freegle pins hard for this reason).
@@ -88,22 +88,49 @@ MediaWiki silent login — is preserved with a session bridge (§4.3).
   **Zapier / TRP.org / RepairTogether integrations keep working unchanged** on their
   existing `users.api_token` credentials. New SPA traffic is pure Sanctum.
   `EnsureAPIToken` middleware + the `restarters_apitoken` cookie die with Blade.
-- New endpoints (session middleware group `auth-web` — see §4.3):
-  - `POST /api/v2/auth/login` {email, password} → `{token, user}` (+ fires the
-    `Illuminate\Auth\Events\Login` via web-guard login, so Wiki/Discourse listeners run)
-  - `POST /api/v2/auth/logout` → revokes current token, logs out web guard (fires Logout)
-  - `POST /api/v2/auth/register` {…, invite_hash?} → creates user, returns `{token, user}`;
-    resolves invite hashes **statelessly** (replaces the `AcceptUserInvites`
-    session-array middleware; hash passed in the payload, resolved against `Invite`)
+- New endpoints (plain `api` middleware group — **no session, no CSRF**: bearer
+  auth is not ambient-credential auth, so CSRF protection is inapplicable; a
+  phpunit test asserts login succeeds with no CSRF token. The web-guard session
+  is established **only** at the bridge (§4.3), never on the XHR path — a
+  cross-origin XHR's Set-Cookie is discarded by the browser anyway, and skipping
+  web-guard login here also avoids paying LogInToWiki's synchronous MediaWiki
+  round-trip for cookies that could never land):
+  - `POST /api/v2/auth/login` {email, password, invite_code?} → `{token, user}`.
+    Does **not** fire `Illuminate\Auth\Events\Login` (that would trigger
+    LogInToWiki uselessly — see above); instead invokes the audit path
+    (LogSuccessfulLogin behaviour) directly. Wiki login happens at the bridge.
+  - `POST /api/v2/auth/logout` → revokes current token; queues the Discourse
+    logout + wiki-cookie-forget listeners (fires `Logout` on the web guard only
+    if a web session exists).
+  - `POST /api/v2/auth/register` {…, invite_hash?, invite_code?} → creates user,
+    returns `{token, user}`; resolves invite hashes/codes **statelessly**
+    (replaces the `AcceptUserInvites` session-array middleware; identifiers
+    passed in the payload, resolved against `Invite`/shareable codes)
+  - `POST /api/v2/invites/claim` {code|hash} (authed) — applies a group/event
+    invite to the current user. This replaces the session-bridged
+    **shareable-link flow** (`GET /group/invite/{code}`, `/party/invite/{code}`):
+    those URLs become SPA routes; if the visitor is logged in the page claims
+    immediately, otherwise it routes through login/register carrying the code.
+    `shareable_link` generation moves to the frontend URL; Laravel keeps
+    redirectors for previously-shared links (§5).
   - `POST /api/v2/auth/password/forgot`, `POST /api/v2/auth/password/reset` —
     JSON versions of the real custom `recovery`/`recovery_expires` flow (the
     laravel-ui `ForgotPasswordController`/`ResetPasswordController`/`RegisterController`
     are dead code and are deleted, not ported)
   - `GET /api/v2/auth/email-available?email=` (existing `check-valid-email` logic)
 - `GET /api/v2/session` — the single client-bootstrap call: `{user: {...roles,
-  networks, language, preferences} | null, config: {discourse_url, gtm_id, …},
-  flags}`. Replaces every `window.*` global, navbar `Auth::user()` read and
-  env-inlined Blade value. `PATCH /api/v2/session {locale}` persists locale.
+  networks, language, preferences, consent: {gdpr, past_data, future_data}} |
+  null, config: {discourse_url, gtm_id, …}, flags}`. Replaces every `window.*`
+  global, navbar `Auth::user()` read and env-inlined Blade value.
+  `PATCH /api/v2/session {locale}` persists locale.
+- **GDPR consent gate** (today: `VerifyUserConsent` middleware wraps the whole
+  authenticated Blade app, redirecting to the register/consent form): ported as
+  (a) consent status in the session payload, (b) a global SPA middleware that
+  redirects unconsented users to the consent-completion page (reusing the
+  register form's completion mode), (c) a server-side `verifyUserConsent.api`
+  middleware on authenticated v2 mutation routes returning 403
+  `{reason:'consent_required'}`, and (d) `POST /api/v2/auth/consent` to record
+  it. Nothing consent-gated today may become reachable without consent.
 
 ### 4.3 Discourse SSO + MediaWiki bridge
 
@@ -111,20 +138,28 @@ MediaWiki silent login — is preserved with a session bridge (§4.3).
 cookie listeners fundamentally need a Laravel **web session** during a top-level
 browser navigation. Bridge design:
 
-- The auth endpoints above run in a route group **with session middleware**
-  (`StartSession`/cookies, no Blade). Because dev is cross-origin, the session
-  cookie set by an XHR login isn't reliable in all browsers — so we do not depend
-  on it. Instead:
-- `POST /api/v2/auth/sso-ticket` (Sanctum-authed) → one-time, 60-second, signed
-  ticket. The client navigates top-level to
-  `GET /auth/bridge?ticket=…&redirect=/discourse/sso?sso=…&sig=…`. The bridge
-  validates + consumes the ticket, `Auth::login()`s the web guard (firing the Login
-  event → MediaWiki `mw_*` cookies get queued first-party), then redirects onward.
+- `POST /api/v2/auth/sso-ticket` (Sanctum-authed) → one-time, 60-second ticket
+  (random value, sha256 stored, single-use). The client navigates **top-level** to
+  `GET /auth/bridge?ticket=…&redirect=…`. The bridge runs under a dedicated
+  `bridge` middleware group (`EncryptCookies` + `AddQueuedCookiesToResponse` +
+  `StartSession` — **no `VerifyCsrfToken`**, it's a GET with a one-time ticket):
+  validates + consumes the ticket, `Auth::login()`s the web guard — firing the
+  Login event, so `LogInToWiki` queues the `mw_*` cookies on this first-party
+  response — then redirects onward. `redirect` is validated against an
+  **allowlist** (the `/discourse/sso` path, `WIKI_URL`, `FRONTEND_URL`) — no open
+  redirect.
 - Links out to Talk/Wiki from the Nuxt navbar route through the bridge.
-- When Discourse initiates SSO and there is no Laravel session, the `auth`
-  middleware's login redirect now points at `FRONTEND_URL/login?redirect=<original>`
-  (config `app.frontend_url`); after login the client sends the user back through
-  the bridge. Playwright covers this hop explicitly (highest-risk integration).
+- When Discourse initiates SSO and there is no Laravel session: the login
+  redirect for `/discourse/sso` is repointed at
+  `FRONTEND_URL/login?redirect=<original>` **scoped to that route only** via
+  `services.discourse.middleware` config (a dedicated authenticate middleware) —
+  the global `auth` alias / `Authenticate::redirectTo()` is untouched until
+  phase F, so legacy Blade routes keep their own /login redirect throughout B–E.
+  After client-side login the user is sent back through the bridge.
+- Test coverage: phpunit for ticket issue/consume/expiry/replay + bridge
+  session establishment; Playwright asserts the SPA→bridge→`/discourse/sso`
+  hop 302s into Discourse's `session/sso_login` (full round-trip stays in the
+  Discourse-profile CI job, same `www.example.com` host mapping as today).
 
 ### 4.4 Client conventions
 
@@ -151,8 +186,14 @@ inventory + the 17 `@json` Blade views):
    routes), `DELETE /api/v2/groups/{id}` (archive semantics), group stats block for
    the group page (`/api/v2/groups/{id}/stats`), nearby groups.
 4. **Events** — RSVP family (`POST/DELETE /api/v2/events/{id}/attendees/me`),
-   volunteer PATCH (quantity/role) and invite, event devices list, images,
-   `DELETE /api/v2/events/{id}`, moderation approve. (create/edit/get exist.)
+   `GET /api/v2/events/{id}/attendees` (list: confirmed/invited/volunteers —
+   today only the v1 volunteers endpoint exists), a per-user `attending` boolean
+   on the v2 event resource when authenticated (today computed only in the Blade
+   `PartyController`), volunteer PATCH (quantity/role) and invite, event devices
+   list, images, `DELETE /api/v2/events/{id}`, moderation approve.
+   (create/edit/get exist.) The event mixin port is therefore two composables:
+   `useEventComputed(event)` for resource-derivable fields and
+   `useEventAttendance(id)` backed by the attendees endpoint.
 5. **Devices** — paginated list/search v2 (replaces `/api/devices/{page}/{size}`),
    images via tus, barrier/spare-part option lists (`/api/v2/devices/options`).
 6. **Users** — folded in: `/users/me/*` family (PR #868), admin list (PR #866);
@@ -175,11 +216,13 @@ Existing **externally-consumed v1 endpoints are frozen** (Zapier/TRP/RepairToget
 stats, changes, outbound/info, networks) — never removed or reshaped on this branch.
 
 **Internal GET-mutation routes** (`group/delete/{id}`, `party/join/{id}`,
-image-delete GETs, `markAsRead`, …) are replaced by proper verbs. **Emailed
-deep-links** (`party/accept-invite/{id}/{hash}`, `group/accept-invite/…`,
-`/user/reset?recovery=…`) keep their GET URLs: Laravel keeps tiny handlers that
-validate then redirect into the SPA (`FRONTEND_URL/…?status=…`), so old emails
-keep working.
+image-delete GETs, `markAsRead`, …) are replaced by proper verbs. **Emailed and
+shared deep-links** (`party/accept-invite/{id}/{hash}`, `group/accept-invite/…`,
+`group/invite/{code}`, `party/invite/{code}`, `/user/reset?recovery=…`) keep
+their GET URLs: Laravel keeps tiny handlers that redirect into the SPA
+(`FRONTEND_URL/…`) carrying the hash/code, where the claim happens via
+`/api/v2/invites/claim` (§4.2), so old emails and previously-shared links keep
+working for both new and already-registered users.
 
 ## 6. Client architecture
 
@@ -212,7 +255,9 @@ Key rules:
   still sets titles/meta.
 - **URL compatibility**: pages keep today's paths (`/dashboard`, `/group/view/{id}`,
   `/party/edit/{id}`, `/user/register`, …) so bookmarks, emails and the Playwright
-  flows survive. Legacy redirects (faultcat etc.) move to nginx, not Nuxt.
+  flows survive. Optional segments (`/party/create/{group_id?}`) use Nuxt's
+  `[[param]].vue` optional-catch naming. Legacy redirects (faultcat etc.) move to
+  nginx, not Nuxt.
 - **Data flow**: pages call stores; stores call `$api`; components receive props or
   read stores. No component fetches with axios directly; no `newToOld()` field
   adapter — components are written against the real v2 field names (`idgroups`-era
@@ -320,18 +365,29 @@ redirect map for the 16 dead legacy prefixes (faultcat/mobifix/…) and `/workbe
 
 ## 10. Sequencing (strangler, single branch, CI-gated)
 
-- **A. Foundations**: fold-in PRs (done); Sanctum + auth/session/bridge endpoints +
-  CORS rewrite + phpunit; Nuxt scaffold with stack, global stylesheet, BaseAPI,
-  auth store, layouts, login/register pages; docker `restarters_client` service;
-  Taskfile tasks; CircleCI `build-client` job (vitest + nuxt build) parallel to
-  existing `build`. Playwright shell spec (login) in `client/e2e`.
+- **A. Foundations**: fold-in PRs (done); Sanctum + auth/session/consent/bridge
+  endpoints + CORS rewrite (tighten the existing wildcard `config/cors.php`, not
+  just delete AddCorsHeaders) + phpunit; Nuxt scaffold with stack, global
+  stylesheet, BaseAPI, auth store, layouts, login/register pages; docker
+  `restarters_client` service; Taskfile tasks; CircleCI: `build-client` job
+  (lint + vitest + nuxt build, node docker executor) **and** a separate
+  `e2e-client` machine-executor job (compose up core + client with an explicit
+  client readiness poll, then Playwright against the Nuxt origin) — the existing
+  monolithic `build` job is never extended (its 35-min startup + 45-min phpunit
+  budget is already tight).
 - **B–E. Section slices** in §6.2 order. Each slice: missing API endpoints (+
   phpunit) → pages/components/stores (+ vitest) → its Playwright specs ported →
   CI green. Legacy Blade pages remain live and untouched throughout.
-- **F. Cutover**: point compose/CI Playwright at the Nuxt origin as primary;
+- **F. Cutover**: the `e2e-client` suite becomes the primary regression gate;
   delete Blade views (minus §9), `resources/js`, `resources/sass`, jQuery/CDN
-  layouts, dead auth controllers, `EnsureAPIToken`, web routes; nginx API-only +
+  layouts, dead auth controllers, `EnsureAPIToken`, web routes; global
+  `Authenticate::redirectTo()` may now point at FRONTEND_URL; nginx API-only +
   redirect map; delete Jest + legacy Integration specs; `npm` deps prune.
+  **Pre-deletion audit**: `resources/global/js/app.js` imports
+  `resources/js/misc/notifications.js` — move it (and any other
+  `global|wiki → resources/js|sass` cross-references; grep first) into
+  `resources/global/` before deleting, or the kept wiki/global Vite build (and
+  the Fly image build) breaks.
 - **G. Hardening**: full CI runs, flake fixes, Playwright parallelism, coverage
   gates, OpenAPI regenerate, docs (`docs/local-development.md`, CLAUDE.md update).
 
