@@ -32,12 +32,12 @@ Status: ⬜ pending · 🔄 in progress · ✅ done · ❌ blocked
 
 | # | Task | Status | Notes |
 |---|------|--------|-------|
-| B1 | API: `GET /api/v2/dashboard` (your/nearby groups, upcoming events, new groups, moderation counts) + phpunit | ⬜ | DashboardController@indexv2; batched queries (no N+1: withCount + single stats pass); OA annotated |
-| B2 | API: group join/leave (`POST/DELETE /groups/{id}/members/me`), invite + stateless accept, image upload/delete verbs, `DELETE /groups/{id}` archive, `GET /groups/{id}/stats`, nearby | ⬜ | GroupMembershipController + image/archive endpoints on GroupController; invite-accept email deep-link redirector kept (web.php → FRONTEND_URL); 5 new phpunit files |
-| B3 | Pages: /dashboard (+ stores/dashboard, components DashboardGroups/Events cards) + vitest | ⬜ | |
-| B4 | Pages: /group (mine), /group/all, /group/nearby lists + stores/groups + GroupsTable/GroupCard + vitest | ⬜ | column_preferences → user preference API not session |
-| B5 | Pages: /group/view/{id} (stats, events, volunteers, permissions from #892) + vitest | ⬜ | |
-| B6 | Pages: /group/create + /group/edit/{id} (geocode via /api/v2/maps proxy ported here; Quill wrapper; tus image upload) + vitest | ⬜ | MapsProxy → /api/v2/maps/* done here; RichTextEditor (Quill 2) + LocationPicker + TusImageUpload components |
+| B1 | API: `GET /api/v2/dashboard` (your/nearby groups, upcoming events, new groups, moderation counts) + phpunit | 🔄 | DashboardController@indexv2; batched queries (no N+1: withCount + single stats pass); OA annotated |
+| B2 | API: group join/leave (`POST/DELETE /groups/{id}/members/me`), invite + stateless accept, image upload/delete verbs, `DELETE /groups/{id}` archive, `GET /groups/{id}/stats`, nearby | 🔄 | GroupMembershipController + image/archive endpoints on GroupController; invite-accept email deep-link redirector kept (web.php → FRONTEND_URL); 5 new phpunit files |
+| B3 | Pages: /dashboard (+ stores/dashboard, components DashboardGroups/Events cards) + vitest | ✅ | |
+| B4 | Pages: /group (mine), /group/all, /group/nearby lists + stores/groups + GroupsTable/GroupCard + vitest | ✅ | column_preferences → user preference API not session |
+| B5 | Pages: /group/view/{id} (stats, events, volunteers, permissions from #892) + vitest | ✅ | |
+| B6 | Pages: /group/create + /group/edit/{id} (geocode via /api/v2/maps proxy ported here; Quill wrapper; tus image upload) + vitest | ✅ | MapsProxy → /api/v2/maps/* done here; RichTextEditor (Quill 2) + LocationPicker + TusImageUpload components |
 | B7 | Group map page (port RES-1995 map work) | ⬜ | @vue-leaflet/vue-leaflet + leaflet.markercluster + leaflet-control-geocoder (Photon) + CARTO tiles — port GroupMap.vue as-is (NOT MapLibre; design §2); names-index + summary?ids= split fetch |
 | B8 | Playwright: group.test.js flows ported (create, unfollow, image upload) + dashboard smoke | ⬜ | client/e2e/group.test.js (3 flows + smoke); data-testid selectors; deterministic waits (waitForResponse) |
 
