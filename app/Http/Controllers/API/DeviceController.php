@@ -603,6 +603,11 @@ class DeviceController extends Controller {
         $user = Auth::user();
 
         if (!$user) {
+            // SPA bearer tokens authenticate via the sanctum guard.
+            $user = auth('sanctum')->user();
+        }
+
+        if (!$user) {
             $user = auth('api')->user();
         }
 

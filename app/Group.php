@@ -110,7 +110,7 @@ class Group extends Model implements Auditable
      */
     public function getFilteredTagsForUser()
     {
-        $user = auth()->user() ?? auth('api')->user();
+        $user = auth()->user() ?? auth('sanctum')->user() ?? auth('api')->user();
 
         // No user or admin - return all tags
         if (!$user || $user->hasRole('Administrator')) {

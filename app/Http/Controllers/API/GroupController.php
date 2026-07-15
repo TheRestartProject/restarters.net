@@ -319,6 +319,11 @@ class GroupController extends Controller
         // Try session auth first, then API token auth
         $user = Auth::user();
         if (!$user) {
+            // SPA bearer tokens authenticate via the sanctum guard.
+            $user = auth('sanctum')->user();
+        }
+
+        if (!$user) {
             $user = auth('api')->user();
         }
 
@@ -388,6 +393,10 @@ class GroupController extends Controller
         // group view page is loaded via a normal browser session), then fall back to API token auth.  If there is
         // no authenticated user at all, every permission flag is false.
         $user = Auth::user();
+        if (! $user) {
+            // SPA bearer tokens authenticate via the sanctum guard.
+            $user = auth('sanctum')->user();
+        }
         if (! $user) {
             $user = auth('api')->user();
         }
@@ -699,6 +708,11 @@ class GroupController extends Controller
         // This is a slightly odd thing to do, but it is necessary to get both the PHPUnit tests and the
         // real client use of the API to work.
         $user = Auth::user();
+
+        if (!$user) {
+            // SPA bearer tokens authenticate via the sanctum guard.
+            $user = auth('sanctum')->user();
+        }
 
         if (!$user) {
             $user = auth('api')->user();

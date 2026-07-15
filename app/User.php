@@ -25,6 +25,7 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
     use HasFactory;
     use Notifiable;
     use SoftDeletes;
+    use \Laravel\Sanctum\HasApiTokens;
     use \OwenIt\Auditing\Auditable;
     // Use the Authorizable trait so that we can call can() on a user to evaluation policies.
     use \Illuminate\Foundation\Auth\Access\Authorizable;

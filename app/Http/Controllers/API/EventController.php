@@ -241,8 +241,9 @@ class EventController extends Controller
     {
         $party = Party::findOrFail($idevents);
 
-        // Get the user that the API has been authenticated as.
-        $user = auth('api')->user();
+        // Get the user that the API has been authenticated as (whichever guard
+        // the auth:sanctum,api middleware resolved).
+        $user = $request->user();
 
         // Only show emails to users who have edit permission on this event.
         $showEmails = $user && Fixometer::userHasEditPartyPermission($idevents, $user->id);
@@ -302,6 +303,11 @@ class EventController extends Controller
         // This is a slightly odd thing to do, but it is necessary to get both the PHPUnit tests and the
         // real client use of the API to work.
         $user = Auth::user();
+
+        if (!$user) {
+            // SPA bearer tokens authenticate via the sanctum guard.
+            $user = auth('sanctum')->user();
+        }
 
         if (!$user) {
             $user = auth('api')->user();

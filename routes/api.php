@@ -41,7 +41,7 @@ Route::get('/outbound/info/{type}/{id}/{format?}', function ($type, $id, $format
 Route::match(['get', 'post', 'patch', 'head', 'delete', 'options'], '/tus', [App\Http\Controllers\TusController::class, 'serve']);
 Route::match(['get', 'post', 'patch', 'head', 'delete', 'options'], '/tus/{any}', [App\Http\Controllers\TusController::class, 'serve'])->where('any', '.*');
 
-Route::middleware('auth:api')->group(function () {
+Route::middleware('auth:sanctum,api')->group(function () {
     Route::get('/users/me', [ApiController::class, 'getUserInfo']); // Not used but worth keeping and tested.
     Route::get('/users', [ApiController::class, 'getUserList']);  // Not used but worth keeping and tested.
     Route::get('/users/changes', [API\UserController::class, 'changes']); // Used by Zapier
@@ -89,7 +89,7 @@ Route::prefix('v2')->group(function() {
             Route::patch('{id}', [API\GroupController::class, 'updateGroupv2']);
 
             Route::get('{id}/volunteers', [API\GroupController::class, 'getVolunteersForGroupv2']);
-            Route::middleware('auth:api')->group(function ()
+            Route::middleware('auth:sanctum,api')->group(function ()
             {
                 Route::patch('{id}/volunteers/{iduser}', [API\GroupController::class, 'patchVolunteerForGroupv2']);
                 Route::delete('{id}/volunteers/{iduser}', [API\GroupController::class, 'deleteVolunteerForGroupv2']);
@@ -103,12 +103,12 @@ Route::prefix('v2')->group(function() {
         });
 
         Route::prefix('/users')->group(function() {
-            Route::middleware('auth:api')->group(function() {
+            Route::middleware('auth:sanctum,api')->group(function() {
                 Route::get('', [API\UserController::class, 'listUsersv2']);
             });
         });
 
-        Route::prefix('/users/me')->middleware('auth:api')->group(function() {
+        Route::prefix('/users/me')->middleware('auth:sanctum,api')->group(function() {
             Route::get('/preferences', [API\UserController::class, 'getMyEmailPreferencesv2']);
             Route::patch('/preferences', [API\UserController::class, 'updateMyEmailPreferencesv2']);
             Route::get('/calendars', [API\UserController::class, 'getMyCalendarsv2']);
@@ -123,7 +123,7 @@ Route::prefix('v2')->group(function() {
             Route::delete('/', [API\UserController::class, 'deleteMyAccountv2']);
         });
 
-        Route::middleware('auth:api')->group(function() {
+        Route::middleware('auth:sanctum,api')->group(function() {
             Route::get('/users/{id}/repair-directory-options', [API\UserController::class, 'getRepairDirOptionsv2']);
             Route::patch('/users/{id}/repair-directory-role', [API\UserController::class, 'updateRepairDirRolev2']);
             Route::get('/users/{id}/admin-settings', [API\UserController::class, 'getAdminSettingsv2']);
@@ -137,7 +137,7 @@ Route::prefix('v2')->group(function() {
             Route::get('{id}/events', [API\NetworkController::class, 'getNetworkEventsv2']);
             Route::get('{id}/tags', [API\NetworkController::class, 'getNetworkTagsv2']);
             Route::get('{id}/stats', [API\NetworkController::class, 'getNetworkStatsv2']);
-            Route::middleware('auth:api')->group(function() {
+            Route::middleware('auth:sanctum,api')->group(function() {
                 Route::post('{id}/tags', [API\NetworkController::class, 'createNetworkTagv2']);
                 Route::put('{id}/tags/{tagId}', [API\NetworkController::class, 'updateNetworkTagv2']);
                 Route::delete('{id}/tags/{tagId}', [API\NetworkController::class, 'deleteNetworkTagv2']);
@@ -145,7 +145,7 @@ Route::prefix('v2')->group(function() {
         });
 
         Route::prefix('/moderate')->group(function() {
-            Route::middleware('auth:api')->group(function ()
+            Route::middleware('auth:sanctum,api')->group(function ()
             {
                 Route::get('/groups', [API\GroupController::class, 'moderateGroupsv2']);
                 Route::get('/events', [API\EventController::class, 'moderateEventsv2']);
@@ -170,7 +170,7 @@ Route::prefix('v2')->group(function() {
         Route::prefix('/brands')->group(function() {
             Route::get('/', [API\BrandController::class, 'listBrandsv2']);
             Route::get('{id}', [API\BrandController::class, 'getBrandv2']);
-            Route::middleware('auth:api')->group(function() {
+            Route::middleware('auth:sanctum,api')->group(function() {
                 Route::post('/', [API\BrandController::class, 'createBrandv2']);
                 Route::put('{id}', [API\BrandController::class, 'updateBrandv2']);
                 Route::delete('{id}', [API\BrandController::class, 'deleteBrandv2']);
@@ -180,7 +180,7 @@ Route::prefix('v2')->group(function() {
         Route::prefix('/skills')->group(function() {
             Route::get('/', [API\SkillController::class, 'listSkillsv2']);
             Route::get('{id}', [API\SkillController::class, 'getSkillv2']);
-            Route::middleware('auth:api')->group(function() {
+            Route::middleware('auth:sanctum,api')->group(function() {
                 Route::post('/', [API\SkillController::class, 'createSkillv2']);
                 Route::put('{id}', [API\SkillController::class, 'updateSkillv2']);
                 Route::delete('{id}', [API\SkillController::class, 'deleteSkillv2']);
@@ -190,7 +190,7 @@ Route::prefix('v2')->group(function() {
         Route::prefix('/group-tags')->group(function() {
             Route::get('/', [API\GroupTagController::class, 'listGroupTagsv2']);
             Route::get('{id}', [API\GroupTagController::class, 'getGroupTagv2']);
-            Route::middleware('auth:api')->group(function() {
+            Route::middleware('auth:sanctum,api')->group(function() {
                 Route::post('/', [API\GroupTagController::class, 'createGroupTagv2']);
                 Route::put('{id}', [API\GroupTagController::class, 'updateGroupTagv2']);
                 Route::delete('{id}', [API\GroupTagController::class, 'deleteGroupTagv2']);
@@ -200,14 +200,14 @@ Route::prefix('v2')->group(function() {
         Route::prefix('/categories')->group(function() {
             Route::get('/', [API\CategoryController::class, 'listCategoriesv2']);
             Route::get('{id}', [API\CategoryController::class, 'getCategoryv2']);
-            Route::middleware('auth:api')->group(function() {
+            Route::middleware('auth:sanctum,api')->group(function() {
                 Route::put('{id}', [API\CategoryController::class, 'updateCategoryv2']);
             });
         });
 
         Route::get('/category-clusters', [API\CategoryController::class, 'listCategoryClustersv2']);
 
-        Route::middleware('auth:api')->group(function() {
+        Route::middleware('auth:sanctum,api')->group(function() {
             Route::get('/roles', [API\RoleController::class, 'listRolesv2']);
             Route::get('/roles/{id}', [API\RoleController::class, 'getRolev2']);
             Route::put('/roles/{id}/permissions', [API\RoleController::class, 'updateRolePermissionsv2']);
