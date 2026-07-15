@@ -1,72 +1,51 @@
 version: 2.1
 
-jobs:
-  build:
-    machine:
-      image: ubuntu-2204:current
-    resource_class: large
-    environment:
-      - TZ: "UTC"
-
+commands:
+  install-task:
     steps:
-      - checkout
-      
-      # Install Task
       - run:
           name: Install Task
           command: |
             sudo sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b /usr/local/bin
             task --version
 
-      # Set up environment file
+  setup-env:
+    steps:
       - run:
           name: Setup environment
           command: |
             cp .env.example .env
-            
+
             # Configure for Docker Compose setup
             sed -i 's/DB_HOST=.*$/DB_HOST=restarters_db/g' .env
             sed -i 's/DB_DATABASE=.*$/DB_DATABASE=restarters_db_test/g' .env
             sed -i 's/DB_USERNAME=.*$/DB_USERNAME=restarters/g' .env
             sed -i 's/DB_PASSWORD=.*$/DB_PASSWORD=s3cr3t/g' .env
-            
+
             # Configure Discourse integration
             sed -i 's/FEATURE__DISCOURSE_INTEGRATION=.*$/FEATURE__DISCOURSE_INTEGRATION=true/g' .env
             sed -i 's/DISCOURSE_URL=.*$/DISCOURSE_URL=http:\/\/restarters_discourse/g' .env
             sed -i 's/DISCOURSE_APIKEY=.*$/DISCOURSE_APIKEY=fb71f38ca2b8b7cd6a041e57fd8202c9937088f0ecae7db40722bd758dda92fc/g' .env
             sed -i 's/DISCOURSE_APIUSER=.*$/DISCOURSE_APIUSER=someuser/g' .env
-            
+
             # Configure for testing
             sed -i 's/APP_DEBUG=.*$/APP_DEBUG=false/g' .env
             sed -i 's/SESSION_DOMAIN=.*$/SESSION_DOMAIN=localhost/g' .env
             sed -i 's/HONEYPOT_DISABLE=.*$/HONEYPOT_DISABLE=TRUE/g' .env
             sed -i 's/APP_URL=.*$/APP_URL=http:\/\/localhost:8001/g' .env
-            
-            # Add environment variables from CircleCI
+
+            # The Nuxt client origin (SSO bridge redirects, session config).
             echo "" >> .env
+            echo "FRONTEND_URL=http://localhost:3000" >> .env
+
+            # Add environment variables from CircleCI
             echo "GOOGLE_API_CONSOLE_KEY=$GOOGLE_API_CONSOLE_KEY" >> .env
             echo "MAPBOX_TOKEN=$MAPBOX_TOKEN" >> .env
 
-      # Start Docker services using Task
+  wait-for-core:
+    steps:
       - run:
-          name: Start Docker services
-          command: |
-            # Set environment variable for CircleCI detection
-            export CIRCLECI=true
-            # Enable Docker Compose bake for build optimization
-            export COMPOSE_BAKE=true
-            # Start all services using Task
-            task docker:up-all
-          no_output_timeout: 10m
-
-      # Wait for core services to be ready (MySQL + web app). Discourse is started
-      # via docker:up-all but its readiness is checked separately (non-blocking).
-      # docker_run.sh runs npm install + npx playwright install + migrate:fresh --seed
-      # on every startup, which can take 20-25 min on cold CI machines. We poll
-      # directly here with a 25-minute ceiling rather than using the Taskfile helper
-      # (which only allows 10 min) to avoid blocking on that limit.
-      - run:
-          name: Wait for services
+          name: Wait for core services
           command: |
             # Wait for MySQL first
             echo "Waiting for MySQL..."
@@ -100,6 +79,35 @@ jobs:
             done
           no_output_timeout: 38m
 
+jobs:
+  build:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large
+    environment:
+      - TZ: "UTC"
+
+    steps:
+      - checkout
+      - install-task
+      - setup-env
+
+      # Start Docker services using Task
+      - run:
+          name: Start Docker services
+          command: |
+            # Set environment variable for CircleCI detection
+            export CIRCLECI=true
+            # Enable Docker Compose bake for build optimization
+            export COMPOSE_BAKE=true
+            # Start all services using Task
+            task docker:up-all
+          no_output_timeout: 10m
+
+      # Wait for core services to be ready (MySQL + web app). Discourse is started
+      # via docker:up-all but its readiness is checked separately (non-blocking).
+      - wait-for-core
+
       # Setup database and application
       - run:
           name: Setup application
@@ -116,6 +124,12 @@ jobs:
 
             # Generate additional Laravel artifacts for testing
             docker exec restarters php artisan l5-swagger:generate
+
+      # The committed client locale JSONs must match a fresh export from lang/
+      - run:
+          name: Check client translations in sync
+          command: |
+            docker exec restarters php artisan translations:export-client --check
 
       # Setup Discourse API (PostgreSQL must be ready; Discourse web app not required)
       - run:
@@ -194,6 +208,101 @@ jobs:
       - store_test_results:
           path: /tmp/test-results
 
+  # Nuxt client: lint + unit tests + production build. Fast feedback, no
+  # docker-compose stack needed.
+  build-client:
+    docker:
+      - image: cimg/node:22.16
+    resource_class: medium
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - client-npm-v1-{{ checksum "client/package-lock.json" }}
+            - client-npm-v1-
+      - run:
+          name: Install client dependencies
+          command: cd client && npm ci
+      - save_cache:
+          key: client-npm-v1-{{ checksum "client/package-lock.json" }}
+          paths:
+            - ~/.npm
+      - run:
+          name: Lint
+          command: cd client && npm run lint
+      - run:
+          name: Vitest
+          command: |
+            mkdir -p /tmp/test-results/vitest
+            cd client && npx vitest run --reporter=default --reporter=junit --outputFile=/tmp/test-results/vitest/results.xml
+      - run:
+          name: Nuxt build
+          command: cd client && npx nuxi build
+      - store_test_results:
+          path: /tmp/test-results
+      - store_artifacts:
+          path: /tmp/test-results
+          destination: client-test-results
+
+  # Playwright against the real two-container stack (Laravel API + Nuxt client).
+  # Separate machine job — the monolithic `build` job's time budget is already
+  # tight, so client e2e gets its own timeout envelope.
+  e2e-client:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large
+    environment:
+      - TZ: "UTC"
+    steps:
+      - checkout
+      - install-task
+      - setup-env
+      - run:
+          name: Start Docker services (core + client, production client build)
+          command: |
+            export CIRCLECI=true
+            export COMPOSE_BAKE=true
+            export NUXT_DEV_MODE=false
+            task docker:up-core
+          no_output_timeout: 10m
+      - wait-for-core
+      - run:
+          name: Wait for Nuxt client
+          command: |
+            echo "Waiting for the client container (npm ci + nuxi build on first boot)..."
+            for i in $(seq 1 120); do
+              curl -f -s http://localhost:3000 >/dev/null 2>&1 && echo "✓ Client ready after $((i*5))s" && exit 0
+              [ $((i % 12)) -eq 0 ] && echo "  Still waiting... ($((i*5))s elapsed)"
+              sleep 5
+            done
+            echo "❌ Client not ready after 10 minutes — container logs:"
+            docker logs restarters_client --tail=100 2>&1 || true
+            exit 1
+          no_output_timeout: 12m
+      - run:
+          name: Setup application
+          command: |
+            docker exec restarters_db mysql -u root -ps3cr3t -e "GRANT SELECT ON mysql.time_zone_name TO 'restarters'@'%';"
+            docker exec restarters_db mysql -u root -ps3cr3t -e "SET GLOBAL log_bin_trust_function_creators = 1;"
+            docker exec restarters_db mysql -u root -ps3cr3t -e "SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));"
+            docker exec restarters php artisan l5-swagger:generate
+      - run:
+          name: Run client Playwright tests
+          command: |
+            task docker:test:playwright:client
+          no_output_timeout: 15m
+      - run:
+          name: Copy Playwright artifacts
+          command: |
+            mkdir -p /tmp/test-results/playwright-client
+            docker cp restarters_playwright:/tmp/test-results/. /tmp/test-results/playwright-client/ || echo "No playwright results found"
+          when: always
+      - store_artifacts:
+          path: /tmp/test-results
+          destination: client-e2e-results
+      - store_test_results:
+          path: /tmp/test-results
+
   deploy-fly-dev:
     docker:
       - image: cimg/base:current
@@ -235,9 +344,19 @@ workflows:
           filters:
             branches:
               ignore: production
+      - build-client:
+          filters:
+            branches:
+              ignore: production
+      - e2e-client:
+          filters:
+            branches:
+              ignore: production
       - deploy-fly-dev:
           requires:
             - build
+            - build-client
+            - e2e-client
           filters:
             branches:
               only: develop
