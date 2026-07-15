@@ -154,3 +154,66 @@ describe('getModerationRequired', () => {
     expect(store.getters['groups/get'](7).location).toEqual({ lat: 1, lng: 2 })
   })
 })
+
+describe('hydrate', () => {
+  test('fetches full rows for un-hydrated ids in one batched call', async () => {
+    axios.get.mockResolvedValueOnce({ data: { data: [{ id: 1, summary: true }, { id: 2, summary: true }] } })
+    const commits = []
+    const state = { list: {}, hydrating: {} }
+
+    await groups.actions.hydrate(
+      { commit: (type, params) => commits.push([type, params]), state },
+      { ids: [1, 2] }
+    )
+
+    expect(axios.get).toHaveBeenCalledTimes(1)
+    const url = axios.get.mock.calls[0][0]
+    expect(url).toContain('/api/v2/groups/summary')
+    expect(url).toContain('ids=1,2')
+    expect(url).toContain('includeNextEvent=true')
+    expect(url).toContain('includeCounts=true')
+    expect(commits.filter(c => c[0] === 'set').map(c => c[1].id)).toEqual([1, 2])
+  })
+
+  test('skips ids already hydrated or in flight', async () => {
+    const state = {
+      // A full row has summary: true; a bare index entry does not.
+      list: { 1: { id: 1, summary: true }, 2: { id: 2 } },
+      hydrating: { 2: true },
+    }
+
+    await groups.actions.hydrate({ commit: () => {}, state }, { ids: [1, 2] })
+
+    expect(axios.get).not.toHaveBeenCalled()
+  })
+
+  test('chunks requests at the API cap of 200 ids', async () => {
+    axios.get.mockResolvedValue({ data: { data: [] } })
+    const state = { list: {}, hydrating: {} }
+    const ids = Array.from({ length: 250 }, (_, i) => i + 1)
+
+    await groups.actions.hydrate({ commit: () => {}, state }, { ids })
+
+    expect(axios.get).toHaveBeenCalledTimes(2)
+    expect(axios.get.mock.calls[0][0]).toContain('ids=1,')
+    expect(axios.get.mock.calls[1][0]).toContain('ids=201,')
+  })
+})
+
+test('the index fetch shapes entries for the map, filters and table', async () => {
+  axios.get.mockResolvedValueOnce({
+    data: { data: [{ id: 7, name: 'G', lat: 51, lng: 0, country: 'United Kingdom', network_ids: [3], tag_ids: [9], archived_at: null }] }
+  })
+  const commits = []
+
+  await groups.actions.list(
+    { commit: (type, params) => commits.push([type, params]) },
+    { details: true }
+  )
+
+  expect(axios.get.mock.calls[0][0]).toContain('/api/v2/groups/names')
+  const g = commits.find(c => c[0] === 'setList')[1].groups[0]
+  expect(g.location).toEqual({ location: null, country: 'United Kingdom', lat: 51, lng: 0 })
+  expect(g.networks).toEqual([3])
+  expect(g.group_tags_full).toEqual([{ id: 9 }])
+})
