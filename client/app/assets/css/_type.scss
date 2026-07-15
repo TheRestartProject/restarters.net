@@ -1,0 +1,222 @@
+// Base typography + brand utility classes
+// ========================================
+// Ported from resources/global/css/_global.scss (the live brand chrome) —
+// NOT resources/sass/_main.scss, which despite defining a similar h1-h3/body
+// block is dead code (never @imported by resources/sass/app.scss; see
+// docs/nuxt-migration/findings/styles.md).
+
+body,
+html {
+  background-color: $brand-grey !important;
+  font-family: $font-family-third !important;
+  font-size: 18px;
+}
+
+body {
+  padding-bottom: 80px;
+}
+
+@mixin font-default {
+  font-family: $font-family-third;
+  font-weight: 700 !important;
+  font-stretch: normal;
+  font-style: normal;
+  letter-spacing: normal;
+  color: $black;
+}
+
+h1 {
+  @include font-default;
+
+  font-size: 40px !important;
+  line-height: 45px;
+}
+
+h2 {
+  @include font-default;
+
+  font-size: 28px !important;
+  line-height: 32px;
+}
+
+// Old Sass's @extend-based .Font-PatuaOne/.Font-OpenSans utility classes
+// (resources/sass/_mixins.scss) can't be @extend-ed from component
+// partials any more without a shared placeholder chain across separate
+// entry files under Dart Sass's modern module system, so these are plain
+// utility classes instead — apply with class="Font-PatuaOne" etc. exactly
+// as the class names read today (kept unrenamed since Blade views/Vue
+// components already reference them literally).
+.Font-PatuaOne {
+  font-family: 'Patua One', serif;
+}
+
+.Font-OpenSans {
+  font-family: 'Open Sans', Arial, sans-serif;
+
+  &.italic {
+    font-weight: 300;
+    font-style: italic;
+  }
+}
+
+.link-text {
+  text-decoration: none !important;
+  border-bottom: 1px solid $black;
+  color: $black;
+
+  &:hover {
+    border-bottom: 2px solid $black;
+    color: $black;
+  }
+
+  &:focus {
+    border-bottom: 3px solid $black;
+    color: $black;
+  }
+}
+
+.text-brand {
+  color: $brand;
+}
+
+.text-brand-light {
+  color: $brand-light;
+}
+
+// Signature brand "brutalist" drop shadow, ported from
+// resources/sass/helpers/_box-shadows.scss (imported into
+// resources/global/css/app.scss via an explicit cross-tree
+// `@import "../../sass/helpers/box-shadows"` in the source — the one
+// legacy/sass value with no resources/global/css equivalent, folded in
+// here rather than kept as a separate cross-tree import). Used throughout
+// buttons, cards, table sections and modals.
+.box-shadow-offset {
+  box-shadow: 6px 6px 0 0 $black;
+}
+
+@each $breakpoint in map-keys(map-remove($grid-breakpoints, xs)) {
+  @include media-breakpoint-up($breakpoint) {
+    .offset-#{$breakpoint}-box-shadow {
+      box-shadow: 6px 6px 0 0 $black;
+    }
+  }
+}
+
+// Simple loading-placeholder pulse, used while lazy content streams in.
+.vue-placeholder {
+  display: grid;
+  grid-template-columns: 1fr;
+  align-items: center;
+  justify-items: center;
+  color: lightgrey;
+  animation: pulsate 1s ease-out;
+  animation-iteration-count: infinite;
+  opacity: 0.5;
+
+  &-large {
+    width: 100%;
+    height: 416px;
+  }
+
+  &-content {
+    align-self: center;
+    justify-self: center;
+  }
+}
+
+@keyframes pulsate {
+  0% {
+    opacity: 0.25;
+  }
+
+  50% {
+    opacity: 1;
+  }
+
+  100% {
+    opacity: 0.25;
+  }
+}
+
+.clickme {
+  cursor: pointer;
+}
+
+#readmore {
+  float: right;
+}
+
+.clear {
+  &::after,
+  &::before {
+    content: '';
+    display: table;
+    clear: both;
+  }
+}
+
+.d-grid {
+  display: grid;
+}
+
+.no-explict-width div {
+  width: unset !important;
+}
+
+// $sizes was a Bootstrap 4 map (w-25/w-50/w-75/w-100/w-auto's source
+// values) that Bootstrap 5 no longer ships at all — redeclared here so the
+// responsive .w-{breakpoint}-{size} loop below (from
+// resources/global/css/_global.scss) still has something to iterate.
+$sizes: (
+  25: 25%,
+  50: 50%,
+  75: 75%,
+  100: 100%,
+  auto: auto,
+);
+
+@each $breakpoint in map-keys($grid-breakpoints) {
+  @each $size, $length in $sizes {
+    @include media-breakpoint-up($breakpoint) {
+      .w-#{$breakpoint}-#{$size} {
+        width: $length !important;
+      }
+    }
+  }
+}
+
+.w-33 {
+  width: 33.33333%;
+}
+
+.fa-fw {
+  width: 1rem;
+  height: 1rem;
+}
+
+// Horizontal rule variants (resources/global/css/helpers/_hr.scss)
+.hr {
+  &-sm {
+    height: 2px;
+    border-top: 2px solid $black;
+  }
+
+  &-lg {
+    height: 5px;
+    border-top: 5px solid #000;
+    margin-top: 50px;
+    margin-bottom: 20px;
+  }
+
+  &-dashed {
+    border: 0;
+    background-image: url('/images/rectangle.svg');
+    background-color: transparent;
+    background-repeat: repeat;
+    background-position: left;
+    height: 3px;
+    background-size: 20px 35px;
+    margin-top: 30px;
+    margin-bottom: 30px;
+  }
+}

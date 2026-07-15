@@ -1,0 +1,38 @@
+import { useAuthStore } from '../stores/auth.js'
+
+/**
+ * Reads definePageMeta({ auth: true, role: '...' }) on the target route.
+ * Unauthenticated -> /login?redirect=... . Wrong role -> /forbidden.
+ * (design.md §4.4; the API is the real enforcer via 401/403 JSON - this is
+ * UX-level gating only.)
+ *
+ * Role comparison mirrors app/User.php::hasRole() (see composables/useAuth.js
+ * for the full rationale): 'Root' satisfies every role check, everything
+ * else is an exact match against the session's `user.role_name` - NOT
+ * `user.role` (that field, per the GET /api/v2/session contract, is a
+ * separate identifier alongside role_name; role_name is the human role
+ * name pages declare in `role: '...'`).
+ */
+export default defineNuxtRouteMiddleware((to) => {
+  const requiresAuth = to.meta.auth === true
+  const requiredRole = to.meta.role
+
+  if (!requiresAuth) {
+    return
+  }
+
+  const authStore = useAuthStore()
+
+  if (!authStore.loggedIn) {
+    return navigateTo(`/login?redirect=${encodeURIComponent(to.fullPath)}`)
+  }
+
+  if (requiredRole) {
+    const roleName = authStore.user?.role_name
+    const satisfies = roleName === 'Root' || roleName === requiredRole
+
+    if (!satisfies) {
+      return navigateTo('/forbidden')
+    }
+  }
+})

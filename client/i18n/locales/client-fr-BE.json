@@ -1,0 +1,48 @@
+{
+ "client": {
+  "app_name": "Restarters",
+  "dashboard": {
+   "title": "Tableau de bord",
+   "welcome": "Bon retour, {name}!"
+  },
+  "forbidden": {
+   "home_link": "Retour à l'accueil",
+   "text": "Vous n'avez pas la permission de consulter cette page.",
+   "title": "Accès refusé"
+  },
+  "invite": {
+   "event_joined": "Excellent ! Vous avez rejoint l'événement.",
+   "processing": "Un instant, nous traitons votre invitation...",
+   "title": "Adhésion en cours..."
+  },
+  "nav": {
+   "administrator": "Administrateur",
+   "brands": "Marques",
+   "categories": "Catégories",
+   "dashboard": "Tableau de bord",
+   "group_tags": "Tags des Repair Cafés",
+   "roles": "Rôles",
+   "skills": "Compétences",
+   "users": "Utilisateurs"
+  },
+  "recover": {
+   "sent": "Si cette adresse e-mail est enregistrée, nous avons envoyé un lien de réinitialisation du mot de passe."
+  },
+  "register": {
+   "skill_1": "Organisation d'événements",
+   "skill_2": "Coordination des bénévoles",
+   "skill_3": "Marketing",
+   "skill_4": "Sensibilisation communautaire",
+   "skill_5": "Réparation électronique",
+   "skill_6": "Soudure",
+   "skill_7": "Couture",
+   "skill_8": "Réparation de vélos",
+   "skills_organising": "Compétences d'organisation",
+   "skills_technical": "Compétences techniques"
+  },
+  "reset": {
+   "done": "Votre mot de passe a été changé. Vous pouvez maintenant vous connecter.",
+   "invalid_code": "Le code de récupération que vous utilisez n'est pas valide. Veuillez demander un nouveau lien de récupération."
+  }
+ }
+}
