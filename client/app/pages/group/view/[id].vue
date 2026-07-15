@@ -2,6 +2,7 @@
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useGroupsStore } from '~/stores/groups.js'
+import { useUploadedImageUrl } from '~/composables/useUploadedImageUrl.js'
 import GroupJoinButton from '~/components/groups/GroupJoinButton.vue'
 import GroupStats from '~/components/groups/GroupStats.vue'
 import GroupVolunteers from '~/components/groups/GroupVolunteers.vue'
@@ -29,7 +30,8 @@ const canPerformDelete = computed(() => !!permissions.value.can_perform_delete)
 const isMember = computed(() => groupsStore.isMember(id.value))
 const canInvite = computed(() => canedit.value || isMember.value)
 
-const groupImage = computed(() => (group.value?.image ? `/uploads${group.value.image}` : '/images/placeholder-avatar.png'))
+const { uploadedImageUrl } = useUploadedImageUrl()
+const groupImage = computed(() => uploadedImageUrl(group.value?.image) || '/images/placeholder-avatar.png')
 const location = computed(() => {
   const loc = group.value?.location
   if (!loc) return null

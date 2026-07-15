@@ -173,8 +173,18 @@ async function submit() {
     phone: form.phone || null,
     description: form.description,
     location: form.location,
-    postcode: form.postcode || null,
     timezone: form.timezone || null,
+  }
+
+  // Unlike its siblings above, groups.postcode is NOT NULL in the schema,
+  // and Laravel's global ConvertEmptyStringsToNull middleware turns a
+  // submitted '' into null before validateGroupParams ever sees it - its
+  // `input('postcode', '')` default only kicks in when the key is absent
+  // from the request entirely. So a blank postcode must be omitted here,
+  // not sent as '' or null, or group creation 500s with a SQL
+  // integrity-constraint error.
+  if (form.postcode) {
+    payload.postcode = form.postcode
   }
 
   if (!creating.value) {

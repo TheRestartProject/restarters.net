@@ -3,6 +3,7 @@ import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useSessionStore } from '~/stores/session.js'
 import { useGroupsStore } from '~/stores/groups.js'
+import { useUploadedImageUrl } from '~/composables/useUploadedImageUrl.js'
 import GroupForm from '~/components/groups/GroupForm.vue'
 import TusImageUpload from '~/components/forms/TusImageUpload.vue'
 
@@ -39,7 +40,8 @@ const canPerformDelete = computed(() => !!permissions.value.can_perform_delete)
 // (legacy GroupAddEditPage's canNetwork = Auth::user()->hasRole('Administrator')).
 const isAdmin = computed(() => sessionStore.user?.role === 1 || sessionStore.user?.role === 2)
 
-const groupImageUrl = computed(() => (group.value?.image ? `/uploads${group.value.image}` : null))
+const { uploadedImageUrl } = useUploadedImageUrl()
+const groupImageUrl = computed(() => uploadedImageUrl(group.value?.image))
 const updatedMessage = ref('')
 const imageError = ref('')
 const confirmingDelete = ref(false)
