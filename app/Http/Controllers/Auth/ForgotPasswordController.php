@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Attributes\Feature;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\SendsPasswordResetEmails;
 
+#[Feature('Users', description: 'User accounts, profiles, and authentication')]
 class ForgotPasswordController extends Controller
 {
     /*
