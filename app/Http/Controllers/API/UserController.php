@@ -460,6 +460,7 @@ class UserController extends Controller
      *          ))
      *      ),
      *      @OA\Response(response=401, description="Unauthenticated"),
+     *      @OA\Response(response=403, description="Forbidden (e.g. data consent outstanding)"),
      *      @OA\Response(response=422, description="Validation error")
      * )
      */

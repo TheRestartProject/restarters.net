@@ -464,6 +464,81 @@ class AuthController extends Controller
     }
 
     /**
+     * @OA\Post(
+     *      path="/api/v2/auth/consent",
+     *      operationId="consentv2",
+     *      tags={"Auth"},
+     *      summary="Record outstanding data consents (and profile basics) for the current user",
+     *      description="Port of the logged-in branch of the Blade registration form, which doubles as the consent-completion form for users gated by VerifyUserConsent.",
+     *      security={{"apiToken":{}}},
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent(
+     *              required={"age","country","consent_gdpr","consent_past_data","consent_future_data"},
+     *              @OA\Property(property="age", type="string"),
+     *              @OA\Property(property="country", type="string"),
+     *              @OA\Property(property="city", type="string", nullable=true),
+     *              @OA\Property(property="gender", type="string", nullable=true),
+     *              @OA\Property(property="consent_gdpr", type="boolean"),
+     *              @OA\Property(property="consent_past_data", type="boolean"),
+     *              @OA\Property(property="consent_future_data", type="boolean")
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Consents recorded; returns the refreshed session payload",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="data", type="object",
+     *                  @OA\Property(property="user", type="object", nullable=true),
+     *                  @OA\Property(property="config", type="object"),
+     *                  @OA\Property(property="flags", type="object")
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(response=401, description="Unauthenticated"),
+     *      @OA\Response(response=422, description="Validation failure")
+     * )
+     */
+    public function consentv2(Request $request): JsonResponse
+    {
+        $request->validate([
+            'age' => 'required',
+            'country' => 'required',
+            'city' => 'nullable|string',
+            'gender' => 'nullable|string',
+            'consent_gdpr' => 'required|accepted',
+            'consent_past_data' => 'required|accepted',
+            'consent_future_data' => 'required|accepted',
+        ]);
+
+        $user = $request->user();
+        $timestamp = date('Y-m-d H:i:s');
+
+        $user->country_code = $request->input('country');
+        $user->age = $request->input('age');
+
+        if ($request->filled('city')) {
+            $user->location = $request->input('city');
+            $geocoded = app(Geocoder::class)->geocode("{$request->input('city')}, {$request->input('country')}");
+            if (! empty($geocoded)) {
+                $user->latitude = $geocoded['latitude'];
+                $user->longitude = $geocoded['longitude'];
+            }
+        }
+
+        if ($request->filled('gender')) {
+            $user->gender = $request->input('gender');
+        }
+
+        $user->consent_gdpr = $timestamp;
+        $user->consent_past_data = $timestamp;
+        $user->consent_future_data = $timestamp;
+        $user->save();
+
+        return response()->json(['data' => SessionController::sessionPayload($user->fresh())]);
+    }
+
+    /**
      * The LogSuccessfulLogin listener's behaviour, invoked directly because we
      * intentionally do not fire the Login event on the XHR path (see class
      * docblock).

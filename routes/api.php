@@ -78,10 +78,17 @@ Route::get('/talk/topics/{tag?}', [API\DiscourseController::class, 'discussionTo
 Route::get('/timezones', [App\Http\Controllers\ApiController::class, 'timezones']);
 
 // We are working towards a new and more coherent API.
-Route::prefix('v2')->group(function() {
+// VerifyUserConsentApi gates v2 mutations for authenticated-but-unconsented
+// users (self-exempts reads, the auth family and /session).
+Route::prefix('v2')->middleware(\App\Http\Middleware\VerifyUserConsentApi::class)->group(function() {
     Route::middleware(\App\Http\Middleware\APISetLocale::class)->group(function() {
+        // Client bootstrap: current user + config + flags.
+        Route::get('/session', [API\SessionController::class, 'getSessionv2']);
+        Route::middleware('auth:sanctum,api')->patch('/session', [API\SessionController::class, 'patchSessionv2']);
+
         // Token-based auth for the SPA. No session, no CSRF — see AuthController.
         Route::prefix('/auth')->group(function() {
+            Route::middleware('auth:sanctum,api')->post('/consent', [API\AuthController::class, 'consentv2']);
             Route::middleware('throttle:10,1')->group(function() {
                 Route::post('/login', [API\AuthController::class, 'loginv2']);
                 Route::post('/register', [API\AuthController::class, 'registerv2']);
