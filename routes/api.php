@@ -93,6 +93,12 @@ Route::prefix('v2')->group(function() {
             Route::patch('{id}', [API\EventController::class, 'updateEventv2']);
         });
 
+        Route::prefix('/users')->group(function() {
+            Route::middleware('auth:api')->group(function() {
+                Route::get('', [API\UserController::class, 'listUsersv2']);
+            });
+        });
+
         Route::prefix('/networks')->group(function() {
             Route::get('/', [API\NetworkController::class, 'getNetworksv2']);
             Route::get('{id}', [API\NetworkController::class, 'getNetworkv2']);
