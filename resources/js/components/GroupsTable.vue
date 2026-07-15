@@ -272,21 +272,18 @@ export default {
     },
   },
   watch: {
-    async itemsToShow(newVal) {
-      // We may need to fetch the group over the API if not in store.
-      //
-      // This is for the "your groups" or "other groups nearby" case.  For "all groups" it would result in too
-      // many API calls, so we fetch those in a single slow API call.
-      newVal.forEach(async (g) => {
-        const group = this.$store.getters['groups/get'](g.id)
+    itemsToShow: {
+      immediate: true,
+      handler(newVal) {
+        // Hydrate the visible rows in one batched call (image, location
+        // text, counts, next event, tag names). The store skips ids that
+        // are already hydrated or in flight.
+        const ids = newVal.map(g => g.id)
 
-        if (!group || !group.location) {
-          await this.$store.dispatch('groups/fetch', {
-            id: g.id,
-            includeStats: false
-          })
+        if (ids.length) {
+          this.$store.dispatch('groups/hydrate', { ids })
         }
-      })
+      }
     }
   },
   methods: {
@@ -388,8 +385,10 @@ export default {
       if (!this.allGroupTags || !tags) {
         return []
       }
-      const visibleTagIds = this.allGroupTags.map(t => t.id)
-      return tags.filter(t => visibleTagIds.includes(t.id))
+      // Resolve names from allGroupTags: index entries only carry tag ids
+      // until the row is hydrated.
+      const byId = new Map(this.allGroupTags.map(t => [t.id, t]))
+      return tags.filter(t => byId.has(t.id)).map(t => t.name ? t : byId.get(t.id))
     }
   },
 }

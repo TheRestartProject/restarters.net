@@ -89,7 +89,8 @@ export default {
         return groups
       }
 
-      return groups.filter((g) => (g.networks || []).some((n) => n.id === this.network))
+      // Networks may be summary objects ([{id}]) or plain ids (the names index).
+      return groups.filter((g) => (g.networks || []).some((n) => (n && n.id !== undefined ? n.id : n) === this.network))
     },
     mappableGroups() {
       // A group with no geocode would put a marker at null island (0,0) —

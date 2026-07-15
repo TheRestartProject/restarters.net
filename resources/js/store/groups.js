@@ -43,6 +43,10 @@ export default {
     // List of groups indexed by group id.  Use object rather than array so that it's sparse.
     list: {},
 
+    // Ids with a full-row fetch in flight, so watchers firing repeatedly
+    // don't duplicate hydration calls.
+    hydrating: {},
+
     // Groups requiring moderation.
     moderate: {},
 
@@ -68,6 +72,15 @@ export default {
     }
   },
   mutations: {
+    setHydrating(state, params) {
+      params.ids.forEach(id => {
+        if (params.value) {
+          Vue.set(state.hydrating, id, true)
+        } else {
+          Vue.delete(state.hydrating, id)
+        }
+      })
+    },
     set(state, params) {
       Vue.set(state.list, params.id || params.idgroups, params)
     },
@@ -148,23 +161,63 @@ export default {
       }
     },
     async list({commit}, params) {
-      let url
-
-      if (params && params.details) {
-        // We want more details.  Ask for archived groups too: the list shows
-        // them with an "archived" badge, as the old server-rendered page did.
-        url = '/api/v2/groups/summary?locale=' + getLocale() + '&includeNextEvent=true&includeCounts=true&archived=true&minimal=true'
-      } else {
-        // Just the name and lat/lng.
-        url = '/api/v2/groups/names?locale=' + getLocale()
-      }
+      // The names index is enough to draw the map and run the client-side
+      // filters; the table hydrates the rows it actually shows via
+      // hydrate(). Archived groups are included: the list badges them, as
+      // the old server-rendered page did.
+      const url = '/api/v2/groups/names?locale=' + getLocale() +
+        (params && params.details ? '&includeArchived=true' : '')
 
       let ret = await axios.get(url)
 
       if (ret) {
         commit('setList', {
-          groups: ret.data.data
+          groups: ret.data.data.map(g => ({
+            id: g.id,
+            name: g.name,
+            lat: g.lat,
+            lng: g.lng,
+            location: {
+              location: null,
+              country: g.country,
+              lat: g.lat,
+              lng: g.lng,
+            },
+            networks: g.network_ids || [],
+            group_tags_full: (g.tag_ids || []).map(id => ({ id })),
+            archived_at: g.archived_at,
+          }))
         })
+      }
+    },
+    async hydrate({commit, state}, params) {
+      // Fetch full rows (image, location text, counts, next event, tag names)
+      // for just the given ids - one batched call per visible page of the
+      // list, instead of serialising every group up front.
+      const ids = params.ids.filter(id => {
+        const g = state.list[id]
+        return (!g || !g.summary) && !state.hydrating[id]
+      })
+
+      if (!ids.length) {
+        return
+      }
+
+      commit('setHydrating', { ids, value: true })
+
+      try {
+        // The API caps ids at 200 per call.
+        for (let i = 0; i < ids.length; i += 200) {
+          const chunk = ids.slice(i, i + 200)
+          const ret = await axios.get('/api/v2/groups/summary?locale=' + getLocale() +
+            '&includeNextEvent=true&includeCounts=true&archived=true&ids=' + chunk.join(','))
+
+          if (ret && ret.data) {
+            ret.data.data.forEach(g => commit('set', g))
+          }
+        }
+      } finally {
+        commit('setHydrating', { ids, value: false })
       }
     },
     async listTags({commit, rootGetters}) {

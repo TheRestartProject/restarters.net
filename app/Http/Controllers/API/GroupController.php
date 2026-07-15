@@ -269,14 +269,28 @@ class GroupController extends Controller
             'includeArchived' => ['string', 'in:true,false'],
         ]);
 
-        // We only return a small number of attributes, for speed.
-        $query = Group::select('idgroups', 'name', 'latitude', 'longitude', 'archived_at');
+        // We only return a small number of attributes, for speed: this index
+        // drives the groups map (positions/tooltips) and the client-side
+        // name/country/network/tag filters, with full rows hydrated on demand
+        // via /groups/summary?ids=.
+        $query = Group::select('idgroups', 'name', 'latitude', 'longitude', 'country_code', 'archived_at');
 
         if (!$request->has('includeArchived') || $request->get('includeArchived') == 'false') {
             $query = $query->whereNull('archived_at');
         }
 
         $groups = $query->get();
+
+        // Two cheap lookups instead of per-group relation loads.
+        $networkIds = \DB::table('group_network')
+            ->whereIn('group_id', $groups->pluck('idgroups'))
+            ->get()
+            ->groupBy('group_id');
+        $tagIds = \DB::table('grouptags_groups')
+            ->whereIn('group', $groups->pluck('idgroups'))
+            ->get()
+            ->groupBy('group');
+
         $ret = [];
 
         foreach ($groups as $group) {
@@ -285,6 +299,9 @@ class GroupController extends Controller
                 'name' => $group->name,
                 'lat' => $group->latitude,
                 'lng' => $group->longitude,
+                'country' => \App\Helpers\Fixometer::getCountryFromCountryCode($group->country_code),
+                'network_ids' => $networkIds->has($group->idgroups) ? $networkIds[$group->idgroups]->pluck('network_id')->all() : [],
+                'tag_ids' => $tagIds->has($group->idgroups) ? $tagIds[$group->idgroups]->pluck('group_tag')->all() : [],
                 'archived_at' => $group->archived_at ? Carbon::parse($group->archived_at)->toIso8601String() : null
             ];
         }
@@ -328,12 +345,12 @@ class GroupController extends Controller
      *          )
      *      ),
      *      @OA\Parameter(
-     *          name="minimal",
-     *          description="Trim each group to the fields the groups map page uses: networks become plain ids, next_event keeps only id/start/title, and location keeps only location/country/lat/lng.  Default false.",
+     *          name="ids",
+     *          description="Comma-separated group ids.  When present, only these groups are returned (used by the groups list to hydrate the visible rows).  Maximum 200 ids.",
      *          required=false,
      *          in="query",
      *          @OA\Schema(
-     *              type="boolean"
+     *              type="string"
      *          )
      *      ),
      *      @OA\Response(
@@ -359,6 +376,11 @@ class GroupController extends Controller
     public static function listSummaryv2(Request $request) {
         $request->validate([
             'archived' => ['string', 'in:true,false'],
+            'ids' => ['string', 'regex:/^\d+(,\d+)*$/', function ($attribute, $value, $fail) {
+                if (count(explode(',', $value)) > 200) {
+                    $fail('A maximum of 200 ids may be requested at once.');
+                }
+            }],
         ]);
 
         // Eager-load everything the GroupSummary resource touches, otherwise
@@ -367,6 +389,12 @@ class GroupController extends Controller
 
         if ($request->get('archived', 'false') !== 'true') {
             $query = $query->whereNull('archived_at');
+        }
+
+        // The groups list hydrates just its visible rows this way, instead of
+        // paying to serialise every group on page load.
+        if ($request->filled('ids')) {
+            $query = $query->whereIn('idgroups', explode(',', $request->get('ids')));
         }
 
         $groups = $query->get();

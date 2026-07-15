@@ -80,57 +80,67 @@ class GroupSummaryApiTest extends TestCase
         );
     }
 
-    public function testMinimalParamReturnsOnlyWhatTheMapPageUses(): void
+    public function testIdsParamHydratesOnlyThoseGroups(): void
     {
         $network = Network::factory()->create();
         $tag = GroupTags::factory()->create();
-        $group = Group::factory()->create(['name' => 'Minimal Group']);
-        $group->addTag($tag);
-        $network->addGroup($group);
+        $a = Group::factory()->create(['name' => 'Hydrate A']);
+        $b = Group::factory()->create(['name' => 'Hydrate B']);
+        $other = Group::factory()->create(['name' => 'Not Asked For']);
+        $a->addTag($tag);
+        $network->addGroup($a);
         Party::factory()->create([
-            'group' => $group->idgroups,
+            'group' => $a->idgroups,
             'event_start_utc' => Carbon::now()->addDays(3)->toIso8601String(),
             'event_end_utc' => Carbon::now()->addDays(3)->addHours(2)->toIso8601String(),
             'approved' => true,
         ]);
         \Cache::forget('future_events');
 
-        $response = $this->get('/api/v2/groups/summary?minimal=true&includeNextEvent=true&includeCounts=true');
+        $response = $this->get('/api/v2/groups/summary?ids=' . $a->idgroups . ',' . $b->idgroups
+            . '&includeNextEvent=true&includeCounts=true&archived=true');
+        $response->assertSuccessful();
+        $data = collect($response->json('data'));
+
+        // Only the requested groups, with the full row shape the list needs.
+        $this->assertEqualsCanonicalizing([$a->idgroups, $b->idgroups], $data->pluck('id')->all());
+        $ga = $data->firstWhere('id', $a->idgroups);
+        $this->assertEquals($network->id, $ga['networks'][0]['id']);
+        $this->assertNotNull($ga['next_event']);
+        $this->assertArrayHasKey('hosts', $ga);
+        $this->assertEquals($tag->id, $ga['group_tags_full'][0]['id']);
+    }
+
+    public function testIdsParamRejectsMoreThanTwoHundred(): void
+    {
+        $this->expectException(\Illuminate\Validation\ValidationException::class);
+        $this->get('/api/v2/groups/summary?ids=' . implode(',', range(1, 201)));
+    }
+
+    public function testNamesIndexCarriesFilterFields(): void
+    {
+        $network = Network::factory()->create();
+        $tag = GroupTags::factory()->create();
+        $group = Group::factory()->create([
+            'name' => 'Index Group',
+            'country_code' => 'GB',
+        ]);
+        $group->addTag($tag);
+        $network->addGroup($group);
+
+        $response = $this->get('/api/v2/groups/names?includeArchived=true');
         $response->assertSuccessful();
         $g = collect($response->json('data'))->firstWhere('id', $group->idgroups);
         $this->assertNotNull($g);
 
-        // Exactly the fields the map page consumes - nothing else.
+        // The map/list index: identity + position + everything the client-side
+        // filters need, and nothing heavier.
         $this->assertEqualsCanonicalizing(
-            ['id', 'name', 'image', 'location', 'networks', 'group_tags_full',
-             'archived_at', 'summary', 'hosts', 'restarters', 'next_event'],
+            ['id', 'name', 'lat', 'lng', 'archived_at', 'country', 'network_ids', 'tag_ids'],
             array_keys($g)
         );
-        $this->assertEqualsCanonicalizing(
-            ['location', 'country', 'lat', 'lng'],
-            array_keys($g['location'])
-        );
-        // Networks collapse to plain ids.
-        $this->assertEquals([$network->id], $g['networks']);
-        // next_event keeps only what the list and modal show (plus the
-        // id/summary fields its schema requires).
-        $this->assertEqualsCanonicalizing(
-            ['id', 'start', 'title', 'summary'],
-            array_keys($g['next_event'])
-        );
-    }
-
-    public function testDefaultShapeUnchangedWithoutMinimal(): void
-    {
-        $network = Network::factory()->create();
-        $group = Group::factory()->create();
-        $network->addGroup($group);
-
-        $response = $this->get('/api/v2/groups/summary');
-        $g = collect($response->json('data'))->firstWhere('id', $group->idgroups);
-
-        $this->assertArrayHasKey('updated_at', $g);
-        $this->assertEquals($network->id, $g['networks'][0]['id']);
-        $this->assertArrayHasKey('area', $g['location']);
+        $this->assertEquals('United Kingdom', $g['country']);
+        $this->assertEquals([$network->id], $g['network_ids']);
+        $this->assertEquals([$tag->id], $g['tag_ids']);
     }
 }

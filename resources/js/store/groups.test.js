@@ -102,8 +102,7 @@ test('the details list fetch asks for archived groups (shown with a badge, as th
 
   await groups.actions.list({ commit }, { details: true })
 
-  expect(axios.get.mock.calls[0][0]).toContain('archived=true')
-  expect(axios.get.mock.calls[0][0]).toContain('minimal=true')
+  expect(axios.get.mock.calls[0][0]).toContain('includeArchived=true')
 })
 
 // GroupsTable renders its rows from the groups/list store; groups that only

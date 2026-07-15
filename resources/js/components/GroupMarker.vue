@@ -78,6 +78,9 @@ export default {
   },
   methods: {
     openModal() {
+      // The store may only hold the lean index entry for this group; fetch
+      // the full row so the modal can show location and next event.
+      this.$store.dispatch('groups/hydrate', { ids: [this.id] })
       this.showModal = true
     },
     markerHover(over) {
