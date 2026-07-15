@@ -43,6 +43,11 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+// SSO bridge: exchanges a one-time API-issued ticket for a Laravel web session
+// during a top-level navigation, so Discourse SSO and MediaWiki silent login
+// keep working for the token-authenticated SPA. GET only (CSRF-exempt by verb).
+Route::get('/auth/bridge', [App\Http\Controllers\Auth\BridgeController::class, 'bridge']);
+
 Route::middleware('ensureAPIToken')->group(function () {
     Route::prefix('user')->group(function () {
         Route::get('/', [HomeController::class, 'index']);

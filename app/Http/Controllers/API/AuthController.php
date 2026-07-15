@@ -465,6 +465,37 @@ class AuthController extends Controller
 
     /**
      * @OA\Post(
+     *      path="/api/v2/auth/sso-ticket",
+     *      operationId="ssoTicketv2",
+     *      tags={"Auth"},
+     *      summary="Issue a one-time ticket for establishing a web session at GET /auth/bridge",
+     *      description="Used before top-level navigations to Talk (Discourse SSO) or the Wiki, which need a Laravel web session. Tickets are single-use and expire after 60 seconds.",
+     *      security={{"apiToken":{}}},
+     *      @OA\Response(
+     *          response=200,
+     *          description="Ticket issued",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="data", type="object",
+     *                  @OA\Property(property="ticket", type="string"),
+     *                  @OA\Property(property="bridge_url", type="string")
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(response=401, description="Unauthenticated")
+     * )
+     */
+    public function ssoTicketv2(Request $request): JsonResponse
+    {
+        return response()->json([
+            'data' => [
+                'ticket' => \App\SsoTicket::issue($request->user()),
+                'bridge_url' => url('/auth/bridge'),
+            ],
+        ]);
+    }
+
+    /**
+     * @OA\Post(
      *      path="/api/v2/auth/consent",
      *      operationId="consentv2",
      *      tags={"Auth"},

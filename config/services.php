@@ -36,6 +36,11 @@ return [
         // Used by Discourse to route incoming logins.
         'route' => 'discourse/sso',
 
+        // Unauthenticated hits on the SSO route are sent to the SPA's login
+        // page (not Laravel's /login) — scoped here so the global 'auth'
+        // alias keeps its own redirect for the legacy Blade app until cutover.
+        'middleware' => ['web', \App\Http\Middleware\AuthenticateRedirectingToFrontend::class],
+
         // Secret string used to encrypt/decrypt SSO information,
         // be sure that it is 10 chars or longer
         'secret' => env('DISCOURSE_SECRET'),
