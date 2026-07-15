@@ -9,6 +9,37 @@ the PR closes.
 Technical detail lives in `docs/fly-deployment.md` → *PR Previews*. This file
 is the operating guide plus the record of the concrete setup.
 
+## Architecture at a glance
+
+```
+  PR labeled `preview` ─── or push to labeled PR ─── or manual dispatch
+        │
+        ▼
+  GitHub Actions "PR preview" run
+        │  waits at: Review deployments → preview → Approve
+        │  (approver checks the PR's diff to .github/workflows/, fly.pr.toml,
+        │   Dockerfile.fly, docker/*.sh — the run executes the PR's own code)
+        ▼
+  Build: PR merged with base (refs/pull/N/merge), Dockerfile.fly, remote builder
+        │  first deploy also: create app, stage secrets, fresh APP_KEY
+        ▼
+  Deploy to restarters-pr-<N> ──► COLD BOOT
+        │   1. warming page binds :80 (seconds)     ◄─ visitors see this
+        │   2. local MariaDB starts
+        │   3. latest hourly backup restored from Drive (~98MB, minutes)
+        │   4. jobs/failed_jobs truncated (never run production's queue)
+        │   5. php artisan migrate --force  (PR schema vs real data)
+        │   6. status → /_preview_status; real nginx takes over
+        ▼
+  READY at https://restarters-pr-<N>.fly.dev  (cookie gate; PR title shown)
+        │
+        ├─ ~5 min idle ──► SUSPEND (whole-VM snapshot, DB stays loaded)
+        │                     └─ next request ──► resume, sub-second
+        ├─ snapshot discarded by Fly ──► next request = COLD BOOT again
+        ├─ push + approve ──► redeploy = COLD BOOT with NEWER backup
+        └─ PR closed / label removed ──► 6-hourly sweep destroys the app
+```
+
 ## Using a preview
 
 1. Add the `preview` label to the PR (or run the **PR preview** workflow via
@@ -58,9 +89,9 @@ with the PR number left **empty**.
 | Piece | Value |
 |---|---|
 | Fly organisation (`FLY_ORG` repo variable) | `personal` ("Restart Tech") |
-| GitHub environment `preview` | required reviewer: edwh; holds `FLY_ORG_TOKEN`, `FLY_PREVIEW_SECRETS` |
+| GitHub environment `preview` | required reviewers: edwh, ngm, restart-tech, restart-neil (any one approves); holds `FLY_ORG_TOKEN`, `FLY_PREVIEW_SECRETS` |
 | GitHub environment `preview-cleanup` | no reviewers; deployment branches restricted to `develop`; holds `FLY_ORG_TOKEN` |
-| Restore identity | `restarters-preview-restore@restarters-previews.iam.gserviceaccount.com` (GCP project `restarters-previews`, owned by edward@therestartproject.org; Drive API enabled). Needs **Viewer** on the backups folder — it must never be able to delete backups. |
+| Restore identity | `restarters-preview-restore@restarters-previews.iam.gserviceaccount.com` (GCP project `restarters-previews`, owned by edward@therestartproject.org; Drive API enabled). Needs **Viewer** on the backups folder — it must never be able to delete backups — AND the shared drive must allow viewers to download (see Operational learnings). |
 | Tigris | dedicated **read-only** access key for `restarters-uploads` (created 2026-07-13 via the Tigris console) — the real enforcement behind the disabled-uploads flag |
 | Label | `preview` |
 
@@ -72,6 +103,27 @@ blob:
 gh secret set FLY_PREVIEW_SECRETS --env preview < ~/preview-secrets.env
 shred -u ~/preview-secrets.env
 ```
+
+
+## Operational learnings
+
+- **Drive sharing needs two things** (2026-07-14): Viewer access for the
+  restore service account AND the shared drive setting "viewers and
+  commenters can download". Without the latter, the SA can list backups but
+  every download 403s (`cannotDownloadFile`) — the preview boots, reports
+  `restore failed` at /_preview_status, and serves an empty database.
+- **Resume does not re-run startup**: starting a *suspended* machine resumes
+  its old memory state. To force a fresh restore (e.g. after fixing
+  credentials), cold-boot it: `flyctl machine stop <id> -a restarters-pr-<N>`,
+  wait for state `stopped`, then `flyctl machine start <id>`. Note
+  `flyctl machine restart` fails on a suspended machine ("not currently
+  started or stopped") — stop/start is the reliable sequence.
+- **The gate login page shows the PR title** (PR #897): the workflow stages a
+  `PREVIEW_PR_TITLE` secret each deploy; `public/_auth_login.php` displays it.
+- **Measured on the first real preview** (PR #887, 2026-07-14): rootfs ≈1.2GB
+  used → idle storage cost ≈ $0.20–0.30/month, matching the design estimate.
+  Cold boot to ready ≈ 5–8 minutes end to end; suspend/resume confirmed
+  working in production.
 
 ## Security model (short version)
 
