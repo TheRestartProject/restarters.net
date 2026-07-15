@@ -257,6 +257,12 @@ class GroupController extends Controller
      *                   type="object",
      *                   @OA\Property(property="id", type="integer", example=1),
      *                   @OA\Property(property="name", type="string", example="Group Name"),
+     *                   @OA\Property(property="lat", type="number", nullable=true, example=51.5),
+     *                   @OA\Property(property="lng", type="number", nullable=true, example=-0.12),
+     *                   @OA\Property(property="country", type="string", nullable=true, example="United Kingdom"),
+     *                   @OA\Property(property="network_ids", type="array", @OA\Items(type="integer")),
+     *                   @OA\Property(property="tag_ids", type="array", @OA\Items(type="integer")),
+     *                   @OA\Property(property="archived_at", type="string", format="date-time", nullable=true),
      *                )
      *             )
      *          )
