@@ -303,11 +303,12 @@ class GroupController extends Controller
             $ret[] = [
                 'id' => $group->idgroups,
                 'name' => $group->name,
-                'lat' => $group->latitude,
-                'lng' => $group->longitude,
+                'lat' => $group->latitude !== null ? (float) $group->latitude : null,
+                'lng' => $group->longitude !== null ? (float) $group->longitude : null,
                 'country' => \App\Helpers\Fixometer::getCountryFromCountryCode($group->country_code),
-                'network_ids' => $networkIds->has($group->idgroups) ? $networkIds[$group->idgroups]->pluck('network_id')->all() : [],
-                'tag_ids' => $tagIds->has($group->idgroups) ? $tagIds[$group->idgroups]->pluck('group_tag')->all() : [],
+                'network_ids' => $networkIds->has($group->idgroups) ? $networkIds[$group->idgroups]->pluck('network_id')->map(fn ($id) => (int) $id)->all() : [],
+                // The pivot columns are varchars; the API contract is integers.
+                'tag_ids' => $tagIds->has($group->idgroups) ? $tagIds[$group->idgroups]->pluck('group_tag')->map(fn ($id) => (int) $id)->all() : [],
                 'archived_at' => $group->archived_at ? Carbon::parse($group->archived_at)->toIso8601String() : null
             ];
         }
