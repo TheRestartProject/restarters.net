@@ -38,9 +38,10 @@ for (let y = currentYear - 18; y > currentYear - 100; y--) {
 }
 
 const countries = computed(() => {
-  const raw = tm('countries')
-  return Object.entries(raw || {})
-    .map(([code, name]) => ({ code, name }))
+  // tm() returns compiled message ASTs (not strings) for precompiled JSON
+  // locales, so resolve each name through t() — always a plain string.
+  return Object.keys(tm('countries') || {})
+    .map((code) => ({ code, name: t(`countries.${code}`) }))
     .sort((a, b) => a.name.localeCompare(b.name))
 })
 

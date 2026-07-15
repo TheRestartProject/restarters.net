@@ -21,5 +21,8 @@ export async function login(page, { email, password } = USERS.admin) {
 export async function logout(page) {
   await page.getByTestId('nav-user-menu').click()
   await page.getByTestId('nav-logout').click()
-  await expect(page.getByTestId('nav-login')).toBeVisible()
+  // The navbar's logout handler navigates to /login, which uses the plain
+  // layout (no navbar) — assert the login form itself.
+  await page.waitForURL('**/login**')
+  await expect(page.getByTestId('login-form')).toBeVisible()
 }

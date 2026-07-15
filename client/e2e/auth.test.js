@@ -4,6 +4,10 @@ import { USERS, login, logout } from './utils'
 test.describe('authentication', () => {
   test('can log in as admin and reach the dashboard', async ({ page }) => {
     await login(page, USERS.admin)
+
+    // The dashboard/profile/admin links live inside the user dropdown,
+    // mirroring the legacy navbar.
+    await page.getByTestId('nav-user-menu').click()
     await expect(page.getByTestId('nav-dashboard')).toBeVisible()
     // Admins see the admin menu.
     await expect(page.getByTestId('nav-admin-menu')).toBeVisible()
@@ -11,6 +15,8 @@ test.describe('authentication', () => {
 
   test('host does not see the admin menu', async ({ page }) => {
     await login(page, USERS.host)
+    await page.getByTestId('nav-user-menu').click()
+    await expect(page.getByTestId('nav-dashboard')).toBeVisible()
     await expect(page.getByTestId('nav-admin-menu')).toHaveCount(0)
   })
 
@@ -26,7 +32,7 @@ test.describe('authentication', () => {
 
   test('protected route redirects to login and honours redirect after', async ({ page }) => {
     await page.goto('/dashboard')
-    await page.waitForURL('**/login?redirect=%2Fdashboard')
+    await page.waitForURL((url) => url.pathname === '/login' && url.searchParams.get('redirect') === '/dashboard')
 
     await page.getByTestId('login-email').fill(USERS.admin.email)
     await page.getByTestId('login-password').fill(USERS.admin.password)
