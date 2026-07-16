@@ -1,5 +1,9 @@
 {
  "client": {
+  "admin": {
+   "load_error": "Désolé, nous n'avons pas pu charger cette liste.",
+   "tag_in_use_warning": "Ce tag est actuellement appliqué à {count} groupe(s) et en sera également retiré."
+  },
   "app_name": "Restarters",
   "dashboard": {
    "attending": "Participe",

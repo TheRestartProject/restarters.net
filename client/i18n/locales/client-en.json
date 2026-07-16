@@ -1,5 +1,9 @@
 {
  "client": {
+  "admin": {
+   "load_error": "Sorry, we couldn't load that list.",
+   "tag_in_use_warning": "This tag is currently applied to {count} group(s) and will be removed from them too."
+  },
   "app_name": "Restarters",
   "dashboard": {
    "attending": "Attending",
