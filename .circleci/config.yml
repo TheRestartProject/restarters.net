@@ -38,6 +38,16 @@ commands:
             echo "" >> .env
             echo "FRONTEND_URL=http://localhost:3000" >> .env
 
+            # The mysql_testing connection (used by the Taskfile's explicit
+            # pre-phpunit migrate:fresh). phpunit.xml sets these inside the
+            # phpunit process, but plain artisan reads .env — without them
+            # DB_TEST_HOST falls back to 127.0.0.1 and the reset fails.
+            echo "DB_TEST_HOST=restarters_db" >> .env
+            echo "DB_TEST_PORT=3306" >> .env
+            echo "DB_TEST_DATABASE=restarters_db_test" >> .env
+            echo "DB_TEST_USERNAME=restarters" >> .env
+            echo "DB_TEST_PASSWORD=s3cr3t" >> .env
+
             # Add environment variables from CircleCI
             echo "GOOGLE_API_CONSOLE_KEY=$GOOGLE_API_CONSOLE_KEY" >> .env
             echo "MAPBOX_TOKEN=$MAPBOX_TOKEN" >> .env
