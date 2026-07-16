@@ -57,10 +57,10 @@ Status: ⬜ pending · 🔄 in progress · ✅ done · ❌ blocked
 
 | # | Task | Status | Notes |
 |---|------|--------|-------|
-| D1 | Pages: /profile/edit 5 tabs against PR #868 API (Uppy dashboard for photo) + vitest | ⬜ | ProfileTabs + 10 tab components; Uppy@tus wired to /tus; delete-account flow with confirm modal |
-| D2 | Pages: public /profile/{id} + API `GET /api/v2/users/{id}` + phpunit/vitest | ⬜ | PII-safe resource (name, avatar, groups, skills, bio only) |
-| D3 | Pages: /user/all admin list against PR #866 API + vitest | ⬜ | filters/sort/pagination preserved; role editor modal → PATCH /users/{id}/admin-settings |
-| D4 | Pages: admin reference-data CRUD (brands/skills/categories/group-tags/roles) against PR #863 API; AdminCrudPage → AdminCrudTable component + vitest | ⬜ | one generic component + 5 thin pages, per PR-863 prop contract |
+| D1 | Pages: /profile/edit 5 tabs against PR #868 API (Uppy dashboard for photo) + vitest | ✅ | ProfileTabs + 10 tab components; Uppy@tus wired to /tus; delete-account flow with confirm modal |
+| D2 | Pages: public /profile/{id} + API `GET /api/v2/users/{id}` + phpunit/vitest | ✅ | PII-safe resource (name, avatar, groups, skills, bio only) |
+| D3 | Pages: /user/all admin list against PR #866 API + vitest | ✅ | filters/sort/pagination preserved; role editor modal → PATCH /users/{id}/admin-settings |
+| D4 | Pages: admin reference-data CRUD (brands/skills/categories/group-tags/roles) against PR #863 API; AdminCrudPage → AdminCrudTable component + vitest | ✅ | one generic component + 5 thin pages, per PR-863 prop contract |
 | D5 | API+page: admin stats (JSON versions of /admin/stats views) + preview-deploy page | ⬜ | admin stats widgets stay Laravel-served iframes (§9); preview-deploy = simple page on GET/POST /api/v2/admin/preview-deploy |
 | D6 | Playwright: admin-users + admin-reference-data specs ported | ⬜ | client/e2e/admin.test.js |
 
@@ -68,10 +68,10 @@ Status: ⬜ pending · 🔄 in progress · ✅ done · ❌ blocked
 
 | # | Task | Status | Notes |
 |---|------|--------|-------|
-| E1 | Pages: /networks, /networks/{id} (tags mgmt, associate groups, stats) + vitest | ⬜ | grouptags UI: create/edit/delete/assign flows with NC/Admin/Host permission gating from session roles |
-| E2 | Pages: static (about/cookie-policy/visualisations link-outs), onboarding modal, cantcreate (PR #867 keys), /user/forbidden 403 | ⬜ | onboarding shown post-register from session flag |
-| E3 | Notifications dropdown + page (existing endpoints) + talk topics widget | ⬜ | discourse links route via /auth/bridge |
-| E4 | Locale switcher + PATCH session locale + APISetLocale header on every call | ⬜ | en/fr/fr-BE only |
+| E1 | Pages: /networks, /networks/{id} (tags mgmt, associate groups, stats) + vitest | ✅ | grouptags UI: create/edit/delete/assign flows with NC/Admin/Host permission gating from session roles |
+| E2 | Pages: static (about/cookie-policy/visualisations link-outs), onboarding modal, cantcreate (PR #867 keys), /user/forbidden 403 | ✅ | onboarding shown post-register from session flag |
+| E3 | Notifications dropdown + page (existing endpoints) + talk topics widget | ✅ | discourse links route via /auth/bridge |
+| E4 | Locale switcher + PATCH session locale + APISetLocale header on every call | ✅ | en/fr/fr-BE only |
 | E5 | Playwright: grouptags.test.js ported (34 tests, deterministic waits) + landingpage equivalent (/ redirects to /dashboard or marketing landing page) | ⬜ | landing page rebuilt in Nuxt (marketing content from landing.php lang keys) |
 
 ## Phase F — Cutover (Laravel stops serving frontend)
