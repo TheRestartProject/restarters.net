@@ -115,14 +115,16 @@ class InviteGroupTest extends TestCase
         $this->assertEquals(1, $apiGroup['hosts'], "API hosts mismatch. Debug: $debugInfo");
         $this->assertEquals(0, $apiGroup['restarters'], "API restarters mismatch. Debug: $debugInfo");
 
-        // Now accept the invite.
+        // Now accept the invite. GET /group/accept-invite/{id}/{hash} keeps its status-hash DB
+        // update server-side (F2-5) but now redirects into the SPA's group page with a ?joined=1
+        // flag instead of Blade + session flash - see App\Http\Controllers\GroupController::confirmInvite.
         preg_match('/href="(\/group\/accept-invite.*?)"/', $response2->getContent(), $matches);
         $invitation = $matches[1];
         $response3 = $this->get($invitation);
         $this->assertTrue($response3->isRedirection());
         $redirectTo = $response3->getTargetUrl();
-        $this->assertNotFalse(strpos($redirectTo, '/group/view/'.$group->idgroups));
-        $response3->assertSessionHas('success');
+        $frontend = rtrim(config('restarters.frontend_url'), '/');
+        $this->assertEquals($frontend.'/group/view/'.$group->idgroups.'?joined=1', $redirectTo);
 
         // Acceptance should notify the host.
         Notification::assertSentTo(
@@ -186,13 +188,18 @@ class InviteGroupTest extends TestCase
         // Should see shareable code in there.
         $response->assertSee($group->shareable_link);
 
-        // Now pretend we've received that code.
+        // Now pretend we've received that code, via the legacy backend URL some older-style
+        // links may still use (as opposed to $group->shareable_link, which already points
+        // straight at the SPA - see APIv2GroupResourceFieldsTest). GET /group/invite/{code} is
+        // now a thin redirector into the SPA (F2-5): the SPA claims the code statelessly via
+        // POST /api/v2/invites/claim (AuthEndpointsTest::testClaimInviteEndpoint), so this no
+        // longer needs to be authenticated, look the code up, or create session state.
         Auth::logout();
-        $response = $this->get($group->shareable_link);
+        $frontend = rtrim(config('restarters.frontend_url'), '/');
+        $response = $this->get('/group/invite/'.$unique_shareable_code);
 
         $this->assertTrue($response->isRedirection());
-        $redirectTo = $response->getTargetUrl();
-        $this->assertNotFalse(strpos($redirectTo, '/user/register'));
+        $response->assertRedirect($frontend.'/group/invite/'.$unique_shareable_code);
     }
 
     /**

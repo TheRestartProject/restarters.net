@@ -12,7 +12,6 @@ use App\Role;
 use App\User;
 use DB;
 use Illuminate\Support\Facades\Notification;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Tests\TestCase;
 use App\Notifications\JoinEvent;
 use Illuminate\Support\Facades\Queue;
@@ -172,11 +171,14 @@ class InviteEventTest extends TestCase
             "Expected attending:false but got attending:true. Debug: " . $debugInfo);
         $this->assertStringContainsString('"invitation"', $events);
 
-        // Now accept the invitation.
+        // Now accept the invitation. GET /party/accept-invite/{id}/{hash} keeps its status-hash
+        // DB update server-side (F2-5) but now redirects into the SPA's party page with a
+        // ?joined=1 flag instead of Blade - see App\Http\Controllers\PartyController::confirmInvite.
         $response4 = $this->get($invitation);
         $this->assertTrue($response4->isRedirection());
         $redirectTo = $response4->getTargetUrl();
-        $this->assertNotFalse(strpos($redirectTo, '/party/view/'.$event->idevents));
+        $frontend = rtrim(config('restarters.frontend_url'), '/');
+        $this->assertEquals($frontend.'/party/view/'.$event->idevents.'?joined=1', $redirectTo);
 
         // Now should show.
         $response5 = $this->get('/party');
@@ -286,7 +288,8 @@ class InviteEventTest extends TestCase
         $response8 = $this->get($invitation);
         $this->assertTrue($response8->isRedirection());
         $redirectTo = $response8->getTargetUrl();
-        $this->assertNotFalse(strpos($redirectTo, '/party/view/'.$event->idevents));
+        $frontend = rtrim(config('restarters.frontend_url'), '/');
+        $this->assertEquals($frontend.'/party/view/'.$event->idevents.'?joined=1', $redirectTo);
 
         // Should now show.
         $event->refresh();
@@ -381,7 +384,8 @@ class InviteEventTest extends TestCase
         $response8 = $this->get($invitation);
         $this->assertTrue($response8->isRedirection());
         $redirectTo = $response8->getTargetUrl();
-        $this->assertNotFalse(strpos($redirectTo, '/party/view/'.$event->idevents));
+        $frontend = rtrim(config('restarters.frontend_url'), '/');
+        $this->assertEquals($frontend.'/party/view/'.$event->idevents.'?joined=1', $redirectTo);
 
         // This should generate a notification to the host.
         Notification::assertSentTo(
@@ -431,30 +435,24 @@ class InviteEventTest extends TestCase
                            'shareable_code' => $unique_shareable_code,
                        ]);
 
+        // GET /party/invite/{code} is now a thin redirector into the SPA (F2-5): the SPA claims
+        // the code statelessly via POST /api/v2/invites/claim
+        // (AuthEndpointsTest::testClaimEventShareableCode), which is what actually joins the
+        // event now, so this no longer touches the DB or needs the code to exist.
+        $this->actingAs($user);
+        $frontend = rtrim(config('restarters.frontend_url'), '/');
 
-        // Invited volunteers shouldn't update the count.
+        $rsp = $this->get('/party/invite/' . $unique_shareable_code);
+        $rsp->assertRedirect($frontend.'/party/invite/'.$unique_shareable_code);
+
+        // Invited volunteers shouldn't update the count - nothing joined server-side.
         $event->refresh();
         assertEquals(1, $event->volunteers);
 
-        // Accept the invite via the code.
-        $this->actingAs($user);
-        $this->followingRedirects();
-        $rsp = $this->get('/party/invite/' . $unique_shareable_code);
-        $rsp->assertSuccessful();
-        $this->assertStringContainsString('/dashboard', url()->current());
-        $rsp->assertSee(__('events.you_have_joined', [
-            'url' => url("/party/view/{$event->idevents}"),
-            'name' => $event->venue
-        ]), false);
-
-
-        // Should now show.
-        $event->refresh();
-        assertEquals(2, $event->volunteers);
-
-        // Try with invalid code.
-        $this->expectException(NotFoundHttpException::class);
+        // An unknown code redirects the same way - no DB lookup happens here any more, so there's
+        // nothing to 404 on; the SPA's claim call is what surfaces the unknown-code error.
         $rsp = $this->get('/party/invite/' . $unique_shareable_code . '1');
+        $rsp->assertRedirect($frontend.'/party/invite/'.$unique_shareable_code.'1');
     }
 
     public function testInviteNonUsers(): void {

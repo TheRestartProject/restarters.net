@@ -630,7 +630,10 @@ class Party extends Model implements Auditable
     public function getShareableLinkAttribute()
     {
         if (! empty($this->shareable_code)) {
-            return url("party/invite/{$this->shareable_code}");
+            // Points at the SPA, matching Group::getShareableLinkAttribute();
+            // the claim happens via POST /api/v2/invites/claim (or the
+            // invite_code param on login/register).
+            return rtrim(config('restarters.frontend_url'), '/')."/party/invite/{$this->shareable_code}";
         }
 
         return '';

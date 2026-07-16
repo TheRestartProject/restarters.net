@@ -15,8 +15,12 @@ class AccountCreationTest extends TestCase
 {
     public function testRegister(): void
     {
+        // GET /user/register is now a thin redirector into the SPA (F2-4) - the Blade form it
+        // used to serve is dead. POST /user/register/{hash?} below is untouched: it's kept
+        // temporarily (dies at F) purely because these tests exercise it directly.
+        $frontend = rtrim(config('restarters.frontend_url'), '/');
         $response = $this->get('/user/register');
-        $response->assertSee(__('registration.reg-step-1-heading'), $response->getContent());
+        $response->assertRedirect($frontend.'/user/register');
 
         $userAttributes = $this->userAttributes();
         $response = $this->post('/user/register/', $userAttributes);

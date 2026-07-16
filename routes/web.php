@@ -51,10 +51,18 @@ Route::get('/auth/bridge', [App\Http\Controllers\Auth\BridgeController::class, '
 Route::middleware('ensureAPIToken')->group(function () {
     Route::prefix('user')->group(function () {
         Route::get('/', [HomeController::class, 'index']);
+        // Thin redirectors into the SPA (F2-5): /api/v2/auth/password/forgot and
+        // /password/reset (App\Http\Controllers\API\AuthController) now own the
+        // recover/reset flows, so the POST siblings that used to submit the Blade
+        // forms are gone.
         Route::get('reset', [UserController::class, 'reset']);
-        Route::post('reset', [UserController::class, 'reset']);
         Route::get('recover', [UserController::class, 'recover']);
-        Route::post('recover', [UserController::class, 'recover']);
+        // Thin redirector into the SPA (F2-4): still named 'registration' because
+        // resources/views/features/index.blade.php builds its signup link from
+        // route('registration'). POST register/{hash?} below is temporarily kept
+        // (dead code once this GET redirects away from the Blade form) because the
+        // legacy navbar still links to /user/register until the Blade app is
+        // retired at F - it dies with the rest of Auth::routes() then.
         Route::get('register/{hash?}', [UserController::class, 'getRegister'])->name('registration');
         Route::post('register/check-valid-email', [UserController::class, 'postEmail']);
         Route::post('register/{hash?}', [UserController::class, 'postRegister']);
@@ -357,6 +365,8 @@ Route::middleware('auth', 'verifyUserConsent', 'ensureAPIToken')->group(function
         Route::post('/edit/{id}', [GroupController::class, 'edit']);
         Route::get('/view/{id}', [GroupController::class, 'view'])->name('group.show');
         Route::post('/invite', [GroupController::class, 'postSendInvite']);
+        // Emailed deep link (App\Http\Controllers\API\GroupMembershipController:236): DB semantics
+        // frozen, but now redirects into the SPA (F2-5) instead of the Blade group/view page.
         Route::get('/accept-invite/{id}/{hash}', [GroupController::class, 'confirmInvite']);
         Route::get('/join/{id}', [GroupController::class, 'getJoinGroup']);
         Route::post('/image-upload/{id}', [GroupController::class, 'imageUpload']);
@@ -384,6 +394,8 @@ Route::middleware('auth', 'verifyUserConsent', 'ensureAPIToken')->group(function
         Route::get('/deleteimage', [PartyController::class, 'deleteimage']);
         Route::get('/join/{id}', [PartyController::class, 'getJoinEvent']);
         Route::post('/invite', [PartyController::class, 'postSendInvite']);
+        // Emailed deep link (App\Http\Controllers\API\EventAttendanceController:300): DB semantics
+        // frozen, but now redirects into the SPA (F2-5) instead of the Blade party/view page.
         Route::get('/accept-invite/{id}/{hash}', [PartyController::class, 'confirmInvite']);
         Route::get('/cancel-invite/{id}', [PartyController::class, 'cancelInvite']);
         Route::post('/remove-volunteer', [PartyController::class, 'removeVolunteer']);
@@ -428,6 +440,9 @@ Route::middleware('auth', 'verifyUserConsent', 'ensureAPIToken')->group(function
 });
 
 Route::middleware('ensureAPIToken')->group(function () {
+    // Shareable-code deep links (Group/Party::shareable_link): thin redirectors into the SPA
+    // (F2-5) - POST /api/v2/invites/claim now owns validating the code and claiming it, so
+    // there's no server-side Invite row or session-array bookkeeping left to do here.
     Route::get('/party/invite/{code}', [PartyController::class, 'confirmCodeInvite']);
     Route::get('/group/invite/{code}', [GroupController::class, 'confirmCodeInvite']);
 

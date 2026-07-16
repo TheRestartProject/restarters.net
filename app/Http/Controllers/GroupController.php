@@ -415,13 +415,21 @@ class GroupController extends Controller
         ]));
     }
 
+    /**
+     * Emailed deep link (App\Http\Controllers\API\GroupMembershipController:236). The status-hash
+     * DB update is frozen server-side (F2-5) - it's idempotent and this is the only writer - but
+     * the final destination is now the SPA's group page rather than the Blade one, with a query
+     * flag instead of session flash (a redirect out of this app can't carry Laravel session state).
+     */
     public function confirmInvite($group_id, $hash): RedirectResponse
     {
+        $frontend = rtrim(config('restarters.frontend_url'), '/');
+
         // Find user/group relationship based on the invitation hash.
         $user_group = UserGroups::where('status', $hash)->where('group', $group_id)->first();
         if (empty($user_group)) {
             \Sentry\CaptureMessage(__('groups.invite_invalid'));
-            return redirect('/group/view/'.intval($group_id))->with('warning', __('groups.invite_invalid'));
+            return redirect($frontend.'/group/view/'.intval($group_id).'?invite=invalid');
         }
 
         // Set user as confirmed member of group.
@@ -444,7 +452,7 @@ class GroupController extends Controller
             ]));
         }
 
-        return redirect('/group/view/'.$user_group->group)->with('success', __('groups.invite_confirmed'));
+        return redirect($frontend.'/group/view/'.$user_group->group.'?joined=1');
     }
 
     public function edit(Request $request, $id, Geocoder $geocoder)
@@ -612,36 +620,13 @@ class GroupController extends Controller
     }
 
     /**
-     * [confirmCodeInvite description].
-     *
-     * @author Christopher Kelker - @date 2019-03-25
-     * @editor  Christopher Kelker
-     * @version 1.0.0
-     * @param   [type]      $code
-     * @return  [type]
+     * Shareable-code deep link (Group::shareable_link). Thin redirector into the SPA (F2-5):
+     * POST /api/v2/invites/claim (App\Http\Controllers\API\AuthController::claimShareableCode)
+     * now owns validating the code and claiming it - including the unknown-code 404 - so there's
+     * no DB read, Invite row, or session-array bookkeeping left to do here.
      */
     public function confirmCodeInvite(Request $request, $code): RedirectResponse
     {
-        // Variables
-        $group = Group::where('shareable_code', $code)->first();
-        $hash = substr(bin2hex(openssl_random_pseudo_bytes(32)), 0, 24);
-
-        // Validate a record exists with the Group code
-        if (empty($group)) {
-            abort(404);
-        }
-
-        // Create a new Invite record
-        Invite::create([
-            'record_id' => $group->idgroups,
-            'email' => '',
-            'hash' => $hash,
-            'type' => 'group',
-        ]);
-
-        // Push this into a session variable to find by the Group prefix
-        session()->push('groups.'.$code, $hash);
-
-        return redirect('/user/register')->with('auth-for-invitation', __('auth.login_before_using_shareable_link', ['login_url' => url('/login')]));
+        return redirect(rtrim(config('restarters.frontend_url'), '/').'/group/invite/'.$code);
     }
 }

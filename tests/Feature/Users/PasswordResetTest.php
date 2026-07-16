@@ -2,100 +2,49 @@
 
 namespace Tests\Feature;
 
-use App\Notifications\ResetPassword;
-use App\User;
-use DB;
-use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 
+/**
+ * GET /user/reset is now a thin redirector into the SPA (F2-5) - submission is owned end-to-end
+ * by POST /api/v2/auth/password/reset, covered by
+ * tests/Feature/Auth/AuthEndpointsTest.php::testResetPasswordWithValidToken and
+ * ::testResetPasswordRejectsExpiredOrUnknownToken. This only needs to check the redirect itself;
+ * the emailed link (App\Http\Controllers\API\AuthController::forgotPasswordv2) still points here
+ * unchanged, carrying ?recovery=.
+ */
 class PasswordResetTest extends TestCase
 {
-    public function testInvalidEmail(): void {
-        $response = $this->post('/user/recover', [
-            'email' => 'bademail!'
-        ]);
-
-        $response->assertSeeText(__('passwords.invalid'));
-    }
-
-    public function testUnknownEmail(): void {
-        $response = $this->post('/user/recover', [
-            'email' => 'nobody@nowhere.com'
-        ]);
-
-        $response->assertSeeText(__('passwords.user'), false);
-    }
-
-    public function testResetSuccess(): void
+    public function testResetCarriesRecoveryCodeToFrontend(): void
     {
-        Notification::fake();
-        Event::fake();
+        $frontend = rtrim(config('restarters.frontend_url'), '/');
 
-        $restarter = User::factory()->restarter()->create();
+        $response = $this->get('/user/reset?recovery=abc123');
 
-        $response = $this->post('/user/recover', [
-            'email' => $restarter->email
-        ]);
+        $response->assertRedirect($frontend.'/user/reset?recovery=abc123');
+    }
 
-        $response->assertSeeText(__('passwords.sent'));
+    public function testResetWithNoRecoveryCodeStillRedirects(): void
+    {
+        $frontend = rtrim(config('restarters.frontend_url'), '/');
 
-        Notification::assertSentTo(
-            [$restarter],
-            ResetPassword::class,
-            function ($notification, $channels, $user) {
-                $mailData = $notification->toMail($user)->toArray();
-                self::assertEquals(__('notifications.password_reset_subject', [], $user->language), $mailData['subject']);
+        $response = $this->get('/user/reset');
 
-                // Render to HTML to check the footer which is inserted by email.blade.php isn't accidentally
-                // escaped.
-                $html = $notification->toMail($user)->render();
-                self::assertGreaterThan(0, strpos($html, 'contact <a href'));
+        $response->assertRedirect($frontend.'/user/reset');
+    }
 
-                return true;
-            }
-        );
+    public function testPostRouteWasRemoved(): void
+    {
+        // Base TestCase disables exception handling; without this the 405
+        // surfaces as MethodNotAllowedHttpException instead of a response.
+        $this->withExceptionHandling();
 
-        $restarter->refresh();
-
-        // Get the reset page - should see corresponding email.
-        $response = $this->get ('/user/reset?recovery=' . $restarter->recovery);
-        $response->assertSee($restarter->email);
-
-        // Invalid code
+        // The Blade form submission handler is gone - the API endpoint owns it now.
         $response = $this->post('/user/reset', [
-            'recovery' => '',
+            'recovery' => 'abc123',
             'password' => 'newpass',
-            'confirm_password' => 'newpass'
+            'confirm_password' => 'newpass',
         ]);
 
-        // Invalid code
-        $response = $this->post('/user/reset', [
-            'recovery' => $restarter->recovery . '1',
-            'password' => 'newpass',
-            'confirm_password' => 'newpass'
-        ]);
-
-        $response->assertSeeText('using is invalid');
-
-        // Valid but mismatch passwords.
-        $response = $this->post('/user/reset', [
-            'recovery' => $restarter->recovery,
-            'password' => 'newpass',
-            'confirm_password' => 'mismatch'
-        ]);
-
-        $response->assertSeeText(__('passwords.match'));
-
-        // Valid - should redirect to login patch and dispatch password changed event to update the wiki.
-        $this->followingRedirects();
-        $response = $this->post('/user/reset', [
-            'recovery' => $restarter->recovery,
-            'password' => 'newpass',
-            'confirm_password' => 'newpass'
-        ]);
-
-        $response->assertSeeText(__('passwords.updated'));
-        Event::assertDispatched(\App\Events\PasswordChanged::class);
+        $response->assertStatus(405);
     }
 }
