@@ -75,6 +75,13 @@ export default defineNuxtConfig({
   },
 
   vite: {
+    server: {
+      // The Playwright container reaches the dev server as
+      // http://restarters_client:3000; Vite's allowedHosts protection
+      // rejects non-localhost Host headers by default after a container
+      // restart. Dev-server only — no effect on production builds.
+      allowedHosts: ['restarters_client', 'localhost', 'www.example.com'],
+    },
     css: {
       preprocessorOptions: {
         scss: {

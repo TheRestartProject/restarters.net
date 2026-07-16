@@ -12,8 +12,8 @@ describe('middleware/auth.global', () => {
     vi.stubGlobal('navigateTo', navigateToMock)
   })
 
-  function route({ auth, role, fullPath = '/somewhere' } = {}) {
-    return { meta: { auth, role }, fullPath }
+  function route({ auth, role, fullPath = '/somewhere', path = '/somewhere' } = {}) {
+    return { meta: { auth, role }, fullPath, path }
   }
 
   it('does nothing for routes that do not require auth', () => {
@@ -76,5 +76,45 @@ describe('middleware/auth.global', () => {
     authMiddleware(route({ auth: true, role: 'Administrator' }), route())
 
     expect(navigateToMock).toHaveBeenCalledWith('/forbidden')
+  })
+
+  it('redirects unconsented users to the consent page with a redirect query', () => {
+    const authStore = useAuthStore()
+    authStore.token = 'tok-1'
+    authStore.user = { id: 1, role_name: 'Restarter', consent: { given: false } }
+
+    authMiddleware(route({ auth: true, fullPath: '/dashboard', path: '/dashboard' }), route())
+
+    expect(navigateToMock).toHaveBeenCalledWith('/user/consent?redirect=%2Fdashboard')
+  })
+
+  it('does not consent-redirect while the session user is still loading', () => {
+    const authStore = useAuthStore()
+    authStore.token = 'tok-1'
+    authStore.user = null
+
+    authMiddleware(route({ auth: true }), route())
+
+    expect(navigateToMock).not.toHaveBeenCalled()
+  })
+
+  it('does not consent-redirect consented users', () => {
+    const authStore = useAuthStore()
+    authStore.token = 'tok-1'
+    authStore.user = { id: 1, role_name: 'Restarter', consent: { given: true } }
+
+    authMiddleware(route({ auth: true }), route())
+
+    expect(navigateToMock).not.toHaveBeenCalled()
+  })
+
+  it('lets unconsented users reach the consent page itself', () => {
+    const authStore = useAuthStore()
+    authStore.token = 'tok-1'
+    authStore.user = { id: 1, role_name: 'Restarter', consent: { given: false } }
+
+    authMiddleware(route({ auth: true, path: '/user/consent', fullPath: '/user/consent' }), route())
+
+    expect(navigateToMock).not.toHaveBeenCalled()
   })
 })

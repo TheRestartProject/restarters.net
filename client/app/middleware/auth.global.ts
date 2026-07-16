@@ -35,4 +35,13 @@ export default defineNuxtRouteMiddleware((to) => {
       return navigateTo('/forbidden')
     }
   }
+
+  // GDPR consent gate (design §4.2): users with outstanding consents can
+  // read public pages but get routed to the completion form before using
+  // authenticated pages — the API enforces the same server-side with 403
+  // consent_required. Strict === false: while the session user is still
+  // loading, consent is undefined and we must not redirect.
+  if (to.path !== '/user/consent' && authStore.user?.consent?.given === false) {
+    return navigateTo(`/user/consent?redirect=${encodeURIComponent(to.fullPath)}`)
+  }
 })

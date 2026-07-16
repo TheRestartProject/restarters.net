@@ -27,6 +27,12 @@ export default class AuthAPI extends BaseAPI {
     return this.$post('/api/v2/auth/password/forgot', { email })
   }
 
+  // Records outstanding data consents (plus profile basics) for the current
+  // user - the completion flow VerifyUserConsentApi gates mutations on.
+  consent(payload) {
+    return this.$post('/api/v2/auth/consent', payload)
+  }
+
   resetPassword({ recovery, password, password_confirmation }) {
     return this.$post('/api/v2/auth/password/reset', {
       recovery,
