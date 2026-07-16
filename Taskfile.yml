@@ -241,7 +241,9 @@ tasks:
           docker exec restarters bash -c "export XDEBUG_MODE=off; ./vendor/bin/phpunit -d memory_limit=1024M --bootstrap vendor/autoload.php --log-junit /tmp/phpunit-results.xml --configuration ./phpunit.xml --teamcity {{ .CLI_ARGS }}"
         fi
       - |
-        if [ ! -z "$COVERALLS_REPO_TOKEN" ]; then
+        # Mirror the generation gate above: no clover.xml is produced on
+        # non-develop CI branches, so there is nothing to upload there.
+        if [ -n "$COVERALLS_REPO_TOKEN" ] && { [ -z "$CIRCLE_BRANCH" ] || [ "$CIRCLE_BRANCH" = "develop" ]; }; then
           echo "Uploading coverage to Coveralls..."
           docker exec -e COVERALLS_REPO_TOKEN="$COVERALLS_REPO_TOKEN" restarters bash -c "./upload-coverage.sh tests/clover.xml"
         else
