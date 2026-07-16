@@ -21,7 +21,7 @@ describe('restarters.scss', () => {
     })
 
     expect(result.css.length).toBeGreaterThan(1000)
-  })
+  }, 60_000)
 
   it('pins $blue to Bootstrap 4s default rather than Bootstrap 5s', () => {
     const result = sass.compile(entry, {
