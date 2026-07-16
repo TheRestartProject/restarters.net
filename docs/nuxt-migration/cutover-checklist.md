@@ -102,3 +102,42 @@ repoint to FRONTEND_URL in the same commit that deletes Auth::routes(), or
 everything using the global auth alias fatals with RouteNotFoundException.
 Bridge note: /auth/bridge runs in the full web group (design §4.3 described a
 dedicated group) — harmless (GET skips CSRF); keep as-is, documented here.
+
+
+## F execution order (commit batches — drafted 2026-07-16)
+
+Pre-F landed already: F2-3 StatsShare ✅; cross-ref traps 1-3 ✅; six
+deep-link redirectors AUTHORED (uncommitted; run their filter + commit
+before starting F proper).
+
+- **F-batch-1 (layouts + errors):** edit header_plain/header_nocookie/footer
+  @vite() lists to surviving entries only; edit errors/* includes; verify
+  kept widget routes render (curl) + legacy suite still green (it must be —
+  legacy pages still reference the OLD entries via header.blade.php which
+  stays until batch 3... CHECK: header.blade.php is used by logged-in Blade
+  pages until batch 3 — so batch 1 must NOT break it; only touch
+  header_plain/header_nocookie/footer if legacy pages share them! THEY DO
+  (login page uses header_plain). => Batch 1 therefore lands TOGETHER with
+  batch 3 in one commit, or header_plain keeps dual @vite lists until then.
+  DECISION: single mega-commit for F2 (delete + edits atomically), preceded
+  by a dry-run build check on a temp branch.
+- **F-batch-2 (routes):** web.php trim to KEEP+redirectors per
+  classification; delete legacy-redirect blocks (nginx map lands in
+  docker/nginx.conf + nginx-fly.conf same commit); Authenticate::redirectTo
+  → FRONTEND_URL same commit as Auth::routes() deletion; strip
+  ensureAPIToken from kept groups; drop dead middleware aliases
+  (VerifyUserConsent route usage, AcceptUserInvites, EnsureAPIToken).
+- **F-batch-3 (the deletion):** resources/js, resources/sass, doomed Blade
+  views (retention list), laravel-ui controllers + composer dep, vite
+  entries trim, jest config + tests, tests/Integration legacy specs,
+  build-legacy-frontend CI job, docker:test:playwright legacy task, npm
+  prune of vue2 deps. THEN: full phpunit + client gates + e2e suite + CI.
+- **F-batch-4 (F4/F5):** ApiOnlyRouteSurfaceTest pinning the route list;
+  docs (local-development.md, CLAUDE.md, README).
+
+## G6 method note
+
+chrome-devtools MCP is disconnected; the visual parity review runs via
+Playwright instead (chromium, --disable-gpu via launch args in a dedicated
+config): scripted page-pair screenshots (live restarters.net read-only login
+vs local client), pixel/structure comparison, findings doc. No MCP needed.
