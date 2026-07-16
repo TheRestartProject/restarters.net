@@ -53,6 +53,12 @@ commands:
             echo "MAPBOX_TOKEN=$MAPBOX_TOKEN" >> .env
 
   wait-for-core:
+    parameters:
+      probe:
+        type: string
+        # Blade homepage by default; jobs with SKIP_NPM_INSTALL must probe an
+        # API route instead (no Vite manifest -> Blade pages 500).
+        default: "http://localhost:8001"
     steps:
       - run:
           name: Wait for core services
@@ -78,7 +84,7 @@ commands:
                 docker logs restarters --tail=100 2>&1 || true
                 exit 1
               fi
-              curl -f -s http://localhost:8001 >/dev/null 2>&1 && echo "✓ Web app ready after $((i*5))s" && break
+              curl -f -s << parameters.probe >> >/dev/null 2>&1 && echo "✓ Web app ready after $((i*5))s" && break
               if [ $i -eq 420 ]; then
                 echo "❌ Web app not ready after 35 minutes — container logs:"
                 docker logs restarters --tail=100 2>&1 || true
@@ -123,7 +129,9 @@ jobs:
 
       # Wait for core services to be ready (MySQL + web app). Discourse is started
       # via docker:up-all but its readiness is checked separately (non-blocking).
-      - wait-for-core
+      # Probe an API route: SKIP_NPM_INSTALL means Blade pages 500 (no Vite manifest).
+      - wait-for-core:
+          probe: "http://localhost:8001/api/v2/session"
 
       # Setup database and application
       - run:
