@@ -117,6 +117,16 @@
    "skills": "Skills",
    "users": "Users"
   },
+  "profile": {
+   "access_denied": "You don't have permission to edit any settings for this user.",
+   "editing_user": "Editing: {name}",
+   "editing_user_fallback": "Editing user #{id}",
+   "load_error": "Sorry, we couldn't load that.",
+   "no_groups": "Not a member of any groups yet.",
+   "not_found": "That profile couldn't be found.",
+   "permissions_label": "Permissions:",
+   "preferences_label": "Preferences:"
+  },
   "recover": {
    "sent": "If that email address is registered, we've sent a password reset link."
   },
@@ -135,6 +145,11 @@
   "reset": {
    "done": "Your password has been changed. You can now sign in.",
    "invalid_code": "The recovery code you're using is invalid. Please request a new recovery link."
+  },
+  "users": {
+   "edit_role": "Edit role",
+   "edit_role_for": "Edit role: {name}",
+   "load_error": "Sorry, we couldn't load the users list."
   }
  }
 }

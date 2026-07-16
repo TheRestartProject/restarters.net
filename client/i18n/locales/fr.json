@@ -625,6 +625,7 @@
         "invite_cancelled": "Vous ne participez plus à cet évènement.",
         "image_delete_success": "Merci, l'image a été supprimée",
         "image_delete_error": "Désolé, mais l'image ne peut pas être supprimée.",
+        "image_upload_error": "Désolé, mais l'image n'a pas pu être téléchargée.",
         "delete_permission": "Vous n'avez pas la permission de supprimer cet événement",
         "delete_success": "L'événement a été supprimé.",
         "geocode_failed": "Lieu non trouvé. Si vous ne parvenez pas à trouver le lieu où se trouve votre événement, essayez d'indiquer un lieu plus général (tel qu'un village ou une ville) ou une adresse spécifique, plutôt qu'un nom de bâtiment.",

@@ -146,6 +146,7 @@ return [
   'invite_cancelled' => 'You are no longer attending this event.',
   'image_delete_success' => 'Thank you, the image has been deleted.',
   'image_delete_error' => 'Sorry, but the image can\'t be deleted.',
+  'image_upload_error' => 'Sorry, but the image could not be uploaded.',
   'delete_permission' => 'You do not have permission to delete this event.',
   'delete_success' => 'Event has been deleted.',
   'geocode_failed' => 'Location not found. If you are unable to find the location of your event, please try a more general location (such as village/town), or a specific street address, rather than a building name.',

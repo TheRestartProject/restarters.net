@@ -143,9 +143,22 @@ Route::prefix('v2')->middleware(\App\Http\Middleware\VerifyUserConsentApi::class
         });
 
         Route::prefix('/events')->group(function() {
+            Route::get('{id}/attendees', [API\EventController::class, 'attendeesv2']);
+            Route::get('{id}/devices', [API\EventController::class, 'devicesv2']);
             Route::get('{id}', [API\EventController::class, 'getEventv2']);
             Route::post('', [API\EventController::class, 'createEventv2']);
             Route::patch('{id}', [API\EventController::class, 'updateEventv2']);
+
+            Route::middleware('auth:sanctum,api')->group(function() {
+                Route::post('{id}/attendees/me', [API\EventAttendanceController::class, 'rsvpv2']);
+                Route::delete('{id}/attendees/me', [API\EventAttendanceController::class, 'cancelRsvpv2']);
+                Route::patch('{id}/volunteers/{iduser}', [API\EventAttendanceController::class, 'patchVolunteerv2']);
+                Route::delete('{id}/volunteers/{idevents_users}', [API\EventAttendanceController::class, 'deleteVolunteerv2']);
+                Route::post('{id}/invites', [API\EventAttendanceController::class, 'invitesv2']);
+                Route::post('{id}/images', [API\EventAttendanceController::class, 'uploadImagev2']);
+                Route::delete('{id}/images/{idimages}', [API\EventAttendanceController::class, 'deleteImagev2']);
+                Route::delete('{id}', [API\EventAttendanceController::class, 'deleteEventv2']);
+            });
         });
 
         Route::prefix('/users')->group(function() {
@@ -157,6 +170,7 @@ Route::prefix('v2')->middleware(\App\Http\Middleware\VerifyUserConsentApi::class
         Route::prefix('/users/me')->middleware('auth:sanctum,api')->group(function() {
             Route::post('/onboarding-complete', [API\UserController::class, 'onboardingCompletev2']);
             Route::get('/groups', [API\UserController::class, 'getMyGroupsv2']);
+            Route::get('/events', [API\UserController::class, 'getMyEventsv2']);
             Route::get('/preferences', [API\UserController::class, 'getMyEmailPreferencesv2']);
             Route::patch('/preferences', [API\UserController::class, 'updateMyEmailPreferencesv2']);
             Route::get('/calendars', [API\UserController::class, 'getMyCalendarsv2']);
@@ -209,10 +223,24 @@ Route::prefix('v2')->middleware(\App\Http\Middleware\VerifyUserConsentApi::class
         });
 
         Route::prefix('/devices')->group(function() {
+            // Must be registered before the {id} routes below, or these would be captured as an
+            // {id} value.
+            Route::get('/options', [API\DeviceController::class, 'optionsv2']);
+            Route::get('', [API\DeviceController::class, 'listDevicesv2']);
+
             Route::get('{id}', [API\DeviceController::class, 'getDevicev2']);
             Route::post('', [API\DeviceController::class, 'createDevicev2']);
             Route::patch('{id}', [API\DeviceController::class, 'updateDevicev2']);
             Route::delete('{id}', [API\DeviceController::class, 'deleteDevicev2']);
+
+            Route::middleware('auth:sanctum,api')->group(function() {
+                Route::post('{id}/images', [API\DeviceController::class, 'uploadImagev2']);
+                Route::delete('{id}/images/{idimages}', [API\DeviceController::class, 'deleteImagev2']);
+            });
+        });
+
+        Route::prefix('/stats')->group(function() {
+            Route::get('/latest-repaired-event', [API\DeviceController::class, 'latestRepairedEventv2']);
         });
 
         Route::prefix('/brands')->group(function() {

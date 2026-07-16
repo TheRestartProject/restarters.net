@@ -82,14 +82,20 @@ class FixometerFile extends Model
      * The caller is responsible for having already validated $localPath is a
      * real, acceptable image before calling this (this method still re-checks
      * the MIME type itself via filename(), same as upload() does).
+     *
+     * @param bool $clear Purge any pre-existing image(s) for this reference before attaching
+     *                    this one. True (the default) gives single-image semantics, matching
+     *                    the group/profile-photo callers. Event/device photos are a gallery
+     *                    (multiple images per reference, mirroring upload()'s $multiple=true
+     *                    path), so those callers must pass false.
      */
-    public function uploadLocalFile(string $localPath, $type, $reference = null, $referenceType = null, $profile = false, $crop = true)
+    public function uploadLocalFile(string $localPath, $type, $reference = null, $referenceType = null, $profile = false, $crop = true, $clear = true)
     {
         if (! is_file($localPath)) {
             return null;
         }
 
-        return $this->processLocalFile($localPath, $type, $reference, $referenceType, true, $profile, $crop, false);
+        return $this->processLocalFile($localPath, $type, $reference, $referenceType, $clear, $profile, $crop, false);
     }
 
     /**

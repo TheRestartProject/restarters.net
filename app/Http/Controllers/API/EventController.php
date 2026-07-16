@@ -322,6 +322,129 @@ class EventController extends Controller
 
     /**
      * @OA\Get(
+     *      path="/api/v2/events/{id}/attendees",
+     *      operationId="getEventAttendeesv2",
+     *      tags={"Events","Volunteers"},
+     *      summary="Get event attendees",
+     *      description="Confirmed attendees (participants/volunteers/hosts) and pending invitees for an event. Replaces the Blade-only attended/invited/hosts computation in PartyController::view() and extends v1 GET /api/events/{id}/volunteers (confirmed-only). Unlike the Blade view, lists are NOT truncated.",
+     *      @OA\Parameter(
+     *          name="id",
+     *          description="Event id",
+     *          required=true,
+     *          in="path",
+     *          @OA\Schema(type="integer")
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(@OA\Property(property="data", type="object",
+     *              @OA\Property(property="confirmed", type="array", @OA\Items(
+     *                  @OA\Property(property="id", type="integer", description="events_users.idevents_users"),
+     *                  @OA\Property(property="user", type="integer", nullable=true, description="Null for a manually-added, unregistered volunteer"),
+     *                  @OA\Property(property="fullName", type="string"),
+     *                  @OA\Property(property="role", type="integer", description="Role: HOST=3, RESTARTER=4, GUEST=5 (guest = plain attendee/participant)"),
+     *                  @OA\Property(property="confirmed", type="boolean"),
+     *                  @OA\Property(property="profilePath", type="string"),
+     *                  @OA\Property(property="volunteer", type="object", nullable=true, description="Present only when user is set",
+     *                      @OA\Property(property="id", type="integer"),
+     *                      @OA\Property(property="name", type="string"),
+     *                      @OA\Property(property="email", type="string", nullable=true, description="Only when the caller has edit-party permission"),
+     *                      @OA\Property(property="user_skills", type="array", @OA\Items(type="object"))
+     *                  )
+     *              )),
+     *              @OA\Property(property="invited", type="array", description="Same shape as confirmed, with confirmed:false; the raw status hash is not surfaced", @OA\Items(
+     *                  @OA\Property(property="id", type="integer"),
+     *                  @OA\Property(property="user", type="integer", nullable=true),
+     *                  @OA\Property(property="fullName", type="string"),
+     *                  @OA\Property(property="role", type="integer"),
+     *                  @OA\Property(property="confirmed", type="boolean"),
+     *                  @OA\Property(property="profilePath", type="string"),
+     *                  @OA\Property(property="volunteer", type="object", nullable=true,
+     *                      @OA\Property(property="id", type="integer"),
+     *                      @OA\Property(property="name", type="string"),
+     *                      @OA\Property(property="email", type="string", nullable=true),
+     *                      @OA\Property(property="user_skills", type="array", @OA\Items(type="object"))
+     *                  )
+     *              ))
+     *          ))
+     *      ),
+     *      @OA\Response(response=404, description="Event not found")
+     * )
+     */
+    public function attendeesv2(Request $request, $idevents): JsonResponse
+    {
+        $party = Party::findOrFail($idevents);
+
+        // Optional auth: showEmails mirrors listVolunteers' gate, everything else is public.
+        $user = $request->user();
+        $showEmails = $user && Fixometer::userHasEditPartyPermission($idevents, $user->id);
+
+        $confirmed = Party::expandVolunteers($party->allConfirmedVolunteers()->get(), $showEmails);
+        $invited = Party::expandVolunteers($party->allInvited()->get(), $showEmails);
+
+        return response()->json([
+            'data' => [
+                'confirmed' => array_map(fn ($row) => self::shapeAttendee($row, true), $confirmed),
+                'invited' => array_map(fn ($row) => self::shapeAttendee($row, false), $invited),
+            ],
+        ]);
+    }
+
+    /**
+     * Shape an EventsUsers row (as expanded by Party::expandVolunteers()) into the
+     * confirmed/invited attendee JSON documented in api-contracts-phase-c.md#C1b.
+     */
+    private static function shapeAttendee($row, bool $confirmed): array
+    {
+        $shaped = [
+            'id' => $row->idevents_users,
+            'user' => $row->user,
+            'fullName' => $row['fullName'],
+            'role' => (int) $row->role,
+            'confirmed' => $confirmed,
+            'profilePath' => $row['profilePath'],
+        ];
+
+        if ($row->user) {
+            $shaped['volunteer'] = $row['volunteer'];
+        }
+
+        return $shaped;
+    }
+
+    /**
+     * @OA\Get(
+     *      path="/api/v2/events/{id}/devices",
+     *      operationId="getEventDevicesv2",
+     *      tags={"Events","Devices"},
+     *      summary="Get the devices logged at an event",
+     *      description="Replaces the Blade view() controller's inline device-resolve loop - not exposed as a callable endpoint today (Blade passes it as an initial prop). The Nuxt client needs it as a real call since there's no server render.",
+     *      @OA\Parameter(
+     *          name="id",
+     *          description="Event id",
+     *          required=true,
+     *          in="path",
+     *          @OA\Schema(type="integer")
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(@OA\Property(property="data", type="array", @OA\Items(ref="#/components/schemas/Device")))
+     *      ),
+     *      @OA\Response(response=404, description="Event not found")
+     * )
+     */
+    public function devicesv2(Request $request, $idevents): JsonResponse
+    {
+        $party = Party::findOrFail($idevents);
+
+        return response()->json([
+            'data' => \App\Http\Resources\Device::collection($party->devices()->get()),
+        ]);
+    }
+
+    /**
+     * @OA\Get(
      *      path="/api/v2/moderate/events",
      *      operationId="getEventsModeratev2",
      *      tags={"Events"},
@@ -615,6 +738,18 @@ class EventController extends Controller
      *                   property="link",
      *                   ref="#/components/schemas/Event/properties/link",
      *                ),
+     *                @OA\Property(
+     *                   property="participants",
+     *                   description="New value for the participants headcount counter (replaces POST /party/update-quantity). Host/NC/admin gated, same as the rest of this endpoint.",
+     *                   type="integer",
+     *                   minimum=0,
+     *                ),
+     *                @OA\Property(
+     *                   property="volunteers",
+     *                   description="New value for the volunteers headcount counter (replaces POST /party/update-volunteerquantity). Host/NC/admin gated, same as the rest of this endpoint.",
+     *                   type="integer",
+     *                   minimum=0,
+     *                ),
      *             )
      *         )
      *    ),
@@ -628,7 +763,11 @@ class EventController extends Controller
      *              ref="#/components/schemas/Event"
      *            )
      *        ),
-     *     )
+     *     ),
+     *     @OA\Response(response=401, description="Unauthenticated"),
+     *     @OA\Response(response=403, description="Not permitted to edit this event, or data consent required"),
+     *     @OA\Response(response=404, description="Event not found"),
+     *     @OA\Response(response=422, description="Validation failure")
      *  )
      */
     public function updateEventv2(Request $request, $idEvents): JsonResponse
@@ -664,6 +803,26 @@ class EventController extends Controller
             'timezone' => $timezone,
             'network_data' => $network_data,
         ];
+
+        // Headcount counters (the +/- control next to "Participants"/"Volunteers"): folded in here
+        // instead of the legacy POST /party/update-quantity + update-volunteerquantity routes
+        // (judgment call #3 in api-contracts-phase-c.md). Those two routes had their own inline
+        // role check ((Host||NetworkCoordinator)&&userHasEditPartyPermission || Administrator) which
+        // is a SUBSET of the userHasEditPartyPermission check already enforced above (that helper
+        // already returns true for Administrator/NetworkCoordinator-for-network/host-of-group), so
+        // reusing it here only tightens, never loosens, who can bump the counters.
+        $request->validate([
+            'participants' => 'nullable|integer|min:0',
+            'volunteers' => 'nullable|integer|min:0',
+        ]);
+
+        if ($request->filled('participants')) {
+            $update['pax'] = $request->input('participants');
+        }
+
+        if ($request->filled('volunteers')) {
+            $update['volunteers'] = $request->input('volunteers');
+        }
 
         $party = Party::findOrFail($idEvents);
         $party->update($update);

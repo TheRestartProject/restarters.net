@@ -5,6 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Auth;
 
 /**
  * @OA\Schema(
@@ -226,6 +227,14 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *          format="date-time",
  *     ),
  *     @OA\Property(
+ *          property="attending",
+ *          title="attending",
+ *          description="Whether the authenticated user is attending this event (EventsUsers.status==='1'). Omitted when the caller is not authenticated.",
+ *          format="boolean",
+ *          example="true",
+ *          nullable=true
+ *     ),
+ *     @OA\Property(
  *          property="full",
  *          title="full",
  *          description="Indicates that this is a full result, not summary group information.",
@@ -268,6 +277,11 @@ class Party extends JsonResource
             'network_data' => $networkData,
             'full' => true,
         ];
+
+        // Mirrors expandEvent()'s Auth::user() && $event->isBeingAttendedBy(...) check (strict
+        // status==='1'). Optional-auth chain matches Volunteer resource / API\EventController::getUser().
+        $currentUser = Auth::user() ?? auth('sanctum')->user() ?? auth('api')->user();
+        $ret['attending'] = $this->when($currentUser !== null, fn () => $this->resource->isBeingAttendedBy($currentUser->id));
 
         if ($this->link) {
             // Don't return this unless present - the OpenAPI schema doesn't allow null values.

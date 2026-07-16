@@ -3,12 +3,14 @@
 namespace App\Http\Controllers\API;
 
 use App\Events\PasswordChanged;
+use App\EventsUsers;
 use App\Group;
 use App\Helpers\Fixometer;
 use App\Helpers\Geocoder;
 use App\Helpers\Tus;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\UserAdmin;
+use App\Party;
 use App\Permissions;
 use App\Preferences;
 use App\Role;
@@ -298,6 +300,107 @@ class UserController extends Controller
                 'image_url' => $group->realImageUrl(),
             ])->values()->all(),
         ]);
+    }
+
+    /**
+     * @OA\Get(
+     *      path="/api/v2/users/me/events",
+     *      operationId="getMyEventsv2",
+     *      tags={"Users","Events"},
+     *      summary="Events relevant to the authenticated user",
+     *      description="Replacement basis for the dead /party (mine) route (PartyController::index()'s no-group_id branch, which has no API endpoint today - only a server-rendered prop). Returns the union of: events the user hosts/attends/belongs to the group of, nearby upcoming events if the user has a location, and other approved upcoming events - each tagged nearby/all as the Blade view does.",
+     *      security={{"apiToken":{}}},
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(@OA\Property(property="data", type="array", @OA\Items(
+     *              @OA\Property(property="id", type="integer"),
+     *              @OA\Property(property="title", type="string", nullable=true),
+     *              @OA\Property(property="start", type="string", format="date-time"),
+     *              @OA\Property(property="end", type="string", format="date-time"),
+     *              @OA\Property(property="timezone", type="string", nullable=true),
+     *              @OA\Property(property="online", type="boolean"),
+     *              @OA\Property(property="location", type="string", nullable=true),
+     *              @OA\Property(property="approved", type="boolean"),
+     *              @OA\Property(property="attending", type="boolean"),
+     *              @OA\Property(property="nearby", type="boolean", description="True for a nearby-upcoming event not already in the user's own list"),
+     *              @OA\Property(property="all", type="boolean", description="True for an event included only because it's nearby or generally upcoming, not because the user hosts/attends/belongs to its group"),
+     *              @OA\Property(property="group", type="object", nullable=true,
+     *                  @OA\Property(property="id", type="integer"),
+     *                  @OA\Property(property="name", type="string")
+     *              )
+     *          )))
+     *      ),
+     *      @OA\Response(response=401, description="Unauthenticated")
+     * )
+     */
+    public function getMyEventsv2(Request $request): JsonResponse
+    {
+        $user = $request->user();
+
+        // Explicit $userids everywhere below - these scopes fall back to Auth::user() (the
+        // default 'web' guard) when passed null, which is not necessarily who $request->user()
+        // resolved via the sanctum/api guards.
+        $attending = EventsUsers::where('user', $user->id)->where('status', '1')->pluck('event')->toArray();
+
+        $events = [];
+        $seenIds = [];
+
+        foreach (Party::forUser([$user->id])->with(['theGroup.groupImage.image'])->reorder()->orderBy('event_start_utc', 'DESC')->get() as $event) {
+            $events[] = self::shapeMyEvent($event, $attending);
+            $seenIds[] = $event->idevents;
+        }
+
+        if (! is_null($user->latitude) && ! is_null($user->longitude)) {
+            $nearbyEvents = Party::upcomingEventsInUserArea($user)
+                ->with(['theGroup.groupImage.image'])
+                ->whereNotIn('idevents', $seenIds)
+                ->get();
+
+            foreach ($nearbyEvents as $event) {
+                if (Fixometer::userHasViewPartyPermission($event->idevents, $user->id)) {
+                    $row = self::shapeMyEvent($event, $attending);
+                    $row['nearby'] = true;
+                    $row['all'] = true;
+                    $events[] = $row;
+                    $seenIds[] = $event->idevents;
+                }
+            }
+        }
+
+        $otherUpcoming = Party::with(['theGroup.networks', 'theGroup.groupImage.image'])->future()
+            ->whereNotIn('idevents', $seenIds)
+            ->get();
+
+        foreach ($otherUpcoming as $event) {
+            if (Fixometer::userHasViewPartyPermission($event->idevents, $user->id, $event)) {
+                $row = self::shapeMyEvent($event, $attending);
+                $row['all'] = true;
+                $events[] = $row;
+            }
+        }
+
+        return response()->json(['data' => $events]);
+    }
+
+    private static function shapeMyEvent(Party $event, array $attending): array
+    {
+        $group = $event->theGroup;
+
+        return [
+            'id' => $event->idevents,
+            'title' => $event->venue ?? $event->location,
+            'start' => $event->event_start_utc,
+            'end' => $event->event_end_utc,
+            'timezone' => $event->timezone,
+            'online' => (bool) $event->online,
+            'location' => $event->location,
+            'approved' => (bool) $event->approved,
+            'attending' => in_array($event->idevents, $attending),
+            'nearby' => false,
+            'all' => false,
+            'group' => $group ? ['id' => $group->idgroups, 'name' => $group->name] : null,
+        ];
     }
 
     /**

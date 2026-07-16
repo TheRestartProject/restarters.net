@@ -117,6 +117,16 @@
    "skills": "Compétences",
    "users": "Utilisateurs"
   },
+  "profile": {
+   "access_denied": "Vous n'avez pas la permission de modifier les paramètres de cet utilisateur.",
+   "editing_user": "Modification de : {name}",
+   "editing_user_fallback": "Modification de l'utilisateur n°{id}",
+   "load_error": "Désolé, nous n'avons pas pu charger ces données.",
+   "no_groups": "Ne fait partie d'aucun groupe pour le moment.",
+   "not_found": "Ce profil est introuvable.",
+   "permissions_label": "Permissions :",
+   "preferences_label": "Préférences :"
+  },
   "recover": {
    "sent": "Si cette adresse e-mail est enregistrée, nous avons envoyé un lien de réinitialisation du mot de passe."
   },
@@ -135,6 +145,11 @@
   "reset": {
    "done": "Votre mot de passe a été changé. Vous pouvez maintenant vous connecter.",
    "invalid_code": "Le code de récupération que vous utilisez n'est pas valide. Veuillez demander un nouveau lien de récupération."
+  },
+  "users": {
+   "edit_role": "Modifier le rôle",
+   "edit_role_for": "Modifier le rôle : {name}",
+   "load_error": "Désolé, nous n'avons pas pu charger la liste des utilisateurs."
   }
  }
 }
