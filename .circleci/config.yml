@@ -110,13 +110,14 @@ jobs:
             export CIRCLECI=true
             # Enable Docker Compose bake for build optimization
             export COMPOSE_BAKE=true
+            # phpunit-only job: skip the ~10-12 min npm/Vite container startup
+            # (the suite outgrew CircleCI's 60-min job cap as one monolith;
+            # jest + legacy Playwright live in build-legacy-frontend now).
+            export SKIP_NPM_INSTALL=true
             # Start all services using Task
             task docker:up-all
             # This job tests the Laravel side only; the Nuxt client container
-            # (started by the shared profiles, ~1GB+ for nuxi dev) starves the
-            # machine late in the coverage-instrumented phpunit run — both
-            # 2026-07-15 hangs were memory stalls at different late tests.
-            # e2e-client is the job that needs it.
+            # is only needed by e2e-client.
             docker stop restarters_client || true
           no_output_timeout: 10m
 
@@ -181,46 +182,64 @@ jobs:
             docker cp restarters:/tmp/phpunit-results.xml /tmp/test-results/phpunit/results.xml
           no_output_timeout: 45m
 
-      # Run Jest tests
-      - run:
-          name: Run Jest tests
-          command: |
-            # Run Jest tests using Task for consistency with local development
-            task docker:test:jest
-            # Copy test results to host if they exist
-            docker cp restarters:/tmp/test-results/junit.xml /tmp/test-results/jest/junit.xml || echo "Jest results not found, skipping"
-
-      # Run main Playwright tests (excluding autocomplete)
-      - run:
-          name: Run main Playwright tests
-          command: |
-            # Run Playwright tests using Task for consistency with local development
-            task docker:test:playwright
-          no_output_timeout: 10m
-
-      # Copy test results and artifacts
-      - run:
-          name: Copy Playwright artifacts
-          command: |
-            # Create test results directory on host
-            mkdir -p /tmp/test-results/playwright
-            mkdir -p /tmp/test-results/logs
-
-            # List what's available in the playwright container
-            docker exec restarters_playwright bash -c "ls -la /tmp/test-results/* || echo 'No playwright directories found'"
-
-            # Copy test results and artifacts from playwright container to host
-            docker cp restarters_playwright:/tmp/test-results/. /tmp/test-results/playwright/ || echo "Playwright HTML report not found"
-
-            # Copy Vite log from restarters container for debugging
-            docker cp restarters:/tmp/vite.log /tmp/test-results/logs/vite.log || echo "Vite log not found"
-          when: always
-
       # Store artifacts
       - store_artifacts:
           path: /tmp/test-results
           destination: playwright-test-results
       
+      - store_test_results:
+          path: /tmp/test-results
+
+  # Legacy Blade frontend: jest + the legacy Playwright suite. Split from
+  # `build` because the combined job outgrew CircleCI's 60-minute cap.
+  # This whole job is deleted at Phase F cutover along with the suites it runs.
+  build-legacy-frontend:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large
+    environment:
+      - TZ: "UTC"
+    steps:
+      - checkout
+      - install-task
+      - setup-env
+      - run:
+          name: Start Docker services
+          command: |
+            export CIRCLECI=true
+            export COMPOSE_BAKE=true
+            task docker:up-all
+            docker stop restarters_client || true
+          no_output_timeout: 10m
+      - wait-for-core
+      - run:
+          name: Setup application
+          command: |
+            docker exec restarters_db mysql -u root -ps3cr3t -e "GRANT SELECT ON mysql.time_zone_name TO 'restarters'@'%';"
+            docker exec restarters_db mysql -u root -ps3cr3t -e "SET GLOBAL log_bin_trust_function_creators = 1;"
+            docker exec restarters_db mysql -u root -ps3cr3t -e "SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));"
+            docker exec restarters php artisan l5-swagger:generate
+      - run:
+          name: Run Jest tests
+          command: |
+            mkdir -p /tmp/test-results/jest
+            task docker:test:jest
+            docker cp restarters:/tmp/test-results/junit.xml /tmp/test-results/jest/junit.xml || echo "Jest results not found, skipping"
+      - run:
+          name: Run main Playwright tests
+          command: |
+            task docker:test:playwright
+          no_output_timeout: 15m
+      - run:
+          name: Copy Playwright artifacts
+          command: |
+            mkdir -p /tmp/test-results/playwright /tmp/test-results/logs
+            docker cp restarters_playwright:/tmp/test-results/. /tmp/test-results/playwright/ || echo "Playwright HTML report not found"
+            docker cp restarters:/tmp/vite.log /tmp/test-results/logs/vite.log || echo "Vite log not found"
+          when: always
+      - store_artifacts:
+          path: /tmp/test-results
+          destination: legacy-frontend-results
       - store_test_results:
           path: /tmp/test-results
 
@@ -360,6 +379,10 @@ workflows:
           filters:
             branches:
               ignore: production
+      - build-legacy-frontend:
+          filters:
+            branches:
+              ignore: production
       - build-client:
           filters:
             branches:
@@ -371,6 +394,7 @@ workflows:
       - deploy-fly-dev:
           requires:
             - build
+            - build-legacy-frontend
             - build-client
             - e2e-client
           filters:

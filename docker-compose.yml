@@ -91,6 +91,8 @@ services:
       UID: ${UID}
       GID: ${GID}
       CIRCLECI: ${CIRCLECI:-false}
+      # Pure-API CI jobs skip the npm/Vite startup work (see docker_run.sh).
+      SKIP_NPM_INSTALL: ${SKIP_NPM_INSTALL:-false}
     working_dir: /var/www
     ports:
       - "5173:5173"

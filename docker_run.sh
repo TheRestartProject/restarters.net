@@ -75,22 +75,31 @@ done
 wait_for_service "MySQL database" "mysqladmin ping -h restarters_db --skip-ssl --silent" 60 5
 
 php artisan migrate:fresh --seed
-npm install --legacy-peer-deps
-npm rebuild node-sass
 
-# Install Playwright for testing (system deps already in Dockerfile).
-# In CI, skip browser download — Playwright tests run in the dedicated
-# restarters_playwright container (mcr.microsoft.com/playwright) which
-# ships pre-installed browsers. Downloading here saves 10-15 min on CI.
-if [ "${CIRCLECI}" != "true" ]; then
-    npm install -D @playwright/test
-    npx playwright install
+# Jobs that only need the API/phpunit (CI's build job, e2e-client) set
+# SKIP_NPM_INSTALL=true: npm install + node-sass rebuild + Vite cost ~10-12
+# minutes of container startup that pure-API workloads never use — and the
+# monolithic CI job was blowing CircleCI's 60-minute cap.
+if [ "${SKIP_NPM_INSTALL}" != "true" ]; then
+    npm install --legacy-peer-deps
+    npm rebuild node-sass
+
+    # Install Playwright for testing (system deps already in Dockerfile).
+    # In CI, skip browser download — Playwright tests run in the dedicated
+    # restarters_playwright container (mcr.microsoft.com/playwright) which
+    # ships pre-installed browsers. Downloading here saves 10-15 min on CI.
+    if [ "${CIRCLECI}" != "true" ]; then
+        npm install -D @playwright/test
+        npx playwright install
+    fi
+
+    # Start Vite dev server in the background with logging
+    echo "Starting Vite dev server..."
+    nohup npm run dev > /tmp/vite.log 2>&1 &
+    echo "Vite dev server started with PID $!"
+else
+    echo "SKIP_NPM_INSTALL=true — skipping npm install/node-sass/Playwright/Vite"
 fi
-
-# Start Vite dev server in the background with logging
-echo "Starting Vite dev server..."
-nohup npm run dev > /tmp/vite.log 2>&1 &
-echo "Vite dev server started with PID $!"
 
 php artisan key:generate
 php artisan cache:clear
