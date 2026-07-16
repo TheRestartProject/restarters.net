@@ -92,6 +92,7 @@ Status: ⬜ pending · 🔄 in progress · ✅ done · ❌ blocked
 | G2 | Vitest coverage ≥ existing jest coverage on ported logic; coverage artifact in CI | ⬜ | v8 coverage, summary in CI artifacts; stores/api/composables >90%, components >80% |
 | G3 | Playwright workers >1 trial (post-CSRF removal); flake pass (3 consecutive green runs) | ⬜ | |
 | G4 | l5-swagger regenerate + OpenAPI response validation green; translations sync check green | ⬜ | |
+| G6 | VISUAL PARITY REVIEW (Edward 2026-07-16): compare live restarters.net vs local Nuxt client page-by-page via chrome-devtools MCP (Chrome in WSL, --disable-gpu; two-step attach per memory). Read-only login to live with credentials Edward supplied IN-CONVERSATION (do not persist/commit them; re-request if lost). Screenshot key pages both sides (landing, login, dashboard, group list/view/create, event view/create, device recording, fixometer, profile tabs, admin lists, networks), diff layout/typography/colors/spacing, produce findings doc, fix material differences | ⬜ | runs after F cutover + suites green; NO mutations on live — view-only |
 | G5 | Session log + this plan closed out; PR opened (against develop) with folded-PR closure notes | ⬜ | |
 
 ## Conventions cheat-sheet (for resumed sessions)
