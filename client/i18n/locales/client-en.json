@@ -5,6 +5,40 @@
    "tag_in_use_warning": "This tag is currently applied to {count} group(s) and will be removed from them too."
   },
   "app_name": "Restarters",
+  "cookie_policy": {
+   "how_heading": "How does restarters.net use cookies?",
+   "how_text": "We use different types of cookies for different purposes. These are:",
+   "intro": "Our website, like most, uses cookies to help the website work and to help us understand how visitors find and navigate it. Cookies are small text files stored on your computer by your web browser. You can find more information about cookies at aboutcookies.org.uk.",
+   "kinds_heading": "Some different types of cookies",
+   "kinds_text": "Cookies may be first party or third party, depending on whether the cookie is set by our site or by another website - and persistent or session cookies, depending on whether they remain on your device or are deleted when you close your browser.",
+   "managing_heading": "Managing cookies",
+   "managing_text": "When you first visit our site, you can opt in to our use of cookies (as outlined in this policy) and for these cookies to be added to your browser. If you opt in and later wish to opt out, you can do so from your browser's cookie settings.",
+   "outline": "This page outlines the cookies that we use on our website, and what they do.",
+   "row_analytics_description": "Used to distinguish users on the Google Analytics platform and to control the rate of requests made to it.",
+   "row_analytics_name": "_ga, _gat, _gid",
+   "row_domain": ".restarters.net",
+   "row_mediawiki_description": "Used by MediaWiki.",
+   "row_mediawiki_name": "UseCDNCache, UseDC",
+   "row_session_description": "Used to keep you logged in between visits to the application.",
+   "row_session_name": "restarters_session",
+   "row_wiki_description": "Used for automatic login to the wiki.",
+   "row_wiki_name": "wiki_db_mw__session, wiki_db_mw_Token, wiki_db_mw_UserID, wiki_db_mw_UserName",
+   "row_xsrf_description": "Used to prevent data being posted to the application maliciously.",
+   "row_xsrf_name": "XSRF-TOKEN",
+   "table_description": "Description",
+   "table_domain": "Domain",
+   "table_heading": "Cookies set by us (first party)",
+   "table_name": "Cookie name",
+   "table_type": "Type",
+   "third_party_heading": "Cookies set by others (third party)",
+   "third_party_none": "There are currently no third-party cookies.",
+   "title": "Cookie Policy",
+   "type_analytical": "Analytical/performance cookies - to analyse the use of our website and its performance, in order to improve it.",
+   "type_analytical_label": "Analytical / Performance",
+   "type_marketing": "Marketing/targeting cookies - we do not use any marketing cookies.",
+   "type_necessary": "Strictly necessary cookies - required for the operation of our website (for example, the cookie that remembers your opt-in consent for cookies).",
+   "type_necessary_label": "Necessary"
+  },
   "dashboard": {
    "attending": "Attending",
    "load_error": "Sorry, we couldn't load your dashboard.",
@@ -111,6 +145,9 @@
    "processing": "Just a moment while we process your invite...",
    "title": "Joining..."
   },
+  "locale_switcher": {
+   "label": "Language"
+  },
   "nav": {
    "administrator": "Administrator",
    "brands": "Brands",
@@ -120,6 +157,20 @@
    "roles": "Roles",
    "skills": "Skills",
    "users": "Users"
+  },
+  "networks": {
+   "associate_groups_error": "Could not add those groups to the network. Please try again.",
+   "groups_load_error": "Sorry, we couldn't load this network's groups.",
+   "load_error": "Sorry, we couldn't load that network.",
+   "no_groups": "This network has no groups yet.",
+   "not_found": "That network could not be found.",
+   "stats_unavailable": "Stats are not available for this network right now.",
+   "tags_load_error": "Sorry, we couldn't load this network's tags."
+  },
+  "notifications": {
+   "discourse_aria": "Talk notifications",
+   "restarters_aria": "Restarters notifications",
+   "unread": "{count} unread notification | {count} unread notifications"
   },
   "profile": {
    "access_denied": "You don't have permission to edit any settings for this user.",

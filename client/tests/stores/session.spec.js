@@ -12,6 +12,7 @@ describe('stores/session', () => {
     mockApi = {
       session: {
         fetch: vi.fn(),
+        save: vi.fn(),
       },
       user: {
         dismissOnboarding: vi.fn(),
@@ -96,7 +97,7 @@ describe('stores/session', () => {
       expect(mockApi.user.dismissOnboarding).toHaveBeenCalledTimes(1)
     })
 
-    it('still clears the flag locally when the API call fails (endpoint is a recorded gap)', async () => {
+    it('still clears the flag locally when the API call fails', async () => {
       mockApi.user.dismissOnboarding.mockRejectedValueOnce({ status: 404 })
 
       const store = useSessionStore()
@@ -116,6 +117,38 @@ describe('stores/session', () => {
       await store.dismissOnboarding()
 
       expect(store.flags).toBeNull()
+    })
+  })
+
+  describe('saveLocale', () => {
+    it('PATCHes the locale and replaces user/config/flags with the response', async () => {
+      const sessionData = {
+        user: { id: 1, name: 'Jane', language: 'fr' },
+        config: { discourse_url: 'https://talk.example.com' },
+        flags: { onboarding: false },
+      }
+      mockApi.session.save.mockResolvedValueOnce({ data: sessionData })
+
+      const store = useSessionStore()
+      const authStore = useAuthStore()
+      const result = await store.saveLocale('fr')
+
+      expect(mockApi.session.save).toHaveBeenCalledWith({ locale: 'fr' })
+      expect(store.user).toEqual(sessionData.user)
+      expect(store.config).toEqual(sessionData.config)
+      expect(store.flags).toEqual(sessionData.flags)
+      expect(authStore.user).toEqual(sessionData.user)
+      expect(result).toEqual(sessionData)
+    })
+
+    it('rejects when the API call fails, leaving prior state untouched', async () => {
+      mockApi.session.save.mockRejectedValueOnce({ status: 401 })
+
+      const store = useSessionStore()
+      store.user = { id: 1, name: 'Jane' }
+
+      await expect(store.saveLocale('fr')).rejects.toEqual({ status: 401 })
+      expect(store.user).toEqual({ id: 1, name: 'Jane' })
     })
   })
 })

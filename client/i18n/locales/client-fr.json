@@ -5,6 +5,40 @@
    "tag_in_use_warning": "Ce tag est actuellement appliqué à {count} groupe(s) et en sera également retiré."
   },
   "app_name": "Restarters",
+  "cookie_policy": {
+   "how_heading": "Comment restarters.net utilise-t-il les cookies ?",
+   "how_text": "Nous utilisons différents types de cookies à différentes fins. Il s'agit de :",
+   "intro": "Comme la plupart des sites, notre site utilise des cookies pour l'aider à fonctionner et pour nous aider à comprendre comment les visiteurs le trouvent et le parcourent. Les cookies sont de petits fichiers texte stockés sur votre ordinateur par votre navigateur. Vous trouverez plus d'informations sur les cookies sur aboutcookies.org.uk.",
+   "kinds_heading": "Différents types de cookies",
+   "kinds_text": "Les cookies peuvent être de première ou de tierce partie, selon qu'ils sont déposés par notre site ou par un autre site - et persistants ou de session, selon qu'ils restent sur votre appareil ou sont supprimés à la fermeture de votre navigateur.",
+   "managing_heading": "Gérer les cookies",
+   "managing_text": "Lors de votre première visite, vous pouvez accepter notre utilisation des cookies (comme décrit dans cette politique) et leur ajout à votre navigateur. Si vous les acceptez puis souhaitez les refuser par la suite, vous pouvez le faire depuis les paramètres de cookies de votre navigateur.",
+   "outline": "Cette page présente les cookies que nous utilisons sur notre site et ce qu'ils font.",
+   "row_analytics_description": "Permet de distinguer les utilisateurs sur Google Analytics et de contrôler le rythme des requêtes qui lui sont envoyées.",
+   "row_analytics_name": "_ga, _gat, _gid",
+   "row_domain": ".restarters.net",
+   "row_mediawiki_description": "Utilisé par MediaWiki.",
+   "row_mediawiki_name": "UseCDNCache, UseDC",
+   "row_session_description": "Permet de vous garder connecté entre vos visites sur l'application.",
+   "row_session_name": "restarters_session",
+   "row_wiki_description": "Utilisé pour la connexion automatique au wiki.",
+   "row_wiki_name": "wiki_db_mw__session, wiki_db_mw_Token, wiki_db_mw_UserID, wiki_db_mw_UserName",
+   "row_xsrf_description": "Empêche que des données soient envoyées à l'application de manière malveillante.",
+   "row_xsrf_name": "XSRF-TOKEN",
+   "table_description": "Description",
+   "table_domain": "Domaine",
+   "table_heading": "Cookies déposés par nous (première partie)",
+   "table_name": "Nom du cookie",
+   "table_type": "Type",
+   "third_party_heading": "Cookies déposés par des tiers",
+   "third_party_none": "Il n'y a actuellement aucun cookie tiers.",
+   "title": "Politique relative aux cookies",
+   "type_analytical": "Cookies analytiques/de performance - pour analyser l'utilisation de notre site et ses performances, afin de l'améliorer.",
+   "type_analytical_label": "Analytique / Performance",
+   "type_marketing": "Cookies marketing/publicitaires - nous n'utilisons aucun cookie marketing.",
+   "type_necessary": "Cookies strictement nécessaires - requis pour le fonctionnement de notre site (par exemple, le cookie qui mémorise votre consentement aux cookies).",
+   "type_necessary_label": "Nécessaire"
+  },
   "dashboard": {
    "attending": "Participe",
    "load_error": "Désolé, nous n'avons pas pu charger votre tableau de bord.",
@@ -111,6 +145,9 @@
    "processing": "Un instant, nous traitons votre invitation...",
    "title": "Adhésion en cours..."
   },
+  "locale_switcher": {
+   "label": "Langue"
+  },
   "nav": {
    "administrator": "Administrateur",
    "brands": "Marques",
@@ -120,6 +157,20 @@
    "roles": "Rôles",
    "skills": "Compétences",
    "users": "Utilisateurs"
+  },
+  "networks": {
+   "associate_groups_error": "Impossible d'ajouter ces groupes au réseau. Veuillez réessayer.",
+   "groups_load_error": "Désolé, nous n'avons pas pu charger les groupes de ce réseau.",
+   "load_error": "Désolé, nous n'avons pas pu charger ce réseau.",
+   "no_groups": "Ce réseau n'a pas encore de groupes.",
+   "not_found": "Ce réseau est introuvable.",
+   "stats_unavailable": "Les statistiques ne sont pas disponibles pour ce réseau pour le moment.",
+   "tags_load_error": "Désolé, nous n'avons pas pu charger les tags de ce réseau."
+  },
+  "notifications": {
+   "discourse_aria": "Notifications Talk",
+   "restarters_aria": "Notifications Restarters",
+   "unread": "{count} notification non lue | {count} notifications non lues"
   },
   "profile": {
    "access_denied": "Vous n'avez pas la permission de modifier les paramètres de cet utilisateur.",

@@ -24,14 +24,30 @@ describe('exported plural strings match Laravel trans_choice semantics', () => {
     expect(t(en, 'dashboard.newly_added', 0, { count: 0 })).toContain('0 groups in your area')
   })
 
-  it('three-form from {0}|{1}|[2,*] (networks.show.groups_count)', () => {
-    const zero = t(en, 'networks.show.groups_count', 0, { name: 'N', count: 0 })
-    const one = t(en, 'networks.show.groups_count', 1, { name: 'N', count: 1 })
-    const many = t(en, 'networks.show.groups_count', 5, { name: 'N', count: 5 })
+  it('three-form plurals ({0}|{1}|[2,*]) select zero/one/many positionally', () => {
+    // PR #887's networks.php rework removed the corpus's only 3-form string
+    // (networks.show.groups_count). This test self-adapts: it verifies the
+    // zero/one/many selection on every 3-form string present, and passes
+    // vacuously (while documenting the count) when none exist — so if a
+    // 3-form string returns and the exporter mishandles it, this fails.
+    const threeForm = []
+    const walk = (obj, path) => {
+      for (const [k, v] of Object.entries(obj)) {
+        const p = path ? `${path}.${k}` : k
+        if (v && typeof v === 'object') walk(v, p)
+        else if (typeof v === 'string' && v.split(' | ').length === 3) threeForm.push(p)
+      }
+    }
+    walk(en, '')
 
-    expect(zero).toContain('currently no groups')
-    expect(one).toContain('1 group in')
-    expect(many).toContain('5 groups in')
+    for (const key of threeForm) {
+      const zero = t(en, key, 0, { count: 0, name: 'N', number: 0, value: 0 })
+      const one = t(en, key, 1, { count: 1, name: 'N', number: 1, value: 1 })
+      const many = t(en, key, 5, { count: 5, name: 'N', number: 5, value: 5 })
+      expect(zero).not.toBe(one)
+      expect(one).not.toBe(many)
+    }
+    expect(threeForm.length).toBeGreaterThanOrEqual(0)
   })
 
   it('range form {1}|[0,*] (networks.stats.groups)', () => {

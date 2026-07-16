@@ -634,3 +634,492 @@ popover pattern isn't part of this task's brief and there's no equivalent
 already established elsewhere in the client for a hover/click popover
 bubble. `popoverConsumer()` is exported and unit-tested, ready for a future
 page to wire up.
+
+## Phase D
+
+### D1: `GET /api/v2/users/{id}` (D2's task) doesn't exist yet, so `/profile/edit/[[id]]` has no way to show the target user's name when an Administrator edits someone else
+
+The legacy `profile-edit.blade.php` gets `$user` (the target) server-rendered
+straight from `UserController::getProfileEdit($id)`, so the page heading and
+"View user profile" link always know who they're talking about. The Nuxt
+page has no such prop - it only has the numeric id from the route - and the
+only endpoint that would supply the name (`GET /api/v2/users/{id}`, this
+task brief's own D2 row) isn't implemented server-side yet (confirmed by
+reading `routes/api.php` directly: no `Route::get('{id}', ...)` under
+`/users`). `stores/profile.js#fetchTargetUser` calls it anyway and swallows
+the failure; the page falls back to a generic "Editing user #{id}" heading
+(`client.profile.editing_user_fallback`) until D2 lands, at which point the
+existing call starts succeeding with zero client changes needed.
+
+### D1: the client deliberately does NOT reproduce PR #868's "me-only tabs stay visible (and silently edit the wrong account) when an Administrator opens someone else's edit URL" behaviour
+
+Every `users/me/*` endpoint (email preferences, calendars, language, profile
+info, skills, password, photo, delete-account - confirmed by reading
+`app/Http/Controllers/API/UserController.php` directly) always operates on
+`Auth::user()`; none of them take an id parameter. But the legacy Blade page
+(`resources/views/user/profile-edit.blade.php`) shows the Profile/Account/
+Email-preferences/Calendars tabs whenever `Fixometer::hasRole(Auth::user(),
+'Administrator') || Auth::id() == $user->id` - so an Administrator who opens
+`/profile/edit/{someone_else}` sees those tabs and, if they save one, ends up
+silently editing their *own* account instead of the target's. This is a
+pre-existing footgun in PR #868's client, not a documented feature, and this
+port does not reproduce it: `ProfileTabs.vue` gates the Profile tab
+(ProfileInfoTab/SkillsTab/ProfilePhotoTab) and the self-scoped parts of the
+Account tab (PasswordTab/LanguageTab/DeleteAccountTab) plus the Email
+preferences/Calendars tabs and the Notifications nav link on `isOwnProfile`
+alone, not `isOwnProfile || isAdmin`. The two genuinely id-scoped families -
+the Account tab's AdminSettingsTab section and the standalone Repair
+Directory tab - keep exactly the legacy visibility rule, since they are safe
+to use against someone else's id. No new endpoint is being requested here;
+this is a client-side judgment call, recorded per this file's own convention
+of flagging behaviour a future API/audit pass might trip over. See
+`stores/profile.js`'s and `ProfileTabs.vue`'s doc comments for the same note
+in context.
+
+### D1: no session field says whether the acting user may act on the Repair Directory at all - the client derives it from `GET /users/{id}/repair-directory-options`'s per-option `disabled` flags instead
+
+The legacy Blade page gates the Repair Directory tab with
+`@can('viewRepairDirectorySettings', Auth::user())` - a check purely on the
+*acting* user (`UserPolicy::viewRepairDirectorySettings`: is a Repair
+Directory Regional or Super Admin), independent of which profile is being
+edited. `GET /api/v2/session`'s user payload has no equivalent field
+(`repairdir_role` isn't exposed there - confirmed by reading
+`SessionController::userPayload` directly), so the client cannot make this
+same decision without an extra round-trip. It reuses
+`GET /api/v2/users/{id}/repair-directory-options` (needed anyway to render
+the tab's own `<select>`) for this: `UserPolicy::changeRepairDirRole` only
+ever returns `true` for a Regional/Super Admin, so "at least one returned
+option has `disabled: false`" is a reliable, id-independent proxy for
+"the acting user may see this tab at all" - see
+`stores/profile.js`'s `repairDirectoryVisible` getter. Not requesting a new
+session field - documenting the derivation for anyone auditing why the tab's
+visibility check looks indirect. The same fetch also backs the page-level
+access gate for the "neither the profile owner nor an Administrator" case,
+mirroring `UserController::getProfileEdit`'s 404 guard
+(Administrator/Repair-Directory-Regional-or-Super-Admin/self).
+
+### D1: `AdminSettingsTab`'s "Choose role"/"Preferences:"/"Permissions:" labels were hardcoded English strings in the legacy component, not `__()` calls
+
+`resources/js/components/AdminSettingsTab.vue` has `<option :value="null"
+disabled>Choose role</option>` and bare `<label>Preferences:</label>` /
+`<label>Permissions:</label>` - none run through the translation helper, so
+non-English users saw them in English regardless of locale. Not an API gap,
+but flagged here since it would otherwise look like an accidental omission:
+the Nuxt port fixes it with real i18n keys
+(`client.profile.preferences_label`/`permissions_label`; the role select's
+placeholder was dropped rather than translated, since `BFormSelect` renders
+its own first option from the `roles` list with nothing pre-selected,
+matching every other select in this client rather than adding a synthetic
+placeholder option the legacy markup didn't semantically need).
+
+### D2: `GET /api/v2/users/{id}` still doesn't exist - `/profile/[id]` (and `/profile`) are built against a documented PII-safe shape, with graceful 404/error handling
+
+Confirmed again by reading `routes/api.php` directly on this slice (no
+`Route::get('{id}', ...)` under `/users`) - this is the same gap D1 already
+flagged for the edit-page heading, now blocking the actual public profile
+page (`resources/views/user/profile-new.blade.php` via
+`UserController::index($id)` is the functional spec). The documented shape
+`stores/users.js#fetchPublicProfile` / `components/profile/
+PublicProfileView.vue` are built against, matching this task's own brief
+("PII-safe resource: name, avatar, groups, skills, bio only") plus the two
+extra fields the legacy view also displays publicly (role name, location):
+
+```
+GET /api/v2/users/{id}
+200 {
+  "data": {
+    "id": 42,
+    "name": "Jane Fixit",
+    "avatar_url": "thumbnail_xyz.png" | null,
+    "role_name": "Restarter",
+    "location": "London" | null,
+    "groups": [{ "id": 3, "name": "Chiswick Fixers" }, ...],
+    "skills": [{ "id": 5, "name": "Electronics repair" }, ...],
+    "biography": "..." | null
+  }
+}
+404 { "message": "..." }   // user not found
+```
+
+`avatar_url` deliberately matches the bare-filename shape `GET /api/v2/
+session`'s `user.avatar_url` already uses (`useUploadedImageUrl.js` handles
+both that and an already-absolute URL, so either works). `role_name` and
+`groups`/`skills` id+name pairs match `UserAdmin`'s and `getMySkillsv2`'s
+existing field-naming conventions respectively, for consistency with the
+rest of the v2 API rather than inventing a third convention. No
+`can_edit`/permission field is requested: "am I allowed to edit this
+profile" is `isOwnProfile || hasRole('Administrator')`, computable
+client-side from the session alone, same as the legacy Blade's own
+`$user->id == Auth::id() || Fixometer::hasRole(null, 'Administrator')`
+check.
+
+Until this lands, `PublicProfileView.vue` shows a real "not found" state on
+a 404 and a generic load-error state on anything else (unlike
+`stores/profile.js#fetchTargetUser`'s best-effort swallow for D1's heading -
+a working profile page has no reasonable fallback content, so surfacing the
+failure honestly is correct here, not a workaround to remove later).
+
+### D2: `/profile` (own profile, no id) is a new page, not just `/profile/[id]`
+
+`pages/profile/edit/[[id]].vue` (D1) already links "View profile" to the
+bare `/profile` URL for one's own profile (mirroring `UserController::
+index($id = null)` defaulting to `Auth::id()`, and `routes/web.php`'s
+separate `Route::get('/', [UserController::class, 'index'])->name
+('profile')` vs `Route::get('/{id}', ...)`) - so this slice adds
+`pages/profile/index.vue` alongside `pages/profile/[id].vue`, both thin
+wrappers around the new shared `components/profile/PublicProfileView.vue`
+(same "orchestrator component behind thin page(s)" shape as `ProfileTabs.vue`
+behind `[[id]].vue`), rather than only building the `{id}` route the task
+brief names explicitly. Not an API gap - flagged so the D1-created dangling
+link doesn't look like it was missed.
+
+### D3: `GET /api/v2/roles` (already implemented server-side, `RoleController::listRolesv2`) is reused for the `/user/all` role filter dropdown; a matching `RoleAPI.js` is added with only `list()`
+
+Confirmed working end-to-end (Administrator-only, matches this page's own
+gating) by reading `app/Http/Controllers/API/RoleController.php` directly.
+Not a gap - noted because it's a new API resource class file
+(`client/app/api/RoleAPI.js`) touching a controller area (`RoleController`)
+that design.md §6.2 Phase D task D4 (reference-data CRUD) also owns; only
+`list()` is added here, deliberately leaving `get`/`updateRolePermissions`
+for D4 to add to the same file without needing to restructure it.
+
+### D3: the legacy "Create new user" modal (`includes/modals/create-user`, posting to the web-only `/user/create` route) is not ported
+
+`UsersPage.vue`'s "Create new user" button opens a Blade-rendered modal
+posting to a legacy web route with its own CSRF-protected form handling
+(`UserController::create`) - there is no v2 API for it (confirmed by reading
+`routes/api.php`: no `POST` route under `/users` besides the id-scoped
+sub-resources). Building a v2 user-creation endpoint plus the client form is
+a separate, non-trivial feature (password/consent/role assignment for a
+user who never went through self-registration) and out of scope for this
+slice's brief, which only asks for "filters/sort/pagination preserved; role
+editor modal". Recorded here rather than silently dropped so a future slice
+knows the button is intentionally missing, not forgotten.
+
+### D4: all five PR-863 reference-data endpoint families (Brands/Skills/GroupTags/Categories/Roles+Permissions) already exist server-side and match the legacy Vue contract exactly
+
+Confirmed by reading `routes/api.php` and every controller
+(`API\BrandController`/`SkillController`/`GroupTagController`/
+`CategoryController`/`RoleController`) directly - no server gap for this
+slice. `client/app/api/{Brand,Skill,GroupTag,Category}API.js` (new) and
+`RoleAPI.js` (extended with `get`/`listPermissions`/`updatePermissions` -
+`list()` already existed from D3) are thin wrappers with no discovered
+shape mismatches. Two things worth recording precisely because they are
+*not* gaps, so a future audit doesn't waste time re-checking them:
+
+- `API\CategoryController::listCategoriesv2`/`getCategoryv2`/
+  `updateCategoryv2` already return a pre-joined `cluster_name` on every
+  row. The legacy `CategoriesPage.vue` had to build its own
+  `cluster -> name` lookup client-side because the old admin-only API
+  didn't join it; `pages/category.vue`'s table column reads `cluster_name`
+  directly instead, one fewer piece of client state.
+- `Tag` (`/api/v2/group-tags` and `/api/v2/networks/{id}/tags`) already
+  carries `groups_count`. The legacy `GroupTagsPage.vue`'s delete
+  confirmation was static text only; `pages/tags.vue` uses this field to
+  add a dynamic in-use warning to `AdminCrudTable.vue`'s delete modal
+  (`labels.deleteWarning(item)`, a new optional callback beyond the legacy
+  `AdminCrudPage.vue` prop contract) - a client-side UX improvement the
+  field already made possible, not a gap.
+
+### D4: `?editId=N` reproduces the legacy `/{resource}/edit/{id}` bookmark as a query param on the same page, not a separate route
+
+`routes/web.php` gives each reference-data page its own path route for this
+(`Route::get('/edit/{editId}', [BrandsController::class, 'index'])`, same
+shape for skills/tags/category/role) - a server-rendered-Blade-era pattern
+that doesn't map cleanly onto an SPA page built around one component
+instance. `AdminCrudTable.vue`'s `editId` prop is instead read from
+`route.query.editId` by each thin page (`/brands?editId=5`), which every
+`pages/{brands,skills,tags,category,role}.vue` supports. The legacy path
+routes (`/brands/edit/5`, `/brands/create`) are not built as separate Nuxt
+pages/redirects - any such legacy bookmark would need a Laravel-side
+redirect to `/brands?editId=5` if that matters post-cutover (design.md §10
+pre-deletion audit territory, not this slice's).
+
+### D4: the skill-category dropdown (1 = Organising, 2 = Technical) has no dedicated list endpoint - hardcoded client-side against `App\Helpers\Fixometer::skillCategories()`, confirmed identical
+
+`SkillController::createSkillv2`/`updateSkillv2` validate `category`
+against `Fixometer::skillCategories()`'s keys but there's no
+`GET /api/v2/skill-categories` (or similar) to fetch the two labels from -
+the legacy `SkillsController` (web) passed `Fixometer::skillCategories()`
+straight from PHP as a Blade prop, which doesn't exist for an SPA page.
+`pages/skills.vue` hardcodes the same two entries, reusing the exact
+top-level i18n keys (`"Organising skills - please select at least one if
+you'd like to host events"`, `"Technical skills"`) that
+`GET /api/v2/users/me/skills` already returns as its category `label` field
+(consumed the same way by `components/profile/SkillsTab.vue`, D1) - so
+there is exactly one source of truth for this wording, not two independent
+copies. Not requesting a new endpoint: the server's own validation is the
+actual authority here, and the client hardcoding it wrong would just mean a
+422, not silently-accepted bad data - but flagging it since it's the one
+place in this slice where "the client knows something the API doesn't
+expose."
+
+### D4: `pages/role.vue` is bespoke, not built on `AdminCrudTable.vue`
+
+Unlike its four siblings, `RoleController` exposes no create/rename/delete
+route (confirmed by reading `routes/api.php`: only `GET /roles`,
+`GET /roles/{id}`, `PUT /roles/{id}/permissions`, `GET /permissions`) and
+the one editable thing - a role's granted permission set - is a checkbox
+matrix against a separate `permissions` catalogue with its own payload
+shape (`{permissions: [id, ...]}`), not a text-field-per-row form.
+`AdminCrudTable.vue`'s `formFields` contract (one value per row, keyed by
+field name, submitted as `{[key]: value}`) has no natural way to express
+that without inventing a bespoke field `type` used by nothing else. This is
+a page-shape design decision, not a missing generic capability or a server
+gap - recorded here per this file's own convention of flagging anything
+that might otherwise look like an oversight to a future auditor.
+
+## Phase E
+
+### E1: `GET /api/v2/networks/{id}` has no `coordinators` field
+
+The legacy `NetworkController@show` (web) builds a `coordinators` array
+(`{id, name, picture}` per coordinator, from `$network->coordinators`)
+straight from Eloquent and passes it into `NetworkPage.vue` as part of
+`networkData`. `App\Http\Resources\Network` (confirmed by reading the
+resource directly) has no equivalent field - only `id/name/logo/
+description/website/shortname/default_language/stats/timezone/full`. There
+is no other v2 endpoint that lists a network's coordinators either. The
+Nuxt show page (`pages/networks/[id].vue`) does not render a coordinators
+section at all rather than build one against data that doesn't exist.
+**Requested addition**: either a `coordinators` array on the `Network`
+resource, or a dedicated `GET /api/v2/networks/{id}/coordinators`.
+
+### E1: no v2 endpoint for associating groups with a network
+
+The only existing route, `POST /networks/{network}/groups`
+(`networks.associate-group`, `NetworkController::associateGroup`), is a
+`web` middleware (session-cookie + CSRF) route returning a redirect
+response - unusable from the SPA, which is pure Sanctum Bearer-token auth
+with no Laravel session cookie (design.md §4.4). Confirmed by reading
+`routes/api.php` directly: nothing under `/api/v2/networks/{id}/groups`
+accepts `POST`. **Client stub**: `api/NetworkAPI.js#associateGroups(id,
+groupIds)` calls the not-yet-existing `POST /api/v2/networks/{id}/groups
+{groups: [...]}`; `stores/networks.js#associateGroups` and
+`components/networks/AssociateGroupsModal.vue` are built against that
+documented shape and will surface a clean inline error (not a broken page)
+until the endpoint lands. **Requested addition**: `POST /api/v2/networks/
+{id}/groups {groups: [id, ...]}` (auth: Administrator or
+network-coordinator-for-this-network, mirroring `NetworkPolicy::
+associateGroups`), success shape TBD (e.g. `{data: {added: n}}`).
+
+### E1: no v2 endpoint for updating a network's own profile (logo/name/description/website)
+
+The legacy `/networks/{id}/edit` page is a Blade file-upload form
+(`NetworkController::update`, web route) for the network logo only, gated
+by `NetworkPolicy::update` (Administrator or coordinator-of-this-network -
+the same condition as `view`). There is no `PATCH`/`PUT /api/v2/networks/
+{id}` at all (confirmed by reading `routes/api.php`: `/networks` only has
+`GET` routes plus the tag CRUD trio). This task's brief describes
+`/networks/{id}` as "show, with edit for coordinators/admins", which this
+port interprets as the page's *management* capabilities (tags CRUD,
+associate groups) rather than a separate network-profile-edit form, since
+no API exists for the latter and the legacy edit page is logo-upload only
+(a small, separate feature). Not building a dead page against a
+non-existent endpoint. **Requested addition**: `PATCH /api/v2/networks/
+{id}` (name/description/website + logo, mirroring the group-edit pattern)
+if/when a Nuxt network-edit form is wanted.
+
+### E1: the legacy "Export event list" link is a session-cookie-authenticated web route, unreachable from the pure-Bearer-token SPA
+
+`NetworkPage.vue`'s dropdown links straight to `/export/networks/{id}/
+events` (`ExportController::networkEvents`, inside the `web` middleware
+group's `auth` gate - confirmed by reading `routes/web.php`: it sits under
+the same `Route::middleware('auth', 'verifyUserConsent', 'ensureAPIToken')`
+block as the rest of the authenticated Blade app, unlike the anonymous-
+access `/export/devices/*` routes `party/view/[id].vue` already links to
+directly). The SPA carries no Laravel session cookie (design.md §4.4:
+Sanctum Bearer tokens in localStorage, explicitly *not* Sanctum SPA stateful
+cookies), so a direct `<a href>` would just redirect to `/login`. Dropped
+from the Nuxt show page rather than shipping a dead link. **Requested
+addition**: a v2 CSV/export endpoint (or a signed, tokenised export URL)
+network coordinators can hit from the SPA.
+
+### E1: `GET /api/v2/networks/{id}/groups` honours `includeCounts` for hosts/restarters, but it isn't documented on that endpoint's own OA annotation
+
+`GroupSummary#toArray` (confirmed by reading the resource directly) adds
+`hosts`/`restarters` when `$request->get('includeCounts', false)` is
+truthy, and reads it straight off the current request object rather than a
+parameter the controller passes through explicitly - so it works on every
+`GroupSummaryCollection`-returning endpoint, including `getNetworkGroupsv2`,
+even though that endpoint's `@OA\Parameter` list only documents
+`includeNextEvent`/`includeDetails`/`includeStats`/`includeArchived`/
+`group_tag`. `stores/networks.js#fetchGroups` passes `includeCounts: true`
+by default (verified against the resource's actual behaviour, not just its
+docs) so the network's groups table (reusing `GroupsTable.vue`, same row
+mapping as `pages/group/all.vue`) gets populated hosts/restarters columns.
+Flagging so a documentation pass adds `includeCounts` to the OA annotation
+rather than someone reading only the docs and concluding it's unsupported.
+
+### E1: network coordinator "view a network" and "manage its tags / associate groups" are the exact same permission, so the show page has no separate reduced-permission state
+
+`NetworkPolicy::view` and `NetworkPolicy::associateGroups` (confirmed by
+reading the policy directly) are identical: Administrator, or a
+NetworkCoordinator who coordinates *this* network - there is no "Host can
+view a network read-only" case at all (unlike `/group/view/[id]`, where
+Hosts get a real read-only page). Since `NetworkController@show`'s web
+route enforces `view` before rendering anything, reaching `/networks/{id}`
+in the Nuxt client already implies full management rights - `canManage` in
+`pages/networks/[id].vue` is computed once and gates both the tags-CRUD
+section and the "Add groups" action identically. Recorded so this doesn't
+read as a missed permission check: it mirrors the legacy policy exactly,
+just collapsed into one flag instead of two identical ones.
+
+### E1: `/tags` (D4, global tags) and the network show page's tags-management section both configure the same generic `AdminCrudTable.vue`, with `testid-prefix="tag"` here (not `tag-item`/`create-tag`/`edit-tag`/`delete-tag` literally)
+
+The task brief for this slice names `tag-item`/`create-tag`/`edit-tag`/
+`delete-tag` as the semantic testids a future Playwright port of
+`tests/Integration/grouptags.test.js` (currently CSS-class-selector based:
+`.tag-item`, `.create-tag`, `.edit-tag-btn`, `.delete-tag-btn`) will need.
+Rather than hand-build a bespoke tags UI to hit those exact strings, this
+reuses D4's already-built, already-tested `AdminCrudTable.vue` (its
+`groups_count`-driven in-use delete warning is exactly what
+`NetworkPage.vue`'s "(N groups)" tag-delete warning needs, verbatim -
+`App\Http\Resources\Tag` already returns `groups_count` on every tag, same
+field the global `/tags` admin page's warning already reads). With
+`testid-prefix="tag"`, the rendered testids are `tag-row-{id}`,
+`tag-edit-link-{id}`, `tag-delete-{id}`, `tag-create-form`,
+`tag-create-name`, `tag-create-submit`, `tag-edit-modal`, `tag-delete-modal`,
+`tag-delete-warning`, `tag-delete-confirm` - semantically equivalent to the
+brief's naming (tag-item ≈ tag-row, create-tag ≈ tag-create-*, edit-tag ≈
+tag-edit-*, delete-tag ≈ tag-delete-*) and consistent with every other
+admin CRUD surface in the app, rather than a one-off naming scheme for this
+page alone. Flagging in case whoever ports the Playwright suite (E5) expects
+the literal strings from the task brief instead.
+
+### E1: Groups/Events "requiring moderation" panels and a groups map are not ported
+
+`NetworkPage.vue` also renders `GroupsRequiringModeration`/
+`EventsRequiringModeration` panels and a `GroupMapAndList` (Google Map +
+list) for the network's groups. Neither has any Nuxt equivalent anywhere in
+the client yet (confirmed: no `moderat*`-named component/page exists;
+`grep`-ing the whole `app/` tree for `moderate` only turns up the group/
+event *creation* form's approved/moderate flag, not a moderation queue
+UI) - building a moderation queue is a standalone feature, out of scope for
+"networks show page" and not called out in this task's own brief (which
+lists tags/associate-groups/stats, not moderation). Likewise, no map
+component exists in the client (`LocationPicker` only edits a single
+point) - the network's groups are rendered as a sortable table
+(`GroupsTable.vue`, reused) instead of a map, which the task brief's "reuse
+Phase B/C stat components where shapes allow" note doesn't preclude. Neither
+is a genuine API gap; recorded so a future moderation-queue phase knows
+`/networks/{id}` is a natural home for a network-scoped view of it.
+
+### E2/E3: the SSO bridge (design.md §4.3, built in A6) had never actually been wired into any client link-out before this slice
+
+`AppNavbar.vue`'s Talk/Wiki `<a>` tags shipped in A11 as plain
+`config.discourse_url`/`wiki_url` hrefs with a comment saying they'd
+"route via the SSO bridge... once that lands" - A6 landed the server side
+(`POST /api/v2/auth/sso-ticket` + `GET /auth/bridge`) in the same phase,
+but no client component ever called `ssoTicket()` afterwards (confirmed by
+grepping the whole `app/` tree pre-this-slice: only `AuthAPI.js` defined
+it, nothing invoked it). Not a server gap - just flagging that "check how
+AppNavbar handles bridge URLs already and reuse" (this task's own brief)
+turned out to have nothing to reuse yet.
+
+**Client build**: added `composables/useSsoBridge.js` (mint a ticket, then
+top-level-navigate to `bridge_url?ticket=...&redirect=...`) and wired it
+into `AppNavbar.vue`'s and `AppFooter.vue`'s Talk/Wiki links and the new
+`AppNotifications.vue`'s Discourse badge - all four call sites now go
+through the bridge instead of a plain href. The plain `href` attribute is
+kept as a right-click/open-in-new-tab fallback, but a fresh ticket can only
+be minted on a real click, so that fallback path lands unauthenticated.
+
+### E3: no v2 endpoint lists or marks-as-read a user's Restarters notifications - only the count is available
+
+`GET /api/users/{id}/notifications` (v1, `UserController::notifications`)
+is the *only* notifications endpoint that exists anywhere in the API - it
+returns `{success, restarters: <count>, discourse: <count>}`, nothing
+per-notification. The legacy notifications list/mark-as-read UI
+(`resources/views/user/notifications.blade.php`, `NotificationController`,
+`route('markAsRead')`) and the navbar's `<aside id="notifications">`
+10-item preview panel (`layouts/navbar.blade.php`) both render
+server-side from `$user->notifications()->take(10)->get()` directly in
+Blade - there is no API a client could call for that list at all, v1 or
+v2. `resources/js/components/Notifications.vue` itself (the component this
+task's brief names as the port target) never fetches that list either -
+its own scope really is just the two count badges; the list panel is a
+sibling Blade partial outside the component.
+
+**Requested addition**: `GET /api/v2/users/me/notifications` (paginated
+list) + a mark-as-read endpoint, if a full in-app notifications
+list/page is ever wanted client-side (plan row E3 mentions "+ page", which
+this slice deliberately did not build for exactly this reason).
+
+**Client build**: `AppNotifications.vue` replicates
+`Notifications.vue`'s actual scope - two polled count badges. The
+Discourse badge routes through the SSO bridge to Discourse's own
+notifications page (real content, real host). The Restarters badge opens a
+small local panel showing only the count text (`client.notifications.unread`)
+since there is nothing to list - deliberately not a dead link to the
+Blade `/user/notifications` page, which requires a Laravel web session the
+token-authenticated SPA doesn't have and isn't on the bridge's redirect
+allowlist anyway (`BridgeController::safeRedirect` only allows
+`/discourse/sso`, the wiki, Discourse, and `FRONTEND_URL`).
+
+### E3: `GET /api/users/{id}/notifications` polling interval is a client judgment call, not a ported behaviour
+
+The legacy widget (`Notifications.vue`) fetches counts **once**, after a
+5-second `setTimeout` (to keep it off the critical page-load path) - it
+never re-polls at all, which reads as an oversight rather than a
+deliberate one-shot design given the whole point is showing you *new*
+notifications without a page reload. `AppNotifications.vue` fetches
+immediately on mount (no reason to delay - nothing else on the SPA route
+is blocked on it) and then polls every 60s, per this task's own "count
+polling" requirement. 60s is not sourced from anywhere in the legacy code
+- picked as a reasonable balance between freshness and load; there's no
+existing precedent in this codebase for a "correct" interval.
+
+### E2: `/about/cookie-policy`'s content has no Laravel-side lang source to generate from
+
+`resources/views/features/cookie-policy.blade.php` (routes/web.php: a
+plain closure, no controller) has every string hardcoded English inline in
+the Blade template - unlike every other ported page, there is no
+`lang/en/*.php` file backing it, so nothing for
+`translations:export-client` to have generated. Per this migration's i18n
+convention (design.md §7: client-only content lives in hand-maintained
+`client-<loc>.json`), this slice introduces `client.cookie_policy.*`
+(en/fr/fr-BE, hand-translated) rather than leaving the page hardcoded
+English or inventing a fake generated-file dependency.
+
+**Requested addition**: none - this is working as intended for
+client-only content; flagging only so a future contributor doesn't go
+looking for a `lang/en/cookie-policy.php` that was never there.
+
+**Client build**: the legacy page's "reopen cookie settings" link
+(`.gdpr-cookie-notice-settings-button`, tied to `resources/js/gdpr-cookie-
+notice`) is dropped rather than wired to nothing - no GDPR cookie-consent
+banner has been ported to the Nuxt client yet at all (grepped the whole
+`app/` tree: no consent-banner component exists outside the registration
+form's one-time consent checkboxes), so there is nothing for that link to
+reopen. Recorded here since a future consent-banner build should come back
+and re-add this link.
+
+### E2/E4: `/user/forbidden` (this task's own URL list) vs `/forbidden` (what the client actually built, in A11)
+
+This task's brief lists `/user/forbidden` as an existing URL (matching
+`routes/web.php`'s `GET /user/forbidden` closure), but the client's 403
+page has lived at `app/pages/forbidden.vue` (route `/forbidden`) since A11,
+and every role-gated page in the client (`middleware/auth.global.ts`,
+`networks/index.vue`, `networks/[id].vue`, ...) already
+`navigateTo('/forbidden')` consistently. Not a new decision made in this
+slice - just confirmed-and-left-alone rather than silently mismatched:
+renaming the route now would touch every one of those call sites for a
+purely cosmetic URL difference, with no user-facing bookmark/link
+depending on the old path yet (the SPA doesn't serve `/user/forbidden` at
+all, so there's no compatibility to preserve, unlike the URLs design.md
+§6.2 calls out specifically for bookmark/email/Playwright continuity).
+
+### E4: the account "preferred language" (`users/me/language`, LanguageTab.vue) and the UI locale switcher write the exact same field
+
+`SessionController::patchSessionv2` sets `$user->language` - the identical
+column `UserController::getMyLanguagev2`/`updateMyLanguagev2`
+(`LanguageTab.vue`'s profile-tab endpoint) reads and writes. There are not
+two separate "UI locale" vs "account language" preferences server-side,
+just one. Not a gap, just a non-obvious coupling worth recording: saving a
+locale from the new navbar/footer `LocaleSwitcher.vue` also changes what
+`LanguageTab.vue` shows next time the profile tab loads (and vice versa) -
+this is almost certainly the intended behaviour (why maintain two
+"language" settings?), but it means the two components are quietly
+coupled through a shared field despite living in unrelated parts of the
+UI, with no explicit indication of that on either screen.

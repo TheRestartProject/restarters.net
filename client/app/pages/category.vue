@@ -1,0 +1,111 @@
+<script setup>
+import { computed, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
+import AdminCrudTable from '~/components/admin/AdminCrudTable.vue'
+import { useAdminRefdataStore } from '~/stores/adminRefdata.js'
+
+// /category - resources/views/category/index.blade.php +
+// resources/js/components/CategoriesPage.vue (design.md §6.2 Phase D task
+// D4, PR #863's AdminCrudPage.vue prop contract is the functional spec).
+//
+// Unlike its siblings (brands/skills/tags), CategoryController::index is a
+// PUBLIC list view - any authenticated user can see the categories table;
+// only the update itself is Administrator-only (enforced server-side by
+// API\CategoryController::updateCategoryv2, same as every other admin
+// mutation - design.md §4.4). So this page is gated on `auth: true` alone,
+// not `role: 'Administrator'` - matching the legacy controller exactly. The
+// edit link/modal stays visible to every viewer, same as legacy
+// CategoriesPage.vue (which never hid it either); a non-Administrator who
+// submits an edit gets the same 403 rendered inline as any other API
+// error, not a client-side pre-emptive block.
+//
+// `:allow-create="false" :allow-delete="false"`: confirmed by reading
+// routes/api.php - only GET '/', GET '{id}' and PUT '{id}' exist under
+// /categories, no POST or DELETE.
+//
+// Unlike legacy (which had to build its own cluster-id -> name lookup
+// client-side because the old admin-only API didn't join it),
+// API\CategoryController::listCategoriesv2/getCategoryv2/updateCategoryv2
+// already return `cluster_name` pre-joined on every row - the table column
+// below reads it directly, no lookup needed.
+definePageMeta({ auth: true })
+
+const { t } = useI18n()
+useHead({ title: t('admin.categories') })
+
+const adminStore = useAdminRefdataStore()
+const route = useRoute()
+
+const editId = computed(() => {
+  const raw = route.query.editId
+  const n = Number(raw)
+  return raw != null && !Number.isNaN(n) ? n : null
+})
+
+onMounted(() => {
+  adminStore.fetchClusters().catch(() => {})
+})
+
+const clusterOptions = computed(() => [
+  { value: null, text: '—' },
+  ...adminStore.clusters.data.map((c) => ({ value: c.id, text: c.name })),
+])
+
+// Wrapped in computed() (rather than plain consts) so everything stays
+// correct if the locale changes without a full page reload - see
+// pages/brands.vue's equivalent comment.
+const reliabilityOptions = computed(() => [1, 2, 3, 4, 5, 6].map((n) => ({ value: n, text: t(`admin.reliability-${n}`) })))
+const reliabilityLookup = computed(() => Object.fromEntries(reliabilityOptions.value.map((o) => [o.value, o.text])))
+
+const tableFields = computed(() => [
+  { key: 'name', label: t('admin.category_name'), sortable: true },
+  { key: 'cluster_name', label: t('admin.category_cluster'), sortable: true },
+  { key: 'weight', label: t('admin.weight'), sortable: true },
+  { key: 'footprint', label: t('admin.co2_footprint'), sortable: true },
+  {
+    key: 'footprint_reliability',
+    label: t('admin.reliability'),
+    sortable: true,
+    formatter: (value) => (value != null ? reliabilityLookup.value[value] || value : ''),
+  },
+])
+
+const formFields = computed(() => [
+  { key: 'name', label: t('admin.category_name'), type: 'text', required: true, maxLength: 255 },
+  { key: 'weight', label: t('admin.weight'), type: 'number', required: false, nullIfEmpty: true },
+  { key: 'footprint', label: t('admin.co2_footprint'), type: 'number', required: false, nullIfEmpty: true },
+  { key: 'footprint_reliability', label: t('admin.reliability'), type: 'select', required: false, options: reliabilityOptions.value, nullIfEmpty: true },
+  { key: 'cluster', label: t('admin.category_cluster'), type: 'select', required: false, options: clusterOptions.value, nullIfEmpty: true },
+  { key: 'description_short', label: t('admin.description'), type: 'textarea', required: false, rows: 4, nullIfEmpty: true },
+])
+
+const labels = computed(() => ({
+  title: t('admin.categories'),
+  editTitle: t('admin.edit-category'),
+  saveButton: t('admin.save-category'),
+  cancel: t('partials.cancel'),
+  emptyText: t('admin.no-categories'),
+  loadError: t('client.admin.load_error'),
+  retry: t('client.dashboard.retry'),
+  updateSuccess: t('category.update_success'),
+  updateError: t('category.update_error'),
+}))
+</script>
+
+<template>
+  <div class="container py-4" data-testid="category-page">
+    <AdminCrudTable
+      display-key="name"
+      :table-fields="tableFields"
+      :form-fields="formFields"
+      :labels="labels"
+      testid-prefix="category"
+      :allow-create="false"
+      :allow-delete="false"
+      :edit-id="editId"
+      :items="adminStore.categories.data"
+      :fetch-items="adminStore.fetchCategories"
+      :update-item="adminStore.updateCategory"
+    />
+  </div>
+</template>

@@ -4,6 +4,7 @@ import { useI18n } from 'vue-i18n'
 import { useSessionStore } from '~/stores/session.js'
 import { useAuthStore } from '~/stores/auth.js'
 import { useAuth } from '~/composables/useAuth.js'
+import { useSsoBridge } from '~/composables/useSsoBridge.js'
 import IconLogo from './icons/IconLogo.vue'
 import IconTalk from './icons/IconTalk.vue'
 import IconFixometer from './icons/IconFixometer.vue'
@@ -11,17 +12,21 @@ import IconEvents from './icons/IconEvents.vue'
 import IconGroups from './icons/IconGroups.vue'
 import IconWiki from './icons/IconWiki.vue'
 import IconAdmin from './icons/IconAdmin.vue'
+import AppNotifications from './AppNotifications.vue'
+import LocaleSwitcher from './LocaleSwitcher.vue'
 
 // Driven entirely by the session store (design.md §6.2 task brief): a null
 // session user renders login/join links, otherwise role-conditional items
-// (admin menu for Administrators, network-coordinator link, notifications
-// placeholder) plus the user dropdown. Talk/Wiki are plain hrefs to
-// config.discourse_url/wiki_url for now - they will route via the SSO
-// bridge (design.md §4.3) once that lands.
+// (admin menu for Administrators, network-coordinator link) plus the user
+// dropdown and the notifications badges. Talk/Wiki route through the SSO
+// bridge (design.md §4.3, useSsoBridge) on click - the plain href stays as
+// a fallback for open-in-new-tab/right-click, but lands unauthenticated
+// there since a fresh ticket can only be minted on click.
 const { t } = useI18n()
 const sessionStore = useSessionStore()
 const authStore = useAuthStore()
 const { hasRole } = useAuth()
+const { goTo } = useSsoBridge()
 
 const user = computed(() => sessionStore.user)
 const config = computed(() => sessionStore.config || {})
@@ -55,6 +60,26 @@ async function logout() {
   await authStore.logout()
   await navigateTo('/login')
 }
+
+// Mirrors legacy navbar.blade.php's Talk link:
+// `${DISCOURSE_URL}/session/sso?return_path=${DISCOURSE_URL}`.
+function goToTalk() {
+  const base = config.value.discourse_url
+  if (!base) {
+    return
+  }
+
+  goTo(`${base}/session/sso?return_path=${encodeURIComponent(base)}`)
+}
+
+function goToWiki() {
+  const base = config.value.wiki_url
+  if (!base) {
+    return
+  }
+
+  goTo(base)
+}
 </script>
 
 <template>
@@ -65,7 +90,7 @@ async function logout() {
 
     <ul id="nav-left" class="nav-left d-flex justify-content-between w-100 pr-md-3">
       <li>
-        <a :href="config.discourse_url || '#'" rel="noopener noreferrer" data-testid="nav-talk">
+        <a :href="config.discourse_url || '#'" rel="noopener noreferrer" data-testid="nav-talk" @click.prevent="goToTalk">
           <IconTalk />
           <span>{{ t('general.menu_discourse') }}</span>
         </a>
@@ -89,7 +114,7 @@ async function logout() {
         </NuxtLink>
       </li>
       <li>
-        <a :href="config.wiki_url || '#'" rel="noopener noreferrer" data-testid="nav-wiki">
+        <a :href="config.wiki_url || '#'" rel="noopener noreferrer" data-testid="nav-wiki" @click.prevent="goToWiki">
           <IconWiki />
           <span>{{ t('general.menu_wiki') }}</span>
         </a>
@@ -97,6 +122,10 @@ async function logout() {
     </ul>
 
     <ul class="nav-right">
+      <li>
+        <LocaleSwitcher />
+      </li>
+
       <template v-if="!user">
         <li>
           <NuxtLink to="/login" class="btn btn-outline-dark" data-testid="nav-login">
@@ -110,9 +139,8 @@ async function logout() {
         </li>
       </template>
       <template v-else>
-        <li data-testid="nav-notifications" aria-hidden="true">
-          <!-- Placeholder: the real notifications bell/dropdown lands with
-               the Talk/notifications migration slice (design.md §6.2). -->
+        <li data-testid="nav-notifications">
+          <AppNotifications />
         </li>
 
         <li class="nav-item dropdown">
