@@ -102,6 +102,12 @@ jobs:
             export COMPOSE_BAKE=true
             # Start all services using Task
             task docker:up-all
+            # This job tests the Laravel side only; the Nuxt client container
+            # (started by the shared profiles, ~1GB+ for nuxi dev) starves the
+            # machine late in the coverage-instrumented phpunit run — both
+            # 2026-07-15 hangs were memory stalls at different late tests.
+            # e2e-client is the job that needs it.
+            docker stop restarters_client || true
           no_output_timeout: 10m
 
       # Wait for core services to be ready (MySQL + web app). Discourse is started
