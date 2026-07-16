@@ -15,10 +15,14 @@ or during F2 (defaults chosen below, flag in the PR).
 2. [F2-2] errors/{403,404,500,503}.blade.php include layouts.header (when
    authed) / header_plain + footer — framework-invoked on ANY kept route's
    error. Keep + edit these; layouts/header.blade.php survives only for this.
-3. [F2-3] /outbound/info/{type}/{id}/leaf renders StatsShare.vue (Vue 2,
-   registered only in resources/js/app.js). Port StatsShare to a minimal
-   standalone bundle for the widget surface (or drop the leaf format —
-   DECISION; default: port, it's partner-facing).
+3. [F2-3] ✅ DONE pre-cutover: leaf widget now uses the vanilla
+   resources/global/js/widgets/stats-share.js (own vite entry); Blade bakes
+   translations into data-t-* attributes. Two pre-existing bugs preserved
+   bug-for-bug and documented in-code (fontSize switch fallthrough → always
+   renders LinkedIn's size; emHeightAscent-based highlight box silently
+   no-ops in modern browsers) — FOLLOW-UP decision whether to fix, since
+   fixing visibly changes the live partner image. StatsShare.vue itself
+   still serves the in-app StatsShareModal until F deletes resources/js.
 4. DECISION: /group-tag/stats/{id}/{format?} (§9 KEEP) is ALREADY BROKEN —
    GroupController::statsByGroupTag does not exist (only ever referenced by
    the route, commit 455bf46ec3). Default: drop the route at F2 with a note
