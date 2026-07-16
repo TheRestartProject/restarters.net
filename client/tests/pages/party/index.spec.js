@@ -1,0 +1,149 @@
+import { mount } from '@vue/test-utils'
+import { createPinia, setActivePinia } from 'pinia'
+import { createI18n } from 'vue-i18n'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import PartyIndexPage from '../../../app/pages/party/index.vue'
+import { useEventsStore } from '../../../app/stores/events.js'
+import { useDashboardStore } from '../../../app/stores/dashboard.js'
+import en from '../../../i18n/locales/en.json'
+import clientEn from '../../../i18n/locales/client-en.json'
+
+const NuxtLinkStub = { props: ['to'], template: '<a :href="to"><slot /></a>' }
+const BAlertStub = { template: '<div><slot /></div>' }
+const BButtonStub = { template: '<button v-bind="$attrs"><slot /></button>' }
+const BBadgeStub = { template: '<span v-bind="$attrs"><slot /></span>' }
+
+function mountPage() {
+  const i18n = createI18n({ legacy: false, locale: 'en', messages: { en: { ...en, ...clientEn } } })
+
+  return mount(PartyIndexPage, {
+    global: {
+      plugins: [i18n],
+      stubs: { NuxtLink: NuxtLinkStub, BAlert: BAlertStub, BButton: BButtonStub, BBadge: BBadgeStub },
+    },
+  })
+}
+
+function evt(overrides = {}) {
+  return {
+    id: 1,
+    title: 'Event',
+    start: '2026-08-01T10:00:00Z',
+    end: '2026-08-01T12:00:00Z',
+    timezone: 'Europe/London',
+    attending: false,
+    approved: true,
+    group: { id: 9, name: 'A Group' },
+    ...overrides,
+  }
+}
+
+describe('pages/party/index (mine)', () => {
+  let eventsStore
+  let dashboardStore
+
+  beforeEach(() => {
+    setActivePinia(createPinia())
+
+    eventsStore = useEventsStore()
+    eventsStore.fetchMyEvents = vi.fn().mockResolvedValue([])
+
+    dashboardStore = useDashboardStore()
+    dashboardStore.fetch = vi.fn().mockResolvedValue({})
+  })
+
+  it('calls eventsStore.fetchMyEvents() and dashboardStore.fetch() on mount', () => {
+    mountPage()
+    expect(eventsStore.fetchMyEvents).toHaveBeenCalledTimes(1)
+    expect(dashboardStore.fetch).toHaveBeenCalledTimes(1)
+  })
+
+  it('shows a loading skeleton while loading', () => {
+    eventsStore.myEvents.loading = true
+
+    const wrapper = mountPage()
+
+    expect(wrapper.find('[data-testid="party-mine-loading"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="party-mine-content"]').exists()).toBe(false)
+  })
+
+  it('shows an error state with a retry button that calls fetchMyEvents again', async () => {
+    eventsStore.myEvents.error = { status: 500 }
+
+    const wrapper = mountPage()
+    expect(wrapper.find('[data-testid="party-mine-error"]').exists()).toBe(true)
+
+    await wrapper.find('[data-testid="party-mine-retry"]').trigger('click')
+    expect(eventsStore.fetchMyEvents).toHaveBeenCalledTimes(2)
+  })
+
+  it('shows the empty state on the upcoming tab when there are no mine events', () => {
+    eventsStore.myEvents.data = []
+
+    const wrapper = mountPage()
+
+    expect(wrapper.find('[data-testid="party-mine-panel-upcoming"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="events-list-empty"]').exists()).toBe(true)
+  })
+
+  it('splits mine events into upcoming and past tabs', async () => {
+    eventsStore.myEvents.data = [
+      evt({ id: 1, title: 'Future', start: '2026-08-20T10:00:00Z', end: '2026-08-20T12:00:00Z' }),
+      evt({ id: 2, title: 'Past', start: '2020-01-01T10:00:00Z', end: '2020-01-01T12:00:00Z' }),
+    ]
+
+    const wrapper = mountPage()
+
+    expect(wrapper.find('[data-testid="event-card-1"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="event-card-2"]').exists()).toBe(false)
+
+    await wrapper.find('[data-testid="party-mine-tab-past"]').trigger('click')
+
+    expect(wrapper.find('[data-testid="event-card-2"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="event-card-1"]').exists()).toBe(false)
+  })
+
+  it('excludes a nearby-tagged event from the mine (upcoming) bucket', () => {
+    eventsStore.myEvents.data = [
+      evt({ id: 3, title: 'Nearby', start: '2026-08-20T10:00:00Z', end: '2026-08-20T12:00:00Z', nearby: true }),
+    ]
+
+    const wrapper = mountPage()
+
+    const mineUpcoming = wrapper.find('[data-testid="party-mine-panel-upcoming"]')
+    expect(mineUpcoming.find('[data-testid="event-card-3"]').exists()).toBe(false)
+    expect(mineUpcoming.find('[data-testid="events-list-empty"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="party-other-events"]').exists()).toBe(true)
+  })
+
+  it('shows the other-events section with nearby/all tabs when tagged events are present', async () => {
+    eventsStore.myEvents.data = [
+      evt({ id: 3, title: 'Nearby Event', start: '2026-08-20T10:00:00Z', end: '2026-08-20T12:00:00Z', nearby: true }),
+      evt({ id: 4, title: 'All Event', start: '2026-08-21T10:00:00Z', end: '2026-08-21T12:00:00Z', all: true }),
+    ]
+
+    const wrapper = mountPage()
+
+    expect(wrapper.find('[data-testid="party-other-events"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="event-card-3"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="event-card-4"]').exists()).toBe(false)
+
+    await wrapper.find('[data-testid="party-other-tab-all"]').trigger('click')
+
+    expect(wrapper.find('[data-testid="event-card-4"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="event-card-3"]').exists()).toBe(false)
+  })
+
+  it('marks a mine event as hosting when its group id has role HOST in dashboard your_groups', () => {
+    dashboardStore.data = {
+      your_groups: [{ id: 9, name: 'A Group', role: 3, archived: false, image_url: null }],
+    }
+    eventsStore.myEvents.data = [
+      evt({ id: 1, start: '2026-08-20T10:00:00Z', end: '2026-08-20T12:00:00Z', group: { id: 9, name: 'A Group' } }),
+    ]
+
+    const wrapper = mountPage()
+
+    expect(wrapper.find('[data-testid="event-card-hosting-1"]').exists()).toBe(true)
+  })
+})

@@ -2,6 +2,7 @@ import SessionAPI from './SessionAPI.js'
 import AuthAPI from './AuthAPI.js'
 import GroupAPI from './GroupAPI.js'
 import EventAPI from './EventAPI.js'
+import DeviceAPI from './DeviceAPI.js'
 import UserAPI from './UserAPI.js'
 import NetworkAPI from './NetworkAPI.js'
 import DashboardAPI from './DashboardAPI.js'
@@ -18,6 +19,7 @@ export default (config) => ({
   auth: new AuthAPI(config),
   group: new GroupAPI(config),
   event: new EventAPI(config),
+  device: new DeviceAPI(config),
   user: new UserAPI(config),
   network: new NetworkAPI(config),
   dashboard: new DashboardAPI(config),

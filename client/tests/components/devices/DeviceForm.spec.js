@@ -1,0 +1,282 @@
+import { mount } from '@vue/test-utils'
+import { createPinia, setActivePinia } from 'pinia'
+import { createI18n } from 'vue-i18n'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import DeviceForm from '../../../app/components/devices/DeviceForm.vue'
+import { useDevicesStore } from '../../../app/stores/devices.js'
+import en from '../../../i18n/locales/en.json'
+import clientEn from '../../../i18n/locales/client-en.json'
+
+const BFormStub = { emits: ['submit'], template: '<form @submit.prevent="$emit(\'submit\', $event)"><slot /></form>' }
+const BFormGroupStub = { template: '<div><slot /></div>' }
+const BAlertStub = { template: '<div><slot /></div>' }
+const BButtonStub = { template: '<button v-bind="$attrs"><slot /></button>' }
+const DevicePhotosStub = { props: ['eventId', 'deviceId', 'images'], template: '<div data-testid="device-photos-stub" />' }
+
+const GLOBAL_STUBS = {
+  BForm: BFormStub,
+  BFormGroup: BFormGroupStub,
+  BAlert: BAlertStub,
+  BButton: BButtonStub,
+  DevicePhotos: DevicePhotosStub,
+}
+
+function seedMeta(store) {
+  store.itemTypes.data = [
+    { type: 'Blender', powered: true, idcategories: 30, categoryname: 'Kitchen' },
+    { type: 'Sofa', powered: false, idcategories: 31, categoryname: 'Furniture' },
+  ]
+  store.itemTypes.loaded = true
+
+  store.categories.data = [
+    { id: 10, name: 'Toaster', powered: true, cluster: 1, cluster_name: 'Kitchen' },
+    { id: 20, name: 'Bicycle', powered: false, cluster: 2, cluster_name: 'Outdoors' },
+  ]
+  store.categories.loaded = true
+
+  store.clusterHeaders.data = [
+    { id: 1, name: 'Kitchen' },
+    { id: 2, name: 'Outdoors' },
+  ]
+  store.clusterHeaders.loaded = true
+
+  store.brands.data = [{ id: 1, brand_name: 'Acme' }]
+  store.brands.loaded = true
+
+  store.options.data = {
+    barriers: [{ id: 1, name: 'Spare parts not available' }],
+    spare_parts: ['No', 'Manufacturer', 'Third party'],
+    next_steps: ['More time needed', 'Professional help', 'Do it yourself'],
+  }
+  store.options.loaded = true
+}
+
+function mountForm(props = {}) {
+  const i18n = createI18n({ legacy: false, locale: 'en', messages: { en: { ...en, ...clientEn } } })
+
+  return mount(DeviceForm, {
+    props: { eventId: 5, powered: true, ...props },
+    global: {
+      plugins: [i18n],
+      stubs: GLOBAL_STUBS,
+    },
+  })
+}
+
+describe('components/devices/DeviceForm', () => {
+  let store
+
+  beforeEach(() => {
+    setActivePinia(createPinia())
+    vi.stubGlobal('useNuxtApp', () => ({ $api: { device: {} } }))
+    store = useDevicesStore()
+    seedMeta(store)
+  })
+
+  it('requires a category before submitting', async () => {
+    store.addDevice = vi.fn()
+    const wrapper = mountForm()
+
+    await wrapper.find('[data-testid="device-form"]').trigger('submit')
+
+    expect(wrapper.find('[data-testid="device-form-category-error"]').exists()).toBe(true)
+    expect(store.addDevice).not.toHaveBeenCalled()
+  })
+
+  it('submits the exact payload field names validateDeviceParams expects (create)', async () => {
+    store.addDevice = vi.fn().mockResolvedValue({ device: { id: 42 } })
+    const wrapper = mountForm()
+
+    await wrapper.find('[data-testid="device-form-item-type"]').setValue('Toaster')
+    await wrapper.find('[data-testid="device-form-category"]').setValue('10')
+    await wrapper.find('[data-testid="device-form-brand"]').setValue('Acme')
+    await wrapper.find('[data-testid="device-form-model"]').setValue('9000')
+    await wrapper.find('[data-testid="device-form-age"]').setValue('2')
+    await wrapper.find('[data-testid="device-form-problem"]').setValue('Would not toast')
+    await wrapper.find('[data-testid="device-form-notes"]').setValue('Needed a new element')
+    await wrapper.find('[data-testid="device-form-status"]').setValue('Fixed')
+    await wrapper.find('[data-testid="device-form"]').trigger('submit')
+    await wrapper.vm.$nextTick()
+
+    expect(store.addDevice).toHaveBeenCalledWith(5, {
+      category: 10,
+      item_type: 'Toaster',
+      brand: 'Acme',
+      model: '9000',
+      age: 2,
+      estimate: 0,
+      problem: 'Would not toast',
+      notes: 'Needed a new element',
+      repair_status: 'Fixed',
+      next_steps: null,
+      // showSpareParts is true for Fixed, but the select wasn't touched in
+      // this test, so it keeps its blank default -> null, not a guessed value.
+      spare_parts: null,
+      barrier: null,
+    })
+  })
+
+  it('loops addDevice once per unit of quantity', async () => {
+    store.addDevice = vi.fn().mockResolvedValue({ device: { id: 1 } })
+    const wrapper = mountForm()
+
+    await wrapper.find('[data-testid="device-form-category"]').setValue('10')
+    await wrapper.find('[data-testid="device-form-quantity"]').setValue('3')
+    await wrapper.find('[data-testid="device-form"]').trigger('submit')
+    await wrapper.vm.$nextTick()
+
+    expect(store.addDevice).toHaveBeenCalledTimes(3)
+  })
+
+  it('emits saved after a successful create', async () => {
+    store.addDevice = vi.fn().mockResolvedValue({ device: { id: 42 } })
+    const wrapper = mountForm()
+
+    await wrapper.find('[data-testid="device-form-category"]').setValue('10')
+    await wrapper.find('[data-testid="device-form"]').trigger('submit')
+    await wrapper.vm.$nextTick()
+
+    expect(wrapper.emitted('saved')).toBeTruthy()
+  })
+
+  it('shows a generic error and does not emit saved when the store call fails', async () => {
+    store.addDevice = vi.fn().mockRejectedValue({ status: 500 })
+    const wrapper = mountForm()
+
+    await wrapper.find('[data-testid="device-form-category"]').setValue('10')
+    await wrapper.find('[data-testid="device-form"]').trigger('submit')
+    await wrapper.vm.$nextTick()
+
+    expect(wrapper.find('[data-testid="device-form-error"]').exists()).toBe(true)
+    expect(wrapper.emitted('saved')).toBeFalsy()
+  })
+
+  it('emits cancel when Cancel is clicked', async () => {
+    const wrapper = mountForm()
+    await wrapper.find('[data-testid="device-form-cancel"]').trigger('click')
+    expect(wrapper.emitted('cancel')).toBeTruthy()
+  })
+
+  describe('conditional repair-status fields', () => {
+    it('shows next steps + spare parts for Repairable, hides barrier', async () => {
+      const wrapper = mountForm()
+      await wrapper.find('[data-testid="device-form-status"]').setValue('Repairable')
+
+      expect(wrapper.find('[data-testid="device-form-next-steps"]').exists()).toBe(true)
+      expect(wrapper.find('[data-testid="device-form-spare-parts"]').exists()).toBe(true)
+      expect(wrapper.find('[data-testid="device-form-barrier"]').exists()).toBe(false)
+    })
+
+    it('shows only spare parts for Fixed', async () => {
+      const wrapper = mountForm()
+      await wrapper.find('[data-testid="device-form-status"]').setValue('Fixed')
+
+      expect(wrapper.find('[data-testid="device-form-next-steps"]').exists()).toBe(false)
+      expect(wrapper.find('[data-testid="device-form-spare-parts"]').exists()).toBe(true)
+      expect(wrapper.find('[data-testid="device-form-barrier"]').exists()).toBe(false)
+    })
+
+    it('shows only barrier for End of life', async () => {
+      const wrapper = mountForm()
+      await wrapper.find('[data-testid="device-form-status"]').setValue('End of life')
+
+      expect(wrapper.find('[data-testid="device-form-next-steps"]').exists()).toBe(false)
+      expect(wrapper.find('[data-testid="device-form-spare-parts"]').exists()).toBe(false)
+      expect(wrapper.find('[data-testid="device-form-barrier"]').exists()).toBe(true)
+    })
+  })
+
+  describe('weight field visibility (EventDevice.vue: showWeight)', () => {
+    it('is always shown for unpowered devices', async () => {
+      const wrapper = mountForm({ powered: false })
+      await wrapper.find('[data-testid="device-form-category"]').setValue('20')
+      expect(wrapper.find('[data-testid="device-form-weight"]').exists()).toBe(true)
+    })
+
+    it('is hidden for powered devices unless the misc category (46) is chosen', async () => {
+      const wrapper = mountForm({ powered: true })
+      await wrapper.find('[data-testid="device-form-category"]').setValue('10')
+      expect(wrapper.find('[data-testid="device-form-weight"]').exists()).toBe(false)
+
+      await wrapper.find('[data-testid="device-form-category"]').setValue('46')
+      expect(wrapper.find('[data-testid="device-form-weight"]').exists()).toBe(true)
+    })
+  })
+
+  describe('category suggestion (EXACT-match port)', () => {
+    it('applies a matching cluster category suggestion as the user types the item type (add mode)', async () => {
+      const wrapper = mountForm({ powered: true })
+      await wrapper.find('[data-testid="device-form-item-type"]').setValue('Toaster')
+
+      expect(wrapper.find('[data-testid="device-form-category"]').element.value).toBe('10')
+    })
+
+    it('does not overwrite an existing category when editing', async () => {
+      const wrapper = mountForm({
+        powered: true,
+        device: { id: 7, item_type: '', category: { id: 20, name: 'Bicycle', powered: false }, images: [] },
+      })
+
+      await wrapper.find('[data-testid="device-form-item-type"]').setValue('Toaster')
+
+      // The category select stays on the device's original category (20),
+      // not the "Toaster" suggestion (10), because editing.value is true
+      // and form.category was already non-empty.
+      expect(wrapper.find('[data-testid="device-form-category"]').element.value).toBe('20')
+    })
+  })
+
+  describe('edit mode', () => {
+    function editDevice(overrides = {}) {
+      return {
+        id: 7,
+        item_type: 'Kettle',
+        category: { id: 10, name: 'Toaster', powered: true },
+        brand: 'Acme',
+        model: 'K1',
+        age: 2,
+        estimate: 0,
+        problem: 'Broken',
+        notes: 'Some notes',
+        repair_status: 'Fixed',
+        next_steps: null,
+        spare_parts: 'No',
+        barrier: null,
+        images: [{ idxref: 1, path: 'a.jpg' }],
+        ...overrides,
+      }
+    }
+
+    it('prefills the form from the device prop', () => {
+      const wrapper = mountForm({ device: editDevice() })
+
+      expect(wrapper.find('[data-testid="device-form-item-type"]').element.value).toBe('Kettle')
+      expect(wrapper.find('[data-testid="device-form-category"]').element.value).toBe('10')
+      expect(wrapper.find('[data-testid="device-form-brand"]').element.value).toBe('Acme')
+      expect(wrapper.find('[data-testid="device-form-model"]').element.value).toBe('K1')
+    })
+
+    it('shows DevicePhotos with the device id and existing images', () => {
+      const wrapper = mountForm({ device: editDevice() })
+      const photos = wrapper.findComponent(DevicePhotosStub)
+      expect(photos.exists()).toBe(true)
+      expect(photos.props('deviceId')).toBe(7)
+      expect(photos.props('images')).toEqual([{ idxref: 1, path: 'a.jpg' }])
+    })
+
+    it('does not show quantity when editing', () => {
+      const wrapper = mountForm({ device: editDevice() })
+      expect(wrapper.find('[data-testid="device-form-quantity"]').exists()).toBe(false)
+    })
+
+    it('submits an update keyed by the device id, not addDevice', async () => {
+      store.updateDevice = vi.fn().mockResolvedValue({ device: editDevice() })
+      const wrapper = mountForm({ device: editDevice() })
+
+      await wrapper.find('[data-testid="device-form"]').trigger('submit')
+      await wrapper.vm.$nextTick()
+
+      expect(store.updateDevice).toHaveBeenCalledWith(5, 7, expect.objectContaining({ category: 10, item_type: 'Kettle' }))
+    })
+  })
+})

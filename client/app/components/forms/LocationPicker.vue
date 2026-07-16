@@ -54,6 +54,26 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  // Optional copy overrides so non-group callers (e.g. EventForm.vue's
+  // "venue" field, api-contracts-phase-c.md C4) don't have to say
+  // "Location" - defaults reproduce the original group-only copy exactly,
+  // so GroupForm.vue (and its tests) are unaffected.
+  label: {
+    type: String,
+    default: null,
+  },
+  placeholder: {
+    type: String,
+    default: null,
+  },
+  helpText: {
+    type: String,
+    default: null,
+  },
+  errorText: {
+    type: String,
+    default: null,
+  },
 })
 
 const emit = defineEmits(['update:location', 'update:postcode', 'update:lat', 'update:lng', 'place-selected'])
@@ -162,7 +182,7 @@ function onLngInput(event) {
 
 <template>
   <div class="location-picker">
-    <BFormGroup :label="`${t('groups.location')}:`" label-for="location-picker-input">
+    <BFormGroup :label="`${label || t('groups.location')}:`" label-for="location-picker-input">
       <div class="location-picker__autocomplete">
         <input
           id="location-picker-input"
@@ -170,7 +190,7 @@ function onLngInput(event) {
           type="text"
           class="form-control"
           :class="{ 'is-invalid': hasError }"
-          :placeholder="t('groups.groups_location_placeholder')"
+          :placeholder="placeholder || t('groups.groups_location_placeholder')"
           autocomplete="off"
           data-testid="location-picker-input"
           @input="onInput"
@@ -189,10 +209,10 @@ function onLngInput(event) {
         </ul>
       </div>
       <small v-if="hasError" class="form-text text-danger" data-testid="location-picker-error">
-        {{ t('groups.geocode_failed') }}
+        {{ errorText || t('groups.geocode_failed') }}
       </small>
       <small v-else class="form-text text-muted">
-        {{ t('groups.groups_location_small') }}
+        {{ helpText || t('groups.groups_location_small') }}
       </small>
     </BFormGroup>
 
