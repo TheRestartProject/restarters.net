@@ -38,18 +38,18 @@ Status: ⬜ pending · 🔄 in progress · ✅ done · ❌ blocked
 | B4 | Pages: /group (mine), /group/all, /group/nearby lists + stores/groups + GroupsTable/GroupCard + vitest | ✅ | column_preferences → user preference API not session |
 | B5 | Pages: /group/view/{id} (stats, events, volunteers, permissions from #892) + vitest | ✅ | |
 | B6 | Pages: /group/create + /group/edit/{id} (geocode via /api/v2/maps proxy ported here; Quill wrapper; tus image upload) + vitest | ✅ | MapsProxy → /api/v2/maps/* done here; RichTextEditor (Quill 2) + LocationPicker + TusImageUpload components |
-| B7 | Group map page (port RES-1995 map work) | 🔄 | UNBLOCKED by Edward 2026-07-16: fold in PR #887 assuming it merges. Sequence: (1) after phase-c-server commits → merge origin/RES-1995_map_of_groups_l10 (conflicts only routes/api.php + resources/js/app.js, additive-union); (2) after phase-de-client workflow finishes → build the map page vs names+summary endpoints |
+| B7 | Group map page (port RES-1995 map work) | 🔄 | UNBLOCKED by Edward 2026-07-16: fold in PR #887 assuming it merges. Sequence: (1) after phase-c-server commits → merge origin/RES-1995_map_of_groups_l10 (conflicts only routes/api.php + resources/js/app.js, additive-union); (2) after phase-de-client workflow finishes → build the map page vs names+summary endpoints  — #887 MERGED into branch 2026-07-16; map page build queued behind phase-de-client workflow |
 | B8 | Playwright: group.test.js flows ported (create, unfollow, image upload) + dashboard smoke | ✅ | client/e2e/group.test.js (3 flows + smoke); data-testid selectors; deterministic waits (waitForResponse) |
 
 ## Phase C — Events + Devices slice
 
 | # | Task | Status | Notes |
 |---|------|--------|-------|
-| C1 | API: RSVP family + `GET /events/{id}/attendees` + per-user `attending` flag on v2 event resource, volunteer PATCH/invite, event devices list, images, DELETE event, moderation approve + phpunit | 🔄 | useEventComputed(event) + useEventAttendance(id) composable pair depends on these |
+| C1 | API: RSVP family + `GET /events/{id}/attendees` + per-user `attending` flag on v2 event resource, volunteer PATCH/invite, event devices list, images, DELETE event, moderation approve + phpunit | ✅ | useEventComputed(event) + useEventAttendance(id) composable pair depends on these |
 | C2 | Pages: /party (list mine), /party/all + /party/all-past (DEAD legacy routes — build minimal per contracts doc over GET users/me/events), group events tab + stores/events + vitest | ✅ | EventsTable/EventCard/EventFilters; joined/hosted badges |
 | C3 | Pages: /party/view/{id} (RSVP, volunteers, devices readonly, calendar links, share) + vitest | ✅ | ics links stay Laravel /calendar/* |
 | C4 | Pages: /party/create /party/edit/{id} /party/duplicate/{id} (b-calendar→vue-datepicker-next, venue/group-location picker, moderation approve UI) + vitest | ✅ | .event-approve select preserved as data-testid=event-approve |
-| C5 | API+pages: device CRUD on event page (item type autocomplete/category suggestion port of items store, spare parts, barriers, photos via tus) + vitest | 🔄 | /api/v2/devices/options endpoint (brands/barriers/spareparts/itemtypes); DeviceForm + DeviceRow + useCategorySuggestion (exact-match port of items.js — legacy has NO fuzzy matching; keep parity); addDevice/updateDevice/deleteDevice + photo attach via tus; multiselect keyboard UX preserved |
+| C5 | API+pages: device CRUD on event page (item type autocomplete/category suggestion port of items store, spare parts, barriers, photos via tus) + vitest | ✅ | /api/v2/devices/options endpoint (brands/barriers/spareparts/itemtypes); DeviceForm + DeviceRow + useCategorySuggestion (exact-match port of items.js — legacy has NO fuzzy matching; keep parity); addDevice/updateDevice/deleteDevice + photo attach via tus; multiselect keyboard UX preserved |
 | C6 | Pages: /fixometer (home), device search/list, impact stats + vitest | ✅ | fixometer dashboard page + /device/search page + ImpactStats components; GET /api/v2/devices paginated+filters endpoint added (APIv2DevicesListTest) |
 | C7 | Playwright: event.test.js + device.test.js flows ported | ⬜ | client/e2e/event.test.js (create future/past, invite modal), device.test.js (5 flows incl. photo + category suggestion excluded-slow) |
 
