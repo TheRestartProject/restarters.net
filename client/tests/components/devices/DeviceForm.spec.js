@@ -108,11 +108,9 @@ describe('components/devices/DeviceForm', () => {
       problem: 'Would not toast',
       notes: 'Needed a new element',
       repair_status: 'Fixed',
-      next_steps: null,
-      // showSpareParts is true for Fixed, but the select wasn't touched in
-      // this test, so it keeps its blank default -> null, not a guessed value.
-      spare_parts: null,
-      barrier: null,
+      // Empty optionals are OMITTED, not sent as null: the endpoint's
+      // pre-existing validation ('brand' => 'string' etc., no nullable)
+      // 422s on null values - the shape the legacy client always sent.
     })
   })
 

@@ -223,9 +223,9 @@ describe('pages/party/view/[id]', () => {
       expect(wrapper.find('[data-testid="event-view-delete"]').exists()).toBe(true)
     })
 
-    it('shows Edit/Delete when the dashboard reports the user hosts the event\'s group', () => {
+    it('shows Edit/Delete when memberships report the user hosts the event\'s group', () => {
       eventsStore.current.data = baseEvent({ group: { id: 9, name: 'Acme Restarters' } })
-      dashboardStore.data = { your_groups: [{ id: 9, name: 'Acme Restarters', role: 3 }] }
+      groupsStore.memberships = [{ id: 9, name: 'Acme Restarters', role: 3 }]
       authStore.user = { role_name: 'Restarter' }
 
       const wrapper = mountPage()
@@ -235,7 +235,7 @@ describe('pages/party/view/[id]', () => {
     it('hides Edit/Duplicate/Delete for a plain Restarter not hosting the group', () => {
       eventsStore.current.data = baseEvent()
       authStore.user = { role_name: 'Restarter' }
-      dashboardStore.data = { your_groups: [] }
+      groupsStore.memberships = []
 
       const wrapper = mountPage()
       expect(wrapper.find('[data-testid="event-view-edit"]').exists()).toBe(false)
@@ -281,7 +281,7 @@ describe('pages/party/view/[id]', () => {
     it('hides Invite volunteers for a non-editing attendee (stricter than legacy - api-gaps.md)', () => {
       eventsStore.current.data = baseEvent({ approved: true, attending: true })
       authStore.user = { role_name: 'Restarter' }
-      dashboardStore.data = { your_groups: [] }
+      groupsStore.memberships = []
 
       const wrapper = mountPage()
       expect(wrapper.find('[data-testid="event-view-invite"]').exists()).toBe(false)

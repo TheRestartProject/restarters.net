@@ -54,7 +54,7 @@ function dismiss() {
 <template>
   <BModal
     :model-value="show"
-    hide-footer
+    no-footer
     hide-header
     data-testid="onboarding-modal"
     @hide="dismiss"

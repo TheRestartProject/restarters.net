@@ -43,7 +43,7 @@ async function deleteAccount() {
       </BButton>
     </div>
 
-    <BModal :model-value="showModal" :title="t('partials.are_you_sure')" hide-footer data-testid="delete-account-modal" @hide="showModal = false">
+    <BModal :model-value="showModal" :title="t('partials.are_you_sure')" no-footer data-testid="delete-account-modal" @hide="showModal = false">
       <p>{{ t('auth.delete_account_text') }}</p>
       <div class="d-flex justify-content-end gap-2">
         <BButton variant="outline-secondary" @click="showModal = false">{{ t('partials.cancel') }}</BButton>

@@ -72,7 +72,11 @@ function onAdded() {
       <span class="fw-normal">({{ devices.length }})</span>
     </h2>
 
-    <div v-if="loading" data-testid="event-devices-loading">
+    <!-- Stale-while-revalidate: only swap to the spinner when there is no
+         data yet. A forced refresh (e.g. after a photo upload) must NOT
+         unmount the table - that destroyed DeviceRow's editing state and
+         closed the edit form mid-upload. -->
+    <div v-if="loading && devices.length === 0" data-testid="event-devices-loading">
       <div class="placeholder-glow">
         <span class="placeholder col-12" style="height: 3rem" />
       </div>

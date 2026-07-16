@@ -2,7 +2,6 @@
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useEventsStore } from '~/stores/events.js'
-import { useDashboardStore } from '~/stores/dashboard.js'
 import { useGroupsStore } from '~/stores/groups.js'
 import { useDevicesStore } from '~/stores/devices.js'
 import { useAuth } from '~/composables/useAuth.js'
@@ -34,7 +33,6 @@ import EventDevicesPanel from '~/components/devices/EventDevicesPanel.vue'
 const { t } = useI18n()
 const route = useRoute()
 const eventsStore = useEventsStore()
-const dashboardStore = useDashboardStore()
 const groupsStore = useGroupsStore()
 const devicesStore = useDevicesStore()
 const { hasRole, loggedIn } = useAuth()
@@ -64,10 +62,14 @@ const approved = computed(() => !!event.value?.approved)
 // best-effort source pages/party/index.vue already uses for its "hosting"
 // badge.
 const isAdmin = computed(() => hasRole('Administrator'))
+// Memberships come from GET /api/v2/users/me/groups (uncapped, role per
+// group) rather than the dashboard's your_groups (capped at 5 and only
+// fresh after visiting /dashboard) - the stale-cap variant hid the device
+// panel from hosts of newly created groups.
 const hostedGroupIds = computed(() =>
-  (dashboardStore.data?.your_groups || []).filter((g) => g.role === 3).map((g) => g.id)
+  (groupsStore.memberships || []).filter((g) => g.role === 3).map((g) => g.id)
 )
-const memberGroupIds = computed(() => (dashboardStore.data?.your_groups || []).map((g) => g.id))
+const memberGroupIds = computed(() => (groupsStore.memberships || []).map((g) => g.id))
 const isHostOfGroup = computed(() => !!event.value?.group && hostedGroupIds.value.includes(event.value.group.id))
 const inGroup = computed(() => !!event.value?.group && memberGroupIds.value.includes(event.value.group.id))
 
@@ -96,7 +98,9 @@ function load() {
   // stores/events.js#devices/fetchDevices (C3) - see stores/devices.js's
   // doc comment for why that field was left in place rather than removed.
   devicesStore.fetchForEvent(id.value)
-  dashboardStore.fetch().catch(() => {})
+  if (loggedIn.value) {
+    groupsStore.fetchMemberships().catch(() => {})
+  }
 }
 
 function retry() {

@@ -83,7 +83,7 @@ function close() {
     :model-value="show"
     data-testid="network-associate-groups-modal"
     :title="t('networks.show.add_groups_modal_header', { name: networkName })"
-    hide-footer
+    no-footer
     @hide="close"
   >
     <BAlert v-if="successMessage" :model-value="true" variant="success" data-testid="network-associate-groups-success">

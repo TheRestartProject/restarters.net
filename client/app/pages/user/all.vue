@@ -321,7 +321,7 @@ onMounted(() => {
     <BModal
       :model-value="editingUserId !== null"
       :title="roleModalTitle"
-      hide-footer
+      no-footer
       data-testid="users-role-modal"
       @hide="closeRoleModal"
     >

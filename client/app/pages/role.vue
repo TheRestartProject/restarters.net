@@ -151,7 +151,7 @@ onMounted(load)
       </table>
     </div>
 
-    <BModal :model-value="showEdit" :title="editTitle" hide-footer data-testid="roles-edit-modal" @hide="closeEditModal">
+    <BModal :model-value="showEdit" :title="editTitle" no-footer data-testid="roles-edit-modal" @hide="closeEditModal">
       <p v-if="editError" class="text-danger" data-testid="roles-edit-error">{{ editError }}</p>
       <div v-if="editingRole">
         <p>{{ t('admin.role_permissions_help') }}</p>

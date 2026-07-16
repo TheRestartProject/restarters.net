@@ -103,31 +103,44 @@ const quantities = Array.from({ length: 11 }, (_, i) => i)
 const categorySuggested = ref(false)
 let suggestionTimer = null
 
+// Two triggers with different clearing semantics (the legacy implementation
+// derived the suggestion from a computed over the Vuex store, so both cases
+// worked implicitly):
+// - user edits the item type: apply a matching suggestion, or clear the
+//   category when nothing matches (legacy behavior for add);
+// - the item-types/clusters datasets arrive after the user already typed:
+//   apply a match, but NEVER clear - the user may have picked a category
+//   manually while the data was still loading.
+function runSuggestion(value, { allowClear }) {
+  const suggestion = suggestDeviceCategory({
+    itemType: value,
+    powered: props.powered,
+    clusters: clusters.value,
+    itemTypes: itemTypes.value,
+    translate: t,
+  })
+
+  if (suggestion) {
+    if (!editing.value || !form.category) {
+      form.category = suggestion.idcategories
+      categorySuggested.value = true
+      clearTimeout(suggestionTimer)
+      suggestionTimer = setTimeout(() => {
+        categorySuggested.value = false
+      }, 5000)
+    }
+  } else if (allowClear && !editing.value) {
+    form.category = null
+  }
+}
+
 watch(
   () => form.itemType,
-  (newVal) => {
-    const suggestion = suggestDeviceCategory({
-      itemType: newVal,
-      powered: props.powered,
-      clusters: clusters.value,
-      itemTypes: itemTypes.value,
-      translate: t,
-    })
-
-    if (suggestion) {
-      if (!editing.value || !form.category) {
-        form.category = suggestion.idcategories
-        categorySuggested.value = true
-        clearTimeout(suggestionTimer)
-        suggestionTimer = setTimeout(() => {
-          categorySuggested.value = false
-        }, 5000)
-      }
-    } else if (!editing.value) {
-      form.category = null
-    }
-  }
+  (newVal) => runSuggestion(newVal, { allowClear: true })
 )
+watch([itemTypes, clusters], () => {
+  if (form.itemType) runSuggestion(form.itemType, { allowClear: false })
+})
 
 // Powered devices only allow editing the weight for the "None of the
 // above" misc category; unpowered devices always allow it
@@ -159,20 +172,33 @@ const missingCategory = ref(false)
 const generalError = ref('')
 
 function buildPayload() {
-  return {
+  // The v2 device endpoint's validation (a pre-existing contract) accepts
+  // most optional fields as omit-or-string, NOT null - `'brand' => 'string'`
+  // etc. fail on null (same class as the group-form postcode bug). Only
+  // 'problem'/'next_steps'/'barrier' are nullable server-side, but omitting
+  // empties uniformly is simplest and matches what the legacy client sent.
+  const payload = {
     category: form.category,
-    item_type: form.itemType || null,
-    brand: form.brand || null,
-    model: form.model || null,
     age: form.age ? parseFloat(form.age) : 0,
     estimate: form.estimate ? parseFloat(form.estimate) : 0,
-    problem: form.problem || null,
-    notes: form.notes || null,
-    repair_status: form.repairStatus || null,
-    next_steps: showNextSteps.value ? form.nextSteps || null : null,
-    spare_parts: showSpareParts.value ? form.spareParts || null : null,
-    barrier: showBarrier.value ? form.barrier || null : null,
   }
+
+  const optional = {
+    item_type: form.itemType,
+    brand: form.brand,
+    model: form.model,
+    problem: form.problem,
+    notes: form.notes,
+    repair_status: form.repairStatus,
+    next_steps: showNextSteps.value ? form.nextSteps : '',
+    spare_parts: showSpareParts.value ? form.spareParts : '',
+    barrier: showBarrier.value ? form.barrier : '',
+  }
+  for (const [key, value] of Object.entries(optional)) {
+    if (value) payload[key] = value
+  }
+
+  return payload
 }
 
 async function submit() {

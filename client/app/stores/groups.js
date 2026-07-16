@@ -60,6 +60,13 @@ export const useGroupsStore = defineStore('groups', {
     namesLoading: false,
     namesError: null,
 
+    // ALL of the current user's group memberships with pivot role -
+    // GET /api/v2/users/me/groups (uncapped, unlike the dashboard's
+    // your_groups which is limited to 5 and only fetched on /dashboard).
+    // null = never fetched.
+    memberships: null,
+    membershipsLoading: false,
+
     // id -> full Group resource (GET /api/v2/groups/{id})
     details: {},
     // id -> boolean, true while a hydration request is in flight
@@ -87,6 +94,21 @@ export const useGroupsStore = defineStore('groups', {
   },
 
   actions: {
+    async fetchMemberships(force = false) {
+      if (this.membershipsLoading || (this.memberships !== null && !force)) {
+        return this.memberships
+      }
+      this.membershipsLoading = true
+      try {
+        const { $api } = useNuxtApp()
+        const { data } = await $api.user.myGroups()
+        this.memberships = data
+        return data
+      } finally {
+        this.membershipsLoading = false
+      }
+    },
+
     async fetchNames(params) {
       const { $api } = useNuxtApp()
 

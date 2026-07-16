@@ -109,8 +109,15 @@ onMounted(load)
             <BBadge v-if="group.archived_at" variant="secondary" pill data-testid="group-view-archived">
               {{ t('groups.archived_group') }}
             </BBadge>
-            <div v-if="group.tags && group.tags.length" class="mb-2">
-              <BBadge v-for="tag in group.tags" :key="tag.id" variant="info" pill class="me-1">
+            <div v-if="group.tags && group.tags.length" class="mb-2" data-testid="group-view-tags">
+              <BBadge
+                v-for="tag in group.tags"
+                :key="tag.id"
+                variant="info"
+                pill
+                class="me-1"
+                :data-testid="`group-view-tag-${tag.id}`"
+              >
                 {{ tag.name }}
               </BBadge>
             </div>

@@ -428,7 +428,7 @@ onMounted(load)
     <BModal
       :model-value="showCreate"
       :title="labels.createButton"
-      hide-footer
+      no-footer
       :data-testid="`${testidPrefix}-create-modal`"
       @hide="showCreate = false; resetCreateForm()"
     >
@@ -495,7 +495,7 @@ onMounted(load)
     <BModal
       :model-value="showEdit"
       :title="labels.editTitle"
-      hide-footer
+      no-footer
       :data-testid="`${testidPrefix}-edit-modal`"
       @hide="showEdit = false; resetEditForm()"
     >
@@ -563,7 +563,7 @@ onMounted(load)
       v-if="allowDelete"
       :model-value="showDeleteConfirm"
       :title="labels.confirmDeleteTitle"
-      hide-footer
+      no-footer
       :data-testid="`${testidPrefix}-delete-modal`"
       @hide="cancelDelete"
     >
