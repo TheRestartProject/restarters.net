@@ -39,26 +39,22 @@ class BasicTest extends TestCase
                 // Can't assert on all-group-tags dev systems might have varying info.
                 'your-area' => 'London',
                 ':can-create' => 'true',
-                ':user-id' => $user->id,
                 'tab' => $tab,
                 ':network' => 'null',
                 ':networks' => '[{"id":' . Network::first()->id . ',"name":"Restarters","description":null,"website":null,"default_language":"en","timezone":"Europe\\/London","created_at":"2021-05-24 12:19:37","updated_at":"2021-05-24 12:19:37","events_push_to_wordpress":0,"include_in_zapier":0,"users_push_to_drip":0,"shortname":"restarters","discourse_group":null,"auto_approve_events":0,"logo":null}]',
                 ':show-tags' => 'false',
             ],
         ]);
-
-        $groups = json_decode($props[1][':all-groups'], true);
-        $this->assertEquals($group->idgroups, $groups[0]['idgroups']);
-        $this->assertEquals(0, $groups[0]['location']['distance']);
     }
 
 
-    public function tabProvider(): array {
+    public static function tabProvider(): array {
         return [
             ['', 'mine'],
-            ['/all', 'all'],
+            ['/all', 'other'],
             ['/mine', 'mine'],
-            ['/nearby','nearby'],
+            ['/nearby','other'],
+            ['/other', 'other'],
         ];
     }
 }

@@ -36,23 +36,26 @@
       />
     </div>
     <hr class="d-block d-md-none" />
-    <b-table :fields="fields" :items="itemsToShow" sort-null-last thead-tr-class="d-none d-md-table-row" :sort-compare="sortCompare">
+    <b-table :fields="fields" :items="itemsToShow" sort-null-last thead-tr-class="d-none d-md-table-row" :sort-compare="sortCompare"
+             :tbody-tr-class="rowClass"
+             @row-hovered="rowHovered" @row-unhovered="rowUnhovered"
+    >
       <template slot="head(group_image)">
         <span />
       </template>
       <template slot="cell(group_image)" slot-scope="data">
-        <b-img-lazy :src="data.item.group_name.image" class="profile" @error.native="brokenProfileImage" v-if="data.item.group_name.image" />
+        <b-img-lazy :src="groupImage(data.item)" class="profile" @error.native="brokenProfileImage" v-if="groupImage(data.item)" />
         <b-img-lazy :src="defaultProfile" class="profile" v-else />
       </template>
       <template slot="head(group_name)">
         <b-img :src="imageUrl('/icons/group_name_ico.svg')" class="mt-3 icon" />
       </template>
       <template slot="cell(group_name)" slot-scope="data">
-        <a :href="'/group/view/' + data.item.group_name.idgroups">{{ data.item.group_name.name }}</a>
-        <GroupArchivedBadge :idgroups="data.item.group_name.idgroups" />
-        <div v-if="showTags && data.item.group_name.group_tags_full && data.item.group_name.group_tags_full.length" class="mt-1">
+        <a :href="'/group/view/' + (data.item.idgroups || data.item.id)">{{ data.item.name }}</a>
+        <GroupArchivedBadge :idgroups="data.item.idgroups || data.item.id" />
+        <div v-if="showTags && data.item.group_tags_full && data.item.group_tags_full.length" class="mt-1">
           <b-badge
-              v-for="tag in visibleTags(data.item.group_name.group_tags_full)"
+              v-for="tag in visibleTags(data.item.group_tags_full)"
               :key="tag.id"
               variant="secondary"
               class="mr-1 tag-badge"
@@ -63,16 +66,16 @@
         <b-img :src="imageUrl('/icons/map_marker_ico.svg')" class="mt-3 icon " />
       </template>
       <template slot="cell(location)" slot-scope="data">
-        <div class="d-none d-md-block">
-          {{ data.item.location.location.location }} <span class="text-muted small" v-if="data.item.location.location.distance">{{ distance(data.item.location.location.distance )}}&nbsp;km</span>
+        <div class="d-none d-md-block" v-if="data.item.location && data.item.location.location">
+          {{ data.item.location.location }} <span class="text-muted small" v-if="data.item.location.distance">{{ distance(data.item.location.distance )}}&nbsp;km</span>
           <br />
-          <span class="small text-muted">{{ data.item.location.location.country }}</span>
+          <span class="small text-muted">{{ data.item.location.country }}</span>
         </div>
       </template>
-      <template slot="head(all_confirmed_hosts_count)">
+      <template slot="head(hosts)">
         <b-img :src="imageUrl('/icons/user_ico.svg')" class="mt-3 iconsmall" />
       </template>
-      <template slot="head(all_confirmed_restarters_count)">
+      <template slot="head(restarters)">
         <b-img :src="imageUrl('/icons/volunteer_ico-thick.svg')" class="mt-3 icon" />
       </template>
       <template slot="head(next_event)">
@@ -81,7 +84,7 @@
       <template slot="cell(next_event)" slot-scope="data">
         <div>
           <div v-if="data.item.next_event">
-            {{ data.item.next_event }}
+            {{ formatDate(data.item.next_event) }}
           </div>
           <div v-else>
             {{ __('groups.upcoming_none_planned') }}
@@ -93,9 +96,9 @@
       </template>
       <template slot="cell(following)" slot-scope="data">
         <div v-if="approve" class="cell-warning d-flex justify-content-around p-2">
-          <a :href="'/group/edit/' + data.item.idgroups">{{ __('groups.group_requires_moderation') }}</a>
+          <a :href="'/group/edit/' + data.item.id">{{ __('groups.group_requires_moderation') }}</a>
         </div>
-        <b-btn variant="primary" class="text-nowrap mr-2" v-else-if="!data.item.following" :to="'/group/join/' + data.item.idgroups">
+        <b-btn variant="primary" class="text-nowrap mr-2" v-else-if="!yourGroup(data.item.id)" :to="'/group/join/' + data.item.id">
           <span class="d-block d-md-none">
             {{ __('groups.join_group_button_mobile') }}
           </span>
@@ -103,7 +106,7 @@
             {{ __('groups.join_group_button') }}
           </span>
         </b-btn>
-        <b-btn variant="primary" class="text-nowrap mr-2" v-else @click="leaveGroup(data.item.idgroups)">
+        <b-btn variant="primary" class="text-nowrap mr-2" v-else @click="leaveGroup(data.item.id)">
           <span class="d-block d-md-none">
             {{ __('groups.leave_group_button_mobile') }}
           </span>
@@ -111,9 +114,13 @@
             {{ __('groups.leave_group_button') }}
           </span>
         </b-btn>
-        <ConfirmModal :key="'leavegroupmodal-' + data.item.idgroups" :ref="'confirmLeave-' + data.item.idgroups" @confirm="leaveConfirmed(data.item.idgroups)" :message="__('groups.leave_group_confirm')" />
+        <ConfirmModal :key="'leavegroupmodal-' + data.item.id" :ref="'confirmLeave-' + data.item.id" @confirm="leaveConfirmed(data.item.id)" :message="__('groups.leave_group_confirm')" />
       </template>
     </b-table>
+    <infinite-loading @infinite="loadMore">
+      <span slot="no-results" />
+      <span slot="no-more" />
+    </infinite-loading>
   </div>
 </template>
 <script>
@@ -123,16 +130,44 @@ import moment from 'moment'
 import GroupsTableFilters from './GroupsTableFilters.vue'
 import ConfirmModal from './ConfirmModal.vue'
 import GroupArchivedBadge from "./GroupArchivedBadge.vue";
+import InfiniteLoading from 'vue-infinite-loading'
+
 
 export default {
-  components: {GroupArchivedBadge, ConfirmModal, GroupsTableFilters},
+  components: {GroupArchivedBadge, ConfirmModal, GroupsTableFilters, InfiniteLoading},
   mixins: [images],
   props: {
-    groups: {
+    groupids: {
       type: Array,
       required: true
     },
+    // Group id whose row should be highlighted (set when its map pin is hovered).
+    hover: {
+      type: Number,
+      required: false,
+      default: null
+    },
     count: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    tab: {
+      type: Number,
+      required: false,
+      default: 0
+    },
+    yourArea: {
+      type: String,
+      required: false,
+      default: null
+    },
+    yourGroups: {
+      type: Array,
+      required: false,
+      default: () => [],
+    },
+    approve: {
       type: Boolean,
       required: false,
       default: false
@@ -141,11 +176,6 @@ export default {
       type: Boolean,
       required: false,
       default: false
-    },
-    network: {
-      type: Number,
-      required: false,
-      default: null
     },
     networks: {
       type: Array,
@@ -162,39 +192,24 @@ export default {
       required: false,
       default: false
     },
-    tab: {
-      type: Number,
-      required: false,
-      default: 0
-    },
-    yourArea: {
-      type: String,
-      required: false,
-      default: null
-    },
-    approve: {
-      type: Boolean,
-      required: false,
-      default: false
-    }
   },
   data () {
     return {
-      fields: [
-        { key: 'group_image', label: 'Group Image', tdClass: 'image'},
-        { key: 'group_name', label: 'Group Name', sortable: true },
-        { key: 'location', label: 'Location', tdClass: "hidecell", thClass: "hidecell" },
-        { key: 'all_confirmed_hosts_count', label: 'Hosts', sortable: true, tdClass: "hidecell text-center", thClass: "hidecell text-center pl-3" },
-        { key: 'all_confirmed_restarters_count', label: 'Restarters', sortable: true, tdClass: "hidecell text-center", thClass: "hidecell text-center pl-3" },
-        { key: 'next_event', label: 'Next Event', sortable: true, tdClass: "hidecell event", thClass: "hidecell" },
-        { key: 'following' , label: 'Follow' }
-      ],
       searchName: null,
       searchLocation: null,
       searchNetwork: null,
       searchCountry: null,
-      searchShow: false,
       searchTags: null,
+      searchShow: false,
+      fields: [
+        { key: 'group_image', label: 'Group Image', tdClass: 'image'},
+        { key: 'group_name', label: 'Group Name', sortable: true },
+        { key: 'location', label: 'Location', tdClass: "hidecell", thClass: "hidecell" },
+        { key: 'hosts', label: 'Hosts', sortable: true, tdClass: "hidecell text-center", thClass: "hidecell text-center pl-3" },
+        { key: 'restarters', label: 'Restarters', sortable: true, tdClass: "hidecell text-center", thClass: "hidecell text-center pl-3" },
+        { key: 'next_event', label: 'Next Event', sortable: true, tdClass: "hidecell event", thClass: "hidecell" },
+        { key: 'following' , label: 'Follow' }
+      ],
       show: 3,
       left: []
     }
@@ -203,94 +218,94 @@ export default {
     defaultProfile() {
       return DEFAULT_PROFILE
     },
-    filteredGroups() {
-      return this.groups.filter(g => {
-        // Groups can be in multiple networks.
-        let match = true
-
-        if (this.searchNetwork) {
-          match &= typeof g.networks.find(n => {
-            return parseInt(this.searchNetwork) === parseInt(n)
-          }) !== 'undefined'
-        }
-
-        if (this.searchName) {
-          match &= g.name.toLowerCase().indexOf(this.searchName.toLowerCase()) !== -1
-        }
-
-        if (this.searchLocation) {
-          if (g.location && g.location.location) {
-            match &= g.location.location.toLowerCase().indexOf(this.searchLocation.toLowerCase()) !== -1
-          }
-        }
-
-        if (this.searchCountry) {
-          match &= g.location && g.location.country && g.location.country.toLowerCase().indexOf(this.searchCountry.country.toLowerCase()) !== -1
-        }
-
-        if (this.searchTags) {
-          // Tag in common?
-          if (this.searchTags.length) {
-            const tagsInCommon = this.searchTags.filter(t => {
-              return g.group_tags.indexOf(t.id) !== -1
-            })
-
-            match &= tagsInCommon.length > 0
-          }
-        }
-
-        if (this.left.includes(g.idgroups)) {
-          match = false
-        }
-
-        return match
-      })
+    groups() {
+      return this.$store.getters['groups/list']
     },
     items() {
-      return this.filteredGroups.map(g => {
-        return {
-          idgroups: g.idgroups,
-          group_image: g.group_image ? g.group_image : DEFAULT_PROFILE,
-          group_name: g,
-          location: g,
-          next_event: g.next_event ? (new moment(g.next_event).format(DATE_FORMAT)) : null,
-          all_hosts_count: g.all_hosts_count,
-          all_restarters_count: g.all_restarters_count,
-          all_confirmed_hosts_count: g.all_confirmed_hosts_count,
-          all_confirmed_restarters_count: g.all_confirmed_restarters_count,
-          following: g.following
-        }
-      })
+      return this.groups.filter((g) => this.groupids.includes(g.id))
+    },
+    filteredItems() {
+      let items = this.items
+
+      if (this.searchName) {
+        const name = this.searchName.toLowerCase()
+        items = items.filter(g => g.name && g.name.toLowerCase().includes(name))
+      }
+
+      if (this.searchLocation) {
+        const loc = this.searchLocation.toLowerCase()
+        items = items.filter(g => g.location && g.location.location && g.location.location.toLowerCase().includes(loc))
+      }
+
+      if (this.searchCountry) {
+        items = items.filter(g => g.location && g.location.country === this.searchCountry.country)
+      }
+
+      if (this.searchNetwork) {
+        // Groups may hold networks as summary objects ([{id}]) or as plain ids.
+        items = items.filter(g => (g.networks || []).some(n => (n && n.id !== undefined ? n.id : n) === this.searchNetwork))
+      }
+
+      if (this.searchTags && this.searchTags.length) {
+        const tagIds = this.searchTags.map(t => t.id)
+        items = items.filter(g => {
+          const groupTags = g.group_tags_full || []
+          return tagIds.every(id => groupTags.some(t => t.id === id))
+        })
+      }
+
+      return items
     },
     itemsToShow() {
-      return this.items.slice(0, this.show)
+      // Sort before slicing so the first page is the alphabetically-first
+      // groups, not whatever happened to be first in the store.
+      const items = [...this.filteredItems].sort((a, b) => {
+        return a.name.localeCompare(b.name)
+      })
+
+      return items.slice(0, this.show)
     },
     translatedGroupCount() {
       return this.__('groups.group_count', {
-        count: this.filteredGroups.length
+        count: this.items.length
       })
     },
-},
-  created() {
-    // We might arrive on the page to filter by network.
-    this.searchNetwork = this.network
   },
-  mounted() {
-    this.loadMore()
+  watch: {
+    itemsToShow: {
+      immediate: true,
+      handler(newVal) {
+        // Hydrate the visible rows in one batched call (image, location
+        // text, counts, next event, tag names). The store skips ids that
+        // are already hydrated or in flight.
+        const ids = newVal.map(g => g.id)
+
+        if (ids.length) {
+          this.$store.dispatch('groups/hydrate', { ids })
+        }
+      }
+    }
   },
   methods: {
+    eventStart(event) {
+      // next_event is an object ({start}) from the v2 APIs but a plain date
+      // string in the moderation store (newToOld).
+      return event && event.start ? event.start : event
+    },
+    formatDate(date) {
+      return new moment(this.eventStart(date)).format('ddd Do MMM YYYY')
+    },
     brokenProfileImage(event) {
       event.target.src = DEFAULT_PROFILE
     },
-    toggleFilters() {
-      this.searchShow = !this.searchShow
+    groupImage(item) {
+      // The v2 APIs return a bare path; the moderation store and old
+      // server-rendered data are already prefixed.
+      if (!item.image) {
+        return null
+      }
 
-      // Reset the search filters so that we don't end up filtered if we switch screen sizes.  It might be nice
-      // to preserve the filter values, but that would be a bit of a faff with some two-way props bindings.
-      this.searchName = null
-      this.searchLocation = null
-      this.searchNetwork = this.network
-      this.searchCountry = null
+      return item.image.startsWith('/') || item.image.startsWith('http') ? item.image : '/uploads/mid_' + item.image
     },
     sortCompare(aRow, bRow, key, sortDesc, formatter, compareOptions, compareLocale) {
       const a = aRow[key]
@@ -298,7 +313,7 @@ export default {
 
       if (key === 'group_name') {
         // We need a custom sort because we are putting a link into the group field.
-        return b.name.localeCompare(a.name, compareLocale, compareOptions)
+        return aRow.name.localeCompare(bRow.name, compareLocale, compareOptions)
       } else if (key === 'next_event') {
         // Sort no events to the end.
         if (!aRow.next_event && !bRow.next_event) {
@@ -308,9 +323,9 @@ export default {
         } else if (bRow.next_event && !aRow.next_event) {
           return 1
         } else {
-          return new moment(aRow.group_name.next_event).unix() - new moment(bRow.group_name.next_event).unix()
+          return new moment(this.eventStart(aRow.next_event)).unix() - new moment(this.eventStart(bRow.next_event)).unix()
         }
-      } else if (key === 'all_hosts_count' || key === 'all_restarters_count') {
+      } else if (key === 'hosts' || key === 'restarters') {
         if (parseInt(a) < parseInt(b)) {
           return -1
         } else if (parseInt(a) > parseInt(b)) {
@@ -319,15 +334,15 @@ export default {
           return 0
         }
       } else {
-        return toString(a).localeCompare(toString(b), compareLocale, compareOptions)
+        return String(a).localeCompare(String(b), compareLocale, compareOptions)
       }
     },
-    loadMore() {
-      // We can't use a genuine infinite scroll because we need the data loaded into the table for filtering.  But
-      // we can load it gradually so that the page looks more responsive.
+    loadMore($state) {
       if (this.show < this.items.length) {
-        this.show += 10
-        setTimeout(this.loadMore, 1)
+        this.show++
+        $state.loaded()
+      } else {
+        $state.complete()
       }
     },
     leaveGroup(idgroups) {
@@ -347,16 +362,35 @@ export default {
         return Math.round(dist)
       }
     },
+    yourGroup(id) {
+      // `left` tracks groups unfollowed in this session, so the button flips
+      // without waiting for fresh server data.
+      return this.yourGroups.includes(id) && !this.left.includes(id)
+    },
+    toggleFilters() {
+      this.searchShow = !this.searchShow
+    },
+    rowHovered(item, index, event) {
+      this.$emit('update:hover', item.id)
+    },
+    rowUnhovered(item, index, event) {
+      this.$emit('update:hover', null)
+    },
+    rowClass(item, type) {
+      return item && type === 'row' && item.id === this.hover ? 'group-row-hover' : ''
+    },
     visibleTags(tags) {
       // Filter tags to only show those the user has access to view
       // allGroupTags contains the tags the user can see (admin sees all, NC sees their networks)
       if (!this.allGroupTags || !tags) {
         return []
       }
-      const visibleTagIds = this.allGroupTags.map(t => t.id)
-      return tags.filter(t => visibleTagIds.includes(t.id))
+      // Resolve names from allGroupTags: index entries only carry tag ids
+      // until the row is hydrated.
+      const byId = new Map(this.allGroupTags.map(t => [t.id, t]))
+      return tags.filter(t => byId.has(t.id)).map(t => t.name ? t : byId.get(t.id))
     }
-  }
+  },
 }
 </script>
 <style scoped lang="scss">
@@ -426,5 +460,11 @@ export default {
   font-size: 0.75rem;
   font-weight: normal;
   padding: 0.2em 0.5em;
+}
+
+// Row whose map pin is hovered. ::v-deep because the tr is rendered inside
+// b-table, outside this component's scope attribute.
+::v-deep .group-row-hover td {
+  background-color: #fff3cd;
 }
 </style>

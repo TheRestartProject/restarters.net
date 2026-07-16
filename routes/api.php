@@ -115,10 +115,10 @@ Route::prefix('v2')->middleware(\App\Http\Middleware\VerifyUserConsentApi::class
         Route::middleware('auth:sanctum,api')->post('/invites/claim', [API\AuthController::class, 'claimInvitev2']);
 
         Route::prefix('/groups')->group(function() {
-            // Must be registered before the {id} routes below, or "nearby" would be captured
-            // as an {id} value.
+            // Must be registered before the {id} routes below, or "nearby"/"summary"
+            // would be captured as an {id} value.
             Route::middleware('auth:sanctum,api')->get('/nearby', [API\GroupMembershipController::class, 'nearbyv2']);
-
+            Route::get('/summary', [API\GroupController::class, 'listSummaryv2']);
             Route::get('/names', [API\GroupController::class, 'listNamesv2']);
             Route::get('/tags', [API\GroupController::class, 'listTagsv2']);
             Route::get('{id}/events', [API\GroupController::class, 'getEventsForGroupv2']);

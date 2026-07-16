@@ -142,3 +142,30 @@ h2 {
   width: 1rem;
   height: 1rem;
 }
+
+.fa-spin {
+  animation-name: spin;
+  animation-duration: 4s;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+@keyframes spin {
+  0%  {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+// Group map markers: only the stock blue Leaflet marker image ships in
+// public/images, so recolour it for the "your group" and hover states.
+// The stock marker is blue (hue ~207deg): +273deg lands on green, +153deg on red.
+.group-marker-yours {
+  filter: hue-rotate(273deg);
+}
+
+.group-marker-hover {
+  filter: hue-rotate(153deg) saturate(1.5);
+}

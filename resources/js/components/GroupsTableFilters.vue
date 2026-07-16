@@ -46,6 +46,7 @@
         open-direction="bottom"
     />
     <multiselect
+        v-if="networkOptions.length"
         v-model="searchNetwork"
         :placeholder="__('networks.network')"
         :options="networkOptions"

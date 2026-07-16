@@ -67,6 +67,9 @@ import RichTextEditor from './components/RichTextEditor.vue'
 import Notifications from './components/Notifications.vue'
 import GroupTimeZone from './components/GroupTimeZone.vue'
 import StatsShare from './components/StatsShare.vue'
+import GroupMapAndList from './components/GroupMapAndList.vue'
+import GroupMarker from './components/GroupMarker.vue'
+import GroupInfoModal from './components/GroupInfoModal.vue'
 import CategoriesTable from './components/CategoriesTable.vue'
 import RolesTable from './components/RolesTable.vue'
 import EmailValidation from './components/EmailValidation.vue'
@@ -453,6 +456,9 @@ function initializeJQuery() {
             'grouptagspage': GroupTagsPage,
             'categoriespage': CategoriesPage,
             'rolespage': RolesPage,
+            'groupmapandlist': GroupMapAndList,
+            'groupmarker': GroupMarker,
+            'groupinfomodal': GroupInfoModal,
           }
         })
       })
@@ -1107,6 +1113,6 @@ function initAutocomplete() {
 // All jQuery initialization moved to initializeJQuery() function above
 // Sentry initialization is also inside the initializeJQuery() function
 
-// Start jQuery initialization (called earlier on line 509, don't duplicate here)
+// Start jQuery initialization (called earlier in file)
 // initializeJQuery();
 
