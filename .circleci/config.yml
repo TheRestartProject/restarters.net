@@ -180,6 +180,17 @@ jobs:
             # Configure Discourse settings (only if Discourse web app is up)
             docker exec restarters php artisan discourse:setting personal_message_enabled_groups 10 || echo "Warning: discourse:setting failed - Discourse may not be fully started"
 
+            # Wait for the Discourse web app itself (non-fatal). Skipping npm
+            # made phpunit start ~12 min earlier, and Discourse-integration
+            # tests crawl against a cold Discourse (5s timeout + retries per
+            # call) — give it the warm-up window it used to get by accident.
+            echo "Waiting for Discourse web app (up to 10 min, non-fatal)..."
+            for i in $(seq 1 120); do
+              curl -f -s http://localhost:8003 >/dev/null 2>&1 && echo "✓ Discourse ready after $((i*5))s" && break
+              [ $((i % 12)) -eq 0 ] && echo "  Still waiting for Discourse... ($((i*5))s)"
+              sleep 5
+            done
+
       # Run PHPUnit tests
       - run:
           name: Run PHPUnit tests

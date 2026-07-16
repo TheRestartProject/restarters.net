@@ -57,6 +57,12 @@ abstract class TestCase extends BaseTestCase
     {
         parent::setUp();
 
+        // Blade-rendering tests must not depend on a built Vite manifest:
+        // CI's phpunit-only job skips npm entirely (SKIP_NPM_INSTALL), and
+        // these page-render tests assert content, not asset tags. Dies with
+        // the Blade tests at Phase F cutover.
+        $this->withoutVite();
+
         DB::statement('SET foreign_key_checks=0');
         Network::truncate();
         Group::truncate();
