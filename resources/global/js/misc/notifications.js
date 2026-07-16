@@ -1,9 +1,3 @@
-// NOTE (Phase F prep): this file exists in two places during the migration.
-// resources/global/js/misc/notifications.js is the canonical copy (survives
-// cutover, imported by global/js/app.js). This copy exists only because
-// vite.config.js's define {'global': 'window'} shim (for select2) mangles any
-// import path containing the token 'global' from within resources/js — and
-// this whole tree is deleted at Phase F anyway.
 function toggleRead(event) {
     event.preventDefault();
 
