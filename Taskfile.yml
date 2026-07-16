@@ -219,13 +219,23 @@ tasks:
     cmds:
       - mkdir -p /tmp/test-results/phpunit
       - |
-        if [ -z "$CIRCLECI" ]; then
-          echo "Resetting test database and running migrations..."
-          docker exec restarters bash -c "php artisan migrate:fresh --seed --database=mysql_testing --force"
+        # Always reset the test DB here (CI included). CI used to skip this,
+        # relying on the container-startup migrate:fresh — but that runs with
+        # no `set -e`, so a startup migration failure silently left the CI
+        # test DB missing the newest tables (seen 2026-07-16: sso_tickets
+        # absent while every earlier table existed). Explicit reset right
+        # before phpunit is deterministic and matches local behaviour.
+        echo "Resetting test database and running migrations..."
+        docker exec restarters bash -c "php artisan migrate:fresh --seed --database=mysql_testing --force"
+      - |
+        # Coverage only when it will actually be uploaded: XDEBUG coverage
+        # across the full suite accumulates enough memory to stall CI late in
+        # the run (three hangs at test ~683-702, different IO-free tests).
+        if [ -n "$COVERALLS_REPO_TOKEN" ]; then
+          docker exec -e COVERALLS_REPO_TOKEN="$COVERALLS_REPO_TOKEN" restarters bash -c "export XDEBUG_MODE=coverage; ./vendor/bin/phpunit -d memory_limit=1024M --bootstrap vendor/autoload.php --coverage-clover tests/clover.xml --log-junit /tmp/phpunit-results.xml --configuration ./phpunit.xml --teamcity {{ .CLI_ARGS }}"
         else
-          echo "Running on CircleCI - skipping database reset (handled by CI setup)"
+          docker exec restarters bash -c "export XDEBUG_MODE=off; ./vendor/bin/phpunit -d memory_limit=1024M --bootstrap vendor/autoload.php --log-junit /tmp/phpunit-results.xml --configuration ./phpunit.xml --teamcity {{ .CLI_ARGS }}"
         fi
-      - docker exec -e COVERALLS_REPO_TOKEN="$COVERALLS_REPO_TOKEN" restarters bash -c "export XDEBUG_MODE=coverage; ./vendor/bin/phpunit -d memory_limit=1024M --bootstrap vendor/autoload.php --coverage-clover tests/clover.xml --log-junit /tmp/phpunit-results.xml --configuration ./phpunit.xml --teamcity {{ .CLI_ARGS }}"
       - |
         if [ ! -z "$COVERALLS_REPO_TOKEN" ]; then
           echo "Uploading coverage to Coveralls..."
