@@ -87,6 +87,7 @@ export default defineConfig({
                 'resources/js/app.js',
                 'resources/sass/app.scss',
                 'resources/global/js/app.js',
+                'resources/global/js/widgets/stats-share.js',
                 'resources/global/css/app.scss',
                 'resources/wiki/js/wiki.js',
                 'resources/wiki/css/app.scss'
