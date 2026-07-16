@@ -38,7 +38,7 @@ Status: ⬜ pending · 🔄 in progress · ✅ done · ❌ blocked
 | B4 | Pages: /group (mine), /group/all, /group/nearby lists + stores/groups + GroupsTable/GroupCard + vitest | ✅ | column_preferences → user preference API not session |
 | B5 | Pages: /group/view/{id} (stats, events, volunteers, permissions from #892) + vitest | ✅ | |
 | B6 | Pages: /group/create + /group/edit/{id} (geocode via /api/v2/maps proxy ported here; Quill wrapper; tus image upload) + vitest | ✅ | MapsProxy → /api/v2/maps/* done here; RichTextEditor (Quill 2) + LocationPicker + TusImageUpload components |
-| B7 | Group map page (port RES-1995 map work) | ⬜ | @vue-leaflet/vue-leaflet + leaflet.markercluster + leaflet-control-geocoder (Photon) + CARTO tiles — port GroupMap.vue as-is (NOT MapLibre; design §2); names-index + summary?ids= split fetch |
+| B7 | Group map page (port RES-1995 map work) | 🔄 | UNBLOCKED by Edward 2026-07-16: fold in PR #887 assuming it merges. Sequence: (1) after phase-c-server commits → merge origin/RES-1995_map_of_groups_l10 (conflicts only routes/api.php + resources/js/app.js, additive-union); (2) after phase-de-client workflow finishes → build the map page vs names+summary endpoints |
 | B8 | Playwright: group.test.js flows ported (create, unfollow, image upload) + dashboard smoke | ✅ | client/e2e/group.test.js (3 flows + smoke); data-testid selectors; deterministic waits (waitForResponse) |
 
 ## Phase C — Events + Devices slice
