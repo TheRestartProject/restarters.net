@@ -315,7 +315,7 @@ tasks:
           export PLAYWRIGHT_API_URL=http://www.example.com:8001
           export PW_TEST_HTML_REPORT_OPEN=never
           export FORCE_COLOR=1
-          stdbuf -oL -eL npx playwright test --config=playwright.client.config.js --reporter=html
+          stdbuf -oL -eL npx playwright test --config=playwright.client.config.js --reporter=html {{ .CLI_ARGS }}
         "
 
   docker:test:playwright:
