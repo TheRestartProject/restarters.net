@@ -31,7 +31,20 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  // Optional row<->marker hover linking for /group/map (GroupMap.vue): the
+  // id whose row/pin should be highlighted, and update:hoveredId to report
+  // back which row the pointer is over. Unused (stays null, no visual
+  // effect) by /group and /group/all - resources/js/components/
+  // GroupMapAndList.vue's hover.sync between GroupMap and GroupsTable is
+  // the functional spec (Neil's PR feedback there: hovering a pin
+  // highlights the matching row, and vice versa).
+  hoveredId: {
+    type: Number,
+    default: null,
+  },
 })
+
+const emit = defineEmits(['update:hoveredId'])
 
 const { t, locale } = useI18n()
 const { roleLabelKey, roleVariant } = useGroupRole()
@@ -158,7 +171,14 @@ function sortIndicator(key) {
             {{ t('client.groups.no_results') }}
           </td>
         </tr>
-        <tr v-for="row in sortedGroups" :key="row.id" :data-testid="`group-row-${row.id}`">
+        <tr
+          v-for="row in sortedGroups"
+          :key="row.id"
+          :data-testid="`group-row-${row.id}`"
+          :class="{ 'group-row-hovered': hoveredId === row.id }"
+          @mouseenter="emit('update:hoveredId', row.id)"
+          @mouseleave="emit('update:hoveredId', null)"
+        >
           <td>
             <NuxtLink :to="`/group/view/${row.id}`" :data-testid="`group-row-link-${row.id}`">
               {{ row.name }}
@@ -214,5 +234,9 @@ function sortIndicator(key) {
   padding: 0;
   font-weight: bold;
   cursor: pointer;
+}
+
+.group-row-hovered {
+  background-color: var(--bs-tertiary-bg, #f8f9fa);
 }
 </style>

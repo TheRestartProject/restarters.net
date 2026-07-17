@@ -114,4 +114,32 @@ describe('components/groups/GroupsTable', () => {
     expect(wrapper.find('[data-testid="group-row-archived-10"]').exists()).toBe(false)
     expect(wrapper.find('[data-testid="group-row-archived-11"]').exists()).toBe(true)
   })
+
+  // /group/map's row<->marker hover linking (GroupMap.vue) - Neil's PR
+  // feedback on the legacy GroupMapAndList: hovering a pin highlights the
+  // matching row, and vice versa.
+  describe('hover linking', () => {
+    it('emits update:hoveredId on mouseenter/mouseleave', async () => {
+      const wrapper = mountComponent({ groups: rows })
+
+      await wrapper.find('[data-testid="group-row-1"]').trigger('mouseenter')
+      expect(wrapper.emitted('update:hoveredId').at(-1)).toEqual([1])
+
+      await wrapper.find('[data-testid="group-row-1"]').trigger('mouseleave')
+      expect(wrapper.emitted('update:hoveredId').at(-1)).toEqual([null])
+    })
+
+    it('highlights the row matching hoveredId', () => {
+      const wrapper = mountComponent({ groups: rows, hoveredId: 2 })
+
+      expect(wrapper.find('[data-testid="group-row-2"]').classes()).toContain('group-row-hovered')
+      expect(wrapper.find('[data-testid="group-row-1"]').classes()).not.toContain('group-row-hovered')
+    })
+
+    it('defaults to no row highlighted', () => {
+      const wrapper = mountComponent({ groups: rows })
+
+      expect(wrapper.find('[data-testid="group-row-1"]').classes()).not.toContain('group-row-hovered')
+    })
+  })
 })

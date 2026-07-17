@@ -49,6 +49,18 @@ export default class GroupAPI extends BaseAPI {
     return this.$get('/api/v2/groups/nearby', params)
   }
 
+  // GET /api/v2/groups/summary - GroupSummary[] (location/image/networks/
+  // tags/hosts/restarters/next_event), implemented server-side by PR #887
+  // (API\GroupController::listSummaryv2). `params.ids` (comma-separated,
+  // max 200) hydrates just the given rows; omitted, returns every
+  // non-archived group. Used by stores/groups.js#fetchSummaries to hydrate
+  // only the groups currently visible on /group/map - see that action's
+  // doc comment for why (831KB/3.7s TTFB fetching every group's summary
+  // up front, on the pre-migration equivalent).
+  summary(params) {
+    return this.$get('/api/v2/groups/summary', params)
+  }
+
   // GET /api/v2/groups/{id}/stats (api-contracts-phase-b.md B2, not yet
   // implemented server-side) - {group_stats, device_stats, cluster_stats,
   // top_devices}, per the group/view.blade.php Blade props it replaces. See

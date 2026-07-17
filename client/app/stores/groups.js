@@ -53,6 +53,16 @@ import { useToastStore } from './toast.js'
  * implemented, role-filtered server-side) and uploadGroupImage (POST
  * /api/v2/groups/{id}/images - a B2 gap, see docs/nuxt-migration/
  * api-gaps.md B6).
+ *
+ * B7 (/group/map) lands PR #887: `names` now also carries `lat`/`lng`/
+ * `country`/`network_ids`/`tag_ids` (previously just {id, name,
+ * archived_at} - see the comment above and all.vue's own note, both now
+ * stale) - that's the whole index the map draws markers from and filters
+ * client-side, same as the legacy GroupMapAndList's `groups/list`. Visible
+ * rows are then hydrated via `fetchSummaries`, the batched counterpart to
+ * `fetchDetails` above (GET /api/v2/groups/summary?ids=..., not
+ * GET /api/v2/groups/{id} N times) - mirroring the legacy Vuex store's
+ * `hydrate` action, chunked at the API's 200-id cap.
  */
 export const useGroupsStore = defineStore('groups', {
   state: () => ({
@@ -87,6 +97,14 @@ export const useGroupsStore = defineStore('groups', {
     // /group/create, /group/edit/[id] - role-filtered tag list
     // (GET /api/v2/groups/tags, already implemented server-side).
     tags: { data: [], loading: false, error: null },
+
+    // /group/map - id -> GroupSummary, hydrated on demand for whichever
+    // rows are currently visible (see fetchSummaries below).
+    summaryByIds: {},
+    // id -> boolean, true while that id's summary fetch is in flight - the
+    // in-flight half of fetchSummaries' "don't refetch" guard (the other
+    // half is just checking summaryByIds already has the id).
+    summaryLoading: {},
   }),
 
   getters: {
@@ -434,6 +452,66 @@ export const useGroupsStore = defineStore('groups', {
         throw error
       } finally {
         this.tags.loading = false
+      }
+    },
+
+    // GET /api/v2/groups/summary?ids=... (already implemented server-side -
+    // API\GroupController::listSummaryv2, PR #887). Batched counterpart to
+    // fetchDetails: hydrates every id in one call (chunked at the API's
+    // 200-id cap) rather than one request per row - /group/map calls this
+    // with whatever ids are currently visible on the map/list, same as the
+    // legacy Vuex store's `hydrate` action.
+    //
+    // Skips ids already in summaryByIds (unless force) AND ids with a fetch
+    // already in flight - the second guard matters here specifically
+    // because panning the map can call this again before the previous
+    // batch has returned, and without it the same ids would be requested
+    // twice concurrently.
+    async fetchSummaries(ids, { force = false } = {}) {
+      const idsToFetch = [...new Set(ids)].filter(
+        (id) => (force || !this.summaryByIds[id]) && !this.summaryLoading[id]
+      )
+
+      if (!idsToFetch.length) {
+        return []
+      }
+
+      const loading = { ...this.summaryLoading }
+      idsToFetch.forEach((id) => {
+        loading[id] = true
+      })
+      this.summaryLoading = loading
+
+      const { $api } = useNuxtApp()
+
+      try {
+        const results = []
+
+        // The API caps ids at 200 per call (GroupController::listSummaryv2's
+        // validation rule) - chunk rather than assume the caller already did.
+        for (let i = 0; i < idsToFetch.length; i += 200) {
+          const chunk = idsToFetch.slice(i, i + 200)
+          const { data } = await $api.group.summary({
+            ids: chunk.join(','),
+            includeCounts: 'true',
+            includeNextEvent: 'true',
+          })
+          results.push(...data)
+        }
+
+        const merged = { ...this.summaryByIds }
+        results.forEach((summary) => {
+          merged[summary.id] = summary
+        })
+        this.summaryByIds = merged
+
+        return results
+      } finally {
+        const doneLoading = { ...this.summaryLoading }
+        idsToFetch.forEach((id) => {
+          delete doneLoading[id]
+        })
+        this.summaryLoading = doneLoading
       }
     },
 

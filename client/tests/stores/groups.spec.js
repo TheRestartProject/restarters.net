@@ -27,6 +27,7 @@ describe('stores/groups', () => {
         setVolunteerHost: vi.fn(),
         tags: vi.fn(),
         uploadImage: vi.fn(),
+        summary: vi.fn(),
       },
       dashboard: {
         fetch: vi.fn(),
@@ -105,6 +106,97 @@ describe('stores/groups', () => {
       expect(result).toBeNull()
       expect(store.details[5]).toBeUndefined()
       expect(store.detailsLoading[5]).toBe(false)
+    })
+  })
+
+  describe('fetchSummaries', () => {
+    it('batches every requested id into one call and populates summaryByIds', async () => {
+      mockApi.group.summary.mockResolvedValueOnce({
+        data: [
+          { id: 1, name: 'Alpha' },
+          { id: 2, name: 'Beta' },
+        ],
+      })
+
+      const store = useGroupsStore()
+      const result = await store.fetchSummaries([1, 2])
+
+      expect(mockApi.group.summary).toHaveBeenCalledTimes(1)
+      expect(mockApi.group.summary).toHaveBeenCalledWith(
+        expect.objectContaining({ ids: '1,2', includeCounts: 'true', includeNextEvent: 'true' })
+      )
+      expect(result).toEqual([{ id: 1, name: 'Alpha' }, { id: 2, name: 'Beta' }])
+      expect(store.summaryByIds[1]).toEqual({ id: 1, name: 'Alpha' })
+      expect(store.summaryByIds[2]).toEqual({ id: 2, name: 'Beta' })
+    })
+
+    it('does not refetch an id already hydrated, unless force is set', async () => {
+      mockApi.group.summary.mockResolvedValueOnce({ data: [{ id: 1, name: 'Alpha' }] })
+
+      const store = useGroupsStore()
+      await store.fetchSummaries([1])
+      await store.fetchSummaries([1])
+
+      expect(mockApi.group.summary).toHaveBeenCalledTimes(1)
+
+      mockApi.group.summary.mockResolvedValueOnce({ data: [{ id: 1, name: 'Alpha updated' }] })
+      await store.fetchSummaries([1], { force: true })
+
+      expect(mockApi.group.summary).toHaveBeenCalledTimes(2)
+      expect(store.summaryByIds[1]).toEqual({ id: 1, name: 'Alpha updated' })
+    })
+
+    it('only fetches the ids not already hydrated, in one call', async () => {
+      mockApi.group.summary.mockResolvedValueOnce({ data: [{ id: 1, name: 'Alpha' }] })
+      const store = useGroupsStore()
+      await store.fetchSummaries([1])
+
+      mockApi.group.summary.mockResolvedValueOnce({ data: [{ id: 2, name: 'Beta' }] })
+      await store.fetchSummaries([1, 2])
+
+      expect(mockApi.group.summary).toHaveBeenCalledTimes(2)
+      expect(mockApi.group.summary).toHaveBeenLastCalledWith(expect.objectContaining({ ids: '2' }))
+    })
+
+    it('does not issue a second request for an id whose fetch is still in flight', async () => {
+      let resolveFetch
+      mockApi.group.summary.mockReturnValueOnce(
+        new Promise((resolve) => {
+          resolveFetch = resolve
+        })
+      )
+
+      const store = useGroupsStore()
+      const first = store.fetchSummaries([1])
+      const second = store.fetchSummaries([1])
+
+      resolveFetch({ data: [{ id: 1, name: 'Alpha' }] })
+      await Promise.all([first, second])
+
+      expect(mockApi.group.summary).toHaveBeenCalledTimes(1)
+    })
+
+    it('returns [] and makes no call when every id is already hydrated', async () => {
+      mockApi.group.summary.mockResolvedValueOnce({ data: [{ id: 1, name: 'Alpha' }] })
+      const store = useGroupsStore()
+      await store.fetchSummaries([1])
+
+      const result = await store.fetchSummaries([1])
+
+      expect(result).toEqual([])
+      expect(mockApi.group.summary).toHaveBeenCalledTimes(1)
+    })
+
+    it('chunks requests at 200 ids', async () => {
+      mockApi.group.summary.mockResolvedValue({ data: [] })
+
+      const store = useGroupsStore()
+      const ids = Array.from({ length: 250 }, (_, i) => i + 1)
+      await store.fetchSummaries(ids)
+
+      expect(mockApi.group.summary).toHaveBeenCalledTimes(2)
+      expect(mockApi.group.summary.mock.calls[0][0].ids.split(',')).toHaveLength(200)
+      expect(mockApi.group.summary.mock.calls[1][0].ids.split(',')).toHaveLength(50)
     })
   })
 
