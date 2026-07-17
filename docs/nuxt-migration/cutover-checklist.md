@@ -135,6 +135,30 @@ before starting F proper).
 - **F-batch-4 (F4/F5):** ApiOnlyRouteSurfaceTest pinning the route list;
   docs (local-development.md, CLAUDE.md, README).
 
+## F2 refinements (verified against code, 2026-07-17)
+
+- errors/{403,404,500,503} currently branch to layouts.header when authed;
+  navbar.blade.php (which header includes) calls route('profile'/'brands'/
+  'skills'/'tags'/'category'/'users'/'roles'/'networks.*') — ALL dying, so an
+  authed 404 would itself throw RouteNotFoundException. REVISION to the
+  retention list: errors/* always include header_plain; layouts/header.blade
+  .php AND layouts/navbar.blade.php die. header_plain/nocookie/footer make NO
+  route() calls (verified) so they are name-safe.
+- set-lang + set-cookie: no references from any kept view or surviving JS
+  (verified) → both routes die. LanguageSwitcher middleware stays (widget
+  locale via session/param), InformationAlertCookieController dies.
+- route('registration') has no references in kept trees → name dropped.
+- user/thumbnail: no consumers outside its controller (verified) → dies.
+- /about/cookie-policy: SPA page exists (client/app/pages/about/cookie-policy
+  .vue); route dies, catch-all redirect covers old links.
+- admin/preview-deploy (PR previews to restarters.dev, cfb47d7fd3): KEPT +
+  view edited to header_plain. DECISION flagged: behind session auth, which
+  post-cutover only exists via /auth/bridge — may want /api/v2 port later.
+- Route trim strategy: explicit KEEP list + GET catch-all
+  `/{any?}` → 302 to FRONTEND_URL preserving path+query, with `^(?!api/).*`
+  so unknown API paths still 404 JSON. Draft: scratchpad/f2-web-routes-draft
+  .php (session-local).
+
 ## G6 method note
 
 chrome-devtools MCP is disconnected; the visual parity review runs via

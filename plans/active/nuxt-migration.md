@@ -38,7 +38,7 @@ Status: ⬜ pending · 🔄 in progress · ✅ done · ❌ blocked
 | B4 | Pages: /group (mine), /group/all, /group/nearby lists + stores/groups + GroupsTable/GroupCard + vitest | ✅ | column_preferences → user preference API not session |
 | B5 | Pages: /group/view/{id} (stats, events, volunteers, permissions from #892) + vitest | ✅ | |
 | B6 | Pages: /group/create + /group/edit/{id} (geocode via /api/v2/maps proxy ported here; Quill wrapper; tus image upload) + vitest | ✅ | MapsProxy → /api/v2/maps/* done here; RichTextEditor (Quill 2) + LocationPicker + TusImageUpload components |
-| B7 | Group map page (port RES-1995 map work) | 🔄 | UNBLOCKED by Edward 2026-07-16: fold in PR #887 assuming it merges. Sequence: (1) after phase-c-server commits → merge origin/RES-1995_map_of_groups_l10 (conflicts only routes/api.php + resources/js/app.js, additive-union); (2) after phase-de-client workflow finishes → build the map page vs names+summary endpoints  — #887 MERGED into branch 2026-07-16; map page build queued behind phase-de-client workflow |
+| B7 | Group map page (port RES-1995 map work) | ✅ | Committed 8f01ffcf27 (2026-07-17): /group/map route+tab, GroupMap.vue (Leaflet+markercluster+Photon, CARTO tiles), split names/summary?ids= fetch preserved (chunked at 200-id cap), row↔marker hover, useGroupMapGeometry composable, 53 vitest + groupmap e2e. Companion fix 7871a6f96b: devices-store raw-object reactivity escape = the spare-parts flake root cause (suite 57/57 0-flaky, 32.6m→7.7m) |
 | B8 | Playwright: group.test.js flows ported (create, unfollow, image upload) + dashboard smoke | ✅ | client/e2e/group.test.js (3 flows + smoke); data-testid selectors; deterministic waits (waitForResponse) |
 
 ## Phase C — Events + Devices slice
@@ -51,7 +51,7 @@ Status: ⬜ pending · 🔄 in progress · ✅ done · ❌ blocked
 | C4 | Pages: /party/create /party/edit/{id} /party/duplicate/{id} (b-calendar→vue-datepicker-next, venue/group-location picker, moderation approve UI) + vitest | ✅ | .event-approve select preserved as data-testid=event-approve |
 | C5 | API+pages: device CRUD on event page (item type autocomplete/category suggestion port of items store, spare parts, barriers, photos via tus) + vitest | ✅ | /api/v2/devices/options endpoint (brands/barriers/spareparts/itemtypes); DeviceForm + DeviceRow + useCategorySuggestion (exact-match port of items.js — legacy has NO fuzzy matching; keep parity); addDevice/updateDevice/deleteDevice + photo attach via tus; multiselect keyboard UX preserved |
 | C6 | Pages: /fixometer (home), device search/list, impact stats + vitest | ✅ | fixometer dashboard page + /device/search page + ImpactStats components; GET /api/v2/devices paginated+filters endpoint added (APIv2DevicesListTest) |
-| C7 | Playwright: event.test.js + device.test.js flows ported | ⬜ | client/e2e/event.test.js (create future/past, invite modal), device.test.js (5 flows incl. photo + category suggestion excluded-slow) |
+| C7 | Playwright: event.test.js + device.test.js flows ported | ✅ | client/e2e/event.test.js (create future/past, invite modal), device.test.js (5 flows incl. photo + self-seeding category suggestion) |
 
 ## Phase D — Profile + Admin slice
 
@@ -61,8 +61,8 @@ Status: ⬜ pending · 🔄 in progress · ✅ done · ❌ blocked
 | D2 | Pages: public /profile/{id} + API `GET /api/v2/users/{id}` + phpunit/vitest | ✅ | PII-safe resource (name, avatar, groups, skills, bio only) |
 | D3 | Pages: /user/all admin list against PR #866 API + vitest | ✅ | filters/sort/pagination preserved; role editor modal → PATCH /users/{id}/admin-settings |
 | D4 | Pages: admin reference-data CRUD (brands/skills/categories/group-tags/roles) against PR #863 API; AdminCrudPage → AdminCrudTable component + vitest | ✅ | one generic component + 5 thin pages, per PR-863 prop contract |
-| D5 | API+page: admin stats (JSON versions of /admin/stats views) + preview-deploy page | ⬜ | admin stats widgets stay Laravel-served iframes (§9); preview-deploy = simple page on GET/POST /api/v2/admin/preview-deploy |
-| D6 | Playwright: admin-users + admin-reference-data specs ported | ⬜ | client/e2e/admin.test.js |
+| D5 | API+page: admin stats (JSON versions of /admin/stats views) + preview-deploy page | ⬜ | admin stats widgets stay Laravel-served iframes (§9); preview-deploy KEPT Laravel-side at F2 (view→header_plain) with DECISION flag — /api/v2 port is a follow-up (see cutover-checklist F2 refinements) |
+| D6 | Playwright: admin-users + admin-reference-data specs ported | ✅ | client/e2e/admin.test.js |
 
 ## Phase E — Networks + static slice
 
@@ -72,7 +72,7 @@ Status: ⬜ pending · 🔄 in progress · ✅ done · ❌ blocked
 | E2 | Pages: static (about/cookie-policy/visualisations link-outs), onboarding modal, cantcreate (PR #867 keys), /user/forbidden 403 | ✅ | onboarding shown post-register from session flag |
 | E3 | Notifications dropdown + page (existing endpoints) + talk topics widget | ✅ | discourse links route via /auth/bridge |
 | E4 | Locale switcher + PATCH session locale + APISetLocale header on every call | ✅ | en/fr/fr-BE only |
-| E5 | Playwright: grouptags.test.js ported (34 tests, deterministic waits) + landingpage equivalent (/ redirects to /dashboard or marketing landing page) | ⬜ | landing page rebuilt in Nuxt (marketing content from landing.php lang keys) |
+| E5 | Playwright: grouptags.test.js ported (34 tests, deterministic waits) + landingpage equivalent (/ redirects to /dashboard or marketing landing page) | ✅ | full client suite now 57 tests incl. groupmap; double-run gate: run1 57/57 0-flaky 2026-07-17, run2 in flight |
 
 ## Phase F — Cutover (Laravel stops serving frontend)
 
