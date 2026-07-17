@@ -1,5 +1,6 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
+import { useToastStore } from '~/stores/toast.js'
 import { useI18n } from 'vue-i18n'
 import { useGroupsStore } from '~/stores/groups.js'
 import { useUploadedImageUrl } from '~/composables/useUploadedImageUrl.js'
@@ -77,7 +78,22 @@ function load() {
   groupsStore.fetchVolunteers(id.value)
 }
 
-onMounted(load)
+onMounted(() => {
+  load()
+
+  // The email accept-invite redirector (GET /group/accept-invite/{id}/{hash},
+  // kept in Laravel per design §5) lands here with a query flag in place of
+  // the old session flash. Toast it once, then strip the param.
+  if (route.query.joined === '1') {
+    useToastStore().success(t('groups.invite_confirmed'))
+  } else if (route.query.invite === 'invalid') {
+    useToastStore().error(t('groups.invite_invalid'))
+  }
+  if (route.query.joined || route.query.invite) {
+    const { joined, invite, ...rest } = route.query
+    navigateTo({ query: rest }, { replace: true })
+  }
+})
 </script>
 
 <template>

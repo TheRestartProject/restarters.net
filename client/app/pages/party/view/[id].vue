@@ -1,5 +1,6 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
+import { useToastStore } from '~/stores/toast.js'
 import { useI18n } from 'vue-i18n'
 import { useEventsStore } from '~/stores/events.js'
 import { useGroupsStore } from '~/stores/groups.js'
@@ -107,7 +108,22 @@ function retry() {
   load()
 }
 
-onMounted(load)
+onMounted(() => {
+  load()
+
+  // Email accept-invite redirector query flags (see group/view/[id].vue).
+  // The legacy party flow only flashed the invalid case; the joined toast
+  // is a small consistency addition (client.events.invite_confirmed).
+  if (route.query.joined === '1') {
+    useToastStore().success(t('client.events.invite_confirmed'))
+  } else if (route.query.invite === 'invalid') {
+    useToastStore().error(t('events.invite_invalid'))
+  }
+  if (route.query.joined || route.query.invite) {
+    const { joined, invite, ...rest } = route.query
+    navigateTo({ query: rest }, { replace: true })
+  }
+})
 
 async function onRsvp() {
   attendPending.value = true

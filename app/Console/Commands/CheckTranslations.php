@@ -117,6 +117,8 @@ class CheckTranslations extends Command
             'resources/views/',               // Blade templates
             'resources/js/components/',       // Vue templates
             'resources/js/mixins/',           // Vue mixins (rare)
+            'client/app/',                    // Nuxt SPA (t('file.key') usage)
+            'client/e2e/',                    // SPA e2e specs asserting strings
             'app/',                           // Models (rare)
             'app/Notifications/',             // Email notifications
             'app/Http/Controllers/',          // Controllers (rarely)
