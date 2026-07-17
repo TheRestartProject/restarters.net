@@ -101,17 +101,6 @@ async function editNetworkTagByRow(page, tagId, newName) {
   return response
 }
 
-async function deleteNetworkTagByRow(page, tagId) {
-  await page.getByTestId(`tag-delete-${tagId}`).click()
-  await expect(page.getByTestId('tag-delete-modal')).toBeVisible()
-
-  const [response] = await Promise.all([
-    page.waitForResponse((resp) => resp.url().includes(`/tags/${tagId}`) && resp.request().method() === 'DELETE'),
-    page.getByTestId('tag-delete-confirm').click(),
-  ])
-  return response
-}
-
 function networkTagRowId(response) {
   return response.json().then((body) => (body.data || body).id)
 }
