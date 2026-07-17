@@ -1,5 +1,6 @@
 import { createPinia, setActivePinia } from 'pinia'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { watch } from 'vue'
 import { useDevicesStore } from '../../app/stores/devices.js'
 import { useToastStore } from '../../app/stores/toast.js'
 
@@ -61,6 +62,34 @@ describe('stores/devices', () => {
       const store = useDevicesStore()
       await expect(store.fetchForEvent(5)).rejects.toEqual(apiError)
       expect(store.listError(5)).toEqual(apiError)
+    })
+
+    // The other fetchForEvent tests only re-read state AFTER awaiting, so
+    // they pass even if the mutations bypass reactivity. This one pins the
+    // notification itself: a subscriber that rendered the loading state
+    // must be told when the first fetch settles. (The event page's devices
+    // panel hung on its skeleton forever without this - the action mutated
+    // the raw pre-assignment object, not the reactive proxy, so whether the
+    // panel updated depended on whether the fetch beat the first render:
+    // the CI spare-parts flake.)
+    it('notifies reactive subscribers when the first fetch settles', async () => {
+      let resolveFetch
+      mockApi.event.devices.mockReturnValueOnce(new Promise((resolve) => { resolveFetch = resolve }))
+
+      const store = useDevicesStore()
+      const loadingSeen = []
+      const countSeen = []
+      watch(() => store.listLoading(5), (v) => loadingSeen.push(v), { flush: 'sync' })
+      watch(() => store.list(5).length, (v) => countSeen.push(v), { flush: 'sync' })
+
+      const pending = store.fetchForEvent(5)
+      expect(loadingSeen).toEqual([true])
+
+      resolveFetch({ data: [{ id: 1, item_type: 'Toaster' }] })
+      await pending
+
+      expect(loadingSeen).toEqual([true, false])
+      expect(countSeen).toEqual([1])
     })
   })
 

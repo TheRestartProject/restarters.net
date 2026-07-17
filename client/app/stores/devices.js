@@ -124,8 +124,15 @@ export const useDevicesStore = defineStore('devices', {
         return this.byEvent[eventId].data
       }
 
-      const entry = this.byEvent[eventId] || { data: [], loading: false, error: null, loaded: false }
-      this.byEvent[eventId] = entry
+      // Assign the fallback into state FIRST, then read it back: the
+      // read-back is the reactive proxy, whereas mutating the plain object
+      // after assignment bypasses subscribers entirely (the event page's
+      // devices panel then never left its loading skeleton - see the
+      // "notifies reactive subscribers" spec).
+      if (!this.byEvent[eventId]) {
+        this.byEvent[eventId] = { data: [], loading: false, error: null, loaded: false }
+      }
+      const entry = this.byEvent[eventId]
       entry.loading = true
       entry.error = null
 
@@ -150,8 +157,12 @@ export const useDevicesStore = defineStore('devices', {
     // legacy add flow's draft ids) immediately, then reconciles with the
     // server's real row on success or drops it on failure.
     async addDevice(eventId, payload) {
-      const entry = this.byEvent[eventId] || { data: [], loading: false, error: null, loaded: true }
-      this.byEvent[eventId] = entry
+      // Same assign-then-read-back as fetchForEvent: `entry` must be the
+      // reactive proxy, not the plain fallback object.
+      if (!this.byEvent[eventId]) {
+        this.byEvent[eventId] = { data: [], loading: false, error: null, loaded: true }
+      }
+      const entry = this.byEvent[eventId]
 
       const tempId = -(Date.now() + Math.floor(Math.random() * 1000))
       const optimisticDevice = {
