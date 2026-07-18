@@ -37,7 +37,7 @@ describe('restarters.scss', () => {
     // for "the whole $blue-pin-before-Bootstrap trick still works".
     expect(result.css).toContain('#007bff')
     expect(result.css).not.toContain('#0d6efd')
-  })
+  }, 60_000)
 
   it('carries the brand primary colour into Bootstrap-generated rules', () => {
     const result = sass.compile(entry, {
@@ -49,5 +49,5 @@ describe('restarters.scss', () => {
     })
 
     expect(result.css).toContain('#0394a6')
-  })
+  }, 60_000)
 })

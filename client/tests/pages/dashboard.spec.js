@@ -6,6 +6,7 @@ import DashboardPage from '../../app/pages/dashboard.vue'
 import { useAuthStore } from '../../app/stores/auth.js'
 import { useSessionStore } from '../../app/stores/session.js'
 import { useDashboardStore } from '../../app/stores/dashboard.js'
+import { useEventsStore } from '../../app/stores/events.js'
 import en from '../../i18n/locales/en.json'
 import clientEn from '../../i18n/locales/client-en.json'
 
@@ -17,6 +18,7 @@ const NuxtLinkStub = {
 const BAlertStub = { template: '<div><slot /></div>' }
 const BButtonStub = { template: '<button v-bind="$attrs"><slot /></button>' }
 const BBadgeStub = { template: '<span v-bind="$attrs"><slot /></span>' }
+const BFormSelectStub = { props: ['modelValue', 'options'], template: '<select />' }
 const BModalStub = {
   props: ['modelValue'],
   emits: ['hide'],
@@ -37,6 +39,7 @@ function mountDashboard() {
         BButton: BButtonStub,
         BBadge: BBadgeStub,
         BModal: BModalStub,
+        BFormSelect: BFormSelectStub,
       },
     },
   })
@@ -50,6 +53,9 @@ describe('pages/dashboard', () => {
 
     dashboardStore = useDashboardStore()
     dashboardStore.fetch = vi.fn().mockResolvedValue(emptyData)
+
+    // dashboard.vue also fetches the user's events (for the Add Data picker).
+    useEventsStore().fetchMyEvents = vi.fn().mockResolvedValue([])
 
     const authStore = useAuthStore()
     authStore.user = { id: 1, name: 'Jane' }
