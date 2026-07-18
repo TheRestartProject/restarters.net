@@ -14,8 +14,16 @@ else → Nitro). Files changed:
 - `docker/supervisord-fly.conf`: `[program:nuxt]` → `node client/.output/server/index.mjs` on 127.0.0.1:3000, inherits Fly env.
 - `docker/nginx-fly.conf`: `^~ /api|/auth/bridge|/discourse|/export|/calendar|/outbound|/{group,admin,party}/stats` → php-fpm; `location / { try_files $uri @nuxt }` + `@nuxt` proxy to :3000; `/images/` now falls back to @nuxt (SPA-vs-widget image overlap). Redirectors dropped — the SPA owns user/reset, user/register, party|group/invite natively.
 - `fly.pr.toml` / `fly.toml` / `fly.dev.toml`: `FRONTEND_URL` + `NUXT_PUBLIC_API_BASE` = the app's own origin (apiBase carries /api/v2).
-CI unaffected (compose/CI use docker/nginx.conf + the client container, not these
-Fly files). **Validate on a preview deploy — checklist:**
+First redeploy result (2026-07-18): build went GREEN on Node 22 (Nuxt 4 needs
+>=22 — bumped Dockerfile.fly) and `/` now 302s to the site gate, NOT localhost —
+**the localhost-redirect is fixed.** The redeploy still failed at the *migrate*
+step, unrelated: prod had `personal_access_tokens` created out-of-band (no
+migrations row), so Sanctum's unguarded vendor migration re-ran → 1050. Fixed
+with `Sanctum::ignoreMigrations()` + a guarded published copy of the migration
+(+ regression test). This would have broken the prod `migrate` too.
+
+CI unaffected by the infra bits (compose/CI use docker/nginx.conf + the client
+container, not these Fly files). **Validate on a preview deploy — checklist:**
 1. `/` loads the SPA (not a localhost redirect); deep link e.g. `/party/view/<id>` returns the SPA (200), client-router resolves.
 2. `/_nuxt/*` assets 200 from Nitro; `/images/<spa-only>.svg` 200; a widget image (`/images/broken-toaster.png`) still 200 from Laravel disk.
 3. `/api/v2/session` 200 from Laravel; login → dashboard works end-to-end.

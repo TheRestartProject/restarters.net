@@ -10,6 +10,7 @@ use Auth;
 use Cache;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Translation\Translator;
+use Laravel\Sanctum\Sanctum;
 use OwenIt\Auditing\Models\Audit;
 use Schema;
 
@@ -45,6 +46,14 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+        // Use our own copy of Sanctum's personal_access_tokens migration
+        // (database/migrations, guarded with Schema::hasTable) instead of the
+        // vendor one. Production had the table created out-of-band without a
+        // migrations row, so the unguarded vendor migration re-ran and hit
+        // "1050 Table already exists"; the guarded copy is a no-op when the
+        // table is already present but still creates it on fresh installs.
+        Sanctum::ignoreMigrations();
+
         $this->app->singleton(Geocoder::class, function () {
             return new Geocoder();
         });
