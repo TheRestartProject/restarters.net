@@ -96,7 +96,7 @@ async function confirmRemove(volunteer) {
       >
         <div class="d-flex align-items-center">
           <img
-            :src="volunteer.image || '/images/placeholder-avatar.png'"
+            :src="volunteer.image || '/images/placeholder-avatar.webp'"
             alt=""
             width="40"
             height="40"

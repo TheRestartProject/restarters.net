@@ -592,12 +592,50 @@ category `<select>`'s data flow.
 `resources/views/fixometer/index.blade.php` +
 `resources/js/components/FixometerPage.vue` render the impact stats and the
 powered/unpowered `FixometerRecordsTable.vue` on one page, switched by tabs.
-The C6 task brief splits these into two Nuxt pages (`/fixometer` for the
-impact stats + latest-repairs banner, `/device/search` for the paginated
-table) - a judgment call, not a contract-doc instruction. `/fixometer` links
-to `/device/search` via a new "Browse repair records" button
+The C6 task brief originally split these into two Nuxt pages (`/fixometer`
+for the impact stats + latest-repairs banner, `/device/search` for the
+paginated table) - a judgment call, not a contract-doc instruction.
+`/fixometer` links to `/device/search` via a "Browse repair records" button
 (`client.fixometer.browse_records`) to bridge the gap where the legacy page
 had tabs on one screen.
+
+**Update (D3 design-parity pass, docs/nuxt-migration/findings/
+g6-visual-review.md D3):** `components/fixometer/DevicesSearchTable.vue` is
+now also embedded directly on `/fixometer` (matching the legacy single-page
+layout more closely), in addition to remaining a standalone page at
+`/device/search` - the "Browse repair records" link above is kept for
+anyone who wants the table on a page of its own to bookmark/share. A few
+further judgment calls from that pass:
+
+- **Stat-card grid colours.** `FixometerGlobalImpact.vue`/`StatsValue.vue`
+  actually border every card in near-black (`$black #222`) and only colour
+  the value text/the "Latest Data" banner in the lighter brand teal
+  (`$brand-light #4aaebc`). `components/fixometer/ImpactStats.vue` borders
+  every card in the darker brand teal instead (`$brand #0394a6`) to match
+  the task brief's explicit "teal outline" ask and the offset-shadow brand
+  motif already flagged in the D1 finding - a deliberate deviation from the
+  legacy's literal colours, left for design review.
+- **"Add Data" button simplified.** `FixometerHeading.vue`'s button opens
+  `AddDataModal.vue`, a full group→event picker (own Vuex reads, a "create
+  event" fallback, `moment`-formatted event options) that has no equivalent
+  store support in the Nuxt client yet. `pages/fixometer.vue` instead shows
+  the button only when logged in and links straight to `/dashboard` (where
+  a host/admin's own groups/events are already listed) - a scoped-down
+  substitute, not a port of the modal.
+- **Filter sections default to expanded.** `FixometerFilters.vue`'s two
+  collapsible sections (ITEM & REPAIR INFO / EVENT INFO) start collapsed
+  unless the URL carries a matching query param. `DevicesSearchTable.vue`'s
+  ported version starts both expanded (no URL-param wiring) so the fields
+  are usable immediately - a simplification, not a bug.
+- **POWERED (n)/UNPOWERED (n) toggle counts.** The legacy tabs' counts come
+  from two simultaneously-mounted `FixometerRecordsTable.vue` instances
+  (one per tab) each fetching independently. The Nuxt table only fetches
+  the active tab; the inactive tab's count instead falls back to an
+  optional `poweredCount`/`unpoweredCount` prop (`pages/fixometer.vue`
+  passes `impactData.total_powered`/`total_unpowered`, the same
+  `GET /api/homepage_data` aggregate the stat grid already uses) rather
+  than firing a second search. Omitted (no parens) when the prop isn't
+  supplied, e.g. on the standalone `/device/search` page.
 
 ### C6: status filter's `status` query param is the numeric `Device::REPAIR_STATUS_*` code, not the `repair_status` resource string - the legacy filter passed the wrong one
 

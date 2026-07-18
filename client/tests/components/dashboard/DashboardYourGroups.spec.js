@@ -69,4 +69,15 @@ describe('components/dashboard/DashboardYourGroups', () => {
     expect(wrapper.find('[data-testid="your-group-archived-1"]').exists()).toBe(false)
     expect(wrapper.find('[data-testid="your-group-archived-2"]').exists()).toBe(true)
   })
+
+  it('shows the newly-added highlight banner only when there are new nearby groups', () => {
+    const withNew = mountComponent({
+      groups: [],
+      newNearbyGroups: [{ id: 9, name: 'New Group', distance: 1, location: 'Leeds', image_url: null }],
+    })
+    expect(withNew.find('[data-testid="your-groups-new-highlight"]').exists()).toBe(true)
+
+    const withoutNew = mountComponent({ groups: [], newNearbyGroups: [] })
+    expect(withoutNew.find('[data-testid="your-groups-new-highlight"]').exists()).toBe(false)
+  })
 })

@@ -81,7 +81,7 @@ const canedit = computed(() => isAdmin.value || isHostOfGroup.value)
 // match, not added server-side.
 const candelete = computed(() => canedit.value && devicesStore.list(id.value).length === 0)
 
-const groupImage = computed(() => uploadedImageUrl(event.value?.group?.image) || '/images/placeholder-avatar.png')
+const groupImage = computed(() => uploadedImageUrl(event.value?.group?.image) || '/images/placeholder-avatar.webp')
 
 const showInvite = ref(false)
 const confirmingDelete = ref(false)

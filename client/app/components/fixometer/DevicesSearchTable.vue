@@ -30,8 +30,36 @@ const STATUS_END_OF_LIFE = 3
 
 const PAGE_SIZE = 20
 
+// Optional POWERED (n)/UNPOWERED (n) counts for the toggle that isn't
+// currently active (FixometerPage.vue's b-tabs titles - "POWERED (123)").
+// The active toggle always shows the live search `count` below; the other
+// one falls back to this prop when supplied (fixometer.vue passes
+// impactData.total_powered/total_unpowered, the same aggregate GET
+// /api/homepage_data figures FixometerGlobalImpact.vue's grid already
+// uses) rather than firing a second search just to get a count. Omitted
+// entirely (no parens) when not supplied, e.g. on the standalone
+// /device/search page.
+const props = defineProps({
+  poweredCount: {
+    type: Number,
+    default: null,
+  },
+  unpoweredCount: {
+    type: Number,
+    default: null,
+  },
+})
+
 const { t } = useI18n()
 const devicesStore = useDevicesStore()
+
+// FixometerFilters.vue's two collapsible sections (ITEM & REPAIR INFO /
+// EVENT INFO), ported as a lightweight expand/collapse rather than
+// b-collapse - default to expanded (the legacy default was collapsed
+// unless the URL carried a matching query param) so the fields are usable
+// immediately without an extra click.
+const itemInfoExpanded = ref(true)
+const eventInfoExpanded = ref(true)
 
 const filters = reactive({
   powered: true,
@@ -113,6 +141,17 @@ const loading = computed(() => devicesStore.searchResults.loading)
 const error = computed(() => devicesStore.searchResults.error)
 const totalPages = computed(() => Math.max(1, Math.ceil(count.value / PAGE_SIZE)))
 
+function toggleLabel(label, n) {
+  return n === null || n === undefined ? label : `${label} (${n.toLocaleString()})`
+}
+
+const poweredLabel = computed(() =>
+  toggleLabel(t('devices.title_powered'), filters.powered ? count.value : props.poweredCount)
+)
+const unpoweredLabel = computed(() =>
+  toggleLabel(t('devices.title_unpowered'), !filters.powered ? count.value : props.unpoweredCount)
+)
+
 function statusLabel(device) {
   const key = deviceStatusKey(device)
   return key ? t(key) : null
@@ -133,101 +172,137 @@ function nextPage() {
 
 <template>
   <div data-testid="devices-search-table">
-    <fieldset class="mb-3" data-testid="device-search-filters">
-      <legend class="visually-hidden">{{ t('devices.item_and_repair_info') }}</legend>
+    <div class="btn-group mb-3" role="group" data-testid="device-search-powered-toggle">
+      <button
+        type="button"
+        class="btn btn-sm"
+        :class="filters.powered ? 'btn-primary' : 'btn-outline-primary'"
+        data-testid="device-search-powered-true"
+        @click="filters.powered = true"
+      >
+        {{ poweredLabel }}
+      </button>
+      <button
+        type="button"
+        class="btn btn-sm"
+        :class="!filters.powered ? 'btn-primary' : 'btn-outline-primary'"
+        data-testid="device-search-powered-false"
+        @click="filters.powered = false"
+      >
+        {{ unpoweredLabel }}
+      </button>
+    </div>
 
-      <div class="btn-group mb-3" role="group" data-testid="device-search-powered-toggle">
-        <button
-          type="button"
-          class="btn btn-sm"
-          :class="filters.powered ? 'btn-primary' : 'btn-outline-primary'"
-          data-testid="device-search-powered-true"
-          @click="filters.powered = true"
-        >
-          {{ t('devices.title_powered') }}
-        </button>
-        <button
-          type="button"
-          class="btn btn-sm"
-          :class="!filters.powered ? 'btn-primary' : 'btn-outline-primary'"
-          data-testid="device-search-powered-false"
-          @click="filters.powered = false"
-        >
-          {{ t('devices.title_unpowered') }}
-        </button>
-      </div>
+    <p
+      class="text-brand small"
+      data-testid="device-search-powered-description"
+    >
+      <!-- eslint-disable-next-line vue/no-v-html -->
+      <span v-html="filters.powered ? t('devices.description_powered') : t('devices.description_unpowered')" />
+    </p>
 
-      <div class="row g-3">
-        <div class="col-sm-6 col-md-4">
-          <label class="form-label" for="device-search-category">{{ t('devices.category') }}</label>
-          <select id="device-search-category" v-model.number="filters.category" class="form-select" data-testid="device-search-category">
-            <option :value="null">{{ t('client.devices.any_category') }}</option>
-            <optgroup v-for="cluster in filteredClusters" :key="cluster.id" :label="t(cluster.name)">
-              <option v-for="c in cluster.categories" :key="c.idcategories" :value="c.idcategories">
-                {{ t(c.name) }}
-              </option>
-            </optgroup>
-          </select>
+    <div class="device-search-section mb-3" data-testid="device-search-item-info">
+      <button
+        type="button"
+        class="device-search-section__header"
+        data-testid="device-search-item-info-toggle"
+        @click="itemInfoExpanded = !itemInfoExpanded"
+      >
+        <span class="device-search-section__title">{{ t('devices.item_and_repair_info') }}</span>
+        <img :src="itemInfoExpanded ? '/images/dropdown-arrow-up.svg' : '/images/dropdown-arrow.svg'" alt="">
+      </button>
+      <fieldset v-show="itemInfoExpanded" class="device-search-section__body" data-testid="device-search-filters">
+        <legend class="visually-hidden">{{ t('devices.item_and_repair_info') }}</legend>
+
+        <div class="row g-3">
+          <div class="col-sm-6 col-md-4">
+            <label class="form-label" for="device-search-category">{{ t('devices.category') }}</label>
+            <select id="device-search-category" v-model.number="filters.category" class="form-select" data-testid="device-search-category">
+              <option :value="null">{{ t('client.devices.any_category') }}</option>
+              <optgroup v-for="cluster in filteredClusters" :key="cluster.id" :label="t(cluster.name)">
+                <option v-for="c in cluster.categories" :key="c.idcategories" :value="c.idcategories">
+                  {{ t(c.name) }}
+                </option>
+              </optgroup>
+            </select>
+          </div>
+
+          <div v-if="filters.powered" class="col-sm-6 col-md-4">
+            <label class="form-label" for="device-search-brand">{{ t('devices.brand') }}</label>
+            <input id="device-search-brand" v-model="filters.brand" type="text" class="form-control" data-testid="device-search-brand">
+          </div>
+
+          <div class="col-sm-6 col-md-4">
+            <label class="form-label" for="device-search-model">
+              {{ filters.powered ? t('devices.model') : t('devices.model_or_type') }}
+            </label>
+            <input
+              v-if="filters.powered"
+              id="device-search-model"
+              v-model="filters.model"
+              type="text"
+              class="form-control"
+              data-testid="device-search-model"
+            >
+            <input
+              v-else
+              id="device-search-model"
+              v-model="filters.item_type"
+              type="text"
+              class="form-control"
+              data-testid="device-search-item-type"
+            >
+          </div>
+
+          <div class="col-sm-6 col-md-4">
+            <label class="form-label" for="device-search-status">{{ t('devices.status') }}</label>
+            <select id="device-search-status" v-model.number="filters.status" class="form-select" data-testid="device-search-status">
+              <option :value="null">{{ t('client.devices.any_status') }}</option>
+              <option :value="STATUS_FIXED">{{ t('partials.fixed') }}</option>
+              <option :value="STATUS_REPAIRABLE">{{ t('partials.repairable') }}</option>
+              <option :value="STATUS_END_OF_LIFE">{{ t('partials.end') }}</option>
+            </select>
+          </div>
+
+          <div class="col-sm-6 col-md-4">
+            <label class="form-label" for="device-search-comments">{{ t('devices.search_assessment_comments') }}</label>
+            <input id="device-search-comments" v-model="filters.comments" type="text" class="form-control" data-testid="device-search-comments">
+          </div>
         </div>
+      </fieldset>
+    </div>
 
-        <div v-if="filters.powered" class="col-sm-6 col-md-4">
-          <label class="form-label" for="device-search-brand">{{ t('devices.brand') }}</label>
-          <input id="device-search-brand" v-model="filters.brand" type="text" class="form-control" data-testid="device-search-brand">
-        </div>
+    <div class="device-search-section mb-3" data-testid="device-search-event-info">
+      <button
+        type="button"
+        class="device-search-section__header"
+        data-testid="device-search-event-info-toggle"
+        @click="eventInfoExpanded = !eventInfoExpanded"
+      >
+        <span class="device-search-section__title">{{ t('devices.event_info') }}</span>
+        <img :src="eventInfoExpanded ? '/images/dropdown-arrow-up.svg' : '/images/dropdown-arrow.svg'" alt="">
+      </button>
+      <fieldset v-show="eventInfoExpanded" class="device-search-section__body">
+        <legend class="visually-hidden">{{ t('devices.event_info') }}</legend>
 
-        <div class="col-sm-6 col-md-4">
-          <label class="form-label" for="device-search-model">
-            {{ filters.powered ? t('devices.model') : t('devices.model_or_type') }}
-          </label>
-          <input
-            v-if="filters.powered"
-            id="device-search-model"
-            v-model="filters.model"
-            type="text"
-            class="form-control"
-            data-testid="device-search-model"
-          >
-          <input
-            v-else
-            id="device-search-model"
-            v-model="filters.item_type"
-            type="text"
-            class="form-control"
-            data-testid="device-search-item-type"
-          >
-        </div>
+        <div class="row g-3">
+          <div class="col-sm-6 col-md-4">
+            <label class="form-label" for="device-search-group">{{ t('devices.group') }}</label>
+            <input id="device-search-group" v-model="filters.group" type="text" class="form-control" data-testid="device-search-group">
+          </div>
 
-        <div class="col-sm-6 col-md-4">
-          <label class="form-label" for="device-search-status">{{ t('devices.status') }}</label>
-          <select id="device-search-status" v-model.number="filters.status" class="form-select" data-testid="device-search-status">
-            <option :value="null">{{ t('client.devices.any_status') }}</option>
-            <option :value="STATUS_FIXED">{{ t('partials.fixed') }}</option>
-            <option :value="STATUS_REPAIRABLE">{{ t('partials.repairable') }}</option>
-            <option :value="STATUS_END_OF_LIFE">{{ t('partials.end') }}</option>
-          </select>
-        </div>
+          <div class="col-sm-6 col-md-4">
+            <label class="form-label" for="device-search-from-date">{{ t('devices.from_date') }}</label>
+            <input id="device-search-from-date" v-model="filters.from_date" type="date" class="form-control" data-testid="device-search-from-date">
+          </div>
 
-        <div class="col-sm-6 col-md-4">
-          <label class="form-label" for="device-search-comments">{{ t('devices.search_assessment_comments') }}</label>
-          <input id="device-search-comments" v-model="filters.comments" type="text" class="form-control" data-testid="device-search-comments">
+          <div class="col-sm-6 col-md-4">
+            <label class="form-label" for="device-search-to-date">{{ t('devices.to_date') }}</label>
+            <input id="device-search-to-date" v-model="filters.to_date" type="date" class="form-control" data-testid="device-search-to-date">
+          </div>
         </div>
-
-        <div class="col-sm-6 col-md-4">
-          <label class="form-label" for="device-search-group">{{ t('devices.group') }}</label>
-          <input id="device-search-group" v-model="filters.group" type="text" class="form-control" data-testid="device-search-group">
-        </div>
-
-        <div class="col-sm-6 col-md-4">
-          <label class="form-label" for="device-search-from-date">{{ t('devices.from_date') }}</label>
-          <input id="device-search-from-date" v-model="filters.from_date" type="date" class="form-control" data-testid="device-search-from-date">
-        </div>
-
-        <div class="col-sm-6 col-md-4">
-          <label class="form-label" for="device-search-to-date">{{ t('devices.to_date') }}</label>
-          <input id="device-search-to-date" v-model="filters.to_date" type="date" class="form-control" data-testid="device-search-to-date">
-        </div>
-      </div>
-    </fieldset>
+      </fieldset>
+    </div>
 
     <div v-if="loading" data-testid="device-search-loading">
       <div class="placeholder-glow">
@@ -311,3 +386,41 @@ function nextPage() {
     </template>
   </div>
 </template>
+
+<style scoped lang="scss">
+// FixometerFilters.vue's collapsible section chrome (border/shadow in the
+// lighter brand teal, uppercase clickable header) - kept scoped, same
+// reasoning as ImpactStats.vue's stat-card grid.
+.device-search-section {
+  border: 1px solid #4aaebc;
+  box-shadow: 4px 4px 0 0 #4aaebc;
+}
+
+.device-search-section__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  background-color: #dce3ec;
+  border: 0;
+  text-align: left;
+
+  img {
+    width: 24px;
+  }
+}
+
+.device-search-section__title {
+  text-transform: uppercase;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+.device-search-section__body {
+  border: 0;
+  padding: 0.75rem;
+  margin: 0;
+}
+</style>
+

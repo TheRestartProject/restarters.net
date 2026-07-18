@@ -28,7 +28,7 @@ const { t } = useI18n()
   >
     <div class="d-flex align-items-center">
       <img
-        :src="group.image_url || '/images/placeholder-avatar.png'"
+        :src="group.image_url || '/images/placeholder-avatar.webp'"
         alt=""
         width="56"
         height="56"

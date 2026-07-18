@@ -29,7 +29,7 @@ function mountComponent(props = {}) {
 
 describe('components/dashboard/DashboardNearbyGroups', () => {
   it('shows a "set your location" prompt with no join CTAs when the user has no location', () => {
-    const wrapper = mountComponent({ nearbyGroups: [], newNearbyGroups: [], hasLocation: false })
+    const wrapper = mountComponent({ nearbyGroups: [], hasLocation: false })
 
     expect(wrapper.find('[data-testid="nearby-groups-no-location"]').exists()).toBe(true)
     expect(wrapper.find('[data-testid="nearby-groups-no-location"]').html()).toContain('/profile/edit')
@@ -37,7 +37,7 @@ describe('components/dashboard/DashboardNearbyGroups', () => {
   })
 
   it('shows an empty state when the user has a location but no nearby groups', () => {
-    const wrapper = mountComponent({ nearbyGroups: [], newNearbyGroups: [], hasLocation: true })
+    const wrapper = mountComponent({ nearbyGroups: [], hasLocation: true })
 
     expect(wrapper.find('[data-testid="nearby-groups-empty"]').exists()).toBe(true)
     expect(wrapper.find('[data-testid="nearby-groups-no-location"]').exists()).toBe(false)
@@ -47,24 +47,11 @@ describe('components/dashboard/DashboardNearbyGroups', () => {
     const wrapper = mountComponent({
       hasLocation: true,
       nearbyGroups: [{ id: 5, name: 'Nearby Fixers', distance: 3.2, location: 'Bristol', image_url: null }],
-      newNearbyGroups: [],
     })
 
     expect(wrapper.find('[data-testid="nearby-group-link-5"]').attributes('href')).toBe('/group/view/5')
     expect(wrapper.find('[data-testid="nearby-group-distance-5"]').text()).toContain('3.2')
     expect(wrapper.find('[data-testid="nearby-group-location-5"]').text()).toBe('Bristol')
     expect(wrapper.find('[data-testid="nearby-group-join-5"]').attributes('href')).toBe('/group/view/5')
-  })
-
-  it('shows the newly-added highlight banner only when there are new nearby groups', () => {
-    const withNew = mountComponent({
-      hasLocation: true,
-      nearbyGroups: [],
-      newNearbyGroups: [{ id: 9, name: 'New Group', distance: 1, location: 'Leeds', image_url: null }],
-    })
-    expect(withNew.find('[data-testid="nearby-groups-new-highlight"]').exists()).toBe(true)
-
-    const withoutNew = mountComponent({ hasLocation: true, nearbyGroups: [], newNearbyGroups: [] })
-    expect(withoutNew.find('[data-testid="nearby-groups-new-highlight"]').exists()).toBe(false)
   })
 })

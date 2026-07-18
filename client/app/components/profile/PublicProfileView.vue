@@ -84,7 +84,7 @@ watch(() => props.userId, load)
           <div class="row row-compressed profile-header">
             <div class="col-3">
               <img
-                :src="avatarUrl || '/images/placeholder-avatar.png'"
+                :src="avatarUrl || '/images/placeholder-avatar.webp'"
                 alt=""
                 :class="avatarUrl ? 'img-fluid rounded' : 'img-fluid rounded-circle'"
                 :data-testid="avatarUrl ? 'profile-view-avatar' : 'profile-view-avatar-placeholder'"

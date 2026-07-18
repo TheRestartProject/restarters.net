@@ -69,7 +69,7 @@ function skillNames(attendee) {
 }
 
 function profileImage(attendee) {
-  return uploadedImageUrl(attendee.profilePath) || '/images/placeholder-avatar.png'
+  return uploadedImageUrl(attendee.profilePath) || '/images/placeholder-avatar.webp'
 }
 
 function askRemove(attendee) {

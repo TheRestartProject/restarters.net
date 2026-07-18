@@ -1,12 +1,12 @@
 <script setup>
 import { computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useAuthStore } from '~/stores/auth.js'
 import { useSessionStore } from '~/stores/session.js'
 import { useDashboardStore } from '~/stores/dashboard.js'
 import DashboardYourGroups from '~/components/dashboard/DashboardYourGroups.vue'
 import DashboardNearbyGroups from '~/components/dashboard/DashboardNearbyGroups.vue'
 import DashboardUpcomingEvents from '~/components/dashboard/DashboardUpcomingEvents.vue'
+import DashboardRightSidebar from '~/components/dashboard/DashboardRightSidebar.vue'
 import DashboardOnboardingModal from '~/components/dashboard/DashboardOnboardingModal.vue'
 
 // resources/views/dashboard/index.blade.php + resources/js/components/
@@ -17,7 +17,6 @@ definePageMeta({ auth: true })
 const { t } = useI18n()
 useHead({ title: t('dashboard.title') })
 
-const authStore = useAuthStore()
 const sessionStore = useSessionStore()
 const dashboardStore = useDashboardStore()
 
@@ -50,31 +49,42 @@ onMounted(() => {
 
 <template>
   <div class="container py-4" data-testid="dashboard-page">
-    <h1 data-testid="dashboard-welcome">
-      {{ t('client.dashboard.welcome', { name: authStore.user?.name }) }}
-    </h1>
+    <!-- Legacy DashboardPage.vue h1 - a static hero, not personalised: there
+         is no "returning user" variant in the legacy spec. -->
+    <div class="d-flex justify-content-center align-items-center" data-testid="dashboard-hero">
+      <img src="/images/arrows_doodle.svg" alt="" class="d-none d-md-block doodle doodle--arrows">
+      <h1 class="mx-2 mb-0" data-testid="dashboard-welcome">
+        {{ t('dashboard.title') }}
+      </h1>
+      <img src="/images/confetti_doodle.svg" alt="" class="d-none d-md-block doodle doodle--confetti">
+    </div>
 
-    <div v-if="dashboardStore.loading" data-testid="dashboard-loading">
+    <div v-if="dashboardStore.loading" data-testid="dashboard-loading" class="mt-4">
       <div v-for="n in 3" :key="n" class="placeholder-glow mb-3">
         <span class="placeholder col-12" style="height: 6rem" />
       </div>
     </div>
 
-    <BAlert v-else-if="dashboardStore.error" :model-value="true" variant="danger" data-testid="dashboard-error">
+    <BAlert v-else-if="dashboardStore.error" :model-value="true" variant="danger" data-testid="dashboard-error" class="mt-4">
       <p>{{ t('client.dashboard.load_error') }}</p>
       <BButton variant="danger" data-testid="dashboard-retry" @click="retry">
         {{ t('client.dashboard.retry') }}
       </BButton>
     </BAlert>
 
-    <div v-else class="dashboard-grid" data-testid="dashboard-content">
-      <DashboardYourGroups :groups="yourGroups" />
+    <div v-else class="dashboard-grid mt-4" data-testid="dashboard-content">
+      <div class="panel dashboard-grid__yourgroups">
+        <DashboardYourGroups :groups="yourGroups" :new-nearby-groups="newNearbyGroups" />
+        <DashboardUpcomingEvents :events="upcomingEvents" class="dashboard-grid__events" />
+      </div>
+
+      <DashboardRightSidebar class="dashboard-grid__sidebar" />
+
       <DashboardNearbyGroups
+        class="panel dashboard-grid__nearby"
         :nearby-groups="nearbyGroups"
-        :new-nearby-groups="newNearbyGroups"
         :has-location="hasLocation"
       />
-      <DashboardUpcomingEvents :events="upcomingEvents" class="dashboard-grid__events" />
     </div>
 
     <DashboardOnboardingModal :show="showOnboarding" @dismiss="dismissOnboarding" />
@@ -82,16 +92,48 @@ onMounted(() => {
 </template>
 
 <style scoped lang="scss">
+.doodle--arrows {
+  width: 44px;
+  height: auto;
+}
+
+.doodle--confetti {
+  width: 60px;
+  height: auto;
+}
+
 .dashboard-grid {
   display: grid;
   grid-template-columns: 1fr;
   gap: 2rem;
 
+  &__yourgroups {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
   @media (min-width: 768px) {
     grid-template-columns: 2fr 1fr;
+    grid-template-areas:
+      'yourgroups sidebar'
+      'nearby sidebar';
+
+    &__yourgroups {
+      grid-area: yourgroups;
+      grid-template-columns: 1fr 1fr;
+    }
+
+    &__sidebar {
+      grid-area: sidebar;
+    }
+
+    &__nearby {
+      grid-area: nearby;
+    }
 
     &__events {
-      grid-column: 1 / -1;
+      align-self: start;
     }
   }
 }

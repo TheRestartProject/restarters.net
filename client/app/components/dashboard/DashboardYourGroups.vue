@@ -26,6 +26,14 @@ const props = defineProps({
     type: Array,
     default: () => [],
   },
+  // Legacy DashboardYourGroups.vue shows the "newly added" banner in the
+  // panel header regardless of whether the user already has groups - it's
+  // the same newNearbyGroups data DashboardNearbyGroups uses for its own
+  // (empty-state) highlight.
+  newNearbyGroups: {
+    type: Array,
+    default: () => [],
+  },
 })
 
 const { t } = useI18n()
@@ -46,66 +54,82 @@ function roleVariant(role) {
 
 <template>
   <div data-testid="dashboard-your-groups">
-    <h2>{{ t('dashboard.your_groups_heading') }}</h2>
-
-    <div v-if="!sortedGroups.length" data-testid="your-groups-empty">
-      <p>{{ t('client.dashboard.no_your_groups') }}</p>
-      <NuxtLink to="/group" data-testid="your-groups-browse-link">
-        {{ t('groups.all_groups') }}
+    <div class="d-flex justify-content-between flex-wrap align-items-center">
+      <div class="d-flex align-items-center">
+        <h2 class="mb-0">{{ t('dashboard.your_groups_heading') }}</h2>
+        <img src="/images/group_doodle_ico.svg" alt="" class="group-doodle ms-3">
+      </div>
+      <NuxtLink
+        v-if="newNearbyGroups.length"
+        to="/group/nearby"
+        class="new-highlight px-2"
+        data-testid="your-groups-new-highlight"
+      >
+        <img src="/images/arrow-right-doodle-white.svg" alt="" class="me-1">
+        {{ t('dashboard.newly_added', { count: newNearbyGroups.length }, newNearbyGroups.length) }}
       </NuxtLink>
     </div>
 
-    <template v-else>
-      <p>{{ t('dashboard.catch_up') }}</p>
-
-      <ul class="list-unstyled" data-testid="your-groups-list">
-        <li
-          v-for="group in sortedGroups"
-          :key="group.id"
-          class="d-flex justify-content-between align-items-center py-2 border-bottom"
-          :data-testid="`your-group-${group.id}`"
-        >
-          <div class="d-flex align-items-center">
-            <img
-              :src="group.image_url || '/images/placeholder-avatar.png'"
-              alt=""
-              width="48"
-              height="48"
-              class="rounded-circle me-2"
-            >
-            <div>
-              <NuxtLink :to="`/group/view/${group.id}`" :data-testid="`your-group-link-${group.id}`">
-                {{ group.name }}
-              </NuxtLink>
-              <div>
-                <BBadge
-                  v-if="roleLabel(group.role)"
-                  :variant="roleVariant(group.role)"
-                  class="me-1"
-                  :data-testid="`your-group-role-${group.id}`"
-                >
-                  {{ roleLabel(group.role) }}
-                </BBadge>
-                <BBadge
-                  v-if="group.archived"
-                  variant="secondary"
-                  pill
-                  :data-testid="`your-group-archived-${group.id}`"
-                >
-                  {{ t('groups.archived_group') }}
-                </BBadge>
-              </div>
-            </div>
-          </div>
-        </li>
-      </ul>
-
-      <div class="d-flex justify-content-end">
-        <NuxtLink to="/group" data-testid="your-groups-see-all">
-          {{ t('dashboard.see_all_groups') }}
+    <div class="content-divider">
+      <div v-if="!sortedGroups.length" data-testid="your-groups-empty">
+        <p>{{ t('client.dashboard.no_your_groups') }}</p>
+        <NuxtLink to="/group" data-testid="your-groups-browse-link">
+          {{ t('groups.all_groups') }}
         </NuxtLink>
       </div>
-    </template>
+
+      <template v-else>
+        <p>{{ t('dashboard.catch_up') }}</p>
+
+        <ul class="list-unstyled" data-testid="your-groups-list">
+          <li
+            v-for="group in sortedGroups"
+            :key="group.id"
+            class="d-flex justify-content-between align-items-center py-2 border-bottom"
+            :data-testid="`your-group-${group.id}`"
+          >
+            <div class="d-flex align-items-center">
+              <img
+                :src="group.image_url || '/images/placeholder-avatar.webp'"
+                alt=""
+                width="48"
+                height="48"
+                class="group-avatar me-2"
+              >
+              <div>
+                <NuxtLink :to="`/group/view/${group.id}`" :data-testid="`your-group-link-${group.id}`">
+                  {{ group.name }}
+                </NuxtLink>
+                <div>
+                  <BBadge
+                    v-if="roleLabel(group.role)"
+                    :variant="roleVariant(group.role)"
+                    class="me-1"
+                    :data-testid="`your-group-role-${group.id}`"
+                  >
+                    {{ roleLabel(group.role) }}
+                  </BBadge>
+                  <BBadge
+                    v-if="group.archived"
+                    variant="secondary"
+                    pill
+                    :data-testid="`your-group-archived-${group.id}`"
+                  >
+                    {{ t('groups.archived_group') }}
+                  </BBadge>
+                </div>
+              </div>
+            </div>
+          </li>
+        </ul>
+
+        <div class="d-flex justify-content-end">
+          <NuxtLink to="/group" data-testid="your-groups-see-all">
+            {{ t('dashboard.see_all_groups') }}
+          </NuxtLink>
+        </div>
+      </template>
+    </div>
   </div>
 </template>
 
@@ -113,5 +137,26 @@ function roleVariant(role) {
 h2 {
   font-size: 1.1rem;
   font-weight: bold;
+}
+
+.group-doodle {
+  height: 40px;
+}
+
+.group-avatar {
+  border: 1px solid #222;
+}
+
+.new-highlight {
+  font-size: 0.85rem;
+  background-color: #222;
+  color: #fff;
+  text-decoration: none;
+  line-height: 2.5rem;
+  align-self: center;
+
+  &:hover {
+    color: #fff;
+  }
 }
 </style>

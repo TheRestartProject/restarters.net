@@ -32,7 +32,7 @@ const isMember = computed(() => groupsStore.isMember(id.value))
 const canInvite = computed(() => canedit.value || isMember.value)
 
 const { uploadedImageUrl } = useUploadedImageUrl()
-const groupImage = computed(() => uploadedImageUrl(group.value?.image) || '/images/placeholder-avatar.png')
+const groupImage = computed(() => uploadedImageUrl(group.value?.image) || '/images/placeholder-avatar.webp')
 const location = computed(() => {
   const loc = group.value?.location
   if (!loc) return null

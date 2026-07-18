@@ -220,3 +220,13 @@ $sizes: (
     margin-bottom: 30px;
   }
 }
+
+// Dashed content divider under a section heading - the brand "----" rule used
+// across the dashboard and fixometer content panels. Promoted here (rather
+// than re-declared in each component's scoped styles) per the "shared brand
+// pattern -> global" convention.
+.content-divider {
+  border-top: 3px dashed $black;
+  margin-top: 1rem;
+  padding-top: 1rem;
+}
