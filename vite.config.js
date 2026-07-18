@@ -41,7 +41,6 @@ export default defineConfig({
     plugins: [
         laravel({
             input: [
-                'resources/global/js/app.js',
                 'resources/global/js/widgets/stats-share.js',
                 'resources/global/css/app.scss',
                 'resources/wiki/js/wiki.js',
