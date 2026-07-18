@@ -25,6 +25,16 @@ in place) now `Schema::hasTable`-guard, with a regression test over both. This
 would have broken the prod `migrate` too. (Only these two `Schema::create`
 migrations exist on the branch vs develop, so the class is fully covered.)
 
+Second symptom (2026-07-18): past the gate the preview showed ERR_TOO_MANY_
+REDIRECTS. Cause: Laravel's `/{any?}` catch-all still 302'd to
+`config('restarters.frontend_url')`, which is now THIS host — a self-loop — and
+`try_files $uri` on `/` could fall through to Laravel's index. This is a
+two-host (A)-design shim that's wrong for the same-host Nitro-origin (B) design.
+Fixed structurally: (1) nginx `location = /` forces the root to @nuxt; (2) the
+catch-all now `abort(404)` instead of redirecting to frontend_url (browsers
+reach Nitro via nginx, never Laravel, so unknown Laravel-prefix sub-paths must
+404, not loop). Updated `ApiOnlyRouteSurfaceTest` to pin the 404.
+
 CI unaffected by the infra bits (compose/CI use docker/nginx.conf + the client
 container, not these Fly files). **Validate on a preview deploy — checklist:**
 1. `/` loads the SPA (not a localhost redirect); deep link e.g. `/party/view/<id>` returns the SPA (200), client-router resolves.

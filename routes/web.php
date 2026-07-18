@@ -4,7 +4,6 @@ use App\Http\Controllers\CalendarEventsController;
 use App\Http\Controllers\ExportController;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\PartyController;
-use App\Http\Controllers\PreviewDeployController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -19,8 +18,8 @@ use Illuminate\Support\Facades\Route;
 |   (b) emailed / shared deep-link redirectors into the SPA,
 |   (c) anonymous data exports and calendar feeds,
 |   (d) the embeddable stats widgets partners iframe,
-|   (e) admin preview-deploy tooling,
-|   (f) a catch-all that sends any other browser navigation to the SPA.
+|   (e) a catch-all that sends any other browser navigation to the SPA.
+| (Admin preview-deploy tooling moved to /api/v2 + the SPA.)
 | See docs/nuxt-migration/cutover-checklist.md for what died here and why.
 |
 */
@@ -85,24 +84,20 @@ Route::get('/party/stats/{id}/wide', function ($id) {
     return App\Http\Controllers\PartyController::stats($id);
 });
 
-// PR preview deploys to restarters.dev (admin tooling). DECISION flagged in the
-// cutover checklist: post-cutover a web session only exists after an
-// /auth/bridge exchange; a follow-up may move this behind /api/v2.
-Route::middleware('auth')->group(function () {
-    Route::get('admin/preview-deploy', [PreviewDeployController::class, 'show'])->name('admin.preview-deploy.show');
-    Route::post('admin/preview-deploy', [PreviewDeployController::class, 'deploy'])->name('admin.preview-deploy.deploy');
-});
+// (Admin PR-preview-deploy tooling moved to GET/POST /api/v2/admin/
+// preview-deploys + client/app/pages/admin/preview-deploy.vue - the Blade page
+// couldn't authenticate the post-cutover SPA admin, who has a bearer token but
+// no web session.)
 
-// Everything else: send the browser to the SPA, preserving path + query so
-// legacy bookmarks and old emailed links deep-link into the equivalent SPA
-// route. api/ is excluded so unknown API paths still 404 as JSON rather than
-// bouncing a machine client to the SPA. The dead research-tool prefixes
-// (FaultCat etc.) and /workbench 301 to the Talk archive in nginx instead
-// (docker/nginx.conf, docker/nginx-fly.conf).
+// Everything else: 404. The Nuxt Node server is the origin (nginx routes every
+// non-API, non-widget path to it — see docker/nginx-fly.conf), so browsers
+// never reach Laravel for SPA paths; the SPA serves and deep-links them itself.
+// This route must NOT redirect to config('restarters.frontend_url'): that URL is
+// now this same host, so a browser that did reach Laravel here (an unknown
+// sub-path of a retained prefix like /export or /calendar, or a misroute) would
+// bounce back to itself forever. api/ is excluded so unknown API paths still
+// 404 as JSON. The dead research-tool prefixes (FaultCat etc.) and /workbench
+// 301 to the Talk archive in nginx (docker/nginx.conf, docker/nginx-fly.conf).
 Route::get('/{any?}', function ($any = null) {
-    $target = rtrim(config('restarters.frontend_url'), '/');
-    $path = request()->path() === '/' ? '' : '/'.request()->path();
-    $query = request()->getQueryString();
-
-    return redirect()->away($target.$path.($query ? '?'.$query : ''), 302);
+    abort(404);
 })->where('any', '^(?!api/).*');

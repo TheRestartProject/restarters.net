@@ -39,8 +39,6 @@ class ApiOnlyRouteSurfaceTest extends TestCase
         'GET admin/stats/1',
         'GET admin/stats/2',
         'GET party/stats/{id}/wide',
-        'GET admin/preview-deploy',
-        'POST admin/preview-deploy',
         'GET {any?}',
     ];
 
@@ -74,13 +72,16 @@ class ApiOnlyRouteSurfaceTest extends TestCase
         $this->assertEquals($expected, $webRoutes);
     }
 
-    public function testCatchAllRedirectsBrowsersToSpaPreservingPathAndQuery(): void
+    public function testCatchAllReturns404ForBrowserPaths(): void
     {
-        $response = $this->get('/some/legacy/bookmark?with=query');
+        // The Nuxt Node server is the origin and serves/deep-links every SPA
+        // path itself (nginx routes non-API paths there), so Laravel's catch-all
+        // must NOT redirect to config('restarters.frontend_url') — that is now
+        // this same host, and a browser reaching Laravel here would loop back to
+        // itself. It 404s instead.
+        $response = $this->withExceptionHandling()->get('/some/legacy/bookmark?with=query');
 
-        $response->assertRedirect(
-            rtrim(config('restarters.frontend_url'), '/').'/some/legacy/bookmark?with=query'
-        );
+        $response->assertNotFound();
     }
 
     public function testCatchAllDoesNotSwallowUnknownApiPaths(): void
