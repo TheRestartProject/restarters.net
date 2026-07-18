@@ -16,11 +16,14 @@ else → Nitro). Files changed:
 - `fly.pr.toml` / `fly.toml` / `fly.dev.toml`: `FRONTEND_URL` + `NUXT_PUBLIC_API_BASE` = the app's own origin (apiBase carries /api/v2).
 First redeploy result (2026-07-18): build went GREEN on Node 22 (Nuxt 4 needs
 >=22 — bumped Dockerfile.fly) and `/` now 302s to the site gate, NOT localhost —
-**the localhost-redirect is fixed.** The redeploy still failed at the *migrate*
-step, unrelated: prod had `personal_access_tokens` created out-of-band (no
-migrations row), so Sanctum's unguarded vendor migration re-ran → 1050. Fixed
-with `Sanctum::ignoreMigrations()` + a guarded published copy of the migration
-(+ regression test). This would have broken the prod `migrate` too.
+**the localhost-redirect is fixed.** The redeploy then failed at the *migrate*
+step, unrelated: prod has the branch's two new tables created out-of-band (no
+migrations rows), so their unguarded create-migrations re-ran → 1050. Both
+branch-added new-table migrations (`personal_access_tokens` via
+`Sanctum::ignoreMigrations()` + a guarded published copy; `sso_tickets` guarded
+in place) now `Schema::hasTable`-guard, with a regression test over both. This
+would have broken the prod `migrate` too. (Only these two `Schema::create`
+migrations exist on the branch vs develop, so the class is fully covered.)
 
 CI unaffected by the infra bits (compose/CI use docker/nginx.conf + the client
 container, not these Fly files). **Validate on a preview deploy — checklist:**

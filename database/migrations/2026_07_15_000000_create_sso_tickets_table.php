@@ -13,6 +13,14 @@ return new class extends Migration
 {
     public function up(): void
     {
+        // Guarded with hasTable: production has this table created out-of-band
+        // (no migrations row), so on a restored copy the create re-ran and hit
+        // "1050 Table 'sso_tickets' already exists". No-op when present, still
+        // creates it on fresh installs (CI, local, phpunit).
+        if (Schema::hasTable('sso_tickets')) {
+            return;
+        }
+
         Schema::create('sso_tickets', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id')->index();
