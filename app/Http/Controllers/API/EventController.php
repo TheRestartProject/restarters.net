@@ -297,7 +297,7 @@ class EventController extends Controller
         // relevant hosts/coordinators/admins - restores the legacy
         // PartyController::view() gate the API-only cutover dropped. Events on
         // approved groups stay fully public.
-        if (! Fixometer::userHasViewPartyPermission($idevents, $request->user()?->id, $party)) {
+        if (! Fixometer::userHasViewPartyPermission($idevents, $this->optionalUser()?->id, $party)) {
             abort(404);
         }
 
@@ -326,6 +326,18 @@ class EventController extends Controller
         }
 
         return $user;
+    }
+
+    /**
+     * Resolve the acting user across all guards (web session, SPA sanctum
+     * bearer, api_token) without throwing - for optional-auth endpoints that
+     * are public but behave differently for a recognised user. Plain
+     * $request->user() only checks the default 'web' guard, so it misses the
+     * client's bearer token on routes that carry no auth middleware.
+     */
+    private function optionalUser()
+    {
+        return Auth::user() ?? auth('sanctum')->user() ?? auth('api')->user();
     }
 
     /**
@@ -384,7 +396,9 @@ class EventController extends Controller
         $party = Party::findOrFail($idevents);
 
         // Optional auth: showEmails mirrors listVolunteers' gate, everything else is public.
-        $user = $request->user();
+        // Resolve across guards so the SPA's bearer token is recognised on this
+        // auth-middleware-free route (default 'web' guard alone would miss it).
+        $user = $this->optionalUser();
 
         // Events on unapproved groups are hidden from the public (legacy
         // PartyController::view() gate) - approved-group events stay public.
@@ -455,7 +469,7 @@ class EventController extends Controller
 
         // Events on unapproved groups are hidden from the public (legacy
         // PartyController::view() gate) - approved-group events stay public.
-        if (! Fixometer::userHasViewPartyPermission($idevents, $request->user()?->id, $party)) {
+        if (! Fixometer::userHasViewPartyPermission($idevents, $this->optionalUser()?->id, $party)) {
             abort(404);
         }
 
