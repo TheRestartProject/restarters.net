@@ -17,8 +17,9 @@ RUN pecl install channel://pecl.php.net/xmlrpc-1.0.0RC3 && docker-php-ext-enable
 # Install composer
 COPY --from=composer/composer:2-bin /composer /usr/bin/composer
 
-# Install Node 18
-RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
+# Install Node 22 (Nuxt 4 / nuxi require Node >=22; matches client/Dockerfile
+# node:22 and CI cimg/node:22.16. Vite 4 root build is Node-22-compatible too.)
+RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
     && apt-get install -y nodejs \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
@@ -100,10 +101,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Install xmlrpc
 RUN pecl install channel://pecl.php.net/xmlrpc-1.0.0RC3 && docker-php-ext-enable xmlrpc
 
-# Node (runtime only) — runs the Nuxt Nitro server that serves the SPA origin
-# (client/.output, started by supervisord). The build itself happens in the
-# builder stage; this image only needs the node binary to run it.
-RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
+# Node 22 (runtime only) — runs the Nuxt Nitro server that serves the SPA origin
+# (client/.output, started by supervisord). The .output targets Node >=22, same
+# as the builder. This image only needs the node binary to run it.
+RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
     && apt-get install -y --no-install-recommends nodejs \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
