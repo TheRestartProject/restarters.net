@@ -1,24 +1,23 @@
 // Visual parity capture harness.
 // =================================
-// Drives BOTH systems - the Nuxt SPA under development and the live legacy
-// site (the parity target) - through the SAME page list at the SAME viewports,
+// Drives BOTH local dev systems - the new Nuxt SPA and the old legacy Blade app
+// (the parity target) - through the SAME page list at the SAME viewports,
 // saving matched screenshot pairs for side-by-side diffing:
 //
-//   parity-shots/<viewport>/<slug>__dev.png
-//   parity-shots/<viewport>/<slug>__live.png
+//   parity-shots/<viewport>/<slug>__new.png
+//   parity-shots/<viewport>/<slug>__old.png
 //
 // This exists because page-by-page eyeballing repeatedly missed real
 // differences (wrong auth gating, wrong layout, wrong styling). Rendered-page
 // pairs are the only way to catch "the styles are completely wrong".
 //
-// Run: task parity:capture        (see Taskfile; needs live creds in env)
+// Run: task parity:capture
 // NOT part of the CI suite: it lives outside client/e2e and uses its own
 // config (playwright.parity.config.js), so `task docker:test:playwright:client`
 // never picks it up.
 //
-// SAFETY: the live site is READ-ONLY here. We log in and navigate/screenshot
-// only - never submit a form, never mutate. Live credentials come from the
-// environment and are never written to disk or committed.
+// Both targets are LOCAL DEV instances on the SAME seeded database, so no
+// production credentials are used and mutating flows can be exercised safely.
 // ESM: client/package.json is "type": "module" (same as client/e2e/*.test.js).
 import { test } from '@playwright/test'
 
@@ -42,12 +41,21 @@ const PAGES = [
   { slug: '08-groups-nearby', path: '/group/nearby', auth: true },
 ]
 
+// Both systems are LOCAL DEV instances sharing the same seeded database:
+//   new = the Nuxt SPA under development (restarters_client)
+//   old = the legacy Blade app from origin/develop (restarters_legacy_nginx,
+//         host port 8005; see docs/nuxt-migration/findings/parity-audit.md)
+// Comparing dev-to-dev (rather than against production) means:
+//   - no production credentials are needed anywhere,
+//   - both sides show IDENTICAL data, so every difference is a real difference
+//     rather than production-vs-seed-data noise,
+//   - and non-read-only flows (create/edit wizards) can be exercised safely.
 const SYSTEMS = [
   {
-    name: 'dev',
-    base: process.env.PARITY_DEV_BASE || 'http://restarters_client:3000',
-    email: process.env.PARITY_DEV_EMAIL || 'jane@bloggs.net',
-    password: process.env.PARITY_DEV_PASSWORD || 'passw0rd',
+    name: 'new',
+    base: process.env.PARITY_NEW_BASE || 'http://restarters_client:3000',
+    email: process.env.PARITY_EMAIL || 'jane@bloggs.net',
+    password: process.env.PARITY_PASSWORD || 'passw0rd',
     async login(page, base, email, password) {
       await page.goto(`${base}/login`, { waitUntil: 'domcontentloaded' })
       await page.getByTestId('login-email').fill(email)
@@ -57,10 +65,10 @@ const SYSTEMS = [
     },
   },
   {
-    name: 'live',
-    base: process.env.PARITY_LIVE_BASE || 'https://restarters.net',
-    email: process.env.PARITY_LIVE_EMAIL,
-    password: process.env.PARITY_LIVE_PASSWORD,
+    name: 'old',
+    base: process.env.PARITY_OLD_BASE || 'http://restarters_legacy_nginx',
+    email: process.env.PARITY_EMAIL || 'jane@bloggs.net',
+    password: process.env.PARITY_PASSWORD || 'passw0rd',
     async login(page, base, email, password) {
       await page.goto(`${base}/login`, { waitUntil: 'domcontentloaded' })
       // NB: my_name / my_time are bot honeypots - never fill my_name.

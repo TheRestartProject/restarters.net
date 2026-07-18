@@ -310,16 +310,23 @@ tasks:
   parity:capture:
     desc: Capture matched dev-vs-live screenshot pairs for visual parity diffing.
     summary: |
-      Drives BOTH systems - the Nuxt SPA (restarters_client) and the live
-      legacy site - through the same page list at desktop + mobile, writing
-      matched pairs to parity-shots/<viewport>/<slug>__{dev,live}.png so the
-      two can be diffed side by side. This is the systematic replacement for
-      eyeballing pages one at a time.
+      Drives BOTH LOCAL DEV systems through the same page list at desktop +
+      mobile, writing matched pairs to
+      parity-shots/<viewport>/<slug>__{new,old}.png so they can be diffed
+      side by side. The systematic replacement for eyeballing pages one at a time.
 
-      Live credentials are read from the environment and are NEVER written to
-      disk or committed; live access is READ-ONLY (navigate + screenshot only):
-        PARITY_LIVE_EMAIL=... PARITY_LIVE_PASSWORD=... task parity:capture
-      Without them the live logged-in pages are skipped (logged-out still run).
+        new = the Nuxt SPA under development  (restarters_client:3000, :8004)
+        old = the legacy Blade app from origin/develop
+              (restarters_legacy_nginx, host :8005)
+
+      Both run against the SAME seeded database with the same test login, so
+      every difference is a real difference rather than production-vs-test-data
+      noise - and because neither is production, non-read-only flows
+      (create/edit wizards) can be exercised safely. No production credentials
+      are involved anywhere.
+
+      To stand up the legacy instance see
+      docs/nuxt-migration/findings/parity-audit.md.
 
       Uses its own config (playwright.parity.config.js, testDir client/parity)
       so the CI suite never runs it.
@@ -334,10 +341,10 @@ tasks:
       - docker exec restarters_playwright bash -c "npx playwright install chromium"
       - |
         docker exec \
-          -e PARITY_LIVE_EMAIL="$PARITY_LIVE_EMAIL" \
-          -e PARITY_LIVE_PASSWORD="$PARITY_LIVE_PASSWORD" \
-          -e PARITY_DEV_BASE="${PARITY_DEV_BASE:-http://restarters_client:3000}" \
-          -e PARITY_LIVE_BASE="${PARITY_LIVE_BASE:-https://restarters.net}" \
+          -e PARITY_NEW_BASE="${PARITY_NEW_BASE:-http://restarters_client:3000}" \
+          -e PARITY_OLD_BASE="${PARITY_OLD_BASE:-http://restarters_legacy_nginx}" \
+          -e PARITY_EMAIL="${PARITY_EMAIL:-jane@bloggs.net}" \
+          -e PARITY_PASSWORD="${PARITY_PASSWORD:-passw0rd}" \
           restarters_playwright bash -c "
             export PW_TEST_HTML_REPORT_OPEN=never
             export FORCE_COLOR=1

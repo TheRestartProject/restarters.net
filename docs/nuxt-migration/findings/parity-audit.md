@@ -13,16 +13,40 @@ process is now mechanical and repeatable.
 ## The method (repeatable)
 
 1. **Capture** — `task parity:capture`
-   Drives BOTH systems through the SAME page list, at desktop (1440x900) and
-   mobile (390x844), logged-out and logged-in, dismissing live's cookie banner,
-   writing matched pairs to `parity-shots/<viewport>/<slug>__{dev,live}.png`.
+   Drives BOTH LOCAL DEV systems through the SAME page list, at desktop
+   (1440x900) and mobile (390x844), logged-out and logged-in, writing matched
+   pairs to `parity-shots/<viewport>/<slug>__{new,old}.png`.
+   - `new` = the Nuxt SPA (`restarters_client:3000`, host `:8004`)
+   - `old` = the legacy Blade app from `origin/develop`
+     (`restarters_legacy_nginx`, host `:8005`) — see "Legacy dev instance" below
    - Harness: `client/parity/capture.spec.js`, config `playwright.parity.config.js`
      (separate testDir so CI never runs it; it asserts nothing).
-   - Live is READ-ONLY: log in, navigate, screenshot. Never submits a form.
-   - Live credentials come from `PARITY_LIVE_EMAIL` / `PARITY_LIVE_PASSWORD`
-     in the environment and are never written to disk or committed:
-     `PARITY_LIVE_EMAIL=... PARITY_LIVE_PASSWORD=... task parity:capture`
-     Without them, live logged-in pages are skipped.
+
+   **Both targets are dev instances on the SAME seeded database, logged in as the
+   same test user.** This is deliberate and matters:
+   - no production credentials are involved anywhere;
+   - identical data means every difference is a REAL difference — a differing
+     count/name/row is a defect (wrong query, missing field, broken fetch), not
+     test-data noise, so the diff step treats data differences as findings;
+   - neither system is production, so non-read-only flows (create/edit wizards)
+     can be exercised and captured. Comparing against production could only ever
+     cover read-only pages.
+
+   ### Legacy dev instance
+   ```bash
+   git worktree add .worktrees/legacy-parity origin/develop
+   # .env copied from the main tree, APP_URL=http://localhost:8005, same
+   # APP_KEY and same DB_HOST/DB_DATABASE (restarters_db_test) so it reads the
+   # SAME seeded data as the SPA.
+   # Containers (reuse existing images - do NOT build, disk is tight):
+   #   restarters_legacy        php-fpm, from the restarters image, worktree at /var/www
+   #   restarters_legacy_nginx  nginx:latest, host :8005, root /var/www/public
+   docker start restarters_legacy restarters_legacy_nginx
+   docker exec -d restarters_legacy php-fpm   # main process is `sleep infinity`
+   ```
+   NEVER run `migrate:fresh`/`db:wipe` from the legacy instance: `restarters_db_test`
+   is shared with the dev site and the phpunit suite. No migration is needed —
+   the current schema is a superset of what the legacy app requires.
 2. **Diff** — a workflow with one agent per pair, plus a second agent that
    independently verifies every claimed difference and rejects data-only
    differences (production vs seeded data) and the Nuxt DevTools badge.
