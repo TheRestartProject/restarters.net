@@ -25,6 +25,11 @@ primary_region = "lhr"
   APP_ENV = "staging"
   APP_DEBUG = "false"
   APP_URL = "https://restarters-pr-__PR_NUMBER__.fly.dev"
+  # The Nuxt SPA is served same-origin (nginx → Nitro on :3000); the SPA's
+  # apiBase is this host (API paths already include /api/v2). FRONTEND_URL keeps
+  # any residual Laravel link-building on-host instead of the localhost default.
+  FRONTEND_URL = "https://restarters-pr-__PR_NUMBER__.fly.dev"
+  NUXT_PUBLIC_API_BASE = "https://restarters-pr-__PR_NUMBER__.fly.dev"
   # Local embedded MariaDB (restored from backup at cold boot; 127.0.0.1 only)
   DB_CONNECTION = "mysql"
   DB_HOST = "127.0.0.1"
