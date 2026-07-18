@@ -45,3 +45,6 @@ restarters-anonymised.sql
 .claude-session.md
 # PHPUnit coverage artifact
 /tests/clover.xml
+
+# Visual parity capture output (task parity:capture) - screenshots, never committed
+parity-shots/

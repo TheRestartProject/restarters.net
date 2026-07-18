@@ -307,6 +307,43 @@ tasks:
           stdbuf -oL -eL npx playwright test --config=playwright.client.config.js --reporter=html {{ .CLI_ARGS }}
         "
 
+  parity:capture:
+    desc: Capture matched dev-vs-live screenshot pairs for visual parity diffing.
+    summary: |
+      Drives BOTH systems - the Nuxt SPA (restarters_client) and the live
+      legacy site - through the same page list at desktop + mobile, writing
+      matched pairs to parity-shots/<viewport>/<slug>__{dev,live}.png so the
+      two can be diffed side by side. This is the systematic replacement for
+      eyeballing pages one at a time.
+
+      Live credentials are read from the environment and are NEVER written to
+      disk or committed; live access is READ-ONLY (navigate + screenshot only):
+        PARITY_LIVE_EMAIL=... PARITY_LIVE_PASSWORD=... task parity:capture
+      Without them the live logged-in pages are skipped (logged-out still run).
+
+      Uses its own config (playwright.parity.config.js, testDir client/parity)
+      so the CI suite never runs it.
+    cmds:
+      - mkdir -p parity-shots/desktop parity-shots/mobile
+      # Same preconditions as docker:test:playwright:client - without the seeded
+      # users the dev login has no account to log in as, and the auth rate limit
+      # rejects the repeated logins this harness performs.
+      - task: playwright:seed-data
+      - |
+        docker exec restarters bash -c "grep -q '^AUTH_RATE_LIMIT' /var/www/.env && sed -i 's/^AUTH_RATE_LIMIT=.*/AUTH_RATE_LIMIT=1000/' /var/www/.env || echo 'AUTH_RATE_LIMIT=1000' >> /var/www/.env; php artisan config:clear"
+      - docker exec restarters_playwright bash -c "npx playwright install chromium"
+      - |
+        docker exec \
+          -e PARITY_LIVE_EMAIL="$PARITY_LIVE_EMAIL" \
+          -e PARITY_LIVE_PASSWORD="$PARITY_LIVE_PASSWORD" \
+          -e PARITY_DEV_BASE="${PARITY_DEV_BASE:-http://restarters_client:3000}" \
+          -e PARITY_LIVE_BASE="${PARITY_LIVE_BASE:-https://restarters.net}" \
+          restarters_playwright bash -c "
+            export PW_TEST_HTML_REPORT_OPEN=never
+            export FORCE_COLOR=1
+            stdbuf -oL -eL npx playwright test --config=playwright.parity.config.js --reporter=list {{ .CLI_ARGS }}
+          "
+
   docker:wait-for-services-*:
     desc: Wait for Docker services to be ready and responding for a given profile (Usage - task docker:wait-for-services-[core|debug|discourse|all])
     summary: |
