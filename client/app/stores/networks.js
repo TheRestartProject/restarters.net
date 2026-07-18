@@ -74,6 +74,17 @@ export const useNetworksStore = defineStore('networks', {
       }
     },
 
+    // Set the network logo from a completed tus upload, then reflect the new
+    // logo url on the loaded network so the preview updates immediately.
+    async uploadLogo(id, uploadKey) {
+      const { $api } = useNuxtApp()
+      const { data } = await $api.network.uploadLogo(id, uploadKey)
+      if (this.current.data && this.current.data.id === id) {
+        this.current.data = { ...this.current.data, logo: data.logo }
+      }
+      return data
+    },
+
     async fetchGroups(id, params) {
       const { $api } = useNuxtApp()
 

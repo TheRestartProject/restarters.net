@@ -9,11 +9,6 @@ return [
                                 <li>Document and bring down the barriers to repair</li>
                             </ul>',
   'whatis' => 'Welcome to the Restarters community',
-  'more' => 'Find out more',
-  'stat_1' => 'Items fixed',
-  'stat_2' => 'CO<sub>2</sub>e emissions prevented',
-  'stat_3' => 'Waste prevented',
-  'stat_4' => 'Events held',
   'login_title' => 'Sign in',
   'join_title' => 'Join Restarters',
   'join_title_short' => 'Join',

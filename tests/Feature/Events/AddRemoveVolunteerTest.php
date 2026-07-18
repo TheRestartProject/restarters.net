@@ -116,9 +116,8 @@ class AddRemoveVolunteerTest extends TestCase
 
         // Remove them
         $volunteer = EventsUsers::where('user', $restarter->id)->first();
-        $this->post('/party/remove-volunteer/', [
-            'id' => $volunteer->idevents_users,
-        ])->assertSee('true');
+        $this->delete('/api/v2/events/'.$event->idevents.'/volunteers/'.$volunteer->idevents_users.'?api_token='.$host->api_token)
+            ->assertJson(['data' => ['deleted' => true]]);
 
         // Check they no longer show in the list of volunteers.
         $response = $this->get('/api/events/' . $event->idevents . '/volunteers?api_token='  . $host->api_token);
@@ -140,16 +139,12 @@ class AddRemoveVolunteerTest extends TestCase
 
         // Add an invited user
         $restarter = User::factory()->restarter()->create();
-        $response = $this->post('/party/invite', [
-            'group_name' => $group->name,
-            'event_id' => $event->idevents,
-            'manual_invite_box' => $restarter->email,
-            'message_to_restarters' => 'Join us, but not in a creepy zombie way',
+        $response = $this->post('/api/v2/events/'.$event->idevents.'/invites?api_token='.$host->api_token, [
+            'emails' => [$restarter->email],
+            'message' => 'Join us, but not in a creepy zombie way',
         ]);
 
-        $response->assertSessionHas('success');
-        $response = $this->get('/party/view/'.$event->idevents);
-        $response->assertSee('Invites sent!');
+        $response->assertSuccessful();
 
         // Invited volunteers shouldn't affect the count.
         $event->refresh();
@@ -166,9 +161,8 @@ class AddRemoveVolunteerTest extends TestCase
         ]);
 
         $volunteer = EventsUsers::where('user', $restarter->id)->first();
-        $this->post('/party/remove-volunteer/', [
-            'id' => $volunteer->idevents_users,
-        ])->assertSee('true');
+        $this->delete('/api/v2/events/'.$event->idevents.'/volunteers/'.$volunteer->idevents_users.'?api_token='.$host->api_token)
+            ->assertJson(['data' => ['deleted' => true]]);
 
         // Invited volunteers shouldn't affect the count.
         $event->refresh();
@@ -185,9 +179,8 @@ class AddRemoveVolunteerTest extends TestCase
         $this->assertEquals('success', $rsp['success']);
 
         $volunteer = EventsUsers::where('full_name', 'Jo Bloggins')->first();
-        $this->post('/party/remove-volunteer/', [
-            'id' => $volunteer->idevents_users,
-        ])->assertSee('true');
+        $this->delete('/api/v2/events/'.$event->idevents.'/volunteers/'.$volunteer->idevents_users.'?api_token='.$host->api_token)
+            ->assertJson(['data' => ['deleted' => true]]);
 
         // Invited volunteers shouldn't affect the count.
         $event->refresh();
@@ -201,9 +194,8 @@ class AddRemoveVolunteerTest extends TestCase
         ]);
 
         $volunteer = EventsUsers::where('event', $event->idevents)->whereNull('user')->first();
-        $this->post('/party/remove-volunteer/', [
-            'id' => $volunteer->idevents_users,
-        ])->assertSee('true');
+        $this->delete('/api/v2/events/'.$event->idevents.'/volunteers/'.$volunteer->idevents_users.'?api_token='.$host->api_token)
+            ->assertJson(['data' => ['deleted' => true]]);
     }
 
     public function roleProvider(): array {
@@ -297,13 +289,11 @@ class AddRemoveVolunteerTest extends TestCase
         $invitee = User::factory()->restarter()->create();
 
         // Invite the user (this creates an events_users record with status = hash token)
-        $response = $this->post('/party/invite', [
-            'group_name' => $group->name,
-            'event_id' => $event->idevents,
-            'manual_invite_box' => $invitee->email,
-            'message_to_restarters' => 'Please join our event',
+        $response = $this->post('/api/v2/events/'.$event->idevents.'/invites?api_token='.$admin->api_token, [
+            'emails' => [$invitee->email],
+            'message' => 'Please join our event',
         ]);
-        $response->assertSessionHas('success');
+        $response->assertSuccessful();
 
         // Verify the invitation was created with a hash status (not '1')
         $invitation = EventsUsers::where('event', $event->idevents)
@@ -427,11 +417,9 @@ class AddRemoveVolunteerTest extends TestCase
             $invitee = User::factory()->restarter()->create();
             $invitees[] = $invitee;
 
-            $this->post('/party/invite', [
-                'group_name' => $group->name,
-                'event_id' => $event->idevents,
-                'manual_invite_box' => $invitee->email,
-                'message_to_restarters' => 'Please join',
+            $this->post('/api/v2/events/'.$event->idevents.'/invites?api_token='.$admin->api_token, [
+                'emails' => [$invitee->email],
+                'message' => 'Please join',
             ]);
         }
 

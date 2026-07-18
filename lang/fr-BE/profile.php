@@ -7,7 +7,6 @@ return [
     'no_bio' => ':name n\'a pas encore enregistré de biographie',
     'edit_user' => 'Editer utilisateur',
     'change_photo' => 'Changer ma photo',
-    'profile_picture' => 'Photo de profil',
     'language_panel_title' => 'Paramètres de langue',
     'language_updated' => 'Préférence de langue mise à jour',
     'preferred_language' => 'Langue de préférence',

@@ -62,6 +62,13 @@ class PartyIndexQueryTest extends TestCase
     {
         $user = $this->loginAsTestUser(Role::ADMINISTRATOR);
 
+        // The Blade /party list page is gone post-cutover; the live equivalent of "my
+        // events" (which is what PartyController::index()/expandEvent() rendered) is
+        // GET /api/v2/users/me/events (API\UserController::getMyEventsv2). Events are
+        // included there via Party::forUser()'s memberOfGroup() scope, so the admin
+        // (host of the groups created below) sees them the same way.
+        $url = '/api/v2/users/me/events?api_token=' . $user->api_token;
+
         // Create 2 events across 2 groups.
         $id1 = $this->createGroup('Group A');
         $id2 = $this->createGroup('Group B');
@@ -70,10 +77,10 @@ class PartyIndexQueryTest extends TestCase
         }
 
         // Warm up
-        $this->get('/party');
+        $this->get($url);
 
         DB::enableQueryLog();
-        $this->get('/party')->assertSuccessful();
+        $this->get($url)->assertSuccessful();
         $queriesFor2Events = count(DB::getQueryLog());
         DB::disableQueryLog();
         DB::flushQueryLog();
@@ -85,7 +92,7 @@ class PartyIndexQueryTest extends TestCase
         }
 
         DB::enableQueryLog();
-        $this->get('/party')->assertSuccessful();
+        $this->get($url)->assertSuccessful();
         $queriesFor8Events = count(DB::getQueryLog());
         DB::disableQueryLog();
         DB::flushQueryLog();
@@ -93,7 +100,7 @@ class PartyIndexQueryTest extends TestCase
         $this->assertLessThan(
             $queriesFor2Events * 1.5,
             $queriesFor8Events,
-            "Query count grew too much — N+1 in PartyController::index or expandEvent. 2 events: $queriesFor2Events, 8 events: $queriesFor8Events"
+            "Query count grew too much — N+1 in UserController::getMyEventsv2 or shapeMyEvent. 2 events: $queriesFor2Events, 8 events: $queriesFor8Events"
         );
     }
 }

@@ -2,8 +2,6 @@
 
 return [
     'title' => 'Users',
-    'reveal_filters' => 'Reveal filters',
-    'create_new' => 'Create new user',
     'name' => 'Name',
     'email' => 'Email address',
     'role' => 'Role',

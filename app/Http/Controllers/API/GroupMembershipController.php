@@ -315,6 +315,15 @@ class GroupMembershipController extends Controller
             abort(403);
         }
 
+        // Preserve the pre-cutover protection: a group with an event that has a
+        // device cannot be removed (Group::canDelete()). This mirrors the old
+        // GET /group/delete rule (which redirected to /user/forbidden) and the
+        // can_perform_delete flag the SPA gates its delete button on
+        // (GroupController::groupPermissionsFor).
+        if (! $group->canDelete()) {
+            abort(403);
+        }
+
         $group->update(['archived_at' => now()]);
 
         return response()->json(['data' => ['archived' => true]]);

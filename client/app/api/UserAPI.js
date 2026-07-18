@@ -76,6 +76,19 @@ export default class UserAPI extends BaseAPI {
     return this.$get(`/api/users/${id}/notifications`)
   }
 
+  // GET /api/v2/users/me/notifications - paginated list of the user's in-app
+  // (Restarters) notifications (UserController::getMyNotificationsv2),
+  // backing the /notifications page.
+  myNotifications(params) {
+    return this.$get('/api/v2/users/me/notifications', params)
+  }
+
+  // POST /api/v2/users/me/notifications/read - mark one (by id) or all
+  // notifications as read.
+  markNotificationsRead(id) {
+    return this.$post('/api/v2/users/me/notifications/read', id ? { id } : {})
+  }
+
   // users/me/* family backing /profile/edit/[[id]] (design.md §6.2 Phase D,
   // PR #868's UserController - all already implemented server-side, see
   // app/Http/Controllers/API/UserController.php). Every one of these always

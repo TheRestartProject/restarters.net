@@ -1,8 +1,6 @@
 // jQuery loaded from CDN in header, not bundled
 
 import './components/dropdown.js';
-import './components/ajax-search-discourse-notifications.js';
-import './components/check-auth.js';
 import './misc/notifications.js';
 
 // Use strict mode to reduce development errors.

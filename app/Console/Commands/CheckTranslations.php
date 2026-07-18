@@ -58,7 +58,11 @@ class CheckTranslations extends Command
             } else if (strpos($file, '.php') !== false) {
                 // Actual translation file (not . or ..).
                 $group = substr($file, 0, strpos($file, '.'));
-                $keys = \Lang::get($group);
+                // Force the 'en' locale: we scan lang/en, but \Lang::get()
+                // resolves in the CURRENT locale, which under phpunit may be a
+                // test locale ('UT') with no file — returning the group name
+                // (a string) and breaking checkKeys' foreach.
+                $keys = \Lang::get($group, [], 'en');
 
                 $count += $this->checkKeys($keys, $group);
             }
@@ -70,6 +74,10 @@ class CheckTranslations extends Command
     private function checkKeys($keys, $prefix): int
     {
         $count = 0;
+
+        if (! is_array($keys)) {
+            return 0;
+        }
 
         foreach ($keys as $key => $value) {
             $fullKey = "$prefix.$key";
@@ -86,6 +94,9 @@ class CheckTranslations extends Command
                 // will want to remove it and it doesn't matter if it is not translated properly.
                 if (strpos($fullKey, 'groups.tag-') === 0) {
                     // This is valid - it's used in a constructed way.
+                } else if (preg_match('/^admin\.reliability-\d$/', $fullKey)) {
+                    // Constructed in the SPA: t(`admin.reliability-${n}`)
+                    // (client/app/pages/category.vue), so grep can't see it.
                 } else if (!$this->usedInCode($fullKey)) {
                     error_log("ERROR: translation key $fullKey not used in code so far as we can tell");
                     $count++;
@@ -113,27 +124,80 @@ class CheckTranslations extends Command
     }
 
     private function usedInCode($key) {
+        return isset($this->usedKeys()[$key]);
+    }
+
+    private $usedKeysCache = null;
+
+    /**
+     * One grep per scanned tree instead of one per key: with ~2000 keys the
+     * per-key approach spawned ~8000 grep processes and took ~20 minutes
+     * inside the phpunit suite. A single grep -rhoF -f <keys-file> pass per
+     * tree collects every key that appears anywhere in a few seconds.
+     * resources/js died at the Nuxt-migration cutover; the SPA under
+     * client/ is now the main consumer.
+     */
+    private function usedKeys(): array {
+        if ($this->usedKeysCache !== null) {
+            return $this->usedKeysCache;
+        }
+
+        $keys = [];
+        foreach (scandir(base_path('lang/en')) as $file) {
+            if (strpos($file, '.php') === false) {
+                continue;
+            }
+            $group = substr($file, 0, strpos($file, '.'));
+            $this->collectKeys(\Lang::get($group, [], 'en'), $group, $keys);
+        }
+
+        // One in-memory haystack per scanned tree, then strpos per key —
+        // same substring semantics as the old per-key grep, without the
+        // process spawns.
+        $haystack = '';
         foreach ([
-            'resources/views/',               // Blade templates
-            'resources/js/components/',       // Vue templates
-            'resources/js/mixins/',           // Vue mixins (rare)
+            'resources/views/',               // retained widget/email Blade
             'client/app/',                    // Nuxt SPA (t('file.key') usage)
             'client/e2e/',                    // SPA e2e specs asserting strings
-            'app/',                           // Models (rare)
-            'app/Notifications/',             // Email notifications
-            'app/Http/Controllers/',          // Controllers (rarely)
-            'app/Http/Middleware/',           // Middleware(rarely)
-            'app/Services/',                  // Services(rarely)
-            'app/'                            // Models rarely)
+            'app/',                           // notifications, controllers, services
                  ] as $loc) {
-            $cmd = 'grep -r "' . addslashes($key) . '" ' . $loc . ' > /dev/null';
-            system($cmd, $rc);
-
-            if ($rc == 0) {
-                return true;
+            if (!is_dir(base_path($loc))) {
+                continue;
+            }
+            $it = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator(base_path($loc), \FilesystemIterator::SKIP_DOTS));
+            foreach ($it as $fileInfo) {
+                if ($fileInfo->isFile()) {
+                    $haystack .= file_get_contents($fileInfo->getPathname())."\n";
+                }
             }
         }
 
-        return false;
+        $found = [];
+        foreach ($keys as $key) {
+            if (strpos($haystack, $key) !== false) {
+                $found[$key] = true;
+            }
+        }
+        $this->usedKeysCache = $found;
+
+        return $found;
+    }
+
+    private function collectKeys($keys, $prefix, array &$out): void {
+        // \Lang::get($group) returns the group name (a string) when a file
+        // does not resolve to a translation array (e.g. _json.php's DB data,
+        // or a group with no file). Nothing to collect in that case.
+        if (! is_array($keys)) {
+            return;
+        }
+
+        foreach ($keys as $key => $value) {
+            $fullKey = "$prefix.$key";
+            if (is_array($value)) {
+                $this->collectKeys($value, $fullKey, $out);
+            } else {
+                $out[] = $fullKey;
+            }
+        }
     }
 }

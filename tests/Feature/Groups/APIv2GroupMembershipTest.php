@@ -2,7 +2,9 @@
 
 namespace Tests\Feature\Groups;
 
+use App\Device;
 use App\Group;
+use App\Party;
 use App\Network;
 use App\Notifications\NewGroupMember;
 use App\Role;
@@ -224,6 +226,26 @@ class APIv2GroupMembershipTest extends TestCase
         $response->assertSuccessful();
         $this->assertEquals(['archived' => true], $response->json('data'));
         $this->assertNotNull(Group::find($idgroups)->archived_at);
+    }
+
+    public function testArchiveBlockedWhenGroupHasADevice(): void
+    {
+        // Pre-cutover a group with an event that has a device could not be
+        // deleted (Group::canDelete()); archivev2 must preserve that.
+        $host = User::factory()->host()->create();
+        $idgroups = $this->createGroupAsHost($host);
+
+        $event = Party::factory()->create(['group' => $idgroups]);
+        Device::factory()->fixed()->create(['event' => $event->idevents]);
+
+        $admin = User::factory()->administrator()->create(['api_token' => 'archive-tok-dev']);
+        $this->app['auth']->forgetGuards();
+        $this->actingAs($admin);
+
+        $response = $this->delete("/api/v2/groups/$idgroups?api_token=archive-tok-dev");
+
+        $response->assertStatus(403);
+        $this->assertNull(Group::find($idgroups)->archived_at);
     }
 
     public function testNetworkCoordinatorForGroupCanArchiveGroup(): void

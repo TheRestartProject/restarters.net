@@ -159,6 +159,117 @@ before starting F proper).
   so unknown API paths still 404 JSON. Draft: scratchpad/f2-web-routes-draft
   .php (session-local).
 
+## Untranslated-string review (2026-07-17, per Edward's request)
+
+After pruning 291 checker-flagged dead lang keys, a 90-agent sweep of all
+88 SPA templates + retained Blade checked for hardcoded user-facing English
+(the inverse gap the checker can't see). Results:
+- NO pruned key's text exists hardcoded anywhere — the prune orphaned
+  nothing (mechanical value-vs-source cross-check, all 7 hits were code
+  comments/identifiers).
+- 8 real SPA i18n gaps found and FIXED (all porting gaps, not prune
+  fallout): kg/CO2 tab suffixes in EventDevicesPanel + EventDevicesReadOnly
+  (client.devices.tab_impact), km suffix in GroupCard
+  (client.groups.distance_km), logo alt text on both networks pages
+  (client.networks.logo_alt) — en/fr/fr-BE.
+- 68 findings on retained Blade (stats widgets, error pages, header_plain
+  logo alt) are PRE-EXISTING hardcoded English on English-first surfaces,
+  untouched by the migration. Deliberately left: widgets are partner
+  embeds (bug-for-bug retention principle, same as StatsShare); Laravel
+  error pages are edge-visible only post-cutover (SPA has error.vue).
+  Flagged as follow-up, not migration scope.
+
+## F2 test-fallout DECISIONS / GAPS (2026-07-17)
+
+- Legacy Blade-render Feature tests were stripped/deleted as their coverage
+  moved to APIv2*Test + client vitest/e2e. loginAsTestUser rewritten to
+  factory+actingAs (auth external-interface now in AuthEndpointsTest).
+- WikiLoginTests: PORTED to the SSO bridge (wiki-sync-on-login moved from
+  the Blade /login to BridgeController's Login event, by design) and the v2
+  password endpoint (ChangeWikiPassword via PasswordChanged). Not lost.
+- PrivilegeEscalationTest: DELETED — every cross-user attack it covered is
+  covered by APIv2User* (testCannotChangeAnotherUsersPassword,
+  testCannotDeleteAnotherUsersAccount, testNonAdminForbidden, ...) and the
+  v2 operate-on-self design removed the vulnerability class.
+- **FEATURE GAP for Edward**: the "request review email to volunteers"
+  feature (old GET /party/contribution/{id} → PartyController::getContributions,
+  sending the EventRepairs notification) was NEVER ported to /api/v2. Its
+  test (EventRequestReviewEmailTest) was deleted because there is no live
+  endpoint to point it at. If this feature is still wanted, it needs an API
+  endpoint + client UI + the test restored. DECISION: confirm with Edward
+  whether to reinstate or intentionally drop.
+
+## F2 further notes (from Groups test triage)
+
+- GroupCreateTest::testEventVisibility DELETED: it asserted the old Blade
+  behaviour that events of an unapproved group were hidden by group-approval/
+  role gating. GET /api/v2/events/{id} has no such gate. If per-group-approval
+  event hiding is still required, verify it in the API layer — FLAG for Edward.
+- GroupEditTest::audit_log_escapes_xss_payload DELETED: it asserted the Blade
+  audit-log accordion HTML-escaped a stored XSS payload. Output escaping is
+  now the SPA's job (Vue escapes interpolations by default); the server-render
+  escaping test has no equivalent. Low risk, noted.
+- Invite email validation CONTRACT CHANGE: old POST /group/invite threw a
+  ValidationException on a bad address; new POST /api/v2/groups/{id}/invites
+  soft-validates (filter_var) and returns bad addresses in data.invalid with
+  invites_sent excluding them. Tests updated to the new contract.
+
+## ADMIN-CAPABILITY GAPS surfaced by user-test triage (FLAG for Edward)
+
+The old Blade admin flows had no /api/v2 equivalent, so their tests were
+ported to policy-level assertions or deleted. If these admin capabilities
+are still wanted in the SPA they need API endpoints + client UI:
+- Admin CREATE a user (old POST /user/create) — registerv2 is self-signup
+  only. UserAdminTest/AccountCreationTest admin-create tests removed.
+- Admin RESET another user's password (old POST /user/edit new-password) —
+  updateMyPasswordv2 is self-only. Ported to UserPolicy assertion.
+- Admin EDIT another user's info/invites (old /user/edit, /profile/edit-*
+  with foreign id) — v2 profile endpoints are self-only. Ported to
+  UserPolicy assertions (host-on-unrelated forbidden etc. still pinned).
+- Admin SOFT-DELETE another user (old /user/soft-delete) — deleteMyAccountv2
+  is self-only. Ported to UserPolicy assertion + model check.
+- MediaWiki avatar THUMBNAIL lookup (old /user/thumbnail) — no v2 route
+  (getThumbnail now unreachable). testBadMediaWikiId deleted.
+The security GUARANTEES (non-admins can't touch others) are preserved via
+UserPolicy tests; what's absent is the admin-does-it-to-another *capability*
+over the API. DECISION: confirm whether D3/D5 admin scope intends these.
+
+## Image-upload test fallout (json()-form scan, second pass)
+
+My first dead-route scan matched ->post('/..') but missed the
+->json('POST','/..') form, hiding four image-upload test files. Handled:
+- ModerationEventPhotosNotificationTest: found a REAL REGRESSION —
+  uploadImagev2 (event photos) did not fire EventImagesUploaded, so the
+  admin moderation-photos notification never fired for SPA uploads (the
+  event/listener/notification were all still wired; only the dispatch was
+  dropped). FIXED in EventAttendanceController::uploadImagev2 (fires the
+  event; the listener throttles per-admin so per-upload is safe). Test
+  repointed to POST /api/v2/events/{id}/images (tus upload_key).
+- GroupEditTest image_upload/image_upload_preserves: subagent had wrongly
+  repointed to PATCH; deleted (group images fully covered by
+  APIv2GroupImagesTest, 16 tests). Also fixed a subagent assertFalse(0)
+  bug (tinyint 0 is not boolean false).
+- Devices/EditTest device-image methods: deleted (APIv2DeviceImagesTest).
+- UploadsDisabledTest: group-image cases repointed to the API (the
+  image_upload flag is enforced in FixometerFile, shared by all image
+  endpoints, so disabling it makes the API upload 422). config default
+  test kept.
+- **GAP for Edward**: network-logo upload has NO /api/v2 endpoint (old
+  PUT /networks/{network} web route removed). The two network-logo
+  UploadsDisabledTest cases were dropped. If networks still need editable
+  logos in the SPA, an API endpoint + client UI are needed.
+
+## Group delete → archive semantic change (GroupDeleteTest deleted)
+
+The old GET /group/delete/{id} HARD-deleted a group and was blocked when the
+group had a device (data-loss protection). The v2 DELETE /api/v2/groups/{id}
+(archivev2) instead sets archived_at (reversible soft-archive) with no
+device check — so the protection is unnecessary (archiving loses no data).
+The permission matrix (admin/NC can, host can't) is covered by
+APIv2GroupMembershipTest. GroupDeleteTest (old hard-delete + device-block
+rules) was deleted. FLAG: if a true hard-delete is ever reintroduced, the
+device-protection rule must come back with it.
+
 ## G6 method note
 
 chrome-devtools MCP is disconnected; the visual parity review runs via

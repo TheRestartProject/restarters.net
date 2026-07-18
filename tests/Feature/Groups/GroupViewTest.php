@@ -8,7 +8,6 @@ use App\Party;
 use App\Role;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Tests\TestCase;
 
 class GroupViewTest extends TestCase
@@ -33,48 +32,17 @@ class GroupViewTest extends TestCase
             'event' => $event->idevents,
         ]);
 
-        // View with id.  The page itself no longer carries the per-user UI permission flags (canedit,
-        // can-see-delete, can-perform-delete, ...) as Blade props - GroupPage.vue fetches those, along with the
-        // rest of the group data, from GET /api/v2/groups/{id}. See APIv2GroupPermissionsTest for thorough
-        // coverage of that flag matrix; here we just check the page still renders the group/event data it is
-        // still responsible for passing down.
-        $response = $this->get("/group/view/$id");
-
-        $props = $this->assertVueProperties($response, [
-            [],
-            [
-                ':idgroups' => $id,
-                ':top-devices' => json_encode([
-                    [
-                        'counter' => 1,
-                        'name' => 'Desktop computer'
-                    ]
-                ]),
-            ],
-        ]);
-        $this->assertEquals(1, count(json_decode($props[1][':events'], TRUE)));
-
-        // The API endpoint the page fetches from should report full permissions for this administrator.
+        // The page itself no longer carries the per-user UI permission flags (canedit, can-see-delete,
+        // can-perform-delete, ...) as Blade props - GroupPage.vue fetches those, along with the rest of
+        // the group data, from GET /api/v2/groups/{id}. See APIv2GroupPermissionsTest for thorough
+        // coverage of that flag matrix; here we just check the API endpoint reports full permissions
+        // for this administrator.
         $apiResponse = $this->get("/api/v2/groups/$id");
         $apiResponse->assertSuccessful();
         $permissions = json_decode($apiResponse->getContent(), true)['data']['permissions'];
         $this->assertTrue($permissions['can_edit']);
         $this->assertTrue($permissions['can_see_delete']);
         $this->assertFalse($permissions['can_perform_delete']);
-    }
-
-    public function testInvalidGroup(): void
-    {
-        $this->loginAsTestUser(Role::RESTARTER);
-        $this->expectException(NotFoundHttpException::class);
-        $this->get('/group/view/undefined');
-    }
-
-    public function testInvalidGroup2(): void
-    {
-        $this->loginAsTestUser(Role::RESTARTER);
-        $this->expectException(NotFoundHttpException::class);
-        $this->get('/group/view/1');
     }
 
     private function assertGroupPermissions($id, $canSeeDelete, $canPerformDelete): void
@@ -101,26 +69,12 @@ class GroupViewTest extends TestCase
                                                                     ]);
 
         // Groups are deletable unless they have an event with a device.
-        $response = $this->get("/group/view/$id");
-        $this->assertVueProperties($response, [
-            [],
-            [
-                ':idgroups' => $id,
-            ],
-        ]);
         $this->assertGroupPermissions($id, true, true);
 
         $iddevices = $this->createDevice($event->idevents,
             'misc', null, 1.5, 0, '',
             Device::REPAIR_STATUS_FIXED_STR, null, null, 111);
 
-        $response = $this->get("/group/view/$id");
-        $this->assertVueProperties($response, [
-            [],
-            [
-                ':idgroups' => $id,
-            ],
-        ]);
         $this->assertGroupPermissions($id, true, false);
 
         # Check the device shows in the API.
@@ -134,13 +88,6 @@ class GroupViewTest extends TestCase
         foreach (['Restarter', 'Host', 'NetworkCoordinator'] as $role) {
             $user = \App\User::factory()->{lcfirst($role)}()->create();
             $this->actingAs($user);
-            $response = $this->get("/group/view/$id");
-            $this->assertVueProperties($response, [
-                [],
-                [
-                    ':idgroups' => $id,
-                ],
-            ]);
             $this->assertGroupPermissions($id, false, false);
         }
 
@@ -167,11 +114,13 @@ class GroupViewTest extends TestCase
                                                                     'group' => $id,
                                                                 ]);
 
-        // Event should show in list for group.
-        $response = $this->get("/group/view/$id");
-        $props = $this->getVueProperties($response);
-        $events = json_decode($props[1][':events'], true);
-        self::assertEquals(Party::latest()->first()->idevents, $events[0]['idevents']);
+        // Event should show in the list for the group. GroupPage.vue now fetches this from
+        // GET /api/v2/groups/{id}/events (GroupController::getEventsForGroupv2) rather than
+        // Blade :events props.
+        $response = $this->get("/api/v2/groups/$id/events");
+        $response->assertSuccessful();
+        $events = json_decode($response->getContent(), true)['data'];
+        self::assertEquals(Party::latest()->first()->idevents, $events[0]['id']);
     }
 
     public function testGroupIndexNextEventIsEagerLoaded(): void
@@ -227,11 +176,15 @@ class GroupViewTest extends TestCase
             ]);
         }
 
+        // The group list page is now rendered by the SPA, which fetches it from
+        // GET /api/v2/groups/summary (see testGroupIndexNextEventIsEagerLoaded above) rather than
+        // the old Blade /group listing - point the N+1 regression check at that live endpoint.
+
         // Warm up (first request may have extra overhead).
-        $this->get('/group');
+        $this->get('/api/v2/groups/summary?includeNextEvent=true');
 
         DB::enableQueryLog();
-        $this->get('/group')->assertSuccessful();
+        $this->get('/api/v2/groups/summary?includeNextEvent=true')->assertSuccessful();
         $queriesFor3 = count(DB::getQueryLog());
         DB::disableQueryLog();
         DB::flushQueryLog();
@@ -248,7 +201,7 @@ class GroupViewTest extends TestCase
         }
 
         DB::enableQueryLog();
-        $this->get('/group')->assertSuccessful();
+        $this->get('/api/v2/groups/summary?includeNextEvent=true')->assertSuccessful();
         $queriesFor6 = count(DB::getQueryLog());
         DB::disableQueryLog();
         DB::flushQueryLog();

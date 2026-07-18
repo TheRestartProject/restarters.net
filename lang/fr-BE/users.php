@@ -2,8 +2,6 @@
 
 return [
     'title' => 'Utilisateurs',
-    'reveal_filters' => 'Afficher les filtres',
-    'create_new' => 'Créer un nouvel utilisateur',
     'name' => 'Nom',
     'email' => 'Adresse e-mail',
     'role' => 'Rôle',

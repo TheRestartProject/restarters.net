@@ -4,13 +4,9 @@ namespace Tests\Feature;
 
 use App\Group;
 use App\Notifications\NewGroupWithinRadius;
-use App\Party;
 use App\Role;
 use App\User;
-use DB;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Notification;
-use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
 
 class BasicTest extends TestCase
@@ -30,16 +26,24 @@ class BasicTest extends TestCase
         $this->processQueuedNotifications();
 
         // Should have generated a notification for the approval.
-        $this->actingAs($host);
-        $rsp = $this->get('/profile/notifications');
-        $rsp->assertSee(__('notifications.new_group_title'));
+        $this->assertEquals(1, $host->unreadNotifications()->count());
+        $notification = $host->notifications()->first();
+        $this->assertNotNull($notification);
+        $this->assertEquals(NewGroupWithinRadius::class, $notification->type);
+        $this->assertEquals(__('notifications.new_group_title'), $notification->data['title']);
 
-        // Mark it as read.
-        if (preg_match('/.*(markAsRead\/.+?)".*/', $rsp->getContent(), $matches)) {
-            $rsp = $this->get($matches[1]);
-            $rsp->assertRedirect();
-        } else {
-            self::assertFalse(true);
-        }
+        // /profile/notifications is dead (Nuxt cutover); GET /api/users/{id}/notifications
+        // is the live equivalent, though it only exposes counts (not the notification body) -
+        // confirm it reflects the unread notification we just generated.
+        $this->actingAs($host);
+        $rsp = $this->get('/api/users/'.$host->id.'/notifications');
+        $rsp->assertSuccessful();
+        $json = json_decode($rsp->getContent(), true);
+        $this->assertEquals(1, $json['restarters']);
+
+        // There is no live mark-as-read API endpoint (route:list has none), so assert the
+        // mark-as-read behaviour directly on the model instead of via a dead HTTP route.
+        $notification->markAsRead();
+        $this->assertEquals(0, $host->unreadNotifications()->count());
     }
 }

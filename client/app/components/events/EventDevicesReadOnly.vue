@@ -75,7 +75,7 @@ function round(n) {
           >
             <b>{{ t('devices.title_powered') }}</b> ({{ powered.length }})
             <template v-if="stats">
-              &middot; {{ round(stats.waste_powered) }}kg &middot; {{ round(stats.co2_powered) }}kg CO2
+              {{ t('client.devices.tab_impact', { waste: round(stats.waste_powered), co2: round(stats.co2_powered) }) }}
             </template>
           </button>
         </li>
@@ -89,7 +89,7 @@ function round(n) {
           >
             <b>{{ t('devices.title_unpowered') }}</b> ({{ unpowered.length }})
             <template v-if="stats">
-              &middot; {{ round(stats.waste_unpowered) }}kg &middot; {{ round(stats.co2_unpowered) }}kg CO2
+              {{ t('client.devices.tab_impact', { waste: round(stats.waste_unpowered), co2: round(stats.co2_unpowered) }) }}
             </template>
           </button>
         </li>

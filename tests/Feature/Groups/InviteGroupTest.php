@@ -14,7 +14,6 @@ use DB;
 use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 use Auth;
-use Illuminate\Validation\ValidationException;
 
 class InviteGroupTest extends TestCase
 {
@@ -32,14 +31,18 @@ class InviteGroupTest extends TestCase
         // Invite a user.
         $user = User::factory()->restarter()->create();
 
-        $response = $this->post('/group/invite', [
-            'group_name' => $group->name,
-            'group_id' => $group->idgroups,
-            'manual_invite_box' => $user->email,
-            'message_to_restarters' => 'Join us, but not in a creepy zombie way',
+        // POST /group/invite is gone; invites are now a plain API mutation
+        // (GroupMembershipController::invitesv2), which takes an array of emails rather than a
+        // single manual_invite_box string.
+        $response = $this->post('/api/v2/groups/'.$group->idgroups.'/invites?api_token='.$host->api_token, [
+            'emails' => [$user->email],
+            'message' => 'Join us, but not in a creepy zombie way',
         ]);
 
-        $response->assertSessionHas('success');
+        $response->assertSuccessful();
+        $json = json_decode($response->getContent(), true);
+        $this->assertEquals(1, $json['data']['invites_sent']);
+        $this->assertEquals([], $json['data']['invalid']);
 
         // Invitation should generate a notification.
         Notification::assertSentTo(
@@ -66,19 +69,10 @@ class InviteGroupTest extends TestCase
 
         // We should see that we have been invited to the group.
         $this->actingAs($user);
-        $response2 = $this->get('/group/view/'.$group->idgroups);
-        $response2->assertSee('You have an invitation to this group.');
 
         // Check the counts.
         // Small delay to ensure any database commits or cache invalidations are complete
         usleep(100000); // 100ms
-
-        $this->assertVueProperties($response2, [
-            [],
-            [
-                ':idgroups' => $group->idgroups,
-            ],
-        ]);
 
         // Check the group membership counts directly on the model (these are no longer exposed to the Blade
         // view/Vue props - GroupPage.vue now gets group data, including confirmed hosts/restarters counts, from
@@ -118,8 +112,14 @@ class InviteGroupTest extends TestCase
         // Now accept the invite. GET /group/accept-invite/{id}/{hash} keeps its status-hash DB
         // update server-side (F2-5) but now redirects into the SPA's group page with a ?joined=1
         // flag instead of Blade + session flash - see App\Http\Controllers\GroupController::confirmInvite.
-        preg_match('/href="(\/group\/accept-invite.*?)"/', $response2->getContent(), $matches);
-        $invitation = $matches[1];
+        // The hash used to be scraped off the (now-dead) Blade group page's invitation banner; it's
+        // simply the pending users_groups.status value invitesv2() wrote when the invite was sent.
+        $pendingMembership = DB::table('users_groups')
+            ->where('user', $user->id)
+            ->where('group', $group->idgroups)
+            ->first();
+        $this->assertNotNull($pendingMembership);
+        $invitation = '/group/accept-invite/'.$group->idgroups.'/'.$pendingMembership->status;
         $response3 = $this->get($invitation);
         $this->assertTrue($response3->isRedirection());
         $redirectTo = $response3->getTargetUrl();
@@ -140,14 +140,6 @@ class InviteGroupTest extends TestCase
         );
 
         // Check the counts have changed.
-        $response4 = $this->get('/group/view/'.$group->idgroups);
-        $this->assertVueProperties($response4, [
-            [],
-            [
-                ':idgroups' => $group->idgroups,
-            ],
-        ]);
-
         $freshGroup = Group::find($group->idgroups);
         $this->assertEquals(1, $freshGroup->all_hosts_count);
         $this->assertEquals(1, $freshGroup->all_confirmed_hosts_count);
@@ -182,12 +174,6 @@ class InviteGroupTest extends TestCase
         $host = User::factory()->host()->create();
         $this->actingAs($host);
 
-        $this->actingAs($host);
-        $response = $this->get('/group/view/'.$group->idgroups);
-
-        // Should see shareable code in there.
-        $response->assertSee($group->shareable_link);
-
         // Now pretend we've received that code, via the legacy backend URL some older-style
         // links may still use (as opposed to $group->shareable_link, which already points
         // straight at the SPA - see APIv2GroupResourceFieldsTest). GET /group/invite/{code} is
@@ -207,21 +193,31 @@ class InviteGroupTest extends TestCase
      */
     public function testInviteInvalidEmail($email, $valid): void
     {
-        $this->loginAsTestUser(Role::ADMINISTRATOR);
+        $admin = $this->loginAsTestUser(Role::ADMINISTRATOR);
 
         $idgroups = $this->createGroup();
         $group = Group::findOrFail($idgroups);
 
-        if (!$valid) {
-            $this->expectException(ValidationException::class);
-        }
-
-        $this->post('/group/invite', [
-            'group_name' => $group->name,
-            'group_id' => $group->idgroups,
-            'manual_invite_box' => $email,
-            'message_to_restarters' => 'Join us, but not in a creepy zombie way',
+        // POST /group/invite is gone. Unlike the old Blade form's manual_invite_box, which used
+        // Laravel validation and threw a ValidationException for a bad address, the live API
+        // (GroupMembershipController::invitesv2) accepts an array of emails and soft-validates
+        // each one with filter_var(), reporting invalid addresses back in the response rather
+        // than rejecting the whole request.
+        $response = $this->post('/api/v2/groups/'.$group->idgroups.'/invites?api_token='.$admin->api_token, [
+            'emails' => [$email],
+            'message' => 'Join us, but not in a creepy zombie way',
         ]);
+
+        $response->assertSuccessful();
+        $json = json_decode($response->getContent(), true);
+
+        if ($valid) {
+            $this->assertEquals(1, $json['data']['invites_sent']);
+            $this->assertEquals([], $json['data']['invalid']);
+        } else {
+            $this->assertEquals(0, $json['data']['invites_sent']);
+            $this->assertEquals([$email], $json['data']['invalid']);
+        }
     }
 
     public function invalidEmailProvider(): array

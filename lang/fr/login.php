@@ -9,11 +9,6 @@ return [
                                 <li>Voir et partager l\'impact d’événements de réparation</li>
                                 <li>Documenter et faire tomber les barrières à la réparation</li>
                             </ul>',
-  'more' => 'En savoir plus',
-  'stat_1' => 'Appareils réparés',
-  'stat_2' => 'Émissions de CO<sub>2</sub>e évitées',
-  'stat_3' => 'Déchets<br>évités',
-  'stat_4' => 'Événements<br>réalisés',
   'login_title' => 'Connexion',
   'join_title' => 'Rejoindre Restarters',
   'join_title_short' => 'Rejoindre',

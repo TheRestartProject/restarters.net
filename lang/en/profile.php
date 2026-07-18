@@ -7,7 +7,6 @@ return [
   'no_bio' => ':name has not yet entered a biography.',
   'edit_user' => 'Edit user',
   'change_photo' => 'Change my photo',
-  'profile_picture' => 'Profile picture',
   'skills_updated' => 'Skills updated!',
   'notifications' => 'Notifications',
   'language_panel_title' => 'Language settings',

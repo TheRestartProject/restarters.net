@@ -820,4 +820,148 @@ class NetworkController extends Controller
 
         return response()->json(['message' => 'Tag deleted successfully']);
     }
+
+    /**
+     * @OA\Post(
+     *      path="/api/v2/networks/{id}/groups",
+     *      operationId="associateNetworkGroups",
+     *      tags={"Networks"},
+     *      summary="Associate groups with a network",
+     *      description="Add one or more groups to a network. Requires authentication as a Network Coordinator for this network or an Administrator.",
+     *      security={{"apiToken":{}}},
+     *      @OA\Parameter(name="id", description="Network id", required=true, in="path", @OA\Schema(type="integer")),
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent(
+     *              required={"groups"},
+     *              @OA\Property(property="groups", type="array", @OA\Items(type="integer")),
+     *          )
+     *      ),
+     *      @OA\Response(response=200, description="Groups associated",
+     *          @OA\JsonContent(@OA\Property(property="data", type="object",
+     *              @OA\Property(property="associated", type="integer")))),
+     *      @OA\Response(response=403, description="Forbidden"),
+     * )
+     *
+     * Port of NetworkController::associateGroup (the old session+CSRF web form).
+     */
+    public function associateGroupsv2(Request $request, $id): JsonResponse
+    {
+        $network = Network::findOrFail($id);
+        $user = Auth::user();
+
+        if (! $user) {
+            return response()->json(['message' => 'Unauthenticated'], 401);
+        }
+
+        if (! $user->hasRole('Administrator') && ! $user->isCoordinatorOf($network)) {
+            return response()->json(['message' => 'You do not have permission to add groups to this network'], 403);
+        }
+
+        $validated = $request->validate([
+            'groups' => 'required|array|min:1',
+            'groups.*' => 'integer',
+        ]);
+
+        $associated = 0;
+        foreach ($validated['groups'] as $groupId) {
+            $group = Group::find($groupId);
+            if ($group) {
+                $network->addGroup($group);
+                $associated++;
+            }
+        }
+
+        return response()->json(['data' => ['associated' => $associated]]);
+    }
+
+    /**
+     * @OA\Post(
+     *      path="/api/v2/networks/{id}/logo",
+     *      operationId="uploadNetworkLogo",
+     *      tags={"Networks"},
+     *      summary="Upload a network logo",
+     *      description="Set the network's logo from a completed tus upload. Requires authentication as a Network Coordinator for this network or an Administrator.",
+     *      security={{"apiToken":{}}},
+     *      @OA\Parameter(name="id", description="Network id", required=true, in="path", @OA\Schema(type="integer")),
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent(
+     *              required={"upload_key"},
+     *              @OA\Property(property="upload_key", type="string", description="Key of the completed tus upload"),
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Logo stored",
+     *          @OA\JsonContent(@OA\Property(property="data", type="object",
+     *              @OA\Property(property="logo", type="string")))
+     *      ),
+     *      @OA\Response(response=403, description="Forbidden"),
+     *      @OA\Response(response=422, description="Upload invalid or uploads disabled"),
+     * )
+     *
+     * Port of NetworkController::update's network_logo handling: stores the
+     * image under network_logos/ (with a -_x100 sized copy) and sets
+     * network->logo. The SPA uploads the file via tus first, then calls this
+     * with the resulting upload_key.
+     */
+    public function uploadLogov2(Request $request, $id): JsonResponse
+    {
+        $network = Network::findOrFail($id);
+        $user = Auth::user();
+
+        if (! $user) {
+            return response()->json(['message' => 'Unauthenticated'], 401);
+        }
+
+        if (! $user->hasRole('Administrator') && ! $user->isCoordinatorOf($network)) {
+            return response()->json(['message' => 'You do not have permission to edit this network'], 403);
+        }
+
+        $validated = $request->validate([
+            'upload_key' => 'required|string',
+        ]);
+
+        if (! config('restarters.features.image_upload')) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'upload_key' => [__('events.image_upload_error')],
+            ]);
+        }
+
+        // Resolve (and validate: complete, <=2MB, image mime) the tus upload.
+        $tusPath = EventAttendanceController::validatedTusFilePath($validated['upload_key'], 'events');
+
+        $extByMime = [
+            'image/jpeg' => 'jpg',
+            'image/png' => 'png',
+            'image/gif' => 'gif',
+        ];
+        $mime = @finfo_file(finfo_open(FILEINFO_MIME_TYPE), $tusPath);
+        $ext = $extByMime[$mime] ?? 'jpg';
+
+        // Same disk selection as the old web controller (s3 on Fly, else public).
+        $disk = config('filesystems.default') === 's3' ? 's3' : 'public_uploads';
+        $storage = \Illuminate\Support\Facades\Storage::disk($disk);
+
+        $path = 'network_logos/'.\Illuminate\Support\Str::random(40).'.'.$ext;
+        if (! $storage->put($path, file_get_contents($tusPath))) {
+            abort(500, 'Failed to save logo');
+        }
+
+        // Generate the _x100 sized version by copying the file (matches the
+        // old controller; the sized image is served at that derived path).
+        $sizedPath = preg_replace('/\.([^.\s]{3,4})$/', '-_x100.$1', $path);
+        $storage->copy($path, $sizedPath);
+
+        $network->logo = $path;
+        $network->save();
+
+        // Clean up the consumed tus upload.
+        $cache = \App\Helpers\Tus::buildCache();
+        $cache->delete($validated['upload_key']);
+        @unlink($tusPath);
+
+        return response()->json(['data' => ['logo' => $network->logo]]);
+    }
 }

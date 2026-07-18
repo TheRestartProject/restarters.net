@@ -108,6 +108,14 @@ export const useEventsStore = defineStore('events', {
       return data
     },
 
+    // POST /api/v2/events/{id}/request-review - ask confirmed attendees to
+    // review the event's repairs. Host/coordinator/admin only.
+    async requestReview(id) {
+      const { $api } = useNuxtApp()
+      const { data } = await $api.event.requestReview(id)
+      return data
+    },
+
     // DELETE /api/v2/events/{id} (C1g). Only ever called when the page's
     // client-side canDelete gate is true - see pages/party/view/[id].vue.
     async deleteEvent(id) {

@@ -1,5 +1,5 @@
 import { test, expect } from './fixtures'
-import { USERS, login, createGroup, createEvent, approveEvent } from './utils'
+import { USERS, login, logout, createGroup, createEvent, approveEvent } from './utils'
 
 // Ports tests/Integration/event.test.js's three flows to the Nuxt client:
 // create a future event, create a past event, and open the invite-
@@ -59,5 +59,57 @@ test.describe('events', () => {
     // against the same POST /api/v2/events/{id}/invites endpoint.
     await expect(page.getByTestId('event-invite-emails')).toBeVisible()
     await expect(page.getByTestId('event-invite-submit')).toBeVisible()
+  })
+
+  test('Host can request reviews on a finished event', async ({ page }) => {
+    test.slow()
+    await login(page, USERS.admin)
+
+    const groupId = await createGroup(page)
+    const eventId = await createEvent(page, groupId, { past: true })
+    await approveEvent(page, eventId)
+
+    await page.goto(`/party/view/${eventId}`, { waitUntil: 'domcontentloaded' })
+
+    // The button only shows for a host viewing a finished event — it was a
+    // dropped feature (the old event-request-review modal), so its presence
+    // AND that it hits the real POST endpoint are both under test.
+    const button = page.getByTestId('event-view-request-review')
+    await expect(button).toBeVisible({ timeout: 10000 })
+
+    const [response] = await Promise.all([
+      page.waitForResponse(
+        (resp) => resp.url().includes(`/api/v2/events/${eventId}/request-review`) && resp.request().method() === 'POST',
+      ),
+      button.click(),
+    ])
+    expect(response.status()).toBe(200)
+  })
+
+  test('Following the hosting group from the event page joins it', async ({ page }) => {
+    test.slow()
+    // Admin creates the group + event (admin becomes a host/member).
+    await login(page, USERS.admin)
+    const groupId = await createGroup(page)
+    const eventId = await createEvent(page, groupId, { past: false })
+    await approveEvent(page, eventId)
+    await logout(page)
+
+    // A different user who is NOT in the group sees the "follow group" button.
+    await login(page, USERS.host)
+    await page.goto(`/party/view/${eventId}`, { waitUntil: 'domcontentloaded' })
+
+    const followButton = page.getByTestId('event-view-follow-group')
+    await expect(followButton).toBeVisible({ timeout: 10000 })
+
+    // This used to be a NuxtLink to the dead /group/join/{id} page; it must
+    // now call the join API and succeed.
+    const [response] = await Promise.all([
+      page.waitForResponse(
+        (resp) => resp.url().includes(`/api/v2/groups/${groupId}/members/me`) && resp.request().method() === 'POST',
+      ),
+      followButton.click(),
+    ])
+    expect(response.status()).toBe(200)
   })
 })

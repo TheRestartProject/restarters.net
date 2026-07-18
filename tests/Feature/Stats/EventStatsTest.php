@@ -3,10 +3,7 @@
 namespace Tests\Feature\Stats;
 
 use App\Device;
-use App\Group;
 use App\Party;
-use App\Role;
-use App\User;
 use Tests\Feature\Stats\StatsTestCase;
 
 class EventStatsTest extends StatsTestCase
@@ -178,54 +175,5 @@ class EventStatsTest extends StatsTestCase
         $response = $this->get('/party/stats/' . $event->idevents . '/wide');
         $response->assertSuccessful();
         $response->assertSee('<span id="ewaste-diverted-value">23</span>', false);
-    }
-
-    /** @test */
-    public function event_stats_for_upcoming_event(): void {
-        $this->_setupCategoriesWithUnpoweredWeights();
-
-        $this->host = User::factory()->administrator()->create();
-        $this->actingAs($this->host);
-
-        $this->group = Group::factory()->create();
-        $this->group->addVolunteer($this->host);
-        $this->group->makeMemberAHost($this->host);
-
-        // Create a future event.
-        $idevents = $this->createEvent($this->group->idgroups, 'tomorrow');
-
-        // Add a fixed device.
-        $device = Device::factory()->fixed()->create([
-                                                                      'category' => $this->_idUnpoweredMisc,
-                                                                      'category_creation' => $this->_idUnpoweredMisc,
-                                                                      'event' => $idevents,
-                                                                      'estimate' => 7.89,
-                                                                  ]);
-
-        // Fixed device should show in stats on view event page.
-        $response = $this->get('/party/view/' . $idevents);
-        $props = $this->assertVueProperties($response, [
-            [],
-            [
-                ':idevents' => $idevents
-            ]
-        ]);
-
-        $stats = json_decode($props[1][':stats'], TRUE);
-        self::assertEquals(1, $stats['fixed_devices']);
-
-        // But it shouldn't show on the group stats page.
-        $response = $this->get('/group/view/' . $this->group->idgroups);
-        $props = $this->assertVueProperties($response, [
-            [],
-            [
-                ':idgroups' => $this->group->idgroups
-            ]
-        ]);
-
-        $stats = json_decode($props[1][':device-stats'], TRUE);
-        self::assertEquals(0, $stats['fixed']);
-        $stats = json_decode($props[1][':group-stats'], TRUE);
-        self::assertEquals(0, $stats['co2_unpowered']);
     }
 }

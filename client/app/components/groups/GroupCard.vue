@@ -1,4 +1,5 @@
 <script setup>
+import { useI18n } from 'vue-i18n'
 import GroupJoinButton from './GroupJoinButton.vue'
 
 // Single-group summary card for /group/nearby (DashboardNearbyGroups.vue's
@@ -16,6 +17,8 @@ defineProps({
     default: false,
   },
 })
+
+const { t } = useI18n()
 </script>
 
 <template>
@@ -40,7 +43,7 @@ defineProps({
             {{ group.location }}
           </span>
           <span v-if="group.distance != null" :data-testid="`group-card-distance-${group.id}`">
-            ({{ group.distance }} km)
+            {{ t('client.groups.distance_km', { distance: group.distance }) }}
           </span>
         </div>
       </div>

@@ -69,7 +69,8 @@
    "previous_page": "Previous",
    "quantity": "Quantity",
    "remove_photo": "Remove photo",
-   "results_count": "{count} item found | {count} items found"
+   "results_count": "{count} item found | {count} items found",
+   "tab_impact": "· {waste}kg · {co2}kg CO2"
   },
   "events": {
    "all_past_title": "All past events",
@@ -94,6 +95,7 @@
    "no_devices": "No items recorded yet.",
    "no_search_results": "No events match your search.",
    "now_following_group": "You are now following this group.",
+   "request_review": "Request reviews",
    "search_label": "Search events",
    "search_placeholder": "Search by title or venue",
    "start_required": "Please choose a start time.",
@@ -124,6 +126,7 @@
    "column_restarters": "Restarters",
    "columns_label": "Columns",
    "description_required": "Please tell us about your group.",
+   "distance_km": "({distance} km)",
    "edit_forbidden": "You don't have permission to edit this group.",
    "email_invalid": "Please enter a valid email address.",
    "image_upload_error": "Sorry, we couldn't upload that image. Please try again.",
@@ -164,6 +167,9 @@
    "associate_groups_error": "Could not add those groups to the network. Please try again.",
    "groups_load_error": "Sorry, we couldn't load this network's groups.",
    "load_error": "Sorry, we couldn't load that network.",
+   "logo_alt": "{name} logo",
+   "logo_heading": "Network logo",
+   "logo_upload_error": "Sorry, we couldn't upload that logo. Please try again.",
    "no_groups": "This network has no groups yet.",
    "not_found": "That network could not be found.",
    "stats_unavailable": "Stats are not available for this network right now.",
@@ -171,6 +177,8 @@
   },
   "notifications": {
    "discourse_aria": "Talk notifications",
+   "empty": "You have no notifications.",
+   "load_error": "Sorry, we couldn't load your notifications.",
    "restarters_aria": "Restarters notifications",
    "unread": "{count} unread notification | {count} unread notifications"
   },

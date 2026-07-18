@@ -58,11 +58,15 @@ export default class NetworkAPI extends BaseAPI {
     return this.$get(`/api/v2/networks/${id}/stats`, params)
   }
 
-  // POST /api/v2/networks/{id}/groups - documented but NOT yet implemented
-  // server-side (the only existing route, networks.associate-group in
-  // routes/web.php, is a session+CSRF form POST with a redirect response,
-  // unusable from the SPA). See docs/nuxt-migration/api-gaps.md Phase E.
+  // POST /api/v2/networks/{id}/groups - associate groups with the network
+  // (NetworkController::associateGroupsv2). Admin/coordinator only.
   associateGroups(id, groupIds) {
     return this.$post(`/api/v2/networks/${id}/groups`, { groups: groupIds })
+  }
+
+  // POST /api/v2/networks/{id}/logo - set the network logo from a completed
+  // tus upload (NetworkController::uploadLogov2). Admin/coordinator only.
+  uploadLogo(id, uploadKey) {
+    return this.$post(`/api/v2/networks/${id}/logo`, { upload_key: uploadKey })
   }
 }

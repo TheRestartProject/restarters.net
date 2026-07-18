@@ -12,7 +12,7 @@ use Tests\TestCase;
  *  - GET /group/invite/{code}, /party/invite/{code} (valid code): see
  *    InviteGroupTest::testInviteViaLink, InviteEventTest::testInviteViaLink.
  *  - GET /group/accept-invite, /party/accept-invite (valid hash, DB-effect assertions): see
- *    InviteGroupTest::testInvite, InviteEventTest::testInviteReal/testInvitableUserPOV/
+ *    InviteGroupTest::testInvite, InviteEventTest::testInviteReal/
  *    testInvitableNotifications.
  * This file covers the previously-untested GET /user/register/{hash?} redirector and the
  * invalid-hash branch of the two accept-invite redirectors.

@@ -3,21 +3,21 @@
 namespace Tests\Feature;
 
 use App\Events\UserUpdated;
-use App\Group;
-use App\Helpers\Fixometer;
-use App\Role;
-use App\Skills;
 use App\User;
-use App\UsersSkills;
-use Carbon\Carbon;
 use DB;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
+/**
+ * Model-level profile behaviour (Discourse-sync event dispatch, lat/lng
+ * precision). The route-driven profile-edit tests that used the removed Blade
+ * endpoints (/profile/edit-info, /profile/edit-tags, /profile image upload)
+ * are now covered by the API suite:
+ *   - update + geocoding: APIv2UserProfileTest::testUpdatePersistsFieldsAndGeocodesLocation,
+ *     ::testUpdateClearsLatLongOnGeocodeFailure, ::testUpdateValidatesRequiredFields
+ *   - skills/host-promotion: APIv2UserProfileTest::testSkillsPersistsAndPromotesToHost
+ *   - photo: APIv2UserPhotoTest
+ */
 class EditProfileTest extends TestCase
 {
     protected function setUp(): void
@@ -88,168 +88,5 @@ class EditProfileTest extends TestCase
         $user = User::where('id', $userId)->first();
         $this->assertEquals(123.456, $user->latitude);
         $this->assertEquals(132.654, $user->longitude);
-    }
-
-    /** test */
-    // Check that we can update the location.
-    public function test_location_update(): void
-    {
-        $user = User::factory()->create();
-        $this->actingAs($user);
-
-        $this->post('/profile/edit-info', [
-            'name' => $user->name,
-            'email' => $user->email,
-            'age' => $user->age,
-            'country' => 'GB',
-            'townCity' => 'London',
-        ]);
-
-        $user = $user->fresh();
-        $this->assertEquals(51.507, round($user->latitude, 3));
-        $this->assertEquals(-0.128, round($user->longitude, 3));
-
-        $good = Config::get('GOOGLE_API_CONSOLE_KEY');
-        Config::set('GOOGLE_API_CONSOLE_KEY', 'zzz');
-
-        // Supply the id.
-        $this->post('/profile/edit-info', [
-            'id' => $user->id,
-            'name' => $user->name,
-            'email' => $user->email,
-            'age' => $user->age,
-            'country' => 'GB',
-            'townCity' => 'ZZZZ',
-        ]);
-
-        Config::set('GOOGLE_API_CONSOLE_KEY', $good);
-
-        $user = $user->fresh();
-        $this->assertNull($user->latitude);
-        $this->assertNull($user->longitude);
-    }
-
-    public function idProvider(): array {
-        return [
-            [ TRUE ],
-            [ FALSE ]
-        ];
-    }
-
-    /**
-     * @test
-     * @dataProvider idProvider
-     */
-    public function test_tags_update($id): void {
-        $user = User::factory()->create();
-        $this->actingAs($user);
-
-        $skill1 = Skills::create([
-                                     'skill_name'  => 'UT1',
-                                     'description' => 'Planning',
-                                     'category' => 1
-                                 ]);
-        $skill2 = Skills::create([
-                                    'skill_name'  => 'UT2',
-                                    'description' => 'Unit Testing',
-                                    'category' => 2
-                                ]);
-
-        // Add this skill.
-        $params = [
-            'tags' => [ $skill1->id, $skill2->id ]
-        ];
-
-        if ($id) {
-            $params['id'] = $user->id;
-        };
-
-        $response = $this->post('/profile/edit-tags', $params);
-
-        $this->assertTrue($response->isRedirection());
-        $response->assertSessionHas('message');
-
-        // Check it persisted. The skills selector on /profile/edit is now a Vue
-        // component (SkillsTab) that loads its state from the API rather than the
-        // server-rendered <select>, so we assert against the data directly rather
-        // than scraping HTML for a "selected" option.
-        $response2 = $this->get('/profile/edit');
-        $response2->assertSuccessful();
-
-        $userSkillIds = UsersSkills::where('user', $user->id)->pluck('skill')->toArray();
-        $this->assertContains($skill1->id, $userSkillIds);
-        $this->assertContains($skill2->id, $userSkillIds);
-
-        // Should have promoted to host because we have a category 1 skill.
-        $user->refresh();
-        self::assertEquals(Role::HOST, $user->role);
-
-        // Try to edit someone else's profile - should fail.
-        $this->expectException(NotFoundHttpException::class);
-        $response = $this->get('/profile/edit/' . ($user->id + 1));
-    }
-
-    /**
-     * @test
-     * @dataProvider idProvider
-     */
-    public function image_upload($id): void {
-        Storage::fake('avatars');
-        $user = User::factory()->create();
-        $this->actingAs($user);
-
-        // Try with no file.
-        $response = $this->json('POST', '/profile/edit-photo', []);
-        $this->assertTrue($response->isRedirection());
-        $response->assertSessionHas('error');
-
-        // We don't upload files in a standard Laravel way, so testing upload is a bit of a hack.
-        $_FILES = [
-            'profilePhoto' => [
-                'error'    => "0",
-                'name'     => 'avatar.jpg',
-                'size'     => 123,
-                'tmp_name' => __FILE__,   // use THIS file - a real file
-                'type'     => 'image/jpg'
-            ]
-        ];
-
-        $params = [];
-
-        if ($id) {
-            $params['id'] = $id;
-        }
-
-        $response = $this->json('POST', '/profile/edit-photo', $params);
-        $this->assertTrue($response->isRedirection());
-        $response->assertSessionHas('message');
-
-        // And again, which will test the case of overwriting.
-        $response = $this->json('POST', '/profile/edit-photo', $params);
-        $this->assertTrue($response->isRedirection());
-        $response->assertSessionHas('message');
-    }
-
-    /**
-     * @test
-     */
-    public function edit_profile(): void {
-        $user = User::factory()->create();
-        $this->actingAs($user);
-
-        $userData = $user->getAttributes();
-
-        $response = $this->json('POST', '/profile/edit-info', []);
-        $errors = session('errors')->getMessages();
-        $this->assertEquals(4, count($errors));
-
-        $response = $this->json('POST', '/profile/edit-info', [
-            'name' => $userData['name'] . '1',
-            'age' =>  $userData['age']  + 1,
-            'email' => $userData['email'] . '1',
-            'country' => 'GB',
-        ]);
-        $this->assertTrue($response->isRedirection());
-        $response->assertSessionHas('message');
     }
 }

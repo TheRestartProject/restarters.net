@@ -87,6 +87,7 @@ const showInvite = ref(false)
 const confirmingDelete = ref(false)
 const deleting = ref(false)
 const attendPending = ref(false)
+const requestingReview = ref(false)
 const showFollowPrompt = ref(false)
 const nowFollowing = ref(false)
 
@@ -150,6 +151,27 @@ async function onCancelRsvp() {
   } finally {
     attendPending.value = false
   }
+}
+
+// "Request reviews" — emails confirmed attendees asking them to review the
+// event's repairs (the old event-request-review modal / getContributions).
+async function onRequestReview() {
+  requestingReview.value = true
+  try {
+    await eventsStore.requestReview(id.value)
+    useToastStore().success(t('events.review_requested'))
+  } catch {
+    useToastStore().error(t('events.review_requested_permissions'))
+  } finally {
+    requestingReview.value = false
+  }
+}
+
+// Join the hosting group from the event page (the old /group/join/{id} link,
+// which is a dead web route now — join is POST /api/v2/groups/{id}/members/me).
+async function joinHostingGroup() {
+  if (!event.value?.group) return
+  await followGroup()
 }
 
 // Replaces the Blade session flash pair 'prompt-follow-group' ->
@@ -317,9 +339,14 @@ async function confirmDelete() {
             {{ t('events.invite_volunteers') }}
           </BButton>
 
-          <NuxtLink v-if="!inGroup && event.group" :to="`/group/join/${event.group.id}`" class="btn btn-outline-info" data-testid="event-view-follow-group">
+          <BButton
+            v-if="!inGroup && event.group"
+            variant="outline-info"
+            data-testid="event-view-follow-group"
+            @click="joinHostingGroup"
+          >
             {{ t('groups.join_group_button') }}
-          </NuxtLink>
+          </BButton>
 
           <NuxtLink v-if="canedit" :to="`/party/edit/${id}`" class="btn btn-outline-primary" data-testid="event-view-edit">
             {{ t('events.edit_event') }}
@@ -327,6 +354,16 @@ async function confirmDelete() {
           <NuxtLink v-if="canedit" :to="`/party/duplicate/${id}`" class="btn btn-outline-secondary" data-testid="event-view-duplicate">
             {{ t('events.duplicate_event') }}
           </NuxtLink>
+
+          <BButton
+            v-if="canedit && finished"
+            variant="outline-secondary"
+            :disabled="requestingReview"
+            data-testid="event-view-request-review"
+            @click="onRequestReview"
+          >
+            {{ t('client.events.request_review') }}
+          </BButton>
 
           <a v-if="finished && canedit" :href="`/export/devices/event/${id}`" class="btn btn-outline-secondary" data-testid="event-view-export">
             {{ t('devices.export_event_data') }}

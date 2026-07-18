@@ -111,19 +111,7 @@ class APIv2MapsProxyTest extends TestCase
         $response->assertStatus(422);
     }
 
-    public function testLegacySessionAuthRouteStillWorks(): void
-    {
-        // Kept working until cutover (design.md §5): both routes delegate to the same
-        // MapsProxyController.
-        Http::fake([
-            'maps.googleapis.com/maps/api/place/autocomplete/*' => Http::response(['status' => 'OK', 'predictions' => []], 200),
-        ]);
-
-        $user = User::factory()->restarter()->create();
-        $this->actingAs($user);
-
-        $response = $this->get('/maps/autocomplete?input=london');
-
-        $response->assertStatus(200);
-    }
+    // The legacy session-auth web route /maps/autocomplete was removed at the
+    // Nuxt cutover (design.md §5); the SPA uses /api/v2/maps/* exclusively,
+    // covered by the tests above.
 }

@@ -625,6 +625,79 @@ class UserController extends Controller
     }
 
     /**
+     * @OA\Get(
+     *      path="/api/v2/users/me/notifications",
+     *      operationId="getMyNotifications",
+     *      tags={"Users"},
+     *      summary="List the authenticated user's in-app notifications",
+     *      description="Paginated list of the user's Restarters (in-app) notifications, replacing the old /profile/notifications page.",
+     *      security={{"apiToken":{}}},
+     *      @OA\Parameter(name="page", in="query", required=false, @OA\Schema(type="integer")),
+     *      @OA\Response(response=200, description="Notifications"),
+     *      @OA\Response(response=401, description="Unauthenticated"),
+     * )
+     */
+    public function getMyNotificationsv2(Request $request): JsonResponse
+    {
+        $user = Auth::user();
+        $notifications = $user->notifications()->paginate(20);
+
+        return response()->json([
+            'data' => collect($notifications->items())->map(function ($n) {
+                $data = is_array($n->data) ? $n->data : (array) $n->data;
+
+                return [
+                    'id' => $n->id,
+                    'type' => class_basename($n->type),
+                    'title' => $data['title'] ?? null,
+                    'name' => $data['name'] ?? null,
+                    'url' => $data['url'] ?? null,
+                    'read' => $n->read_at !== null,
+                    'created_at' => optional($n->created_at)->toIso8601String(),
+                ];
+            })->all(),
+            'meta' => [
+                'current_page' => $notifications->currentPage(),
+                'last_page' => $notifications->lastPage(),
+                'total' => $notifications->total(),
+                'unread' => $user->unreadNotifications()->count(),
+            ],
+        ]);
+    }
+
+    /**
+     * @OA\Post(
+     *      path="/api/v2/users/me/notifications/read",
+     *      operationId="markMyNotificationsRead",
+     *      tags={"Users"},
+     *      summary="Mark the user's notifications as read",
+     *      description="Marks a single notification (by id) or all of them as read.",
+     *      security={{"apiToken":{}}},
+     *      @OA\RequestBody(required=false, @OA\JsonContent(
+     *          @OA\Property(property="id", type="string", description="Notification id; omit to mark all as read"),
+     *      )),
+     *      @OA\Response(response=200, description="Marked read"),
+     *      @OA\Response(response=401, description="Unauthenticated"),
+     * )
+     */
+    public function markMyNotificationsReadv2(Request $request): JsonResponse
+    {
+        $user = Auth::user();
+        $id = $request->input('id');
+
+        if ($id) {
+            $notification = $user->notifications()->where('id', $id)->first();
+            if ($notification) {
+                $notification->markAsRead();
+            }
+        } else {
+            $user->unreadNotifications->markAsRead();
+        }
+
+        return response()->json(['data' => ['unread' => $user->unreadNotifications()->count()]]);
+    }
+
+    /**
      * @OA\Patch(
      *      path="/api/v2/users/me/language",
      *      operationId="updateMyLanguagev2",

@@ -103,4 +103,11 @@ export default class EventAPI extends BaseAPI {
   deleteImage(id, idimages) {
     return this.$del(`/api/v2/events/${id}/images/${idimages}`)
   }
+
+  // POST /api/v2/events/{id}/request-review - emails confirmed attendees
+  // asking them to review the event's repairs (EventAttendanceController::
+  // requestReviewv2). Host/coordinator/admin only.
+  requestReview(id) {
+    return this.$post(`/api/v2/events/${id}/request-review`)
+  }
 }

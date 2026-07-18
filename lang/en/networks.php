@@ -9,21 +9,15 @@ return [
     'particular_network' => ':networkName network',
     'groups' => 'Groups',
     'about' => 'About',
-    'actions' => 'Network Actions',
-    'coordinators' => 'Network Coordinators',
     'impact' => 'Impact'
   ],
   'stats' => [
     'groups' => '{1} Group|[0,*] Groups',
     'events' => '{1} Event|[0,*] Events',
-    'waste_diverted' => 'Waste Diverted',
-    'co2_prevented' => 'CO2 Prevented'
   ],
   'tags' => [
     'title' => 'Group Tags',
     'no_tags' => 'No tags created yet.',
-    'new_tag_placeholder' => 'New tag name...',
-    'description_placeholder' => 'Description (optional)',
     'create' => 'Create Tag',
     'create_error' => 'Failed to create tag. Please try again.',
     'edit' => 'Edit',
@@ -43,7 +37,6 @@ return [
     'all_networks' => 'All networks',
     'all_networks_explainer' => 'All networks in the system (admin-only).',
     'all_networks_no_networks' => 'There are no networks in the system.',
-    'description' => 'Description',
   ],
   'show' => [
     'add_groups_menuitem' => 'Add groups',
@@ -55,10 +48,5 @@ return [
     'none' => 'None',
   ],
   'edit' => [
-    'label_logo' => 'Network logo',
-    'button_save' => 'Save changes',
-    'add_new_field' => 'Add new field',
-    'new_field_name' => 'New field name',
-    'add_field' => 'Add field',
   ],
 ];

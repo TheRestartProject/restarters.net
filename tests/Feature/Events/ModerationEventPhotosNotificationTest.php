@@ -4,39 +4,84 @@ namespace Tests\Feature;
 
 use App\EventsUsers;
 use App\Group;
-use App\Helpers\Fixometer;
-use App\Notifications\AdminModerationEvent;
+use App\Helpers\Tus;
 use App\Notifications\AdminModerationEventPhotos;
 use App\Party;
 use App\User;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithoutMiddleware;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
-use Illuminate\Support\Facades\DB;
+use TusPhp\Cache\Cacheable;
 
+/**
+ * Uploading event photos must notify admins (who opted in) that there are
+ * photos to moderate. Post-cutover the upload happens via
+ * POST /api/v2/events/{id}/images (tus upload_key), not the removed Blade
+ * /party/image-upload route; uploadImagev2 fires EventImagesUploaded →
+ * SendAdminModerateEventPhotosNotification, exactly as the old controller did.
+ */
 class ModerationEventPhotosNotificationTest extends TestCase
 {
-    /**
-     * @var User[]
-     */
+    /** @var User[] */
     protected $admins;
 
-    /**
-     * @var User
-     */
+    /** @var User */
     protected $restarter;
 
-    /**
-     * @var Party
-     */
+    /** @var Party */
     protected $event;
 
-    /**
-     * @var Group
-     */
+    /** @var Group */
     protected $group;
+
+    /** @var string[] */
+    private array $tmpTusFiles = [];
+
+    protected function tearDown(): void
+    {
+        foreach ($this->tmpTusFiles as $path) {
+            if (is_file($path)) {
+                @unlink($path);
+            }
+        }
+        parent::tearDown();
+    }
+
+    /**
+     * Stage a completed tus upload the way the SPA's uploader would, and
+     * return its upload_key. Mirrors APIv2EventImagesTest.
+     */
+    private function seedCompletedTusUpload(string $sourcePath): string
+    {
+        $key = 'mod-'.uniqid();
+
+        $uploadDir = Tus::uploadDir();
+        if (! is_dir($uploadDir)) {
+            mkdir($uploadDir, 0775, true);
+        }
+
+        $destPath = $uploadDir.'/'.$key;
+        copy($sourcePath, $destPath);
+        $this->tmpTusFiles[] = $destPath;
+
+        $size = filesize($destPath);
+        $cache = Tus::buildCache();
+        $now = new \DateTime();
+
+        $cache->set($key, [
+            'name' => $key,
+            'size' => $size,
+            'offset' => $size,
+            'checksum' => null,
+            'location' => 'http://localhost/api/tus/'.$key,
+            'file_path' => $destPath,
+            'metadata' => [],
+            'upload_type' => 'normal',
+            'created_at' => $now->format(Cacheable::RFC_7231),
+            'expires_at' => $now->modify('+1 day')->format(Cacheable::RFC_7231),
+        ]);
+
+        return $key;
+    }
 
     /** @test */
     public function a_moderation_notification_is_sent_to_admins_when_event_photos_are_uploaded(): void
@@ -45,30 +90,22 @@ class ModerationEventPhotosNotificationTest extends TestCase
 
         $this->init_event_and_dependencies();
 
-        \Storage::fake('avatars');
-
+        // FixometerFile::uploadLocalFile writes relative to DOCUMENT_ROOT.
         $_SERVER['DOCUMENT_ROOT'] = getcwd();
-        \FixometerFile::$uploadTesting = TRUE;
-        file_put_contents('/tmp/UT.jpg', file_get_contents(public_path() .'/images/community.jpg'));
+        \FixometerFile::$uploadTesting = true;
+        $key = $this->seedCompletedTusUpload(public_path().'/images/community.jpg');
 
-        $_FILES = [
-            'file' => [
-                'error'    => "0",
-                'name'     => 'UT.jpg',
-                'size'     => 123,
-                'tmp_name' => [ '/tmp/UT.jpg' ],
-                'type'     => 'image/jpg'
-            ]
-        ];
-
+        // The volunteer uploads a photo through the API. v2 endpoints
+        // authenticate via the token guard (auth:sanctum,api), so pass the
+        // api_token explicitly.
         $response = $this->actingAs($this->restarter)
-                         ->json('POST', '/party/image-upload/'.$this->event->getKey(), []);
-        $response->assertOk();
+                         ->postJson('/api/v2/events/'.$this->event->getKey().'/images?api_token='.$this->restarter->api_token, ['upload_key' => $key]);
+        $response->assertSuccessful();
 
         $admins = $this->admins;
         $event = $this->event;
 
-        $this->artisan("queue:work --stop-when-empty");
+        $this->artisan('queue:work --stop-when-empty');
 
         Notification::assertSentTo(
             $admins,
@@ -78,20 +115,14 @@ class ModerationEventPhotosNotificationTest extends TestCase
                 $mailData = $notification->toMail($admin)->toArray();
                 self::assertEquals(__('notifications.greeting', [], $admin->language), $mailData['greeting']);
                 self::assertEquals(__('notifications.new_event_photos_subject', [
-                    'event' => $event->venue
+                    'event' => $event->venue,
                 ], $admin->language), $mailData['subject']);
 
                 return true;
             }
         );
-
-        // Delete the image.
-        $image = \DB::select("SELECT idimages, path FROM images ORDER BY idimages DESC LIMIT 1");
-        $idimages = $image[0]->idimages;
-        $path = $image[0]->path;
-        $response = $this->get("/party/image/delete/{$event->idevents}/$idimages/$path");
-        $response->assertRedirect();
-        $response->assertSessionHas('success');
+        // (Image deletion is covered by APIv2EventImagesTest; this test's
+        // concern is only that uploading photos notifies the admins.)
     }
 
     protected function init_event_and_dependencies()
@@ -100,13 +131,8 @@ class ModerationEventPhotosNotificationTest extends TestCase
         $this->admins = User::factory()->count(5)->administrator()->create();
 
         // Set some locales.
-        $locales = [
-            'en',
-            'fr',
-        ];
-
+        $locales = ['en', 'fr'];
         $ix = 0;
-
         foreach ($this->admins as $admin) {
             $admin->language = $locales[$ix++];
             $ix = $ix % count($locales);

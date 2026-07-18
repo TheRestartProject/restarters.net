@@ -91,6 +91,14 @@ class FixometerFile extends Model
      */
     public function uploadLocalFile(string $localPath, $type, $reference = null, $referenceType = null, $profile = false, $crop = true, $clear = true)
     {
+        // Same gate as upload(): preview/staging environments sharing the
+        // production bucket disable writes via this flag. uploadLocalFile is
+        // the path every /api/v2 image endpoint uses, so it must honour it too
+        // (returning null makes the callers surface their image_upload_error).
+        if (! config('restarters.features.image_upload')) {
+            return null;
+        }
+
         if (! is_file($localPath)) {
             return null;
         }

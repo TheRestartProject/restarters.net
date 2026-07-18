@@ -81,24 +81,20 @@ php artisan migrate:fresh --seed
 # minutes of container startup that pure-API workloads never use — and the
 # monolithic CI job was blowing CircleCI's 60-minute cap.
 if [ "${SKIP_NPM_INSTALL}" != "true" ]; then
+    # Post-cutover this only installs the widget/wiki build tooling (vite,
+    # sass, jquery/bootstrap) — the SPA's deps live in the restarters_client
+    # container. node-sass is gone (dart-sass via npm), so no rebuild step.
     npm install --legacy-peer-deps
-    npm rebuild node-sass
 
-    # Install Playwright for testing (system deps already in Dockerfile).
-    # In CI, skip browser download — Playwright tests run in the dedicated
-    # restarters_playwright container (mcr.microsoft.com/playwright) which
-    # ships pre-installed browsers. Downloading here saves 10-15 min on CI.
-    if [ "${CIRCLECI}" != "true" ]; then
-        npm install -D @playwright/test
-        npx playwright install
-    fi
-
-    # Start Vite dev server in the background with logging
+    # Build the widget/wiki assets so the retained Blade surface (@vite)
+    # has a manifest, then start Vite in dev mode for HMR when hacking on
+    # those assets.
+    npm run build > /tmp/vite-build.log 2>&1 || echo "Vite build failed — see /tmp/vite-build.log"
     echo "Starting Vite dev server..."
     nohup npm run dev > /tmp/vite.log 2>&1 &
     echo "Vite dev server started with PID $!"
 else
-    echo "SKIP_NPM_INSTALL=true — skipping npm install/node-sass/Playwright/Vite"
+    echo "SKIP_NPM_INSTALL=true — skipping npm install/Vite"
 fi
 
 php artisan key:generate

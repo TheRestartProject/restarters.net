@@ -3,6 +3,7 @@ import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useGroupRole } from '../../composables/useGroupRole.js'
 import GroupJoinButton from './GroupJoinButton.vue'
+import GroupsTableFilters from './GroupsTableFilters.vue'
 
 // Sortable groups table shared by /group (mine) and /group/all
 // (resources/js/components/GroupsTable.vue is the functional spec - column
@@ -42,6 +43,11 @@ const props = defineProps({
     type: Number,
     default: null,
   },
+  // Show the name/location/country/tags filter bar (GroupsTableFilters.vue).
+  showFilters: {
+    type: Boolean,
+    default: false,
+  },
 })
 
 const emit = defineEmits(['update:hoveredId'])
@@ -51,6 +57,27 @@ const { roleLabelKey, roleVariant } = useGroupRole()
 
 const sortKey = ref('name')
 const sortDesc = ref(false)
+
+const filters = ref({ name: '', location: '', country: '', tags: '' })
+
+function matchesFilters(row) {
+  const f = filters.value
+  const has = (haystack, needle) =>
+    !needle || String(haystack || '').toLowerCase().includes(needle.toLowerCase())
+
+  const tagText = Array.isArray(row.tags)
+    ? row.tags.map((tag) => tag?.tag_name ?? tag?.name ?? tag).join(' ')
+    : (row.tags || '')
+
+  return (
+    has(row.name, f.name) &&
+    has(row.location?.location, f.location) &&
+    has(row.location?.country, f.country) &&
+    has(tagText, f.tags)
+  )
+}
+
+const filteredGroups = computed(() => (props.showFilters ? props.groups.filter(matchesFilters) : props.groups))
 
 function sortBy(key) {
   if (sortKey.value === key) {
@@ -73,7 +100,7 @@ function nextEventTime(row) {
 }
 
 const sortedGroups = computed(() => {
-  const rows = [...props.groups]
+  const rows = [...filteredGroups.value]
   const dir = sortDesc.value ? -1 : 1
 
   rows.sort((a, b) => {
@@ -114,6 +141,7 @@ function sortIndicator(key) {
 
 <template>
   <div data-testid="groups-table">
+    <GroupsTableFilters v-if="showFilters" @update:filters="filters = $event" />
     <table class="table">
       <thead>
         <tr>

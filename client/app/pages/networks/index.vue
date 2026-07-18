@@ -95,7 +95,7 @@ function retry() {
           <tbody>
             <tr v-for="network in yourNetworks" :key="network.id" :data-testid="`your-network-row-${network.id}`">
               <td>
-                <img v-if="network.logo" :src="network.logo" :alt="`${network.name} logo`" style="width: auto; height: 50px">
+                <img v-if="network.logo" :src="network.logo" :alt="t('client.networks.logo_alt', { name: network.name })" style="width: auto; height: 50px">
               </td>
               <td>
                 <NuxtLink :to="`/networks/${network.id}`" :data-testid="`your-network-link-${network.id}`">
@@ -124,7 +124,7 @@ function retry() {
           <tbody>
             <tr v-for="network in allNetworks" :key="network.id" :data-testid="`all-network-row-${network.id}`">
               <td>
-                <img v-if="network.logo" :src="network.logo" :alt="`${network.name} logo`" style="width: auto; height: 50px">
+                <img v-if="network.logo" :src="network.logo" :alt="t('client.networks.logo_alt', { name: network.name })" style="width: auto; height: 50px">
               </td>
               <td>
                 <NuxtLink :to="`/networks/${network.id}`" :data-testid="`all-network-link-${network.id}`">

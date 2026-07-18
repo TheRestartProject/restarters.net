@@ -69,7 +69,8 @@
    "previous_page": "Précédent",
    "quantity": "Quantité",
    "remove_photo": "Supprimer la photo",
-   "results_count": "{count} objet trouvé | {count} objets trouvés"
+   "results_count": "{count} objet trouvé | {count} objets trouvés",
+   "tab_impact": "· {waste} kg · {co2} kg de CO2"
   },
   "events": {
    "all_past_title": "Tous les événements passés",
@@ -94,6 +95,7 @@
    "no_devices": "Aucun objet enregistré pour le moment.",
    "no_search_results": "Aucun événement ne correspond à votre recherche.",
    "now_following_group": "Vous suivez maintenant ce groupe.",
+   "request_review": "Demander des avis",
    "search_label": "Rechercher des événements",
    "search_placeholder": "Rechercher par titre ou lieu",
    "start_required": "Veuillez choisir une heure de début.",
@@ -124,6 +126,7 @@
    "column_restarters": "Restarters",
    "columns_label": "Colonnes",
    "description_required": "Merci de nous en dire plus sur votre groupe.",
+   "distance_km": "({distance} km)",
    "edit_forbidden": "Vous n'avez pas la permission de modifier ce groupe.",
    "email_invalid": "Veuillez saisir une adresse e-mail valide.",
    "image_upload_error": "Désolé, nous n'avons pas pu envoyer cette image. Veuillez réessayer.",
@@ -164,6 +167,9 @@
    "associate_groups_error": "Impossible d'ajouter ces groupes au réseau. Veuillez réessayer.",
    "groups_load_error": "Désolé, nous n'avons pas pu charger les groupes de ce réseau.",
    "load_error": "Désolé, nous n'avons pas pu charger ce réseau.",
+   "logo_alt": "Logo de {name}",
+   "logo_heading": "Logo du réseau",
+   "logo_upload_error": "Désolé, nous n'avons pas pu télécharger ce logo. Veuillez réessayer.",
    "no_groups": "Ce réseau n'a pas encore de groupes.",
    "not_found": "Ce réseau est introuvable.",
    "stats_unavailable": "Les statistiques ne sont pas disponibles pour ce réseau pour le moment.",
@@ -171,6 +177,8 @@
   },
   "notifications": {
    "discourse_aria": "Notifications Talk",
+   "empty": "Vous n'avez aucune notification.",
+   "load_error": "Désolé, nous n'avons pas pu charger vos notifications.",
    "restarters_aria": "Notifications Restarters",
    "unread": "{count} notification non lue | {count} notifications non lues"
   },

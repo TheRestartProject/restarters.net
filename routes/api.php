@@ -154,6 +154,7 @@ Route::prefix('v2')->middleware(\App\Http\Middleware\VerifyUserConsentApi::class
                 Route::delete('{id}/attendees/me', [API\EventAttendanceController::class, 'cancelRsvpv2']);
                 Route::patch('{id}/volunteers/{iduser}', [API\EventAttendanceController::class, 'patchVolunteerv2']);
                 Route::delete('{id}/volunteers/{idevents_users}', [API\EventAttendanceController::class, 'deleteVolunteerv2']);
+                Route::post('{id}/request-review', [API\EventAttendanceController::class, 'requestReviewv2']);
                 Route::post('{id}/invites', [API\EventAttendanceController::class, 'invitesv2']);
                 Route::post('{id}/images', [API\EventAttendanceController::class, 'uploadImagev2']);
                 Route::delete('{id}/images/{idimages}', [API\EventAttendanceController::class, 'deleteImagev2']);
@@ -176,6 +177,8 @@ Route::prefix('v2')->middleware(\App\Http\Middleware\VerifyUserConsentApi::class
             Route::get('/calendars', [API\UserController::class, 'getMyCalendarsv2']);
             Route::get('/language', [API\UserController::class, 'getMyLanguagev2']);
             Route::patch('/language', [API\UserController::class, 'updateMyLanguagev2']);
+            Route::get('/notifications', [API\UserController::class, 'getMyNotificationsv2']);
+            Route::post('/notifications/read', [API\UserController::class, 'markMyNotificationsReadv2']);
             Route::get('/profile', [API\UserController::class, 'getMyProfilev2']);
             Route::patch('/profile', [API\UserController::class, 'updateMyProfilev2']);
             Route::get('/skills', [API\UserController::class, 'getMySkillsv2']);
@@ -203,6 +206,8 @@ Route::prefix('v2')->middleware(\App\Http\Middleware\VerifyUserConsentApi::class
                 Route::post('{id}/tags', [API\NetworkController::class, 'createNetworkTagv2']);
                 Route::put('{id}/tags/{tagId}', [API\NetworkController::class, 'updateNetworkTagv2']);
                 Route::delete('{id}/tags/{tagId}', [API\NetworkController::class, 'deleteNetworkTagv2']);
+                Route::post('{id}/logo', [API\NetworkController::class, 'uploadLogov2']);
+                Route::post('{id}/groups', [API\NetworkController::class, 'associateGroupsv2']);
             });
         });
 

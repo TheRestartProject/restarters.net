@@ -40,3 +40,8 @@ restarters-anonymised.sql
 /public/repair-data*.csv
 /uploads/*.jpg
 .mcp.json
+
+# Local ralph session log (not for commit)
+.claude-session.md
+# PHPUnit coverage artifact
+/tests/clover.xml

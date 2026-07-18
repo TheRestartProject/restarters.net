@@ -5,11 +5,13 @@ namespace App\Http\Controllers\API;
 use App\Audits;
 use App\Device;
 use App\Events\EventDeleted;
+use App\Events\EventImagesUploaded;
 use App\EventsUsers;
 use App\Helpers\Fixometer;
 use App\Helpers\Tus;
 use App\Http\Controllers\Controller;
 use App\Invite;
+use App\Notifications\EventRepairs;
 use App\Notifications\JoinEvent;
 use App\Notifications\RSVPEvent;
 use App\Party;
@@ -181,6 +183,50 @@ class EventAttendanceController extends Controller
         }
 
         return response()->json(['data' => ['host' => $host]]);
+    }
+
+    /**
+     * @OA\Post(
+     *      path="/api/v2/events/{id}/request-review",
+     *      operationId="requestEventReview",
+     *      tags={"Events"},
+     *      summary="Ask attendees to review the event's repairs",
+     *      description="Sends the EventRepairs notification to every confirmed restarter who attended, asking them to review/contribute to the repair records. Requires host/coordinator/administrator permission (userHasEditPartyPermission).",
+     *      security={{"apiToken":{}}},
+     *      @OA\Parameter(name="id", description="Event id", required=true, in="path", @OA\Schema(type="integer")),
+     *      @OA\Response(response=200, description="Requests sent",
+     *          @OA\JsonContent(@OA\Property(property="data", type="object",
+     *              @OA\Property(property="requested", type="integer")))),
+     *      @OA\Response(response=403, description="Not permitted"),
+     *      @OA\Response(response=404, description="Event not found"),
+     * )
+     *
+     * Port of PartyController::getContributions (the old "Request review" modal
+     * on the event page linking to GET /party/contribution/{id}).
+     */
+    public function requestReviewv2(Request $request, $idevents): JsonResponse
+    {
+        $user = $request->user();
+        $event = Party::findOrFail($idevents);
+
+        if (! Fixometer::userHasEditPartyPermission($idevents, $user->id)) {
+            abort(403);
+        }
+
+        // Confirmed restarters (status 1, role RESTARTER) who attended.
+        $restarters = User::join('events_users', 'events_users.user', '=', 'users.id')
+            ->where('events_users.status', 1)
+            ->where('events_users.role', Role::RESTARTER)
+            ->where('events_users.event', $idevents)
+            ->select('users.*')
+            ->get();
+
+        Notification::send($restarters, new EventRepairs([
+            'event_name' => $event->getEventName(),
+            'event_url' => rtrim(config('restarters.frontend_url'), '/').'/party/view/'.intval($idevents).'#devices',
+        ]));
+
+        return response()->json(['data' => ['requested' => $restarters->count()]]);
     }
 
     /**
@@ -400,6 +446,11 @@ class EventAttendanceController extends Controller
                 'upload_key' => [__('events.image_upload_error')],
             ]);
         }
+
+        // Restore the moderation-notification hook the Blade PartyController
+        // fired (the SendAdminModerateEventPhotosNotification listener is still
+        // registered, and throttles per-admin, so firing per upload is safe).
+        event(new EventImagesUploaded($event, $user->id));
 
         return response()->json([
             'data' => [

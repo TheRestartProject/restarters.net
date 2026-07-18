@@ -39,17 +39,18 @@ class InviteEventTest extends TestCase
                                           ]);
 
         $host = User::factory()->host()->create();
+        $group->addVolunteer($host);
+        $group->makeMemberAHost($host);
         $this->actingAs($host);
 
         // Invite a user.
         $user = User::factory()->restarter()->create();
 
-        $response = $this->post('/party/invite', [
-            'group_name' => $group->name,
-            'event_id' => $event->idevents,
-            'manual_invite_box' => $user->email,
-            'message_to_restarters' => 'Join us, but not in a creepy zombie way',
+        $response = $this->post('/api/v2/events/'.$event->idevents.'/invites?api_token='.$host->api_token, [
+            'emails' => [$user->email],
+            'message' => 'Join us, but not in a creepy zombie way',
         ]);
+        $response->assertSuccessful();
 
         Notification::assertSentTo(
             [$user],
@@ -77,19 +78,16 @@ class InviteEventTest extends TestCase
 
     public function testInviteReal(): void
     {
+        // Registration itself goes through the token API now (see
+        // AuthEndpointsTest); we just need a real user here to drive the
+        // invite flow, so create one directly rather than round-tripping
+        // through the dead POST /user/register/ Blade route.
         $userAttributes = $this->userAttributes();
-        $response = $this->post('/user/register/', $userAttributes);
-
-        $response->assertStatus(302);
-        $response->assertRedirect('dashboard');
-        $this->assertDatabaseHas('users', [
+        $host = User::factory()->create([
+            'name' => $userAttributes['name'],
             'email' => $userAttributes['email'],
         ]);
-
-        $host = User::latest()->first();
-
-        // Need to set the trust level for the user to be able to create a private message thread.
-
+        $this->actingAs($host);
 
         // Create group.
         $idgroups = $this->createGroup();
@@ -105,22 +103,18 @@ class InviteEventTest extends TestCase
         // Invite a user.
         $user = User::factory()->restarter()->create();
 
-        $response = $this->post('/party/invite', [
-            'group_name' => $group->name,
-            'event_id' => $event->idevents,
-            'manual_invite_box' => $user->email,
-            'message_to_restarters' => 'Join us, but not in a creepy zombie way',
+        $response = $this->post('/api/v2/events/'.$event->idevents.'/invites?api_token='.$host->api_token, [
+            'emails' => [$user->email],
+            'message' => 'Join us, but not in a creepy zombie way',
         ]);
-
-        $response->assertSessionHas('success');
-        $response = $this->get('/party/view/'.$event->idevents);
-        $response->assertSee('Invites sent!');
+        $response->assertSuccessful();
+        $this->assertEquals(1, $response->json('data.invites_sent'));
 
         // Check it's in the DB.
         $this->assertDatabaseHas('events_users', [
             'user' => $user->id,
             'event' => $event->idevents,
-            'role' => 4,
+            'role' => Role::RESTARTER,
         ]);
 
         // Invited volunteers shouldn't update the count.
@@ -129,7 +123,6 @@ class InviteEventTest extends TestCase
 
         // Admin approves the event.
         $admin = User::factory()->administrator()->create();
-        $this->get('/logout');
         $this->actingAs($admin);
         $eventData = $event->getAttributes();
         $eventData['id'] = $event->idevents;
@@ -137,39 +130,17 @@ class InviteEventTest extends TestCase
         $this->patch('/api/v2/events/'.$event->idevents, $this->eventAttributesToAPI($eventData));
 
         // As the user...
-        $this->get('/logout');
         $this->actingAs($user);
 
         // ...join the group.
-        $response = $this->get('/group/join/'.$group->idgroups);
-        $this->assertTrue($response->isRedirection());
+        $response = $this->post('/api/v2/groups/'.$group->idgroups.'/members/me?api_token='.$user->api_token);
+        $response->assertSuccessful();
 
-        // We should see that we have been invited.
-        $response2 = $this->get('/party/view/'.$event->idevents);
-        $response2->assertSee(__('events.pending_rsvp_message'));
-        preg_match('/href="(\/party\/accept-invite\/' . $event->idevents . '\/.*?)"/', $response2->getContent(), $matches);
-        $this->assertGreaterThan(0, count($matches));
-        $invitation = $matches[1];
-
-        // ...should show up in the list of events with an invitation as we have not yet accepted.
-        $response3 = $this->get('/party');
-        $events = $this->getVueProperties($response3)[1][':initial-events'];
-
-        // Debug info only shown on failure
-        $eventUser = \App\EventsUsers::where('event', $event->idevents)
-            ->where('user', $user->id)
-            ->first();
-        $debugInfo = json_encode([
-            'event_id' => $event->idevents,
-            'user_id' => $user->id,
-            'events_users_status' => $eventUser ? $eventUser->status : 'NOT_FOUND',
-            'events_users_role' => $eventUser ? $eventUser->role : 'NOT_FOUND',
-            'attending_in_response' => strpos($events, '"attending":true') !== false ? 'true' : 'false',
-        ]);
-
-        $this->assertStringContainsString('"attending":false', $events,
-            "Expected attending:false but got attending:true. Debug: " . $debugInfo);
-        $this->assertStringContainsString('"invitation"', $events);
+        // We should see that we have been invited (a hash status, not yet confirmed).
+        $eventUser = EventsUsers::where('event', $event->idevents)->where('user', $user->id)->first();
+        $this->assertNotNull($eventUser);
+        $this->assertNotEquals('1', $eventUser->status);
+        $invitation = '/party/accept-invite/'.$event->idevents.'/'.$eventUser->status;
 
         // Now accept the invitation. GET /party/accept-invite/{id}/{hash} keeps its status-hash
         // DB update server-side (F2-5) but now redirects into the SPA's party page with a
@@ -180,127 +151,25 @@ class InviteEventTest extends TestCase
         $frontend = rtrim(config('restarters.frontend_url'), '/');
         $this->assertEquals($frontend.'/party/view/'.$event->idevents.'?joined=1', $redirectTo);
 
-        // Now should show.
-        $response5 = $this->get('/party');
-        $events = $this->getVueProperties($response5)[1][':initial-events'];
-        $this->assertNotFalse(strpos($events, '"attending":true'));
-
         // Count should now include them.
         $event->refresh();
         assertEquals(2, $event->volunteers);
+        $eventUser->refresh();
+        $this->assertEquals('1', $eventUser->status);
 
-        // Invite again - different code path when they're already there.
-        $response = $this->post('/party/invite', [
-            'group_name' => $group->name,
-            'event_id' => $event->idevents,
-            'manual_invite_box' => $user->email,
-            'message_to_restarters' => 'Join us, but not in a creepy zombie way',
+        // Invite again - different code path when they're already there: the invite is
+        // accepted (a confirmed 'status' of 1) so invitesv2 must leave it alone rather than
+        // resetting it to a fresh hash. Only the host/coordinator/admin can invite, so switch
+        // back to the admin for this call.
+        $this->actingAs($admin);
+        $response = $this->post('/api/v2/events/'.$event->idevents.'/invites?api_token='.$admin->api_token, [
+            'emails' => [$user->email],
+            'message' => 'Join us, but not in a creepy zombie way',
         ]);
+        $response->assertSuccessful();
 
-        $response->assertSessionHas('warning');
-    }
-
-    public function testInvitableUserPOV(): void
-    {
-        $this->withoutExceptionHandling();
-
-        $group = Group::factory()->create([
-                                              'approved' => true
-                                           ]);
-        $host = User::factory()->host()->create();
-        $event = Party::factory()->create([
-                                                   'group' => $group,
-                                                   'event_start_utc' => '2130-01-01T12:13:00+00:00',
-                                                   'event_end_utc' => '2130-01-01T13:14:00+00:00',
-                                                   'user_id' => $host->id
-                                               ]);
-        EventsUsers::create([
-                                'event' => $event->getKey(),
-                                'user' => $host->getKey(),
-                                'status' => 1,
-                                'role' => 3,
-                                'full_name' => null,
-                           ]);
-        $this->actingAs($host);
-
-        $event->refresh();
-        assertEquals(1, $event->volunteers);
-
-        // Should have no group members and therefore no invitable members.
-        $response = $this->get('/party/get-group-emails-with-names/'.$event->idevents);
-        $members = json_decode($response->getContent());
-        $this->assertEquals([], $members);
-
-        // User joins the group.
-        $user = User::factory()->restarter()->create();
-        $this->get('/logout');
-        $this->actingAs($user);
-        $response2 = $this->get('/group/join/'.$group->idgroups);
-        $this->assertTrue($response2->isRedirection());
-
-        // Shouldn't show up as invitable when we are logged in.
-        $response3 = $this->get('/party/get-group-emails-with-names/'.$event->idevents);
-        $members = json_decode($response3->getContent());
-        $this->assertEquals([], $members);
-
-        // Now should show as invitable to the event.
-        $this->get('/logout');
-        $this->actingAs($host);
-        $response4 = $this->get('/party/get-group-emails-with-names/'.$event->idevents);
-        $members = json_decode($response4->getContent());
-        $this->assertEquals(1, count($members));
-
-        // Invite the user to the event.
-        $response5 = $this->post('/party/invite', [
-            'group_name' => $group->name,
-            'event_id' => $event->idevents,
-            'manual_invite_box' => $user->email,
-            'message_to_restarters' => 'Join us, but not in a creepy zombie way',
-        ]);
-
-        $response5->assertSessionHas('success');
-
-        // Invited volunteers shouldn't update the count.
-        $event->refresh();
-        assertEquals(1, $event->volunteers);
-
-        // Invited member should not show up as invitable.
-        $response6 = $this->get('/party/get-group-emails-with-names/'.$event->idevents);
-        $members = json_decode($response6->getContent());
-        $this->assertEquals([], $members);
-
-        // As the user...
-        $this->get('/logout');
-        $this->actingAs($user);
-
-        $this->processQueuedNotifications();
-
-        // Now accept the invitation.
-        $response7 = $this->get('/party/view/'.$event->idevents);
-        $response7->assertSee('You&#039;ve been invited to join an event', false);
-        preg_match('/href="(\/party\/accept-invite.*?)"/', $response7->getContent(), $matches);
-        if (count($matches) <= 0) {
-            error_log("Invite failed " . $response7->getContent());
-        }
-        $this->assertGreaterThan(0, count($matches));
-        $invitation = $matches[1];
-
-        $response8 = $this->get($invitation);
-        $this->assertTrue($response8->isRedirection());
-        $redirectTo = $response8->getTargetUrl();
-        $frontend = rtrim(config('restarters.frontend_url'), '/');
-        $this->assertEquals($frontend.'/party/view/'.$event->idevents.'?joined=1', $redirectTo);
-
-        // Should now show.
-        $event->refresh();
-        assertEquals(2, $event->volunteers);
-
-        // Now a group member and confirmed so should not show as invitable.
-        $this->get('/logout');
-        $this->actingAs($host);
-        $response9 = $this->get('/party/get-group-emails-with-names/'.$event->idevents);
-        $members = json_decode($response9->getContent());
-        $this->assertEquals([], $members);
+        $eventUser->refresh();
+        $this->assertEquals('1', $eventUser->status);
     }
 
     public function testInvitableNotifications(): void
@@ -324,6 +193,8 @@ class InviteEventTest extends TestCase
 
         $group = Group::find($idgroups);
         $host = User::factory()->host()->create();
+        $group->addVolunteer($host);
+        $group->makeMemberAHost($host);
         $event = Party::find($idevents);
         EventsUsers::create([
                                 'event' => $event->getKey(),
@@ -334,47 +205,22 @@ class InviteEventTest extends TestCase
                             ]);
         $this->actingAs($host);
 
-        // Should have no group members and therefore no invitable members.
-        $response = $this->get('/party/get-group-emails-with-names/'.$event->idevents);
-        $members = json_decode($response->getContent());
-        $this->assertEquals([], $members);
-
         // User joins the group.
         $user = User::factory()->restarter()->create();
-        $this->get('/logout');
         $this->actingAs($user);
-        $response2 = $this->get('/group/join/'.$group->idgroups);
-        $this->assertTrue($response2->isRedirection());
-
-        // Shouldn't show up as invitable when we are logged in.
-        $response3 = $this->get('/party/get-group-emails-with-names/'.$event->idevents);
-        $members = json_decode($response3->getContent());
-        $this->assertEquals([], $members);
-
-        // Now should show as invitable to the event.
-        $this->get('/logout');
-        $this->actingAs($host);
-        $response4 = $this->get('/party/get-group-emails-with-names/'.$event->idevents);
-        $members = json_decode($response4->getContent());
-        $this->assertEquals(1, count($members));
+        $response2 = $this->post('/api/v2/groups/'.$group->idgroups.'/members/me?api_token='.$user->api_token);
+        $response2->assertSuccessful();
 
         // Invite the user to the event.
-        $response5 = $this->post('/party/invite', [
-            'group_name' => $group->name,
-            'event_id' => $event->idevents,
-            'manual_invite_box' => $user->email,
-            'message_to_restarters' => 'Join us, but not in a creepy zombie way',
+        $this->actingAs($host);
+        $response5 = $this->post('/api/v2/events/'.$event->idevents.'/invites?api_token='.$host->api_token, [
+            'emails' => [$user->email],
+            'message' => 'Join us, but not in a creepy zombie way',
         ]);
 
-        $response5->assertSessionHas('success');
-
-        // Invited member should not show up as invitable.
-        $response6 = $this->get('/party/get-group-emails-with-names/'.$event->idevents);
-        $members = json_decode($response6->getContent());
-        $this->assertEquals([], $members);
+        $response5->assertSuccessful();
 
         // As the user...
-        $this->get('/logout');
         $this->actingAs($user);
 
         // Now accept the invitation, which should trigger adding to the Discourse thread.
@@ -403,13 +249,6 @@ class InviteEventTest extends TestCase
                 return true;
             }
         );
-
-        // Now a group member and confirmed so should not show as invitable.
-        $this->get('/logout');
-        $this->actingAs($host);
-        $response9 = $this->get('/party/get-group-emails-with-names/'.$event->idevents);
-        $members = json_decode($response9->getContent());
-        $this->assertEquals([], $members);
 
         Queue::assertPushed(\Illuminate\Events\CallQueuedListener::class, function ($job) use ($event, $user) {
             if ($job->class == AddUserToDiscourseThreadForEvent::class) {
@@ -470,19 +309,19 @@ class InviteEventTest extends TestCase
                                           ]);
 
         $host = User::factory()->host()->create();
+        $group->addVolunteer($host);
+        $group->makeMemberAHost($host);
         $this->actingAs($host);
 
         // Invite a user.
         $user = User::factory()->restarter()->create();
 
-        $response = $this->post('/party/invite', [
-            'group_name' => $group->name,
-            'event_id' => $event->idevents,
-            'manual_invite_box' => 'test@test.com',
-            'message_to_restarters' => 'Join us, but not in a creepy zombie way',
+        $response = $this->post('/api/v2/events/'.$event->idevents.'/invites?api_token='.$host->api_token, [
+            'emails' => ['test@test.com'],
+            'message' => 'Join us, but not in a creepy zombie way',
         ]);
 
-        $response->assertSessionHas('success');
+        $response->assertSuccessful();
     }
 
     public function testInviteNoUsers(): void {
@@ -500,6 +339,8 @@ class InviteEventTest extends TestCase
                                           ]);
 
         $host = User::factory()->host()->create();
+        $group->addVolunteer($host);
+        $group->makeMemberAHost($host);
         $this->actingAs($host);
 
         // Invite a user.
@@ -507,36 +348,42 @@ class InviteEventTest extends TestCase
 
         $this->expectException(ValidationException::class);
 
-        $response = $this->post('/party/invite', [
-            'group_name' => $group->name,
-            'event_id' => $event->idevents,
-            'manual_invite_box' => '',
-            'message_to_restarters' => 'Join us, but not in a creepy zombie way',
+        $response = $this->post('/api/v2/events/'.$event->idevents.'/invites?api_token='.$host->api_token, [
+            'emails' => [],
+            'message' => 'Join us, but not in a creepy zombie way',
         ]);
     }
 
     /**
      * @dataProvider invalidEmailProvider
+     *
+     * Note: the dead /party/invite route used a Delimited('email') validation rule that threw a
+     * ValidationException for any malformed address. The live invitesv2 endpoint (EventAttendanceController)
+     * instead accepts the request and reports malformed addresses back in the 'invalid' array of the
+     * response (see APIv2EventVolunteersTest::testInviteReportsMalformedAddressesAsInvalid) - so this now
+     * asserts that graceful behaviour instead of an exception.
      */
     public function testInviteInvalidEmail($email, $valid): void
     {
-        $this->loginAsTestUser(Role::ADMINISTRATOR);
+        $admin = $this->loginAsTestUser(Role::ADMINISTRATOR);
 
         $idgroups = $this->createGroup();
         $group = Group::findOrFail($idgroups);
         $idevents = $this->createEvent($idgroups, 'tomorrow');
         $event = Party::findOrFail($idevents);
 
-        if (!$valid) {
-            $this->expectException(ValidationException::class);
-        }
-
-        $this->post('/party/invite', [
-            'group_name' => $group->name,
-            'event_id' => $event->idevents,
-            'manual_invite_box' => $email,
-            'message_to_restarters' => 'Join us, but not in a creepy zombie way',
+        $response = $this->post('/api/v2/events/'.$event->idevents.'/invites?api_token='.$admin->api_token, [
+            'emails' => [$email],
+            'message' => 'Join us, but not in a creepy zombie way',
         ]);
+
+        $response->assertSuccessful();
+
+        if ($valid) {
+            $this->assertEquals([], $response->json('data.invalid'));
+        } else {
+            $this->assertEquals([$email], $response->json('data.invalid'));
+        }
     }
 
     public function invalidEmailProvider(): array

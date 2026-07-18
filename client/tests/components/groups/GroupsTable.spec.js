@@ -142,4 +142,48 @@ describe('components/groups/GroupsTable', () => {
       expect(wrapper.find('[data-testid="group-row-1"]').classes()).not.toContain('group-row-hovered')
     })
   })
+
+  describe('filter bar', () => {
+    const filterableRows = [
+      { id: 1, name: 'London Fixers', location: { location: 'London', country: 'UK' }, tags: [{ tag_name: 'electronics' }] },
+      { id: 2, name: 'Paris Repairers', location: { location: 'Paris', country: 'France' }, tags: [{ tag_name: 'textiles' }] },
+    ]
+
+    it('does not render the filter bar unless showFilters is set', () => {
+      const wrapper = mountComponent({ groups: filterableRows })
+      expect(wrapper.find('[data-testid="groups-table-filters"]').exists()).toBe(false)
+    })
+
+    it('renders the filter bar when showFilters is set', () => {
+      const wrapper = mountComponent({ groups: filterableRows, showFilters: true })
+      expect(wrapper.find('[data-testid="groups-table-filters"]').exists()).toBe(true)
+    })
+
+    it('filters rows by name', async () => {
+      const wrapper = mountComponent({ groups: filterableRows, showFilters: true })
+      await wrapper.find('[data-testid="groups-table-filters-toggle"]').trigger('click')
+      await wrapper.find('[data-testid="groups-table-filter-name"]').setValue('paris')
+
+      expect(wrapper.find('[data-testid="group-row-2"]').exists()).toBe(true)
+      expect(wrapper.find('[data-testid="group-row-1"]').exists()).toBe(false)
+    })
+
+    it('filters rows by location and country', async () => {
+      const wrapper = mountComponent({ groups: filterableRows, showFilters: true })
+      await wrapper.find('[data-testid="groups-table-filters-toggle"]').trigger('click')
+      await wrapper.find('[data-testid="groups-table-filter-country"]').setValue('UK')
+
+      expect(wrapper.find('[data-testid="group-row-1"]').exists()).toBe(true)
+      expect(wrapper.find('[data-testid="group-row-2"]').exists()).toBe(false)
+    })
+
+    it('filters rows by tag', async () => {
+      const wrapper = mountComponent({ groups: filterableRows, showFilters: true })
+      await wrapper.find('[data-testid="groups-table-filters-toggle"]').trigger('click')
+      await wrapper.find('[data-testid="groups-table-filter-tags"]').setValue('textiles')
+
+      expect(wrapper.find('[data-testid="group-row-2"]').exists()).toBe(true)
+      expect(wrapper.find('[data-testid="group-row-1"]').exists()).toBe(false)
+    })
+  })
 })

@@ -7,6 +7,7 @@ import { useNetworksStore } from '~/stores/networks.js'
 import { useGroupsStore } from '~/stores/groups.js'
 import NetworkStats from '~/components/networks/NetworkStats.vue'
 import AssociateGroupsModal from '~/components/networks/AssociateGroupsModal.vue'
+import TusImageUpload from '~/components/forms/TusImageUpload.vue'
 import AdminCrudTable from '~/components/admin/AdminCrudTable.vue'
 import GroupsTable from '~/components/groups/GroupsTable.vue'
 
@@ -55,6 +56,16 @@ useHead({ title: computed(() => network.value?.name || t('networks.general.netwo
 const selectedTagFilter = ref('')
 const showDescriptionModal = ref(false)
 const showAssociateModal = ref(false)
+const logoError = ref('')
+
+async function onLogoUploaded({ uploadKey }) {
+  logoError.value = ''
+  try {
+    await networksStore.uploadLogo(id.value, uploadKey)
+  } catch {
+    logoError.value = t('client.networks.logo_upload_error')
+  }
+}
 
 const truncatedDescription = computed(() => {
   const description = network.value?.description
@@ -192,7 +203,7 @@ const tagLabels = computed(() => ({
 
     <template v-else-if="network">
       <div class="d-flex align-items-center mb-4">
-        <img v-if="network.logo" :src="network.logo" :alt="`${network.name} logo`" class="me-4" style="max-height: 60px">
+        <img v-if="network.logo" :src="network.logo" :alt="t('client.networks.logo_alt', { name: network.name })" class="me-4" style="max-height: 60px">
         <div class="flex-grow-1">
           <h1 data-testid="network-show-name">{{ network.name }}</h1>
           <a v-if="network.website" :href="network.website" target="_blank" rel="noopener noreferrer" class="text-muted" data-testid="network-show-website">
@@ -203,6 +214,19 @@ const tagLabels = computed(() => ({
           {{ t('networks.show.add_groups_menuitem') }}
         </BButton>
       </div>
+
+      <section v-if="canManage" class="mb-4" data-testid="network-logo-manage">
+        <h2>{{ t('client.networks.logo_heading') }}</h2>
+        <TusImageUpload
+          :current-image-url="network.logo || ''"
+          data-testid="network-logo-upload"
+          @uploaded="onLogoUploaded"
+          @upload-error="logoError = $event"
+        />
+        <BAlert v-if="logoError" :model-value="true" variant="danger" class="mt-2" data-testid="network-logo-error">
+          {{ logoError }}
+        </BAlert>
+      </section>
 
       <section class="mb-4">
         <h2>{{ t('networks.general.impact') }}</h2>
@@ -243,7 +267,7 @@ const tagLabels = computed(() => ({
         <div v-else-if="!groupRows.length" class="text-muted" data-testid="network-show-groups-empty">
           {{ t('client.networks.no_groups') }}
         </div>
-        <GroupsTable v-else :groups="groupRows" :show-join="false" />
+        <GroupsTable v-else :groups="groupRows" :show-join="false" :show-filters="true" />
       </section>
 
       <section v-if="canManage" data-testid="tags-management">

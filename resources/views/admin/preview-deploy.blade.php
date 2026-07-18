@@ -1,10 +1,6 @@
-@extends('layouts.app')
-
-@section('title')
-Deploy Preview Branch
-@endsection
-
-@section('content')
+{{-- Post-cutover this uses the retained plain layout (layouts.app died with
+     the Blade frontend); functionality unchanged. --}}
+@include('layouts.header_plain')
 <section>
     <div class="container mt-4">
         <h1>Deploy Preview Branch to restarters.dev</h1>
@@ -65,4 +61,4 @@ Deploy Preview Branch
         </p>
     </div>
 </section>
-@endsection
+@include('layouts.footer')
