@@ -293,6 +293,14 @@ class EventController extends Controller
     {
         $party = Party::findOrFail($idevents);
 
+        // Events on unapproved (unmoderated) groups are only visible to the
+        // relevant hosts/coordinators/admins - restores the legacy
+        // PartyController::view() gate the API-only cutover dropped. Events on
+        // approved groups stay fully public.
+        if (! Fixometer::userHasViewPartyPermission($idevents, $request->user()?->id, $party)) {
+            abort(404);
+        }
+
         return \App\Http\Resources\Party::make($party);
     }
 
@@ -377,6 +385,13 @@ class EventController extends Controller
 
         // Optional auth: showEmails mirrors listVolunteers' gate, everything else is public.
         $user = $request->user();
+
+        // Events on unapproved groups are hidden from the public (legacy
+        // PartyController::view() gate) - approved-group events stay public.
+        if (! Fixometer::userHasViewPartyPermission($idevents, $user?->id, $party)) {
+            abort(404);
+        }
+
         $showEmails = $user && Fixometer::userHasEditPartyPermission($idevents, $user->id);
 
         $confirmed = Party::expandVolunteers($party->allConfirmedVolunteers()->get(), $showEmails);
@@ -437,6 +452,12 @@ class EventController extends Controller
     public function devicesv2(Request $request, $idevents): JsonResponse
     {
         $party = Party::findOrFail($idevents);
+
+        // Events on unapproved groups are hidden from the public (legacy
+        // PartyController::view() gate) - approved-group events stay public.
+        if (! Fixometer::userHasViewPartyPermission($idevents, $request->user()?->id, $party)) {
+            abort(404);
+        }
 
         return response()->json([
             'data' => \App\Http\Resources\Device::collection($party->devices()->get()),

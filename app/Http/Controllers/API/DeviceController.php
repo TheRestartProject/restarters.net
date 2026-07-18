@@ -396,6 +396,17 @@ class DeviceController extends Controller {
         ];
 
         $device = Device::findOrFail($iddevices);
+
+        // IDOR guard: the permission check above validated the *target* eventid
+        // from the request body, but the device is loaded by its URL id. Also
+        // require edit permission on the device's *current* owning event -
+        // otherwise a host of event A could pass eventid=A and reassign/
+        // overwrite a device that actually belongs to someone else's event B
+        // (deleteDevicev2 derives the event from the device for the same reason).
+        if (!Fixometer::userHasEditEventsDevicesPermission($device->event, $user->id)) {
+            abort(403);
+        }
+
         $device->update($data);
 
         event(new DeviceCreatedOrUpdated($device));

@@ -304,6 +304,40 @@ class AuthEndpointsTest extends TestCase
         $login->assertOk();
     }
 
+    public function testResetPasswordTokenCannotBeReplayed(): void
+    {
+        $user = $this->makeUser('replay@restarters.test');
+        $user->update([
+            'recovery' => 'onetimetoken',
+            'recovery_expires' => date('Y-m-d H:i:s', time() + 3600),
+        ]);
+
+        // Legitimate first use succeeds.
+        $this->post('/api/v2/auth/password/reset', [
+            'recovery' => 'onetimetoken',
+            'password' => 'victimnewpass',
+            'password_confirmation' => 'victimnewpass',
+        ], ['Accept' => 'application/json'])->assertOk();
+
+        // The same emailed link must not be replayable within its 24h window:
+        // the recovery token is rotated on use, so a second reset with the old
+        // token is rejected - an attacker who later obtains the link cannot
+        // take over the (already-reset) account.
+        $this->withExceptionHandling();
+        $this->post('/api/v2/auth/password/reset', [
+            'recovery' => 'onetimetoken',
+            'password' => 'attackerpass',
+            'password_confirmation' => 'attackerpass',
+        ], ['Accept' => 'application/json'])->assertStatus(422);
+
+        // The victim's password (from the legitimate first reset) still works;
+        // the attacker's replay did not take effect.
+        $this->post('/api/v2/auth/login', [
+            'email' => $user->email,
+            'password' => 'victimnewpass',
+        ], ['Accept' => 'application/json'])->assertOk();
+    }
+
     public function testResetPasswordRejectsExpiredOrUnknownToken(): void
     {
         $user = $this->makeUser('expired@restarters.test');

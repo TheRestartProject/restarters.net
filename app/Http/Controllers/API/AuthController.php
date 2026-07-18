@@ -373,7 +373,14 @@ class AuthController extends Controller
         }
 
         $oldPassword = $user->password;
-        $user->update(['password' => Hash::make($request->input('password'))]);
+        $user->update([
+            'password' => Hash::make($request->input('password')),
+            // Rotate the recovery token so the just-used reset link cannot be
+            // replayed within its 24h window (an intercepted/forwarded link
+            // must be single-use). Mirrors UserController::updateMyPasswordv2.
+            'recovery' => substr(bin2hex(openssl_random_pseudo_bytes(32)), 0, 24),
+            'recovery_expires' => strftime('%Y-%m-%d %X', time() + (24 * 60 * 60)),
+        ]);
 
         event(new PasswordChanged($user, $oldPassword));
 

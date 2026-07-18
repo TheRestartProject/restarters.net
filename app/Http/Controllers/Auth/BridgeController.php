@@ -69,7 +69,15 @@ class BridgeController extends Controller
         ]);
 
         foreach ($allowedPrefixes as $prefix) {
-            if (str_starts_with($target, $prefix)) {
+            $prefix = rtrim($prefix, '/');
+
+            // Match on an origin/path *boundary*, not a bare string prefix: a
+            // plain str_starts_with lets "https://app.example.com.attacker.com"
+            // pass the "https://app.example.com" allowlist entry (open redirect).
+            // Only the exact target, or one continuing with '/' or '?', is safe.
+            if ($target === $prefix
+                || str_starts_with($target, $prefix.'/')
+                || str_starts_with($target, $prefix.'?')) {
                 return $target;
             }
         }

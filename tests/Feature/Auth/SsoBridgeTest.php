@@ -91,6 +91,24 @@ class SsoBridgeTest extends TestCase
         $response->assertRedirect(config('restarters.frontend_url'));
     }
 
+    public function testRedirectAllowlistBlocksSuffixBypass(): void
+    {
+        $user = User::factory()->restarter()->create();
+        $ticket = SsoTicket::issue($user);
+
+        // A hostile host that merely *starts with* the allowlisted frontend
+        // origin string (e.g. "https://app.example.com.attacker.com") must NOT
+        // pass - str_starts_with without an origin boundary is an open-redirect
+        // bypass.
+        $frontend = rtrim(config('restarters.frontend_url'), '/');
+        $evil = $frontend.'.attacker.example.com/phish';
+
+        $response = $this->get('/auth/bridge?ticket='.$ticket.'&redirect='.urlencode($evil));
+
+        $this->assertAuthenticatedAs($user, 'web');
+        $response->assertRedirect(config('restarters.frontend_url'));
+    }
+
     public function testUnauthenticatedDiscourseSsoRedirectsToSpaLogin(): void
     {
         $response = $this->get('/discourse/sso?sso=abc&sig=def');
