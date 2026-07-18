@@ -78,11 +78,11 @@ Status: ⬜ pending · 🔄 in progress · ✅ done · ❌ blocked
 
 | # | Task | Status | Notes |
 |---|------|--------|-------|
-| F1 | Point compose + CI Playwright at Nuxt as primary suite; legacy Integration suite still green | 🔄 | CI four-job topology GREEN 2026-07-16 (build phpunit-only npm-less, build-legacy-frontend [dies at F], build-client, e2e-client). Full cutover of primary gate happens with F2/F3 |
-| F2 | Delete: Blade views (minus §9 surface), resources/js, resources/sass, laravel-ui auth controllers, EnsureAPIToken + restarters_apitoken, dead legacy-redirect blocks, vite entries trimmed to wiki/global only | ⬜ | FIRST move resources/js/misc/notifications.js → resources/global/js (global/js/app.js imports it) + grep all global|wiki→js/sass cross-refs; then delete; global Authenticate::redirectTo may now point at FRONTEND_URL |
-| F3 | Delete Jest suite + tests/Integration Blade specs; remove jest/vue2 deps from root package.json; nginx redirect map for legacy prefixes | ⬜ | root package.json now build-tooling only (vite + wiki/global css); docker/nginx.conf + nginx-fly.conf: 16 legacy prefixes → Discourse thread redirect |
-| F4 | routes/web.php final audit: nothing view-returning outside §9; route:list snapshot test | ⬜ | tests/Feature/ApiOnlyRouteSurfaceTest pins the allowed web-route list |
-| F5 | Docs: local-development.md, CLAUDE.md (client dev commands), README | ⬜ | |
+| F1 | Point compose + CI Playwright at Nuxt as primary suite; legacy Integration suite still green | ✅ | CI four-job topology GREEN 2026-07-16 (build phpunit-only npm-less, build-legacy-frontend [dies at F], build-client, e2e-client). Full cutover of primary gate happens with F2/F3 |
+| F2 | Delete: Blade views (minus §9 surface), resources/js, resources/sass, laravel-ui auth controllers, EnsureAPIToken + restarters_apitoken, dead legacy-redirect blocks, vite entries trimmed to wiki/global only | ✅ | FIRST move resources/js/misc/notifications.js → resources/global/js (global/js/app.js imports it) + grep all global|wiki→js/sass cross-refs; then delete; global Authenticate::redirectTo may now point at FRONTEND_URL |
+| F3 | Delete Jest suite + tests/Integration Blade specs; remove jest/vue2 deps from root package.json; nginx redirect map for legacy prefixes | ✅ | root package.json now build-tooling only (vite + wiki/global css); docker/nginx.conf + nginx-fly.conf: 16 legacy prefixes → Discourse thread redirect |
+| F4 | routes/web.php final audit: nothing view-returning outside §9; route:list snapshot test | ✅ | tests/Feature/ApiOnlyRouteSurfaceTest pins the allowed web-route list |
+| F5 | Docs: local-development.md, CLAUDE.md (client dev commands), README | ✅ | Committed 07e6abd7cc 2026-07-18: full F cutover atomic commit. phpunit 772 green, client vitest 877, e2e 62 passed (1 pre-existing flaky), lint/build/translations clean. Plus 9 real regressions restored (network logo, associate-groups, group device-protection, request-review, follow-group link, notifications page, image_upload flag on API path, moderation-photos notification, groups filter bar) each with API+e2e tests |
 
 ## Phase G — Hardening / done criteria
 
