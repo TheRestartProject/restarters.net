@@ -3,6 +3,8 @@ import { computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useSessionStore } from '~/stores/session.js'
 import { useDashboardStore } from '~/stores/dashboard.js'
+import { useEventsStore } from '~/stores/events.js'
+import DashboardAddData from '~/components/dashboard/DashboardAddData.vue'
 import DashboardYourGroups from '~/components/dashboard/DashboardYourGroups.vue'
 import DashboardNearbyGroups from '~/components/dashboard/DashboardNearbyGroups.vue'
 import DashboardUpcomingEvents from '~/components/dashboard/DashboardUpcomingEvents.vue'
@@ -19,6 +21,8 @@ useHead({ title: t('dashboard.title') })
 
 const sessionStore = useSessionStore()
 const dashboardStore = useDashboardStore()
+const eventsStore = useEventsStore()
+const myEvents = computed(() => eventsStore.myEvents.data ?? [])
 
 const yourGroups = computed(() => dashboardStore.data?.your_groups ?? [])
 const nearbyGroups = computed(() => dashboardStore.data?.nearby_groups ?? [])
@@ -44,6 +48,9 @@ function dismissOnboarding() {
 
 onMounted(() => {
   dashboardStore.fetch()
+  // Backs the Add Data group -> event picker (all of the user's events, not
+  // just the dashboard's upcoming set).
+  eventsStore.fetchMyEvents()
 })
 </script>
 
@@ -72,7 +79,9 @@ onMounted(() => {
       </BButton>
     </BAlert>
 
-    <div v-else class="dashboard-grid mt-4" data-testid="dashboard-content">
+    <template v-else>
+      <DashboardAddData :groups="yourGroups" :events="myEvents" />
+      <div class="dashboard-grid mt-4" data-testid="dashboard-content">
       <div class="panel dashboard-grid__yourgroups">
         <DashboardYourGroups :groups="yourGroups" :new-nearby-groups="newNearbyGroups" />
         <DashboardUpcomingEvents :events="upcomingEvents" class="dashboard-grid__events" />
@@ -85,7 +94,8 @@ onMounted(() => {
         :nearby-groups="nearbyGroups"
         :has-location="hasLocation"
       />
-    </div>
+      </div>
+    </template>
 
     <DashboardOnboardingModal :show="showOnboarding" @dismiss="dismissOnboarding" />
   </div>

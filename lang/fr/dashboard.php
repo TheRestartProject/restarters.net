@@ -26,4 +26,7 @@ return [
   'getting_the_most_bullet2' => '<strong>Organiser</strong>: <a href="https://talk.restarters.net/session/sso?return_path=https://talk.restarters.net/t/how-to-run-a-repair-event-the-restart-party-kit/324/" target="_blank">Apprenez comment organiser un événement</a> and/or <a href="https://talk.restarters.net/c/community-repair/5" target="_blank">Demandez de l\'aide à la communauté sur Talk</a>.',
   'getting_the_most_bullet3' => '<strong>Chatter</strong>: <a href="https://talk.restarters.net/session/sso?return_path=https://talk.restarters.net/" target="_blank">Retrouvez les dernières conversations</a> sur le forum Talk. N\'hésitez pas à <a href="https://talk.restarters.net/t/who-is-everyone-meet-and-greet/44" target="_blank">vous présenter</a> aussi!',
   'getting_the_most_bullet4' => '<strong>Analyser</strong>: Voir notre impact sur <a href="https://restarters.net/fixometer" target="_blank">le Fixometer</a>.',
+  'add_data_heading' => 'Ajouter des données',
+  'see_your_impact' => 'Et regardez votre impact sur le Fixometer',
+  'add_data_add' => 'Ajouter',
 ];
