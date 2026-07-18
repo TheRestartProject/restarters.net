@@ -25,6 +25,10 @@ $brand-placeholder: #6c757d;
 $brand-grey: #f5f7fa;
 $brand-grey-darker: #dce3ec;
 $brand-orange: #ffbe5f;
+// Legacy Fixometer brand blue, used only by the .panel__blue content panel
+// (see _panels.scss). Kept as a token rather than a literal so the panel
+// variants read consistently against $brand / $brand-orange.
+$brand-blue: #0faca8;
 
 // Present in the source file but not consumed by anything ported into this
 // stylesheet yet; kept for parity so a later page/component partial that
