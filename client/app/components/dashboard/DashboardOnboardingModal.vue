@@ -15,17 +15,17 @@ const { t } = useI18n()
 
 const slides = [
   {
-    image: '/images/onboarding/onboarding_1.jpg',
+    image: '/images/onboarding/onboarding-1.webp',
     heading: 'onboarding.slide1_heading',
     content: 'onboarding.slide1_content',
   },
   {
-    image: '/images/onboarding/onboarding_2.jpg',
+    image: '/images/onboarding/onboarding-2.webp',
     heading: 'onboarding.slide2_heading',
     content: 'onboarding.slide2_content',
   },
   {
-    image: '/images/onboarding/onboarding_3.jpg',
+    image: '/images/onboarding/onboarding-3.webp',
     heading: 'onboarding.slide3_heading',
     content: 'onboarding.slide3_content',
   },

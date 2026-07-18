@@ -165,6 +165,10 @@ Route::prefix('v2')->middleware(\App\Http\Middleware\VerifyUserConsentApi::class
         Route::prefix('/users')->group(function() {
             Route::middleware('auth:sanctum,api')->group(function() {
                 Route::get('', [API\UserController::class, 'listUsersv2']);
+                // PII-safe public profile - any logged-in user may view any
+                // profile (mirrors the legacy UserController::index, whose
+                // only gate was the route's auth middleware).
+                Route::get('/{id}', [API\UserController::class, 'getPublicProfilev2']);
             });
         });
 

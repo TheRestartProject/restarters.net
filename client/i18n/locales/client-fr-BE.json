@@ -115,6 +115,7 @@
    "title": "Accès refusé"
   },
   "groups": {
+   "all_tab": "Tous les groupes",
    "approve_option": "Approuver",
    "cluster_computers": "Ordinateurs et bureautique",
    "cluster_entertainment": "Loisirs et audiovisuel",

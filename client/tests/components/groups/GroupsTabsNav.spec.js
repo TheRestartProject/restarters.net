@@ -32,4 +32,16 @@ describe('components/groups/GroupsTabsNav', () => {
     expect(wrapper.find('[data-testid="groups-tab-map"]').classes()).toContain('active')
     expect(wrapper.find('[data-testid="groups-tab-mine"]').classes()).not.toContain('active')
   })
+
+  it('renders resolved translation labels, not raw i18n keys', () => {
+    // Regression guard: the /group/all tab used a non-existent key
+    // (groups.all_groups) and rendered the raw path, which CSS uppercased to
+    // "GROUPS.ALL_GROUPS" in the UI. Every tab label must resolve to real text.
+    const wrapper = mountNav('mine')
+
+    expect(wrapper.find('[data-testid="groups-tab-mine"]').text()).toBe('Your Groups')
+    expect(wrapper.find('[data-testid="groups-tab-nearby"]').text()).toBe('Other groups')
+    expect(wrapper.find('[data-testid="groups-tab-all"]').text()).toBe('All groups')
+    expect(wrapper.find('[data-testid="groups-tab-map"]').text()).toBe('Map')
+  })
 })

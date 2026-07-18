@@ -115,6 +115,7 @@
    "title": "Access denied"
   },
   "groups": {
+   "all_tab": "All groups",
    "approve_option": "Approve",
    "cluster_computers": "Computers and Home Office",
    "cluster_entertainment": "Home Entertainment",

@@ -16,10 +16,10 @@ const { t } = useI18n()
         <IconLogo />
       </NuxtLink>
       <ul class="list-unstyled d-flex mb-0">
-        <li class="ml-3">
+        <li class="ms-3">
           <NuxtLink to="/login" data-testid="plain-nav-login">{{ t('login.login_title') }}</NuxtLink>
         </li>
-        <li class="ml-3">
+        <li class="ms-3">
           <NuxtLink to="/user/register" data-testid="plain-nav-join">{{ t('login.join_title') }}</NuxtLink>
         </li>
       </ul>

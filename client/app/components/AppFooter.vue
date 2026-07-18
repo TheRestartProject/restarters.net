@@ -50,27 +50,27 @@ function goToWiki() {
       </NuxtLink>
 
       <ul class="list-unstyled d-flex flex-wrap mb-0">
-        <li class="mr-3">
+        <li class="me-3">
           <a :href="config.discourse_url || '#'" rel="noopener noreferrer" data-testid="footer-talk" @click.prevent="goToTalk">
             {{ t('general.menu_discourse') }}
           </a>
         </li>
-        <li class="mr-3">
+        <li class="me-3">
           <a :href="config.wiki_url || '#'" rel="noopener noreferrer" data-testid="footer-wiki" @click.prevent="goToWiki">
             {{ t('general.menu_wiki') }}
           </a>
         </li>
-        <li class="mr-3">
+        <li class="me-3">
           <a :href="t('general.help_feedback_url')" target="_blank" rel="noopener noreferrer" data-testid="footer-help">
             {{ t('general.menu_help_feedback') }}
           </a>
         </li>
-        <li class="mr-3">
+        <li class="me-3">
           <a :href="t('general.faq_url')" target="_blank" rel="noopener noreferrer" data-testid="footer-faq">
             {{ t('general.menu_faq') }}
           </a>
         </li>
-        <li class="mr-3">
+        <li class="me-3">
           <a :href="t('general.restartproject_url')" target="_blank" rel="noopener noreferrer" data-testid="footer-restart-project">
             {{ t('general.therestartproject') }}
           </a>

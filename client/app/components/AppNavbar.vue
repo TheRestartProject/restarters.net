@@ -35,7 +35,7 @@ const config = computed(() => sessionStore.config || {})
 // resolve it as a build-time module import - it's a runtime request for a
 // public/ asset (design.md's Stylesheet-stage note: /images/* assets land
 // in client/public/images/ in a later asset-migration stage).
-const avatarSrc = '/images/placeholder-avatar.png'
+const avatarSrc = '/images/placeholder-avatar.webp'
 
 const menuOpen = ref(false)
 
@@ -83,12 +83,12 @@ function goToWiki() {
 </script>
 
 <template>
-  <nav class="nav-wrapper pl-0 pr-0" data-testid="app-navbar">
+  <nav class="nav-wrapper ps-0 pe-0" data-testid="app-navbar">
     <NuxtLink to="/" class="icon-brand" data-testid="nav-logo">
       <IconLogo />
     </NuxtLink>
 
-    <ul id="nav-left" class="nav-left d-flex justify-content-between w-100 pr-md-3">
+    <ul id="nav-left" class="nav-left d-flex justify-content-between w-100 pe-md-3">
       <li>
         <a :href="config.discourse_url || '#'" rel="noopener noreferrer" data-testid="nav-talk" @click.prevent="goToTalk">
           <IconTalk />

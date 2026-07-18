@@ -51,7 +51,7 @@ function isActive(tab) {
       data-testid="groups-tab-all"
       :aria-current="isActive('all') ? 'page' : undefined"
     >
-      {{ t('groups.all_groups') }}
+      {{ t('client.groups.all_tab') }}
     </NuxtLink>
     <NuxtLink
       to="/group/map"

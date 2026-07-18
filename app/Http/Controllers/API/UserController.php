@@ -1506,4 +1506,80 @@ class UserController extends Controller
             ],
         ]);
     }
+
+    /**
+     * @OA\Get(
+     *      path="/api/v2/users/{id}",
+     *      operationId="getPublicProfilev2",
+     *      tags={"Users"},
+     *      summary="Get a user's public (PII-safe) profile",
+     *      security={{"apiToken":{}}},
+     *      @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="data", type="object",
+     *                  @OA\Property(property="id", type="integer"),
+     *                  @OA\Property(property="name", type="string"),
+     *                  @OA\Property(property="avatar_url", type="string", nullable=true),
+     *                  @OA\Property(property="role_name", type="string", nullable=true),
+     *                  @OA\Property(property="location", type="string", nullable=true),
+     *                  @OA\Property(property="groups", type="array", @OA\Items(
+     *                      @OA\Property(property="id", type="integer"),
+     *                      @OA\Property(property="name", type="string")
+     *                  )),
+     *                  @OA\Property(property="skills", type="array", @OA\Items(
+     *                      @OA\Property(property="id", type="integer"),
+     *                      @OA\Property(property="name", type="string")
+     *                  )),
+     *                  @OA\Property(property="biography", type="string", nullable=true)
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(response=401, description="Unauthenticated"),
+     *      @OA\Response(response=404, description="User not found")
+     * )
+     *
+     * PII-safe public profile behind pages/profile/[id].vue and /profile
+     * (resources/views/user/profile-new.blade.php via the legacy
+     * UserController::index($id) is the functional spec). No permission check
+     * beyond the route's own auth middleware: any logged-in user may view any
+     * profile, exactly as the legacy Blade page did. Fields limited to what
+     * that page rendered publicly - name, avatar, role name, location, the
+     * user's groups and skills, and their biography.
+     */
+    public function getPublicProfilev2($id): JsonResponse
+    {
+        $user = User::find($id);
+
+        if (! $user) {
+            return response()->json(['message' => 'User not found'], 404);
+        }
+
+        // Same xref/thumbnail derivation SessionController::userPayload() and
+        // the legacy profile view (User::getProfile) use, so the avatar here
+        // matches what the navbar already shows for the same person.
+        $profile = User::getProfile($user->id);
+        $avatarUrl = ($profile && $profile->path) ? url('/uploads/thumbnail_'.$profile->path) : null;
+
+        return response()->json([
+            'data' => [
+                'id' => (int) $user->id,
+                'name' => $user->name,
+                'avatar_url' => $avatarUrl,
+                'role_name' => optional($user->role()->first())->role,
+                'location' => $user->location,
+                'groups' => $user->groups->map(fn ($group) => [
+                    'id' => (int) $group->idgroups,
+                    'name' => $group->name,
+                ])->values(),
+                'skills' => $user->skills->map(fn ($skill) => [
+                    'id' => (int) $skill->id,
+                    'name' => $skill->skill_name,
+                ])->values(),
+                'biography' => $user->biography,
+            ],
+        ]);
+    }
 }
