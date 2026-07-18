@@ -1,5 +1,5 @@
 import { test, expect } from './fixtures'
-import { USERS, login, logout, createGroup, createEvent, approveEvent } from './utils'
+import { USERS, login, logout, createGroup, createEvent, approveEvent, approveGroup } from './utils'
 
 // Ports tests/Integration/event.test.js's three flows to the Nuxt client:
 // create a future event, create a past event, and open the invite-
@@ -91,6 +91,10 @@ test.describe('events', () => {
     // Admin creates the group + event (admin becomes a host/member).
     await login(page, USERS.admin)
     const groupId = await createGroup(page)
+    // Approve the group so its event is publicly viewable: GET
+    // /api/v2/events/{id} hides events on unapproved groups from non-members
+    // (the moderation gate), which is exactly who follows a group from here.
+    await approveGroup(page, groupId)
     const eventId = await createEvent(page, groupId, { past: false })
     await approveEvent(page, eventId)
     await logout(page)

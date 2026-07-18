@@ -128,6 +128,30 @@ export async function approveEvent(page, eventId) {
   expect(saveResponse.status()).toBe(200)
 }
 
+// Approves a group via the moderation select on /group/edit/{id}
+// (GroupForm.vue's data-testid=group-form-moderate, only rendered for an
+// admin viewing an unapproved group). Needed whenever a non-privileged user
+// must view the group's events: GET /api/v2/events/{id} hides events on
+// unapproved (unmoderated) groups from everyone but their host/coordinator/
+// admin (EventController's userHasViewPartyPermission gate).
+export async function approveGroup(page, groupId) {
+  if (!page.url().includes(`/group/edit/${groupId}`)) {
+    await page.goto(`/group/edit/${groupId}`, { waitUntil: 'domcontentloaded' })
+  }
+
+  await page.getByTestId('group-form-moderate').waitFor({ timeout: 15000 })
+  await page.getByTestId('group-form-moderate').selectOption('approve')
+
+  const [saveResponse] = await Promise.all([
+    page.waitForResponse(
+      (resp) => resp.url().includes(`/api/v2/groups/${groupId}`) && resp.request().method() === 'PATCH',
+      { timeout: 15000 },
+    ),
+    page.getByTestId('group-form-submit').click(),
+  ])
+  expect(saveResponse.status()).toBe(200)
+}
+
 // Adds a device to an event via /party/view/{id} (EventDevicesPanel.vue +
 // DeviceForm.vue's inline, non-modal add form - no vue-multiselect, no
 // dropzone-during-create; see DeviceForm.vue's own doc comment for why
