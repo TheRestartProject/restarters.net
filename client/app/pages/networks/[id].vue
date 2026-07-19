@@ -10,6 +10,7 @@ import AssociateGroupsModal from '~/components/networks/AssociateGroupsModal.vue
 import TusImageUpload from '~/components/forms/TusImageUpload.vue'
 import AdminCrudTable from '~/components/admin/AdminCrudTable.vue'
 import GroupsTable from '~/components/groups/GroupsTable.vue'
+import ModerationQueue from '~/components/moderation/ModerationQueue.vue'
 
 // /networks/{id} - resources/views/networks/show.blade.php +
 // resources/js/components/NetworkPage.vue (design.md §6.2 Phase E task E1).
@@ -214,6 +215,13 @@ const tagLabels = computed(() => ({
           {{ t('networks.show.add_groups_menuitem') }}
         </BButton>
       </div>
+
+      <!-- Groups/events awaiting moderation, for Administrators and this
+           network's coordinators (legacy network page showed both queues). -->
+      <template v-if="canManage">
+        <ModerationQueue type="groups" />
+        <ModerationQueue type="events" />
+      </template>
 
       <section v-if="canManage" class="mb-4" data-testid="network-logo-manage">
         <h2>{{ t('client.networks.logo_heading') }}</h2>

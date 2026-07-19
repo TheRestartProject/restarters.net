@@ -4,7 +4,9 @@ import { useI18n } from 'vue-i18n'
 import { useEventsStore } from '~/stores/events.js'
 import { useDashboardStore } from '~/stores/dashboard.js'
 import { useEventPermissions } from '~/composables/useEventPermissions.js'
+import { useAuth } from '~/composables/useAuth.js'
 import EventsList from '~/components/events/EventsList.vue'
+import ModerationQueue from '~/components/moderation/ModerationQueue.vue'
 import {
   eventIsFinished,
   eventIsInProgress,
@@ -29,6 +31,12 @@ const dashboardStore = useDashboardStore()
 // userCanCreateEvents check (Root/Admin/NetworkCoordinator or host of any
 // group). Without this the SPA had no way to reach /party/create at all.
 const { canCreateEvents, ensureLoaded: ensureEventPerms } = useEventPermissions()
+
+// Events-requiring-moderation queue, shown to Administrators and
+// NetworkCoordinators above the event lists (legacy events/index.blade.php
+// rendered <EventsRequiringModeration> for those roles).
+const { hasRole } = useAuth()
+const showModeration = computed(() => hasRole('Administrator') || hasRole('NetworkCoordinator'))
 
 const mineTab = ref('upcoming')
 const otherTab = ref('nearby')
@@ -95,6 +103,8 @@ onMounted(load)
         {{ t('events.add_event') }}
       </NuxtLink>
     </div>
+
+    <ModerationQueue v-if="showModeration" type="events" class="mt-3" />
 
     <div v-if="eventsStore.myEvents.loading" data-testid="party-mine-loading">
       <div class="placeholder-glow mb-3">

@@ -2,9 +2,11 @@
 import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useGroupsStore } from '~/stores/groups.js'
+import { useAuth } from '~/composables/useAuth.js'
 import GroupsTabsNav from '~/components/groups/GroupsTabsNav.vue'
 import GroupsTable from '~/components/groups/GroupsTable.vue'
 import GroupMap from '~/components/groups/GroupMap.vue'
+import ModerationQueue from '~/components/moderation/ModerationQueue.vue'
 
 // /group/map - resources/js/components/GroupMapAndList.vue (map+list shell)
 // + GroupMap.vue (the Leaflet map itself) are the functional spec. Unlike
@@ -20,6 +22,12 @@ const { t } = useI18n()
 useHead({ title: t('groups.groups') })
 
 const groupsStore = useGroupsStore()
+
+// Groups-requiring-moderation queue for Administrators / NetworkCoordinators
+// (legacy showed a "Groups requiring moderation" panel above the group list/map
+// for those roles).
+const { hasRole } = useAuth()
+const showModeration = computed(() => hasRole('Administrator') || hasRole('NetworkCoordinator'))
 
 // null = the map hasn't told us what's in view yet; an empty array is a
 // real answer (nothing in view) and must not fall back to every group -
@@ -99,6 +107,8 @@ onMounted(() => {
         {{ t('groups.create_groups') }}
       </NuxtLink>
     </h1>
+
+    <ModerationQueue v-if="showModeration" type="groups" />
 
     <GroupsTabsNav active="map" />
 

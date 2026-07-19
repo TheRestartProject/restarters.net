@@ -14,6 +14,7 @@ import SkillAPI from './SkillAPI.js'
 import GroupTagAPI from './GroupTagAPI.js'
 import CategoryAPI from './CategoryAPI.js'
 import PreviewDeployAPI from './PreviewDeployAPI.js'
+import ModerationAPI from './ModerationAPI.js'
 
 /**
  * Factory: one instance of each resource class, sharing the same config
@@ -37,4 +38,5 @@ export default (config) => ({
   groupTag: new GroupTagAPI(config),
   category: new CategoryAPI(config),
   previewDeploy: new PreviewDeployAPI(config),
+  moderation: new ModerationAPI(config),
 })
