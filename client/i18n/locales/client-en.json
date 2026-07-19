@@ -214,6 +214,11 @@
       "banner_text": "We use cookies to help our website function, and analytical cookies to improve our website. Please click Cookie Settings to amend cookie settings or click OK to accept all.",
       "settings": "Cookie settings",
       "accept": "OK"
+    },
+    "moderation": {
+      "events_title": "Events requiring moderation",
+      "groups_title": "Groups requiring moderation",
+      "none": "Nothing is awaiting moderation."
     }
   }
 }
