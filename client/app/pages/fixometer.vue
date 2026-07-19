@@ -10,8 +10,16 @@ import DevicesSearchTable from '~/components/fixometer/DevicesSearchTable.vue'
 // resources/js/components/FixometerPage.vue are the functional spec
 // (api-contracts-phase-c.md C6b; design.md §6.2 C6 task brief; git show
 // 07e6abd7cc^ for both, the commit before Phase F deleted the Blade + Vue 2
-// frontend). Public, no auth gate - DeviceController::index() works for
-// guests too (isAdmin false, user_groups empty when logged out).
+// frontend).
+//
+// AUTH-GATED. The legacy route sat inside
+// `Route::middleware('auth', 'verifyUserConsent', 'ensureAPIToken')`
+// (routes/web.php at 07e6abd7cc^), and the live site still 302s anonymous
+// visitors to /login. A previous comment here asserted this page was "public,
+// no auth gate" because DeviceController::index() tolerates guests - that
+// conflated "the API tolerates logged-out callers" with "the page was reachable
+// logged out", and left the page open to anonymous visitors.
+definePageMeta({ auth: true })
 //
 // Legacy top-to-bottom structure, replicated here: FixometerHeading (h1 +
 // doodle + "Add Data" button), a thick <hr>, the "Our Global Impact" h2 +

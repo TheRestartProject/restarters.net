@@ -17,6 +17,23 @@ export default defineNuxtRouteMiddleware((to) => {
   const requiresAuth = to.meta.auth === true
   const requiredRole = to.meta.role
 
+  // Guest-only pages (definePageMeta({ guest: true })): the legacy app gated
+  // these with Laravel's `guest` middleware - LoginController's
+  // `$this->middleware('guest')->except(['index','logout'])` (the named `index`
+  // method does not exist on that controller, so the login form itself WAS
+  // gated) and RegisterController's unconditional `$this->middleware('guest')`.
+  // A logged-in user landing on them was bounced away rather than shown a login
+  // or registration form again.
+  if (to.meta.guest === true) {
+    const guestStore = useAuthStore()
+
+    if (guestStore.loggedIn) {
+      return navigateTo('/dashboard')
+    }
+
+    return
+  }
+
   if (!requiresAuth) {
     return
   }

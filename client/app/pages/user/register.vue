@@ -3,7 +3,7 @@ import { computed, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '~/stores/auth.js'
 
-definePageMeta({ layout: 'plain' })
+definePageMeta({ layout: 'plain', guest: true })
 
 const { t, tm } = useI18n()
 useHead({ title: t('login.join_title') })

@@ -117,4 +117,38 @@ describe('middleware/auth.global', () => {
 
     expect(navigateToMock).not.toHaveBeenCalled()
   })
+
+  // Guest-only pages. Legacy gated these with Laravel's `guest` middleware
+  // (RegisterController's unconditional $this->middleware('guest'), and
+  // LoginController's ->except(['index',...]) which exempted a method that does
+  // not exist, so the login form was gated too). A logged-in user was bounced.
+  describe('guest-only pages', () => {
+    function guestRoute(path = '/login') {
+      return { meta: { guest: true }, fullPath: path, path }
+    }
+
+    it('bounces a logged-in user off a guest-only page', () => {
+      const authStore = useAuthStore()
+      authStore.token = 'tok-1'
+      authStore.user = { id: 1, role_name: 'Restarter' }
+
+      authMiddleware(guestRoute('/login'), route())
+
+      expect(navigateToMock).toHaveBeenCalledWith('/dashboard')
+    })
+
+    it('lets a logged-out visitor through to a guest-only page', () => {
+      authMiddleware(guestRoute('/user/register'), route())
+
+      expect(navigateToMock).not.toHaveBeenCalled()
+    })
+
+    it('does not apply the auth gate to guest-only pages', () => {
+      // guest pages must not also be treated as auth-required
+      const result = authMiddleware(guestRoute('/login'), route())
+
+      expect(result).toBeUndefined()
+      expect(navigateToMock).not.toHaveBeenCalled()
+    })
+  })
 })

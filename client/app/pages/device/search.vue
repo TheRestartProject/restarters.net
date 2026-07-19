@@ -8,7 +8,14 @@ import DevicesSearchTable from '~/components/fixometer/DevicesSearchTable.vue'
 // against GET /api/v2/devices per the contract. Functional spec for the
 // filter/column set is FixometerFilters.vue + FixometerRecordsTable.vue
 // (previously embedded in /fixometer, now its own page - see fixometer.vue's
-// doc comment). Public, no auth gate (same as /fixometer).
+// doc comment).
+//
+// AUTH-GATED, same as /fixometer: the legacy /device/search route sat inside
+// `Route::middleware('auth', ...)` (routes/web.php at 07e6abd7cc^), so
+// anonymous visitors were redirected to /login. The previous "public, no auth
+// gate" note here inherited fixometer.vue's incorrect claim.
+definePageMeta({ auth: true })
+
 const { t } = useI18n()
 useHead({ title: t('devices.repair_records') })
 </script>
