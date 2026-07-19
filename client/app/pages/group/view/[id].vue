@@ -238,3 +238,12 @@ onMounted(() => {
     </template>
   </div>
 </template>
+
+<style scoped>
+/* Match develop's GroupHeading.vue: the group heading image is restricted to
+   67px wide (height auto) instead of rendering at its full uploaded size. */
+.groupImage {
+  width: 67px;
+  height: auto;
+}
+</style>
