@@ -1,10 +1,11 @@
-import { mount } from '@vue/test-utils'
+import { flushPromises, mount } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
 import { createI18n } from 'vue-i18n'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import PartyIndexPage from '../../../app/pages/party/index.vue'
 import { useEventsStore } from '../../../app/stores/events.js'
 import { useDashboardStore } from '../../../app/stores/dashboard.js'
+import { useProfileStore } from '../../../app/stores/profile.js'
 import en from '../../../i18n/locales/en.json'
 import clientEn from '../../../i18n/locales/client-en.json'
 
@@ -12,14 +13,44 @@ const NuxtLinkStub = { props: ['to'], template: '<a :href="to"><slot /></a>' }
 const BAlertStub = { template: '<div><slot /></div>' }
 const BButtonStub = { template: '<button v-bind="$attrs"><slot /></button>' }
 const BBadgeStub = { template: '<span v-bind="$attrs"><slot /></span>' }
+const BModalStub = {
+  props: ['modelValue', 'title'],
+  emits: ['hide'],
+  template: '<div v-if="modelValue" :data-title="title"><slot /></div>',
+}
+const AlertsBannerStub = { template: '<div data-testid="stub-alerts-banner" />' }
+
+// lang/en/calendars.php gained copy_button_label/see_all_calendars alongside
+// this Nuxt work (RES gap-closure pass) but client/i18n/locales/en.json is a
+// generated, checked-in artifact this change intentionally leaves untouched
+// (php artisan translations:export-client) - overlay the new keys here, same
+// pattern as tests/pages/networks/show.spec.js.
+const messages = {
+  en: {
+    ...en,
+    ...clientEn,
+    calendars: {
+      ...en.calendars,
+      copy_button_label: 'Copy your calendar link',
+      see_all_calendars: 'See all your calendars',
+    },
+  },
+}
 
 function mountPage() {
-  const i18n = createI18n({ legacy: false, locale: 'en', messages: { en: { ...en, ...clientEn } } })
+  const i18n = createI18n({ legacy: false, locale: 'en', messages })
 
   return mount(PartyIndexPage, {
     global: {
       plugins: [i18n],
-      stubs: { NuxtLink: NuxtLinkStub, BAlert: BAlertStub, BButton: BButtonStub, BBadge: BBadgeStub },
+      stubs: {
+        NuxtLink: NuxtLinkStub,
+        BAlert: BAlertStub,
+        BButton: BButtonStub,
+        BBadge: BBadgeStub,
+        BModal: BModalStub,
+        AlertsBanner: AlertsBannerStub,
+      },
     },
   })
 }
@@ -41,6 +72,7 @@ function evt(overrides = {}) {
 describe('pages/party/index (mine)', () => {
   let eventsStore
   let dashboardStore
+  let profileStore
 
   beforeEach(() => {
     setActivePinia(createPinia())
@@ -50,12 +82,20 @@ describe('pages/party/index (mine)', () => {
 
     dashboardStore = useDashboardStore()
     dashboardStore.fetch = vi.fn().mockResolvedValue({})
+
+    profileStore = useProfileStore()
+    profileStore.fetchCalendars = vi.fn().mockResolvedValue({})
   })
 
   it('calls eventsStore.fetchMyEvents() and dashboardStore.fetch() on mount', () => {
     mountPage()
     expect(eventsStore.fetchMyEvents).toHaveBeenCalledTimes(1)
     expect(dashboardStore.fetch).toHaveBeenCalledTimes(1)
+  })
+
+  it('mounts the AlertsBanner above the events list', () => {
+    const wrapper = mountPage()
+    expect(wrapper.find('[data-testid="stub-alerts-banner"]').exists()).toBe(true)
   })
 
   it('shows a loading skeleton while loading', () => {
@@ -145,5 +185,62 @@ describe('pages/party/index (mine)', () => {
     const wrapper = mountPage()
 
     expect(wrapper.find('[data-testid="event-card-hosting-1"]').exists()).toBe(true)
+  })
+
+  describe('calendar link modal', () => {
+    it('is hidden until the calendar button is clicked', () => {
+      const wrapper = mountPage()
+      expect(wrapper.find('[data-testid="party-calendar-modal"]').exists()).toBe(false)
+    })
+
+    it('opens the modal and fetches the calendar link when the button is clicked', async () => {
+      const wrapper = mountPage()
+
+      await wrapper.find('[data-testid="party-calendar-button"]').trigger('click')
+
+      expect(wrapper.find('[data-testid="party-calendar-modal"]').exists()).toBe(true)
+      expect(profileStore.fetchCalendars).toHaveBeenCalledTimes(1)
+    })
+
+    it('exposes the iCal URL with a working copy button once loaded', async () => {
+      profileStore.calendars.data = { user_url: 'https://example.test/calendar/user/abc' }
+
+      const originalClipboard = navigator.clipboard
+      const writeText = vi.fn()
+      Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true })
+
+      const wrapper = mountPage()
+      await wrapper.find('[data-testid="party-calendar-button"]').trigger('click')
+      await flushPromises()
+
+      expect(wrapper.find('[data-testid="party-calendar-url"]').element.value).toBe('https://example.test/calendar/user/abc')
+
+      await wrapper.find('[data-testid="party-calendar-copy"]').trigger('click')
+      expect(writeText).toHaveBeenCalledWith('https://example.test/calendar/user/abc')
+
+      Object.defineProperty(navigator, 'clipboard', { value: originalClipboard, configurable: true })
+    })
+
+    it('links to the profile edit page for the full calendars list', async () => {
+      profileStore.calendars.data = { user_url: 'https://example.test/calendar/user/abc' }
+
+      const wrapper = mountPage()
+      await wrapper.find('[data-testid="party-calendar-button"]').trigger('click')
+
+      const link = wrapper.find('[data-testid="party-calendar-see-all"]')
+      expect(link.exists()).toBe(true)
+    })
+
+    it('shows a load-error state when fetchCalendars fails', async () => {
+      profileStore.fetchCalendars = vi.fn().mockRejectedValue({ status: 500 })
+      profileStore.calendars.error = { status: 500 }
+
+      const wrapper = mountPage()
+      await wrapper.find('[data-testid="party-calendar-button"]').trigger('click')
+      await flushPromises()
+
+      expect(wrapper.find('[data-testid="party-calendar-error"]').exists()).toBe(true)
+      expect(wrapper.find('[data-testid="party-calendar-url"]').exists()).toBe(false)
+    })
   })
 })

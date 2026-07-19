@@ -16,6 +16,7 @@ import CategoryAPI from './CategoryAPI.js'
 import PreviewDeployAPI from './PreviewDeployAPI.js'
 import ModerationAPI from './ModerationAPI.js'
 import TalkAPI from './TalkAPI.js'
+import AlertsAPI from './AlertsAPI.js'
 
 /**
  * Factory: one instance of each resource class, sharing the same config
@@ -41,4 +42,5 @@ export default (config) => ({
   previewDeploy: new PreviewDeployAPI(config),
   moderation: new ModerationAPI(config),
   talk: new TalkAPI(config),
+  alerts: new AlertsAPI(config),
 })

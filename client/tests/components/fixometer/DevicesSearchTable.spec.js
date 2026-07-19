@@ -4,11 +4,25 @@ import { createI18n } from 'vue-i18n'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import DevicesSearchTable from '../../../app/components/fixometer/DevicesSearchTable.vue'
 import { useDevicesStore } from '../../../app/stores/devices.js'
+import { useAuthStore } from '../../../app/stores/auth.js'
 import en from '../../../i18n/locales/en.json'
 import clientEn from '../../../i18n/locales/client-en.json'
 
 const NuxtLinkStub = { props: ['to'], template: '<a :href="to"><slot /></a>' }
 const BBadgeStub = { template: '<span v-bind="$attrs"><slot /></span>' }
+const BButtonStub = { template: '<button v-bind="$attrs"><slot /></button>' }
+// Same shape as components/admin/AdminCrudTable.spec.js's BModalStub - only
+// renders its slot while open, and exposes `title` for assertions.
+const BModalStub = {
+  props: ['modelValue', 'title'],
+  emits: ['hide'],
+  template: '<div v-if="modelValue" :data-modal-title="title"><slot /></div>',
+}
+const DeviceFormStub = {
+  props: ['eventId', 'device', 'powered'],
+  emits: ['saved', 'cancel'],
+  template: '<div data-testid="device-form-stub">{{ eventId }}:{{ device && device.id }}:{{ powered }}</div>',
+}
 
 function mountComponent() {
   const i18n = createI18n({
@@ -18,8 +32,17 @@ function mountComponent() {
   })
 
   return mount(DevicesSearchTable, {
-    global: { plugins: [i18n], stubs: { NuxtLink: NuxtLinkStub, BBadge: BBadgeStub } },
+    global: {
+      plugins: [i18n],
+      stubs: { NuxtLink: NuxtLinkStub, BBadge: BBadgeStub, BButton: BButtonStub, BModal: BModalStub, DeviceForm: DeviceFormStub },
+    },
   })
+}
+
+// Mirrors AppNavbar.spec.js's setLoggedInUser: useAuth()'s hasRole() reads
+// authStore.user.role_name directly.
+function setAdmin() {
+  useAuthStore().user = { role_name: 'Administrator' }
 }
 
 function device(overrides = {}) {
@@ -284,5 +307,126 @@ describe('components/fixometer/DevicesSearchTable', () => {
     await flushPromises()
 
     expect(wrapper.find('[data-testid="device-search-error"]').exists()).toBe(true)
+  })
+
+  // Gap fix (MEDIUM): legacy FixometerRecordsTable.vue gave Administrators
+  // inline edit + delete on every row; this table used to offer only the
+  // read-only 'i' info toggle for every viewer, including admins.
+  describe('admin edit/delete', () => {
+    it('does not show edit/delete controls for a non-admin viewer', async () => {
+      mockApi.device.search.mockResolvedValue({ data: { items: [device()], count: 1 } })
+      const wrapper = mountComponent()
+      await flushPromises()
+
+      expect(wrapper.find('[data-testid="device-search-edit-1"]').exists()).toBe(false)
+      expect(wrapper.find('[data-testid="device-search-delete-1"]').exists()).toBe(false)
+      // The read-only info toggle is unaffected.
+      expect(wrapper.find('[data-testid="device-search-info-1"]').exists()).toBe(true)
+    })
+
+    it('shows edit/delete controls for an Administrator', async () => {
+      setAdmin()
+      mockApi.device.search.mockResolvedValue({ data: { items: [device()], count: 1 } })
+      const wrapper = mountComponent()
+      await flushPromises()
+
+      expect(wrapper.find('[data-testid="device-search-edit-1"]').exists()).toBe(true)
+      expect(wrapper.find('[data-testid="device-search-delete-1"]').exists()).toBe(true)
+      // The read-only info toggle is still there too - a pure addition, not a swap.
+      expect(wrapper.find('[data-testid="device-search-info-1"]').exists()).toBe(true)
+    })
+
+    it('swaps the row for DeviceForm when an admin clicks Edit, and re-runs the search on save', async () => {
+      setAdmin()
+      mockApi.device.search.mockResolvedValue({ data: { items: [device()], count: 1 } })
+      const wrapper = mountComponent()
+      await flushPromises()
+
+      await wrapper.find('[data-testid="device-search-edit-1"]').trigger('click')
+      expect(wrapper.find('[data-testid="device-search-row-1"]').exists()).toBe(false)
+      const form = wrapper.findComponent(DeviceFormStub)
+      expect(form.exists()).toBe(true)
+      expect(form.props('eventId')).toBe(55)
+      expect(form.props('device').id).toBe(1)
+      expect(form.props('powered')).toBe(true)
+
+      mockApi.device.search.mockClear()
+      await form.vm.$emit('saved')
+      await flushPromises()
+
+      expect(mockApi.device.search).toHaveBeenCalledTimes(1)
+      expect(wrapper.find('[data-testid="device-search-row-1"]').exists()).toBe(true)
+    })
+
+    it('closes the edit form on cancel without re-running the search', async () => {
+      setAdmin()
+      mockApi.device.search.mockResolvedValue({ data: { items: [device()], count: 1 } })
+      const wrapper = mountComponent()
+      await flushPromises()
+
+      await wrapper.find('[data-testid="device-search-edit-1"]').trigger('click')
+      mockApi.device.search.mockClear()
+      await wrapper.findComponent(DeviceFormStub).vm.$emit('cancel')
+      await flushPromises()
+
+      expect(mockApi.device.search).not.toHaveBeenCalled()
+      expect(wrapper.find('[data-testid="device-search-row-1"]').exists()).toBe(true)
+    })
+
+    it('requires a delete confirm-modal click before calling the store, then re-runs the search', async () => {
+      setAdmin()
+      mockApi.device.search.mockResolvedValue({ data: { items: [device()], count: 1 } })
+      const store = useDevicesStore()
+      store.deleteDevice = vi.fn().mockResolvedValue()
+
+      const wrapper = mountComponent()
+      await flushPromises()
+
+      await wrapper.find('[data-testid="device-search-delete-1"]').trigger('click')
+      expect(store.deleteDevice).not.toHaveBeenCalled()
+      expect(wrapper.find('[data-testid="device-search-delete-modal"]').exists()).toBe(true)
+
+      mockApi.device.search.mockClear()
+      await wrapper.find('[data-testid="device-search-delete-confirm"]').trigger('click')
+      await flushPromises()
+
+      expect(store.deleteDevice).toHaveBeenCalledWith(55, 1)
+      expect(mockApi.device.search).toHaveBeenCalledTimes(1)
+      expect(wrapper.find('[data-testid="device-search-delete-modal"]').exists()).toBe(false)
+    })
+
+    it('does not call the store when delete is cancelled', async () => {
+      setAdmin()
+      mockApi.device.search.mockResolvedValue({ data: { items: [device()], count: 1 } })
+      const store = useDevicesStore()
+      store.deleteDevice = vi.fn().mockResolvedValue()
+
+      const wrapper = mountComponent()
+      await flushPromises()
+
+      await wrapper.find('[data-testid="device-search-delete-1"]').trigger('click')
+      await wrapper.find('[data-testid="device-search-delete-cancel"]').trigger('click')
+      await flushPromises()
+
+      expect(store.deleteDevice).not.toHaveBeenCalled()
+      expect(wrapper.find('[data-testid="device-search-delete-modal"]').exists()).toBe(false)
+    })
+
+    it('shows an error and keeps the modal open when delete fails', async () => {
+      setAdmin()
+      mockApi.device.search.mockResolvedValue({ data: { items: [device()], count: 1 } })
+      const store = useDevicesStore()
+      store.deleteDevice = vi.fn().mockRejectedValue({ status: 500 })
+
+      const wrapper = mountComponent()
+      await flushPromises()
+
+      await wrapper.find('[data-testid="device-search-delete-1"]').trigger('click')
+      await wrapper.find('[data-testid="device-search-delete-confirm"]').trigger('click')
+      await flushPromises()
+
+      expect(wrapper.find('[data-testid="device-search-delete-modal"]').exists()).toBe(true)
+      expect(wrapper.find('[data-testid="device-search-delete-error"]').exists()).toBe(true)
+    })
   })
 })

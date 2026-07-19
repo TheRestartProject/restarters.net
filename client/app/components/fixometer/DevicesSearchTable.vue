@@ -3,8 +3,10 @@ import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import moment from 'moment'
 import { useDevicesStore } from '../../stores/devices.js'
+import { useAuth } from '../../composables/useAuth.js'
 import { deviceStatusKey, deviceStatusVariant } from '../../composables/useDeviceDisplay.js'
 import FixometerSortHeader from './FixometerSortHeader.vue'
+import DeviceForm from '../devices/DeviceForm.vue'
 
 // Paginated/filterable device search table for /device/search
 // (api-contracts-phase-c.md C6a; design.md §6.2 C6 task brief). The legacy
@@ -53,6 +55,17 @@ const props = defineProps({
 
 const { t } = useI18n()
 const devicesStore = useDevicesStore()
+const { hasRole } = useAuth()
+
+// Gap fix (MEDIUM): legacy FixometerRecordsTable.vue gave Administrators an
+// inline edit + delete on every row (the row-details slot rendered
+// EventDevice with :edit="isAdmin" :delete-button="true"); this table only
+// ever offered the read-only 'i' info toggle, a real capability loss for
+// admins. Ported below as admin-only edit/delete controls alongside the
+// existing (unchanged) info toggle, reusing DeviceForm.vue - same
+// edit-in-place idiom as components/devices/DeviceRow.vue - rather than a
+// second bespoke form.
+const isAdmin = computed(() => hasRole('Administrator'))
 
 // FixometerFilters.vue's two collapsible sections (ITEM & REPAIR INFO /
 // EVENT INFO), ported as a lightweight expand/collapse rather than
@@ -107,6 +120,61 @@ function toggleDetails(id) {
     next.add(id)
   }
   expanded.value = next
+}
+
+// Admin-only inline edit: swaps the row for DeviceForm.vue, same pattern as
+// DeviceRow.vue's editing state. Search results aren't cached in the store
+// (unlike byEvent[id]), so a save/delete re-runs the current search rather
+// than relying on the store's optimistic patch to update this list.
+const editingId = ref(null)
+
+function startEdit(id) {
+  editingId.value = id
+}
+
+function onDeviceSaved() {
+  editingId.value = null
+  runSearch()
+}
+
+function cancelEdit() {
+  editingId.value = null
+}
+
+// Admin-only delete, behind a single shared confirm modal - same idiom as
+// components/admin/AdminCrudTable.vue's delete-confirm BModal.
+const deletingDevice = ref(null)
+const showDeleteConfirm = ref(false)
+const deleting = ref(false)
+const deleteError = ref('')
+
+function askDelete(device) {
+  deletingDevice.value = device
+  deleteError.value = ''
+  showDeleteConfirm.value = true
+}
+
+function cancelDelete() {
+  showDeleteConfirm.value = false
+  deletingDevice.value = null
+}
+
+async function confirmDelete() {
+  if (!deletingDevice.value) return
+
+  deleting.value = true
+  deleteError.value = ''
+
+  try {
+    await devicesStore.deleteDevice(deletingDevice.value.eventid, deletingDevice.value.id)
+    showDeleteConfirm.value = false
+    deletingDevice.value = null
+    runSearch()
+  } catch {
+    deleteError.value = t('client.devices.delete_failed')
+  } finally {
+    deleting.value = false
+  }
 }
 
 const clusters = computed(() => devicesStore.clusters)
@@ -399,61 +467,92 @@ function nextPage() {
               </td>
             </tr>
             <template v-for="device in devices" :key="device.id">
-              <tr :data-testid="`device-search-row-${device.id}`">
-                <td>{{ device.item_type || '-' }}</td>
-                <td>{{ device.category ? t(device.category.name) : '-' }}</td>
-                <td v-if="filters.powered">{{ device.brand || '-' }}</td>
-                <td>{{ device.short_problem || '-' }}</td>
-                <td>{{ device.groupname || '-' }}</td>
-                <td>
-                  <BBadge v-if="statusLabel(device)" :variant="deviceStatusVariant(device)" :data-testid="`device-search-status-${device.id}`">
-                    {{ statusLabel(device) }}
-                  </BBadge>
-                </td>
-                <td>{{ formatDate(device.created_at) }}</td>
-                <td class="text-end">
-                  <button
-                    type="button"
-                    class="device-search-info"
-                    :class="{ 'device-search-info--on': expanded.has(device.id) }"
-                    :aria-expanded="expanded.has(device.id)"
-                    :data-testid="`device-search-info-${device.id}`"
-                    @click="toggleDetails(device.id)"
-                  >
-                    <span aria-hidden="true">i</span>
-                    <span class="visually-hidden">{{ t('devices.table_intro') }}</span>
-                  </button>
+              <tr v-if="isAdmin && editingId === device.id" :data-testid="`device-search-editing-${device.id}`">
+                <td :colspan="filters.powered ? 8 : 7" class="p-0">
+                  <DeviceForm
+                    :event-id="device.eventid"
+                    :device="device"
+                    :powered="filters.powered"
+                    @saved="onDeviceSaved"
+                    @cancel="cancelEdit"
+                  />
                 </td>
               </tr>
-              <tr
-                v-if="expanded.has(device.id)"
-                class="device-search-details"
-                :data-testid="`device-search-details-${device.id}`"
-              >
-                <td :colspan="filters.powered ? 8 : 7">
-                  <dl class="device-search-details__grid">
-                    <div>
-                      <dt>{{ t('devices.model') }}</dt>
-                      <dd>{{ device.model || '-' }}</dd>
-                    </div>
-                    <div>
-                      <dt>{{ t('devices.age') }}</dt>
-                      <dd>{{ device.age ?? '-' }}</dd>
-                    </div>
-                    <div v-if="device.spare_parts">
-                      <dt>{{ t('devices.spare_parts') }}</dt>
-                      <dd>{{ device.spare_parts }}</dd>
-                    </div>
-                    <div class="device-search-details__wide">
-                      <dt>{{ t('devices.assessment') }}</dt>
-                      <dd>{{ device.problem || '-' }}</dd>
-                    </div>
-                  </dl>
-                  <NuxtLink :to="`/party/view/${device.eventid}`" :data-testid="`device-search-view-${device.id}`">
-                    {{ t('client.events.view_event') }}
-                  </NuxtLink>
-                </td>
-              </tr>
+              <template v-else>
+                <tr :data-testid="`device-search-row-${device.id}`">
+                  <td>{{ device.item_type || '-' }}</td>
+                  <td>{{ device.category ? t(device.category.name) : '-' }}</td>
+                  <td v-if="filters.powered">{{ device.brand || '-' }}</td>
+                  <td>{{ device.short_problem || '-' }}</td>
+                  <td>{{ device.groupname || '-' }}</td>
+                  <td>
+                    <BBadge v-if="statusLabel(device)" :variant="deviceStatusVariant(device)" :data-testid="`device-search-status-${device.id}`">
+                      {{ statusLabel(device) }}
+                    </BBadge>
+                  </td>
+                  <td>{{ formatDate(device.created_at) }}</td>
+                  <td class="text-end">
+                    <button
+                      type="button"
+                      class="device-search-info"
+                      :class="{ 'device-search-info--on': expanded.has(device.id) }"
+                      :aria-expanded="expanded.has(device.id)"
+                      :data-testid="`device-search-info-${device.id}`"
+                      @click="toggleDetails(device.id)"
+                    >
+                      <span aria-hidden="true">i</span>
+                      <span class="visually-hidden">{{ t('devices.table_intro') }}</span>
+                    </button>
+                    <template v-if="isAdmin">
+                      <button
+                        type="button"
+                        class="btn btn-sm btn-link p-0 ms-2"
+                        :data-testid="`device-search-edit-${device.id}`"
+                        @click="startEdit(device.id)"
+                      >
+                        {{ t('client.devices.edit') }}
+                      </button>
+                      <button
+                        type="button"
+                        class="btn btn-sm btn-link text-danger p-0 ms-2"
+                        :data-testid="`device-search-delete-${device.id}`"
+                        @click="askDelete(device)"
+                      >
+                        {{ t('devices.delete_device') }}
+                      </button>
+                    </template>
+                  </td>
+                </tr>
+                <tr
+                  v-if="expanded.has(device.id)"
+                  class="device-search-details"
+                  :data-testid="`device-search-details-${device.id}`"
+                >
+                  <td :colspan="filters.powered ? 8 : 7">
+                    <dl class="device-search-details__grid">
+                      <div>
+                        <dt>{{ t('devices.model') }}</dt>
+                        <dd>{{ device.model || '-' }}</dd>
+                      </div>
+                      <div>
+                        <dt>{{ t('devices.age') }}</dt>
+                        <dd>{{ device.age ?? '-' }}</dd>
+                      </div>
+                      <div v-if="device.spare_parts">
+                        <dt>{{ t('devices.spare_parts') }}</dt>
+                        <dd>{{ device.spare_parts }}</dd>
+                      </div>
+                      <div class="device-search-details__wide">
+                        <dt>{{ t('devices.assessment') }}</dt>
+                        <dd>{{ device.problem || '-' }}</dd>
+                      </div>
+                    </dl>
+                    <NuxtLink :to="`/party/view/${device.eventid}`" :data-testid="`device-search-view-${device.id}`">
+                      {{ t('client.events.view_event') }}
+                    </NuxtLink>
+                  </td>
+                </tr>
+              </template>
             </template>
           </tbody>
         </table>
@@ -482,6 +581,28 @@ function nextPage() {
           {{ t('client.devices.next_page') }}
         </button>
       </div>
+
+      <BModal
+        v-if="isAdmin"
+        :model-value="showDeleteConfirm"
+        :title="t('devices.delete_device')"
+        no-footer
+        data-testid="device-search-delete-modal"
+        @hide="cancelDelete"
+      >
+        <p>{{ t('devices.confirm_delete') }}</p>
+        <p v-if="deleteError" class="text-danger" data-testid="device-search-delete-error">
+          {{ deleteError }}
+        </p>
+        <div class="d-flex justify-content-end gap-2">
+          <BButton variant="outline-secondary" data-testid="device-search-delete-cancel" @click="cancelDelete">
+            {{ t('partials.cancel') }}
+          </BButton>
+          <BButton variant="danger" :disabled="deleting" data-testid="device-search-delete-confirm" @click="confirmDelete">
+            {{ t('devices.delete_device') }}
+          </BButton>
+        </div>
+      </BModal>
     </template>
       </div>
     </div>

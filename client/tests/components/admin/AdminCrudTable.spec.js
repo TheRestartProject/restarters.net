@@ -69,7 +69,7 @@ const LABELS = {
 const ROW = { id: 1, name: 'Widget One', kind: 1, notes: 'Some notes', weight: 2.5, inUse: false }
 const ROW_IN_USE = { id: 2, name: 'Widget Two', kind: 2, notes: '', weight: null, inUse: true }
 
-function mountTable(props = {}) {
+function mountTable(props = {}, slots = {}) {
   return mount(AdminCrudTable, {
     props: {
       items: [ROW, ROW_IN_USE],
@@ -84,6 +84,7 @@ function mountTable(props = {}) {
       deleteItem: vi.fn().mockResolvedValue(undefined),
       ...props,
     },
+    slots,
     global: { stubs: GLOBAL_STUBS },
   })
 }
@@ -146,6 +147,41 @@ describe('components/admin/AdminCrudTable', () => {
     expect(row.text()).toContain('Widget One')
     expect(row.text()).toContain('Alpha') // formatter(kind=1) -> 'Alpha'
     expect(row.text()).toContain('Some notes')
+  })
+
+  describe('custom cell rendering (#cell-<key> slot)', () => {
+    // category.vue's coloured reliability badge is the motivating case
+    // (design.md gap: reliability was plain text, not the legacy
+    // colour-coded badge) - this covers the generic mechanism, backward-
+    // compatibility is what the widgets-shape default-rendering tests above
+    // already pin down.
+    it('falls back to the plain formatted value when no matching slot is provided', async () => {
+      const wrapper = mountTable()
+      await flushPromises()
+
+      const row = wrapper.find('[data-testid="widgets-row-1"]')
+      expect(row.text()).toContain('Alpha') // TABLE_FIELDS' kind formatter, unaffected by the slot mechanism
+    })
+
+    it('renders a caller-supplied #cell-<key> slot instead, passed the item and the formatted value', async () => {
+      const wrapper = mountTable({}, {
+        'cell-kind': '<template #cell-kind="{ item, value }"><span data-testid="custom-kind">{{ value }}-#{{ item.id }}</span></template>',
+      })
+      await flushPromises()
+
+      const row = wrapper.find('[data-testid="widgets-row-1"]')
+      expect(row.find('[data-testid="custom-kind"]').text()).toBe('Alpha-#1')
+    })
+
+    it('leaves other columns on the same row rendering the default way when only one column has a slot', async () => {
+      const wrapper = mountTable({}, {
+        'cell-kind': '<template #cell-kind="{ value }"><span data-testid="custom-kind">{{ value }}</span></template>',
+      })
+      await flushPromises()
+
+      const row = wrapper.find('[data-testid="widgets-row-1"]')
+      expect(row.text()).toContain('Some notes') // notes column, no slot supplied for it
+    })
   })
 
   it('hides the add button when allowCreate is false', async () => {

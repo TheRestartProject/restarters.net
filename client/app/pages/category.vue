@@ -57,6 +57,22 @@ const clusterOptions = computed(() => [
 const reliabilityOptions = computed(() => [1, 2, 3, 4, 5, 6].map((n) => ({ value: n, text: t(`admin.reliability-${n}`) })))
 const reliabilityLookup = computed(() => Object.fromEntries(reliabilityOptions.value.map((o) => [o.value, o.text])))
 
+// Reliability level -> badge colour, ported verbatim from legacy
+// CategoryController::index's $colors map (level 6 - "N/A" - shares level
+// 3's amber, and an unrecognised/null level falls back to that same amber).
+// Bootstrap's base .badge class supplies the white label text, matching the
+// legacy `<span class="badge indicator-N" style="background-color:...">`.
+const RELIABILITY_COLORS = {
+  1: '#AD2C1C',
+  2: '#FF1B00',
+  3: '#FFBA00',
+  4: '#43B136',
+  5: '#26781C',
+  6: '#FFBA00',
+}
+const RELIABILITY_FALLBACK_COLOR = RELIABILITY_COLORS[6]
+const reliabilityColor = (level) => RELIABILITY_COLORS[level] || RELIABILITY_FALLBACK_COLOR
+
 const tableFields = computed(() => [
   { key: 'name', label: t('admin.category_name'), sortable: true },
   { key: 'cluster_name', label: t('admin.category_cluster'), sortable: true },
@@ -106,6 +122,10 @@ const labels = computed(() => ({
       :items="adminStore.categories.data"
       :fetch-items="adminStore.fetchCategories"
       :update-item="adminStore.updateCategory"
-    />
+    >
+      <template #cell-footprint_reliability="{ item, value }">
+        <span class="badge" :style="{ backgroundColor: reliabilityColor(item.footprint_reliability) }">{{ value }}</span>
+      </template>
+    </AdminCrudTable>
   </div>
 </template>

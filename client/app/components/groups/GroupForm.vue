@@ -13,6 +13,7 @@ import { LEAFLET_ATTRIBUTION, LEAFLET_TILES } from '../../utils/mapConstants.js'
 import { useGroupsStore } from '../../stores/groups.js'
 import RichTextEditor from '../forms/RichTextEditor.vue'
 import LocationPicker from '../forms/LocationPicker.vue'
+import TusImageUpload from '../forms/TusImageUpload.vue'
 
 // Shared by /group/create and /group/edit/[id.vue] (design.md §6.2 B6 task
 // brief). Functional spec: resources/views/group/create.blade.php +
@@ -127,6 +128,25 @@ function fieldError(field) {
   return fieldErrors.value[field]?.[0] || ''
 }
 
+// Create-mode-only group photo (design.md §6.2 B6 task brief gap: legacy
+// GroupAddEdit.vue/GroupImage.vue let a host set the photo as part of
+// creation; edit mode already has its own TusImageUpload above this
+// component in group/edit/[id].vue, so this block is gated on `creating` to
+// avoid a second image picker there). The tus upload itself doesn't need a
+// group id - only the attach call below does - so the upload key is just
+// held here until submit() has one.
+const pendingImageUploadKey = ref(null)
+const imageError = ref('')
+
+function onImageUploaded({ uploadKey }) {
+  imageError.value = ''
+  pendingImageUploadKey.value = uploadKey
+}
+
+function onImageUploadError(message) {
+  imageError.value = message
+}
+
 onMounted(async () => {
   const { $api } = useNuxtApp()
 
@@ -231,6 +251,17 @@ async function submit() {
   try {
     if (creating.value) {
       const id = await groupsStore.createGroup(payload)
+
+      if (pendingImageUploadKey.value) {
+        try {
+          await groupsStore.uploadGroupImage(id, pendingImageUploadKey.value)
+        } catch {
+          // The group itself was created fine - the store already toasted
+          // the upload failure, so don't block navigation over a photo that
+          // can still be added from the edit page afterwards.
+        }
+      }
+
       emit('created', id)
     } else {
       const id = await groupsStore.updateGroup(props.groupId, payload)
@@ -256,6 +287,11 @@ defineExpose({ submit })
       <!-- eslint-disable-next-line vue/no-v-html -->
       <span v-html="generalError" />
     </BAlert>
+
+    <BFormGroup v-if="creating" :label="`${t('groups.group_image')}:`" class="mb-4">
+      <TusImageUpload @uploaded="onImageUploaded" @upload-error="onImageUploadError" />
+      <div v-if="imageError" class="text-danger" data-testid="group-form-image-error">{{ imageError }}</div>
+    </BFormGroup>
 
     <BFormGroup :label="`${t('groups.groups_name_of')}:`" label-for="group-form-name">
       <input

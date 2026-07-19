@@ -57,6 +57,12 @@ const BButtonStub = { template: '<button v-bind="$attrs"><slot /></button>' }
 const BCardStub = { template: '<div><slot /></div>' }
 const BCardHeaderStub = { template: '<div><slot /></div>' }
 const BCardBodyStub = { template: '<div><slot /></div>' }
+const TusImageUploadStub = {
+  props: ['currentImageUrl'],
+  emits: ['uploaded', 'upload-error'],
+  template:
+    '<div data-testid="stub-tus-image-upload"><button data-testid="stub-upload-ok" @click="$emit(\'uploaded\', { uploadKey: \'key123\' })" /><button data-testid="stub-upload-fail" @click="$emit(\'upload-error\', \'boom\')" /></div>',
+}
 const BFormCheckboxGroupStub = {
   props: ['modelValue', 'options'],
   emits: ['update:modelValue'],
@@ -81,6 +87,7 @@ const GLOBAL_STUBS = {
   BCardHeader: BCardHeaderStub,
   BCardBody: BCardBodyStub,
   BFormCheckboxGroup: BFormCheckboxGroupStub,
+  TusImageUpload: TusImageUploadStub,
 }
 
 function mountForm(props = {}) {
@@ -188,6 +195,68 @@ describe('components/groups/GroupForm', () => {
       expect(wrapper.find('[data-testid="group-form-name-error"]').text()).toContain('already exists')
       expect(wrapper.find('[data-testid="group-form-error"]').exists()).toBe(true)
     })
+
+    it('shows the image picker (gap: legacy GroupAddEdit.vue sets the photo at creation time)', () => {
+      const wrapper = mountForm()
+      expect(wrapper.findComponent(TusImageUploadStub).exists()).toBe(true)
+    })
+
+    it('uploads the selected image after createGroup resolves, in order, before emitting created', async () => {
+      const store = useGroupsStore()
+      const calls = []
+      store.createGroup = vi.fn().mockImplementation(async () => {
+        calls.push('createGroup')
+        return 42
+      })
+      store.uploadGroupImage = vi.fn().mockImplementation(async (id, uploadKey) => {
+        calls.push(['uploadGroupImage', id, uploadKey])
+      })
+
+      const wrapper = mountForm()
+      await fillRequiredFields(wrapper)
+      await wrapper.find('[data-testid="stub-upload-ok"]').trigger('click')
+      await wrapper.find('[data-testid="group-form"]').trigger('submit')
+      await wrapper.vm.$nextTick()
+
+      expect(calls).toEqual(['createGroup', ['uploadGroupImage', 42, 'key123']])
+      expect(wrapper.emitted('created')).toEqual([[42]])
+    })
+
+    it('creates with no image without calling uploadGroupImage', async () => {
+      const store = useGroupsStore()
+      store.createGroup = vi.fn().mockResolvedValue(42)
+      store.uploadGroupImage = vi.fn()
+
+      const wrapper = mountForm()
+      await fillRequiredFields(wrapper)
+      await wrapper.find('[data-testid="group-form"]').trigger('submit')
+      await wrapper.vm.$nextTick()
+
+      expect(store.createGroup).toHaveBeenCalled()
+      expect(store.uploadGroupImage).not.toHaveBeenCalled()
+      expect(wrapper.emitted('created')).toEqual([[42]])
+    })
+
+    it('still creates the group and emits created when the image upload fails after create', async () => {
+      const store = useGroupsStore()
+      store.createGroup = vi.fn().mockResolvedValue(42)
+      store.uploadGroupImage = vi.fn().mockRejectedValue(new Error('upload failed'))
+
+      const wrapper = mountForm()
+      await fillRequiredFields(wrapper)
+      await wrapper.find('[data-testid="stub-upload-ok"]').trigger('click')
+      await wrapper.find('[data-testid="group-form"]').trigger('submit')
+      await wrapper.vm.$nextTick()
+
+      expect(store.uploadGroupImage).toHaveBeenCalledWith(42, 'key123')
+      expect(wrapper.emitted('created')).toEqual([[42]])
+    })
+
+    it('shows an image upload error message from TusImageUpload', async () => {
+      const wrapper = mountForm()
+      await wrapper.find('[data-testid="stub-upload-fail"]').trigger('click')
+      expect(wrapper.find('[data-testid="group-form-image-error"]').text()).toBe('boom')
+    })
   })
 
   describe('edit mode', () => {
@@ -280,6 +349,11 @@ describe('components/groups/GroupForm', () => {
     it('does not show the moderate control once the group is already approved', () => {
       const wrapper = mountForm({ groupId: 5, initialGroup: GROUP, permissions: { can_demote: true } })
       expect(wrapper.find('[data-testid="group-form-moderate"]').exists()).toBe(false)
+    })
+
+    it('does not render its own image picker (group/edit/[id].vue already renders one above the form)', () => {
+      const wrapper = mountForm({ groupId: 5, initialGroup: GROUP })
+      expect(wrapper.findComponent(TusImageUploadStub).exists()).toBe(false)
     })
   })
 

@@ -408,7 +408,15 @@ onMounted(load)
               >
                 {{ cellValue(item, field) }}
               </a>
-              <template v-else>{{ cellValue(item, field) }}</template>
+              <!-- Optional per-column custom rendering: a caller can provide
+                   #cell-<field.key>="{ item, value }" to render a column's
+                   cell itself (e.g. category.vue's coloured reliability
+                   badge). Falls back to the plain formatted value when no
+                   such slot is filled, so every page that doesn't opt in
+                   (brands/skills/tags/role) renders exactly as before. -->
+              <slot v-else :name="`cell-${field.key}`" :item="item" :value="cellValue(item, field)">
+                {{ cellValue(item, field) }}
+              </slot>
             </td>
             <td v-if="allowDelete">
               <BButton
