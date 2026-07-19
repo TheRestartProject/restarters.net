@@ -67,6 +67,34 @@ describe('composables/useInviteClaim', () => {
     })
   })
 
+  it('shows the already-member toast instead of the joined toast when already_member is true', async () => {
+    const authStore = useAuthStore()
+    authStore.token = 'tok-1'
+    authStore.user = { id: 1, name: 'Jane' }
+
+    mockApi.auth.claimInvite.mockResolvedValueOnce({
+      data: { type: 'group', id: 42, already_member: true },
+    })
+
+    await claimInvite({
+      code: 'abc123',
+      inviteType: 'group',
+      viewPathPrefix: '/group/view/',
+      joinedMessage: 'Excellent! You have joined the group.',
+      alreadyMemberMessage: 'You are already a member of this group.',
+      currentPath: '/group/invite/abc123',
+    })
+
+    expect(navigateToMock).toHaveBeenCalledWith('/group/view/42')
+
+    const toastStore = useToastStore()
+    expect(toastStore.toasts).toHaveLength(1)
+    expect(toastStore.toasts[0]).toMatchObject({
+      message: 'You are already a member of this group.',
+      variant: 'success',
+    })
+  })
+
   it('claims an event invite and redirects to the event page', async () => {
     const authStore = useAuthStore()
     authStore.token = 'tok-1'

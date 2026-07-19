@@ -153,7 +153,7 @@
         "create-new-brand": "Create new brand",
         "category_cluster": "Category Cluster",
         "weight": "Weight (kg)",
-        "co2_footprint": "CO<sub>2</sub> Footprint (kg)",
+        "co2_footprint": "CO₂ Footprint (kg)",
         "reliability": "Reliability",
         "reliability-1": "Very poor",
         "reliability-2": "Poor",
@@ -191,7 +191,11 @@
         "save-role": "Save role",
         "role_permissions_help": "Tick the permissions this role should have. The role itself cannot be renamed.",
         "role_update_success": "Role permissions updated.",
-        "role_update_error": "Could not update role permissions."
+        "role_update_error": "Could not update role permissions.",
+        "main_branches": "Main branches",
+        "open_pull_requests": "Open pull requests",
+        "preview_deploy_confirm": "This will redeploy restarters.dev with the selected branch and restore the overnight database. Continue?",
+        "view_workflows": "View running workflows →"
     },
     "auth": {
         "email_address_validation": "An account with this email address already exists. Have you tried logging in?",
@@ -757,6 +761,7 @@
         "invite_noemails": "You have not entered any emails!",
         "invite_invalid": "Something went wrong - this invite is invalid or has expired",
         "invite_cancelled": "You are no longer attending this event.",
+        "already_member": "You are already a member of this event.",
         "image_delete_success": "Thank you, the image has been deleted.",
         "image_delete_error": "Sorry, but the image can't be deleted.",
         "image_upload_error": "Sorry, but the image could not be uploaded.",
@@ -952,6 +957,7 @@
         "invite_success_apart_from": "Invites sent - apart from these ({emails}) who have already joined the group, have already been sent an invite, or have not opted in to receive emails.",
         "invite_invalid": "Something went wrong - this invite is invalid or has expired.",
         "invite_confirmed": "Excellent! You have joined the group.",
+        "already_member": "You are already a member of this group.",
         "follow_group_error": "Failed to follow this group.",
         "image_upload_error": "Failed to upload group picture!",
         "export.events.date": "Date",

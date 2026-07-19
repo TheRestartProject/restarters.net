@@ -12,8 +12,22 @@ const AdminCrudTableStub = {
   template: '<div data-testid="stub-admin-crud-table" />',
 }
 
+// lang/en/admin.php's co2_footprint gained a real Unicode subscript in
+// place of raw "<sub>2</sub>" markup (the table header/form label render it
+// as plain text, so the old value showed the literal tags on screen) but
+// client/i18n/locales/en.json is a generated, checked-in artifact this
+// change intentionally leaves untouched (php artisan translations:export-client)
+// - overlay the changed key here so the spec doesn't depend on regenerating it.
+const messages = {
+  en: {
+    ...en,
+    ...clientEn,
+    admin: { ...en.admin, co2_footprint: 'CO₂ Footprint (kg)' },
+  },
+}
+
 function mountPage() {
-  const i18n = createI18n({ legacy: false, locale: 'en', messages: { en: { ...en, ...clientEn } } })
+  const i18n = createI18n({ legacy: false, locale: 'en', messages })
 
   return mount(CategoryPage, {
     global: {
@@ -91,6 +105,19 @@ describe('pages/category', () => {
       { value: 5, text: 'Very good' },
       { value: 6, text: 'N/A' },
     ])
+  })
+
+  it('renders the CO2 footprint label as plain text with a real subscript, not literal <sub> markup', () => {
+    const wrapper = mountPage()
+    const table = wrapper.findComponent(AdminCrudTableStub)
+
+    const footprintColumn = table.props('tableFields').find((f) => f.key === 'footprint')
+    const footprintField = table.props('formFields').find((f) => f.key === 'footprint')
+
+    expect(footprintColumn.label).toBe('CO₂ Footprint (kg)')
+    expect(footprintField.label).toBe('CO₂ Footprint (kg)')
+    expect(footprintColumn.label).not.toContain('<sub>')
+    expect(footprintField.label).not.toContain('<sub>')
   })
 
   it('wires items and fetchItems to the adminRefdata store', () => {

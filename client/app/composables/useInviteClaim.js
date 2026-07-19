@@ -12,7 +12,14 @@ import { useToastStore } from '../stores/toast.js'
  * Pulled out of the page components so it can be unit-tested directly
  * without mounting an async-setup page through Suspense (design.md §8).
  */
-export async function claimInvite({ code, inviteType, viewPathPrefix, joinedMessage, currentPath }) {
+export async function claimInvite({
+  code,
+  inviteType,
+  viewPathPrefix,
+  joinedMessage,
+  alreadyMemberMessage,
+  currentPath,
+}) {
   const authStore = useAuthStore()
 
   if (!authStore.loggedIn) {
@@ -33,7 +40,7 @@ export async function claimInvite({ code, inviteType, viewPathPrefix, joinedMess
       invite_type: inviteType,
     })
 
-    toastStore.success(joinedMessage)
+    toastStore.success(data.already_member ? alreadyMemberMessage : joinedMessage)
     return navigateTo(`${viewPathPrefix}${data.id}`)
   } catch (err) {
     toastStore.error(err)

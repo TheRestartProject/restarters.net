@@ -82,6 +82,7 @@ return [
   'invite_noemails' => 'You have not entered any emails!',
   'invite_invalid' => 'Something went wrong - this invite is invalid or has expired',
   'invite_cancelled' => 'You are no longer attending this event.',
+  'already_member' => 'You are already a member of this event.',
   'image_delete_success' => 'Thank you, the image has been deleted.',
   'image_delete_error' => 'Sorry, but the image can\'t be deleted.',
   'image_upload_error' => 'Sorry, but the image could not be uploaded.',

@@ -111,8 +111,20 @@
       "kg": "kg"
     },
     "forbidden": {
+      "back_link": "Go back",
+      "dashboard_link": "Return to the dashboard",
+      "diagnostic_intro": "Please include the following details in your bug report:",
+      "diagnostic_previous_url": "Previous URL",
+      "diagnostic_time": "Time",
+      "diagnostic_url": "URL",
+      "diagnostic_user": "User",
       "home_link": "Back to home",
+      "logout_link": "Log out and log back in",
+      "recovery_intro": "In the meantime, you could:",
+      "report_instructions": "You can report the issue by emailing <a href=\"mailto:community&#64;therestartproject.org\">community&#64;therestartproject.org</a>, or by posting in the <a href=\"https://talk.restarters.net/c/restarters-dev\" target=\"_blank\" rel=\"noopener\">restarters-dev Discourse forum</a>.",
+      "report_intro": "Please let us know that you encountered this issue and we'll look into it as soon as possible.",
       "text": "You don't have permission to view this page.",
+      "thanks": "Thanks!",
       "title": "Access denied"
     },
     "groups": {

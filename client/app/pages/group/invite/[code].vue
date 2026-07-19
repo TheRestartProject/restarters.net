@@ -14,6 +14,7 @@ await claimInvite({
   inviteType: 'group',
   viewPathPrefix: '/group/view/',
   joinedMessage: t('groups.invite_confirmed'),
+  alreadyMemberMessage: t('groups.already_member'),
   currentPath: route.fullPath,
 })
 </script>

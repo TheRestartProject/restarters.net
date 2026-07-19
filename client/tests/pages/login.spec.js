@@ -8,7 +8,17 @@ import en from '../../i18n/locales/en.json'
 
 const NuxtLinkStub = {
   props: ['to'],
-  template: '<a :href="to"><slot /></a>',
+  // `to` can be a plain path string or a { path, query } object (e.g. the
+  // "Create account" link forwards route.query) - render both the same way
+  // a real router-link would, so tests can assert on the resolved href.
+  template: '<a :href="hrefFor(to)"><slot /></a>',
+  methods: {
+    hrefFor(to) {
+      if (typeof to === 'string') return to
+      const qs = new URLSearchParams(to.query || {}).toString()
+      return qs ? `${to.path}?${qs}` : to.path
+    },
+  },
 }
 
 const bvnStubs = {
@@ -99,6 +109,27 @@ describe('pages/login', () => {
         invite_type: 'group',
         invite_hash: 'deadbeef',
       })
+    )
+  })
+
+  it('forwards invite/redirect query params through the "Create account" link', () => {
+    const wrapper = mountLogin({
+      invite_code: 'abc123',
+      invite_type: 'group',
+      invite_hash: 'deadbeef',
+      redirect: '/group/invite/abc123',
+    })
+
+    expect(wrapper.find('[data-testid="login-register-link"]').attributes('href')).toBe(
+      '/user/register?invite_code=abc123&invite_type=group&invite_hash=deadbeef&redirect=%2Fgroup%2Finvite%2Fabc123'
+    )
+  })
+
+  it('links to plain /user/register when there is no invite/redirect query', () => {
+    const wrapper = mountLogin()
+
+    expect(wrapper.find('[data-testid="login-register-link"]').attributes('href')).toBe(
+      '/user/register'
     )
   })
 

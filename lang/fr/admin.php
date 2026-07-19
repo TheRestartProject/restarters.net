@@ -6,7 +6,7 @@ return [
   'categories' => 'Catégories',
   'category_cluster' => 'Groupe de catégorie',
   'category_name' => 'Nom de catégorie',
-  'co2_footprint' => 'Empreinte CO<sub>2</sub> (kg)',
+  'co2_footprint' => 'Empreinte CO₂ (kg)',
   'create-new-brand' => 'Créer une nouvelle marque',
   'create-new-skill' => 'Créer une nouvelle compétence',
   'skills' => 'Compétences',
@@ -51,4 +51,8 @@ return [
   'role_permissions_help' => 'Cochez les permissions à accorder à ce rôle. Le nom du rôle ne peut pas être modifié.',
   'role_update_success' => 'Permissions du rôle mises à jour.',
   'role_update_error' => 'Impossible de mettre à jour les permissions du rôle.',
+  'main_branches' => 'Branches principales',
+  'open_pull_requests' => 'Demandes de tirage ouvertes',
+  'preview_deploy_confirm' => 'Ceci va redéployer restarters.dev avec la branche sélectionnée et restaurer la sauvegarde de la base de données de la nuit dernière. Continuer ?',
+  'view_workflows' => 'Voir les workflows en cours →',
 ];

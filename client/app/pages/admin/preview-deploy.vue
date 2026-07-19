@@ -1,5 +1,6 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 // Admin PR-preview-deploy tooling. Replaces the removed Blade
 // admin/preview-deploy page (which couldn't authenticate the post-cutover SPA
@@ -8,7 +9,10 @@ import { computed, onMounted, ref } from 'vue'
 definePageMeta({ auth: true, role: 'Administrator' })
 useHead({ title: 'Preview deploy' })
 
+const { t } = useI18n()
 const { $api } = useNuxtApp()
+
+const WORKFLOWS_URL = 'https://github.com/TheRestartProject/restarters.net/actions/workflows/preview-deploy.yml'
 
 const prs = ref([])
 const error = ref(null)
@@ -17,10 +21,29 @@ const selectedBranch = ref('')
 const deploying = ref(false)
 const feedback = ref('')
 const feedbackVariant = ref('success')
+const showConfirm = ref(false)
 
-const options = computed(() =>
-  prs.value.map((p) => ({ value: p.branch, text: `#${p.number} — ${p.title} (${p.branch}, @${p.author})` }))
-)
+// Blade's admin/preview-deploy.blade.php always offered a "Main branches"
+// optgroup (develop/master) ahead of any open-PR branches, so the select is
+// never empty/disabled when there are zero open PRs.
+const options = computed(() => {
+  const groups = [
+    {
+      label: t('admin.main_branches'),
+      options: [
+        { value: 'develop', text: 'develop' },
+        { value: 'master', text: 'master' },
+      ],
+    },
+  ]
+  if (prs.value.length) {
+    groups.push({
+      label: t('admin.open_pull_requests'),
+      options: prs.value.map((p) => ({ value: p.branch, text: `#${p.number} — ${p.title} (${p.branch}, @${p.author})` })),
+    })
+  }
+  return groups
+})
 
 async function load() {
   loading.value = true
@@ -29,9 +52,7 @@ async function load() {
     const { data } = await $api.previewDeploy.list()
     prs.value = data.prs || []
     error.value = data.error
-    if (prs.value.length) {
-      selectedBranch.value = prs.value[0].branch
-    }
+    selectedBranch.value = prs.value.length ? prs.value[0].branch : 'develop'
   } catch {
     error.value = 'Could not load pull requests.'
   } finally {
@@ -39,7 +60,15 @@ async function load() {
   }
 }
 
+function openConfirm() {
+  if (!selectedBranch.value) {
+    return
+  }
+  showConfirm.value = true
+}
+
 async function deploy() {
+  showConfirm.value = false
   if (!selectedBranch.value) {
     return
   }
@@ -89,11 +118,34 @@ onMounted(load)
           variant="primary"
           :disabled="deploying || !selectedBranch"
           data-testid="preview-deploy-submit"
-          @click="deploy"
+          @click="openConfirm"
         >
           {{ deploying ? 'Deploying…' : 'Deploy' }}
         </BButton>
       </div>
+
+      <BModal
+        :model-value="showConfirm"
+        :title="t('partials.are_you_sure')"
+        no-footer
+        data-testid="preview-deploy-confirm-modal"
+        @hide="showConfirm = false"
+      >
+        <p>{{ t('admin.preview_deploy_confirm') }}</p>
+        <div class="d-flex justify-content-end gap-2">
+          <BButton variant="outline-secondary" data-testid="preview-deploy-confirm-cancel" @click="showConfirm = false">
+            {{ t('partials.cancel') }}
+          </BButton>
+          <BButton variant="primary" data-testid="preview-deploy-confirm-ok" @click="deploy">
+            Deploy
+          </BButton>
+        </div>
+      </BModal>
     </template>
+
+    <hr class="mt-4">
+    <p class="text-muted small">
+      <a :href="WORKFLOWS_URL" target="_blank" rel="noopener noreferrer">{{ t('admin.view_workflows') }}</a>
+    </p>
   </div>
 </template>

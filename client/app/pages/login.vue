@@ -120,7 +120,11 @@ const emailErrors = computed(() => fieldErrors.value.email || [])
                     </NuxtLink>
                   </div>
                   <div class="col-12">
-                    <NuxtLink class="entry-panel__link" to="/user/register" data-testid="login-register-link">
+                    <NuxtLink
+                      class="entry-panel__link"
+                      :to="{ path: '/user/register', query: route.query }"
+                      data-testid="login-register-link"
+                    >
                       {{ t('auth.create_account') }}
                     </NuxtLink>
                   </div>

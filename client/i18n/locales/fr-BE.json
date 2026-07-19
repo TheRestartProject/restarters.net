@@ -162,7 +162,7 @@
         "categories": "Catégories",
         "category_cluster": "Groupe de catégorie",
         "category_name": "Nom de catégorie",
-        "co2_footprint": "Empreinte CO<sub>2</sub> (kg)",
+        "co2_footprint": "Empreinte CO₂ (kg)",
         "create-new-brand": "Créer une nouvelle marque",
         "create-new-skill": "Créer une nouvelle compétence",
         "skills": "Compétences",
@@ -206,7 +206,11 @@
         "save-role": "Enregistrer le rôle",
         "role_permissions_help": "Cochez les permissions à accorder à ce rôle. Le nom du rôle ne peut pas être modifié.",
         "role_update_success": "Permissions du rôle mises à jour.",
-        "role_update_error": "Impossible de mettre à jour les permissions du rôle."
+        "role_update_error": "Impossible de mettre à jour les permissions du rôle.",
+        "main_branches": "Branches principales",
+        "open_pull_requests": "Demandes de tirage ouvertes",
+        "preview_deploy_confirm": "Ceci va redéployer restarters.dev avec la branche sélectionnée et restaurer la sauvegarde de la base de données de la nuit dernière. Continuer ?",
+        "view_workflows": "Voir les workflows en cours →"
     },
     "auth": {
         "failed": "Soit cette adresse électronique n’est pas enregistrée dans le système, soit le mot de passe est incorrect.",
@@ -771,6 +775,7 @@
         "invite_noemails": "Vous n'avez pas saisi d'emails!",
         "invite_invalid": "Un problème est survenu - cette invitation n'est pas valide ou a expiré.",
         "invite_cancelled": "Vous ne participez plus à cet évènement.",
+        "already_member": "Vous êtes déjà membre de cet évènement.",
         "image_delete_success": "Merci, l'image a été supprimée",
         "image_delete_error": "Désolé, mais l'image ne peut pas être supprimée.",
         "image_upload_error": "Désolé, mais l'image n'a pas pu être téléchargée.",
@@ -967,6 +972,7 @@
         "invite_success_apart_from": "Invitations envoyées - en dehors de ces ({emails}) qui ont déjà rejoint le groupe, ont déjà reçu une invitation, ou n'ont pas choisi de recevoir des emails.",
         "invite_invalid": "Un problème est survenu - cette invitation n'est pas valide ou a expiré.",
         "invite_confirmed": "Excellent ! Vous avez rejoint le Repair Café.",
+        "already_member": "Vous êtes déjà membre de ce Repair Café.",
         "follow_group_error": "N'a pas réussi à suivre ce Repair Café.",
         "image_upload_error": "Échec du téléchargement de l'image du Repair Café !",
         "export.events.date": "Date",

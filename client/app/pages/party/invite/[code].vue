@@ -14,6 +14,7 @@ await claimInvite({
   inviteType: 'event',
   viewPathPrefix: '/party/view/',
   joinedMessage: t('client.invite.event_joined'),
+  alreadyMemberMessage: t('events.already_member'),
   currentPath: route.fullPath,
 })
 </script>

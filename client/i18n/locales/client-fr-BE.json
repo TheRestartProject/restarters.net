@@ -111,8 +111,20 @@
       "kg": "kg"
     },
     "forbidden": {
+      "back_link": "Retour",
+      "dashboard_link": "Retourner au tableau de bord",
+      "diagnostic_intro": "Veuillez inclure les informations suivantes dans votre signalement :",
+      "diagnostic_previous_url": "URL précédente",
+      "diagnostic_time": "Heure",
+      "diagnostic_url": "URL",
+      "diagnostic_user": "Utilisateur",
       "home_link": "Retour à l'accueil",
+      "logout_link": "Se déconnecter puis se reconnecter",
+      "recovery_intro": "En attendant, vous pouvez :",
+      "report_instructions": "Vous pouvez signaler le problème par e-mail à <a href=\"mailto:community&#64;therestartproject.org\">community&#64;therestartproject.org</a>, ou en publiant sur le <a href=\"https://talk.restarters.net/c/restarters-dev\" target=\"_blank\" rel=\"noopener\">forum de développement Restarters</a>.",
+      "report_intro": "Merci de nous signaler que vous avez rencontré ce problème ; nous l'examinerons dès que possible.",
       "text": "Vous n'avez pas la permission de consulter cette page.",
+      "thanks": "Merci !",
       "title": "Accès refusé"
     },
     "groups": {

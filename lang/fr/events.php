@@ -82,6 +82,7 @@ return [
   'invite_noemails' => 'Vous n\'avez pas saisi d\'emails!',
   'invite_invalid' => 'Un problème est survenu - cette invitation n\'est pas valide ou a expiré.',
   'invite_cancelled' => 'Vous ne participez plus à cet évènement.',
+  'already_member' => 'Vous êtes déjà membre de cet évènement.',
   'image_delete_success' => 'Merci, l\'image a été supprimée',
   'image_delete_error' => 'Désolé, mais l\'image ne peut pas être supprimée.',
   'image_upload_error' => 'Désolé, mais l\'image n\'a pas pu être téléchargée.',

@@ -11,7 +11,7 @@ return [
   'create-new-brand' => 'Create new brand',
   'category_cluster' => 'Category Cluster',
   'weight' => 'Weight (kg)',
-  'co2_footprint' => 'CO<sub>2</sub> Footprint (kg)',
+  'co2_footprint' => 'CO₂ Footprint (kg)',
   'reliability' => 'Reliability',
   'reliability-1' => 'Very poor',
   'reliability-2' => 'Poor',
@@ -50,4 +50,8 @@ return [
   'role_permissions_help' => 'Tick the permissions this role should have. The role itself cannot be renamed.',
   'role_update_success' => 'Role permissions updated.',
   'role_update_error' => 'Could not update role permissions.',
+  'main_branches' => 'Main branches',
+  'open_pull_requests' => 'Open pull requests',
+  'preview_deploy_confirm' => 'This will redeploy restarters.dev with the selected branch and restore the overnight database. Continue?',
+  'view_workflows' => 'View running workflows →',
 ];

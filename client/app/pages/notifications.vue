@@ -2,6 +2,7 @@
 import { computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useNotificationsStore } from '~/stores/notifications.js'
+import { useRelativeTime } from '~/composables/useRelativeTime.js'
 
 // /notifications - the old /profile/notifications page
 // (UserController::getNotifications + resources/views/user/notifications.blade
@@ -14,6 +15,40 @@ useHead({ title: t('notifications.notifications') })
 
 const store = useNotificationsStore()
 const list = computed(() => store.list)
+const { relativeTime, absoluteDateTime } = useRelativeTime()
+
+// Mirrors Fixometer::notificationClasses(): buckets a notification's type
+// (class_basename of the Laravel notification class, e.g. 'JoinGroup') into
+// the same three card categories so kind stays visually scannable, without
+// hardcoding every notification class name here.
+const TYPE_CATEGORIES = {
+  user: ['AdminNewUser', 'ResetPassword'],
+  event: [
+    'EventConfirmed',
+    'EventDevices',
+    'EventRepairs',
+    'JoinEvent',
+    'AdminModerationEvent',
+    'NotifyRestartersOfNewEvent',
+    'RSVPEvent',
+    'AdminWordPressCreateEventFailure',
+    'AdminWordPressEditEventFailure',
+  ],
+  group: [
+    'GroupConfirmed',
+    'JoinGroup',
+    'AdminModerationGroup',
+    'NewGroupMember',
+    'NewGroupWithinRadius',
+    'AdminWordPressCreateGroupFailure',
+    'AdminWordPressEditGroupFailure',
+  ],
+  device: ['NotifyAdminNoDevices', 'AdminAbnormalDevices'],
+}
+
+function notificationCategory(type) {
+  return Object.keys(TYPE_CATEGORIES).find((category) => TYPE_CATEGORIES[category].includes(type)) ?? 'other'
+}
 
 function load(page = 1) {
   store.fetchList(page).catch(() => {})
@@ -62,8 +97,9 @@ async function markOne(id) {
         v-for="n in list.items"
         :key="n.id"
         class="list-group-item"
-        :class="{ 'list-group-item-light': n.read }"
+        :class="[`notification--${notificationCategory(n.type)}`, { 'list-group-item-light': n.read }]"
         :data-testid="`notification-${n.id}`"
+        :data-notification-category="notificationCategory(n.type)"
       >
         <div class="d-flex justify-content-between align-items-start">
           <div>
@@ -72,7 +108,7 @@ async function markOne(id) {
               <a v-if="n.url" :href="n.url">{{ n.name }}</a>
               <span v-else-if="n.name">{{ n.name }}</span>
             </div>
-            <small class="text-muted">{{ n.created_at }}</small>
+            <small class="text-muted" :title="absoluteDateTime(n.created_at)">{{ relativeTime(n.created_at) }}</small>
           </div>
           <BButton
             v-if="!n.read"
@@ -98,3 +134,25 @@ async function markOne(id) {
     </div>
   </div>
 </template>
+
+<style scoped>
+/* Left-edge accent per notificationCategory() bucket, mirroring the
+   card__restart/parties/groups/devices classes from
+   partials/notification.blade.php - just enough to keep kind scannable at a
+   glance without pulling in an icon set. */
+.notification--user {
+  border-inline-start: 4px solid var(--bs-primary);
+}
+
+.notification--event {
+  border-inline-start: 4px solid var(--bs-success);
+}
+
+.notification--group {
+  border-inline-start: 4px solid var(--bs-warning);
+}
+
+.notification--device {
+  border-inline-start: 4px solid var(--bs-secondary);
+}
+</style>
