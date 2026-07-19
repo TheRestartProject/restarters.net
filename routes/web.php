@@ -98,6 +98,12 @@ Route::get('/party/stats/{id}/wide', function ($id) {
 // bounce back to itself forever. api/ is excluded so unknown API paths still
 // 404 as JSON. The dead research-tool prefixes (FaultCat etc.) and /workbench
 // 301 to the Talk archive in nginx (docker/nginx.conf, docker/nginx-fly.conf).
+//
+// Return a 404 RESPONSE rather than abort(404): {any?} also matches "/", and the
+// test suite disables exception handling, so an abort() here THROWS
+// NotFoundHttpException and breaks the many feature/unit tests whose helpers do
+// `$this->get('/')` for its middleware side effects (CheckForRepairNetwork). A
+// plain response keeps the 404 semantics without throwing.
 Route::get('/{any?}', function ($any = null) {
-    abort(404);
+    return response('', 404);
 })->where('any', '^(?!api/).*');
