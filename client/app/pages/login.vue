@@ -112,7 +112,7 @@ const emailErrors = computed(() => fieldErrors.value.email || [])
             </BFormGroup>
 
             <div class="row entry-panel__actions">
-              <div class="col-6 col-md-8 align-content-center flex-column d-flex">
+              <div class="col-8 align-content-center flex-column d-flex">
                 <div class="row">
                   <div class="col-12">
                     <NuxtLink class="entry-panel__link" to="/user/recover" data-testid="login-forgot-password-link">
@@ -126,7 +126,7 @@ const emailErrors = computed(() => fieldErrors.value.email || [])
                   </div>
                 </div>
               </div>
-              <div class="col-6 col-md-4 align-content-center flex-column justify-content-end d-flex">
+              <div class="col-4 align-content-center flex-column justify-content-end d-flex">
                 <BButton
                   type="submit"
                   variant="primary"
