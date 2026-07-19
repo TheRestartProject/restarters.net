@@ -39,6 +39,14 @@ describe('components/dashboard/DashboardAddData', () => {
     expect(wrapper.find('[data-testid="dashboard-add-data"]').exists()).toBe(false)
   })
 
+  it('is hidden when the user has events but no groups to add data against (no empty dropdowns)', () => {
+    // Regression: a user with events but no group membership previously saw the
+    // card with empty group/event selects; hide it when there is nothing to pick.
+    const wrapper = mountComponent({ groups: [], events: EVENTS })
+
+    expect(wrapper.find('[data-testid="dashboard-add-data"]').exists()).toBe(false)
+  })
+
   it('offers only groups that have events, newest event first, and links Add to that event', () => {
     const wrapper = mountComponent({ groups: GROUPS, events: EVENTS })
 

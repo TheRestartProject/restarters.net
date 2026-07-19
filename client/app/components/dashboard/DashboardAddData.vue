@@ -20,8 +20,6 @@ const props = defineProps({
 
 const { t } = useI18n()
 
-const hasAnyEvent = computed(() => props.events.length > 0)
-
 const selectedGroupId = ref(null)
 const selectedEventId = ref(null)
 
@@ -66,7 +64,7 @@ const addUrl = computed(() => (selectedEventId.value ? `/party/view/${selectedEv
 </script>
 
 <template>
-  <div v-if="hasAnyEvent" class="panel" data-testid="dashboard-add-data">
+  <div v-if="groupOptions.length" class="panel" data-testid="dashboard-add-data">
     <div class="d-flex align-items-center">
       <h2 class="mb-0">{{ t('dashboard.add_data_heading') }}</h2>
       <img src="/images/fixometer-doodle.svg" alt="" class="ms-4 d-none d-md-block add-data__doodle">
