@@ -660,6 +660,7 @@
         "invite_to_group": "Inviter au Repair Café",
         "invite_volunteers": "Inviter des bénévoles",
         "most_repaired_devices": "Les appareils les plus réparés",
+        "export_event_list": "Télécharger le bilan",
         "no_past_events": "Il n'y a actuellement aucun événement passé pour ce Repair Café",
         "no_upcoming_events": "Il n'y a actuellement aucun événément à venir pour ce Repair Café",
         "past": "Passé",

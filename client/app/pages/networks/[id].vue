@@ -28,11 +28,10 @@ import ModerationQueue from '~/components/moderation/ModerationQueue.vue'
 // {id, name, avatar_url} - the App-Coordinators-only gap recorded in
 // docs/nuxt-migration/api-gaps.md Phase E has been closed.
 //
-// One feature from the legacy page is still deliberately NOT ported:
-//  - "Export event list" link: the legacy href
-//    (/export/networks/{id}/events) is a session-cookie-authenticated web
-//    route; the SPA is pure Bearer-token auth (design.md §4.4) and has no
-//    session cookie to send, so the link would just redirect to login.
+// "Download event list" links to /export/networks/{id}/events - a PUBLIC
+// (anonymous-access) web route in routes/web.php's /export group (the same kind
+// of link the fixometer uses for /export/devices), so a plain <a href> works
+// from the SPA without a session cookie.
 //
 // Groups/Events "requiring moderation" panels ARE ported below, scoped to
 // THIS network only (:networks="[id]", matching legacy GroupsRequiringModeration
@@ -215,6 +214,14 @@ const tagLabels = computed(() => ({
             {{ network.website }}
           </a>
         </div>
+        <a
+          v-if="canManage"
+          :href="`/export/networks/${network.id}/events`"
+          class="btn btn-outline-primary me-2"
+          data-testid="network-show-export-events"
+        >
+          {{ t('groups.export_event_list') }}
+        </a>
         <BButton v-if="canManage" variant="primary" data-testid="network-show-add-groups" @click="showAssociateModal = true">
           {{ t('networks.show.add_groups_menuitem') }}
         </BButton>

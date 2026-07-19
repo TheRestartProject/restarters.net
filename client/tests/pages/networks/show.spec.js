@@ -240,6 +240,15 @@ describe('pages/networks/[id]', () => {
       expect(wrapper.find('[data-testid="network-show-add-groups"]').exists()).toBe(true)
     })
 
+    it('links "Download event list" to the public export route', async () => {
+      const wrapper = mountPage()
+      await flushPromises()
+
+      const link = wrapper.find('[data-testid="network-show-export-events"]')
+      expect(link.exists()).toBe(true)
+      expect(link.attributes('href')).toBe('/export/networks/1/events')
+    })
+
     it('opens the associate-groups modal with candidates excluding groups already in the network', async () => {
       groupsStore.names = [
         { id: 9, name: 'Tag Test Group', archived_at: null },
