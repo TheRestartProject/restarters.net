@@ -39,7 +39,10 @@ onMounted(() => {
 <template>
   <div class="container py-4" data-testid="group-nearby-page">
     <h1 class="d-flex justify-content-between align-items-start">
-      {{ t('groups.groups') }}
+      <span class="d-flex align-items-center">
+        {{ t('groups.groups') }}
+        <img src="/images/group_doodle_ico.svg" alt="" class="ms-3 d-none d-md-inline-block" style="height: 40px">
+      </span>
       <NuxtLink to="/group/create" class="btn btn-primary" data-testid="group-create-link">
         {{ t('groups.create_groups') }}
       </NuxtLink>

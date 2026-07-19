@@ -134,7 +134,10 @@ function dateLabel(iso) {
 }
 
 function sortIndicator(key) {
-  if (sortKey.value !== key) return ''
+  // Every column is sortable, so show a neutral up/down affordance on the
+  // inactive ones (matching legacy, where all headers carried a sort arrow)
+  // and the resolved direction on the active one.
+  if (sortKey.value !== key) return '↕'
   return sortDesc.value ? '▼' : '▲'
 }
 </script>
