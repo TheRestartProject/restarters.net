@@ -13,44 +13,42 @@ export const useModerationStore = defineStore('moderation', {
   }),
 
   actions: {
-    async fetchEvents({ force = false } = {}) {
-      if (this.events.loading || (this.events.loaded && !force)) {
-        return this.events.data
-      }
-      this.events.loading = true
-      this.events.error = null
-      try {
-        const { $api } = useNuxtApp()
-        const { data } = await $api.moderation.events()
-        this.events.data = data || []
-        this.events.loaded = true
-        return this.events.data
-      } catch (error) {
-        this.events.error = error
-        throw error
-      } finally {
-        this.events.loading = false
-      }
+    // Thin wrappers over loadSection (below) - the only difference between the
+    // two queues is which /moderate endpoint they call.
+    fetchEvents({ force = false } = {}) {
+      const { $api } = useNuxtApp()
+      return loadSection(this, 'events', force, () => $api.moderation.events())
     },
 
-    async fetchGroups({ force = false } = {}) {
-      if (this.groups.loading || (this.groups.loaded && !force)) {
-        return this.groups.data
-      }
-      this.groups.loading = true
-      this.groups.error = null
-      try {
-        const { $api } = useNuxtApp()
-        const { data } = await $api.moderation.groups()
-        this.groups.data = data || []
-        this.groups.loaded = true
-        return this.groups.data
-      } catch (error) {
-        this.groups.error = error
-        throw error
-      } finally {
-        this.groups.loading = false
-      }
+    fetchGroups({ force = false } = {}) {
+      const { $api } = useNuxtApp()
+      return loadSection(this, 'groups', force, () => $api.moderation.groups())
     },
   },
 })
+
+// Cached-fetch for a queue section (events | groups): return early when already
+// loaded (unless forced) or in flight, otherwise load once and record
+// loading/error/data. Kept as a module helper (not an action) so it isn't part
+// of the store's public surface.
+async function loadSection(store, key, force, request) {
+  const section = store[key]
+  if (section.loading || (section.loaded && !force)) {
+    return section.data
+  }
+  section.loading = true
+  section.error = null
+  try {
+    // await inside try so a synchronous throw from request() (e.g. a missing
+    // $api in a test) is caught here, same as the original explicit actions.
+    const { data } = await request()
+    section.data = data || []
+    section.loaded = true
+    return section.data
+  } catch (error) {
+    section.error = error
+    throw error
+  } finally {
+    section.loading = false
+  }
+}
