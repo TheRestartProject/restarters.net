@@ -15,7 +15,7 @@ return [
   'create_groups' => 'Add a new group',
   'create_group' => 'Create group',
   'groups_title1' => 'Your Groups',
-  'groups_title2' => 'Other groups',
+  'groups_title2' => 'Other groups nearby',
   'groups_name' => 'Name',
   'groups_name_of' => 'Name of group',
   'groups_about_group' => 'Tell us about your group',

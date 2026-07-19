@@ -40,7 +40,7 @@ describe('components/groups/GroupsTabsNav', () => {
     const wrapper = mountNav('mine')
 
     expect(wrapper.find('[data-testid="groups-tab-mine"]').text()).toBe('Your Groups')
-    expect(wrapper.find('[data-testid="groups-tab-nearby"]').text()).toBe('Other groups')
+    expect(wrapper.find('[data-testid="groups-tab-nearby"]').text()).toBe('Other groups nearby')
     expect(wrapper.find('[data-testid="groups-tab-all"]').text()).toBe('All groups')
     expect(wrapper.find('[data-testid="groups-tab-map"]').text()).toBe('Map')
   })
