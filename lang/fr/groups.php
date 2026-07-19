@@ -75,6 +75,7 @@ return [
   'about_none' => 'Il n\'y a pas encore de description pour ce Repair Café.',
   'events' => 'évenement|évenements',
   'group_facts' => 'Réalisations du Repair Café',
+  'environmental_impact' => 'Impact environnemental',
   'make_host' => 'Nommer organisateur',
   'remove_host_role' => 'Retirer rôle d\'organisateur',
   'no_volunteers' => 'Il n\'y a pas de bénévoles dans ce repair café',

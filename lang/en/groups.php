@@ -72,6 +72,7 @@ return [
   'website' => 'Website',
   'about_none' => 'There is no description for this group yet.',
   'group_facts' => 'Group achievements',
+  'environmental_impact' => 'Environmental impact',
   'events' => 'event|events',
   'no_volunteers' => 'There are no volunteers in this group',
   'remove_volunteer' => 'Remove Volunteer',
