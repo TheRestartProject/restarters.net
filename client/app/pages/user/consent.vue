@@ -31,8 +31,10 @@ const generalError = ref('')
 
 const currentYear = new Date().getFullYear()
 const ageOptions = computed(() => {
+  // Match legacy Fixometer::allAges() and the sibling register.vue: minimum age
+  // 18 (birth year currentYear-18), exclusive lower bound at currentYear-100.
   const years = []
-  for (let y = currentYear - 16; y >= currentYear - 100; y--) years.push(y)
+  for (let y = currentYear - 18; y > currentYear - 100; y--) years.push(y)
   return years
 })
 
@@ -113,9 +115,19 @@ async function submit() {
       </BFormGroup>
 
       <BFormGroup>
+        <!-- Legacy rendered registration.reg-step-4 as a <legend> above the
+             consent checkboxes; the SPA had only reused it as an error string. -->
+        <p class="fw-bold" data-testid="consent-intro">{{ t('registration.reg-step-4') }}</p>
+
+        <!-- Field/label pairing matches legacy register-new.blade.php step 4
+             (verified at 07e6abd7cc^): consent_gdpr = Personal Data (label1),
+             consent_future_data = Repair Data (label2), consent_past_data =
+             Historical Repair Data (label3). A prior version had label1/label3
+             swapped, so the checkbox text described a different consent than the
+             field it set - a consent-integrity bug. -->
         <BFormCheckbox v-model="form.consent_gdpr" data-testid="consent-gdpr">
           <!-- eslint-disable-next-line vue/no-v-html — fixed lang string with embedded links -->
-          <span v-html="t('registration.reg-step-4-label3')" />
+          <span v-html="t('registration.reg-step-4-label1')" />
         </BFormCheckbox>
         <div v-if="fieldErrors.consent_gdpr" class="text-danger small" data-testid="consent-gdpr-error">
           {{ fieldErrors.consent_gdpr[0] }}
@@ -123,7 +135,7 @@ async function submit() {
 
         <BFormCheckbox v-model="form.consent_past_data" data-testid="consent-past-data">
           <!-- eslint-disable-next-line vue/no-v-html -->
-          <span v-html="t('registration.reg-step-4-label1')" />
+          <span v-html="t('registration.reg-step-4-label3')" />
         </BFormCheckbox>
         <div v-if="fieldErrors.consent_past_data" class="text-danger small" data-testid="consent-past-data-error">
           {{ fieldErrors.consent_past_data[0] }}
