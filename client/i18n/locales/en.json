@@ -627,7 +627,10 @@
         "image_delete_error": "Sorry, but the image can't be deleted",
         "image_upload_error": "fail - image could not be uploaded"
     },
-    "discourse": [],
+    "discourse": {
+        "number_of_comments": "Number of comments",
+        "topic_created_at": "Topic created"
+    },
     "event-audits": {
         "unavailable_audits": "No changes have been made to this event!",
         "created": {

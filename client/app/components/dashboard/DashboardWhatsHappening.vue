@@ -1,21 +1,35 @@
 <script setup>
+import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useSessionStore } from '~/stores/session.js'
 import { useSsoBridge } from '~/composables/useSsoBridge.js'
+import DashboardTalkTopic from '~/components/dashboard/DashboardTalkTopic.vue'
 
-// Legacy source: resources/js/components/DiscourseDiscussion.vue - fetches
-// GET /api/talk/topics/{tag?} (App\Http\Controllers\API\DiscourseController::
-// discussionTopics, routes/api.php, unauthenticated - still live) and lists
-// the top Talk topics, "see all" linking to `${DISCOURSE_URL}/latest`. Wiring
-// live topics needs a new API resource class + $api plugin registration
-// (client/app/api/, client/app/plugins/), both outside this component's
-// permitted scope for this pass - see the dashboard-rebuild report. This
-// renders the section header, dashed divider and "see all" link faithfully;
-// that's also exactly what the legacy page itself shows whenever Discourse
-// has no cached topics (feature flag off, or a cold cache).
+// Legacy source: resources/js/components/DiscourseDiscussion.vue - lists the top
+// Talk topics from GET /api/talk/topics (DiscourseController::discussionTopics,
+// public, cached 60s server-side), "see all" linking to `${DISCOURSE_URL}/latest`.
+// The endpoint returns [] when the discourse_integration flag is off or Discourse
+// has no cached topics, in which case only the header/divider/see-all show - the
+// same empty state the legacy page had.
 const { t } = useI18n()
 const sessionStore = useSessionStore()
 const { goTo } = useSsoBridge()
+
+const topics = ref([])
+const discourseBaseUrl = computed(() => sessionStore.config?.discourse_url || '')
+
+onMounted(async () => {
+  try {
+    const { $api } = useNuxtApp()
+    const res = await $api.talk.topics()
+    if (res?.success) {
+      topics.value = res.topics || []
+    }
+  } catch {
+    // Leave topics empty - the section degrades to the header/divider/see-all
+    // state, exactly as legacy did when Discourse was unavailable.
+  }
+})
 
 function seeAll() {
   const base = sessionStore.config?.discourse_url
@@ -34,6 +48,28 @@ function seeAll() {
     </div>
 
     <div class="content-divider">
+      <table v-if="topics.length" class="table talk-topics" data-testid="whats-happening-topics">
+        <thead>
+          <tr>
+            <th />
+            <th class="d-none d-md-table-cell text-center">
+              <img src="/images/speech_bubble.svg" class="talk-topics__icon" :alt="t('discourse.number_of_comments')" :title="t('discourse.number_of_comments')">
+            </th>
+            <th class="d-none d-md-table-cell text-center">
+              <img src="/images/clock.svg" class="talk-topics__icon" :alt="t('discourse.topic_created_at')" :title="t('discourse.topic_created_at')">
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <DashboardTalkTopic
+            v-for="topic in topics"
+            :key="topic.id"
+            :topic="topic"
+            :discourse-base-url="discourseBaseUrl"
+          />
+        </tbody>
+      </table>
+
       <div class="d-flex justify-content-end">
         <a href="#" data-testid="whats-happening-see-all" @click.prevent="seeAll">
           {{ t('dashboard.whats_happening_see_all') }}
@@ -51,5 +87,13 @@ h2 {
 
 .talk-doodle {
   height: 40px;
+}
+
+.talk-topics {
+  margin-bottom: 0.5rem;
+}
+
+.talk-topics__icon {
+  height: 28px;
 }
 </style>

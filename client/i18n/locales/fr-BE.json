@@ -644,7 +644,10 @@
         "image_delete_error": "Désolé, mais l'image ne peut pas être supprimée.",
         "image_upload_error": "fail - l'image n'a pas pu être téléchargée"
     },
-    "discourse": [],
+    "discourse": {
+        "number_of_comments": "Nombre de commentaires",
+        "topic_created_at": "Sujet créé"
+    },
     "event-audits": {
         "unavailable_audits": "No changes have been made to this event!",
         "created": {

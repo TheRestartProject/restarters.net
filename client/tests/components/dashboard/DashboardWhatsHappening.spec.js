@@ -1,7 +1,7 @@
-import { mount } from '@vue/test-utils'
+import { mount, flushPromises } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
 import { createI18n } from 'vue-i18n'
-import { afterEach, beforeEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import DashboardWhatsHappening from '../../../app/components/dashboard/DashboardWhatsHappening.vue'
 import { useSessionStore } from '../../../app/stores/session.js'
 import en from '../../../i18n/locales/en.json'
@@ -35,9 +35,17 @@ function mountComponent() {
 
 describe('components/dashboard/DashboardWhatsHappening', () => {
   let originalHref
+  let topicsResponse
 
   beforeEach(() => {
     setActivePinia(createPinia())
+
+    // Default: no topics (Discourse off / cold cache). Individual tests set
+    // topicsResponse before mounting to exercise the populated state.
+    topicsResponse = { success: 'success', topics: [] }
+    vi.stubGlobal('useNuxtApp', () => ({
+      $api: { talk: { topics: vi.fn(() => Promise.resolve(topicsResponse)) } },
+    }))
 
     // happy-dom's window.location isn't directly assignable; redefine it per
     // test like useSsoBridge.spec.js does, so a real navigation is observable.
@@ -47,6 +55,7 @@ describe('components/dashboard/DashboardWhatsHappening', () => {
   })
 
   afterEach(() => {
+    vi.unstubAllGlobals()
     window.location = { href: originalHref }
   })
 
@@ -73,5 +82,40 @@ describe('components/dashboard/DashboardWhatsHappening', () => {
     await wrapper.find('[data-testid="whats-happening-see-all"]').trigger('click')
 
     expect(window.location.href).toBe('https://talk.restarters.net/latest')
+  })
+
+  it('renders a row per live Talk topic, linking each to its Discourse topic', async () => {
+    useSessionStore().config = { discourse_url: 'https://talk.restarters.net' }
+    topicsResponse = {
+      success: 'success',
+      topics: [
+        {
+          id: 7,
+          title: 'Fixing kettles',
+          slug: 'fixing-kettles',
+          posts_count: 3,
+          created_at: '2026-01-01T00:00:00Z',
+          category: { color: 'ff0000', name: 'Kettles', topic_url: '/c/kettles' },
+        },
+      ],
+    }
+
+    const wrapper = mountComponent()
+    await flushPromises()
+
+    expect(wrapper.find('[data-testid="whats-happening-topics"]').exists()).toBe(true)
+    const link = wrapper.find('[data-testid="talk-topic-link-7"]')
+    expect(link.text()).toBe('Fixing kettles')
+    expect(link.attributes('href')).toBe('https://talk.restarters.net/t/fixing-kettles')
+  })
+
+  it('shows no topics table when the API returns none, degrading to just the see-all link', async () => {
+    topicsResponse = { success: 'success', topics: [] }
+
+    const wrapper = mountComponent()
+    await flushPromises()
+
+    expect(wrapper.find('[data-testid="whats-happening-topics"]').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="whats-happening-see-all"]').exists()).toBe(true)
   })
 })
