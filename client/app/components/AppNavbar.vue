@@ -13,7 +13,6 @@ import IconGroups from './icons/IconGroups.vue'
 import IconWiki from './icons/IconWiki.vue'
 import IconAdmin from './icons/IconAdmin.vue'
 import AppNotifications from './AppNotifications.vue'
-import LocaleSwitcher from './LocaleSwitcher.vue'
 
 // Driven entirely by the session store (design.md §6.2 task brief): a null
 // session user renders login/join links, otherwise role-conditional items
@@ -122,10 +121,6 @@ function goToWiki() {
     </ul>
 
     <ul class="nav-right">
-      <li>
-        <LocaleSwitcher />
-      </li>
-
       <template v-if="!user">
         <li>
           <NuxtLink to="/login" class="btn btn-outline-dark" data-testid="nav-login">
