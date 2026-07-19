@@ -172,11 +172,11 @@ function nextPage() {
 
 <template>
   <div data-testid="devices-search-table">
-    <div class="btn-group mb-3" role="group" data-testid="device-search-powered-toggle">
+    <div class="device-search-tabs mb-3" role="group" data-testid="device-search-powered-toggle">
       <button
         type="button"
-        class="btn btn-sm"
-        :class="filters.powered ? 'btn-primary' : 'btn-outline-primary'"
+        class="device-search-tabs__tab"
+        :class="{ 'device-search-tabs__tab--active': filters.powered }"
         data-testid="device-search-powered-true"
         @click="filters.powered = true"
       >
@@ -184,8 +184,8 @@ function nextPage() {
       </button>
       <button
         type="button"
-        class="btn btn-sm"
-        :class="!filters.powered ? 'btn-primary' : 'btn-outline-primary'"
+        class="device-search-tabs__tab"
+        :class="{ 'device-search-tabs__tab--active': !filters.powered }"
         data-testid="device-search-powered-false"
         @click="filters.powered = false"
       >
@@ -209,7 +209,7 @@ function nextPage() {
         @click="itemInfoExpanded = !itemInfoExpanded"
       >
         <span class="device-search-section__title">{{ t('devices.item_and_repair_info') }}</span>
-        <img :src="itemInfoExpanded ? '/images/dropdown-arrow-up.svg' : '/images/dropdown-arrow.svg'" alt="">
+        <span class="device-search-section__toggle" aria-hidden="true">{{ itemInfoExpanded ? '−' : '+' }}</span>
       </button>
       <fieldset v-show="itemInfoExpanded" class="device-search-section__body" data-testid="device-search-filters">
         <legend class="visually-hidden">{{ t('devices.item_and_repair_info') }}</legend>
@@ -280,7 +280,7 @@ function nextPage() {
         @click="eventInfoExpanded = !eventInfoExpanded"
       >
         <span class="device-search-section__title">{{ t('devices.event_info') }}</span>
-        <img :src="eventInfoExpanded ? '/images/dropdown-arrow-up.svg' : '/images/dropdown-arrow.svg'" alt="">
+        <span class="device-search-section__toggle" aria-hidden="true">{{ eventInfoExpanded ? '−' : '+' }}</span>
       </button>
       <fieldset v-show="eventInfoExpanded" class="device-search-section__body">
         <legend class="visually-hidden">{{ t('devices.event_info') }}</legend>
@@ -393,6 +393,34 @@ function nextPage() {
 </template>
 
 <style scoped lang="scss">
+// Powered/Unpowered toggle - legacy FixometerPage.vue's b-tabs: both tabs sit
+// in a brand-teal bordered strip, white-backed, the active one picked out in
+// teal (rather than the earlier btn-primary/btn-outline pair, which the theme
+// rendered as a jarring solid-black inactive block).
+.device-search-tabs {
+  display: inline-flex;
+  border: 1px solid #0394a6;
+}
+
+.device-search-tabs__tab {
+  background: #fff;
+  border: 0;
+  border-right: 1px solid #0394a6;
+  padding: 0.5rem 1.25rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: #6c757d;
+
+  &:last-child {
+    border-right: 0;
+  }
+
+  &--active {
+    color: #0394a6;
+    box-shadow: inset 0 -3px 0 0 #0394a6;
+  }
+}
+
 // FixometerFilters.vue's collapsible section chrome (border/shadow in the
 // lighter brand teal, uppercase clickable header) - kept scoped, same
 // reasoning as ImpactStats.vue's stat-card grid.
@@ -410,10 +438,14 @@ function nextPage() {
   background-color: #dce3ec;
   border: 0;
   text-align: left;
+}
 
-  img {
-    width: 24px;
-  }
+// Legacy used a "+"/"−" expand glyph (not a chevron) on these filter bars.
+.device-search-section__toggle {
+  font-size: 1.5rem;
+  font-weight: bold;
+  line-height: 1;
+  color: #0394a6;
 }
 
 .device-search-section__title {
