@@ -144,6 +144,21 @@ describe('components/fixometer/DevicesSearchTable', () => {
     expect(wrapper.find('[data-testid="device-search-empty"]').exists()).toBe(true)
   })
 
+  it('still renders the table with column headers when there are no results', async () => {
+    // Matches legacy b-table (show-empty): the column scaffold stays put on an
+    // empty result set, rather than the whole table vanishing.
+    const wrapper = mountComponent()
+    await flushPromises()
+
+    const table = wrapper.find('[data-testid="device-search-results"]')
+    expect(table.exists()).toBe(true)
+    const headers = table.findAll('thead th').map((h) => h.text()).filter(Boolean)
+    expect(headers).toContain('Category')
+    expect(headers).toContain('Status')
+    // the empty message sits inside the table, not instead of it
+    expect(table.find('[data-testid="device-search-empty"]').exists()).toBe(true)
+  })
+
   it('renders result rows with a link to the associated event', async () => {
     mockApi.device.search.mockResolvedValue({ data: { items: [device()], count: 1 } })
 

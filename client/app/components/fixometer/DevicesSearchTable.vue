@@ -55,11 +55,11 @@ const devicesStore = useDevicesStore()
 
 // FixometerFilters.vue's two collapsible sections (ITEM & REPAIR INFO /
 // EVENT INFO), ported as a lightweight expand/collapse rather than
-// b-collapse - default to expanded (the legacy default was collapsed
-// unless the URL carried a matching query param) so the fields are usable
-// immediately without an extra click.
-const itemInfoExpanded = ref(true)
-const eventInfoExpanded = ref(true)
+// b-collapse. Default to COLLAPSED to match the legacy default (the sections
+// only started open when the URL carried a matching filter query param); a
+// prior version defaulted to expanded, which was a visible parity divergence.
+const itemInfoExpanded = ref(false)
+const eventInfoExpanded = ref(false)
 
 const filters = reactive({
   powered: true,
@@ -319,11 +319,11 @@ function nextPage() {
         {{ t('client.devices.results_count', { count }, count) }}
       </p>
 
-      <div v-if="!devices.length" class="text-muted" data-testid="device-search-empty">
-        {{ t('client.devices.no_results') }}
-      </div>
-
-      <div v-else class="table-responsive">
+      <!-- Always render the table scaffold (column headers) - even with no
+           results - matching the legacy b-table (show-empty). The empty state
+           is a row inside the table, not a replacement for it. A prior version
+           hid the whole table when empty, so the columns disappeared. -->
+      <div class="table-responsive">
         <table class="table" data-testid="device-search-results">
           <thead>
             <tr>
@@ -338,6 +338,11 @@ function nextPage() {
             </tr>
           </thead>
           <tbody>
+            <tr v-if="!devices.length" data-testid="device-search-empty">
+              <td :colspan="filters.powered ? 8 : 7" class="text-muted text-center">
+                {{ t('client.devices.no_results') }}
+              </td>
+            </tr>
             <tr v-for="device in devices" :key="device.id" :data-testid="`device-search-row-${device.id}`">
               <td>{{ device.item_type || '-' }}</td>
               <td>{{ device.category ? t(device.category.name) : '-' }}</td>
