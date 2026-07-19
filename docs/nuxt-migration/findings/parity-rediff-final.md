@@ -2,6 +2,62 @@
 
 Confirmed 98, non-by-design 61.
 
+## Resolution status (2026-07-19 pass)
+
+Each finding below was re-checked against the legacy source and the saved
+old-dev captures; several turned out not to be genuine SPA regressions. Buckets:
+
+**Fixed this pass (grounded in legacy, committed on `nuxt-client`):**
+- Register/landing mobile header logo centred (`5c6bb65`).
+- `/group/nearby` shows the set-a-location prompt when the user has no town set,
+  driven by dashboard `has_location` — closes the CRITICAL + mobile message-logic
+  findings (`be722f9`).
+- Cookie banner restyled to legacy `_gdpr-cookie-notice.scss`: right-aligned
+  bold non-underlined "Cookie settings", brand-orange OK button, `#333` bar —
+  closes every cookie-banner styling finding across landing/login/register/
+  fixometer/groups-nearby (`8bc2004`).
+- Main-nav captions no longer underlined — root-caused to the Bootstrap 4→5
+  `$link-decoration` default; fixed at the shared nav-item placeholder, closes
+  the nav-underline findings on dashboard/fixometer/groups-all/groups-nearby
+  (`8bc2004`).
+- Dashboard "What's happening" heading doodle restored + missing `talk_doodle`
+  asset copied into the client public dir (`ae3fffa`).
+- Fixometer Powered/Unpowered toggle no longer a solid-black block (light tabs,
+  teal active) and the filter bars use legacy's "+"/"−" glyph, not a chevron —
+  verified on new-dev via the parity harness (`b06364a`).
+
+**Not genuine gaps (verified, no action):**
+- All "OLD shows a 500 error page" shots (landing/login/register desktop,
+  events-all desktop+mobile): the legacy capture errored; the SPA renders fine.
+- Header chat/bell "0" vs "--" and username/avatar (dashboard, fixometer,
+  groups-all/nearby): legacy captured pre-hydration; timing artifact.
+- "Broken image placeholder" (dashboard + fixometer): the dev-only Nuxt DevTools
+  badge in the dev-build screenshots — `document.images` shows no broken `<img>`.
+- Footer language selector "missing" (landing mobile): present; the switcher is
+  in the footer.
+- Fixometer mobile "Status" column clipped: table already has a
+  `.table-responsive` scroll wrapper; the shot shows the expected pre-scroll state.
+- Client public-asset audit: clean (every referenced `/images/*` exists).
+
+**By-design (documented decisions, not regressions):**
+- Group tab strip / "container styling" panel + boxed tabs (groups-all,
+  groups-nearby): the SPA deliberately replaced legacy's single `<b-tabs>`
+  `.ourtabs` panel with separate routes + a small nav bar (GroupsTabsNav.vue,
+  design.md §6.2 B4).
+- `/group/all` filters (Tag/Country/Network/location) + viewport-scoped count:
+  the names-index + per-page-hydration design; filters deferred pending PR #887.
+
+**Deferred — genuine but larger than a styling pass:**
+- Fixometer Repair Records two-column card (accordion rail left, tabbed table
+  right in one teal-bordered container) — a structural DevicesSearchTable rework
+  that also changes the filter form's responsive layout.
+- Sortable column headers + "Press the 'i' icons… click a column head to sort"
+  helper + per-row info icons (fixometer table; groups-all table): needs
+  server-side sort support (the device table is paginated) — a feature, not a
+  restyle.
+- Live Discourse topics in "What's happening": needs a new API resource +
+  `$api` registration (recorded in the dashboard-rebuild report).
+
 
 ## CRITICAL
 
