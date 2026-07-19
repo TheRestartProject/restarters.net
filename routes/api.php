@@ -298,5 +298,13 @@ Route::prefix('v2')->middleware(\App\Http\Middleware\VerifyUserConsentApi::class
             Route::put('/roles/{id}/permissions', [API\RoleController::class, 'updateRolePermissionsv2']);
             Route::get('/permissions', [API\RoleController::class, 'listPermissionsv2']);
         });
+
+        // Admin PR-preview-deploy tooling (moved off the Blade web route so the
+        // bearer-authenticated SPA admin can drive it). Administrator-gated in
+        // the controller.
+        Route::middleware('auth:sanctum,api')->group(function() {
+            Route::get('/admin/preview-deploys', [API\PreviewDeployController::class, 'index']);
+            Route::post('/admin/preview-deploys', [API\PreviewDeployController::class, 'deploy']);
+        });
     });
 });

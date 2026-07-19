@@ -202,6 +202,11 @@ function goToWiki() {
                       {{ t('networks.general.networks') }}
                     </NuxtLink>
                   </li>
+                  <li>
+                    <NuxtLink to="/admin/preview-deploy" data-testid="nav-admin-preview-deploy" @click="closeMenu">
+                      Preview deploy
+                    </NuxtLink>
+                  </li>
                 </ul>
               </li>
 

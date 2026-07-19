@@ -13,6 +13,7 @@ import BrandAPI from './BrandAPI.js'
 import SkillAPI from './SkillAPI.js'
 import GroupTagAPI from './GroupTagAPI.js'
 import CategoryAPI from './CategoryAPI.js'
+import PreviewDeployAPI from './PreviewDeployAPI.js'
 
 /**
  * Factory: one instance of each resource class, sharing the same config
@@ -35,4 +36,5 @@ export default (config) => ({
   skill: new SkillAPI(config),
   groupTag: new GroupTagAPI(config),
   category: new CategoryAPI(config),
+  previewDeploy: new PreviewDeployAPI(config),
 })
