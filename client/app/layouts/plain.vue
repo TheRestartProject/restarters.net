@@ -2,6 +2,7 @@
 import LogoStatsHeader from '~/components/LogoStatsHeader.vue'
 import LocaleSwitcher from '~/components/LocaleSwitcher.vue'
 import ToastContainer from '~/components/ToastContainer.vue'
+import CookieConsent from '~/components/CookieConsent.vue'
 
 // Chrome for the logged-out pages (landing / login / register / recover /
 // reset). Legacy header_plain showed the brand mark + the global impact-stats
@@ -25,5 +26,6 @@ import ToastContainer from '~/components/ToastContainer.vue'
       <LocaleSwitcher />
     </footer>
     <ToastContainer />
+    <CookieConsent />
   </div>
 </template>

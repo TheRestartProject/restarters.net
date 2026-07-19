@@ -209,6 +209,11 @@
       "edit_role": "Modifier le rôle",
       "edit_role_for": "Modifier le rôle : {name}",
       "load_error": "Désolé, nous n'avons pas pu charger la liste des utilisateurs."
+    },
+    "cookies": {
+      "banner_text": "Nous utilisons des cookies pour faire fonctionner notre site web et des cookies analytiques pour l’améliorer. Cliquez sur Paramètres des cookies pour les modifier, ou sur OK pour tout accepter.",
+      "settings": "Paramètres des cookies",
+      "accept": "OK"
     }
   }
 }
