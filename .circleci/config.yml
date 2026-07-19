@@ -149,6 +149,9 @@ jobs:
 
             # Generate additional Laravel artifacts for testing
             docker exec restarters php artisan l5-swagger:generate
+            # Fail fast on a broken OpenAPI document (dangling refs, orphaned
+            # security schemes, duplicate operationIds) before running tests.
+            docker exec restarters php tools/openapi-lint.php
 
       # The committed client locale JSONs must match a fresh export from lang/
       - run:

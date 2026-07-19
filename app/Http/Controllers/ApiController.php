@@ -15,7 +15,7 @@ use Illuminate\Http\Request;
  * @OA\Info(
  *      version="2.0.0",
  *      title="Restarters API",
- *      description="An API for accessing Restarters data.  No API authorisation is necessary - all data is read-only and public.",
+ *      description="The Restarters API. The v2 surface (`/api/v2/*`) powers the Nuxt single-page app and is authenticated with a Sanctum bearer token (`Authorization: Bearer <token>`) unless an operation is explicitly marked public. A small number of legacy read-only endpoints outside `/api/v2` use the `?api_token=` query-string convention (see the ApiKeyAuth scheme).",
  *      @OA\Contact(
  *          email="tech@therestartproject.org"
  *      ),
@@ -36,10 +36,19 @@ use Illuminate\Http\Request;
  * )
  *
  * @OA\SecurityScheme(
+ *   securityScheme="apiToken",
+ *   type="http",
+ *   scheme="bearer",
+ *   bearerFormat="Sanctum",
+ *   description="Sanctum personal-access token issued by POST /api/v2/auth/login or /register. Send as `Authorization: Bearer <token>`. This is the scheme every authenticated /api/v2 operation requires.",
+ * )
+ *
+ * @OA\SecurityScheme(
  *   securityScheme="ApiKeyAuth",
  *   type="apiKey",
  *   in="query",
  *   name="api_token",
+ *   description="Legacy query-string token (`?api_token=`) used only by the pre-v2 read-only endpoints outside /api/v2.",
  *  )
  */
 class ApiController extends Controller

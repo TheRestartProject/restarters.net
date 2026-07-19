@@ -171,6 +171,21 @@ tasks:
     cmds:
       - docker exec -it restarters php artisan "{{ .CLI_ARGS }}"
 
+  docker:swagger:generate:
+    desc: Regenerate the OpenAPI (Swagger) spec from the @OA annotations.
+    summary: |
+      Regenerate storage/api-docs/api-docs.json from the @OA annotations under app/.
+      The spec is a gitignored build artifact; CI regenerates it before the PHPUnit
+      and Playwright jobs. Run this after editing any @OA annotation.
+    cmds:
+      - docker exec restarters php artisan l5-swagger:generate
+
+  docker:swagger:lint:
+    desc: Regenerate the OpenAPI spec and check document-level integrity (dangling refs, security schemes, duplicate operationIds).
+    cmds:
+      - docker exec restarters php artisan l5-swagger:generate
+      - docker exec restarters php tools/openapi-lint.php
+
   docker:vite:
     desc: Start Vite dev server with HMR in the container.
     summary: |
