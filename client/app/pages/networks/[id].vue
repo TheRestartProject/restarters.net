@@ -27,14 +27,18 @@ import ModerationQueue from '~/components/moderation/ModerationQueue.vue'
 //  - Network coordinators list: GET /api/v2/networks/{id} has no
 //    `coordinators` field (App\Http\Resources\Network) - the legacy Blade
 //    controller built it directly from `$network->coordinators` server-side.
+//    Still true (re-checked directly against the running API + the Resource
+//    source during the parity pass that added the moderation queues below).
 //  - "Export event list" link: the legacy href
 //    (/export/networks/{id}/events) is a session-cookie-authenticated web
 //    route; the SPA is pure Bearer-token auth (design.md §4.4) and has no
 //    session cookie to send, so the link would just redirect to login.
-//  - Groups/Events "requiring moderation" panels: no moderation-queue
-//    component exists anywhere in the client yet (not built in any earlier
-//    phase) - out of scope for this task, left for whichever phase adds a
-//    moderation queue page.
+//
+// Groups/Events "requiring moderation" panels ARE ported below, scoped to
+// THIS network only (:networks="[id]", matching legacy GroupsRequiringModeration
+// / EventsRequiringModeration's `networks` prop) with always-visible headings
+// + a "None" fallback (alwaysShow), matching legacy NetworkPage.vue exactly -
+// unlike the unscoped, hide-when-empty usage on /party and /group/map.
 definePageMeta({ auth: true })
 
 const { t } = useI18n()
@@ -204,7 +208,7 @@ const tagLabels = computed(() => ({
 
     <template v-else-if="network">
       <div class="d-flex align-items-center mb-4">
-        <img v-if="network.logo" :src="network.logo" :alt="t('client.networks.logo_alt', { name: network.name })" class="me-4" style="max-height: 60px">
+        <img v-if="network.logo" :src="network.logo" :alt="t('client.networks.logo_alt', { name: network.name })" class="me-4 img-fluid" style="max-height: 60px">
         <div class="flex-grow-1">
           <h1 data-testid="network-show-name">{{ network.name }}</h1>
           <a v-if="network.website" :href="network.website" target="_blank" rel="noopener noreferrer" class="text-muted" data-testid="network-show-website">
@@ -217,10 +221,12 @@ const tagLabels = computed(() => ({
       </div>
 
       <!-- Groups/events awaiting moderation, for Administrators and this
-           network's coordinators (legacy network page showed both queues). -->
+           network's coordinators (legacy network page showed both queues,
+           scoped to this network - :networks="[id]" - with an always-visible
+           heading + "None" message rather than hiding the section). -->
       <template v-if="canManage">
-        <ModerationQueue type="groups" />
-        <ModerationQueue type="events" />
+        <ModerationQueue type="groups" :networks="[id]" :always-show="true" />
+        <ModerationQueue type="events" :networks="[id]" :always-show="true" />
       </template>
 
       <section v-if="canManage" class="mb-4" data-testid="network-logo-manage">
@@ -278,20 +284,22 @@ const tagLabels = computed(() => ({
         <GroupsTable v-else :groups="groupRows" :show-join="false" :show-filters="true" />
       </section>
 
-      <section v-if="canManage" data-testid="tags-management">
-        <AdminCrudTable
-          display-key="name"
-          :table-fields="tagTableFields"
-          :form-fields="tagFormFields"
-          :labels="tagLabels"
-          testid-prefix="tag"
-          :items="networksStore.tags.data"
-          :fetch-items="fetchTags"
-          :create-item="createTag"
-          :update-item="updateTag"
-          :delete-item="deleteTag"
-        />
-      </section>
+      <div v-if="canManage" class="row">
+        <section class="col-lg-6" data-testid="tags-management">
+          <AdminCrudTable
+            display-key="name"
+            :table-fields="tagTableFields"
+            :form-fields="tagFormFields"
+            :labels="tagLabels"
+            testid-prefix="tag"
+            :items="networksStore.tags.data"
+            :fetch-items="fetchTags"
+            :create-item="createTag"
+            :update-item="updateTag"
+            :delete-item="deleteTag"
+          />
+        </section>
+      </div>
 
       <BModal :model-value="showDescriptionModal" :title="network.name" size="lg" ok-only data-testid="network-description-modal" @hide="showDescriptionModal = false">
         <!-- eslint-disable-next-line vue/no-v-html -->

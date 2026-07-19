@@ -35,6 +35,10 @@ const GroupsTableStub = {
   props: ['groups', 'showJoin'],
   template: '<div data-testid="stub-groups-table" :data-row-count="groups.length" />',
 }
+const ModerationQueueStub = {
+  props: ['type', 'networks', 'alwaysShow'],
+  template: '<div :data-testid="`stub-moderation-queue-${type}`" :data-networks="JSON.stringify(networks)" :data-always-show="alwaysShow" />',
+}
 
 const GLOBAL_STUBS = {
   NuxtLink: NuxtLinkStub,
@@ -45,6 +49,7 @@ const GLOBAL_STUBS = {
   AssociateGroupsModal: AssociateGroupsModalStub,
   AdminCrudTable: AdminCrudTableStub,
   GroupsTable: GroupsTableStub,
+  ModerationQueue: ModerationQueueStub,
 }
 
 function setLoggedInUser(user) {
@@ -156,6 +161,19 @@ describe('pages/networks/[id]', () => {
       expect(wrapper.find('[data-testid="network-show-name"]').text()).toBe('Test London')
       expect(wrapper.find('[data-testid="stub-network-stats"]').attributes('data-groups-count')).toBe('1')
       expect(wrapper.find('[data-testid="stub-groups-table"]').attributes('data-row-count')).toBe('1')
+    })
+
+    it('scopes the moderation queues to this network and always shows them', async () => {
+      const wrapper = mountPage()
+      await flushPromises()
+
+      const groupsQueue = wrapper.get('[data-testid="stub-moderation-queue-groups"]')
+      expect(groupsQueue.attributes('data-networks')).toBe('[1]')
+      expect(groupsQueue.attributes('data-always-show')).toBe('true')
+
+      const eventsQueue = wrapper.get('[data-testid="stub-moderation-queue-events"]')
+      expect(eventsQueue.attributes('data-networks')).toBe('[1]')
+      expect(eventsQueue.attributes('data-always-show')).toBe('true')
     })
 
     it('always renders tags management (view access implies manage access)', async () => {

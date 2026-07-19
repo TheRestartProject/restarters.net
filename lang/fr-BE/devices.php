@@ -37,6 +37,7 @@ return [
   'title_assessment' => 'Evaluation',
   'title_items' => 'Objet',
   'title_items_at_event' => 'Objets à cet événement',
+  'title_repair' => 'Réparation',
   'title_powered' => 'électriques',
   'title_unpowered' => 'Non-électriques',
   'description_powered' => 'Un <b>appareil électrique</b> est tout ce qui a besoin d\'une source électrique pour fonctionner.',
@@ -55,4 +56,6 @@ return [
   'image_delete_success' => 'Merci, l\'image a été supprimée',
   'image_delete_error' => 'Désolé, mais l\'image ne peut pas être supprimée.',
   'image_upload_error' => 'fail - l\'image n\'a pas pu être téléchargée',
+  'unknown_item_type' => 'Vous créez un nouveau type d\'appareil. Etes-vous sûr(e) qu\'un type d\'appareil existant ne convient pas?',
+  'unknown_brand' => 'Vous créez une nouvelle marque. Etes-vous sûr(e) qu\'une marque existante ne convient pas?',
 ];

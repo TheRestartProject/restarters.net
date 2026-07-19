@@ -56,18 +56,63 @@ const partiesCount = computed(() => props.stats?.parties ?? 0)
     </div>
 
     <template v-else>
-      <div class="d-flex flex-wrap gap-4 mb-3">
-        <div data-testid="network-stats-groups">
-          <div class="h3 mb-0">{{ groupsCount ?? 0 }}</div>
-          <div class="small text-muted">{{ t('networks.stats.groups', { count: groupsCount ?? 0 }, groupsCount ?? 0) }}</div>
+      <!-- Groups/events counts as neo-brutalist stat-box cards (same white
+           box / #222 border / 4px offset shadow / teal value look as
+           GroupStats.vue's .stat-card and ImpactStats.vue's waste/CO2 cards
+           just below) in a responsive grid, instead of plain unstyled
+           numbers - matches legacy NetworkPage.vue's stats-grid .stat-box. -->
+      <div class="network-stats__grid mb-3">
+        <div class="stat-box" data-testid="network-stats-groups">
+          <div class="stat-box__count">{{ groupsCount ?? 0 }}</div>
+          <div class="stat-box__label">{{ t('networks.stats.groups', { count: groupsCount ?? 0 }, groupsCount ?? 0) }}</div>
         </div>
-        <div data-testid="network-stats-parties">
-          <div class="h3 mb-0">{{ partiesCount }}</div>
-          <div class="small text-muted">{{ t('networks.stats.events', { count: partiesCount }, partiesCount) }}</div>
+        <div class="stat-box" data-testid="network-stats-parties">
+          <div class="stat-box__count">{{ partiesCount }}</div>
+          <div class="stat-box__label">{{ t('networks.stats.events', { count: partiesCount }, partiesCount) }}</div>
         </div>
       </div>
 
+      <!-- Waste/CO2 (plus participants/years/powered-unpowered, a superset
+           of legacy's plain waste+CO2 pair) already render as the same
+           bordered stat-card look via ImpactStats.vue - reused as-is rather
+           than duplicated here. -->
       <ImpactStats :impact-data="stats" />
     </template>
   </div>
 </template>
+
+<style scoped lang="scss">
+.network-stats__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1rem;
+}
+
+// Neo-brutalist stat-box card (same formula as GroupStats.vue's .stat-card /
+// ImpactStats.vue's .stat-card): white box, near-black border + offset
+// shadow, teal value.
+.stat-box {
+  background: #fff;
+  border: 1px solid #222;
+  box-shadow: 4px 4px 0 #222;
+  padding: 1rem 0.5rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+}
+
+.stat-box__count {
+  font-size: 1.75rem;
+  font-weight: bold;
+  color: var(--bs-primary, #0394a6);
+  line-height: 1;
+}
+
+.stat-box__label {
+  font-size: 0.875rem;
+  color: #6c757d;
+}
+</style>

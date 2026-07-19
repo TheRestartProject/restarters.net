@@ -56,6 +56,8 @@ return [
   'invite_group_header_link' => 'Inviter des bénévoles',
   'upcoming_none_planned' => 'Aucun prévu',
   'about' => 'A propos',
+  'read_more' => 'Lire plus',
+  'read_less' => 'Lire moins',
   'device_breakdown' => 'Panne de l\'appareil',
   'host' => 'Organisateur',
   'invite_to_group' => 'Inviter au Repair Café',

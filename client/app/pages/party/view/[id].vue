@@ -11,6 +11,7 @@ import { useCalendarLinks } from '~/composables/useCalendarLinks.js'
 import { useUploadedImageUrl } from '~/composables/useUploadedImageUrl.js'
 import EventAttendees from '~/components/events/EventAttendees.vue'
 import EventInviteModal from '~/components/events/EventInviteModal.vue'
+import EventVenueMap from '~/components/events/EventVenueMap.vue'
 import EventDevicesPanel from '~/components/devices/EventDevicesPanel.vue'
 
 // /party/view/[id] - resources/views/events/view.blade.php +
@@ -82,6 +83,49 @@ const canedit = computed(() => isAdmin.value || isHostOfGroup.value)
 const candelete = computed(() => canedit.value && devicesStore.list(id.value).length === 0)
 
 const groupImage = computed(() => uploadedImageUrl(event.value?.group?.image) || '/images/placeholder-avatar.webp')
+
+// Environmental impact block (gap D1) - models GroupStats.vue's
+// group-stats-impact stat cards for the same look (white box, teal count,
+// see this page's <style>), rounded to whole kg the way that component
+// rounds waste/co2 for the group page (StatsImpact.vue's fixometer/tonnes
+// rounding doesn't apply here). Fields come straight off Party::
+// getEventStats() (app/Party.php) via the resource's `stats` object -
+// confirmed against a live GET /api/v2/events/{id}: waste_total, co2_total,
+// dead_devices, repairable_devices, no_weight_powered, no_weight_unpowered.
+function kg(value) {
+  return `${Math.round(value ?? 0).toLocaleString()} kg`
+}
+
+// "Not counting..." note (StatsImpact.vue's `notincluded`): lists the device
+// categories excluded from the two totals above. Unlike develop's version
+// (partials.to_be_recycled/to_be_repaired/no_weight with Oxford-comma
+// joining), the new lang keys here live under events.php per this task's
+// scope, and the categories are joined with plain commas - a simpler
+// rendering of the same "not counting N dead / N repairable / N no-weight
+// devices" note, not a fabrication of new stats fields.
+const notIncludedParts = computed(() => {
+  const stats = event.value?.stats
+  if (!stats) return []
+
+  const parts = []
+  if (stats.dead_devices) {
+    parts.push(`${stats.dead_devices} ${t('events.to_be_recycled', { value: stats.dead_devices }, stats.dead_devices)}`)
+  }
+  if (stats.repairable_devices) {
+    parts.push(`${stats.repairable_devices} ${t('events.to_be_repaired', { value: stats.repairable_devices }, stats.repairable_devices)}`)
+  }
+  const noWeight = (stats.no_weight_powered || 0) + (stats.no_weight_unpowered || 0)
+  if (noWeight) {
+    parts.push(`${noWeight} ${t('events.no_weight', { value: noWeight }, noWeight)}`)
+  }
+  return parts
+})
+
+const notIncludedNote = computed(() => {
+  const parts = notIncludedParts.value
+  if (!parts.length) return null
+  return `${t('events.not_counting', parts.length)} ${parts.join(', ')}.`
+})
 
 const showInvite = ref(false)
 const confirmingDelete = ref(false)
@@ -263,7 +307,7 @@ async function confirmDelete() {
             <h1 data-testid="event-view-title">{{ event.title }}</h1>
 
             <div v-if="event.group" class="d-flex align-items-center mb-1">
-              <img :src="groupImage" alt="" width="32" height="32" class="rounded-circle me-2">
+              <img :src="groupImage" alt="" width="32" height="32" class="rounded-circle me-2 group-avatar">
               <span>
                 {{ t('events.organised_by', { group: '' }) }}
                 <NuxtLink :to="`/group/view/${event.group.id}`" class="fw-bold" data-testid="event-view-group">
@@ -291,6 +335,25 @@ async function confirmDelete() {
                 {{ t('events.view_map') }}
               </a>
             </div>
+
+            <!-- Optional host-set external link (Party::$link, only present
+                 on the resource when set - EventForm.vue's "Event link"
+                 field is the write side; gap D2). -->
+            <div v-if="event.link" class="small" data-testid="event-view-link">
+              {{ t('events.field_event_link') }}:
+              <a :href="event.link" target="_blank" rel="noopener" data-testid="event-view-link-anchor">{{ event.link }}</a>
+            </div>
+
+            <!-- Small static venue map (gap D4) - only for in-person events
+                 with coordinates; the text "view map" link above stays for
+                 everyone (screen readers, and online/no-coords events keep
+                 the location text with no map). -->
+            <EventVenueMap
+              v-if="!event.online && event.lat && event.lng"
+              :lat="event.lat"
+              :lng="event.lng"
+              class="mt-2"
+            />
 
             <div v-if="calendarLinks && upcoming" class="dropdown mt-2" data-testid="event-view-calendar-dropdown">
               <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
@@ -408,6 +471,9 @@ async function confirmDelete() {
         :canedit="canedit"
         :upcoming="upcoming"
         :approved="approved"
+        :finished="finished"
+        :participants="event.stats ? (event.stats.participants ?? 0) : null"
+        :volunteers="event.stats ? (event.stats.volunteers ?? 0) : null"
         class="mb-4"
         @invite="showInvite = true"
       />
@@ -431,6 +497,30 @@ async function confirmDelete() {
         </div>
       </section>
 
+      <!-- Environmental impact (gap D1) - waste/CO2 totals, modelled on
+           components/groups/GroupStats.vue's group-stats-impact stat cards
+           for visual consistency (same neo-brutalist box in this page's
+           <style>). -->
+      <section v-if="finished && event.stats" class="mb-4" data-testid="event-view-impact">
+        <h2>{{ t('events.environmental_impact') }}</h2>
+        <div class="d-flex flex-wrap gap-3">
+          <div class="stat-card" data-testid="event-view-impact-waste">
+            <img src="/images/trash.svg" alt="" class="stat-card__icon">
+            <div class="stat-card__count">{{ kg(event.stats.waste_total) }}</div>
+            <div class="stat-card__label">{{ t('partials.waste_prevented') }}</div>
+          </div>
+          <div class="stat-card" data-testid="event-view-impact-co2">
+            <img src="/images/cloud-empty.svg" alt="" class="stat-card__icon">
+            <div class="stat-card__count">{{ kg(event.stats.co2_total) }}</div>
+            <!-- eslint-disable-next-line vue/no-v-html -->
+            <div class="stat-card__label" v-html="t('partials.co2')" />
+          </div>
+        </div>
+        <p v-if="notIncludedNote" class="small text-muted mt-2 mb-0" data-testid="event-view-impact-notincluded">
+          {{ notIncludedNote }}
+        </p>
+      </section>
+
       <!-- Devices (C5: add/edit/delete for canedit viewers, read-only rows for everyone else) -->
       <EventDevicesPanel
         :event-id="id"
@@ -446,16 +536,57 @@ async function confirmDelete() {
 </template>
 
 <style scoped>
+/* Exact 70x70 square (gap D7), matching develop's EventHeading.vue .datebox
+   (min/max-width/height all pinned to 70px, not just a min-width floor). */
 .datebox {
   color: white;
   background-color: #000;
-  min-width: 60px;
-  min-height: 60px;
-  padding-top: 6px;
+  width: 70px;
+  height: 70px;
+  padding-top: 8px;
 }
 
 .datebox .day {
   font-size: 1.5rem;
   line-height: 1.5rem;
+}
+
+/* develop's EventHeading.vue .groupImage crops non-square uploads instead of
+   squashing them (gap D7). */
+.group-avatar {
+  object-fit: cover;
+}
+
+/* Neo-brutalist stat card - same look as components/groups/GroupStats.vue's
+   .stat-card (white box, near-black border + offset shadow, teal value), for
+   visual consistency across the group/event environmental-impact sections. */
+.stat-card {
+  flex: 1 1 0;
+  min-width: 90px;
+  padding: 1rem 0.5rem;
+  text-align: center;
+  background: #fff;
+  border: 1px solid #222;
+  box-shadow: 4px 4px 0 #222;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+}
+
+.stat-card__icon {
+  height: 40px;
+}
+
+.stat-card__count {
+  font-size: 1.75rem;
+  font-weight: bold;
+  color: var(--bs-primary, #0394a6);
+  line-height: 1;
+}
+
+.stat-card__label {
+  line-height: 1.1;
 }
 </style>

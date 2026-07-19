@@ -11,6 +11,20 @@ import { useAuthStore } from '../../../app/stores/auth.js'
 import en from '../../../i18n/locales/en.json'
 import clientEn from '../../../i18n/locales/client-en.json'
 
+// The page pulls in EventVenueMap.vue (gap D4), which uses the real
+// @vue-leaflet/vue-leaflet package - that package does its own dynamic
+// import()s of Leaflet's marker PNGs to patch L.Icon.Default, which needs a
+// bundler/browser rather than Node's module loader (Vitest runs component
+// tests under Node). Mock the whole package rather than mount it for real,
+// same approach GroupMap.spec.js/EventVenueMap.spec.js take.
+const { LMapStub, LTileLayerStub, LMarkerStub } = vi.hoisted(() => ({
+  LMapStub: { name: 'LMap', props: ['zoom', 'center', 'options', 'useGlobalLeaflet'], template: '<div class="stub-lmap"><slot /></div>' },
+  LTileLayerStub: { name: 'LTileLayer', props: ['url', 'attribution'], template: '<div class="stub-ltilelayer" />' },
+  LMarkerStub: { name: 'LMarker', props: ['latLng', 'icon', 'interactive'], template: '<div class="stub-lmarker" />' },
+}))
+
+vi.mock('@vue-leaflet/vue-leaflet', () => ({ LMap: LMapStub, LTileLayer: LTileLayerStub, LMarker: LMarkerStub }))
+
 const NuxtLinkStub = { props: ['to'], template: '<a :href="to"><slot /></a>' }
 const BAlertStub = { template: '<div><slot /></div>' }
 const BButtonStub = { template: '<button v-bind="$attrs"><slot /></button>' }
@@ -49,13 +63,54 @@ function baseEvent(overrides = {}) {
     approved: true,
     attending: false,
     group: { id: 9, name: 'Acme Restarters', image: null },
-    stats: { fixed_devices: 3, fixed_powered: 2, fixed_unpowered: 1, waste_powered: 4, co2_powered: 5, waste_unpowered: 1, co2_unpowered: 2 },
+    stats: {
+      fixed_devices: 3,
+      fixed_powered: 2,
+      fixed_unpowered: 1,
+      waste_powered: 4,
+      co2_powered: 5,
+      waste_unpowered: 1,
+      co2_unpowered: 2,
+      waste_total: 5,
+      co2_total: 7,
+      dead_devices: 0,
+      repairable_devices: 0,
+      no_weight_powered: 0,
+      no_weight_unpowered: 0,
+      participants: 12,
+      volunteers: 3,
+    },
     ...overrides,
   }
 }
 
 function mountPage() {
-  const i18n = createI18n({ legacy: false, locale: 'en', messages: { en: { ...en, ...clientEn } } })
+  // events.environmental_impact/not_counting/to_be_recycled/to_be_repaired/
+  // no_weight/stat-0/stat-2 are new lang/en/events.php keys (this task's
+  // D1/D3 gaps) not yet in the generated client i18n JSON - the main agent
+  // regenerates that centrally, so they're overlaid here inline rather than
+  // editing client/i18n/locales/*.json directly (see DashboardWhatsHappening
+  // .spec.js for the same pattern).
+  const i18n = createI18n({
+    legacy: false,
+    locale: 'en',
+    messages: {
+      en: {
+        ...en,
+        ...clientEn,
+        events: {
+          ...en.events,
+          environmental_impact: 'Environmental impact',
+          not_counting: "Not counting toward this event's environmental impact is|Not counting toward this event's environmental impact are",
+          to_be_recycled: '{value} item to be recycled|{value} items to be recycled',
+          to_be_repaired: '{value} item to be repaired|{value} items to be repaired',
+          no_weight: '{value} misc or unpowered item with no weight estimate|{value} misc or unpowered items with no weight estimate',
+          'stat-0': 'Participants',
+          'stat-2': 'Volunteers',
+        },
+      },
+    },
+  })
 
   return mount(EventViewPage, {
     global: {
@@ -314,6 +369,110 @@ describe('pages/party/view/[id]', () => {
       eventsStore.current.data = baseEvent({ start: '2020-01-01T10:00:00+00:00', end: '2020-01-01T12:00:00+00:00' })
       const wrapper = mountPage()
       expect(wrapper.find('[data-testid="event-view-calendar-dropdown"]').exists()).toBe(false)
+    })
+  })
+
+  // Gap D1: waste/CO2 stat cards + "not counting" note, modelled on
+  // components/groups/GroupStats.vue's group-stats-impact section.
+  describe('environmental impact (D1)', () => {
+    const finishedRange = { start: '2020-01-01T10:00:00+00:00', end: '2020-01-01T12:00:00+00:00' }
+
+    it('shows rounded waste/co2 totals for a finished event', () => {
+      eventsStore.current.data = baseEvent({ ...finishedRange, stats: { ...baseEvent().stats, waste_total: 5.6, co2_total: 7.4 } })
+      const wrapper = mountPage()
+
+      expect(wrapper.find('[data-testid="event-view-impact-waste"]').text()).toContain('6 kg')
+      expect(wrapper.find('[data-testid="event-view-impact-co2"]').text()).toContain('7 kg')
+    })
+
+    it('does not show the impact section for an upcoming event', () => {
+      eventsStore.current.data = baseEvent()
+      const wrapper = mountPage()
+      expect(wrapper.find('[data-testid="event-view-impact"]').exists()).toBe(false)
+    })
+
+    it('lists dead/repairable/no-weight devices excluded from the totals', () => {
+      eventsStore.current.data = baseEvent({
+        ...finishedRange,
+        stats: { ...baseEvent().stats, dead_devices: 2, repairable_devices: 1, no_weight_powered: 1, no_weight_unpowered: 2 },
+      })
+      const wrapper = mountPage()
+
+      const note = wrapper.find('[data-testid="event-view-impact-notincluded"]').text()
+      expect(note).toContain('2 items to be recycled')
+      expect(note).toContain('1 item to be repaired')
+      expect(note).toContain('3 misc or unpowered items with no weight estimate')
+    })
+
+    it('omits the notincluded note when nothing is excluded', () => {
+      eventsStore.current.data = baseEvent({ ...finishedRange })
+      const wrapper = mountPage()
+      expect(wrapper.find('[data-testid="event-view-impact-notincluded"]').exists()).toBe(false)
+    })
+  })
+
+  // Gap D2: optional host-set external link (Party::$link), only rendered
+  // when the resource actually returns it.
+  describe('event link (D2)', () => {
+    it('renders a clickable external link when event.link is set', () => {
+      eventsStore.current.data = baseEvent({ link: 'https://example.com/signup' })
+      const wrapper = mountPage()
+
+      const anchor = wrapper.find('[data-testid="event-view-link-anchor"]')
+      expect(anchor.exists()).toBe(true)
+      expect(anchor.attributes('href')).toBe('https://example.com/signup')
+      expect(anchor.attributes('target')).toBe('_blank')
+      expect(anchor.attributes('rel')).toBe('noopener')
+    })
+
+    it('does not render a link row when event.link is absent', () => {
+      eventsStore.current.data = baseEvent()
+      const wrapper = mountPage()
+      expect(wrapper.find('[data-testid="event-view-link"]').exists()).toBe(false)
+    })
+  })
+
+  // Gap D4: small Leaflet venue map for in-person events with coordinates.
+  describe('venue map (D4)', () => {
+    it('renders the venue map for an in-person event with coordinates', () => {
+      eventsStore.current.data = baseEvent({ online: false, lat: 51.5, lng: -0.1 })
+      const wrapper = mountPage()
+      expect(wrapper.find('[data-testid="event-venue-map"]').exists()).toBe(true)
+    })
+
+    it('does not render the venue map for an online event', () => {
+      eventsStore.current.data = baseEvent({ online: true, lat: 51.5, lng: -0.1 })
+      const wrapper = mountPage()
+      expect(wrapper.find('[data-testid="event-venue-map"]').exists()).toBe(false)
+    })
+
+    it('does not render the venue map when coordinates are missing', () => {
+      eventsStore.current.data = baseEvent({ online: false, lat: null, lng: null })
+      const wrapper = mountPage()
+      expect(wrapper.find('[data-testid="event-venue-map"]').exists()).toBe(false)
+    })
+  })
+
+  // Gap D3: total-participants/-volunteers headcounts, passed through to
+  // EventAttendees from event.stats (real data, not fabricated - confirmed
+  // against a live GET /api/v2/events/{id}).
+  describe('attendee headcounts (D3)', () => {
+    it('shows participant/volunteer headcounts for a finished event', () => {
+      eventsStore.current.data = baseEvent({
+        start: '2020-01-01T10:00:00+00:00',
+        end: '2020-01-01T12:00:00+00:00',
+        stats: { ...baseEvent().stats, participants: 12, volunteers: 3 },
+      })
+      const wrapper = mountPage()
+
+      expect(wrapper.find('[data-testid="event-attendees-participants"]').text()).toContain('12')
+      expect(wrapper.find('[data-testid="event-attendees-volunteers"]').text()).toContain('3')
+    })
+
+    it('does not show headcounts for an upcoming event', () => {
+      eventsStore.current.data = baseEvent()
+      const wrapper = mountPage()
+      expect(wrapper.find('[data-testid="event-attendees-headcounts"]').exists()).toBe(false)
     })
   })
 })

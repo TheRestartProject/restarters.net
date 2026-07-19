@@ -90,4 +90,19 @@ describe('components/devices/EventDevicesPanel', () => {
     const wrapper = mountPanel({ devices: [] })
     expect(wrapper.find('[data-testid="event-devices-empty"]').exists()).toBe(true)
   })
+
+  // Gap D5: same devices.description_powered/description_unpowered copy
+  // DevicesSearchTable.vue shows under its powered/unpowered toggle.
+  describe('powered/unpowered description (gap D5)', () => {
+    it('shows the powered-item description on the powered tab', () => {
+      const wrapper = mountPanel()
+      expect(wrapper.find('[data-testid="event-devices-description"]').text()).toContain('powered item')
+    })
+
+    it('switches to the unpowered-item description on the unpowered tab', async () => {
+      const wrapper = mountPanel()
+      await wrapper.find('[data-testid="event-devices-tab-unpowered"]').trigger('click')
+      expect(wrapper.find('[data-testid="event-devices-description"]').text()).toContain('unpowered item')
+    })
+  })
 })

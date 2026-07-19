@@ -25,7 +25,17 @@ function confirmedAttendee(overrides = {}) {
 }
 
 function mountComponent(props = {}) {
-  const i18n = createI18n({ legacy: false, locale: 'en', messages: { en: { ...en, ...clientEn } } })
+  // events.stat-0/stat-2 are new lang/en/events.php keys (gap D3) not yet in
+  // the generated client i18n JSON - overlaid inline per
+  // DashboardWhatsHappening.spec.js's pattern rather than editing
+  // client/i18n/locales/*.json directly.
+  const i18n = createI18n({
+    legacy: false,
+    locale: 'en',
+    messages: {
+      en: { ...en, ...clientEn, events: { ...en.events, 'stat-0': 'Participants', 'stat-2': 'Volunteers' } },
+    },
+  })
 
   return mount(EventAttendees, {
     props: { eventId: 5, confirmed: [], invited: [], ...props },
@@ -118,5 +128,30 @@ describe('components/events/EventAttendees', () => {
 
     await wrapper.find('[data-testid="event-attendees-invite-link"]').trigger('click')
     expect(wrapper.emitted('invite')).toBeTruthy()
+  })
+
+  describe('total headcounts (gap D3)', () => {
+    it('shows participant/volunteer counts when finished and the counts are available', () => {
+      const wrapper = mountComponent({ finished: true, participants: 12, volunteers: 3 })
+
+      expect(wrapper.find('[data-testid="event-attendees-participants"]').text()).toBe('12Participants')
+      expect(wrapper.find('[data-testid="event-attendees-volunteers"]').text()).toBe('3Volunteers')
+    })
+
+    it('does not show headcounts for an upcoming (not finished) event', () => {
+      const wrapper = mountComponent({ finished: false, participants: 12, volunteers: 3 })
+      expect(wrapper.find('[data-testid="event-attendees-headcounts"]').exists()).toBe(false)
+    })
+
+    it('does not show headcounts when the counts are unavailable, even if finished', () => {
+      const wrapper = mountComponent({ finished: true, participants: null, volunteers: null })
+      expect(wrapper.find('[data-testid="event-attendees-headcounts"]').exists()).toBe(false)
+    })
+
+    it('shows just the volunteer count when only that is available', () => {
+      const wrapper = mountComponent({ finished: true, participants: null, volunteers: 3 })
+      expect(wrapper.find('[data-testid="event-attendees-participants"]').exists()).toBe(false)
+      expect(wrapper.find('[data-testid="event-attendees-volunteers"]').text()).toBe('3Volunteers')
+    })
   })
 })

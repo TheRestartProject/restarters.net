@@ -42,6 +42,29 @@ const location = computed(() => {
   return typeof loc === 'string' ? loc : loc.location
 })
 
+// Read-more/read-less toggle for the About description, ported from
+// pages/networks/[id].vue's truncatedDescription/showReadMore pattern
+// (develop's GroupDescription.vue uses ReadMore.vue with :max-chars="440").
+const DESCRIPTION_LIMIT = 440
+const showFullDescription = ref(false)
+
+function stripHtml(value) {
+  return String(value).replace(/<[^>]*>/g, '')
+}
+
+const strippedDescription = computed(() => {
+  const description = group.value?.description
+  if (!description) return ''
+  return stripHtml(description)
+})
+
+const showReadMore = computed(() => strippedDescription.value.length > DESCRIPTION_LIMIT)
+
+const truncatedDescription = computed(() => {
+  if (!showReadMore.value) return strippedDescription.value
+  return strippedDescription.value.substring(0, DESCRIPTION_LIMIT) + '...'
+})
+
 const showInvite = ref(false)
 const confirmingArchive = ref(false)
 const archiving = ref(false)
@@ -141,7 +164,7 @@ onMounted(() => {
                 {{ tag.name }}
               </BBadge>
             </div>
-            <div v-if="location" data-testid="group-view-location">{{ location }}</div>
+            <div v-if="location" class="fw-bold" data-testid="group-view-location">{{ location }}</div>
             <a v-if="group.website" :href="group.website" target="_blank" rel="noopener" data-testid="group-view-website">
               {{ t('groups.website') }}
             </a>
@@ -197,7 +220,17 @@ onMounted(() => {
           <h2>{{ t('groups.about') }}</h2>
           <template v-if="group.description">
             <!-- eslint-disable-next-line vue/no-v-html -->
-            <div v-html="group.description" />
+            <div v-if="showFullDescription || !showReadMore" v-html="group.description" />
+            <p v-else data-testid="group-view-description-truncated">{{ truncatedDescription }}</p>
+            <button
+              v-if="showReadMore"
+              type="button"
+              class="btn btn-link p-0"
+              data-testid="group-view-description-toggle"
+              @click="showFullDescription = !showFullDescription"
+            >
+              {{ showFullDescription ? t('groups.read_less') : t('groups.read_more') }}
+            </button>
           </template>
           <p v-else class="text-muted" data-testid="group-view-description-empty">
             {{ t('groups.about_none') }}
@@ -207,7 +240,16 @@ onMounted(() => {
             {{ t('groups.field_phone') }}:
             <a :href="`tel:${group.phone}`">{{ group.phone }}</a>
           </p>
-          <p v-if="group.email" data-testid="group-view-email">
+          <p v-if="group.email" class="d-flex align-items-center gap-2" data-testid="group-view-email">
+            <svg width="30" height="30" viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" class="flex-shrink-0">
+              <g transform="translate(1.25 5)">
+                <path
+                  d="M25.175,4H4.325A3.75,3.75,0,0,0,1,7.75v12.5A3.75,3.75,0,0,0,4.75,24h20a3.75,3.75,0,0,0,3.75-3.75V7.75A3.75,3.75,0,0,0,25.175,4ZM24.6,6.5,16,15.1a1.25,1.25,0,0,1-1.762,0l-8.6-8.6ZM26,20.25a1.25,1.25,0,0,1-1.25,1.25h-20A1.25,1.25,0,0,1,3.5,20.25V8.262l8.6,8.6a3.75,3.75,0,0,0,5.3,0l8.6-8.6Z"
+                  transform="translate(-1 -4)"
+                  fill="#0e1317"
+                />
+              </g>
+            </svg>
             <a :href="`mailto:${group.email}`">{{ group.email }}</a>
           </p>
         </section>

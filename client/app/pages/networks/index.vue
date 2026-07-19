@@ -19,8 +19,17 @@ import { useNetworksStore } from '~/stores/networks.js'
 // (GET /api/v2/networks, public). Both tables are built from the same
 // NetworkSummary list so logos are available for "your networks" too - the
 // legacy page's description column is dropped: NetworkSummary doesn't
-// carry `description` (only the full per-network resource does) - see
+// carry `description` (only the full per-network resource does), and
+// session.user.networks ({id, name} only, SessionController@user) doesn't
+// either - re-confirmed directly against the running API (GET /api/v2/
+// networks, GET /api/v2/session) and both Resources - see
 // docs/nuxt-migration/api-gaps.md Phase E.
+//
+// Legacy always rendered a logo cell (real logo, or a generic placeholder
+// image when the network has none) - ported here using the same
+// placeholder-avatar asset the groups pages already fall back to for a
+// missing image (client/public/images/placeholder-avatar.webp), since the
+// legacy page's own generic-network-logo upload path isn't a client asset.
 definePageMeta({ auth: true })
 
 const { t } = useI18n()
@@ -85,17 +94,17 @@ function retry() {
         <div v-if="!yourNetworks.length" class="text-muted" data-testid="your-networks-empty">
           {{ t('networks.index.your_networks_no_networks') }}
         </div>
-        <table v-else class="table table-striped" data-testid="your-networks-table">
+        <table v-else class="table table-striped table-hover table-layout-fixed" data-testid="your-networks-table">
           <thead>
             <tr>
-              <th scope="col" />
-              <th scope="col">{{ t('networks.general.network') }}</th>
+              <th scope="col" width="20%" />
+              <th scope="col" width="20%">{{ t('networks.general.network') }}</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="network in yourNetworks" :key="network.id" :data-testid="`your-network-row-${network.id}`">
               <td>
-                <img v-if="network.logo" :src="network.logo" :alt="t('client.networks.logo_alt', { name: network.name })" style="width: auto; height: 50px">
+                <img :src="network.logo || '/images/placeholder-avatar.webp'" :alt="t('client.networks.logo_alt', { name: network.name })" style="width: auto; height: 50px">
               </td>
               <td>
                 <NuxtLink :to="`/networks/${network.id}`" :data-testid="`your-network-link-${network.id}`">
@@ -114,17 +123,17 @@ function retry() {
         <div v-if="!allNetworks.length" class="text-muted" data-testid="all-networks-empty">
           {{ t('networks.index.all_networks_no_networks') }}
         </div>
-        <table v-else class="table table-striped" data-testid="all-networks-table">
+        <table v-else class="table table-striped table-hover table-layout-fixed" data-testid="all-networks-table">
           <thead>
             <tr>
-              <th scope="col" />
-              <th scope="col">{{ t('networks.general.network') }}</th>
+              <th scope="col" width="20%" />
+              <th scope="col" width="20%">{{ t('networks.general.network') }}</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="network in allNetworks" :key="network.id" :data-testid="`all-network-row-${network.id}`">
               <td>
-                <img v-if="network.logo" :src="network.logo" :alt="t('client.networks.logo_alt', { name: network.name })" style="width: auto; height: 50px">
+                <img :src="network.logo || '/images/placeholder-avatar.webp'" :alt="t('client.networks.logo_alt', { name: network.name })" style="width: auto; height: 50px">
               </td>
               <td>
                 <NuxtLink :to="`/networks/${network.id}`" :data-testid="`all-network-link-${network.id}`">

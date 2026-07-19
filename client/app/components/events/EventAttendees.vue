@@ -44,6 +44,26 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  // Gap D3: develop's EventAttendance.vue shows total-participants/
+  // -volunteers headcounts next to the confirmed/invited tabs once the event
+  // has happened (`!upcoming` there - narrowed to `finished` here per this
+  // task's brief). Sourced from event.stats.participants/volunteers
+  // (Party::getEventStats(), confirmed on a live GET /api/v2/events/{id} -
+  // both fields are genuinely on the resource, not fabricated); the parent
+  // page passes null when event.stats itself isn't loaded yet, which hides
+  // the row entirely rather than showing a false zero.
+  finished: {
+    type: Boolean,
+    default: false,
+  },
+  participants: {
+    type: Number,
+    default: null,
+  },
+  volunteers: {
+    type: Number,
+    default: null,
+  },
 })
 
 const emit = defineEmits(['invite'])
@@ -100,6 +120,17 @@ async function confirmRemove(attendee) {
     </div>
 
     <template v-else>
+      <div v-if="finished && (participants !== null || volunteers !== null)" class="d-flex flex-wrap gap-4 mb-3" data-testid="event-attendees-headcounts">
+        <div v-if="participants !== null" data-testid="event-attendees-participants">
+          <div class="h3 mb-0">{{ participants }}</div>
+          <div class="small text-muted">{{ t('events.stat-0') }}</div>
+        </div>
+        <div v-if="volunteers !== null" data-testid="event-attendees-volunteers">
+          <div class="h3 mb-0">{{ volunteers }}</div>
+          <div class="small text-muted">{{ t('events.stat-2') }}</div>
+        </div>
+      </div>
+
       <ul class="nav nav-tabs">
         <li class="nav-item">
           <button

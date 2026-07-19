@@ -76,4 +76,18 @@ describe('components/devices/DevicePhotos', () => {
 
     expect(store.deleteDeviceImage).toHaveBeenCalledWith(5, 7, 9)
   })
+
+  describe('5-image cap (gap 14)', () => {
+    it('shows the upload widget when under the limit', () => {
+      const wrapper = mountPhotos({ images: [{ idxref: 1, path: 'a.jpg' }] })
+      expect(wrapper.findComponent(TusImageUploadStub).exists()).toBe(true)
+    })
+
+    it('hides the upload widget once 5 images already exist', () => {
+      const images = Array.from({ length: 5 }, (_, i) => ({ idxref: i + 1, path: `${i}.jpg` }))
+      const wrapper = mountPhotos({ images })
+      expect(wrapper.findComponent(TusImageUploadStub).exists()).toBe(false)
+      expect(wrapper.findAll('[data-testid="device-photo"]')).toHaveLength(5)
+    })
+  })
 })

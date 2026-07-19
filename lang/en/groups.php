@@ -55,6 +55,8 @@ return [
   'upcoming_none_planned' => 'None planned',
   'invite_volunteers' => 'Invite volunteers',
   'about' => 'About',
+  'read_more' => 'Read more',
+  'read_less' => 'Read less',
   'volunteers' => 'Volunteers',
   'invite_to_group' => 'Invite to group',
   'participants' => 'participants',

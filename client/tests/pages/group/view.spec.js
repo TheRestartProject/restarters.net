@@ -48,7 +48,15 @@ const BASE_GROUP = {
 }
 
 function mountPage() {
-  const i18n = createI18n({ legacy: false, locale: 'en', messages: { en: { ...en, ...clientEn } } })
+  // groups.read_more/read_less (gap 9's About read-more toggle) aren't in
+  // the checked-in i18n/locales fixtures yet (they're regenerated from
+  // lang/en/groups.php by `translations:export-client`, which this task
+  // deliberately doesn't run) - overlay them here instead.
+  const i18n = createI18n({
+    legacy: false,
+    locale: 'en',
+    messages: { en: { ...en, ...clientEn, groups: { ...en.groups, read_more: 'Read more', read_less: 'Read less' } } },
+  })
 
   return mount(GroupViewPage, {
     global: {
@@ -103,15 +111,56 @@ describe('pages/group/view/[id]', () => {
     expect(groupsStore.fetchCurrent).toHaveBeenCalledTimes(2)
   })
 
-  it('renders the header: image class hook, name, location and website', () => {
+  it('renders the header: image class hook, name, bold location and website', () => {
     groupsStore.current.data = BASE_GROUP
 
     const wrapper = mountPage()
 
     expect(wrapper.find('img.groupImage').exists()).toBe(true)
     expect(wrapper.find('[data-testid="group-view-name"]').text()).toBe('Fixers United')
-    expect(wrapper.find('[data-testid="group-view-location"]').text()).toBe('Anytown')
+    const location = wrapper.find('[data-testid="group-view-location"]')
+    expect(location.text()).toBe('Anytown')
+    expect(location.classes()).toContain('fw-bold')
     expect(wrapper.find('[data-testid="group-view-website"]').exists()).toBe(true)
+  })
+
+  describe('description read-more/read-less (gap 9)', () => {
+    it('renders a short description in full with no toggle', () => {
+      groupsStore.current.data = BASE_GROUP
+      const wrapper = mountPage()
+
+      expect(wrapper.find('[data-testid="group-view-description-toggle"]').exists()).toBe(false)
+      expect(wrapper.find('[data-testid="group-view-description-truncated"]').exists()).toBe(false)
+      expect(wrapper.text()).toContain('We fix things.')
+    })
+
+    it('truncates a long description behind a read-more toggle, then expands it', async () => {
+      const longText = 'A'.repeat(500)
+      groupsStore.current.data = { ...BASE_GROUP, description: `<p>${longText}</p>` }
+      const wrapper = mountPage()
+
+      const truncated = wrapper.find('[data-testid="group-view-description-truncated"]')
+      expect(truncated.exists()).toBe(true)
+      expect(truncated.text().length).toBeLessThan(longText.length)
+      expect(truncated.text().endsWith('...')).toBe(true)
+
+      const toggle = wrapper.find('[data-testid="group-view-description-toggle"]')
+      expect(toggle.text()).toBe('Read more')
+
+      await toggle.trigger('click')
+      expect(wrapper.find('[data-testid="group-view-description-truncated"]').exists()).toBe(false)
+      expect(wrapper.text()).toContain(longText)
+      expect(wrapper.find('[data-testid="group-view-description-toggle"]').text()).toBe('Read less')
+    })
+  })
+
+  it('shows a mail icon before the mailto link when the group has an email', () => {
+    groupsStore.current.data = { ...BASE_GROUP, email: 'group@example.com' }
+    const wrapper = mountPage()
+
+    const email = wrapper.find('[data-testid="group-view-email"]')
+    expect(email.find('svg').exists()).toBe(true)
+    expect(email.find('a').attributes('href')).toBe('mailto:group@example.com')
   })
 
   describe('permission-gated buttons', () => {

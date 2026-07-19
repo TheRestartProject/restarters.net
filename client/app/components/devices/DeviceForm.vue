@@ -156,6 +156,24 @@ const itemTypeSuggestions = computed(() =>
   itemTypes.value.filter((i) => i.type && Boolean(i.powered) === Boolean(props.powered)).map((i) => i.type)
 )
 
+// Ports DeviceType.vue/DeviceBrand.vue's `notASuggestion` warnings: flag a
+// typed value that isn't one of the known suggestions. Skipped when it
+// still matches the value the device was saved with, so opening an
+// existing device that already has an off-list value (legacy free text)
+// doesn't immediately nag before the user has changed anything.
+const savedItemType = props.device?.item_type || ''
+const savedBrand = props.device?.brand || ''
+
+const itemTypeUnknown = computed(() => {
+  if (!form.itemType || form.itemType === savedItemType) return false
+  return !itemTypeSuggestions.value.includes(form.itemType)
+})
+
+const brandUnknown = computed(() => {
+  if (!form.brand || form.brand === savedBrand) return false
+  return !brands.value.some((b) => b.brand_name === form.brand)
+})
+
 function categoryOptionsForCluster(cluster) {
   return (cluster.categories || []).filter((c) => c.idcategories !== miscCategoryId.value)
 }
@@ -247,135 +265,157 @@ defineExpose({ submit })
       {{ generalError }}
     </BAlert>
 
-    <BFormGroup :label="`${t('devices.item_type')}:`" label-for="device-form-item-type">
-      <input
-        id="device-form-item-type"
-        v-model="form.itemType"
-        type="text"
-        class="form-control"
-        list="device-form-item-type-list"
-        data-testid="device-form-item-type"
-      >
-      <datalist id="device-form-item-type-list">
-        <option v-for="s in itemTypeSuggestions" :key="s" :value="s" />
-      </datalist>
-    </BFormGroup>
+    <!-- develop's EventDevice.vue: three bordered cards (Item/Repair/
+         Assessment) on a row, rather than one flat form. -->
+    <div class="device-form-grid">
+      <div class="device-form-card" data-testid="device-form-card-item">
+        <h3>{{ t('devices.title_items') }}</h3>
 
-    <BFormGroup :label="`${t('devices.category')}:`" label-for="device-form-category">
-      <select
-        id="device-form-category"
-        v-model.number="form.category"
-        class="form-select"
-        :class="{ 'is-invalid': missingCategory, 'border-warning': categorySuggested }"
-        data-testid="device-form-category"
-      >
-        <option :value="null" />
-        <optgroup v-for="cluster in clusters" :key="cluster.id" :label="t(cluster.name)">
-          <option v-for="c in categoryOptionsForCluster(cluster)" :key="c.idcategories" :value="c.idcategories">
-            {{ t(c.name) }}
-          </option>
-        </optgroup>
-        <option :value="miscCategoryId">{{ t('partials.category_none') }}</option>
-      </select>
-      <div v-if="missingCategory" class="invalid-feedback d-block" data-testid="device-form-category-error">
-        {{ t('events.form_error') }}
+        <BFormGroup :label="`${t('devices.item_type')}:`" label-for="device-form-item-type">
+          <input
+            id="device-form-item-type"
+            v-model="form.itemType"
+            type="text"
+            class="form-control"
+            list="device-form-item-type-list"
+            data-testid="device-form-item-type"
+          >
+          <datalist id="device-form-item-type-list">
+            <option v-for="s in itemTypeSuggestions" :key="s" :value="s" />
+          </datalist>
+          <small v-if="itemTypeUnknown" class="form-text text-warning d-block" data-testid="device-form-item-type-warning">
+            {{ t('devices.unknown_item_type') }}
+          </small>
+        </BFormGroup>
+
+        <BFormGroup :label="`${t('devices.category')}:`" label-for="device-form-category">
+          <select
+            id="device-form-category"
+            v-model.number="form.category"
+            class="form-select"
+            :class="{ 'is-invalid': missingCategory, 'border-warning': categorySuggested }"
+            data-testid="device-form-category"
+          >
+            <option :value="null" />
+            <optgroup v-for="cluster in clusters" :key="cluster.id" :label="t(cluster.name)">
+              <option v-for="c in categoryOptionsForCluster(cluster)" :key="c.idcategories" :value="c.idcategories">
+                {{ t(c.name) }}
+              </option>
+            </optgroup>
+            <option :value="miscCategoryId">{{ t('partials.category_none') }}</option>
+          </select>
+          <div v-if="missingCategory" class="invalid-feedback d-block" data-testid="device-form-category-error">
+            {{ t('events.form_error') }}
+          </div>
+        </BFormGroup>
+
+        <BFormGroup :label="`${t('devices.brand')}:`" label-for="device-form-brand">
+          <input
+            id="device-form-brand"
+            v-model="form.brand"
+            type="text"
+            class="form-control"
+            list="device-form-brand-list"
+            data-testid="device-form-brand"
+          >
+          <datalist id="device-form-brand-list">
+            <option v-for="b in brands" :key="b.id" :value="b.brand_name" />
+          </datalist>
+          <small v-if="brandUnknown" class="form-text text-warning d-block" data-testid="device-form-brand-warning">
+            {{ t('devices.unknown_brand') }}
+          </small>
+        </BFormGroup>
+
+        <BFormGroup :label="`${t('devices.model')}:`" label-for="device-form-model">
+          <input id="device-form-model" v-model="form.model" type="text" class="form-control" data-testid="device-form-model">
+        </BFormGroup>
+
+        <BFormGroup :label="`${t('devices.age')}:`" label-for="device-form-age">
+          <input
+            id="device-form-age"
+            v-model="form.age"
+            type="number"
+            min="0"
+            step="0.5"
+            max="500"
+            class="form-control"
+            data-testid="device-form-age"
+          >
+          <small class="form-text text-muted">{{ t('devices.age_approx') }}</small>
+        </BFormGroup>
+
+        <BFormGroup v-if="showWeight" :label="`${t('devices.weight')}:`" label-for="device-form-weight">
+          <input
+            id="device-form-weight"
+            v-model="form.estimate"
+            type="number"
+            min="0"
+            step="0.1"
+            max="500"
+            class="form-control"
+            data-testid="device-form-weight"
+          >
+          <small class="form-text text-muted">
+            {{ weightRequired ? t('devices.required_impact') : t('devices.optional_impact') }}
+          </small>
+        </BFormGroup>
+
+        <DevicePhotos v-if="editing" :event-id="eventId" :device-id="device.id" :images="device.images || []" />
       </div>
-    </BFormGroup>
 
-    <BFormGroup :label="`${t('devices.brand')}:`" label-for="device-form-brand">
-      <input
-        id="device-form-brand"
-        v-model="form.brand"
-        type="text"
-        class="form-control"
-        list="device-form-brand-list"
-        data-testid="device-form-brand"
-      >
-      <datalist id="device-form-brand-list">
-        <option v-for="b in brands" :key="b.id" :value="b.brand_name" />
-      </datalist>
-    </BFormGroup>
+      <div class="device-form-card" data-testid="device-form-card-repair">
+        <h3>{{ t('devices.title_repair') }}</h3>
 
-    <BFormGroup :label="`${t('devices.model')}:`" label-for="device-form-model">
-      <input id="device-form-model" v-model="form.model" type="text" class="form-control" data-testid="device-form-model">
-    </BFormGroup>
+        <BFormGroup :label="`${t('devices.repair_status')}:`" label-for="device-form-status">
+          <select id="device-form-status" v-model="form.repairStatus" class="form-select" data-testid="device-form-status">
+            <option value="" />
+            <option :value="STATUS_FIXED">{{ t('partials.fixed') }}</option>
+            <option :value="STATUS_REPAIRABLE">{{ t('partials.repairable') }}</option>
+            <option :value="STATUS_END_OF_LIFE">{{ t('partials.end_of_life') }}</option>
+          </select>
+        </BFormGroup>
 
-    <BFormGroup :label="`${t('devices.age')}:`" label-for="device-form-age">
-      <input
-        id="device-form-age"
-        v-model="form.age"
-        type="number"
-        min="0"
-        step="0.5"
-        max="500"
-        class="form-control"
-        data-testid="device-form-age"
-      >
-      <small class="form-text text-muted">{{ t('devices.age_approx') }}</small>
-    </BFormGroup>
+        <BFormGroup v-if="showNextSteps" :label="`${t('devices.repair_details')}:`" label-for="device-form-next-steps">
+          <select id="device-form-next-steps" v-model="form.nextSteps" class="form-select" data-testid="device-form-next-steps">
+            <option value="" />
+            <option v-for="n in options.next_steps" :key="n" :value="n">{{ t(nextStepLabel(n)) }}</option>
+          </select>
+        </BFormGroup>
 
-    <BFormGroup v-if="showWeight" :label="`${t('devices.weight')}:`" label-for="device-form-weight">
-      <input
-        id="device-form-weight"
-        v-model="form.estimate"
-        type="number"
-        min="0"
-        step="0.1"
-        max="500"
-        class="form-control"
-        data-testid="device-form-weight"
-      >
-      <small class="form-text text-muted">
-        {{ weightRequired ? t('devices.required_impact') : t('devices.optional_impact') }}
-      </small>
-    </BFormGroup>
+        <BFormGroup v-if="showSpareParts" :label="`${t('devices.spare_parts')}:`" label-for="device-form-spare-parts">
+          <select id="device-form-spare-parts" v-model="form.spareParts" class="form-select" data-testid="device-form-spare-parts">
+            <option value="" />
+            <option v-for="p in options.spare_parts" :key="p" :value="p">{{ t(sparePartsLabel(p)) }}</option>
+          </select>
+        </BFormGroup>
 
-    <BFormGroup :label="`${t('devices.repair_status')}:`" label-for="device-form-status">
-      <select id="device-form-status" v-model="form.repairStatus" class="form-select" data-testid="device-form-status">
-        <option value="" />
-        <option :value="STATUS_FIXED">{{ t('partials.fixed') }}</option>
-        <option :value="STATUS_REPAIRABLE">{{ t('partials.repairable') }}</option>
-        <option :value="STATUS_END_OF_LIFE">{{ t('partials.end_of_life') }}</option>
-      </select>
-    </BFormGroup>
+        <BFormGroup v-if="showBarrier" :label="`${t('partials.choose_barriers')}:`" label-for="device-form-barrier">
+          <select id="device-form-barrier" v-model="form.barrier" class="form-select" data-testid="device-form-barrier">
+            <option value="" />
+            <option v-for="b in options.barriers" :key="b.id" :value="b.name">{{ t(b.name) }}</option>
+          </select>
+        </BFormGroup>
+      </div>
 
-    <BFormGroup v-if="showNextSteps" :label="`${t('devices.repair_details')}:`" label-for="device-form-next-steps">
-      <select id="device-form-next-steps" v-model="form.nextSteps" class="form-select" data-testid="device-form-next-steps">
-        <option value="" />
-        <option v-for="n in options.next_steps" :key="n" :value="n">{{ t(nextStepLabel(n)) }}</option>
-      </select>
-    </BFormGroup>
+      <div class="device-form-card" data-testid="device-form-card-assessment">
+        <h3>{{ t('devices.title_assessment') }}</h3>
 
-    <BFormGroup v-if="showSpareParts" :label="`${t('devices.spare_parts')}:`" label-for="device-form-spare-parts">
-      <select id="device-form-spare-parts" v-model="form.spareParts" class="form-select" data-testid="device-form-spare-parts">
-        <option value="" />
-        <option v-for="p in options.spare_parts" :key="p" :value="p">{{ t(sparePartsLabel(p)) }}</option>
-      </select>
-    </BFormGroup>
+        <BFormGroup :label="`${t('devices.devices_description')}:`" label-for="device-form-problem">
+          <textarea id="device-form-problem" v-model="form.problem" rows="4" class="form-control" data-testid="device-form-problem" />
+        </BFormGroup>
 
-    <BFormGroup v-if="showBarrier" :label="`${t('partials.choose_barriers')}:`" label-for="device-form-barrier">
-      <select id="device-form-barrier" v-model="form.barrier" class="form-select" data-testid="device-form-barrier">
-        <option value="" />
-        <option v-for="b in options.barriers" :key="b.id" :value="b.name">{{ t(b.name) }}</option>
-      </select>
-    </BFormGroup>
-
-    <BFormGroup :label="`${t('devices.devices_description')}:`" label-for="device-form-problem">
-      <textarea id="device-form-problem" v-model="form.problem" rows="4" class="form-control" data-testid="device-form-problem" />
-    </BFormGroup>
-
-    <BFormGroup :label="`${t('client.devices.notes')}:`" label-for="device-form-notes">
-      <textarea
-        id="device-form-notes"
-        v-model="form.notes"
-        rows="4"
-        class="form-control"
-        :placeholder="t('devices.placeholder_notes')"
-        data-testid="device-form-notes"
-      />
-    </BFormGroup>
-
-    <DevicePhotos v-if="editing" :event-id="eventId" :device-id="device.id" :images="device.images || []" />
+        <BFormGroup :label="`${t('client.devices.notes')}:`" label-for="device-form-notes">
+          <textarea
+            id="device-form-notes"
+            v-model="form.notes"
+            rows="4"
+            class="form-control"
+            :placeholder="t('devices.placeholder_notes')"
+            data-testid="device-form-notes"
+          />
+        </BFormGroup>
+      </div>
+    </div>
 
     <BFormGroup v-if="!editing" :label="`${t('client.devices.quantity')}:`" label-for="device-form-quantity">
       <select id="device-form-quantity" v-model.number="form.quantity" class="form-select w-auto" data-testid="device-form-quantity">
@@ -393,3 +433,24 @@ defineExpose({ submit })
     </div>
   </BForm>
 </template>
+
+<style scoped>
+.device-form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.device-form-card {
+  border: 1px solid #dee2e6;
+  border-radius: 0.25rem;
+  padding: 1rem;
+}
+
+.device-form-card h3 {
+  font-size: 1.1rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+</style>

@@ -114,6 +114,15 @@ function onAdded() {
         </li>
       </ul>
 
+      <!-- Gap D5: same explanatory copy DevicesSearchTable.vue shows under
+           its powered/unpowered toggle, reusing the fixometer's existing
+           devices.description_powered/description_unpowered lang keys
+           (contain a <b> tag, hence v-html). -->
+      <p class="text-brand small" data-testid="event-devices-description">
+        <!-- eslint-disable-next-line vue/no-v-html -->
+        <span v-html="activeTab === 'powered' ? t('devices.description_powered') : t('devices.description_unpowered')" />
+      </p>
+
       <div v-if="activeTab === 'powered'">
         <div class="table-responsive pt-3">
           <table class="table" data-testid="event-devices-table-powered">

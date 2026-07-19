@@ -52,7 +52,26 @@ function seedMeta(store) {
 }
 
 function mountForm(props = {}) {
-  const i18n = createI18n({ legacy: false, locale: 'en', messages: { en: { ...en, ...clientEn } } })
+  // devices.title_repair/unknown_item_type/unknown_brand (gaps 7 and 13)
+  // aren't in the checked-in i18n/locales fixtures yet (they're
+  // regenerated from lang/en/devices.php by `translations:export-client`,
+  // which this task deliberately doesn't run) - overlay them here instead.
+  const i18n = createI18n({
+    legacy: false,
+    locale: 'en',
+    messages: {
+      en: {
+        ...en,
+        ...clientEn,
+        devices: {
+          ...en.devices,
+          title_repair: 'REPAIR',
+          unknown_item_type: "You're creating a new item type. Are you sure an existing item type is not suitable?",
+          unknown_brand: "You're creating a new brand. Are you sure an existing brand is not suitable?",
+        },
+      },
+    },
+  })
 
   return mount(DeviceForm, {
     props: { eventId: 5, powered: true, ...props },
@@ -275,6 +294,63 @@ describe('components/devices/DeviceForm', () => {
       await wrapper.vm.$nextTick()
 
       expect(store.updateDevice).toHaveBeenCalledWith(5, 7, expect.objectContaining({ category: 10, item_type: 'Kettle' }))
+    })
+  })
+
+  describe('three-card layout (EventDevice.vue port, gap 7)', () => {
+    it('renders the Item/Repair/Assessment cards, each with its own header', () => {
+      const wrapper = mountForm()
+
+      const item = wrapper.find('[data-testid="device-form-card-item"]')
+      const repair = wrapper.find('[data-testid="device-form-card-repair"]')
+      const assessment = wrapper.find('[data-testid="device-form-card-assessment"]')
+
+      expect(item.exists()).toBe(true)
+      expect(item.find('h3').text()).toBe('ITEM')
+      expect(item.find('[data-testid="device-form-item-type"]').exists()).toBe(true)
+      expect(item.find('[data-testid="device-form-brand"]').exists()).toBe(true)
+
+      expect(repair.exists()).toBe(true)
+      expect(repair.find('h3').text()).toBe('REPAIR')
+      expect(repair.find('[data-testid="device-form-status"]').exists()).toBe(true)
+
+      expect(assessment.exists()).toBe(true)
+      expect(assessment.find('h3').text()).toBe('ASSESSMENT')
+      expect(assessment.find('[data-testid="device-form-problem"]').exists()).toBe(true)
+      expect(assessment.find('[data-testid="device-form-notes"]').exists()).toBe(true)
+    })
+  })
+
+  describe('unknown item-type/brand warning (gap 33)', () => {
+    it('warns when the typed item type matches no suggestion', async () => {
+      const wrapper = mountForm()
+      expect(wrapper.find('[data-testid="device-form-item-type-warning"]').exists()).toBe(false)
+
+      await wrapper.find('[data-testid="device-form-item-type"]').setValue('Not A Real Type')
+      expect(wrapper.find('[data-testid="device-form-item-type-warning"]').exists()).toBe(true)
+
+      await wrapper.find('[data-testid="device-form-item-type"]').setValue('Blender')
+      expect(wrapper.find('[data-testid="device-form-item-type-warning"]').exists()).toBe(false)
+    })
+
+    it('warns when the typed brand matches no suggestion', async () => {
+      const wrapper = mountForm()
+      expect(wrapper.find('[data-testid="device-form-brand-warning"]').exists()).toBe(false)
+
+      await wrapper.find('[data-testid="device-form-brand"]').setValue('Not A Real Brand')
+      expect(wrapper.find('[data-testid="device-form-brand-warning"]').exists()).toBe(true)
+
+      await wrapper.find('[data-testid="device-form-brand"]').setValue('Acme')
+      expect(wrapper.find('[data-testid="device-form-brand-warning"]').exists()).toBe(false)
+    })
+
+    it('does not warn when editing and the field still matches the device`s saved value', () => {
+      const wrapper = mountForm({
+        device: { id: 7, item_type: 'A Legacy Free-Text Type', brand: 'A Legacy Free-Text Brand', category: { id: 10 }, images: [] },
+      })
+
+      expect(wrapper.find('[data-testid="device-form-item-type-warning"]').exists()).toBe(false)
+      expect(wrapper.find('[data-testid="device-form-brand-warning"]').exists()).toBe(false)
     })
   })
 })

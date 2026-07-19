@@ -38,6 +38,7 @@ return [
   'placeholder_notes' => 'Notes.  Examples: repair difficulties, owner\'s perception of problem etc. Helping with the end of Windows 10? Add the #EndOf10 hashtag in the notes.',
   'title_items' => 'ITEM',
   'title_items_at_event' => 'Items at this event',
+  'title_repair' => 'REPAIR',
   'title_assessment' => 'ASSESSMENT',
   'title_powered' => 'POWERED',
   'title_unpowered' => 'UNPOWERED',
@@ -55,4 +56,6 @@ return [
   'image_delete_success' => 'Thank you, the image has been deleted',
   'image_delete_error' => 'Sorry, but the image can\'t be deleted',
   'image_upload_error' => 'fail - image could not be uploaded',
+  'unknown_item_type' => 'You\'re creating a new item type. Are you sure an existing item type is not suitable?',
+  'unknown_brand' => 'You\'re creating a new brand. Are you sure an existing brand is not suitable?',
 ];

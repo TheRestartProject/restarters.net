@@ -117,6 +117,29 @@ describe('pages/networks/index', () => {
     expect(ncWrapper.find('[data-testid="all-networks-section"]').exists()).toBe(false)
   })
 
+  it('shows a real logo when present, and a generic placeholder when absent, in a hoverable fixed-layout table', async () => {
+    networksStore.fetchList = vi.fn().mockImplementation(async () => {
+      networksStore.list.data = [
+        { id: 1, name: 'Test London', logo: 'https://example.com/logo.png' },
+        { id: 2, name: 'Test Scotland', logo: null },
+      ]
+    })
+    setLoggedInUser({ id: 1, role_name: 'Administrator', networks: [{ id: 1, name: 'Test London' }, { id: 2, name: 'Test Scotland' }] })
+
+    const wrapper = mountPage()
+    await flushPromises()
+
+    const table = wrapper.get('[data-testid="your-networks-table"]')
+    expect(table.classes()).toContain('table-hover')
+    expect(table.classes()).toContain('table-layout-fixed')
+
+    const row1 = wrapper.get('[data-testid="your-network-row-1"]')
+    expect(row1.get('img').attributes('src')).toBe('https://example.com/logo.png')
+
+    const row2 = wrapper.get('[data-testid="your-network-row-2"]')
+    expect(row2.get('img').attributes('src')).toBe('/images/placeholder-avatar.webp')
+  })
+
   it('shows a load error with retry on failure', async () => {
     setLoggedInUser({ id: 1, role_name: 'Administrator', networks: [] })
     networksStore.fetchList = vi.fn().mockImplementation(async () => {

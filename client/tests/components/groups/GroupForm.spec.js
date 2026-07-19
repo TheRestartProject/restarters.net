@@ -7,6 +7,31 @@ import { useGroupsStore } from '../../../app/stores/groups.js'
 import en from '../../../i18n/locales/en.json'
 import clientEn from '../../../i18n/locales/client-en.json'
 
+// GroupForm.vue's location-preview map (gap 10) uses real @vue-leaflet/
+// vue-leaflet, which does its own dynamic import()s of Leaflet's marker
+// PNGs to patch L.Icon.Default - that needs a bundler/browser, not Node's
+// module loader, so mount it as plain stubs instead (same approach
+// GroupMap.spec.js already takes for the full group-finder map).
+const { LMapStub, LTileLayerStub, LMarkerStub } = vi.hoisted(() => ({
+  LMapStub: {
+    name: 'LMap',
+    props: ['zoom', 'center', 'useGlobalLeaflet'],
+    template: '<div class="stub-lmap"><slot /></div>',
+  },
+  LTileLayerStub: {
+    name: 'LTileLayer',
+    props: ['url', 'attribution'],
+    template: '<div class="stub-ltilelayer" />',
+  },
+  LMarkerStub: {
+    name: 'LMarker',
+    props: ['latLng', 'icon'],
+    template: '<div class="stub-lmarker" />',
+  },
+}))
+
+vi.mock('@vue-leaflet/vue-leaflet', () => ({ LMap: LMapStub, LTileLayer: LTileLayerStub, LMarker: LMarkerStub }))
+
 // RichTextEditor/LocationPicker are unit-tested on their own
 // (tests/components/forms/*.spec.js) - stub them here to plain inputs so
 // GroupForm's own logic (payload shape, permission gating, validation, 422
@@ -255,6 +280,26 @@ describe('components/groups/GroupForm', () => {
     it('does not show the moderate control once the group is already approved', () => {
       const wrapper = mountForm({ groupId: 5, initialGroup: GROUP, permissions: { can_demote: true } })
       expect(wrapper.find('[data-testid="group-form-moderate"]').exists()).toBe(false)
+    })
+  })
+
+  describe('location map preview (gap 10)', () => {
+    it('is hidden until lat/lng are set', () => {
+      const wrapper = mountForm()
+      expect(wrapper.find('[data-testid="group-form-map-preview"]').exists()).toBe(false)
+    })
+
+    it('shows a marker at the geocoded lat/lng once set', () => {
+      const wrapper = mountForm({
+        groupId: 5,
+        initialGroup: { location: { location: 'Anytown', lat: 1, lng: 2 } },
+      })
+      const preview = wrapper.find('[data-testid="group-form-map-preview"]')
+      expect(preview.exists()).toBe(true)
+
+      const marker = wrapper.findComponent(LMarkerStub)
+      expect(marker.exists()).toBe(true)
+      expect(marker.props('latLng')).toEqual([1, 2])
     })
   })
 })

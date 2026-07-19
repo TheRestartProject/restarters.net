@@ -61,4 +61,11 @@ describe('components/networks/NetworkStats', () => {
     const wrapper = mountComponent({ stats: stats(), groupsCount: null })
     expect(wrapper.find('[data-testid="network-stats-groups"]').text()).toContain('0')
   })
+
+  it('renders the groups/events counts as uniform bordered stat-box cards', () => {
+    const wrapper = mountComponent({ stats: stats(), groupsCount: 4 })
+
+    expect(wrapper.get('[data-testid="network-stats-groups"]').classes()).toContain('stat-box')
+    expect(wrapper.get('[data-testid="network-stats-parties"]').classes()).toContain('stat-box')
+  })
 })

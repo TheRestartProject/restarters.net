@@ -1,9 +1,13 @@
 <script setup>
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useDevicesStore } from '../../stores/devices.js'
 import { useUploadedImageUrl } from '../../composables/useUploadedImageUrl.js'
 import TusImageUpload from '../forms/TusImageUpload.vue'
+
+// develop's DeviceImages.vue: maxFiles = 5, the upload widget is hidden
+// once that many images already exist for this device.
+const MAX_IMAGES = 5
 
 // tus photo upload + display for one device (api-contracts-phase-c.md C1f/
 // C5). Functional spec: resources/js/components/DeviceImages.vue +
@@ -33,6 +37,8 @@ const { uploadedImageUrl } = useUploadedImageUrl()
 const uploadError = ref('')
 const uploading = ref(false)
 const deletingIdxref = ref(null)
+
+const atLimit = computed(() => props.images.length >= MAX_IMAGES)
 
 async function onUploaded({ uploadKey }) {
   uploadError.value = ''
@@ -85,7 +91,7 @@ async function removeImage(image) {
       </div>
     </div>
 
-    <TusImageUpload @uploaded="onUploaded" @upload-error="onUploadError" />
+    <TusImageUpload v-if="!atLimit" @uploaded="onUploaded" @upload-error="onUploadError" />
 
     <BAlert v-if="uploadError" :model-value="true" variant="danger" data-testid="device-photos-error">
       {{ uploadError }}
