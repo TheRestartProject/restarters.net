@@ -10,6 +10,23 @@ export const USERS = {
 }
 
 export async function login(page, { email, password } = USERS.admin) {
+  // Clear any persisted session from a PRIOR login() in the same test (several
+  // tests log in as one user for setup, then re-login as another to switch).
+  // /login is now guest-gated (definePageMeta guest:true) - it redirects a
+  // logged-in user to /dashboard - so without clearing first, goto('/login')
+  // would bounce to /dashboard and the login form would never appear (a 120s
+  // timeout waiting for login-email). localStorage.clear() needs an app origin,
+  // so it is best-effort (about:blank on the very first login just no-ops).
+  await page.evaluate(() => {
+    try {
+      localStorage.clear()
+      sessionStorage.clear()
+    } catch {
+      // no window/origin yet (first login of the test) - nothing to clear
+    }
+  }).catch(() => {})
+  await page.context().clearCookies()
+
   await page.goto('/login')
   await page.getByTestId('login-email').fill(email)
   await page.getByTestId('login-password').fill(password)
