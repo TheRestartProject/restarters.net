@@ -191,26 +191,28 @@ onMounted(() => {
         </div>
       </header>
 
-      <section class="mb-4" data-testid="group-view-description">
-        <template v-if="group.description">
-          <!-- eslint-disable-next-line vue/no-v-html -->
-          <div v-html="group.description" />
-        </template>
-        <p v-else class="text-muted" data-testid="group-view-description-empty">
-          {{ t('groups.about_none') }}
-        </p>
+      <!-- About (left) | Volunteers (right) two-column, matching the live site. -->
+      <div class="d-flex flex-wrap mb-4">
+        <section class="w-100 w-md-50 pe-md-4 mb-3 mb-md-0" data-testid="group-view-description">
+          <h2>{{ t('groups.about') }}</h2>
+          <template v-if="group.description">
+            <!-- eslint-disable-next-line vue/no-v-html -->
+            <div v-html="group.description" />
+          </template>
+          <p v-else class="text-muted" data-testid="group-view-description-empty">
+            {{ t('groups.about_none') }}
+          </p>
 
-        <p v-if="group.phone" class="fw-bold" data-testid="group-view-phone">
-          {{ t('groups.field_phone') }}:
-          <a :href="`tel:${group.phone}`">{{ group.phone }}</a>
-        </p>
-        <p v-if="group.email" data-testid="group-view-email">
-          <a :href="`mailto:${group.email}`">{{ group.email }}</a>
-        </p>
-      </section>
+          <p v-if="group.phone" class="fw-bold" data-testid="group-view-phone">
+            {{ t('groups.field_phone') }}:
+            <a :href="`tel:${group.phone}`">{{ group.phone }}</a>
+          </p>
+          <p v-if="group.email" data-testid="group-view-email">
+            <a :href="`mailto:${group.email}`">{{ group.email }}</a>
+          </p>
+        </section>
 
-      <div class="d-flex flex-wrap">
-        <div class="w-100 w-md-50 pe-md-3">
+        <div class="w-100 w-md-50">
           <GroupVolunteers
             :group-id="id"
             :volunteers="groupsStore.volunteers.data"
