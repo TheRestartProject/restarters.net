@@ -65,6 +65,7 @@ class ApiController extends Controller
                     ->whereNull('deleted_at')
                     ->where('event_end_utc', '<', now())
                     ->selectRaw("
+                        COUNT(*) as events_held,
                         SUM(pax) as participants,
                         SUM(CASE
                             WHEN cancelled = 1 THEN 3
@@ -74,6 +75,10 @@ class ApiController extends Controller
                     ")
                     ->first();
 
+                // events_held mirrors legacy Fixometer::computeStats()'s
+                // partiesCount (past, non-deleted events) - it is the "Events
+                // held" figure in the logged-out header stats bar.
+                $result['events_held'] = (int) ($eventStats->events_held ?? 0);
                 $result['participants'] = (int) ($eventStats->participants ?? 0);
                 $result['hours_volunteered'] = (int) ($eventStats->hours_volunteered ?? 0);
 

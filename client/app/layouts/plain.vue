@@ -1,32 +1,29 @@
 <script setup>
-import { useI18n } from 'vue-i18n'
-import IconLogo from '~/components/icons/IconLogo.vue'
+import LogoStatsHeader from '~/components/LogoStatsHeader.vue'
+import LocaleSwitcher from '~/components/LocaleSwitcher.vue'
 import ToastContainer from '~/components/ToastContainer.vue'
 
-// Minimal chrome for auth pages (login/register/recover/reset), mirroring
-// layouts/header_plain.blade.php's "show_login_join_to_anons" nav: just the
-// brand mark plus login/join links, no full AppNavbar/AppFooter.
-const { t } = useI18n()
+// Chrome for the logged-out pages (landing / login / register / recover /
+// reset). Legacy header_plain showed the brand mark + the global impact-stats
+// bar (includes/info.blade.php, #logostats-header) on these pages - NOT a
+// login/join nav. The `show_login_join_to_anons` login/join header was only set
+// on other pages (events/view for anons, faultcat), none of which are in this
+// SPA's plain-layout set - so the login/join links a prior version rendered
+// here were a parity divergence. The language selector partial
+// (partials.languages) sits at the foot.
 </script>
 
 <template>
   <div class="d-flex flex-column min-vh-100">
-    <header class="container container-nav py-3 d-flex justify-content-between align-items-center">
-      <NuxtLink to="/" data-testid="plain-logo">
-        <IconLogo />
-      </NuxtLink>
-      <ul class="list-unstyled d-flex mb-0">
-        <li class="ms-3">
-          <NuxtLink to="/login" data-testid="plain-nav-login">{{ t('login.login_title') }}</NuxtLink>
-        </li>
-        <li class="ms-3">
-          <NuxtLink to="/user/register" data-testid="plain-nav-join">{{ t('login.join_title') }}</NuxtLink>
-        </li>
-      </ul>
+    <header class="container container-nav py-3">
+      <LogoStatsHeader />
     </header>
     <main class="flex-grow-1">
       <slot />
     </main>
+    <footer class="container d-flex justify-content-end py-3" data-testid="plain-language-bar">
+      <LocaleSwitcher />
+    </footer>
     <ToastContainer />
   </div>
 </template>

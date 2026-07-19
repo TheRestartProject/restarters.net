@@ -1,6 +1,10 @@
 <?php
 
 return [
+  'stat_1' => 'Items fixed',
+  'stat_2' => 'CO<sub>2</sub>e emissions prevented',
+  'stat_3' => 'Waste prevented',
+  'stat_4' => 'Events held',
   'whatis_content' => '<p>This is a place to grow the community electronics repair movement. The world needs more fixing and more fixing skills to be shared.</p><p>Join in if you would like to:</p><ul>
                                 <li>Learn electronics repair with others</li>
                                 <li>Share your repair skills with others</li>
