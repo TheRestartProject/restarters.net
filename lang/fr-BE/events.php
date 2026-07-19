@@ -1,6 +1,7 @@
 <?php
 
 return [
+  'add_event' => 'Ajouter événement',
   'rsvp_message' => 'Super! Vous nous rejoignez pour cet événement',
   'rsvp_button' => 'Désolé, je ne peux plus participer',
   'invite_restarters_modal_heading' => 'Invitez les bénévoles à l\'événement',

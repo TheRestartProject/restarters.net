@@ -4,7 +4,7 @@ import { createI18n } from 'vue-i18n'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import EventEditPage from '../../../app/pages/party/edit/[id].vue'
 import { useEventsStore } from '../../../app/stores/events.js'
-import { useDashboardStore } from '../../../app/stores/dashboard.js'
+import { useGroupsStore } from '../../../app/stores/groups.js'
 import { useAuthStore } from '../../../app/stores/auth.js'
 import en from '../../../i18n/locales/en.json'
 import clientEn from '../../../i18n/locales/client-en.json'
@@ -50,7 +50,7 @@ function mountPage() {
 
 describe('pages/party/edit/[id]', () => {
   let eventsStore
-  let dashboardStore
+  let groupsStore
   let authStore
 
   beforeEach(() => {
@@ -62,8 +62,14 @@ describe('pages/party/edit/[id]', () => {
     eventsStore.fetchEvent = vi.fn().mockResolvedValue(BASE_EVENT)
     eventsStore.uploadEventImage = vi.fn().mockResolvedValue({ image_url: '/uploads/mid_x.png' })
 
-    dashboardStore = useDashboardStore()
-    dashboardStore.fetch = vi.fn().mockResolvedValue({ your_groups: [] })
+    // Host status now comes from the UNCAPPED memberships list
+    // (GET /api/v2/users/me/groups via groupsStore), not the capped dashboard
+    // your_groups. Default: no memberships.
+    groupsStore = useGroupsStore()
+    groupsStore.memberships = []
+    groupsStore.fetchMemberships = vi.fn(function () {
+      return Promise.resolve(this.memberships)
+    })
 
     authStore = useAuthStore()
     authStore.user = { role_name: 'Administrator' }
@@ -91,7 +97,7 @@ describe('pages/party/edit/[id]', () => {
 
   it('shows a forbidden message instead of the form when the user neither administers nor hosts the group', () => {
     authStore.user = { role_name: 'Host' }
-    dashboardStore.data = { your_groups: [{ id: 1, role: 3 }] }
+    groupsStore.memberships = [{ id: 1, name: 'Other', role: 3, archived: false }]
     eventsStore.current.data = BASE_EVENT
 
     const wrapper = mountPage()
@@ -100,9 +106,9 @@ describe('pages/party/edit/[id]', () => {
     expect(wrapper.find('[data-testid="stub-updated"]').exists()).toBe(false)
   })
 
-  it('renders the form when the user hosts the event group (role===3 in your_groups)', () => {
+  it('renders the form when the user hosts the event group (role 3 in memberships)', () => {
     authStore.user = { role_name: 'Host' }
-    dashboardStore.data = { your_groups: [{ id: 9, role: 3 }] }
+    groupsStore.memberships = [{ id: 9, name: 'Hosted', role: 3, archived: false }]
     eventsStore.current.data = BASE_EVENT
 
     const wrapper = mountPage()
@@ -116,7 +122,7 @@ describe('pages/party/edit/[id]', () => {
 
   it('renders the form for an Administrator regardless of hosted groups', () => {
     authStore.user = { role_name: 'Administrator' }
-    dashboardStore.data = { your_groups: [] }
+    groupsStore.memberships = []
     eventsStore.current.data = BASE_EVENT
 
     const wrapper = mountPage()

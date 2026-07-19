@@ -3,6 +3,7 @@ import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useEventsStore } from '~/stores/events.js'
 import { useDashboardStore } from '~/stores/dashboard.js'
+import { useEventPermissions } from '~/composables/useEventPermissions.js'
 import EventsList from '~/components/events/EventsList.vue'
 import {
   eventIsFinished,
@@ -24,6 +25,10 @@ useHead({ title: t('events.your_events') })
 
 const eventsStore = useEventsStore()
 const dashboardStore = useDashboardStore()
+// "Add event" CTA gate - mirrors legacy events/index.blade.php's
+// userCanCreateEvents check (Root/Admin/NetworkCoordinator or host of any
+// group). Without this the SPA had no way to reach /party/create at all.
+const { canCreateEvents, ensureLoaded: ensureEventPerms } = useEventPermissions()
 
 const mineTab = ref('upcoming')
 const otherTab = ref('nearby')
@@ -71,6 +76,7 @@ function retry() {
 function load() {
   eventsStore.fetchMyEvents()
   dashboardStore.fetch().catch(() => {})
+  ensureEventPerms().catch(() => {})
 }
 
 onMounted(load)
@@ -78,7 +84,17 @@ onMounted(load)
 
 <template>
   <div class="container py-4" data-testid="party-mine-page">
-    <h1>{{ t('events.your_events') }}</h1>
+    <div class="d-flex align-items-center justify-content-between">
+      <h1 class="mb-0">{{ t('events.your_events') }}</h1>
+      <NuxtLink
+        v-if="canCreateEvents"
+        to="/party/create"
+        class="btn btn-primary"
+        data-testid="party-add-event"
+      >
+        {{ t('events.add_event') }}
+      </NuxtLink>
+    </div>
 
     <div v-if="eventsStore.myEvents.loading" data-testid="party-mine-loading">
       <div class="placeholder-glow mb-3">

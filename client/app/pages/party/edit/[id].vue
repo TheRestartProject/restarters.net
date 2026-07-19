@@ -2,8 +2,8 @@
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useEventsStore } from '~/stores/events.js'
-import { useDashboardStore } from '~/stores/dashboard.js'
 import { useAuth } from '~/composables/useAuth.js'
+import { useEventPermissions } from '~/composables/useEventPermissions.js'
 import EventForm from '~/components/events/EventForm.vue'
 import TusImageUpload from '~/components/forms/TusImageUpload.vue'
 
@@ -24,23 +24,21 @@ definePageMeta({ auth: true })
 const { t } = useI18n()
 const route = useRoute()
 const eventsStore = useEventsStore()
-const dashboardStore = useDashboardStore()
-const { hasRole } = useAuth()
 
 const id = computed(() => Number(route.params.id))
 const event = computed(() => eventsStore.current.data)
 
-// No permissions object on the v2 Event resource (unlike Group's) - same
-// best-effort canedit approximation as pages/party/view/[id].vue:
-// Administrator always qualifies; NetworkCoordinator's per-network match
-// can't be checked client-side so is never granted (safe false-negative);
-// Host is read from GET /api/v2/dashboard's your_groups[].role
-// (capped at 5, best-effort - see docs/nuxt-migration/api-gaps.md).
+// No permissions object on the v2 Event resource (unlike Group's) - approximate
+// canedit via useEventPermissions: Administrator (and Root) always qualify;
+// a Host qualifies for their own group's events. Host status comes from the
+// UNCAPPED GET /api/v2/users/me/groups list (not the dashboard's your_groups,
+// which is capped at 5 alphabetically - a host of a 6th+ group was wrongly
+// denied edit). NetworkCoordinator's per-network match still can't be checked
+// client-side, so remains a safe false-negative.
+const { hasRole } = useAuth()
 const isAdmin = computed(() => hasRole('Administrator'))
-const hostedGroupIds = computed(() =>
-  (dashboardStore.data?.your_groups || []).filter((g) => g.role === 3).map((g) => g.id)
-)
-const canEdit = computed(() => isAdmin.value || (!!event.value?.group && hostedGroupIds.value.includes(event.value.group.id)))
+const { canManageEventForGroup, ensureLoaded: ensureEventPerms } = useEventPermissions()
+const canEdit = computed(() => canManageEventForGroup(event.value?.group?.id))
 
 const updatedMessage = ref('')
 const imageMessage = ref('')
@@ -50,7 +48,7 @@ useHead({ title: computed(() => (event.value ? `${t('events.editing', { event: e
 
 function load() {
   eventsStore.fetchEvent(id.value)
-  dashboardStore.fetch().catch(() => {})
+  ensureEventPerms().catch(() => {})
 }
 
 onMounted(load)

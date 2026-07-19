@@ -4,7 +4,6 @@ import { createI18n } from 'vue-i18n'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import EventDuplicatePage from '../../../app/pages/party/duplicate/[id].vue'
 import { useEventsStore } from '../../../app/stores/events.js'
-import { useDashboardStore } from '../../../app/stores/dashboard.js'
 import { useGroupsStore } from '../../../app/stores/groups.js'
 import { useAuthStore } from '../../../app/stores/auth.js'
 import en from '../../../i18n/locales/en.json'
@@ -43,7 +42,6 @@ function mountPage() {
 
 describe('pages/party/duplicate/[id]', () => {
   let eventsStore
-  let dashboardStore
   let groupsStore
   let authStore
   let myGroups
@@ -55,9 +53,6 @@ describe('pages/party/duplicate/[id]', () => {
 
     eventsStore = useEventsStore()
     eventsStore.fetchEvent = vi.fn().mockResolvedValue(SOURCE_EVENT)
-
-    dashboardStore = useDashboardStore()
-    dashboardStore.fetch = vi.fn().mockResolvedValue({ your_groups: [] })
 
     groupsStore = useGroupsStore()
     groupsStore.fetchNames = vi.fn().mockResolvedValue([])
@@ -93,7 +88,7 @@ describe('pages/party/duplicate/[id]', () => {
 
   it('shows a forbidden message when the user neither administers nor hosts the source group', async () => {
     authStore.user = { role_name: 'Host' }
-    dashboardStore.data = { your_groups: [{ id: 1, role: 3 }] }
+    myGroups.mockResolvedValue({ data: [{ id: 1, name: 'Other', role: 3, archived: false }] })
     eventsStore.current.data = SOURCE_EVENT
 
     const wrapper = mountPage()
@@ -118,7 +113,7 @@ describe('pages/party/duplicate/[id]', () => {
 
   it('renders EventForm for a host of the source group, sourced from users/me/groups', async () => {
     authStore.user = { role_name: 'Host' }
-    dashboardStore.data = { your_groups: [{ id: 9, role: 3 }] }
+    // host of group 9 comes from the myGroups mock set in beforeEach
     eventsStore.current.data = SOURCE_EVENT
 
     const wrapper = mountPage()

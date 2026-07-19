@@ -2,9 +2,9 @@
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useEventsStore } from '~/stores/events.js'
-import { useDashboardStore } from '~/stores/dashboard.js'
 import { useGroupsStore } from '~/stores/groups.js'
 import { useAuth } from '~/composables/useAuth.js'
+import { useEventPermissions, HOST_ROLE } from '~/composables/useEventPermissions.js'
 import EventForm from '~/components/events/EventForm.vue'
 
 // /party/duplicate/[id] - PartyController::duplicate() renders the same
@@ -19,12 +19,9 @@ import EventForm from '~/components/events/EventForm.vue'
 // the full rationale).
 definePageMeta({ auth: true })
 
-const HOST_ROLE = 3
-
 const { t } = useI18n()
 const route = useRoute()
 const eventsStore = useEventsStore()
-const dashboardStore = useDashboardStore()
 const groupsStore = useGroupsStore()
 const { hasRole } = useAuth()
 
@@ -32,12 +29,10 @@ const sourceId = computed(() => Number(route.params.id))
 const sourceEvent = computed(() => eventsStore.current.data)
 
 const isAdmin = computed(() => hasRole('Administrator'))
-const hostedGroupIds = computed(() =>
-  (dashboardStore.data?.your_groups || []).filter((g) => g.role === HOST_ROLE).map((g) => g.id)
-)
-const canDuplicate = computed(
-  () => isAdmin.value || (!!sourceEvent.value?.group && hostedGroupIds.value.includes(sourceEvent.value.group.id))
-)
+// Host status from the UNCAPPED memberships list (see useEventPermissions) -
+// the dashboard your_groups source was capped at 5 alphabetically.
+const { canManageEventForGroup, ensureLoaded: ensureEventPerms } = useEventPermissions()
+const canDuplicate = computed(() => canManageEventForGroup(sourceEvent.value?.group?.id))
 
 const groupOptions = ref([])
 const groupsLoading = ref(true)
@@ -48,7 +43,7 @@ async function load() {
   groupsLoading.value = true
 
   const eventPromise = eventsStore.fetchEvent(sourceId.value)
-  dashboardStore.fetch().catch(() => {})
+  ensureEventPerms().catch(() => {})
 
   try {
     if (isAdmin.value) {
