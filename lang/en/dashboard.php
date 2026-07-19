@@ -16,7 +16,6 @@ return [
   'no_groups_intro' => 'There are community <a href="/group/all">groups all over the world</a>. You\'re welcome to follow any group to get notified when they organise events.',
   'sidebar_intro_1' => 'We are a global community of people who run local repair events and campaign for our Right to Repair. Restarters.net is our free, open source toolkit.',
   'getting_the_most' => 'Getting started',
-  'getting_the_most_intro' => 'Restarters.net is a free, open source platform for a global community of people making local repair events happen and campaigning for our Right to Repair.',
   'getting_the_most_bullet1' => '<strong>Get fixing</strong>: <a href="https://restarters.net/group" target="_blank" rel="noopener">follow your nearest community repair group</a> and brush up or share your skills with our <a href="https://wiki.restarters.net/" target="_blank">repair wiki</a>.',
   'getting_the_most_bullet2' => '<strong>Get organising</strong>: <a href="https://talk.restarters.net/session/sso?return_path=https://talk.restarters.net/t/how-to-run-a-repair-event-the-restart-party-kit/324/" target="_blank">learn how to run a repair event</a> and/or <a href="https://talk.restarters.net/c/community-repair/5" target="_blank">ask the community for help on Talk</a>.',
   'getting_the_most_bullet3' => '<strong>Get chatting</strong>: <a href="https://talk.restarters.net/session/sso?return_path=https://talk.restarters.net/" target="_blank">catch up on the latest conversations</a> on our forum, Talk. Why not <a href="https://talk.restarters.net/t/who-is-everyone-meet-and-greet/44" target="_blank">introduce yourself</a> too?',
@@ -24,4 +23,6 @@ return [
   'add_data_heading' => 'Add Data',
   'see_your_impact' => 'And see your impact in the Fixometer',
   'add_data_add' => 'Add',
+  'whats_happening_heading' => 'What\'s happening',
+  'whats_happening_see_all' => 'see all',
 ];

@@ -1,6 +1,14 @@
 <script setup>
 import { useI18n } from 'vue-i18n'
 
+// Legacy source: resources/js/components/DashboardNoGroups.vue. Nested
+// inside DashboardYourGroups.vue's own "Your Groups" panel as the empty
+// state (no heading/divider of its own - the parent already supplies
+// "Your Groups" + the dashed rule above this content), not a standalone
+// panel of its own. Verified against the live legacy dashboard: with no
+// location set, the photo never renders at all (a CSS class bug collapses
+// it to zero height), so that's replicated here as a straight v-if rather
+// than an invisible box.
 defineProps({
   nearbyGroups: {
     type: Array,
@@ -23,30 +31,21 @@ const { t } = useI18n()
 
 <template>
   <div data-testid="dashboard-nearby-groups">
-    <div class="d-flex align-items-center">
-      <h2 class="mb-0">{{ t('dashboard.groups_near_you_header') }}</h2>
-    </div>
-
-    <div class="content-divider">
+    <template v-if="hasLocation">
       <div class="nearby-layout">
         <div class="nearby-layout__pic" />
 
         <div class="nearby-layout__overlay">
-          <div v-if="!hasLocation" data-testid="nearby-groups-no-location">
-            <!-- eslint-disable-next-line vue/no-v-html -->
-            <div v-html="t('groups.no_groups_nearest_no_location')" />
-          </div>
-
-          <div v-else-if="!nearbyGroups.length" data-testid="nearby-groups-empty">
-            <!-- eslint-disable-next-line vue/no-v-html -->
-            <p v-html="t('dashboard.no_groups')" />
-            <!-- eslint-disable-next-line vue/no-v-html -->
-            <p v-html="t('dashboard.no_groups_intro')" />
-          </div>
+          <!-- eslint-disable-next-line vue/no-v-html -->
+          <p v-if="!nearbyGroups.length" data-testid="nearby-groups-empty" v-html="t('dashboard.no_groups')" />
+          <!-- eslint-disable-next-line vue/no-v-html -->
+          <p v-html="t('dashboard.no_groups_intro')" />
         </div>
 
-        <template v-if="hasLocation && nearbyGroups.length">
+        <template v-if="nearbyGroups.length">
           <div class="nearby-layout__groups">
+            <h3>{{ t('dashboard.groups_near_you_header') }}</h3>
+            <hr>
             <ul class="list-unstyled" data-testid="nearby-groups-list">
               <li
                 v-for="group in nearbyGroups"
@@ -97,19 +96,26 @@ const { t } = useI18n()
           </div>
         </template>
       </div>
+    </template>
 
-      <div class="mt-3">
-        <strong>{{ t('dashboard.interested_starting') }}</strong>
+    <template v-else>
+      <div data-testid="nearby-groups-no-location">
         <!-- eslint-disable-next-line vue/no-v-html -->
-        <div v-html="t('dashboard.interested_details')" />
+        <div v-html="t('groups.no_groups_nearest_no_location')" />
       </div>
+    </template>
+
+    <div class="mt-3">
+      <strong>{{ t('dashboard.interested_starting') }}</strong>
+      <!-- eslint-disable-next-line vue/no-v-html -->
+      <div v-html="t('dashboard.interested_details')" />
     </div>
   </div>
 </template>
 
 <style scoped lang="scss">
-h2 {
-  font-size: 1.1rem;
+h3 {
+  font-size: 1rem;
   font-weight: bold;
 }
 

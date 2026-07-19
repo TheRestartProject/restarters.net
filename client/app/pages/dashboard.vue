@@ -6,14 +6,22 @@ import { useDashboardStore } from '~/stores/dashboard.js'
 import { useEventsStore } from '~/stores/events.js'
 import DashboardAddData from '~/components/dashboard/DashboardAddData.vue'
 import DashboardYourGroups from '~/components/dashboard/DashboardYourGroups.vue'
-import DashboardNearbyGroups from '~/components/dashboard/DashboardNearbyGroups.vue'
 import DashboardUpcomingEvents from '~/components/dashboard/DashboardUpcomingEvents.vue'
 import DashboardRightSidebar from '~/components/dashboard/DashboardRightSidebar.vue'
+import DashboardWhatsHappening from '~/components/dashboard/DashboardWhatsHappening.vue'
 import DashboardOnboardingModal from '~/components/dashboard/DashboardOnboardingModal.vue'
 
 // resources/views/dashboard/index.blade.php + resources/js/components/
 // DashboardPage.vue (+ DashboardYourGroups/DashboardNoGroups/DashboardGroup/
-// DashboardEvent) are the functional spec (design.md §6.2 task brief).
+// DashboardEvent/DashboardRightSidebar/DiscourseDiscussion) are the
+// functional spec (design.md §6.2 task brief). Section order (verified
+// against the live legacy dashboard, both breakpoints): welcome header ->
+// Getting started -> Your Groups (single panel; DashboardNoGroups nests
+// inside it as the empty state, not a separate panel) -> Add Data ->
+// What's happening. On desktop legacy sits Your Groups/Add Data in a left
+// column beside Getting started on the right - dashboard-grid below
+// reproduces that with grid-template-areas while keeping DOM order the
+// mobile (stacked) order.
 definePageMeta({ auth: true })
 
 const { t } = useI18n()
@@ -80,20 +88,22 @@ onMounted(() => {
     </BAlert>
 
     <template v-else>
-      <DashboardAddData :groups="yourGroups" :events="myEvents" />
       <div class="dashboard-grid mt-4" data-testid="dashboard-content">
-      <div class="panel dashboard-grid__yourgroups">
-        <DashboardYourGroups :groups="yourGroups" :new-nearby-groups="newNearbyGroups" />
-        <DashboardUpcomingEvents :events="upcomingEvents" class="dashboard-grid__events" />
-      </div>
+        <DashboardRightSidebar class="dashboard-grid__sidebar" />
 
-      <DashboardRightSidebar class="dashboard-grid__sidebar" />
+        <div class="panel dashboard-grid__yourgroups" data-testid="dashboard-yourgroups-panel">
+          <DashboardYourGroups
+            :groups="yourGroups"
+            :new-nearby-groups="newNearbyGroups"
+            :nearby-groups="nearbyGroups"
+            :has-location="hasLocation"
+          />
+          <DashboardUpcomingEvents v-if="yourGroups.length" :events="upcomingEvents" class="dashboard-grid__events" />
+        </div>
 
-      <DashboardNearbyGroups
-        class="panel dashboard-grid__nearby"
-        :nearby-groups="nearbyGroups"
-        :has-location="hasLocation"
-      />
+        <DashboardAddData :groups="yourGroups" :events="myEvents" class="dashboard-grid__adddata" />
+
+        <DashboardWhatsHappening class="dashboard-grid__whatshappening" />
       </div>
     </template>
 
@@ -127,7 +137,8 @@ onMounted(() => {
     grid-template-columns: 2fr 1fr;
     grid-template-areas:
       'yourgroups sidebar'
-      'nearby sidebar';
+      'adddata sidebar'
+      'whatshappening whatshappening';
 
     &__yourgroups {
       grid-area: yourgroups;
@@ -138,8 +149,12 @@ onMounted(() => {
       grid-area: sidebar;
     }
 
-    &__nearby {
-      grid-area: nearby;
+    &__adddata {
+      grid-area: adddata;
+    }
+
+    &__whatshappening {
+      grid-area: whatshappening;
     }
 
     &__events {

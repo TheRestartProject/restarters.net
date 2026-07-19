@@ -1,6 +1,7 @@
 <script setup>
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
+import DashboardNearbyGroups from '~/components/dashboard/DashboardNearbyGroups.vue'
 
 // Role ints per app/Role.php (design.md contract - api-contracts-phase-b.md
 // B1 `your_groups[].role`). Not exported anywhere client-side yet (the
@@ -33,6 +34,18 @@ const props = defineProps({
   newNearbyGroups: {
     type: Array,
     default: () => [],
+  },
+  // Legacy DashboardYourGroups.vue's `v-else` (has-groups) branch is the
+  // only one with an events section - DashboardNoGroups (nearbyGroups/
+  // hasLocation, rendered below via DashboardNearbyGroups) is the empty-state
+  // fallback, not a standalone panel of its own.
+  nearbyGroups: {
+    type: Array,
+    default: () => [],
+  },
+  hasLocation: {
+    type: Boolean,
+    default: true,
   },
 })
 
@@ -72,10 +85,7 @@ function roleVariant(role) {
 
     <div class="content-divider">
       <div v-if="!sortedGroups.length" data-testid="your-groups-empty">
-        <p>{{ t('client.dashboard.no_your_groups') }}</p>
-        <NuxtLink to="/group" data-testid="your-groups-browse-link">
-          {{ t('dashboard.see_all_groups') }}
-        </NuxtLink>
+        <DashboardNearbyGroups :nearby-groups="nearbyGroups" :has-location="hasLocation" />
       </div>
 
       <template v-else>

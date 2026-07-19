@@ -4,9 +4,11 @@ import { useI18n } from 'vue-i18n'
 // Legacy source: resources/js/components/DashboardRightSidebar.vue. The
 // legacy version had a couple of display classes that contradicted their
 // parent's (a mobile-only span nested inside a desktop-only block, and vice
-// versa) so those strings never actually rendered - not replicated here,
-// we just show sidebar_intro_1 above the photo on desktop and
-// getting_the_most_intro inside the orange panel on every breakpoint.
+// versa): getting_the_most_intro was never actually reachable on any
+// breakpoint (verified against the live legacy dashboard), so that key is
+// gone. sidebar_intro_1 is what real users saw - above the photo on desktop,
+// inside the orange panel on mobile (the photo/intro box is desktop-only) -
+// replicated here the same way rather than showing it twice on desktop.
 const { t } = useI18n()
 </script>
 
@@ -28,7 +30,7 @@ const { t } = useI18n()
       </div>
 
       <div class="getting-started__content">
-        <p>{{ t('dashboard.getting_the_most_intro') }}</p>
+        <p class="d-block d-md-none">{{ t('dashboard.sidebar_intro_1') }}</p>
 
         <ul class="list-unstyled getting-started__list">
           <!-- eslint-disable vue/no-v-html -->

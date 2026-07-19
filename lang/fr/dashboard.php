@@ -17,7 +17,6 @@ return [
   'see_all_groups' => 'Voir tous les Repair Cafés',
   'sidebar_intro_1' => 'Nous sommes une large communauté d\'organisateurs d\'événements locaux de réparation et nous oeuvrons pour notre droit à la réparation. Restarters.net est notre référentiel gratuit et open source.',
   'getting_the_most' => 'C\'est parti !',
-  'getting_the_most_intro' => 'Restarters.net est une plateforme gratuite, open source, pour une  communauté collective de personnes organisant des événements locaux de réparation et œuvrant pour le droit à la réparation.',
   'getting_the_most_bullet1' => '<strong>Réparer</strong>: <a href="https://restarters.net/group" target="_blank" rel="noopener">Suivez votre Repair Café le plus proche </a> et perfectionnez ou partagez vos compétences sur notre <a href="https://wiki.restarters.net/" target="_blank"> wiki de la réparation </a>.',
   'getting_the_most_bullet2' => '<strong>Organiser</strong>: <a href="https://talk.restarters.net/session/sso?return_path=https://talk.restarters.net/t/how-to-run-a-repair-event-the-restart-party-kit/324/" target="_blank">Apprenez comment organiser un événement</a> and/or <a href="https://talk.restarters.net/c/community-repair/5" target="_blank">Demandez de l\'aide à la communauté sur Talk</a>.',
   'getting_the_most_bullet3' => '<strong>Chatter</strong>: <a href="https://talk.restarters.net/session/sso?return_path=https://talk.restarters.net/" target="_blank">Retrouvez les dernières conversations</a> sur le forum Talk. N\'hésitez pas à <a href="https://talk.restarters.net/t/who-is-everyone-meet-and-greet/44" target="_blank">vous présenter</a> aussi!',
@@ -25,4 +24,6 @@ return [
   'add_data_heading' => 'Ajouter des données',
   'see_your_impact' => 'Et regardez votre impact sur le Fixometer',
   'add_data_add' => 'Ajouter',
+  'whats_happening_heading' => 'Que se passe-t-il ?',
+  'whats_happening_see_all' => 'Voir tout',
 ];

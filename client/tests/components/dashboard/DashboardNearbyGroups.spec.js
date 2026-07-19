@@ -54,4 +54,26 @@ describe('components/dashboard/DashboardNearbyGroups', () => {
     expect(wrapper.find('[data-testid="nearby-group-location-5"]').text()).toBe('Bristol')
     expect(wrapper.find('[data-testid="nearby-group-join-5"]').attributes('href')).toBe('/group/view/5')
   })
+
+  it('has no heading or panel of its own - it nests inside the "Your Groups" panel as its empty state', () => {
+    const wrapper = mountComponent({ nearbyGroups: [], hasLocation: true })
+
+    expect(wrapper.find('h2').exists()).toBe(false)
+  })
+
+  it('does not render the photo when the user has no location (matches the live legacy dashboard)', () => {
+    const wrapper = mountComponent({ nearbyGroups: [], hasLocation: false })
+
+    expect(wrapper.find('.nearby-layout__pic').exists()).toBe(false)
+  })
+
+  it('always shows the "groups all over the world" copy when the user has a location, even alongside a nearby-groups list', () => {
+    const wrapper = mountComponent({
+      hasLocation: true,
+      nearbyGroups: [{ id: 5, name: 'Nearby Fixers', distance: 3.2, location: 'Bristol', image_url: null }],
+    })
+
+    expect(wrapper.find('[data-testid="nearby-groups-empty"]').exists()).toBe(false)
+    expect(wrapper.text()).toContain('groups all over the world')
+  })
 })
