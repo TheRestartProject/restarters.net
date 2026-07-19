@@ -25,7 +25,13 @@ function seeAll() {
 
 <template>
   <div data-testid="dashboard-whats-happening">
-    <h2 class="mb-0">{{ t('dashboard.whats_happening_heading') }}</h2>
+    <div class="d-flex align-items-center">
+      <h2 class="mb-0">{{ t('dashboard.whats_happening_heading') }}</h2>
+      <!-- Desktop-only heading doodle, matching legacy DiscourseDiscussion.vue
+           (d-none d-md-block) and the other dashboard section headings
+           (Your Groups' group_doodle_ico). -->
+      <img src="/images/talk_doodle.svg" alt="" class="talk-doodle ms-3 d-none d-md-block">
+    </div>
 
     <div class="content-divider">
       <div class="d-flex justify-content-end">
@@ -41,5 +47,9 @@ function seeAll() {
 h2 {
   font-size: 1.1rem;
   font-weight: bold;
+}
+
+.talk-doodle {
+  height: 40px;
 }
 </style>
