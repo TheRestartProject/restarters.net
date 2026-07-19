@@ -2,6 +2,7 @@
 import { computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useGroupsStore } from '~/stores/groups.js'
+import { useDashboardStore } from '~/stores/dashboard.js'
 import GroupsTabsNav from '~/components/groups/GroupsTabsNav.vue'
 import GroupCard from '~/components/groups/GroupCard.vue'
 
@@ -14,14 +15,15 @@ const { t } = useI18n()
 useHead({ title: t('groups.groups') })
 
 const groupsStore = useGroupsStore()
+const dashboardStore = useDashboardStore()
 
-// GET /api/v2/groups/nearby (api-contracts-phase-b.md B2) responds
-// `{data: [...]}` with no field distinguishing "no location set" from "no
-// groups nearby" - the same gap already recorded for the dashboard's
-// nearby_groups (docs/nuxt-migration/api-gaps.md). Until the contract grows
-// one, assume a location is set (i.e. an empty list renders the plain
-// "nothing nearby" copy, not a location prompt).
-const hasLocation = computed(() => true)
+// Whether the user has a town/city set. Legacy's "Other groups nearby" tab
+// shows a distinct "set a location in your profile" prompt when they don't,
+// vs the plain "nothing nearby" copy when they do. GET /api/v2/groups/nearby
+// carries no such flag, but GET /api/v2/dashboard does (`has_location`, the
+// same source the dashboard + /party pages use). Default true so we never
+// flash the location prompt while the dashboard is still loading.
+const hasLocation = computed(() => dashboardStore.data?.has_location ?? true)
 const groups = computed(() => groupsStore.nearby.data ?? [])
 
 function retry() {
@@ -30,6 +32,7 @@ function retry() {
 
 onMounted(() => {
   groupsStore.fetchNearby()
+  dashboardStore.fetch().catch(() => {})
 })
 </script>
 

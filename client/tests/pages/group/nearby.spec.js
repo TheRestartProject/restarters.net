@@ -4,6 +4,7 @@ import { createI18n } from 'vue-i18n'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import GroupNearbyPage from '../../../app/pages/group/nearby.vue'
 import { useGroupsStore } from '../../../app/stores/groups.js'
+import { useDashboardStore } from '../../../app/stores/dashboard.js'
 import en from '../../../i18n/locales/en.json'
 import clientEn from '../../../i18n/locales/client-en.json'
 
@@ -62,6 +63,19 @@ describe('pages/group/nearby', () => {
 
     expect(wrapper.find('[data-testid="group-nearby-empty"]').exists()).toBe(true)
     expect(wrapper.find('[data-testid="group-nearby-no-location"]').exists()).toBe(false)
+  })
+
+  it('shows the set-a-location prompt (not the plain empty state) when the user has no town set', () => {
+    // Legacy's "Other groups nearby" tab distinguishes "no location set" from
+    // "no groups nearby"; hasLocation comes from the dashboard's has_location.
+    const dashboardStore = useDashboardStore()
+    dashboardStore.data = { has_location: false }
+    groupsStore.nearby.data = []
+
+    const wrapper = mountPage()
+
+    expect(wrapper.find('[data-testid="group-nearby-no-location"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="group-nearby-empty"]').exists()).toBe(false)
   })
 
   it('renders a card per nearby group', () => {
