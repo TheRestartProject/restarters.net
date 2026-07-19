@@ -125,37 +125,29 @@ describe('pages/group/view/[id]', () => {
       expect(wrapperNoEdit.find('[data-testid="group-view-edit"]').exists()).toBe(false)
     })
 
-    it('hides Delete entirely when can_see_delete is false', () => {
+    it('hides Archive entirely when can_perform_archive is false', () => {
       groupsStore.current.data = BASE_GROUP
       const wrapper = mountPage()
-      expect(wrapper.find('[data-testid="group-view-delete"]').exists()).toBe(false)
+      expect(wrapper.find('[data-testid="group-view-archive"]').exists()).toBe(false)
     })
 
-    it('shows Delete disabled when can_see_delete is true but can_perform_delete is false', () => {
+    it('shows Archive (not Delete) for a coordinator/admin when can_perform_archive is true', async () => {
       groupsStore.current.data = {
         ...BASE_GROUP,
-        permissions: { ...BASE_GROUP.permissions, can_see_delete: true, can_perform_delete: false },
+        permissions: { ...BASE_GROUP.permissions, can_perform_archive: true },
       }
       const wrapper = mountPage()
-      const button = wrapper.find('[data-testid="group-view-delete"]')
+
+      const button = wrapper.find('[data-testid="group-view-archive"]')
       expect(button.exists()).toBe(true)
-      expect(button.attributes('disabled')).toBeDefined()
-    })
-
-    it('shows Delete enabled and wires up the confirm flow when can_perform_delete is true', async () => {
-      groupsStore.current.data = {
-        ...BASE_GROUP,
-        permissions: { ...BASE_GROUP.permissions, can_see_delete: true, can_perform_delete: true },
-      }
-      const wrapper = mountPage()
-
-      const button = wrapper.find('[data-testid="group-view-delete"]')
-      expect(button.attributes('disabled')).toBeUndefined()
+      // labelled Archive, not Delete - it hits the reversible archive endpoint
+      expect(button.text()).toBe('Archive group')
+      expect(wrapper.find('[data-testid="group-view-delete"]').exists()).toBe(false)
 
       await button.trigger('click')
-      expect(wrapper.find('[data-testid="group-view-delete-confirm"]').exists()).toBe(true)
+      expect(wrapper.find('[data-testid="group-view-archive-confirm"]').exists()).toBe(true)
 
-      await wrapper.find('[data-testid="group-view-delete-confirm"]').trigger('click')
+      await wrapper.find('[data-testid="group-view-archive-confirm"]').trigger('click')
       expect(groupsStore.deleteGroup).toHaveBeenCalledWith(5)
     })
 

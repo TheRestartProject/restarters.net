@@ -26,8 +26,11 @@ const group = computed(() => groupsStore.current.data)
 const permissions = computed(() => group.value?.permissions || {})
 const canedit = computed(() => !!permissions.value.can_edit)
 const candemote = computed(() => !!permissions.value.can_demote)
-const canSeeDelete = computed(() => !!permissions.value.can_see_delete)
-const canPerformDelete = computed(() => !!permissions.value.can_perform_delete)
+// The "delete" control actually archives (DELETE /api/v2/groups/{id} ->
+// archivev2, reversible); relabelled to "Archive" and gated on
+// can_perform_archive (Administrator OR NetworkCoordinator-of-group), matching
+// group/edit/[id].vue and legacy GroupActions.vue. No hard-delete endpoint exists.
+const canPerformArchive = computed(() => !!permissions.value.can_perform_archive)
 const isMember = computed(() => groupsStore.isMember(id.value))
 const canInvite = computed(() => canedit.value || isMember.value)
 
@@ -40,8 +43,8 @@ const location = computed(() => {
 })
 
 const showInvite = ref(false)
-const confirmingDelete = ref(false)
-const deleting = ref(false)
+const confirmingArchive = ref(false)
+const archiving = ref(false)
 
 useHead({ title: computed(() => group.value?.name || t('groups.groups')) })
 
@@ -49,25 +52,26 @@ function retry() {
   load()
 }
 
-function askDelete() {
-  confirmingDelete.value = true
+function askArchive() {
+  confirmingArchive.value = true
 }
 
-function cancelDelete() {
-  confirmingDelete.value = false
+function cancelArchive() {
+  confirmingArchive.value = false
 }
 
-async function confirmDelete() {
-  confirmingDelete.value = false
-  deleting.value = true
+async function confirmArchive() {
+  confirmingArchive.value = false
+  archiving.value = true
 
   try {
+    // deleteGroup hits DELETE /api/v2/groups/{id}, which archives (reversible).
     await groupsStore.deleteGroup(id.value)
     await navigateTo('/group')
   } catch {
     // Store already toasted the error.
   } finally {
-    deleting.value = false
+    archiving.value = false
   }
 }
 
@@ -162,27 +166,26 @@ onMounted(() => {
           >
             {{ t('groups.invite_volunteers') }}
           </BButton>
-          <template v-if="canSeeDelete">
-            <template v-if="confirmingDelete">
-              <span class="small align-self-center">{{ t('groups.delete_group_confirm', { name: group.name }) }}</span>
+          <template v-if="canPerformArchive">
+            <template v-if="confirmingArchive">
+              <span class="small align-self-center">{{ t('groups.archive_group_confirm', { name: group.name }) }}</span>
               <BButton
                 variant="danger"
-                :disabled="deleting"
-                data-testid="group-view-delete-confirm"
-                @click="confirmDelete"
+                :disabled="archiving"
+                data-testid="group-view-archive-confirm"
+                @click="confirmArchive"
               >
                 {{ t('partials.yes') }}
               </BButton>
-              <BButton variant="link" @click="cancelDelete">{{ t('partials.cancel') }}</BButton>
+              <BButton variant="link" @click="cancelArchive">{{ t('partials.cancel') }}</BButton>
             </template>
             <BButton
               v-else
               variant="outline-danger"
-              :disabled="!canPerformDelete"
-              data-testid="group-view-delete"
-              @click="askDelete"
+              data-testid="group-view-archive"
+              @click="askArchive"
             >
-              {{ t('groups.delete_group') }}
+              {{ t('groups.archive_group') }}
             </BButton>
           </template>
         </div>
