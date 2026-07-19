@@ -74,7 +74,7 @@ function roleVariant(role) {
       <div v-if="!sortedGroups.length" data-testid="your-groups-empty">
         <p>{{ t('client.dashboard.no_your_groups') }}</p>
         <NuxtLink to="/group" data-testid="your-groups-browse-link">
-          {{ t('groups.all_groups') }}
+          {{ t('dashboard.see_all_groups') }}
         </NuxtLink>
       </div>
 

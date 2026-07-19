@@ -32,7 +32,13 @@ describe('components/dashboard/DashboardYourGroups', () => {
 
     expect(wrapper.find('[data-testid="your-groups-empty"]').exists()).toBe(true)
     expect(wrapper.find('[data-testid="your-groups-list"]').exists()).toBe(false)
-    expect(wrapper.find('[data-testid="your-groups-browse-link"]').exists()).toBe(true)
+    const link = wrapper.find('[data-testid="your-groups-browse-link"]')
+    expect(link.exists()).toBe(true)
+    // The link must render resolved text, not a raw i18n key. A prior version
+    // called t('groups.all_groups') - a key that never existed - so the literal
+    // "groups.all_groups" showed on the dashboard.
+    expect(link.text()).toBe('See all groups')
+    expect(link.text()).not.toMatch(/^[a-z][a-z0-9_]*\.[a-z0-9_.]+$/i)
   })
 
   it('renders groups sorted alphabetically, linking each to its group view page', () => {
