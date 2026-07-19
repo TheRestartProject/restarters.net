@@ -16,7 +16,12 @@
   border: 1px solid $black;
   box-shadow: 6px 6px 0 0 $black;
 
-  p a {
+  // Links inside a content panel are black + underlined, matching the legacy
+  // site (.panel p a / .link-text). Scoped to `.panel a` (not just `p a`) so
+  // panel action links that aren't inside a <p> - e.g. the login panel's
+  // "Forgot password" / "Create an account" / "Find out more" - are black too,
+  // rather than falling back to the Bootstrap 5 themed link colour (teal).
+  a {
     color: $black;
     text-decoration: underline;
 

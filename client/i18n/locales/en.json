@@ -982,6 +982,7 @@
         "network_start": "Get in touch"
     },
     "login": {
+        "more": "Find out more",
         "stat_1": "Items fixed",
         "stat_2": "CO<sub>2</sub>e emissions prevented",
         "stat_3": "Waste prevented",
@@ -1278,11 +1279,21 @@
         "gender_help": "Sharing your gender identity can help the community learn how to promote diversity, but we understand not everybody wants to share.",
         "town-city": "Town/City (Optional)",
         "town-city_help": "Town/city helps match volunteers to groups and to find local events.",
+        "reg-step-2-heading": "Tell us a little bit about yourself",
         "reg-step-3-heading": "How would you like us to keep in touch?",
         "reg-step-4-heading": "Uses of the data you enter",
         "reg-step-1-1": "This is optional but helps us to improve your experience and helps organise events.  You can change these later in your profile.",
         "reg-step-2-1": "This information is useful for us to serve the community better. Of your personal data, only your skills, town/city and name will be visible to other community members.",
-        "reg-step-4": "Please give your consent to our uses of the data that you enter."
+        "reg-step-2-2": "To create an account, you must set a password",
+        "reg-step-3-1a": "We can send you email updates about events and groups related to you, and about Restart Project activities in general.",
+        "reg-step-3-2b": "Following registration, you will receive a short series of welcome emails. You can also opt-in to other communications below.",
+        "reg-step-4": "Please give your consent to our uses of the data that you enter.",
+        "next-step": "Next step",
+        "previous-step": "Previous step",
+        "step-1": "Step 1 of 4",
+        "step-2": "Step 2 of 4",
+        "step-3": "Step 3 of 4",
+        "step-4": "Step 4 of 4"
     },
     "reporting": [],
     "skills": {

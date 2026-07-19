@@ -1,6 +1,7 @@
 <?php
 
 return [
+  'more' => 'En savoir plus',
   'stat_1' => 'Appareils réparés',
   'stat_2' => 'Émissions de CO<sub>2</sub>e évitées',
   'stat_3' => 'Déchets<br>évités',

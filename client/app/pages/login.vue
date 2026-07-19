@@ -144,6 +144,11 @@ const emailErrors = computed(() => fieldErrors.value.email || [])
             <h3 style="font-weight: 700">{{ t('login.whatis') }}</h3>
             <!-- eslint-disable-next-line vue/no-v-html -->
             <div v-html="t('login.whatis_content')" />
+            <!-- Legacy linked "Find out more" to /about, which rendered the
+                 home/marketing page; the SPA's landing (/) is that same content. -->
+            <NuxtLink to="/" class="card__link" data-testid="login-more-link">
+              {{ t('login.more') }}
+            </NuxtLink>
           </div>
         </div>
       </div>

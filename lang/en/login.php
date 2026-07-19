@@ -1,6 +1,7 @@
 <?php
 
 return [
+  'more' => 'Find out more',
   'stat_1' => 'Items fixed',
   'stat_2' => 'CO<sub>2</sub>e emissions prevented',
   'stat_3' => 'Waste prevented',
