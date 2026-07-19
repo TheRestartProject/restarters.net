@@ -43,6 +43,16 @@
       text-transform: uppercase;
       height: 60px;
 
+      // Legacy (Bootstrap 4) left <a> undecorated; Bootstrap 5 sets
+      // $link-decoration: underline, which underlined every nav caption
+      // (TALK/FIXOMETER/EVENTS/GROUPS/WIKI). Restore the plain look.
+      text-decoration: none;
+
+      &:hover,
+      &:focus {
+        text-decoration: none;
+      }
+
       svg {
         min-height: 30px;
         min-width: 30px;

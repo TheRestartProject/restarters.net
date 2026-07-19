@@ -16,10 +16,10 @@ const { accepted, accept } = useCookieConsent()
       {{ t('client.cookies.banner_text') }}
     </p>
     <div class="cookie-consent__actions">
-      <NuxtLink to="/about/cookie-policy" class="cookie-consent__settings" data-testid="cookie-consent-settings">
+      <NuxtLink to="/about/cookie-policy" class="cookie-consent__item cookie-consent__settings" data-testid="cookie-consent-settings">
         {{ t('client.cookies.settings') }}
       </NuxtLink>
-      <button type="button" class="btn btn-primary cookie-consent__accept" data-testid="cookie-consent-accept" @click="accept">
+      <button type="button" class="cookie-consent__item cookie-consent__accept" data-testid="cookie-consent-accept" @click="accept">
         {{ t('client.cookies.accept') }}
       </button>
     </div>
@@ -27,7 +27,11 @@ const { accepted, accept } = useCookieConsent()
 </template>
 
 <style scoped lang="scss">
-// Dark fixed bar across the foot of the viewport, matching the legacy notice.
+// Dark fixed bar across the foot of the viewport, matching the legacy
+// gdpr-cookie-notice (_gdpr-cookie-notice.scss): bar #333, muted-white
+// description, and a right-aligned action row whose two items ("Cookie
+// settings" + "OK") are bold, non-underlined, button-like text - OK alone
+// carries the brand-orange fill.
 .cookie-consent {
   position: fixed;
   left: 0;
@@ -40,28 +44,48 @@ const { accepted, accept } = useCookieConsent()
   justify-content: space-between;
   gap: 1rem;
   padding: 1rem 1.25rem;
-  background: #2b2b2b;
-  color: #fff;
-  font-size: 0.85rem;
+  background: #333;
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 14px;
 }
 
 .cookie-consent__text {
   flex: 1 1 320px;
+  color: rgba(255, 255, 255, 0.75);
 }
 
+// margin-left: auto pins the row to the right, matching legacy .gdpr-cookie-notice-nav.
 .cookie-consent__actions {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  margin-left: auto;
   white-space: nowrap;
 }
 
-.cookie-consent__settings {
+// Both controls share the legacy .gdpr-cookie-notice-nav-item look: bold white
+// text, no underline, generous horizontal padding - so "Cookie settings" reads
+// as a button, not a hyperlink.
+.cookie-consent__item {
+  display: block;
+  height: 40px;
+  line-height: 40px;
+  padding: 0 16px;
+  font-size: 15px;
+  font-weight: 600;
   color: #fff;
-  text-decoration: underline;
+  text-decoration: none;
 
   &:hover {
     color: #fff;
+    text-decoration: none;
   }
+}
+
+// The OK accept button - brand orange fill (.gdpr-cookie-notice-nav-item-btn).
+.cookie-consent__accept {
+  border: 0;
+  background: #f9a33f;
+  border-radius: 3px;
+  cursor: pointer;
 }
 </style>
