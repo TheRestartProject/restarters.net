@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import DashboardNearbyGroups from '~/components/dashboard/DashboardNearbyGroups.vue'
+import CollapsibleSection from '~/components/CollapsibleSection.vue'
 
 // Role ints per app/Role.php (design.md contract - api-contracts-phase-b.md
 // B1 `your_groups[].role`). Not exported anywhere client-side yet (the
@@ -66,22 +67,24 @@ function roleVariant(role) {
 </script>
 
 <template>
-  <div data-testid="dashboard-your-groups">
-    <div class="d-flex justify-content-between flex-wrap align-items-center">
-      <div class="d-flex align-items-center">
-        <h2 class="mb-0">{{ t('dashboard.your_groups_heading') }}</h2>
-        <img src="/images/group_doodle_ico.svg" alt="" class="group-doodle ms-3">
+  <CollapsibleSection data-testid="dashboard-your-groups">
+    <template #title>
+      <div class="d-flex justify-content-between flex-wrap align-items-center">
+        <div class="d-flex align-items-center">
+          <h2 class="mb-0">{{ t('dashboard.your_groups_heading') }}</h2>
+          <img src="/images/group_doodle_ico.svg" alt="" class="group-doodle ms-3">
+        </div>
+        <NuxtLink
+          v-if="newNearbyGroups.length"
+          to="/group/nearby"
+          class="new-highlight px-2"
+          data-testid="your-groups-new-highlight"
+        >
+          <img src="/images/arrow-right-doodle-white.svg" alt="" class="me-1">
+          {{ t('dashboard.newly_added', { count: newNearbyGroups.length }, newNearbyGroups.length) }}
+        </NuxtLink>
       </div>
-      <NuxtLink
-        v-if="newNearbyGroups.length"
-        to="/group/nearby"
-        class="new-highlight px-2"
-        data-testid="your-groups-new-highlight"
-      >
-        <img src="/images/arrow-right-doodle-white.svg" alt="" class="me-1">
-        {{ t('dashboard.newly_added', { count: newNearbyGroups.length }, newNearbyGroups.length) }}
-      </NuxtLink>
-    </div>
+    </template>
 
     <div class="content-divider">
       <div v-if="!sortedGroups.length" data-testid="your-groups-empty">
@@ -140,7 +143,7 @@ function roleVariant(role) {
         </div>
       </template>
     </div>
-  </div>
+  </CollapsibleSection>
 </template>
 
 <style scoped lang="scss">

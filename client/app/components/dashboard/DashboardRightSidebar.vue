@@ -1,5 +1,6 @@
 <script setup>
 import { useI18n } from 'vue-i18n'
+import CollapsibleSection from '~/components/CollapsibleSection.vue'
 
 // Legacy source: resources/js/components/DashboardRightSidebar.vue. The
 // legacy version had a couple of display classes that contradicted their
@@ -24,23 +25,27 @@ const { t } = useI18n()
     </div>
 
     <div class="panel panel__orange getting-started mt-3" data-testid="dashboard-getting-started">
-      <div class="d-flex justify-content-between align-items-start">
-        <h2>{{ t('dashboard.getting_the_most') }}</h2>
-        <img src="/images/hand_doodle.svg" alt="" class="hand-doodle ms-3">
-      </div>
+      <CollapsibleSection>
+        <template #title>
+          <div class="d-flex justify-content-between align-items-start">
+            <h2>{{ t('dashboard.getting_the_most') }}</h2>
+            <img src="/images/hand_doodle.svg" alt="" class="hand-doodle ms-3">
+          </div>
+        </template>
 
-      <div class="getting-started__content">
-        <p class="d-block d-md-none">{{ t('dashboard.sidebar_intro_1') }}</p>
+        <div class="getting-started__content">
+          <p class="d-block d-md-none">{{ t('dashboard.sidebar_intro_1') }}</p>
 
-        <ul class="list-unstyled getting-started__list">
-          <!-- eslint-disable vue/no-v-html -->
-          <li v-html="t('dashboard.getting_the_most_bullet1')" />
-          <li v-html="t('dashboard.getting_the_most_bullet2')" />
-          <li v-html="t('dashboard.getting_the_most_bullet3')" />
-          <li v-html="t('dashboard.getting_the_most_bullet4')" />
-          <!-- eslint-enable vue/no-v-html -->
-        </ul>
-      </div>
+          <ul class="list-unstyled getting-started__list">
+            <!-- eslint-disable vue/no-v-html -->
+            <li v-html="t('dashboard.getting_the_most_bullet1')" />
+            <li v-html="t('dashboard.getting_the_most_bullet2')" />
+            <li v-html="t('dashboard.getting_the_most_bullet3')" />
+            <li v-html="t('dashboard.getting_the_most_bullet4')" />
+            <!-- eslint-enable vue/no-v-html -->
+          </ul>
+        </div>
+      </CollapsibleSection>
     </div>
   </div>
 </template>

@@ -4,6 +4,7 @@ import { useI18n } from 'vue-i18n'
 import { useSessionStore } from '~/stores/session.js'
 import { useSsoBridge } from '~/composables/useSsoBridge.js'
 import DashboardTalkTopic from '~/components/dashboard/DashboardTalkTopic.vue'
+import CollapsibleSection from '~/components/CollapsibleSection.vue'
 
 // Legacy source: resources/js/components/DiscourseDiscussion.vue - lists the top
 // Talk topics from GET /api/talk/topics (DiscourseController::discussionTopics,
@@ -38,14 +39,15 @@ function seeAll() {
 </script>
 
 <template>
-  <div data-testid="dashboard-whats-happening">
-    <div class="d-flex align-items-center">
-      <h2 class="mb-0">{{ t('dashboard.whats_happening_heading') }}</h2>
-      <!-- Desktop-only heading doodle, matching legacy DiscourseDiscussion.vue
-           (d-none d-md-block) and the other dashboard section headings
-           (Your Groups' group_doodle_ico). -->
-      <img src="/images/talk_doodle.svg" alt="" class="talk-doodle ms-3 d-none d-md-block">
-    </div>
+  <CollapsibleSection data-testid="dashboard-whats-happening">
+    <template #title>
+      <div class="d-flex align-items-center">
+        <h2 class="mb-0">{{ t('dashboard.whats_happening_heading') }}</h2>
+        <!-- Desktop-only heading doodle (d-none d-md-block), matching the other
+             dashboard section headings (Your Groups' group_doodle_ico). -->
+        <img src="/images/talk_doodle.svg" alt="" class="talk-doodle ms-3 d-none d-md-block">
+      </div>
+    </template>
 
     <div class="content-divider">
       <table v-if="topics.length" class="table talk-topics" data-testid="whats-happening-topics">
@@ -76,7 +78,7 @@ function seeAll() {
         </a>
       </div>
     </div>
-  </div>
+  </CollapsibleSection>
 </template>
 
 <style scoped>
