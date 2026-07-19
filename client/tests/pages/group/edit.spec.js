@@ -46,8 +46,24 @@ const BASE_GROUP = {
   },
 }
 
+// archive_group/archive_group_confirm are being restored to lang/en/groups.php
+// (see docs/nuxt-migration/findings/parity-audit-findings.md) but the
+// generated client/i18n/locales/en.json is regenerated centrally via
+// `php artisan translations:export-client`, so they're supplied inline here
+// rather than by editing the checked-in locale file.
+const GROUPS_OVERRIDES = {
+  groups: {
+    archive_group: 'Archive group',
+    archive_group_confirm: 'Please confirm that you want to archive {name}.',
+  },
+}
+
 function mountPage() {
-  const i18n = createI18n({ legacy: false, locale: 'en', messages: { en: { ...en, ...clientEn } } })
+  const i18n = createI18n({
+    legacy: false,
+    locale: 'en',
+    messages: { en: { ...en, ...clientEn, groups: { ...en.groups, ...GROUPS_OVERRIDES.groups } } },
+  })
 
   return mount(GroupEditPage, {
     global: {
@@ -153,35 +169,39 @@ describe('pages/group/edit/[id]', () => {
     expect(wrapper.find('[data-testid="group-edit-image-error"]').text()).toBe('boom')
   })
 
-  describe('delete/archive', () => {
-    it('hides the control entirely when can_see_delete is false', () => {
+  describe('archive', () => {
+    it('hides the control entirely when can_perform_archive is false', () => {
       groupsStore.current.data = BASE_GROUP
       const wrapper = mountPage()
-      expect(wrapper.find('[data-testid="group-edit-delete"]').exists()).toBe(false)
+      expect(wrapper.find('[data-testid="group-edit-archive"]').exists()).toBe(false)
     })
 
-    it('shows it disabled when can_see_delete is true but can_perform_delete is false', () => {
+    it('shows the archive control for a NetworkCoordinator when can_perform_archive is true', () => {
       groupsStore.current.data = {
         ...BASE_GROUP,
-        permissions: { ...BASE_GROUP.permissions, can_see_delete: true, can_perform_delete: false },
+        permissions: { ...BASE_GROUP.permissions, can_perform_archive: true },
       }
+      sessionStore.user = { role: 4 } // NetworkCoordinator, not Administrator
       const wrapper = mountPage()
-      const button = wrapper.find('[data-testid="group-edit-delete"]')
-      expect(button.exists()).toBe(true)
-      expect(button.attributes('disabled')).toBeDefined()
+      expect(wrapper.find('[data-testid="group-edit-archive"]').exists()).toBe(true)
     })
 
-    it('confirms then calls deleteGroup and redirects to the view page when can_perform_delete is true', async () => {
+    it('shows the archive_group label and archive_group_confirm copy, and calls deleteGroup (archive semantics) then redirects', async () => {
       groupsStore.current.data = {
         ...BASE_GROUP,
-        permissions: { ...BASE_GROUP.permissions, can_see_delete: true, can_perform_delete: true },
+        name: 'Fixers United',
+        permissions: { ...BASE_GROUP.permissions, can_perform_archive: true },
       }
       const wrapper = mountPage()
 
-      await wrapper.find('[data-testid="group-edit-delete"]').trigger('click')
-      expect(wrapper.find('[data-testid="group-edit-delete-confirm"]').exists()).toBe(true)
+      const button = wrapper.find('[data-testid="group-edit-archive"]')
+      expect(button.text()).toBe('Archive group')
 
-      await wrapper.find('[data-testid="group-edit-delete-confirm"]').trigger('click')
+      await button.trigger('click')
+      expect(wrapper.find('[data-testid="group-edit-archive-confirm"]').exists()).toBe(true)
+      expect(wrapper.text()).toContain('Please confirm that you want to archive Fixers United.')
+
+      await wrapper.find('[data-testid="group-edit-archive-confirm"]').trigger('click')
       expect(groupsStore.deleteGroup).toHaveBeenCalledWith(5)
     })
   })

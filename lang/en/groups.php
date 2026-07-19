@@ -94,8 +94,10 @@ return [
   'create_failed' => 'Group could <strong>not</strong> be created. Please look at the reported errors, correct them, and try again.',
   'edit_failed' => 'Group could not be edited.',
   'delete_group' => 'Delete group',
+  'archive_group' => 'Archive group',
   'archived_group' => 'Archived',
   'delete_group_confirm' => 'Please confirm that you want to delete :name.',
+  'archive_group_confirm' => 'Please confirm that you want to archive :name.',
   'delete_succeeded' => 'Group <strong>:name</strong> has been deleted.',
   'geocode_failed' => 'Location not found. If you are unable to find the location of your group, please try a more general location (such as village/town), or a specific street address, rather than a building name.',
   'discourse_title' => 'This is a discussion group for anyone who follows :group.
