@@ -596,6 +596,7 @@
         "huge_impact_2": "Search your repair data below, and get a flavour of the impact of repair as well as the barriers we face when repairing.  You can help us understand what else this data tells us and what changes we should campaign for over at the <a href=\"https://talk.restarters.net/c/right-to-repair/repair-data/25\">repair data discussion</a> in our forum.",
         "add_data_button": "Add Data",
         "search_text": "Browse or search our global database of repairs.",
+        "table_intro": "Press the ‘i’ icons for details.  Click a column head to sort by that column - click again to reverse sort order.",
         "repair_records": "Repair Records",
         "images": "Images",
         "model_or_type": "Item",

@@ -108,6 +108,11 @@ export const useDevicesStore = defineStore('devices', {
     // not keyed by anything (only one search is ever on screen at a time,
     // same reasoning as stores/groups.js's `current`/`stats`).
     searchResults: { data: [], count: 0, loading: false, error: null },
+
+    // Monotonic id for the in-flight search. Filter typing, sort clicks and
+    // paging can all overlap, so only the newest request's response is applied
+    // - a stale (out-of-order) response must not overwrite fresher results.
+    searchSeq: 0,
   }),
 
   getters: {
@@ -281,6 +286,7 @@ export const useDevicesStore = defineStore('devices', {
     // builds it. Unlike byEvent's fetchForEvent(), this always refetches
     // (no `loaded` guard) since every call represents a new search/page.
     async searchDevices(params) {
+      const seq = ++this.searchSeq
       this.searchResults.loading = true
       this.searchResults.error = null
 
@@ -288,14 +294,25 @@ export const useDevicesStore = defineStore('devices', {
 
       try {
         const { data } = await $api.device.search(params)
+        // A newer search was started while this one was in flight: ignore this
+        // (now stale) response so it can't clobber the fresher results.
+        if (seq !== this.searchSeq) {
+          return data
+        }
         this.searchResults.data = data.items
         this.searchResults.count = data.count
         return data
       } catch (error) {
-        this.searchResults.error = error
+        if (seq === this.searchSeq) {
+          this.searchResults.error = error
+        }
         throw error
       } finally {
-        this.searchResults.loading = false
+        // Only the latest request owns the loading flag; a superseded one
+        // clearing it would flicker the spinner off while the newer is pending.
+        if (seq === this.searchSeq) {
+          this.searchResults.loading = false
+        }
       }
     },
 

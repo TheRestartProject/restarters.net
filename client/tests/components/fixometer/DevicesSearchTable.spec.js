@@ -152,14 +152,15 @@ describe('components/fixometer/DevicesSearchTable', () => {
 
     const table = wrapper.find('[data-testid="device-search-results"]')
     expect(table.exists()).toBe(true)
+    // Header text now includes the sort-arrow glyphs, so match on substring.
     const headers = table.findAll('thead th').map((h) => h.text()).filter(Boolean)
-    expect(headers).toContain('Category')
-    expect(headers).toContain('Status')
+    expect(headers.some((h) => h.includes('Category'))).toBe(true)
+    expect(headers.some((h) => h.includes('Status'))).toBe(true)
     // the empty message sits inside the table, not instead of it
     expect(table.find('[data-testid="device-search-empty"]').exists()).toBe(true)
   })
 
-  it('renders result rows with a link to the associated event', async () => {
+  it('renders result rows and reveals a link to the event in the info details panel', async () => {
     mockApi.device.search.mockResolvedValue({ data: { items: [device()], count: 1 } })
 
     const wrapper = mountComponent()
@@ -170,8 +171,84 @@ describe('components/fixometer/DevicesSearchTable', () => {
     expect(row.text()).toContain('Toaster')
     expect(row.text()).toContain('Chiswick Restarters')
 
+    // The event link lives in the 'i' info details panel (legacy row-details),
+    // hidden until the icon is clicked.
+    expect(wrapper.find('[data-testid="device-search-view-1"]').exists()).toBe(false)
+    await wrapper.find('[data-testid="device-search-info-1"]').trigger('click')
     const link = wrapper.find('[data-testid="device-search-view-1"]')
     expect(link.attributes('href')).toBe('/party/view/55')
+  })
+
+  it('sorts by a column ascending on first click and reverses on the next', async () => {
+    mockApi.device.search.mockResolvedValue({ data: { items: [device()], count: 1 } })
+    const wrapper = mountComponent()
+    await flushPromises()
+    mockApi.device.search.mockClear()
+
+    await wrapper.find('[data-testid="device-search-sort-item_type"]').trigger('click')
+    await flushPromises()
+    expect(mockApi.device.search).toHaveBeenLastCalledWith(
+      expect.objectContaining({ sortBy: 'item_type', sortDesc: 'ASC', page: 1 })
+    )
+
+    mockApi.device.search.mockClear()
+    await wrapper.find('[data-testid="device-search-sort-item_type"]').trigger('click')
+    await flushPromises()
+    expect(mockApi.device.search).toHaveBeenLastCalledWith(
+      expect.objectContaining({ sortBy: 'item_type', sortDesc: 'DESC' })
+    )
+  })
+
+  it('exposes sort controls for exactly the legacy-sortable columns (Assessment is not sortable)', async () => {
+    // powered=true by default, so the Brand column is present too.
+    const wrapper = mountComponent()
+    await flushPromises()
+
+    for (const key of ['item_type', 'category', 'brand', 'groupname', 'repair_status', 'created_at']) {
+      expect(wrapper.find(`[data-testid="device-search-sort-${key}"]`).exists()).toBe(true)
+    }
+    // Assessment renders as a header but carries no sort control (matching legacy).
+    const headerTexts = wrapper.findAll('thead th').map((h) => h.text())
+    expect(headerTexts.some((t) => t.includes('Assessment'))).toBe(true)
+    for (const notSortable of ['assessment', 'problem', 'short_problem']) {
+      expect(wrapper.find(`[data-testid="device-search-sort-${notSortable}"]`).exists()).toBe(false)
+    }
+  })
+
+  it('expands details rows independently, so several can be open at once', async () => {
+    mockApi.device.search.mockResolvedValue({
+      data: { items: [device({ id: 1 }), device({ id: 2, item_type: 'Kettle' })], count: 2 },
+    })
+    const wrapper = mountComponent()
+    await flushPromises()
+
+    await wrapper.find('[data-testid="device-search-info-1"]').trigger('click')
+    expect(wrapper.find('[data-testid="device-search-details-1"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="device-search-details-2"]').exists()).toBe(false)
+
+    // Opening the second must not close the first.
+    await wrapper.find('[data-testid="device-search-info-2"]').trigger('click')
+    expect(wrapper.find('[data-testid="device-search-details-1"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="device-search-details-2"]').exists()).toBe(true)
+  })
+
+  it('toggles a read-only details row via the info icon', async () => {
+    mockApi.device.search.mockResolvedValue({
+      data: { items: [device({ model: 'AB-100', problem: 'Full assessment text' })], count: 1 },
+    })
+    const wrapper = mountComponent()
+    await flushPromises()
+
+    expect(wrapper.find('[data-testid="device-search-details-1"]').exists()).toBe(false)
+
+    await wrapper.find('[data-testid="device-search-info-1"]').trigger('click')
+    const details = wrapper.find('[data-testid="device-search-details-1"]')
+    expect(details.exists()).toBe(true)
+    expect(details.text()).toContain('AB-100')
+    expect(details.text()).toContain('Full assessment text')
+
+    await wrapper.find('[data-testid="device-search-info-1"]').trigger('click')
+    expect(wrapper.find('[data-testid="device-search-details-1"]').exists()).toBe(false)
   })
 
   it('paginates: next/prev change the page param and are bounded', async () => {

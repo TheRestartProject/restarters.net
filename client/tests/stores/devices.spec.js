@@ -375,5 +375,31 @@ describe('stores/devices', () => {
       expect(store.searchResults.error).toEqual(apiError)
       expect(store.searchResults.loading).toBe(false)
     })
+
+    it('applies only the newest search when responses arrive out of order', async () => {
+      // Two overlapping searches (e.g. a sort click then a filter edit); the
+      // STALE first-issued one resolves LAST and must not clobber the fresher
+      // results.
+      let resolveStale
+      let resolveFresh
+      mockApi.device.search
+        .mockImplementationOnce(() => new Promise((resolve) => { resolveStale = resolve }))
+        .mockImplementationOnce(() => new Promise((resolve) => { resolveFresh = resolve }))
+
+      const store = useDevicesStore()
+      const stale = store.searchDevices({ page: 1, brand: 'stale' })
+      const fresh = store.searchDevices({ page: 1, brand: 'fresh' })
+
+      resolveFresh({ data: { items: [{ id: 2, item_type: 'Fresh' }], count: 1 } })
+      await fresh
+      expect(store.searchResults.data).toEqual([{ id: 2, item_type: 'Fresh' }])
+
+      resolveStale({ data: { items: [{ id: 1, item_type: 'Stale' }], count: 9 } })
+      await stale
+      // The stale response is ignored; the fresh results stand.
+      expect(store.searchResults.data).toEqual([{ id: 2, item_type: 'Fresh' }])
+      expect(store.searchResults.count).toBe(1)
+      expect(store.searchResults.loading).toBe(false)
+    })
   })
 })

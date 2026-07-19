@@ -813,8 +813,28 @@ class DeviceController extends Controller {
     {
         $page = max(1, (int) $request->input('page', 1));
         $size = max(1, (int) $request->input('size', 20));
-        $sortBy = $request->input('sortBy', 'event_start_utc');
-        $sortDesc = $request->input('sortDesc', 'DESC');
+
+        // Whitelist the sortable columns. The value comes from the client's
+        // clickable table headers (DevicesSearchTable.vue), so it must NOT be
+        // fed raw into orderBy(): the column argument is interpolated into the
+        // query grammar, so an un-whitelisted string is a SQL-injection vector.
+        // Keys are the field names the client sends per column; values are the
+        // qualified columns on the joined query. Default (and fallback for any
+        // unknown key) is the repair-event date, matching the legacy default.
+        $sortColumns = [
+            'event_start_utc' => 'events.event_start_utc',
+            'item_type' => 'devices.item_type',
+            'category' => 'categories.name',
+            'brand' => 'devices.brand',
+            'groupname' => 'groups.name',
+            'repair_status' => 'devices.repair_status',
+            'created_at' => 'devices.created_at',
+        ];
+        $sortKey = $request->input('sortBy');
+        // is_string guards against a non-scalar sortBy (e.g. ?sortBy[]=x), which
+        // would otherwise throw on the array-key lookup rather than fall back.
+        $sortColumn = (is_string($sortKey) && isset($sortColumns[$sortKey])) ? $sortColumns[$sortKey] : 'events.event_start_utc';
+        $sortDir = strtolower((string) $request->input('sortDesc', 'DESC')) === 'asc' ? 'asc' : 'desc';
         $powered = $request->input('powered');
         $category = $request->input('category');
         $brand = $request->input('brand');
@@ -878,7 +898,7 @@ class DeviceController extends Controller {
             ->join('groups', 'events.group', '=', 'groups.idgroups')
             ->join('categories', 'devices.category', '=', 'categories.idcategories')
             ->where($wheres)
-            ->orderBy($sortBy, $sortDesc);
+            ->orderBy($sortColumn, $sortDir);
 
         $count = $query->count();
 

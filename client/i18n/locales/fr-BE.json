@@ -613,6 +613,7 @@
         "huge_impact_2": "Recherchez vos données de réparation ci-dessous et faites-vous une idée de l'impact de la réparation ainsi que des obstacles auxquels nous sommes confrontés lorsque nous réparons.  Vous pouvez nous aider à comprendre ce que ces données nous apprennent d'autre et quels changements nous devrions préconiser dans la <a href=\"https://talk.restarters.net/c/right-to-repair/repair-data/25\">discussion sur les données de réparation</a> de notre forum.",
         "add_data_button": "Ajouter des données",
         "search_text": "Parcourez  notre base de données de réparation",
+        "table_intro": "Cliquez sur la ligne pour plus de détails.  Cliquez sur l'en-tête d'une colonne pour trier par cette colonne - cliquez à nouveau pour inverser l'ordre de tri.",
         "repair_records": "Données de réparation",
         "age_approx": "Années, approximatif si connu",
         "images": "Images",

@@ -4,6 +4,7 @@ import { useI18n } from 'vue-i18n'
 import moment from 'moment'
 import { useDevicesStore } from '../../stores/devices.js'
 import { deviceStatusKey, deviceStatusVariant } from '../../composables/useDeviceDisplay.js'
+import FixometerSortHeader from './FixometerSortHeader.vue'
 
 // Paginated/filterable device search table for /device/search
 // (api-contracts-phase-c.md C6a; design.md §6.2 C6 task brief). The legacy
@@ -76,6 +77,38 @@ const filters = reactive({
 
 const page = ref(1)
 
+// Server-side sort (GET /api/v2/devices sortBy/sortDesc). Default matches the
+// legacy fixometer table: the repair-event date, newest first. Only the
+// columns whitelisted in DeviceController::listDevicesv2 are accepted; the
+// keys here are exactly those whitelist keys.
+const sortBy = ref('event_start_utc')
+const sortDesc = ref(true)
+
+// Clicking a header sorts by that column ascending; clicking the active column
+// again reverses the direction - the affordance the legacy table's helper text
+// ("click a column head to sort... click again to reverse") describes.
+function toggleSort(key) {
+  if (sortBy.value === key) {
+    sortDesc.value = !sortDesc.value
+  } else {
+    sortBy.value = key
+    sortDesc.value = false
+  }
+}
+
+// The legacy per-row 'i' info icon toggled an inline details panel; a Set lets
+// several be open at once, as bootstrap-vue's row-details did.
+const expanded = ref(new Set())
+function toggleDetails(id) {
+  const next = new Set(expanded.value)
+  if (next.has(id)) {
+    next.delete(id)
+  } else {
+    next.add(id)
+  }
+  expanded.value = next
+}
+
 const clusters = computed(() => devicesStore.clusters)
 // Only offer categories that match the selected powered/unpowered toggle -
 // DeviceCategorySelect.vue's :powered prop does the same filtering
@@ -93,8 +126,8 @@ function buildParams() {
   return {
     page: page.value,
     size: PAGE_SIZE,
-    sortBy: 'event_start_utc',
-    sortDesc: 'DESC',
+    sortBy: sortBy.value,
+    sortDesc: sortDesc.value ? 'DESC' : 'ASC',
     powered: filters.powered,
     category: filters.category || undefined,
     brand: filters.powered ? filters.brand || undefined : undefined,
@@ -129,6 +162,15 @@ watch(
 )
 
 watch(page, () => runSearch())
+
+// A sort change resets to page 1 (same single-fetch guard as the filter watch).
+watch([sortBy, sortDesc], () => {
+  if (page.value !== 1) {
+    page.value = 1
+  } else {
+    runSearch()
+  }
+})
 
 onMounted(() => {
   devicesStore.ensureMetaLoaded()
@@ -172,36 +214,13 @@ function nextPage() {
 
 <template>
   <div data-testid="devices-search-table">
-    <div class="device-search-tabs mb-3" role="group" data-testid="device-search-powered-toggle">
-      <button
-        type="button"
-        class="device-search-tabs__tab"
-        :class="{ 'device-search-tabs__tab--active': filters.powered }"
-        data-testid="device-search-powered-true"
-        @click="filters.powered = true"
-      >
-        {{ poweredLabel }}
-      </button>
-      <button
-        type="button"
-        class="device-search-tabs__tab"
-        :class="{ 'device-search-tabs__tab--active': !filters.powered }"
-        data-testid="device-search-powered-false"
-        @click="filters.powered = false"
-      >
-        {{ unpoweredLabel }}
-      </button>
-    </div>
-
-    <p
-      class="text-brand small"
-      data-testid="device-search-powered-description"
-    >
-      <!-- eslint-disable-next-line vue/no-v-html -->
-      <span v-html="filters.powered ? t('devices.description_powered') : t('devices.description_unpowered')" />
-    </p>
-
-    <div class="device-search-section mb-3" data-testid="device-search-item-info">
+    <!-- Legacy FixometerPage.vue's two-column Repair Records card: the filter
+         accordions form a narrow left rail, the Powered/Unpowered tabs + table
+         a wide right column, both inside one teal-bordered container. Single
+         column on narrow viewports. -->
+    <div class="device-search-layout">
+      <div class="device-search-layout__filters">
+        <div class="device-search-section mb-3" data-testid="device-search-item-info">
       <button
         type="button"
         class="device-search-section__header"
@@ -303,6 +322,34 @@ function nextPage() {
         </div>
       </fieldset>
     </div>
+      </div>
+
+      <div class="device-search-layout__results">
+        <div class="device-search-tabs mb-3" role="group" data-testid="device-search-powered-toggle">
+          <button
+            type="button"
+            class="device-search-tabs__tab"
+            :class="{ 'device-search-tabs__tab--active': filters.powered }"
+            data-testid="device-search-powered-true"
+            @click="filters.powered = true"
+          >
+            {{ poweredLabel }}
+          </button>
+          <button
+            type="button"
+            class="device-search-tabs__tab"
+            :class="{ 'device-search-tabs__tab--active': !filters.powered }"
+            data-testid="device-search-powered-false"
+            @click="filters.powered = false"
+          >
+            {{ unpoweredLabel }}
+          </button>
+        </div>
+
+        <p class="text-brand small" data-testid="device-search-powered-description">
+          <!-- eslint-disable-next-line vue/no-v-html -->
+          <span v-html="filters.powered ? t('devices.description_powered') : t('devices.description_unpowered')" />
+        </p>
 
     <div v-if="loading" data-testid="device-search-loading">
       <div class="placeholder-glow">
@@ -319,21 +366,29 @@ function nextPage() {
         {{ t('client.devices.results_count', { count }, count) }}
       </p>
 
+      <!-- Legacy devices.table_intro: how to use the 'i' info icons + sortable
+           column heads. -->
+      <p class="text-brand small" data-testid="device-search-table-intro">
+        {{ t('devices.table_intro') }}
+      </p>
+
       <!-- Always render the table scaffold (column headers) - even with no
            results - matching the legacy b-table (show-empty). The empty state
            is a row inside the table, not a replacement for it. A prior version
-           hid the whole table when empty, so the columns disappeared. -->
+           hid the whole table when empty, so the columns disappeared.
+           Sortable heads (item/category/brand/group/status/date) mirror the
+           legacy FixometerRecordsTable; Assessment was not sortable there. -->
       <div class="table-responsive">
         <table class="table" data-testid="device-search-results">
           <thead>
             <tr>
-              <th>{{ t('devices.model_or_type') }}</th>
-              <th>{{ t('devices.category') }}</th>
-              <th v-if="filters.powered">{{ t('devices.brand') }}</th>
-              <th>{{ t('devices.assessment') }}</th>
-              <th>{{ t('devices.group') }}</th>
-              <th>{{ t('devices.status') }}</th>
-              <th>{{ t('devices.devices_date') }}</th>
+              <th><FixometerSortHeader :label="t('devices.model_or_type')" sort-key="item_type" :active-key="sortBy" :desc="sortDesc" @sort="toggleSort" /></th>
+              <th><FixometerSortHeader :label="t('devices.category')" sort-key="category" :active-key="sortBy" :desc="sortDesc" @sort="toggleSort" /></th>
+              <th v-if="filters.powered"><FixometerSortHeader :label="t('devices.brand')" sort-key="brand" :active-key="sortBy" :desc="sortDesc" @sort="toggleSort" /></th>
+              <th><FixometerSortHeader :label="t('devices.assessment')" /></th>
+              <th><FixometerSortHeader :label="t('devices.group')" sort-key="groupname" :active-key="sortBy" :desc="sortDesc" @sort="toggleSort" /></th>
+              <th><FixometerSortHeader :label="t('devices.status')" sort-key="repair_status" :active-key="sortBy" :desc="sortDesc" @sort="toggleSort" /></th>
+              <th><FixometerSortHeader :label="t('devices.devices_date')" sort-key="created_at" :active-key="sortBy" :desc="sortDesc" @sort="toggleSort" /></th>
               <th />
             </tr>
           </thead>
@@ -343,24 +398,63 @@ function nextPage() {
                 {{ t('client.devices.no_results') }}
               </td>
             </tr>
-            <tr v-for="device in devices" :key="device.id" :data-testid="`device-search-row-${device.id}`">
-              <td>{{ device.item_type || '-' }}</td>
-              <td>{{ device.category ? t(device.category.name) : '-' }}</td>
-              <td v-if="filters.powered">{{ device.brand || '-' }}</td>
-              <td>{{ device.short_problem || '-' }}</td>
-              <td>{{ device.groupname || '-' }}</td>
-              <td>
-                <BBadge v-if="statusLabel(device)" :variant="deviceStatusVariant(device)" :data-testid="`device-search-status-${device.id}`">
-                  {{ statusLabel(device) }}
-                </BBadge>
-              </td>
-              <td>{{ formatDate(device.created_at) }}</td>
-              <td>
-                <NuxtLink :to="`/party/view/${device.eventid}`" :data-testid="`device-search-view-${device.id}`">
-                  {{ t('client.events.view_event') }}
-                </NuxtLink>
-              </td>
-            </tr>
+            <template v-for="device in devices" :key="device.id">
+              <tr :data-testid="`device-search-row-${device.id}`">
+                <td>{{ device.item_type || '-' }}</td>
+                <td>{{ device.category ? t(device.category.name) : '-' }}</td>
+                <td v-if="filters.powered">{{ device.brand || '-' }}</td>
+                <td>{{ device.short_problem || '-' }}</td>
+                <td>{{ device.groupname || '-' }}</td>
+                <td>
+                  <BBadge v-if="statusLabel(device)" :variant="deviceStatusVariant(device)" :data-testid="`device-search-status-${device.id}`">
+                    {{ statusLabel(device) }}
+                  </BBadge>
+                </td>
+                <td>{{ formatDate(device.created_at) }}</td>
+                <td class="text-end">
+                  <button
+                    type="button"
+                    class="device-search-info"
+                    :class="{ 'device-search-info--on': expanded.has(device.id) }"
+                    :aria-expanded="expanded.has(device.id)"
+                    :data-testid="`device-search-info-${device.id}`"
+                    @click="toggleDetails(device.id)"
+                  >
+                    <span aria-hidden="true">i</span>
+                    <span class="visually-hidden">{{ t('devices.table_intro') }}</span>
+                  </button>
+                </td>
+              </tr>
+              <tr
+                v-if="expanded.has(device.id)"
+                class="device-search-details"
+                :data-testid="`device-search-details-${device.id}`"
+              >
+                <td :colspan="filters.powered ? 8 : 7">
+                  <dl class="device-search-details__grid">
+                    <div>
+                      <dt>{{ t('devices.model') }}</dt>
+                      <dd>{{ device.model || '-' }}</dd>
+                    </div>
+                    <div>
+                      <dt>{{ t('devices.age') }}</dt>
+                      <dd>{{ device.age ?? '-' }}</dd>
+                    </div>
+                    <div v-if="device.spare_parts">
+                      <dt>{{ t('devices.spare_parts') }}</dt>
+                      <dd>{{ device.spare_parts }}</dd>
+                    </div>
+                    <div class="device-search-details__wide">
+                      <dt>{{ t('devices.assessment') }}</dt>
+                      <dd>{{ device.problem || '-' }}</dd>
+                    </div>
+                  </dl>
+                  <NuxtLink :to="`/party/view/${device.eventid}`" :data-testid="`device-search-view-${device.id}`">
+                    {{ t('client.events.view_event') }}
+                  </NuxtLink>
+                </td>
+              </tr>
+            </template>
           </tbody>
         </table>
       </div>
@@ -389,10 +483,45 @@ function nextPage() {
         </button>
       </div>
     </template>
+      </div>
+    </div>
   </div>
 </template>
 
 <style scoped lang="scss">
+// Two-column Repair Records card (legacy FixometerPage.vue): a narrow filter
+// rail beside the tabbed results, together in one teal-bordered container.
+// Stacks to a single column below the lg breakpoint.
+.device-search-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  padding: 1rem;
+  border: 1px solid #0394a6;
+
+  @media (min-width: 992px) {
+    grid-template-columns: minmax(220px, 300px) 1fr;
+    align-items: start;
+  }
+}
+
+.device-search-layout__results {
+  min-width: 0;
+}
+
+// In the two-column layout the filter rail is narrow, so its fields (a
+// col-sm-6 col-md-4 grid tuned for a full-width row) stack one-per-row rather
+// than cramming three across. Below lg the rail is full width and the original
+// grid applies.
+@media (min-width: 992px) {
+  .device-search-layout__filters :deep(.col-sm-6),
+  .device-search-layout__filters :deep(.col-md-4) {
+    flex: 0 0 100%;
+    max-width: 100%;
+    width: 100%;
+  }
+}
+
 // Powered/Unpowered toggle - legacy FixometerPage.vue's b-tabs: both tabs sit
 // in a brand-teal bordered strip, white-backed, the active one picked out in
 // teal (rather than the earlier btn-primary/btn-outline pair, which the theme
@@ -458,6 +587,57 @@ function nextPage() {
   border: 0;
   padding: 0.75rem;
   margin: 0;
+}
+
+// Per-row 'i' info toggle - a small circular brand-teal badge (legacy used
+// info_ico_green.svg); filled when its details row is open.
+.device-search-info {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  padding: 0;
+  border: 1px solid #0394a6;
+  border-radius: 50%;
+  background: #fff;
+  color: #0394a6;
+  font-style: italic;
+  font-weight: bold;
+  font-family: Georgia, 'Times New Roman', serif;
+  line-height: 1;
+  cursor: pointer;
+
+  &--on {
+    background: #0394a6;
+    color: #fff;
+  }
+}
+
+.device-search-details > td {
+  background: #f5f7fa;
+}
+
+.device-search-details__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.25rem 1.5rem;
+  margin: 0 0 0.5rem;
+
+  dt {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    color: #6c757d;
+    margin: 0;
+  }
+
+  dd {
+    margin: 0 0 0.5rem;
+  }
+}
+
+.device-search-details__wide {
+  grid-column: 1 / -1;
 }
 </style>
 
