@@ -1,8 +1,13 @@
 <script setup>
-import { computed, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '~/stores/auth.js'
 
+// 4-step wizard, ported from resources/views/auth/register-new.blade.php
+// (design.md parity rebuild - verified at 07e6abd7cc^): step 1 skills, step 2
+// personal info, step 3 contact preferences, step 4 consent. Each
+// registration.step-N/reg-step-N-heading pair below is the legacy status
+// line + <h3> for that panel.
 definePageMeta({ layout: 'plain', guest: true })
 
 const { t, tm } = useI18n()
@@ -10,25 +15,51 @@ useHead({ title: t('login.join_title') })
 
 const authStore = useAuthStore()
 const route = useRoute()
+const { $api } = useNuxtApp()
 
-// Placeholder skill checkboxes (design.md task brief: "skills multiselect
-// placeholder as simple checkboxes for now") - the real skill list is
-// DB-backed (App\Helpers\Fixometer::allSkills()) and lands with the
-// reference-data API slice (design.md §5.8); ids here are illustrative only
-// and not guaranteed to match production skill ids.
-const skillCategories = [
-  { id: 1, labelKey: 'client.register.skills_organising', skills: [1, 2, 3, 4] },
-  { id: 2, labelKey: 'client.register.skills_technical', skills: [5, 6, 7, 8] },
+// Skills (step 1) are DB-backed - App\Helpers\Fixometer::allSkills() via the
+// public GET /api/v2/skills (App\Http\Controllers\API\SkillController) -
+// grouped client-side into the same two categories the legacy blade looped
+// over (Fixometer::skillCategories(): 1 = Organising, 2 = Technical). Both
+// the category label and each skill's name are used directly as i18n keys,
+// matching the legacy blade's `@lang($skill_category)` / `@lang($skill->skill_name)`
+// and the existing pages/skills.vue + SkillsTab.vue client-side equivalents.
+const SKILL_CATEGORIES = [
+  { id: 1, labelKey: 'Organising skills - please select at least one if you’d like to host events' },
+  { id: 2, labelKey: 'Technical skills' },
 ]
-const skillLabels = {
-  1: 'client.register.skill_1',
-  2: 'client.register.skill_2',
-  3: 'client.register.skill_3',
-  4: 'client.register.skill_4',
-  5: 'client.register.skill_5',
-  6: 'client.register.skill_6',
-  7: 'client.register.skill_7',
-  8: 'client.register.skill_8',
+
+const allSkills = ref([])
+const skillsLoading = ref(true)
+const skillsError = ref(false)
+
+const skillCategories = computed(() =>
+  SKILL_CATEGORIES.map((category) => ({
+    ...category,
+    skills: allSkills.value.filter((skill) => skill.category === category.id),
+  }))
+)
+
+onMounted(async () => {
+  try {
+    const { data } = await $api.skill.list()
+    allSkills.value = data || []
+  } catch {
+    skillsError.value = true
+  } finally {
+    skillsLoading.value = false
+  }
+})
+
+const TOTAL_STEPS = 4
+const currentStep = ref(1)
+
+function nextStep() {
+  if (currentStep.value < TOTAL_STEPS) currentStep.value += 1
+}
+
+function prevStep() {
+  if (currentStep.value > 1) currentStep.value -= 1
 }
 
 const currentYear = new Date().getFullYear()
@@ -70,6 +101,24 @@ function fieldError(field) {
   return fieldErrors.value[field]?.[0] || ''
 }
 
+// Which step each field lives on, so a 422 targeting e.g. `email` (step 2)
+// is actually visible to the user rather than silently sitting on whichever
+// step they submitted from.
+const STEP_FIELDS = {
+  2: ['name', 'email', 'age', 'country', 'gender', 'city', 'password', 'password_confirmation'],
+  3: ['newsletter', 'invites'],
+  4: ['consent_gdpr', 'consent_future_data'],
+}
+
+function jumpToFirstErroredStep(errors) {
+  for (const [step, fields] of Object.entries(STEP_FIELDS)) {
+    if (fields.some((field) => errors[field])) {
+      currentStep.value = Number(step)
+      return
+    }
+  }
+}
+
 async function submit() {
   if (myName.value) {
     return
@@ -79,8 +128,14 @@ async function submit() {
   fieldErrors.value = {}
 
   // Belt-and-braces alongside the native `required` attribute on the
-  // checkboxes below: both consents are mandatory (design.md task brief -
-  // "consent checkboxes required"; matches registration.reg-step-4's copy).
+  // checkboxes below: both consents are mandatory (matches
+  // registration.reg-step-4's copy). Field/label pairing matches
+  // pages/user/consent.vue's step-4 (verified against the legacy blade):
+  // consent_gdpr <-> reg-step-4-label1 (Personal Data), consent_future_data
+  // <-> reg-step-4-label2 (Repair Data). The legacy blade's hidden
+  // consent_past_data auto-grant only fires for its Auth::check() branch
+  // (an already-authenticated user completing their profile) - out of scope
+  // for this anonymous registration form; that flow is pages/user/consent.vue.
   const consentErrors = {}
   if (!form.consent_gdpr) {
     consentErrors.consent_gdpr = [t('registration.reg-step-4')]
@@ -113,6 +168,7 @@ async function submit() {
     if (err?.status === 422) {
       fieldErrors.value = err.data?.errors || {}
       generalError.value = t('general.error_occurred')
+      jumpToFirstErroredStep(fieldErrors.value)
     } else {
       generalError.value = t('general.error_occurred')
     }
@@ -125,168 +181,266 @@ async function submit() {
 <template>
   <section class="registration">
     <div class="container">
-      <BForm data-testid="register-form" @submit.prevent="submit">
-        <div style="position: absolute; left: -9999px;" aria-hidden="true">
-          <label for="my_name">Name</label>
-          <input
-            id="my_name"
-            v-model="myName"
-            type="text"
-            name="my_name"
-            tabindex="-1"
-            autocomplete="off"
-            data-testid="register-honeypot"
-          >
-        </div>
+      <div class="registration-wizard mx-auto">
+        <BForm data-testid="register-form" @submit.prevent="submit">
+          <div style="position: absolute; left: -9999px;" aria-hidden="true">
+            <label for="my_name">Name</label>
+            <input
+              id="my_name"
+              v-model="myName"
+              type="text"
+              name="my_name"
+              tabindex="-1"
+              autocomplete="off"
+              data-testid="register-honeypot"
+            >
+          </div>
 
-        <BAlert v-if="generalError" :model-value="true" variant="danger" data-testid="register-error">
-          {{ generalError }}
-        </BAlert>
+          <BAlert v-if="generalError" :model-value="true" variant="danger" data-testid="register-error">
+            {{ generalError }}
+          </BAlert>
 
-        <fieldset class="panel">
-          <legend>{{ t('registration.reg-step-1-heading') }}</legend>
-          <p>{{ t('registration.reg-step-1-1') }}</p>
+          <!-- STEP 1: skills -->
+          <div v-if="currentStep === 1" class="panel registration-step" data-testid="register-step-1">
+            <span class="registration-step__status">{{ t('registration.step-1') }}</span>
+            <h3>{{ t('registration.reg-step-1-heading') }}</h3>
 
-          <div v-for="category in skillCategories" :key="category.id" class="mb-3">
-            <h5>{{ t(category.labelKey) }}</h5>
-            <div class="row row-compressed">
-              <div v-for="skillId in category.skills" :key="skillId" class="col-6 col-lg-3">
-                <BFormCheckbox
-                  v-model="form.skills"
-                  :value="skillId"
-                  :data-testid="`register-skill-${skillId}`"
-                >
-                  {{ t(skillLabels[skillId]) }}
-                </BFormCheckbox>
+            <fieldset>
+              <legend>{{ t('registration.reg-step-1-1') }}</legend>
+
+              <BAlert v-if="skillsError" :model-value="true" variant="danger" data-testid="register-skills-error">
+                {{ t('client.register.load_error') }}
+              </BAlert>
+              <p v-else-if="!skillsLoading && !allSkills.length" data-testid="register-skills-empty">
+                {{ t('client.register.no_skills') }}
+              </p>
+              <template v-else-if="!skillsLoading">
+                <div v-for="category in skillCategories" :key="category.id" class="mb-3">
+                  <template v-if="category.skills.length">
+                    <h5>{{ t(category.labelKey) }}</h5>
+                    <div class="row row-compressed">
+                      <div v-for="skill in category.skills" :key="skill.id" class="col-6 col-lg-3">
+                        <input
+                          :id="`skill-${skill.id}`"
+                          v-model="form.skills"
+                          type="checkbox"
+                          class="visually-hidden"
+                          :value="skill.id"
+                          :data-testid="`register-skill-${skill.id}`"
+                        >
+                        <label :for="`skill-${skill.id}`" class="btn btn-checkbox">
+                          <span>{{ t(skill.skill_name) }}</span>
+                        </label>
+                      </div>
+                    </div>
+                  </template>
+                </div>
+              </template>
+            </fieldset>
+
+            <div class="button-group d-flex justify-content-end">
+              <BButton type="button" variant="primary" data-testid="register-next" @click="nextStep">
+                {{ t('registration.next-step') }}
+              </BButton>
+            </div>
+          </div>
+
+          <!-- STEP 2: personal info -->
+          <div v-else-if="currentStep === 2" class="panel registration-step" data-testid="register-step-2">
+            <span class="registration-step__status">{{ t('registration.step-2') }}</span>
+            <h3>{{ t('registration.reg-step-2-heading') }}</h3>
+
+            <fieldset>
+              <legend>{{ t('registration.reg-step-2-1') }}</legend>
+
+              <div class="row">
+                <div class="col-lg-6">
+                  <BFormGroup :label="`${t('general.your_name')}:`" label-for="name">
+                    <BFormInput id="name" v-model="form.name" required data-testid="register-name" />
+                    <div v-if="fieldError('name')" class="invalid-feedback d-block" data-testid="register-name-error">
+                      {{ fieldError('name') }}
+                    </div>
+                  </BFormGroup>
+                </div>
+                <div class="col-lg-6">
+                  <BFormGroup :label="`${t('auth.email_address')}:`" label-for="email">
+                    <BFormInput id="email" v-model="form.email" type="email" required data-testid="register-email" />
+                    <div v-if="fieldError('email')" class="invalid-feedback d-block" data-testid="register-email-error">
+                      {{ fieldError('email') }}
+                    </div>
+                  </BFormGroup>
+                </div>
+                <div class="col-lg-6">
+                  <BFormGroup :label="`${t('registration.age')}:`" label-for="age" :description="t('registration.age_help')">
+                    <BFormSelect id="age" v-model="form.age" required data-testid="register-age">
+                      <option value="">&nbsp;</option>
+                      <option v-for="year in birthYears" :key="year" :value="year">{{ year }}</option>
+                    </BFormSelect>
+                    <div v-if="fieldError('age')" class="invalid-feedback d-block" data-testid="register-age-error">
+                      {{ fieldError('age') }}
+                    </div>
+                  </BFormGroup>
+                </div>
+                <div class="col-lg-6">
+                  <BFormGroup :label="`${t('registration.country')}:`" label-for="country" :description="t('registration.country_help')">
+                    <BFormSelect id="country" v-model="form.country" required data-testid="register-country">
+                      <option value="">&nbsp;</option>
+                      <option v-for="c in countries" :key="c.code" :value="c.code">{{ c.name }}</option>
+                    </BFormSelect>
+                    <div v-if="fieldError('country')" class="invalid-feedback d-block" data-testid="register-country-error">
+                      {{ fieldError('country') }}
+                    </div>
+                  </BFormGroup>
+                </div>
+                <div class="col-lg-6">
+                  <BFormGroup :label="`${t('registration.gender')}:`" label-for="gender" :description="t('registration.gender_help')">
+                    <BFormInput id="gender" v-model="form.gender" data-testid="register-gender" />
+                  </BFormGroup>
+                </div>
+                <div class="col-lg-6">
+                  <BFormGroup
+                    :label="`${t('registration.town-city')}:`"
+                    label-for="city"
+                    :description="t('registration.town-city_help')"
+                  >
+                    <BFormInput
+                      id="city"
+                      v-model="form.city"
+                      :placeholder="t('registration.town-city-placeholder')"
+                      data-testid="register-city"
+                    />
+                  </BFormGroup>
+                </div>
               </div>
+            </fieldset>
+
+            <fieldset>
+              <legend>{{ t('registration.reg-step-2-2') }}</legend>
+
+              <div class="row">
+                <div class="col-lg-6">
+                  <BFormGroup :label="`${t('auth.password')}:`" label-for="password">
+                    <BFormInput id="password" v-model="form.password" type="password" required data-testid="register-password" />
+                    <div v-if="fieldError('password')" class="invalid-feedback d-block" data-testid="register-password-error">
+                      {{ fieldError('password') }}
+                    </div>
+                  </BFormGroup>
+                </div>
+                <div class="col-lg-6">
+                  <BFormGroup :label="`${t('auth.repeat_password')}:`" label-for="password-confirm">
+                    <BFormInput
+                      id="password-confirm"
+                      v-model="form.password_confirmation"
+                      type="password"
+                      required
+                      data-testid="register-password-confirmation"
+                    />
+                  </BFormGroup>
+                </div>
+              </div>
+            </fieldset>
+
+            <div class="button-group d-flex justify-content-between">
+              <BButton type="button" variant="link" data-testid="register-prev" @click="prevStep">
+                {{ t('registration.previous-step') }}
+              </BButton>
+              <BButton type="button" variant="primary" data-testid="register-next" @click="nextStep">
+                {{ t('registration.next-step') }}
+              </BButton>
             </div>
           </div>
-        </fieldset>
 
-        <fieldset class="panel">
-          <legend>{{ t('registration.reg-step-2-1') }}</legend>
+          <!-- STEP 3: contact preferences -->
+          <div v-else-if="currentStep === 3" class="panel registration-step" data-testid="register-step-3">
+            <span class="registration-step__status">{{ t('registration.step-3') }}</span>
+            <h3>{{ t('registration.reg-step-3-heading') }}</h3>
 
-          <div class="row">
-            <div class="col-lg-6">
-              <BFormGroup :label="`${t('general.your_name')}:`" label-for="name">
-                <BFormInput id="name" v-model="form.name" required data-testid="register-name" />
-                <div v-if="fieldError('name')" class="invalid-feedback d-block" data-testid="register-name-error">
-                  {{ fieldError('name') }}
-                </div>
-              </BFormGroup>
+            <fieldset>
+              <legend>{{ t('registration.reg-step-3-2b') }}</legend>
+              <legend>{{ t('registration.reg-step-3-1a') }}</legend>
+
+              <BFormCheckbox v-model="form.newsletter" data-testid="register-newsletter">
+                {{ t('registration.reg-step-3-label1') }}
+              </BFormCheckbox>
+              <BFormCheckbox v-model="form.invites" data-testid="register-invites">
+                {{ t('registration.reg-step-3-label2') }}
+              </BFormCheckbox>
+            </fieldset>
+
+            <div class="button-group d-flex justify-content-between">
+              <BButton type="button" variant="link" data-testid="register-prev" @click="prevStep">
+                {{ t('registration.previous-step') }}
+              </BButton>
+              <BButton type="button" variant="primary" data-testid="register-next" @click="nextStep">
+                {{ t('registration.next-step') }}
+              </BButton>
             </div>
-            <div class="col-lg-6">
-              <BFormGroup :label="`${t('auth.email_address')}:`" label-for="email">
-                <BFormInput id="email" v-model="form.email" type="email" required data-testid="register-email" />
-                <div v-if="fieldError('email')" class="invalid-feedback d-block" data-testid="register-email-error">
-                  {{ fieldError('email') }}
-                </div>
-              </BFormGroup>
-            </div>
-            <div class="col-lg-6">
-              <BFormGroup :label="`${t('registration.age')}:`" label-for="age" :description="t('registration.age_help')">
-                <BFormSelect id="age" v-model="form.age" required data-testid="register-age">
-                  <option value="">&nbsp;</option>
-                  <option v-for="year in birthYears" :key="year" :value="year">{{ year }}</option>
-                </BFormSelect>
-                <div v-if="fieldError('age')" class="invalid-feedback d-block" data-testid="register-age-error">
-                  {{ fieldError('age') }}
-                </div>
-              </BFormGroup>
-            </div>
-            <div class="col-lg-6">
-              <BFormGroup :label="`${t('registration.country')}:`" label-for="country" :description="t('registration.country_help')">
-                <BFormSelect id="country" v-model="form.country" required data-testid="register-country">
-                  <option value="">&nbsp;</option>
-                  <option v-for="c in countries" :key="c.code" :value="c.code">{{ c.name }}</option>
-                </BFormSelect>
-                <div v-if="fieldError('country')" class="invalid-feedback d-block" data-testid="register-country-error">
-                  {{ fieldError('country') }}
-                </div>
-              </BFormGroup>
-            </div>
-            <div class="col-lg-6">
-              <BFormGroup :label="`${t('registration.gender')}:`" label-for="gender" :description="t('registration.gender_help')">
-                <BFormInput id="gender" v-model="form.gender" data-testid="register-gender" />
-              </BFormGroup>
-            </div>
-            <div class="col-lg-6">
-              <BFormGroup
-                :label="`${t('registration.town-city')}:`"
-                label-for="city"
-                :description="t('registration.town-city_help')"
+          </div>
+
+          <!-- STEP 4: consent -->
+          <div v-else class="panel registration-step" data-testid="register-step-4">
+            <span class="registration-step__status">{{ t('registration.step-4') }}</span>
+            <h3>{{ t('registration.reg-step-4-heading') }}</h3>
+
+            <fieldset>
+              <legend>{{ t('registration.reg-step-4') }}</legend>
+
+              <BFormCheckbox v-model="form.consent_gdpr" required data-testid="register-consent-gdpr">
+                <!-- eslint-disable-next-line vue/no-v-html -->
+                <span v-html="t('registration.reg-step-4-label1')" />
+              </BFormCheckbox>
+              <div v-if="fieldError('consent_gdpr')" class="invalid-feedback d-block" data-testid="register-consent-gdpr-error">
+                {{ fieldError('consent_gdpr') }}
+              </div>
+
+              <BFormCheckbox v-model="form.consent_future_data" required data-testid="register-consent-future-data">
+                <!-- eslint-disable-next-line vue/no-v-html -->
+                <span v-html="t('registration.reg-step-4-label2')" />
+              </BFormCheckbox>
+              <div
+                v-if="fieldError('consent_future_data')"
+                class="invalid-feedback d-block"
+                data-testid="register-consent-future-data-error"
               >
-                <BFormInput
-                  id="city"
-                  v-model="form.city"
-                  :placeholder="t('registration.town-city-placeholder')"
-                  data-testid="register-city"
-                />
-              </BFormGroup>
+                {{ fieldError('consent_future_data') }}
+              </div>
+            </fieldset>
+
+            <div class="button-group d-flex justify-content-between">
+              <BButton type="button" variant="link" data-testid="register-prev" @click="prevStep">
+                {{ t('registration.previous-step') }}
+              </BButton>
+              <BButton type="submit" variant="primary" :disabled="submitting" data-testid="register-submit">
+                {{ t('registration.complete-profile') }}
+              </BButton>
             </div>
           </div>
-
-          <div class="row">
-            <div class="col-lg-6">
-              <BFormGroup :label="`${t('auth.password')}:`" label-for="password">
-                <BFormInput id="password" v-model="form.password" type="password" required data-testid="register-password" />
-                <div v-if="fieldError('password')" class="invalid-feedback d-block" data-testid="register-password-error">
-                  {{ fieldError('password') }}
-                </div>
-              </BFormGroup>
-            </div>
-            <div class="col-lg-6">
-              <BFormGroup :label="`${t('auth.repeat_password')}:`" label-for="password-confirm">
-                <BFormInput
-                  id="password-confirm"
-                  v-model="form.password_confirmation"
-                  type="password"
-                  required
-                  data-testid="register-password-confirmation"
-                />
-              </BFormGroup>
-            </div>
-          </div>
-        </fieldset>
-
-        <fieldset class="panel">
-          <legend>{{ t('registration.reg-step-3-heading') }}</legend>
-          <BFormCheckbox v-model="form.newsletter" data-testid="register-newsletter">
-            {{ t('registration.reg-step-3-label1') }}
-          </BFormCheckbox>
-          <BFormCheckbox v-model="form.invites" data-testid="register-invites">
-            {{ t('registration.reg-step-3-label2') }}
-          </BFormCheckbox>
-        </fieldset>
-
-        <fieldset class="panel">
-          <legend>{{ t('registration.reg-step-4') }}</legend>
-          <BFormCheckbox v-model="form.consent_gdpr" required data-testid="register-consent-gdpr">
-            <!-- eslint-disable-next-line vue/no-v-html -->
-            <span v-html="t('registration.reg-step-4-label1')" />
-          </BFormCheckbox>
-          <div v-if="fieldError('consent_gdpr')" class="invalid-feedback d-block" data-testid="register-consent-gdpr-error">
-            {{ fieldError('consent_gdpr') }}
-          </div>
-          <BFormCheckbox v-model="form.consent_future_data" required data-testid="register-consent-future-data">
-            <!-- eslint-disable-next-line vue/no-v-html -->
-            <span v-html="t('registration.reg-step-4-label2')" />
-          </BFormCheckbox>
-          <div
-            v-if="fieldError('consent_future_data')"
-            class="invalid-feedback d-block"
-            data-testid="register-consent-future-data-error"
-          >
-            {{ fieldError('consent_future_data') }}
-          </div>
-        </fieldset>
-
-        <div class="button-group d-flex justify-content-end">
-          <BButton type="submit" variant="primary" :disabled="submitting" data-testid="register-submit">
-            {{ t('registration.complete-profile') }}
-          </BButton>
-        </div>
-      </BForm>
+        </BForm>
+      </div>
     </div>
   </section>
 </template>
+
+<style scoped>
+/* Step-scoped layout only - the .panel/.btn-checkbox chrome itself comes
+   from the global brand styles (_panels.scss/_buttons.scss). */
+.registration-wizard {
+  max-width: 760px;
+}
+
+.registration-step {
+  position: relative;
+}
+
+.registration-step__status {
+  position: absolute;
+  top: 20px;
+  right: 25px;
+  font-size: 14px;
+  color: #757575;
+}
+
+.registration-step h3 {
+  padding-right: 100px;
+}
+</style>

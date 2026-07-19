@@ -198,16 +198,8 @@
       "sent": "If that email address is registered, we've sent a password reset link."
     },
     "register": {
-      "skill_1": "Event organising",
-      "skill_2": "Volunteer coordination",
-      "skill_3": "Marketing",
-      "skill_4": "Community outreach",
-      "skill_5": "Electronics repair",
-      "skill_6": "Soldering",
-      "skill_7": "Sewing",
-      "skill_8": "Bicycle repair",
-      "skills_organising": "Organising skills",
-      "skills_technical": "Technical skills"
+      "load_error": "Sorry, we couldn't load the skills list. Please try again.",
+      "no_skills": "No skills are available to select yet. You can add them later from your profile."
     },
     "reset": {
       "done": "Your password has been changed. You can now sign in.",

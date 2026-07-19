@@ -54,12 +54,19 @@ test.describe('authentication', () => {
     const email = `e2e-${Date.now()}@restarters.test`
 
     await page.goto('/user/register')
+    // Step 1 (skills) - optional, move straight on.
+    await page.getByTestId('register-next').click()
+    // Step 2 (personal info).
     await page.getByTestId('register-name').fill('E2E Test User')
     await page.getByTestId('register-email').fill(email)
     await page.getByTestId('register-password').fill('longenough123')
     await page.getByTestId('register-password-confirmation').fill('longenough123')
     await page.getByTestId('register-age').selectOption({ index: 30 })
     await page.getByTestId('register-country').selectOption({ label: 'United Kingdom' })
+    await page.getByTestId('register-next').click()
+    // Step 3 (contact preferences) - leave defaults.
+    await page.getByTestId('register-next').click()
+    // Step 4 (consent).
     await page.getByTestId('register-consent-gdpr').check()
     await page.getByTestId('register-consent-future-data').check()
     await page.getByTestId('register-submit').click()
@@ -70,12 +77,15 @@ test.describe('authentication', () => {
 
   test('registration rejects a taken email', async ({ page }) => {
     await page.goto('/user/register')
+    await page.getByTestId('register-next').click()
     await page.getByTestId('register-name').fill('Duplicate User')
     await page.getByTestId('register-email').fill(USERS.admin.email)
     await page.getByTestId('register-password').fill('longenough123')
     await page.getByTestId('register-password-confirmation').fill('longenough123')
     await page.getByTestId('register-age').selectOption({ index: 30 })
     await page.getByTestId('register-country').selectOption({ label: 'United Kingdom' })
+    await page.getByTestId('register-next').click()
+    await page.getByTestId('register-next').click()
     await page.getByTestId('register-consent-gdpr').check()
     await page.getByTestId('register-consent-future-data').check()
     await page.getByTestId('register-submit').click()

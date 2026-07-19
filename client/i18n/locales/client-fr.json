@@ -198,16 +198,8 @@
       "sent": "Si cette adresse e-mail est enregistrée, nous avons envoyé un lien de réinitialisation du mot de passe."
     },
     "register": {
-      "skill_1": "Organisation d'événements",
-      "skill_2": "Coordination des bénévoles",
-      "skill_3": "Marketing",
-      "skill_4": "Sensibilisation communautaire",
-      "skill_5": "Réparation électronique",
-      "skill_6": "Soudure",
-      "skill_7": "Couture",
-      "skill_8": "Réparation de vélos",
-      "skills_organising": "Compétences d'organisation",
-      "skills_technical": "Compétences techniques"
+      "load_error": "Désolé, nous n'avons pas pu charger la liste des compétences. Veuillez réessayer.",
+      "no_skills": "Aucune compétence n'est disponible pour le moment. Vous pourrez en ajouter plus tard depuis votre profil."
     },
     "reset": {
       "done": "Votre mot de passe a été changé. Vous pouvez maintenant vous connecter.",

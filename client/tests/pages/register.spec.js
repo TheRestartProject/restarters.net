@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import RegisterPage from '../../app/pages/user/register.vue'
 import { useAuthStore } from '../../app/stores/auth.js'
 import en from '../../i18n/locales/en.json'
+import clientEn from '../../i18n/locales/client-en.json'
 
 const NuxtLinkStub = {
   props: ['to'],
@@ -33,9 +34,20 @@ const bvnStubs = {
   BAlert: { template: '<div><slot /></div>' },
 }
 
-function mountRegister(query = {}) {
-  const i18n = createI18n({ legacy: false, locale: 'en', messages: { en } })
+// GET /api/v2/skills, grouped by App\Helpers\Fixometer::skillCategories()
+// (1 = Organising, 2 = Technical) - real ids/names, not the hardcoded
+// placeholder 1-8 the page used to submit.
+const MOCK_SKILLS = [
+  { id: 101, skill_name: 'Event organising', description: null, category: 1 },
+  { id: 102, skill_name: 'Soldering', description: null, category: 2 },
+]
+
+function mountRegister(query = {}, { skillList } = {}) {
+  const i18n = createI18n({ legacy: false, locale: 'en', messages: { en: { ...en, ...clientEn } } })
   vi.stubGlobal('useRoute', () => ({ query, params: {}, fullPath: '/user/register' }))
+  vi.stubGlobal('useNuxtApp', () => ({
+    $api: { skill: { list: skillList || vi.fn().mockResolvedValue({ data: MOCK_SKILLS }) } },
+  }))
 
   return mount(RegisterPage, {
     global: {
@@ -45,7 +57,15 @@ function mountRegister(query = {}) {
   })
 }
 
-async function fillRequiredFields(wrapper) {
+async function clickNext(wrapper) {
+  await wrapper.find('[data-testid="register-next"]').trigger('click')
+}
+
+async function clickPrev(wrapper) {
+  await wrapper.find('[data-testid="register-prev"]').trigger('click')
+}
+
+async function fillStep2(wrapper) {
   await wrapper.find('[data-testid="register-name"]').setValue('Bob Fixer')
   await wrapper.find('[data-testid="register-email"]').setValue('bob@bloggs.net')
   await wrapper.find('[data-testid="register-password"]').setValue('passw0rd')
@@ -54,13 +74,98 @@ async function fillRequiredFields(wrapper) {
   await wrapper.find('[data-testid="register-country"]').setValue('GB')
 }
 
-describe('pages/user/register', () => {
-  let navigateToMock
+// Steps 1 -> 4, filling in step 2's required fields along the way and
+// leaving step 3's contact preferences at their defaults.
+async function goToStep4(wrapper) {
+  await clickNext(wrapper) // step 1 -> 2
+  await fillStep2(wrapper)
+  await clickNext(wrapper) // step 2 -> 3
+  await clickNext(wrapper) // step 3 -> 4
+}
 
+describe('pages/user/register', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
-    navigateToMock = vi.fn()
-    vi.stubGlobal('navigateTo', navigateToMock)
+    vi.stubGlobal('navigateTo', vi.fn())
+  })
+
+  it('renders a 4-step wizard, one step at a time, with a working Next/Previous', async () => {
+    const wrapper = mountRegister()
+    await Promise.resolve()
+
+    expect(wrapper.find('[data-testid="register-step-1"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="register-step-2"]').exists()).toBe(false)
+    expect(wrapper.text()).toContain('Step 1 of 4')
+
+    await clickNext(wrapper)
+    expect(wrapper.find('[data-testid="register-step-1"]').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="register-step-2"]').exists()).toBe(true)
+    expect(wrapper.text()).toContain('Step 2 of 4')
+
+    await clickPrev(wrapper)
+    expect(wrapper.find('[data-testid="register-step-1"]').exists()).toBe(true)
+  })
+
+  it('only shows the submit button on the last step', async () => {
+    const wrapper = mountRegister()
+    await Promise.resolve()
+
+    expect(wrapper.find('[data-testid="register-submit"]').exists()).toBe(false)
+
+    await clickNext(wrapper) // step 2
+    await clickNext(wrapper) // step 3
+    await clickNext(wrapper) // step 4
+    expect(wrapper.find('[data-testid="register-submit"]').exists()).toBe(true)
+  })
+
+  it('fetches skills from the API and renders them as chip buttons grouped by category, not hardcoded ids', async () => {
+    const skillList = vi.fn().mockResolvedValue({ data: MOCK_SKILLS })
+    const wrapper = mountRegister({}, { skillList })
+    await Promise.resolve()
+    await Promise.resolve()
+
+    expect(skillList).toHaveBeenCalled()
+    expect(wrapper.find('[data-testid="register-skill-101"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="register-skill-102"]').exists()).toBe(true)
+    // Real API-provided names, not the old placeholder "skill_1"/"skill_2" text.
+    expect(wrapper.text()).toContain('Event organising')
+    expect(wrapper.text()).toContain('Soldering')
+    // No leftover hardcoded 1-8 ids from the old placeholder scheme.
+    expect(wrapper.find('[data-testid="register-skill-1"]').exists()).toBe(false)
+  })
+
+  it('shows an error state when the skills fetch fails', async () => {
+    const skillList = vi.fn().mockRejectedValue(new Error('network error'))
+    const wrapper = mountRegister({}, { skillList })
+    await Promise.resolve()
+    await Promise.resolve()
+
+    expect(wrapper.find('[data-testid="register-skills-error"]').exists()).toBe(true)
+  })
+
+  it('shows an empty state when the API returns no skills', async () => {
+    const skillList = vi.fn().mockResolvedValue({ data: [] })
+    const wrapper = mountRegister({}, { skillList })
+    await Promise.resolve()
+    await Promise.resolve()
+
+    expect(wrapper.find('[data-testid="register-skills-empty"]').exists()).toBe(true)
+  })
+
+  it('pairs each consent checkbox with the correct legal notice (matches consent.vue)', async () => {
+    const wrapper = mountRegister()
+    await Promise.resolve()
+    await goToStep4(wrapper)
+
+    // The BFormCheckbox stub renders the input immediately followed by its
+    // slotted (v-html) label - scope the assertion to that sibling, not the
+    // whole fieldset, so each checkbox's own notice is checked in isolation.
+    const gdpr = wrapper.get('[data-testid="register-consent-gdpr"]').element.nextElementSibling.textContent
+    const future = wrapper.get('[data-testid="register-consent-future-data"]').element.nextElementSibling.textContent
+
+    expect(gdpr).toContain('Personal Data')
+    expect(future).toContain('Repair Data')
+    expect(future).not.toContain('Personal Data')
   })
 
   it('does not submit when the GDPR/future-data consents are unchecked', async () => {
@@ -68,7 +173,9 @@ describe('pages/user/register', () => {
     authStore.register = vi.fn()
 
     const wrapper = mountRegister()
-    await fillRequiredFields(wrapper)
+    await Promise.resolve()
+    await goToStep4(wrapper)
+
     await wrapper.find('[data-testid="register-form"]').trigger('submit')
     await Promise.resolve()
 
@@ -76,12 +183,20 @@ describe('pages/user/register', () => {
     expect(wrapper.find('[data-testid="register-consent-gdpr-error"]').exists()).toBe(true)
   })
 
-  it('submits the full payload once both consents are checked', async () => {
+  it('submits the selected real skill ids plus the personal fields once both consents are checked', async () => {
     const authStore = useAuthStore()
     authStore.register = vi.fn().mockResolvedValue({ token: 'tok-1', user: { id: 1 } })
+    const navigateToMock = vi.fn()
+    vi.stubGlobal('navigateTo', navigateToMock)
 
     const wrapper = mountRegister({ invite_code: 'abc123', invite_type: 'group' })
-    await fillRequiredFields(wrapper)
+    await Promise.resolve()
+    await Promise.resolve()
+
+    // Step 1: select a skill chip before moving on.
+    await wrapper.find('[data-testid="register-skill-101"]').setValue(true)
+    await goToStep4(wrapper)
+
     await wrapper.find('[data-testid="register-consent-gdpr"]').setValue(true)
     await wrapper.find('[data-testid="register-consent-future-data"]').setValue(true)
     await wrapper.find('[data-testid="register-form"]').trigger('submit')
@@ -94,6 +209,7 @@ describe('pages/user/register', () => {
         email: 'bob@bloggs.net',
         password: 'passw0rd',
         password_confirmation: 'passw0rd',
+        skills: [101],
         consent_gdpr: true,
         consent_future_data: true,
         invite_code: 'abc123',
@@ -108,7 +224,9 @@ describe('pages/user/register', () => {
     authStore.register = vi.fn()
 
     const wrapper = mountRegister()
-    await fillRequiredFields(wrapper)
+    await Promise.resolve()
+    await goToStep4(wrapper)
+
     await wrapper.find('[data-testid="register-honeypot"]').setValue('I am a bot')
     await wrapper.find('[data-testid="register-consent-gdpr"]').setValue(true)
     await wrapper.find('[data-testid="register-consent-future-data"]').setValue(true)
@@ -118,7 +236,7 @@ describe('pages/user/register', () => {
     expect(authStore.register).not.toHaveBeenCalled()
   })
 
-  it('renders 422 field errors', async () => {
+  it('renders 422 field errors, jumping back to the step that owns the field', async () => {
     const authStore = useAuthStore()
     authStore.register = vi.fn().mockRejectedValue({
       status: 422,
@@ -126,13 +244,18 @@ describe('pages/user/register', () => {
     })
 
     const wrapper = mountRegister()
-    await fillRequiredFields(wrapper)
+    await Promise.resolve()
+    await goToStep4(wrapper)
+
     await wrapper.find('[data-testid="register-consent-gdpr"]').setValue(true)
     await wrapper.find('[data-testid="register-consent-future-data"]').setValue(true)
     await wrapper.find('[data-testid="register-form"]').trigger('submit')
     await Promise.resolve()
     await Promise.resolve()
 
+    // `email` lives on step 2 - the error must actually be visible, not
+    // stranded on step 4 where the user submitted from.
+    expect(wrapper.find('[data-testid="register-step-2"]').exists()).toBe(true)
     expect(wrapper.find('[data-testid="register-email-error"]').text()).toBe(
       'The email has already been taken.'
     )
