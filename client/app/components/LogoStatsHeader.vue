@@ -44,7 +44,11 @@ const stats = computed(() => {
 </script>
 
 <template>
-  <div id="logostats-header" class="d-flex align-items-center justify-content-between" data-testid="logo-stats-header">
+  <div
+    id="logostats-header"
+    class="d-flex align-items-center justify-content-center justify-content-md-between"
+    data-testid="logo-stats-header"
+  >
     <NuxtLink to="/" data-testid="logo-stats-logo">
       <IconLogo />
     </NuxtLink>
