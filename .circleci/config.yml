@@ -266,7 +266,12 @@ jobs:
             export NUXT_DEV_MODE=false
             task docker:up-core
           no_output_timeout: 10m
-      - wait-for-core
+      # Probe an API route, not the default "/": post-cutover Laravel no longer
+      # serves "/" (the Nuxt/Nitro origin does), so "/" now returns 404 and the
+      # curl -f readiness check would never pass. /api/v2/session is a live API
+      # route (same probe the phpunit build job uses).
+      - wait-for-core:
+          probe: "http://localhost:8001/api/v2/session"
       - run:
           name: Wait for Nuxt client
           command: |
