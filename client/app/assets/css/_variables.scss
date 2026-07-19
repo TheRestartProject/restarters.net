@@ -56,3 +56,18 @@ $info: #d0dae6;
 $success: #3fce97;
 $danger: $brand-danger;
 $body-bg: $brand-grey;
+
+// Container widths: the legacy site was built on Bootstrap 4, whose largest
+// .container max-width was 1140px (xl). Bootstrap 5 added an xxl breakpoint with
+// a 1320px container, which made every .container noticeably wider than the
+// legacy site on large screens (the parity capture showed the login/register
+// panels ~110px wider each side than old-dev). Cap xxl back to 1140px so the
+// content width matches the legacy layout. Defined before `@import 'bootstrap'`
+// so it wins over Bootstrap's !default map.
+$container-max-widths: (
+  sm: 540px,
+  md: 720px,
+  lg: 960px,
+  xl: 1140px,
+  xxl: 1140px,
+);
