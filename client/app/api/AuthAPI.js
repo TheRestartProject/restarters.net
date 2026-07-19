@@ -41,6 +41,13 @@ export default class AuthAPI extends BaseAPI {
     })
   }
 
+  // Validates a recovery token before the reset form renders, and returns
+  // the account email so the user can confirm which account they're
+  // resetting (legacy reset-password.blade.php's $valid_code / fp_email).
+  recoveryInfo(token) {
+    return this.$get('/api/v2/auth/password/recovery/' + token)
+  }
+
   emailAvailable(email) {
     return this.$get('/api/v2/auth/email-available', { email })
   }

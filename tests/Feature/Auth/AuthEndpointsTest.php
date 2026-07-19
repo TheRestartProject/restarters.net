@@ -361,6 +361,44 @@ class AuthEndpointsTest extends TestCase
         $unknown->assertStatus(422);
     }
 
+    public function testRecoveryInfoForValidToken(): void
+    {
+        $user = $this->makeUser('recoverypreview@restarters.test');
+        $user->update([
+            'recovery' => 'previewtoken',
+            'recovery_expires' => date('Y-m-d H:i:s', time() + 3600),
+        ]);
+
+        $response = $this->get('/api/v2/auth/password/recovery/previewtoken', ['Accept' => 'application/json']);
+
+        $response->assertOk();
+        $this->assertTrue($response->json('data.valid'));
+        $this->assertEquals($user->email, $response->json('data.email'));
+    }
+
+    public function testRecoveryInfoForUnknownToken(): void
+    {
+        $response = $this->get('/api/v2/auth/password/recovery/neverexisted', ['Accept' => 'application/json']);
+
+        $response->assertOk();
+        $this->assertFalse($response->json('data.valid'));
+        $this->assertNull($response->json('data.email'));
+    }
+
+    public function testRecoveryInfoForExpiredToken(): void
+    {
+        $this->makeUser('recoveryexpired@restarters.test')->update([
+            'recovery' => 'expiredpreview',
+            'recovery_expires' => date('Y-m-d H:i:s', time() - 3600),
+        ]);
+
+        $response = $this->get('/api/v2/auth/password/recovery/expiredpreview', ['Accept' => 'application/json']);
+
+        $response->assertOk();
+        $this->assertFalse($response->json('data.valid'));
+        $this->assertNull($response->json('data.email'));
+    }
+
     public function testEmailAvailable(): void
     {
         $this->makeUser('taken2@restarters.test');

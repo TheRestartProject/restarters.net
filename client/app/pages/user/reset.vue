@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '~/stores/auth.js'
 
@@ -10,8 +10,18 @@ useHead({ title: t('auth.reset_password') })
 
 const authStore = useAuthStore()
 const route = useRoute()
+const { $api } = useNuxtApp()
 
 const recovery = typeof route.query.recovery === 'string' ? route.query.recovery : ''
+
+// Legacy reset-password.blade.php validated the recovery token server-side
+// on load ($valid_code) rather than only on submit, and showed the account
+// email (disabled fp_email input) so the user can confirm which account
+// they're resetting. `valid` stays false - showing the invalid-code state -
+// until a successful lookup confirms otherwise.
+const loading = ref(true)
+const valid = ref(false)
+const accountEmail = ref('')
 
 const password = ref('')
 const passwordConfirmation = ref('')
@@ -23,6 +33,23 @@ const done = ref(false)
 function fieldError(field) {
   return fieldErrors.value[field]?.[0] || ''
 }
+
+onMounted(async () => {
+  if (!recovery) {
+    loading.value = false
+    return
+  }
+
+  try {
+    const { data } = await $api.auth.recoveryInfo(recovery)
+    valid.value = !!data?.valid
+    accountEmail.value = data?.email || ''
+  } catch {
+    valid.value = false
+  } finally {
+    loading.value = false
+  }
+})
 
 async function submit() {
   generalError.value = ''
@@ -50,7 +77,13 @@ async function submit() {
 <template>
   <section class="entry-wrapper align-items-center justify-content-center">
     <div class="container">
-      <div v-if="!recovery" class="entry-panel card card__login col-12 mt-5 text-left" data-testid="reset-invalid-code">
+      <div v-if="loading" class="entry-panel card card__login col-12 mt-5 text-left" data-testid="reset-loading">
+        <div class="placeholder-glow">
+          <span class="placeholder col-12" style="height: 6rem" />
+        </div>
+      </div>
+
+      <div v-else-if="!valid" class="entry-panel card card__login col-12 mt-5 text-left" data-testid="reset-invalid-code">
         <h1>{{ t('auth.reset_password') }}</h1>
         <p class="login-text">
           {{ t('client.reset.invalid_code') }}
@@ -69,6 +102,10 @@ async function submit() {
         </BAlert>
 
         <BForm v-if="!done" data-testid="reset-form" @submit.prevent="submit">
+          <BFormGroup :label="`${t('auth.email_address')}:`" label-for="fp_email">
+            <BFormInput id="fp_email" :model-value="accountEmail" disabled data-testid="reset-email" />
+          </BFormGroup>
+
           <BFormGroup :label="`${t('auth.password')}:`" label-for="password">
             <BFormInput id="password" v-model="password" type="password" required data-testid="reset-password" />
             <div v-if="fieldError('password')" class="invalid-feedback d-block" data-testid="reset-password-error">

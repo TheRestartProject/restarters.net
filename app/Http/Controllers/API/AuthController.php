@@ -218,7 +218,6 @@ class AuthController extends Controller
         ]);
 
         $skills = $request->input('skills');
-        $timestamp = date('Y-m-d H:i:s');
 
         $user = User::create([
             'name' => $request->input('name'),
@@ -238,9 +237,7 @@ class AuthController extends Controller
         $user->role = Fixometer::skillsDetermineRole($skills);
         $user->generateAndSetUsername();
 
-        $user->consent_gdpr = $timestamp;
-        $user->consent_future_data = $timestamp;
-        $user->newsletter = $request->boolean('newsletter') ? 1 : 0;
+        $user->recordConsent(['consent_gdpr', 'consent_future_data'], $request->boolean('newsletter'));
 
         if ($request->boolean('invites')) {
             $user->invites = 1;
@@ -364,9 +361,9 @@ class AuthController extends Controller
             'password' => 'required|string|min:6|confirmed',
         ]);
 
-        $user = User::where('recovery', $request->input('recovery'))->first();
+        $user = User::findByValidRecoveryToken($request->input('recovery'));
 
-        if (! $user || strtotime($user->recovery_expires) <= time()) {
+        if (! $user) {
             throw ValidationException::withMessages([
                 'recovery' => [__('passwords.token')],
             ]);
@@ -385,6 +382,38 @@ class AuthController extends Controller
         event(new PasswordChanged($user, $oldPassword));
 
         return response()->json(['message' => __('passwords.updated')]);
+    }
+
+    /**
+     * @OA\Get(
+     *      path="/api/v2/auth/password/recovery/{token}",
+     *      operationId="recoveryInfov2",
+     *      tags={"Auth"},
+     *      summary="Check a password recovery token before the reset form is submitted",
+     *      description="Used by the reset-password page on load, mirroring the Blade recovery page which validated the token up front and pre-filled a disabled account-email field.",
+     *      @OA\Parameter(name="token", in="path", required=true, @OA\Schema(type="string")),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Token validity and, when valid, the owning account's email",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="data", type="object",
+     *                  @OA\Property(property="valid", type="boolean"),
+     *                  @OA\Property(property="email", type="string", nullable=true)
+     *              )
+     *          )
+     *      )
+     * )
+     */
+    public function recoveryInfov2(string $token): JsonResponse
+    {
+        $user = User::findByValidRecoveryToken($token);
+
+        return response()->json([
+            'data' => [
+                'valid' => $user !== null,
+                'email' => $user->email ?? null,
+            ],
+        ]);
     }
 
     /**
@@ -519,7 +548,8 @@ class AuthController extends Controller
      *              @OA\Property(property="gender", type="string", nullable=true),
      *              @OA\Property(property="consent_gdpr", type="boolean"),
      *              @OA\Property(property="consent_past_data", type="boolean"),
-     *              @OA\Property(property="consent_future_data", type="boolean")
+     *              @OA\Property(property="consent_future_data", type="boolean"),
+     *              @OA\Property(property="newsletter", type="boolean", nullable=true, description="Opt in to the newsletter; omitted/false leaves the existing preference unchanged")
      *          )
      *      ),
      *      @OA\Response(
@@ -547,10 +577,10 @@ class AuthController extends Controller
             'consent_gdpr' => 'required|accepted',
             'consent_past_data' => 'required|accepted',
             'consent_future_data' => 'required|accepted',
+            'newsletter' => 'sometimes|boolean',
         ]);
 
         $user = $request->user();
-        $timestamp = date('Y-m-d H:i:s');
 
         $user->country_code = $request->input('country');
         $user->age = $request->input('age');
@@ -568,9 +598,7 @@ class AuthController extends Controller
             $user->gender = $request->input('gender');
         }
 
-        $user->consent_gdpr = $timestamp;
-        $user->consent_past_data = $timestamp;
-        $user->consent_future_data = $timestamp;
+        $user->recordConsent(['consent_gdpr', 'consent_past_data', 'consent_future_data'], $request->boolean('newsletter'));
         $user->save();
 
         return response()->json(['data' => SessionController::sessionPayload($user->fresh())]);

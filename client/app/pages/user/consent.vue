@@ -20,6 +20,7 @@ const form = reactive({
   age: '',
   country: '',
   city: '',
+  newsletter: false,
   consent_gdpr: false,
   consent_past_data: false,
   consent_future_data: false,
@@ -112,6 +113,15 @@ async function submit() {
 
       <BFormGroup :label="`${t('registration.town-city')}:`" label-for="consent-city">
         <BFormInput id="consent-city" v-model="form.city" data-testid="consent-city" />
+      </BFormGroup>
+
+      <BFormGroup>
+        <!-- Legacy step 3's optional newsletter opt-in (reg-step-3-label1),
+             shown ahead of the mandatory step-4 consents below, same order
+             as register-new.blade.php. -->
+        <BFormCheckbox v-model="form.newsletter" data-testid="consent-newsletter">
+          {{ t('registration.reg-step-3-label1') }}
+        </BFormCheckbox>
       </BFormGroup>
 
       <BFormGroup>

@@ -84,6 +84,52 @@ class ConsentGateTest extends TestCase
         $mutate->assertOk();
     }
 
+    public function testConsentEndpointPersistsNewsletterOptIn(): void
+    {
+        $user = $this->unconsentedUser();
+        $user->update(['newsletter' => 0]);
+        $token = $user->createToken('spa')->plainTextToken;
+        $headers = ['Authorization' => 'Bearer '.$token, 'Accept' => 'application/json'];
+
+        $consent = $this->post('/api/v2/auth/consent', [
+            'age' => '1985',
+            'country' => 'GBR',
+            'consent_gdpr' => true,
+            'consent_past_data' => true,
+            'consent_future_data' => true,
+            'newsletter' => true,
+        ], $headers);
+
+        $consent->assertOk();
+        $user->refresh();
+        $this->assertEquals(1, $user->newsletter);
+        $this->assertNotNull($user->consent_gdpr);
+        $this->assertNotNull($user->consent_past_data);
+        $this->assertNotNull($user->consent_future_data);
+    }
+
+    public function testConsentEndpointLeavesNewsletterUnchangedWhenOmitted(): void
+    {
+        $user = $this->unconsentedUser();
+        $user->update(['newsletter' => 1]);
+        $token = $user->createToken('spa')->plainTextToken;
+        $headers = ['Authorization' => 'Bearer '.$token, 'Accept' => 'application/json'];
+
+        $consent = $this->post('/api/v2/auth/consent', [
+            'age' => '1985',
+            'country' => 'GBR',
+            'consent_gdpr' => true,
+            'consent_past_data' => true,
+            'consent_future_data' => true,
+        ], $headers);
+
+        $consent->assertOk();
+        $user->refresh();
+        // Omitting the field must not clobber an existing opt-in.
+        $this->assertEquals(1, $user->newsletter);
+        $this->assertNotNull($user->consent_future_data);
+    }
+
     public function testGuestMutationsUnaffectedByGate(): void
     {
         // Unauthenticated mutation attempts should fail on auth (401), not

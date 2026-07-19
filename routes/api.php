@@ -104,6 +104,7 @@ Route::prefix('v2')->middleware(\App\Http\Middleware\VerifyUserConsentApi::class
                 Route::post('/register', [API\AuthController::class, 'registerv2']);
                 Route::post('/password/forgot', [API\AuthController::class, 'forgotPasswordv2']);
                 Route::post('/password/reset', [API\AuthController::class, 'resetPasswordv2']);
+                Route::get('/password/recovery/{token}', [API\AuthController::class, 'recoveryInfov2']);
             });
             Route::get('/email-available', [API\AuthController::class, 'emailAvailablev2']);
             Route::middleware('auth:sanctum,api')->group(function() {

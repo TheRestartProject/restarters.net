@@ -35,7 +35,15 @@ function mountConsent() {
         BFormGroup: passthrough('div'),
         BFormSelect: { template: '<select><slot /></select>' },
         BFormInput: passthrough('input'),
-        BFormCheckbox: passthrough('label'),
+        // Real checkbox input nested in the label (unlike the other
+        // passthrough stubs) so v-model interaction can be driven from
+        // tests, while `.text()` on the testid'd label still picks up the
+        // v-html slot content for the legal-notice pairing checks below.
+        BFormCheckbox: {
+          props: ['modelValue'],
+          template:
+            '<label v-bind="$attrs"><input type="checkbox" :checked="modelValue" @change="$emit(\'update:modelValue\', $event.target.checked)" /><slot /></label>',
+        },
         BButton: passthrough('button'),
         BAlert: passthrough('div'),
       },
@@ -82,5 +90,37 @@ describe('pages/user/consent', () => {
 
     expect(Math.max(...years)).toBe(currentYear - 18)
     expect(Math.min(...years)).toBe(currentYear - 99)
+  })
+
+  it('offers a newsletter opt-in, reusing the register.vue step-3 label', () => {
+    const wrapper = mountConsent()
+    const newsletter = wrapper.get('[data-testid="consent-newsletter"]')
+
+    expect(newsletter.text()).toContain(en.registration['reg-step-3-label1'])
+    expect(newsletter.get('input').element.checked).toBe(false)
+  })
+
+  it('defaults the newsletter opt-in unchecked and includes it in the consent payload', async () => {
+    const consent = vi.fn().mockResolvedValue({})
+    vi.stubGlobal('useNuxtApp', () => ({ $api: { auth: { consent } } }))
+
+    const wrapper = mountConsent()
+
+    await wrapper.get('[data-testid="consent-gdpr"] input').setValue(true)
+    await wrapper.get('[data-testid="consent-past-data"] input').setValue(true)
+    await wrapper.get('[data-testid="consent-future-data"] input').setValue(true)
+    await wrapper.get('[data-testid="consent-form"]').trigger('submit')
+    await Promise.resolve()
+    await Promise.resolve()
+
+    expect(consent).toHaveBeenCalledWith(expect.objectContaining({ newsletter: false }))
+
+    consent.mockClear()
+    await wrapper.get('[data-testid="consent-newsletter"] input').setValue(true)
+    await wrapper.get('[data-testid="consent-form"]').trigger('submit')
+    await Promise.resolve()
+    await Promise.resolve()
+
+    expect(consent).toHaveBeenCalledWith(expect.objectContaining({ newsletter: true }))
   })
 })
