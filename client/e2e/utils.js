@@ -15,7 +15,21 @@ export async function login(page, { email, password } = USERS.admin) {
   await page.getByTestId('login-password').fill(password)
   await page.getByTestId('login-submit').click()
   await page.waitForURL('**/dashboard')
+  await dismissOnboarding(page)
   await expect(page.getByTestId('nav-user-menu')).toBeVisible()
+}
+
+// The dashboard shows a first-run onboarding modal driven by the server-side
+// `onboarding` flag. On a freshly seeded user (every CI run) it is present and,
+// as a full-screen modal, intercepts pointer events on the navbar - so any test
+// that clicks the nav (e.g. the user menu / logout) times out until it is
+// dismissed. Close it right after login so the rest of the suite is stable.
+export async function dismissOnboarding(page) {
+  const close = page.getByTestId('onboarding-close')
+  if (await close.isVisible().catch(() => false)) {
+    await close.click()
+    await expect(page.getByTestId('onboarding-modal')).toBeHidden()
+  }
 }
 
 export async function logout(page) {
