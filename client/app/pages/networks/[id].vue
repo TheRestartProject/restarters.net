@@ -22,13 +22,13 @@ import ModerationQueue from '~/components/moderation/ModerationQueue.vue'
 // "can manage" - there is no separate reduced-permission view here (unlike
 // e.g. /group/view/[id] where hosts see a read-only page).
 //
-// Two features from the legacy page are deliberately NOT ported, both
-// recorded in docs/nuxt-migration/api-gaps.md Phase E:
-//  - Network coordinators list: GET /api/v2/networks/{id} has no
-//    `coordinators` field (App\Http\Resources\Network) - the legacy Blade
-//    controller built it directly from `$network->coordinators` server-side.
-//    Still true (re-checked directly against the running API + the Resource
-//    source during the parity pass that added the moderation queues below).
+// "Network coordinators" section (avatar + name cards), matching legacy
+// resources/js/components/NetworkPage.vue: GET /api/v2/networks/{id}'s
+// `coordinators` field (App\Http\Resources\Network) now carries
+// {id, name, avatar_url} - the App-Coordinators-only gap recorded in
+// docs/nuxt-migration/api-gaps.md Phase E has been closed.
+//
+// One feature from the legacy page is still deliberately NOT ported:
 //  - "Export event list" link: the legacy href
 //    (/export/networks/{id}/events) is a session-cookie-authenticated web
 //    route; the SPA is pure Bearer-token auth (design.md §4.4) and has no
@@ -254,6 +254,28 @@ const tagLabels = computed(() => ({
         <button v-if="showReadMore" type="button" class="btn btn-link p-0" data-testid="network-show-read-more" @click="showDescriptionModal = true">
           {{ t('partials.read_more') }}
         </button>
+      </section>
+
+      <section v-if="(network.coordinators || []).length" class="mb-4" data-testid="network-show-coordinators">
+        <h2>{{ t('networks.general.coordinators') }}</h2>
+        <div class="d-flex flex-wrap gap-3">
+          <NuxtLink
+            v-for="coordinator in network.coordinators"
+            :key="coordinator.id"
+            :to="`/profile/${coordinator.id}`"
+            class="d-flex align-items-center gap-2 p-2 pe-3 border rounded-pill text-decoration-none coordinator-card"
+            :data-testid="`network-coordinator-${coordinator.id}`"
+          >
+            <img
+              :src="coordinator.avatar_url || '/images/placeholder-avatar.webp'"
+              alt=""
+              width="40"
+              height="40"
+              class="rounded-circle"
+            >
+            <span>{{ coordinator.name }}</span>
+          </NuxtLink>
+        </div>
       </section>
 
       <section class="mb-4">

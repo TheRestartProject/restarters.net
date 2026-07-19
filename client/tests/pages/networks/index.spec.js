@@ -25,8 +25,24 @@ function setLoggedInUser(user) {
   useAuthStore().token = 'tok-1'
 }
 
+// lang/en/networks.php gained `index.description` alongside this Nuxt work
+// (RES gap-closure pass) but client/i18n/locales/en.json is a generated,
+// checked-in artifact this change intentionally leaves untouched (php
+// artisan translations:export-client) - overlay the new key here so the
+// spec doesn't depend on regenerating it.
+const messages = {
+  en: {
+    ...en,
+    ...clientEn,
+    networks: {
+      ...en.networks,
+      index: { ...en.networks.index, description: 'Description' },
+    },
+  },
+}
+
 function mountPage() {
-  const i18n = createI18n({ legacy: false, locale: 'en', messages: { en: { ...en, ...clientEn } } })
+  const i18n = createI18n({ legacy: false, locale: 'en', messages })
 
   return mount(NetworksIndexPage, {
     global: {
@@ -92,6 +108,27 @@ describe('pages/networks/index', () => {
 
     expect(wrapper.find('[data-testid="your-network-row-2"]').exists()).toBe(true)
     expect(wrapper.find('[data-testid="your-network-row-1"]').exists()).toBe(false)
+  })
+
+  it('shows a Description column on "Your networks" (not on "All networks")', async () => {
+    networksStore.fetchList = vi.fn().mockImplementation(async () => {
+      networksStore.list.data = [
+        { id: 1, name: 'Test London', logo: null, description: 'A London network.' },
+        { id: 2, name: 'Test Scotland', logo: null, description: null },
+      ]
+    })
+    setLoggedInUser({ id: 1, role_name: 'Administrator', networks: [{ id: 1, name: 'Test London' }, { id: 2, name: 'Test Scotland' }] })
+
+    const wrapper = mountPage()
+    await flushPromises()
+
+    const yourTable = wrapper.get('[data-testid="your-networks-table"]')
+    expect(yourTable.text()).toContain('Description')
+    expect(wrapper.get('[data-testid="your-network-description-1"]').text()).toBe('A London network.')
+    expect(wrapper.get('[data-testid="your-network-description-2"]').text()).toBe('')
+
+    const allTable = wrapper.get('[data-testid="all-networks-table"]')
+    expect(allTable.text()).not.toContain('Description')
   })
 
   it('shows the "no networks" message when the user coordinates none', async () => {

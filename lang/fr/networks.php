@@ -9,6 +9,7 @@ return [
     'particular_network' => 'Réseau :networkName',
     'groups' => 'Repair Cafés',
     'about' => 'Plus d\'informations',
+    'coordinators' => 'Coordinateurs du réseau',
     'impact' => 'Impact',
   ],
   'stats' => [
@@ -37,6 +38,7 @@ return [
     'your_networks' => 'Vos réseaux',
     'your_networks_explainer' => 'Voici les réseaux dont vous êtes coordinateur',
     'your_networks_no_networks' => 'Vous n\'êtes coordinateur d\'aucun réseau',
+    'description' => 'Description',
   ],
   'network' => 'Réseau',
   'networks' => 'Réseaux',

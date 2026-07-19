@@ -22,8 +22,25 @@ const PROFILE = {
   biography: 'I love fixing things.',
 }
 
+// lang/en/users.php gained `view_profile_on_talk` / `not_on_talk` alongside
+// this Nuxt work (RES gap-closure pass) but client/i18n/locales/en.json is a
+// generated, checked-in artifact this change intentionally leaves untouched
+// (php artisan translations:export-client) - overlay the two new keys here
+// so the spec doesn't depend on regenerating it.
+const messages = {
+  en: {
+    ...en,
+    ...clientEn,
+    users: {
+      ...en.users,
+      view_profile_on_talk: 'View profile on Talk',
+      not_on_talk: '[Not on Talk]',
+    },
+  },
+}
+
 function mountView(props) {
-  const i18n = createI18n({ legacy: false, locale: 'en', messages: { en: { ...en, ...clientEn } } })
+  const i18n = createI18n({ legacy: false, locale: 'en', messages })
 
   return mount(PublicProfileView, {
     props,
@@ -149,6 +166,36 @@ describe('components/profile/PublicProfileView', () => {
     it('shows the placeholder avatar when avatar_url is null', () => {
       const wrapper = mountView({ userId: 42 })
       expect(wrapper.find('[data-testid="profile-view-avatar-placeholder"]').exists()).toBe(true)
+    })
+
+    it('shows a "View profile on Talk" link when on_talk is true', () => {
+      usersStore.publicProfile.data = { ...PROFILE, on_talk: true, talk_profile_url: 'https://talk.restarters.net/u/janefixit' }
+      const wrapper = mountView({ userId: 42 })
+
+      const link = wrapper.get('[data-testid="profile-view-talk-link"] a')
+      expect(link.text()).toBe('View profile on Talk')
+      expect(link.attributes('href')).toBe('https://talk.restarters.net/u/janefixit')
+      expect(link.attributes('target')).toBe('_blank')
+      expect(link.attributes('rel')).toContain('noopener')
+      expect(wrapper.find('[data-testid="profile-view-not-on-talk"]').exists()).toBe(false)
+    })
+
+    it('shows the admin-only "[Not on Talk]" indicator when the viewer is an Administrator and the profile has no Talk account', () => {
+      authStore.user = { id: 1, role_name: 'Administrator' }
+      usersStore.publicProfile.data = { ...PROFILE, on_talk: false, talk_profile_url: null }
+      const wrapper = mountView({ userId: 42 })
+
+      expect(wrapper.find('[data-testid="profile-view-not-on-talk"]').text()).toBe('[Not on Talk]')
+      expect(wrapper.find('[data-testid="profile-view-talk-link"]').exists()).toBe(false)
+    })
+
+    it('hides both the Talk link and the "not on Talk" indicator for a non-admin viewer when the profile has no Talk account', () => {
+      authStore.user = { id: 1, role_name: 'Restarter' }
+      usersStore.publicProfile.data = { ...PROFILE, on_talk: false, talk_profile_url: null }
+      const wrapper = mountView({ userId: 42 })
+
+      expect(wrapper.find('[data-testid="profile-view-talk-link"]').exists()).toBe(false)
+      expect(wrapper.find('[data-testid="profile-view-not-on-talk"]').exists()).toBe(false)
     })
   })
 })

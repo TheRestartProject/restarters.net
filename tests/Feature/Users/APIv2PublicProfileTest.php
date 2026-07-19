@@ -106,4 +106,62 @@ class APIv2PublicProfileTest extends TestCase
 
         $response->assertStatus(404);
     }
+
+    /**
+     * app/User.php::existsOnDiscourse()/getTalkProfileUrl() pairing, mirrored
+     * from the legacy resources/views/user/profile-new.blade.php
+     * (`@if ($user->existsOnDiscourse())` / `env('DISCOURSE_URL').'/u/'.$user->username`).
+     * phpunit.xml sets FEATURE__DISCOURSE_INTEGRATION=false for the whole
+     * suite, so the flag has to be flipped on here to exercise the "on Talk"
+     * path, matching tests/Feature/Users/EditProfileTest.php's convention.
+     */
+    public function testTalkProfileUrlWhenUserIsOnDiscourse(): void
+    {
+        config(['restarters.features.discourse_integration' => true]);
+
+        $viewer = User::factory()->restarter()->create(['api_token' => 'prof-tok']);
+        $this->actingAs($viewer);
+
+        $target = User::factory()->create(['username' => 'janefixit']);
+
+        $response = $this->get('/api/v2/users/'.$target->getKey().'?api_token=prof-tok');
+
+        $response->assertSuccessful();
+        $response->assertJsonPath('data.on_talk', true);
+        $this->assertStringEndsWith('/u/janefixit', $response->json('data.talk_profile_url'));
+    }
+
+    public function testTalkProfileUrlIsNullWhenUserIsNotOnDiscourse(): void
+    {
+        config(['restarters.features.discourse_integration' => true]);
+
+        $viewer = User::factory()->restarter()->create(['api_token' => 'prof-tok']);
+        $this->actingAs($viewer);
+
+        // The restarter() factory state clears username to '' - existsOnDiscourse()
+        // treats that the same as no Discourse account.
+        $target = User::factory()->restarter()->create();
+
+        $response = $this->get('/api/v2/users/'.$target->getKey().'?api_token=prof-tok');
+
+        $response->assertSuccessful();
+        $response->assertJsonPath('data.on_talk', false);
+        $this->assertNull($response->json('data.talk_profile_url'));
+    }
+
+    public function testTalkProfileUrlIsNullWhenDiscourseIntegrationDisabled(): void
+    {
+        config(['restarters.features.discourse_integration' => false]);
+
+        $viewer = User::factory()->restarter()->create(['api_token' => 'prof-tok']);
+        $this->actingAs($viewer);
+
+        $target = User::factory()->create(['username' => 'janefixit']);
+
+        $response = $this->get('/api/v2/users/'.$target->getKey().'?api_token=prof-tok');
+
+        $response->assertSuccessful();
+        $response->assertJsonPath('data.on_talk', false);
+        $this->assertNull($response->json('data.talk_profile_url'));
+    }
 }

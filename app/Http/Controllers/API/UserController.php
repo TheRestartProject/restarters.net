@@ -1533,7 +1533,9 @@ class UserController extends Controller
      *                      @OA\Property(property="id", type="integer"),
      *                      @OA\Property(property="name", type="string")
      *                  )),
-     *                  @OA\Property(property="biography", type="string", nullable=true)
+     *                  @OA\Property(property="biography", type="string", nullable=true),
+     *                  @OA\Property(property="talk_profile_url", type="string", nullable=true),
+     *                  @OA\Property(property="on_talk", type="boolean")
      *              )
      *          )
      *      ),
@@ -1563,6 +1565,12 @@ class UserController extends Controller
         $profile = User::getProfile($user->id);
         $avatarUrl = ($profile && $profile->path) ? url('/uploads/thumbnail_'.$profile->path) : null;
 
+        // Mirrors the legacy profile-new.blade.php's
+        // $user->existsOnDiscourse() / getTalkProfileUrl() pairing: null/false
+        // when Discourse integration is off or the user has no Discourse
+        // account, so the client only ever renders a link that actually works.
+        $onTalk = $user->existsOnDiscourse();
+
         return response()->json([
             'data' => [
                 'id' => (int) $user->id,
@@ -1579,6 +1587,8 @@ class UserController extends Controller
                     'name' => $skill->skill_name,
                 ])->values(),
                 'biography' => $user->biography,
+                'talk_profile_url' => $onTalk ? $user->getTalkProfileUrl() : null,
+                'on_talk' => $onTalk,
             ],
         ]);
     }

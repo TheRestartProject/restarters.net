@@ -18,4 +18,6 @@ return [
     'empty' => 'No users match the current filters.',
     'never' => 'Never',
     'showing' => 'Showing :from to :to of :total results',
+    'view_profile_on_talk' => 'View profile on Talk',
+    'not_on_talk' => '[Not on Talk]',
 ];

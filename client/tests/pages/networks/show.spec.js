@@ -58,8 +58,24 @@ function setLoggedInUser(user) {
   useAuthStore().token = 'tok-1'
 }
 
+// lang/en/networks.php gained `general.coordinators` alongside this Nuxt
+// work (RES gap-closure pass) but client/i18n/locales/en.json is a
+// generated, checked-in artifact this change intentionally leaves untouched
+// (php artisan translations:export-client) - overlay the new key here so
+// the spec doesn't depend on regenerating it.
+const messages = {
+  en: {
+    ...en,
+    ...clientEn,
+    networks: {
+      ...en.networks,
+      general: { ...en.networks.general, coordinators: 'Network Coordinators' },
+    },
+  },
+}
+
 function mountPage() {
-  const i18n = createI18n({ legacy: false, locale: 'en', messages: { en: { ...en, ...clientEn } } })
+  const i18n = createI18n({ legacy: false, locale: 'en', messages })
 
   return mount(NetworkShowPage, {
     global: {
@@ -161,6 +177,39 @@ describe('pages/networks/[id]', () => {
       expect(wrapper.find('[data-testid="network-show-name"]').text()).toBe('Test London')
       expect(wrapper.find('[data-testid="stub-network-stats"]').attributes('data-groups-count')).toBe('1')
       expect(wrapper.find('[data-testid="stub-groups-table"]').attributes('data-row-count')).toBe('1')
+    })
+
+    it('does not render the coordinators section when the network has none', async () => {
+      const wrapper = mountPage()
+      await flushPromises()
+
+      expect(wrapper.find('[data-testid="network-show-coordinators"]').exists()).toBe(false)
+    })
+
+    it('renders a card per coordinator with avatar, name and profile link', async () => {
+      networksStore.fetchCurrent = vi.fn().mockImplementation(async () => {
+        networksStore.current.data = {
+          ...NETWORK,
+          coordinators: [
+            { id: 7, name: 'Coord Inator', avatar_url: 'https://example.com/coord.png' },
+            { id: 8, name: 'No Avatar Person', avatar_url: null },
+          ],
+        }
+      })
+
+      const wrapper = mountPage()
+      await flushPromises()
+
+      const section = wrapper.get('[data-testid="network-show-coordinators"]')
+      expect(section.text()).toContain('Network Coordinators')
+
+      const card7 = wrapper.get('[data-testid="network-coordinator-7"]')
+      expect(card7.text()).toContain('Coord Inator')
+      expect(card7.attributes('href')).toBe('/profile/7')
+      expect(card7.get('img').attributes('src')).toBe('https://example.com/coord.png')
+
+      const card8 = wrapper.get('[data-testid="network-coordinator-8"]')
+      expect(card8.get('img').attributes('src')).toBe('/images/placeholder-avatar.webp')
     })
 
     it('scopes the moderation queues to this network and always shows them', async () => {

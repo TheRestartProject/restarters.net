@@ -18,4 +18,6 @@ return [
     'empty' => 'Aucun utilisateur ne correspond aux filtres actuels.',
     'never' => 'Jamais',
     'showing' => 'Affichage de :from à :to sur :total résultats',
+    'view_profile_on_talk' => 'Voir le profil sur Talk',
+    'not_on_talk' => '[Pas sur Talk]',
 ];

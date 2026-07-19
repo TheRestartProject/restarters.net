@@ -17,12 +17,11 @@ import { useNetworksStore } from '~/stores/networks.js'
 // (GET /api/v2/session's `user.networks`, {id, name} - SessionController).
 // "All networks" (Administrator only) = every network on the platform
 // (GET /api/v2/networks, public). Both tables are built from the same
-// NetworkSummary list so logos are available for "your networks" too - the
-// legacy page's description column is dropped: NetworkSummary doesn't
-// carry `description` (only the full per-network resource does), and
-// session.user.networks ({id, name} only, SessionController@user) doesn't
-// either - re-confirmed directly against the running API (GET /api/v2/
-// networks, GET /api/v2/session) and both Resources - see
+// NetworkSummary list so logos are available for "your networks" too.
+// App\Http\Resources\NetworkSummary now carries `description` too, so the
+// legacy page's Description column is restored on "Your networks" (matching
+// resources/views/networks/index.blade.php, which only showed it there, not
+// on "All networks") - closes the gap recorded in
 // docs/nuxt-migration/api-gaps.md Phase E.
 //
 // Legacy always rendered a logo cell (real logo, or a generic placeholder
@@ -99,6 +98,7 @@ function retry() {
             <tr>
               <th scope="col" width="20%" />
               <th scope="col" width="20%">{{ t('networks.general.network') }}</th>
+              <th scope="col">{{ t('networks.index.description') }}</th>
             </tr>
           </thead>
           <tbody>
@@ -111,6 +111,7 @@ function retry() {
                   {{ network.name }}
                 </NuxtLink>
               </td>
+              <td :data-testid="`your-network-description-${network.id}`">{{ network.description }}</td>
             </tr>
           </tbody>
         </table>

@@ -41,6 +41,7 @@ const notFound = computed(() => error.value?.status === 404)
 
 const isOwnProfile = computed(() => props.userId !== null && props.userId === user.value?.id)
 const canEdit = computed(() => isOwnProfile.value || hasRole('Administrator'))
+const isAdmin = computed(() => hasRole('Administrator'))
 
 const avatarUrl = computed(() => uploadedImageUrl(profile.value?.avatar_url))
 
@@ -95,6 +96,12 @@ watch(() => props.userId, load)
                 <h3 data-testid="profile-view-name">{{ profile.name }}</h3>
                 <p data-testid="profile-view-role-location">
                   {{ profile.role_name }}<template v-if="profile.location">, {{ profile.location }}</template>
+                </p>
+                <p v-if="profile.on_talk" data-testid="profile-view-talk-link">
+                  <a :href="profile.talk_profile_url" target="_blank" rel="noopener noreferrer">{{ t('users.view_profile_on_talk') }}</a>
+                </p>
+                <p v-else-if="isAdmin" class="text-muted" data-testid="profile-view-not-on-talk">
+                  {{ t('users.not_on_talk') }}
                 </p>
               </div>
             </div>

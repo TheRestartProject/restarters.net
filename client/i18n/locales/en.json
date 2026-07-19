@@ -1020,6 +1020,7 @@
             "particular_network": "{networkName} network",
             "groups": "Groups",
             "about": "About",
+            "coordinators": "Network Coordinators",
             "impact": "Impact"
         },
         "stats": {
@@ -1047,7 +1048,8 @@
             "your_networks_no_networks": "You are not a coordinator of any networks.",
             "all_networks": "All networks",
             "all_networks_explainer": "All networks in the system (admin-only).",
-            "all_networks_no_networks": "There are no networks in the system."
+            "all_networks_no_networks": "There are no networks in the system.",
+            "description": "Description"
         },
         "show": {
             "add_groups_menuitem": "Add groups",
@@ -1339,6 +1341,8 @@
         "search": "Search all users",
         "empty": "No users match the current filters.",
         "never": "Never",
-        "showing": "Showing {from} to {to} of {total} results"
+        "showing": "Showing {from} to {to} of {total} results",
+        "view_profile_on_talk": "View profile on Talk",
+        "not_on_talk": "[Not on Talk]"
     }
 }

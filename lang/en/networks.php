@@ -9,6 +9,7 @@ return [
     'particular_network' => ':networkName network',
     'groups' => 'Groups',
     'about' => 'About',
+    'coordinators' => 'Network Coordinators',
     'impact' => 'Impact'
   ],
   'stats' => [
@@ -37,6 +38,7 @@ return [
     'all_networks' => 'All networks',
     'all_networks_explainer' => 'All networks in the system (admin-only).',
     'all_networks_no_networks' => 'There are no networks in the system.',
+    'description' => 'Description',
   ],
   'show' => [
     'add_groups_menuitem' => 'Add groups',
