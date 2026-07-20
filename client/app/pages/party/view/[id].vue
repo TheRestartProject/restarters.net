@@ -16,6 +16,7 @@ import EventInviteModal from '~/components/events/EventInviteModal.vue'
 import EventDetailsPanel from '~/components/events/EventDetailsPanel.vue'
 import EventActionsDropdown from '~/components/events/EventActionsDropdown.vue'
 import EventShareStatsModal from '~/components/events/EventShareStatsModal.vue'
+import StatsShareImageModal from '~/components/events/StatsShareImageModal.vue'
 import EventDevicesPanel from '~/components/devices/EventDevicesPanel.vue'
 
 // /party/view/[id] - resources/views/events/view.blade.php +
@@ -179,6 +180,14 @@ const descriptionNeedsTruncating = computed(() => {
 
 const showInvite = ref(false)
 const showShareStats = ref(false)
+// StatsImpact.vue's CO2-card "Share this" trigger opens a DIFFERENT modal
+// from the header dropdown's "Share event stats" (showShareStats above,
+// EventShareStatsModal's embed-code iframe) - this one is the canvas-
+// painted social-image generator (StatsShareImageModal.vue), matching
+// group/view/[id].vue's identical showShareImage/shareImageCount pair for
+// its own CO2 card.
+const showShareImage = ref(false)
+const shareImageCount = computed(() => Math.round(event.value?.stats?.co2_total ?? 0))
 const confirmingDelete = ref(false)
 const deleting = ref(false)
 const attendPending = ref(false)
@@ -523,13 +532,17 @@ async function confirmDelete() {
               <div class="stat-card__label" v-html="t('partials.co2')" />
               <!-- eslint-disable-next-line vue/no-v-html -->
               <div class="small" data-testid="event-view-impact-equivalent" v-html="equivalentConsumer(event.stats.co2_total)" />
+              <!-- StatsValue.vue's "Share this" - the CO2-card trigger for
+                   the social-image modal, distinct from the header
+                   dropdown's "Share event stats" embed-code modal above
+                   (both used to wrongly open the latter). -->
               <button
                 type="button"
                 class="btn btn-link p-0 small"
                 data-testid="event-view-impact-share"
-                @click="showShareStats = true"
+                @click="showShareImage = true"
               >
-                {{ t('events.share_event_stats') }}
+                {{ t('partials.share_this') }}
               </button>
             </div>
           </div>
@@ -557,6 +570,12 @@ async function confirmDelete() {
         :event-name="event.title"
         :fixed-devices="event.stats ? (event.stats.fixed_devices ?? 0) : 0"
         @close="showShareStats = false"
+      />
+
+      <StatsShareImageModal
+        :show="showShareImage"
+        :count="shareImageCount"
+        @close="showShareImage = false"
       />
 
       <BModal

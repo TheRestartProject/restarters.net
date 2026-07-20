@@ -108,6 +108,22 @@ function lineHeight(ctx, sampleLine, sampleValue) {
   return asc + desc + MARGIN * 2
 }
 
+// StatsShare.vue served these from Laravel's own public/images/stats/
+// (same-origin, since the legacy app served the frontend and API from one
+// origin). Under Nuxt the client and API are different origins, and
+// public/images/stats/ is a plain static file outside config/cors.php's
+// 'api/*' scope - drawing a cross-origin image onto a <canvas> without CORS
+// permission taints it, and a tainted canvas throws on toDataURL()/
+// toBlob(), which is exactly what download() needs. Routing through
+// GET /api/v2/stats/share-image/{filename} (StatsShareImageController)
+// instead of copying the ~224MB image set into the client gets both: CORS
+// headers (so crossOrigin="anonymous" below succeeds) and zero extra client
+// bytes.
+const runtimeConfig = useRuntimeConfig()
+function shareImageUrl(name) {
+  return `${runtimeConfig.public.apiBase}/api/v2/stats/share-image/${name}`
+}
+
 // Loads a background/decoration image and draws it - StatsShare.vue's
 // insertImage(), converted from a callback into a promise. The 500ms pause
 // after onload is inherited unchanged from develop (a canvas-fettling delay
@@ -116,12 +132,17 @@ function lineHeight(ctx, sampleLine, sampleValue) {
 function insertImage(ctx, name, x, y, w, h) {
   return new Promise((resolve, reject) => {
     const img = new Image()
+    // Required for the canvas to stay "un-tainted" across the cross-origin
+    // load above - without this, drawImage() still succeeds (nothing stops
+    // a plain <img> loading cross-origin) but the canvas becomes unreadable
+    // and download()'s toDataURL() throws a SecurityError.
+    img.crossOrigin = 'anonymous'
     img.onload = () => {
       ctx.drawImage(img, x, y, w, h)
       setTimeout(resolve, 500)
     }
     img.onerror = () => reject(new Error(`Failed to load ${name}`))
-    img.src = `/images/stats/${name}`
+    img.src = shareImageUrl(name)
   })
 }
 
