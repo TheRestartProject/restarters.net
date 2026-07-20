@@ -14,6 +14,7 @@ import { useUploadedImageUrl } from '~/composables/useUploadedImageUrl.js'
 import EventAttendees from '~/components/events/EventAttendees.vue'
 import EventInviteModal from '~/components/events/EventInviteModal.vue'
 import EventAddVolunteerModal from '~/components/events/EventAddVolunteerModal.vue'
+import EventCollapsibleSection from '~/components/events/EventCollapsibleSection.vue'
 import EventDetailsPanel from '~/components/events/EventDetailsPanel.vue'
 import EventActionsDropdown from '~/components/events/EventActionsDropdown.vue'
 import EventShareStatsModal from '~/components/events/EventShareStatsModal.vue'
@@ -480,12 +481,15 @@ function closeAddVolunteer() {
           <EventDetailsPanel :event="event" :hosts="hosts" />
 
           <section class="mt-4" data-testid="event-view-description">
-            <!-- EventDescription.vue wraps this in a CollapsibleSection
-                 with `hide-title` - the heading itself only ever shows
-                 below md (the collapsible-toggle affordance goes with it;
-                 out of scope here, see the audit note this comment
-                 replaced). -->
-            <h2 class="d-block d-md-none">{{ t('events.event_description') }}</h2>
+            <!-- EventDescription.vue:2 - CollapsibleSection, `collapsed`
+                 and `hide-title`. This was a bare heading, which meant the
+                 mobile collapse toggle was missing: a long description could
+                 not be collapsed on a phone, which is the whole point of the
+                 component develop uses here. -->
+            <EventCollapsibleSection collapsed hide-title>
+              <template #title>
+                <h2 class="mb-0">{{ t('events.event_description') }}</h2>
+              </template>
             <div
               v-if="event.description"
               class="description-content"
@@ -504,9 +508,10 @@ function closeAddVolunteer() {
               <!-- eslint-disable-next-line vue/no-v-html -->
               <span v-html="descriptionExpanded ? t('events.read_less') : t('events.read_more')" />
             </button>
-            <p v-if="!approved" class="small text-muted" data-testid="event-view-moderation-note">
-              {{ t('partials.event_requires_moderation_by_an_admin') }}.
-            </p>
+              <p v-if="!approved" class="small text-muted" data-testid="event-view-moderation-note">
+                {{ t('partials.event_requires_moderation_by_an_admin') }}.
+              </p>
+            </EventCollapsibleSection>
           </section>
         </div>
 

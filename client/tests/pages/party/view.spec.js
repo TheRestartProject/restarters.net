@@ -750,13 +750,20 @@ describe('pages/party/view/[id]', () => {
 
     // EventDescription.vue's CollapsibleSection hide-title: the "Event
     // description" heading only shows below md.
-    it('hides the "Event description" heading at md and up', () => {
+    // The description now goes through EventCollapsibleSection with
+    // `hide-title`, as develop's EventDescription.vue:2 does, so the
+    // mobile-only behaviour lives on the collapsible's title row rather than
+    // on the heading itself - and the mobile collapse TOGGLE comes with it,
+    // which the bare heading never had.
+    it('renders the description in a collapsible whose title row is mobile-only', () => {
       eventsStore.current.data = baseEvent({ description: '<p>Short.</p>' })
       const wrapper = mountPage()
-      const heading = wrapper.find('[data-testid="event-view-description"] h2')
-      expect(heading.exists()).toBe(true)
-      expect(heading.classes()).toContain('d-block')
-      expect(heading.classes()).toContain('d-md-none')
+
+      const title = wrapper.find('[data-testid="event-view-description"] .collapsible-title')
+      expect(title.exists()).toBe(true)
+      expect(title.classes()).toContain('d-md-none')
+      expect(title.text()).toContain('Description')
+      expect(wrapper.find('[data-testid="event-view-description"] .collapsible-toggle').exists()).toBe(true)
     })
   })
 

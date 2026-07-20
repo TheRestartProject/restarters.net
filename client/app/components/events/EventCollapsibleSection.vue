@@ -9,6 +9,16 @@ import { ref } from 'vue'
 // events-owned copy rather than a cross-boundary import) - kept in sync
 // deliberately, not accidentally duplicated.
 const props = defineProps({
+  // CollapsibleSection's `hide-title` (EventDescription.vue:2): the title row
+  // is mobile-only. At md+ the section is always expanded, so a heading and a
+  // toggle there would be noise. Without this prop the description section
+  // could not use this component at all, and was hand-rolled as a bare
+  // `<h2 class="d-md-none">` - which dropped the mobile collapse toggle
+  // entirely, so on mobile a long description could not be collapsed.
+  hideTitle: {
+    type: Boolean,
+    default: false,
+  },
   collapsed: {
     type: Boolean,
     default: true,
@@ -29,7 +39,8 @@ function toggle() {
 <template>
   <div>
     <div
-      class="collapsible-title d-flex d-md-block justify-content-between align-items-center"
+      class="collapsible-title d-flex justify-content-between align-items-center"
+      :class="hideTitle ? 'd-md-none' : 'd-md-block'"
       role="button"
       data-testid="event-collapsible-title"
       @click="toggle"

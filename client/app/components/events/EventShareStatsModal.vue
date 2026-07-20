@@ -15,8 +15,10 @@ import { useI18n } from 'vue-i18n'
 // (`/party/stats/{id}/wide`) and OutboundController::info's 'leaf' format
 // (`/outbound/info/party/{id}/leaf`, confirmed to accept type=party same as
 // type=group). Both the dropdown item and the CO2-card share button open
-// this same modal - the canvas image generator itself is out of scope, same
-// as the group page.
+// this same modal for the embed codes. The canvas social-image generator is
+// NOT out of scope, as this comment used to claim - it is built
+// (StatsShareImageModal.vue / StatsShareImage.vue) and the CO2 card's
+// "Share this" opens it. Only the embed-code half lives here.
 const props = defineProps({
   show: {
     type: Boolean,
