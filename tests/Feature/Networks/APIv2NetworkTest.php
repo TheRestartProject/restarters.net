@@ -687,9 +687,6 @@ class APIv2NetworkTest extends TestCase
         DB::disableQueryLog();
         DB::flushQueryLog();
 
-        // TEMP DEBUG
-        $this->fail("3 events: $queriesFor3, 6 events: $queriesFor6");
-
         $this->assertLessThan(
             $queriesFor3 * 1.5,
             $queriesFor6,

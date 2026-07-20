@@ -414,7 +414,13 @@ class NetworkController extends Controller
                 ->where('grouptags_groups.group_tag', $tagId);
         }
 
-        $events = $query->select('events.*')->get();
+        // addSelect(), not select() - select() replaces the whole column list, which would
+        // silently discard the all_invited_count column withCount('allInvited') staged above via
+        // its own addSelect() (found by diffing the actual SQL between the 3-event and 6-event
+        // runs of testEventsQueryCountDoesNotScaleWithEventCount: it grew by exactly a
+        // lazy-loaded events_users query per new event - withCount() was running but its result
+        // was being thrown away before the query even executed).
+        $events = $query->addSelect('events.*')->get();
 
         if ($request->get('includeDetails', false)) {
             return \App\Http\Resources\PartyCollection::make($events);
