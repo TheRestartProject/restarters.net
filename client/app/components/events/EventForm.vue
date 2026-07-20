@@ -631,6 +631,21 @@ defineExpose({ submit })
 .event-form-date {
   grid-row: 5 / 6;
   grid-column: 1 / 2;
+
+  // Rendered-parity fix: vue-datepicker-next's own default (index.css)
+  // puts the calendar icon on the right (`.mx-icon-calendar { right: 8px }`)
+  // and pads the input to match; develop's b-form-datepicker puts it on
+  // the left instead - swapped here to match, rather than the icon itself
+  // (a plain CSS-drawn glyph, not an image asset).
+  :deep(.mx-icon-calendar) {
+    right: auto;
+    left: 8px;
+  }
+
+  :deep(.mx-input) {
+    padding-left: 30px;
+    padding-right: 10px;
+  }
 }
 
 .event-form-time {

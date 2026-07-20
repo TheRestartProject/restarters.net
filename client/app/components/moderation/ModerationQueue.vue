@@ -69,27 +69,47 @@ function itemLink(item) {
   return props.type === 'events' ? `/party/view/${item.id}` : `/group/view/${item.id}`
 }
 
-onMounted(() => {
-  if (props.type === 'events') {
-    moderationStore.fetchEvents().catch(() => {})
-  } else {
-    moderationStore.fetchGroups().catch(() => {})
-  }
-})
+// A failed fetch used to be swallowed entirely (`.catch(() => {})`, no log,
+// no error state read anywhere) - to an Administrator that looked exactly
+// like "nothing is awaiting moderation" (parity investigation: /group/all's
+// panel rendered nothing for a group that genuinely needed moderating,
+// because this fetch was failing silently - develop's equivalent
+// (resources/js/store/groups.js's getModerationRequired) has no catch at
+// all, so a failure there is at least a visible unhandled rejection).
+// Logging + surfacing section.error (already tracked by the store, see
+// stores/moderation.js's loadSection) is the same pattern
+// PublicProfileView.vue uses for its own background fetch.
+function load() {
+  const request = props.type === 'events' ? moderationStore.fetchEvents() : moderationStore.fetchGroups()
+  return request.catch((error) => {
+    console.error(`Failed to load ${props.type} moderation queue`, error)
+  })
+}
+
+onMounted(load)
 </script>
 
 <template>
-  <!-- Only surfaces when there is something to moderate, unless alwaysShow
-       forces the heading + "None" message to render regardless (matches
-       legacy: the plain /party + /group/map panels hide entirely on an
-       empty queue; the /networks/{id} page always shows the heading). -->
+  <!-- Only surfaces when there is something to moderate or the fetch
+       failed, unless alwaysShow forces the heading + "None" message to
+       render regardless (matches legacy: the plain /party + /group/map
+       panels hide entirely on an empty queue; the /networks/{id} page
+       always shows the heading). A failed fetch always surfaces, even with
+       alwaysShow false, so it isn't indistinguishable from "nothing to
+       moderate" - see load()'s doc comment above. -->
   <section
-    v-if="alwaysShow || items.length"
+    v-if="alwaysShow || items.length || section.error"
     class="panel panel__orange mb-4"
     :data-testid="`moderation-queue-${type}`"
   >
     <h3 class="mb-3">{{ title }}</h3>
-    <div v-if="!items.length" class="text-muted" :data-testid="`moderation-queue-${type}-empty`">
+    <BAlert v-if="section.error" :model-value="true" variant="danger" :data-testid="`moderation-queue-${type}-error`">
+      <p>{{ t('client.moderation.load_error') }}</p>
+      <BButton variant="danger" size="sm" :data-testid="`moderation-queue-${type}-retry`" @click="load">
+        {{ t('client.dashboard.retry') }}
+      </BButton>
+    </BAlert>
+    <div v-else-if="!items.length" class="text-muted" :data-testid="`moderation-queue-${type}-empty`">
       {{ t('client.moderation.none') }}
     </div>
     <ul v-else class="list-unstyled mb-0">

@@ -724,6 +724,7 @@
         "field_event_group": "Event group",
         "field_event_desc": "Event description",
         "field_event_date": "Date of event",
+        "no_date_selected": "No date selected",
         "field_event_time": "Start/end time",
         "field_event_venue": "Venue address",
         "follow_hosting_group": "This event is being hosted by {group}.  Would you like to follow them?",

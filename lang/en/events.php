@@ -35,6 +35,12 @@ return [
   'field_event_group' => 'Event group',
   'field_event_desc' => 'Event description',
   'field_event_date' => 'Date of event',
+  // New copy: the date field's empty-state placeholder. Not a develop lang
+  // key - develop's b-form-datepicker shows this as an untranslated
+  // library-default string ("No date selected", bootstrap-vue's own
+  // labelNoDateSelected), so there's nothing to port; translated here for
+  // consistency with the rest of this form rather than left hardcoded.
+  'no_date_selected' => 'No date selected',
   'field_event_time' => 'Start/end time',
   'field_event_venue' => 'Venue address',
   'follow_hosting_group' => 'This event is being hosted by :group.  Would you like to follow them?',

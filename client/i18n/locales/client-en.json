@@ -247,7 +247,8 @@
     "moderation": {
       "events_title": "Events requiring moderation",
       "groups_title": "Groups requiring moderation",
-      "none": "Nothing is awaiting moderation."
+      "none": "Nothing is awaiting moderation.",
+      "load_error": "Sorry, we couldn't load the moderation queue."
     }
   }
 }

@@ -118,6 +118,68 @@ describe('components/moderation/ModerationQueue', () => {
     })
   })
 
+  // A failed fetch used to be swallowed entirely (.catch(() => {})), which
+  // to an Administrator looked identical to "nothing is awaiting
+  // moderation" - the exact symptom the parity investigation traced this
+  // to. It must now surface visibly, and even when alwaysShow is false
+  // (the /group/all, /group/nearby, /party, /group/map usage), since that's
+  // precisely the case where "hidden on error" and "hidden because empty"
+  // were indistinguishable.
+  describe('fetch failure', () => {
+    it('surfaces an error state instead of silently rendering nothing, even with alwaysShow false', async () => {
+      const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {})
+      store.fetchGroups = vi.fn(async () => {
+        store.groups.error = { status: 500 }
+        throw new Error('boom')
+      })
+
+      const wrapper = mountQueue('groups')
+      await flushPromises()
+
+      const panel = wrapper.get('[data-testid="moderation-queue-groups"]')
+      expect(panel.text()).toContain('Groups requiring moderation')
+      expect(wrapper.get('[data-testid="moderation-queue-groups-error"]').text()).toContain(
+        "Sorry, we couldn't load the moderation queue."
+      )
+      expect(wrapper.find('[data-testid="moderation-queue-groups-empty"]').exists()).toBe(false)
+      expect(consoleError).toHaveBeenCalled()
+
+      consoleError.mockRestore()
+    })
+
+    it('applies the same error handling to the events queue', async () => {
+      const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {})
+      store.fetchEvents = vi.fn(async () => {
+        store.events.error = { status: 500 }
+        throw new Error('boom')
+      })
+
+      const wrapper = mountQueue('events')
+      await flushPromises()
+
+      expect(wrapper.get('[data-testid="moderation-queue-events-error"]').exists()).toBe(true)
+      expect(consoleError).toHaveBeenCalled()
+
+      consoleError.mockRestore()
+    })
+
+    it('retries the fetch when the retry button is clicked', async () => {
+      vi.spyOn(console, 'error').mockImplementation(() => {})
+      store.fetchGroups = vi.fn(async () => {
+        store.groups.error = { status: 500 }
+        throw new Error('boom')
+      })
+
+      const wrapper = mountQueue('groups')
+      await flushPromises()
+      expect(store.fetchGroups).toHaveBeenCalledTimes(1)
+
+      await wrapper.get('[data-testid="moderation-queue-groups-retry"]').trigger('click')
+      await flushPromises()
+      expect(store.fetchGroups).toHaveBeenCalledTimes(2)
+    })
+  })
+
   describe('alwaysShow', () => {
     it('renders the heading with a "None" message on an empty (possibly filtered) queue', async () => {
       store.fetchGroups = vi.fn(async () => {

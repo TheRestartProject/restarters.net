@@ -32,10 +32,10 @@ const LocationPickerStub = {
 // name.
 vi.mock('vue-datepicker-next', () => ({
   default: {
-    props: ['value'],
+    props: ['value', 'placeholder'],
     emits: ['update:value'],
     template:
-      '<input data-testid="event-form-date-stub" :value="value" @input="$emit(\'update:value\', $event.target.value)" />',
+      '<input data-testid="event-form-date-stub" :value="value" :placeholder="placeholder" @input="$emit(\'update:value\', $event.target.value)" />',
   },
 }))
 
@@ -117,6 +117,15 @@ describe('components/events/EventForm', () => {
   })
 
   describe('create mode', () => {
+    // Rendered-parity fix: develop's date field shows "No date selected"
+    // placeholder text (bootstrap-vue's own untranslated library default,
+    // ported here as a real translated key since there's no develop copy
+    // to reuse) rather than rendering empty.
+    it('shows a "No date selected" placeholder on the date field', () => {
+      const wrapper = mountForm({ groups: [{ id: 9, name: 'Acme Restarters' }] })
+      expect(wrapper.find('[data-testid="event-form-date-stub"]').attributes('placeholder')).toBe('No date selected')
+    })
+
     it('shows validation errors and does not submit when required fields are empty', async () => {
       const store = useEventsStore()
       store.createEvent = vi.fn()

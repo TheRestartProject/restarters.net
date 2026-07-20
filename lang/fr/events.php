@@ -31,6 +31,9 @@ return [
   'field_event_group' => 'Evénement du Repair Café',
   'field_event_desc' => 'Description',
   'field_event_date' => 'Date de l’événement',
+  // New copy - see lang/en/events.php's comment for why this isn't a
+  // develop-ported key.
+  'no_date_selected' => 'Aucune date sélectionnée',
   'field_event_time' => 'Heures de début et de fin',
   'field_event_venue' => 'Adresse du lieu',
   'field_event_images' => 'Ajoutez des images de l\'événement ici',
