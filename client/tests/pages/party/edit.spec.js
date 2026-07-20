@@ -1,4 +1,4 @@
-import { mount } from '@vue/test-utils'
+import { flushPromises, mount } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
 import { createI18n } from 'vue-i18n'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -52,11 +52,16 @@ describe('pages/party/edit/[id]', () => {
   let eventsStore
   let groupsStore
   let authStore
+  let mockApi
 
   beforeEach(() => {
     setActivePinia(createPinia())
     vi.stubGlobal('useRoute', () => ({ params: { id: '5' }, query: {}, fullPath: '/party/edit/5' }))
     vi.stubGlobal('navigateTo', vi.fn())
+
+    // The Event log tab calls $api.event.audits(id) lazily on first open.
+    mockApi = { event: { audits: vi.fn().mockResolvedValue({ data: [] }) } }
+    vi.stubGlobal('useNuxtApp', () => ({ $api: mockApi }))
 
     eventsStore = useEventsStore()
     eventsStore.fetchEvent = vi.fn().mockResolvedValue(BASE_EVENT)
@@ -188,6 +193,31 @@ describe('pages/party/edit/[id]', () => {
       expect(wrapper.find('[data-testid="event-edit-tab-photos"]').exists()).toBe(true)
       expect(wrapper.find('[data-testid="event-edit-tab-details"]').classes()).toContain('active')
       expect(wrapper.find('[data-testid="event-edit-pane-photos"]').attributes('style')).toContain('display: none')
+    })
+
+    // edit.blade.php:40 gates the Event log tab on Administrator. It fetches
+    // lazily on first open - it is an admin-only panel most page loads never
+    // show - so the endpoint must not be called just by landing on the page.
+    it('hides the Event log tab from a non-administrator', () => {
+      authStore.user = { role_name: 'Host' }
+      groupsStore.memberships = [{ id: 9, name: 'Hosted', role: 3, archived: false }]
+      eventsStore.current.data = BASE_EVENT
+      const wrapper = mountPage()
+
+      expect(wrapper.find('[data-testid="event-edit-tab-log"]').exists()).toBe(false)
+    })
+
+    it('shows the Event log tab for an administrator and fetches only on open', async () => {
+      const wrapper = mountEditable()
+
+      expect(wrapper.find('[data-testid="event-edit-tab-log"]').exists()).toBe(true)
+      expect(mockApi.event.audits).not.toHaveBeenCalled()
+
+      await wrapper.find('[data-testid="event-edit-tab-log"]').trigger('click')
+      await flushPromises()
+
+      expect(mockApi.event.audits).toHaveBeenCalledWith(5)
+      expect(wrapper.find('[data-testid="event-edit-pane-log"]').attributes('style') || '').not.toContain('display: none')
     })
 
     it('switches to the Photos pane on click', async () => {

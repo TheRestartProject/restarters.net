@@ -55,6 +55,14 @@ export default class EventAPI extends BaseAPI {
     return this.$get(`/api/v2/events/${id}/attendees`)
   }
 
+  // GET /api/v2/events/{id}/audits - the edit page's Event log tab.
+  // Administrator only; the strings arrive pre-rendered as HTML because the
+  // placeholder substitution lives in the event-audits lang files server-side
+  // (see EventController::auditsv2).
+  audits(id) {
+    return this.$get(`/api/v2/events/${id}/audits`)
+  }
+
   // GET /api/v2/events/{id}/devices (api-contracts-phase-c.md C1e, NEW) -
   // {data: Device[]}. Read-only device list for the event view page;
   // CRUD (add/edit/delete) lands with C5.

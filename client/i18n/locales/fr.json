@@ -498,6 +498,7 @@
         "confirmed": "Confirmé(s)",
         "editing": "Edition {event}",
         "event_attendance": "Participation",
+        "event_log": "Journal des événements",
         "event_photos": "Photos de l'événement",
         "talk_thread": "Voir la conversation de l'événement",
         "invited": "Invité(s)",

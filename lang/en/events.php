@@ -50,6 +50,7 @@ return [
   'organised_by' => 'Organised by :group',
   'invite_volunteers' => 'Invite volunteers',
   'invite_when_approved' => 'You can only invite volunteers when this event has been approved',
+  'event_log' => 'Event log',
   'event_photos' => 'Photos',
   // Already exists on develop's lang/en/events.php with this exact value -
   // ported here rather than reworded, since this branch's copy of the file

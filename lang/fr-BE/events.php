@@ -48,6 +48,7 @@ return [
   'confirmed' => 'Confirmé(s)',
   'editing' => 'Edition :event',
   'event_attendance' => 'Participation',
+  'event_log' => 'Journal des événements',
   'event_photos' => 'Photos de l\'événement',
   // Already exists on develop's lang/fr-BE/events.php with this exact
   // value.

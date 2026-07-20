@@ -53,8 +53,32 @@ const imageError = ref('')
 // (@edited="justCreated = false"), which onUpdated below mirrors.
 const justCreated = ref(false)
 
-// edit.blade.php's Details/Photos tabs; details is active by default.
+// edit.blade.php's Details/Photos/Event log tabs; details is active by default.
 const activeTab = ref('details')
+
+// Event log (edit.blade.php:40) - Administrator only, matching
+// `@if($audits && hasRole(Administrator))`. Fetched lazily on first open
+// rather than on mount: it is an admin-only panel most page loads never show.
+const audits = ref([])
+const auditsLoaded = ref(false)
+const auditsError = ref(false)
+const openAuditId = ref(null)
+
+async function showAuditLog() {
+  activeTab.value = 'log'
+
+  if (auditsLoaded.value) return
+
+  try {
+    const { $api } = useNuxtApp()
+    const { data } = await $api.event.audits(id.value)
+    audits.value = data || []
+  } catch {
+    auditsError.value = true
+  } finally {
+    auditsLoaded.value = true
+  }
+}
 
 onMounted(() => {
   if (eventsStore.justCreatedId === id.value) {
@@ -171,10 +195,56 @@ function onImageUploadError(message) {
             {{ t('events.event_photos') }}
           </button>
         </li>
+        <li v-if="isAdmin" class="nav-item">
+          <button
+            type="button"
+            class="nav-link"
+            :class="{ active: activeTab === 'log' }"
+            data-testid="event-edit-tab-log"
+            @click="showAuditLog"
+          >
+            {{ t('events.event_log') }}
+          </button>
+        </li>
       </ul>
 
       <div v-show="activeTab === 'details'" data-testid="event-edit-pane-details">
         <EventForm :event-id="id" :initial-event="event" :is-admin="isAdmin" :just-created="justCreated" @updated="onUpdated" />
+      </div>
+
+      <div v-if="isAdmin" v-show="activeTab === 'log'" class="pt-3" data-testid="event-edit-pane-log">
+        <BAlert v-if="auditsError" :model-value="true" variant="danger" data-testid="event-edit-log-error">
+          {{ t('client.events.view_load_error') }}
+        </BAlert>
+        <p v-else-if="auditsLoaded && !audits.length" class="text-muted" data-testid="event-edit-log-empty">
+          {{ t('event-audits.unavailable_audits') }}
+        </p>
+        <div v-else class="accordion" data-testid="event-edit-log-accordion">
+          <!-- log-accordion.blade.php: each entry's heading expands to the
+               list of modified attributes. Both are HTML rendered server-side
+               from the event-audits lang files, so v-html is required to show
+               the <strong> emphasis develop uses. -->
+          <div v-for="audit in audits" :key="audit.id" class="accordion-item">
+            <h3 class="accordion-header">
+              <button
+                type="button"
+                class="accordion-button"
+                :class="{ collapsed: openAuditId !== audit.id }"
+                :data-testid="`event-edit-log-heading-${audit.id}`"
+                @click="openAuditId = openAuditId === audit.id ? null : audit.id"
+              >
+                <!-- eslint-disable-next-line vue/no-v-html -->
+                <span v-html="audit.heading" />
+              </button>
+            </h3>
+            <div v-show="openAuditId === audit.id" class="accordion-body" :data-testid="`event-edit-log-body-${audit.id}`">
+              <ul class="list-unstyled mb-0">
+                <!-- eslint-disable-next-line vue/no-v-html -->
+                <li v-for="(change, i) in audit.changes" :key="i" v-html="change" />
+              </ul>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div v-show="activeTab === 'photos'" class="pt-3" data-testid="event-edit-pane-photos">
