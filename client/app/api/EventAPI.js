@@ -110,4 +110,17 @@ export default class EventAPI extends BaseAPI {
   requestReview(id) {
     return this.$post(`/api/v2/events/${id}/request-review`)
   }
+
+  // PUT /api/events/{id}/volunteers (gap 14, api-gaps.md) - deliberately
+  // NOT a /api/v2/ path: EventController::addVolunteer is a v1 endpoint
+  // (routes/api.php), kept there rather than duplicated into v2 (confirmed
+  // covered by tests/Feature/Events/AddRemoveVolunteerTest.php). It sits
+  // under the same `auth:sanctum,api` middleware group as every v2 route
+  // this client already calls, so the normal Bearer-token auth this class
+  // sends on every request works here unchanged - no api_token query param
+  // needed despite legacy's own axios call passing one (Sanctum satisfies
+  // auth:sanctum,api same as the legacy api-guard token would).
+  addVolunteer(id, payload) {
+    return this.$put(`/api/events/${id}/volunteers`, payload)
+  }
 }

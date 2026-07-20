@@ -13,10 +13,12 @@ import { useCo2Equivalent } from '~/composables/useCo2Equivalent.js'
 import { useUploadedImageUrl } from '~/composables/useUploadedImageUrl.js'
 import EventAttendees from '~/components/events/EventAttendees.vue'
 import EventInviteModal from '~/components/events/EventInviteModal.vue'
+import EventAddVolunteerModal from '~/components/events/EventAddVolunteerModal.vue'
 import EventDetailsPanel from '~/components/events/EventDetailsPanel.vue'
 import EventActionsDropdown from '~/components/events/EventActionsDropdown.vue'
 import EventShareStatsModal from '~/components/events/EventShareStatsModal.vue'
 import StatsShareImageModal from '~/components/events/StatsShareImageModal.vue'
+import EventImagesGallery from '~/components/events/EventImagesGallery.vue'
 import EventDevicesPanel from '~/components/devices/EventDevicesPanel.vue'
 
 // /party/view/[id] - resources/views/events/view.blade.php +
@@ -179,6 +181,7 @@ const descriptionNeedsTruncating = computed(() => {
 })
 
 const showInvite = ref(false)
+const showAddVolunteer = ref(false)
 const showShareStats = ref(false)
 // StatsImpact.vue's CO2-card "Share this" trigger opens a DIFFERENT modal
 // from the header dropdown's "Share event stats" (showShareStats above,
@@ -310,6 +313,45 @@ async function confirmDelete() {
   } finally {
     deleting.value = false
   }
+}
+
+// Gap 13: EventAttendanceCount.vue's +/- stepper (EventAttendees.vue,
+// wired below). PATCH /api/v2/events/{id} validates the full set of
+// required event fields on every call (EventController::validateEventParams,
+// same as a normal edit), not just participants/volunteers in isolation -
+// so this resends the event's own current field values alongside the
+// changed count, mirroring EventForm.vue's own update payload shape.
+async function updateHeadcount(field, value) {
+  if (!event.value) return
+
+  const payload = {
+    start: event.value.start,
+    end: event.value.end,
+    title: event.value.title,
+    description: event.value.description,
+    location: event.value.location || null,
+    online: event.value.online,
+    link: event.value.link || null,
+    timezone: event.value.timezone || null,
+    network_data: JSON.stringify(event.value.network_data || {}),
+    [field]: value,
+  }
+
+  try {
+    await eventsStore.updateEventCount(id.value, payload, field, value)
+  } catch {
+    useToastStore().error(t('events.edit_failed'))
+  }
+}
+
+// Gap 14: EventAttendance.vue's own EventAddVolunteerModal always refetches
+// on close (`@hide="fetchVolunteers"`), not just on a confirmed success -
+// matched here rather than only refetching from the modal's own success
+// path, since the modal has no way to signal "nothing changed" vs
+// "cancelled" that would make skipping the refetch worthwhile.
+function closeAddVolunteer() {
+  showAddVolunteer.value = false
+  eventsStore.fetchAttendees(id.value)
 }
 </script>
 
@@ -478,9 +520,17 @@ async function confirmDelete() {
             :participants="event.stats ? (event.stats.participants ?? 0) : null"
             :volunteers="event.stats ? (event.stats.volunteers ?? 0) : null"
             @invite="showInvite = true"
+            @add-volunteer="showAddVolunteer = true"
+            @update-participants="updateHeadcount('participants', $event)"
+            @update-volunteers="updateHeadcount('volunteers', $event)"
           />
         </div>
       </div>
+
+      <!-- Gap 5: event-photos gallery, unblocked now the resource returns
+           `images` - EventPage.vue only renders EventImages.vue when
+           images.length, same as the component's own v-if. -->
+      <EventImagesGallery :images="event.images || []" class="mb-4" />
 
       <!-- Stats (event.stats, already on the resource - api-contracts-phase-c.md C1a).
            Gap 15: items-fixed and environmental-impact side by side in a
@@ -562,6 +612,13 @@ async function confirmDelete() {
       />
 
       <EventInviteModal :show="showInvite" :event-id="id" @close="showInvite = false" />
+
+      <EventAddVolunteerModal
+        :show="showAddVolunteer"
+        :event-id="id"
+        :group-id="event.group ? event.group.id : null"
+        @close="closeAddVolunteer"
+      />
 
       <EventShareStatsModal
         :show="showShareStats"

@@ -4,6 +4,7 @@ import { useI18n } from 'vue-i18n'
 import { useUploadedImageUrl } from '../../composables/useUploadedImageUrl.js'
 import { useEventsStore } from '../../stores/events.js'
 import { EVENT_ROLE_HOST } from '../../composables/useEventAttendance.js'
+import EventAttendanceCount from './EventAttendanceCount.vue'
 
 // GET /api/v2/events/{id}/attendees (api-contracts-phase-c.md C1b).
 // Functional spec: EventAttendance.vue + EventAttendee.vue (confirmed/
@@ -16,11 +17,10 @@ import { EVENT_ROLE_HOST } from '../../composables/useEventAttendance.js'
 // listVolunteers' showEmails gate), so it was never a client-side leak, but
 // this component used to render it inline on every confirmed row anyway -
 // develop's EventAttendee.vue never shows email there at all; the only
-// place develop surfaces it is the add-volunteer modal (gap 14, backend-
-// blocked - no v2 endpoint - see pages/party/view/[id].vue's doc comment),
-// which this SPA doesn't build. Rather than keep an exposure develop
-// doesn't have, the field is left unrendered here entirely (still present
-// on `attendee.volunteer` for whenever that modal becomes buildable).
+// place develop surfaces it is the add-volunteer modal (gap 14 - now built,
+// see EventAddVolunteerModal.vue, wired in below). Rather than keep an
+// exposure develop doesn't have, the field is left unrendered here
+// entirely.
 const props = defineProps({
   eventId: {
     type: Number,
@@ -69,7 +69,7 @@ const props = defineProps({
   },
 })
 
-const emit = defineEmits(['invite'])
+const emit = defineEmits(['invite', 'add-volunteer', 'update-participants', 'update-volunteers'])
 
 const { t } = useI18n()
 const eventsStore = useEventsStore()
@@ -135,11 +135,21 @@ async function confirmRemove() {
       >
         <div v-if="!upcoming && (participants !== null || volunteers !== null)" class="d-flex flex-wrap gap-4 mb-3 mb-md-0" data-testid="event-attendees-headcounts">
           <div v-if="participants !== null" data-testid="event-attendees-participants">
-            <div class="h3 mb-0">{{ participants }}</div>
+            <EventAttendanceCount
+              :count="participants"
+              :canedit="canedit"
+              testid="event-attendees-participants-count"
+              @change="emit('update-participants', $event)"
+            />
             <div class="small text-muted">{{ t('events.stat-0') }}</div>
           </div>
           <div v-if="volunteers !== null" data-testid="event-attendees-volunteers">
-            <div class="h3 mb-0">{{ volunteers }}</div>
+            <EventAttendanceCount
+              :count="volunteers"
+              :canedit="canedit"
+              testid="event-attendees-volunteers-count"
+              @change="emit('update-volunteers', $event)"
+            />
             <div class="small text-muted">{{ t('events.stat-2') }}</div>
           </div>
         </div>
@@ -220,6 +230,20 @@ async function confirmRemove() {
                 </button>
               </li>
             </ul>
+
+            <!-- Gap 14: EventAttendance.vue's "Add volunteer" link, opening
+                 EventAddVolunteerModal.vue (page-level, same convention as
+                 the invite-modal trigger below). Legacy shows this to any
+                 viewer regardless of canedit (the server-side
+                 userHasEditPartyPermission gate is the only enforcement) -
+                 gated on canedit here too, consistent with the rest of this
+                 page's host-only actions, rather than showing an action
+                 that would just 403. -->
+            <div v-if="!upcoming && canedit" class="text-end">
+              <a href="#" data-testid="event-attendees-add-volunteer-link" @click.prevent="emit('add-volunteer')">
+                {{ t('events.add_volunteer_modal_heading') }}
+              </a>
+            </div>
           </div>
 
           <div v-else class="pt-3" data-testid="event-attendees-panel-invited">

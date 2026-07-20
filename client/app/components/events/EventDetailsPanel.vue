@@ -1,26 +1,19 @@
 <script setup>
+import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useEventComputed } from '~/composables/useEventComputed.js'
 import { useCalendarLinks } from '~/composables/useCalendarLinks.js'
+import { useSessionStore } from '~/stores/session.js'
 import EventVenueMap from './EventVenueMap.vue'
 
 // Gap 9: develop's EventDetails.vue renders a bordered, icon-led row list
-// (date [+ add-to-calendar dropdown], time, hosts, link, location [+ map])
-// - the Nuxt view page used to render this same information as plain
-// unadorned text lines inside the header block. This is that same icon+
-// border-row list, pulled out into its own component and placed in the
-// page's left column (gap 4's 2-col layout) below the header, matching
-// EventPage.vue's structure (EventHeading, then EventDetails+EventDescription
-// side-by-side with EventAttendance).
-//
-// The discourse "Talk thread" row (EventDetails.vue's talk_ico.svg link,
-// gap 11) is NOT reproduced - the v2 Event resource carries no
-// discourse_thread field at all (app/Http/Resources/Party.php), unlike the
-// Blade controller which injected it from Party::$discourse_thread
-// server-side. Backend gap: GET /api/v2/events/{id} needs a
-// discourse_thread URL field (only populated when the caller is attending,
-// mirroring view.blade.php's $discourseThread gate) before this row can be
-// added without fabricating data.
+// (date [+ add-to-calendar dropdown], time, talk-thread, hosts, link,
+// location [+ map]) - the Nuxt view page used to render this same
+// information as plain unadorned text lines inside the header block. This
+// is that same icon+border-row list, pulled out into its own component and
+// placed in the page's left column (gap 4's 2-col layout) below the
+// header, matching EventPage.vue's structure (EventHeading, then
+// EventDetails+EventDescription side-by-side with EventAttendance).
 const props = defineProps({
   event: {
     type: Object,
@@ -39,6 +32,21 @@ const props = defineProps({
 const { t } = useI18n()
 const { upcoming, date, start, end, timezone } = useEventComputed(() => props.event)
 const calendarLinks = useCalendarLinks(() => props.event)
+
+// Gap 11: EventDetails.vue's "Talk thread" row (talk_ico.svg link) -
+// app/Http/Resources/Party.php's `discourse_thread` is only present (non-
+// null) when the caller is a confirmed attendee, mirroring view.blade.php's
+// `$discourseThread` gate server-side - so, per that field's own doc
+// comment, no extra client-side isAttending check is needed here (unlike
+// Group.discourse_group, which is unconditionally public and has no such
+// gate). Same {discourse_url}/t/{id} URL-building pattern as
+// pages/group/view/[id].vue's discourseGroup.
+const sessionStore = useSessionStore()
+const discourseThread = computed(() => {
+  const id = props.event.discourse_thread
+  const base = sessionStore.config?.discourse_url
+  return id && base ? `${base}/t/${id}` : null
+})
 </script>
 
 <template>
@@ -68,6 +76,11 @@ const calendarLinks = useCalendarLinks(() => props.event)
       <div data-testid="event-details-time">
         {{ start }}-{{ end }} <span class="text-muted small">{{ timezone }}</span>
       </div>
+    </div>
+
+    <div v-if="discourseThread" class="detail-row d-flex pt-1 pb-1" data-testid="event-details-talk">
+      <img src="/icons/talk_ico.svg" alt="" class="detail-icon me-2">
+      <a :href="discourseThread">{{ t('events.talk_thread') }}</a>
     </div>
 
     <div v-if="hosts.length" class="detail-row d-flex pt-1 pb-1" data-testid="event-details-hosts">

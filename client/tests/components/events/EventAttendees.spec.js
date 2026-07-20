@@ -140,6 +140,31 @@ describe('components/events/EventAttendees', () => {
     expect(wrapper.emitted('invite')).toBeTruthy()
   })
 
+  // Gap 14: EventAttendance.vue's "Add volunteer" link (confirmed tab,
+  // !upcoming events only) - gated on canedit too (see EventAttendees.vue's
+  // doc comment for why, unlike legacy).
+  describe('add-volunteer trigger (gap 14)', () => {
+    it('shows the link for a canedit viewer on a non-upcoming event, and emits add-volunteer on click', async () => {
+      const wrapper = mountComponent({ upcoming: false, canedit: true })
+
+      const link = wrapper.find('[data-testid="event-attendees-add-volunteer-link"]')
+      expect(link.exists()).toBe(true)
+
+      await link.trigger('click')
+      expect(wrapper.emitted('add-volunteer')).toBeTruthy()
+    })
+
+    it('hides the link for an upcoming event, even when canedit', () => {
+      const wrapper = mountComponent({ upcoming: true, canedit: true })
+      expect(wrapper.find('[data-testid="event-attendees-add-volunteer-link"]').exists()).toBe(false)
+    })
+
+    it('hides the link for a non-editing viewer, even on a non-upcoming event', () => {
+      const wrapper = mountComponent({ upcoming: false, canedit: false })
+      expect(wrapper.find('[data-testid="event-attendees-add-volunteer-link"]').exists()).toBe(false)
+    })
+  })
+
   // Gap 21: develop's !upcoming grid condition shows headcounts for
   // in-progress events too, not just finished ones.
   describe('total headcounts (gap D3/21)', () => {
@@ -170,6 +195,28 @@ describe('components/events/EventAttendees', () => {
       const wrapper = mountComponent({ upcoming: false, finished: true, participants: null, volunteers: 3 })
       expect(wrapper.find('[data-testid="event-attendees-participants"]').exists()).toBe(false)
       expect(wrapper.find('[data-testid="event-attendees-volunteers"]').text()).toBe('3Volunteers')
+    })
+
+    // Gap 13: EventAttendanceCount.vue's +/- stepper - editable for a
+    // canedit viewer, plain text otherwise.
+    it('shows editable +/- steppers for a canedit viewer, and emits update-participants/update-volunteers', async () => {
+      const wrapper = mountComponent({ upcoming: false, finished: true, participants: 12, volunteers: 3, canedit: true })
+
+      expect(wrapper.find('[data-testid="event-attendees-participants-count-inc"]').exists()).toBe(true)
+      expect(wrapper.find('[data-testid="event-attendees-volunteers-count-inc"]').exists()).toBe(true)
+
+      await wrapper.find('[data-testid="event-attendees-participants-count-inc"]').trigger('click')
+      expect(wrapper.emitted('update-participants')).toEqual([[13]])
+
+      await wrapper.find('[data-testid="event-attendees-volunteers-count-dec"]').trigger('click')
+      expect(wrapper.emitted('update-volunteers')).toEqual([[2]])
+    })
+
+    it('shows plain-text counts (no stepper) for a non-editing viewer', () => {
+      const wrapper = mountComponent({ upcoming: false, finished: true, participants: 12, volunteers: 3, canedit: false })
+
+      expect(wrapper.find('[data-testid="event-attendees-participants-count-inc"]').exists()).toBe(false)
+      expect(wrapper.find('[data-testid="event-attendees-volunteers-count-inc"]').exists()).toBe(false)
     })
   })
 

@@ -3,11 +3,13 @@ import { createPinia, setActivePinia } from 'pinia'
 import { createI18n } from 'vue-i18n'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import EventViewPage from '../../../app/pages/party/view/[id].vue'
+import EventAddVolunteerModal from '../../../app/components/events/EventAddVolunteerModal.vue'
 import { useEventsStore } from '../../../app/stores/events.js'
 import { useDashboardStore } from '../../../app/stores/dashboard.js'
 import { useGroupsStore } from '../../../app/stores/groups.js'
 import { useDevicesStore } from '../../../app/stores/devices.js'
 import { useAuthStore } from '../../../app/stores/auth.js'
+import { useSessionStore } from '../../../app/stores/session.js'
 import en from '../../../i18n/locales/en.json'
 import clientEn from '../../../i18n/locales/client-en.json'
 
@@ -183,6 +185,8 @@ describe('pages/party/view/[id]', () => {
     devicesStore.fetchForEvent = vi.fn().mockResolvedValue([])
 
     authStore = useAuthStore()
+
+    useSessionStore().config = { discourse_url: 'https://talk.example.com' }
   })
 
   it('fetches the event, attendees and devices for the routed id on mount', () => {
@@ -574,6 +578,148 @@ describe('pages/party/view/[id]', () => {
 
       const wrapper = mountPage()
       expect(wrapper.find('[data-testid="event-details-hosts"]').exists()).toBe(false)
+    })
+  })
+
+  // Gap 11: EventDetails.vue's "Talk thread" row. app/Http/Resources/
+  // Party.php only populates discourse_thread for a confirmed attendee
+  // (mirrors view.blade.php's own gate), so the client renders purely off
+  // whether the field is present - no extra isAttending check layered on
+  // top.
+  describe('discourse talk-thread link (gap 11)', () => {
+    it('links to the Discourse thread when discourse_thread + config are present', () => {
+      eventsStore.current.data = baseEvent({ discourse_thread: '4242' })
+      const wrapper = mountPage()
+
+      const talk = wrapper.find('[data-testid="event-details-talk"]')
+      expect(talk.exists()).toBe(true)
+      expect(talk.find('a').attributes('href')).toBe('https://talk.example.com/t/4242')
+    })
+
+    it('does not render a talk-thread link when discourse_thread is null (non-attendee, or no linked thread)', () => {
+      eventsStore.current.data = baseEvent({ discourse_thread: null })
+      const wrapper = mountPage()
+
+      expect(wrapper.find('[data-testid="event-details-talk"]').exists()).toBe(false)
+    })
+  })
+
+  // Gap 5: event-photos gallery, unblocked now the resource returns
+  // `images`. Full component behaviour (thumbnails, lightbox) is covered
+  // by EventImagesGallery.spec.js - this just confirms the page wires the
+  // real `event.images` through.
+  describe('event photos gallery (gap 5)', () => {
+    it('shows the gallery once the event has images', () => {
+      eventsStore.current.data = baseEvent({ images: [{ id: 1, idxref: 101, path: 'abc.jpg' }] })
+      const wrapper = mountPage()
+
+      expect(wrapper.find('[data-testid="event-images-gallery"]').exists()).toBe(true)
+    })
+
+    it('does not show the gallery when the event has no images', () => {
+      eventsStore.current.data = baseEvent({ images: [] })
+      const wrapper = mountPage()
+
+      expect(wrapper.find('[data-testid="event-images-gallery"]').exists()).toBe(false)
+    })
+  })
+
+  // Gap 13: EventAttendanceCount.vue's +/- stepper. PATCH /api/v2/events/
+  // {id} validates the full event payload on every call, not just
+  // participants/volunteers in isolation, so clicking +/- must resend the
+  // event's current field values alongside the changed count.
+  describe('inline-editable headcounts (gap 13)', () => {
+    it('resends the full event payload plus the changed count when the participants stepper is used', async () => {
+      eventsStore.current.data = baseEvent({
+        start: '2020-01-01T10:00:00+00:00',
+        end: '2020-01-01T12:00:00+00:00',
+        link: 'https://example.com',
+        stats: { ...baseEvent().stats, participants: 4 },
+      })
+      authStore.user = { role_name: 'Administrator' }
+      authStore.token = 'a-token'
+      eventsStore.updateEventCount = vi.fn().mockResolvedValue()
+
+      const wrapper = mountPage()
+      await wrapper.find('[data-testid="event-attendees-participants-count-inc"]').trigger('click')
+
+      expect(eventsStore.updateEventCount).toHaveBeenCalledWith(
+        5,
+        {
+          start: '2020-01-01T10:00:00+00:00',
+          end: '2020-01-01T12:00:00+00:00',
+          title: 'Repair Café',
+          description: '<p>Bring your broken things.</p>',
+          location: 'Town Hall',
+          online: false,
+          link: 'https://example.com',
+          timezone: 'Europe/London',
+          network_data: '{}',
+          participants: 5,
+        },
+        'participants',
+        5
+      )
+    })
+
+    it('toasts an error and leaves the count alone when the save fails', async () => {
+      eventsStore.current.data = baseEvent({
+        start: '2020-01-01T10:00:00+00:00',
+        end: '2020-01-01T12:00:00+00:00',
+        stats: { ...baseEvent().stats, volunteers: 2 },
+      })
+      authStore.user = { role_name: 'Administrator' }
+      authStore.token = 'a-token'
+      eventsStore.updateEventCount = vi.fn().mockRejectedValue(new Error('nope'))
+
+      const wrapper = mountPage()
+      await wrapper.find('[data-testid="event-attendees-volunteers-count-inc"]').trigger('click')
+      await wrapper.vm.$nextTick()
+
+      expect(eventsStore.updateEventCount).toHaveBeenCalled()
+    })
+
+    it('does not show the stepper for a non-editing viewer', () => {
+      eventsStore.current.data = baseEvent({
+        start: '2020-01-01T10:00:00+00:00',
+        end: '2020-01-01T12:00:00+00:00',
+        stats: { ...baseEvent().stats, participants: 4 },
+      })
+
+      const wrapper = mountPage()
+      expect(wrapper.find('[data-testid="event-attendees-participants-count-inc"]').exists()).toBe(false)
+    })
+  })
+
+  // Gap 14: EventAttendance.vue's "Add volunteer" modal - full form
+  // behaviour is covered by EventAddVolunteerModal.spec.js, this just
+  // confirms the page wires the trigger and the close-refetch through.
+  describe('add-volunteer modal (gap 14)', () => {
+    it('opens the add-volunteer modal from the confirmed tab\'s link', async () => {
+      eventsStore.current.data = baseEvent({ start: '2020-01-01T10:00:00+00:00', end: '2020-01-01T12:00:00+00:00' })
+      authStore.user = { role_name: 'Administrator' }
+      authStore.token = 'a-token'
+
+      const wrapper = mountPage()
+      expect(wrapper.find('[data-testid="event-add-volunteer-modal"]').exists()).toBe(false)
+
+      await wrapper.find('[data-testid="event-attendees-add-volunteer-link"]').trigger('click')
+      expect(wrapper.find('[data-testid="event-add-volunteer-modal"]').exists()).toBe(true)
+    })
+
+    it('refetches attendees when the modal is closed (matches legacy\'s always-refetch-on-hide)', async () => {
+      eventsStore.current.data = baseEvent({ start: '2020-01-01T10:00:00+00:00', end: '2020-01-01T12:00:00+00:00' })
+      authStore.user = { role_name: 'Administrator' }
+      authStore.token = 'a-token'
+
+      const wrapper = mountPage()
+      await wrapper.find('[data-testid="event-attendees-add-volunteer-link"]').trigger('click')
+      eventsStore.fetchAttendees.mockClear()
+
+      await wrapper.findComponent(EventAddVolunteerModal).findComponent(BModalStub).vm.$emit('hide')
+
+      expect(eventsStore.fetchAttendees).toHaveBeenCalledWith(5)
+      expect(wrapper.find('[data-testid="event-add-volunteer-modal"]').exists()).toBe(false)
     })
   })
 

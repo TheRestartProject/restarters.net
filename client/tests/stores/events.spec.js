@@ -23,6 +23,7 @@ describe('stores/events', () => {
         create: vi.fn(),
         update: vi.fn(),
         uploadImage: vi.fn(),
+        addVolunteer: vi.fn(),
       },
     }
 
@@ -303,6 +304,33 @@ describe('stores/events', () => {
     })
   })
 
+  // Gap 14: PUT /api/events/{id}/volunteers (v1 - see api/EventAPI.js's
+  // addVolunteer doc comment). Its response envelope is {success:'success'}
+  // rather than v2's {data:...}, so this returns the raw response,
+  // unlike inviteVolunteers above.
+  describe('addVolunteer', () => {
+    it('passes the payload through and returns the raw response', async () => {
+      mockApi.event.addVolunteer.mockResolvedValueOnce({ success: 'success' })
+
+      const store = useEventsStore()
+      const result = await store.addVolunteer(5, { user: 20, full_name: null, volunteer_email_address: null })
+
+      expect(mockApi.event.addVolunteer).toHaveBeenCalledWith(5, { user: 20, full_name: null, volunteer_email_address: null })
+      expect(result).toEqual({ success: 'success' })
+    })
+
+    it('rethrows on failure without toasting (left for the modal to render inline)', async () => {
+      const apiError = { status: 403 }
+      mockApi.event.addVolunteer.mockRejectedValueOnce(apiError)
+
+      const store = useEventsStore()
+      const toastStore = useToastStore()
+
+      await expect(store.addVolunteer(5, { user: 20 })).rejects.toEqual(apiError)
+      expect(toastStore.toasts).toHaveLength(0)
+    })
+  })
+
   describe('deleteEvent', () => {
     it('returns the response data on success', async () => {
       mockApi.event.del.mockResolvedValueOnce({ data: { deleted: true } })
@@ -403,6 +431,46 @@ describe('stores/events', () => {
 
       await expect(store.updateEvent(5, {})).rejects.toEqual(apiError)
       expect(toastStore.toasts).toHaveLength(0)
+    })
+  })
+
+  // Gap 13: EventAttendanceCount.vue's +/- stepper. Unlike updateEvent
+  // above, this patches the cached `current` entry in place rather than
+  // invalidating it - a full-page loading-skeleton flash on every +/-
+  // click would be a regression from legacy's instant local update.
+  describe('updateEventCount', () => {
+    it('patches the cached current entry\'s stats field in place, without invalidating it', async () => {
+      mockApi.event.update.mockResolvedValueOnce({ id: 5 })
+
+      const store = useEventsStore()
+      store.current.data = { id: 5, title: 'Repair Café', stats: { participants: 4, volunteers: 1 } }
+
+      await store.updateEventCount(5, { participants: 7 }, 'participants', 7)
+
+      expect(mockApi.event.update).toHaveBeenCalledWith(5, { participants: 7 })
+      expect(store.current.data).toEqual({ id: 5, title: 'Repair Café', stats: { participants: 7, volunteers: 1 } })
+    })
+
+    it('does not touch current when it belongs to a different event', async () => {
+      mockApi.event.update.mockResolvedValueOnce({ id: 5 })
+
+      const store = useEventsStore()
+      store.current.data = { id: 99, stats: { participants: 4 } }
+
+      await store.updateEventCount(5, { participants: 7 }, 'participants', 7)
+
+      expect(store.current.data).toEqual({ id: 99, stats: { participants: 4 } })
+    })
+
+    it('rethrows on failure, leaving current untouched', async () => {
+      const apiError = { status: 403 }
+      mockApi.event.update.mockRejectedValueOnce(apiError)
+
+      const store = useEventsStore()
+      store.current.data = { id: 5, stats: { participants: 4 } }
+
+      await expect(store.updateEventCount(5, { participants: 7 }, 'participants', 7)).rejects.toEqual(apiError)
+      expect(store.current.data).toEqual({ id: 5, stats: { participants: 4 } })
     })
   })
 
