@@ -664,3 +664,67 @@ By kind: missing-feature=25, styling=27, missing-content=13, layout=31, data=9
 - **NEW (SPA):** Message reads: "There are no groups within 50 km of your location. You can see all groups here. Or why not start your own? Learn what running your own repair event involves." — implies the user DOES have a location on file and a 50km search was performed.
 - **Likely cause:** Same seeded user/DB but the two apps disagree on whether the user has a town/city set — the Nuxt SPA's 'nearest groups' logic is likely defaulting to a location (e.g. 0,0/IP-based) instead of correctly detecting the empty profile field, or is reading a different field than legacy.
 
+
+---
+
+## 2026-07-20 — coverage gap closed: 9 pages render-compared for the first time
+
+An audit of `client/app/pages` against the capture harness found **17 of 40
+routes had never been render-compared**, including the event view page. The
+user had already reported that page as not at parity, which is what prompted
+the audit. Harness now covers every route that exists on both systems
+(`24-group-index` … `34-forbidden`).
+
+Three harness defects were fixing themselves into false passes and are worth
+recording, because each one made missing verification look like verification:
+
+1. **Hardcoded detail-page ids.** Every `migrate:fresh` renumbers events and
+   users, so a stale id rendered a 404 on BOTH systems - a pair that diffs as
+   a perfect match. Ids are now published by `parity-fixtures.php` to
+   `parity-fixtures.json` and read by the spec.
+2. **Unbounded `waitForLoadState('networkidle')`.** One stalled page burned
+   ~4 min and the 300s per-test timeout then killed the rest of the desktop
+   run, so every page after it looked *absent* rather than *failed*.
+3. **Blank captures were emitted silently.** `26-event-view` and
+   `31-profile-edit` produced completely blank desktop shots. The harness now
+   asserts a floor of body text per page.
+
+### Real bug found by (3): share-stats embed URLs — FIXED
+
+`26-event-view`'s blank desktop shot was caused by an unhandled H3Error
+blanking the SPA: `EventShareStatsModal.vue` built `/party/stats/{id}/wide`
+and `/outbound/info/party/{id}/leaf` root-relative. Those routes are served by
+**Laravel**, not Nuxt, so they resolved against the SPA's own origin, 404'd,
+and Nuxt logged `error caught during app initialization` on every event page.
+The copyable embed code was broken for the same reason - it is meant to be
+pasted on someone else's site, where a root-relative path can never resolve.
+develop uses `env('APP_URL')`. Fixed to use `runtimeConfig.public.apiBase`;
+`GroupShareStatsModal.vue` had the identical defect. Specs had pinned the
+root-relative form, so they passed throughout.
+
+### 26-event-view (desktop) — remaining diffs, NOT yet fixed
+
+Verified by direct comparison of `26-event-view__{new,old}.png`:
+
+- **Attendance panel has lost its box.** develop renders the
+  Confirmed/Invited tabs, the volunteer list and "Add volunteer" inside a
+  bordered white panel. Ours renders them flat on the page background.
+- **Same for "Items at this event".** develop wraps it in a teal-bordered
+  panel with the tabs as real tabs and the add button inside; ours is flat,
+  with plain-text tabs.
+- **Participants/Volunteers controls restructured.** develop: an icon plus a
+  bold label ABOVE each -/+ stepper. Ours: stepper first, small label beneath,
+  no icons.
+- **"Attendance" heading gained a count** - ours reads "Attendance (1)",
+  develop just "Attendance".
+- **First "Items fixed" card differs** - develop fills it teal with the count
+  only; ours is white with a "Fixed" label.
+- **Inline map.** develop shows only a "View map" link; ours renders a Leaflet
+  map inline as well.
+- **Extra CO2 line.** Ours adds "that's like growing 0 tree seedlings for 10
+  years" under the CO2 card; develop's card does not carry it here.
+
+Not investigated yet: the other 8 newly-covered pages. `12-profile` and
+`30-profile-view` are both ~30% shorter than develop's at both viewports,
+which is a content difference rather than a render artifact and should be the
+next thing checked.

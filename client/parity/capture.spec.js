@@ -269,11 +269,17 @@ async function settle(page) {
 // which is a real bug the screenshot would otherwise have hidden behind a
 // tidy-looking pair.
 //
-// Every page here renders a nav and a footer, so anything under a few hundred
-// characters of body text is not a page. Reported at the END of the test
-// rather than thrown at the point of failure, so one bad page still doesn't
-// cost every page after it its capture (see the settle() comment).
-const MIN_BODY_TEXT = 200
+// Calibrated against a full run, NOT guessed. A first pass at 200 chars
+// flagged 27 pages, almost all of them legitimately sparse - an empty admin
+// table, or the recover form, which measures 170 (new) vs 171 (old) chars and
+// is therefore a genuine MATCH, not a false one. The sparsest real page in a
+// full run is ~59 chars; a page whose app failed to mount has essentially
+// zero, since not even the nav renders. 40 sits in that gap.
+//
+// Reported at the END of the test rather than thrown at the point of failure,
+// so one bad page still doesn't cost every page after it its capture (see the
+// settle() comment).
+const MIN_BODY_TEXT = 40
 
 async function shoot(page, viewport, slug, system, blanks) {
   await settle(page)
