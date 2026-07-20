@@ -181,6 +181,7 @@
     },
     "nav": {
       "administrator": "Administrateur",
+      "avatar_alt": "Photo de profil de {name}",
       "brands": "Marques",
       "categories": "Catégories",
       "dashboard": "Tableau de bord",

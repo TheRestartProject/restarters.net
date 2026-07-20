@@ -148,8 +148,7 @@ function goToWiki() {
             data-testid="nav-user-menu"
             @click="toggleMenu"
           >
-            <img :src="avatarSrc" :alt="user.name" class="avatar">
-            <span class="user-name">{{ user.name }}</span>
+            <img :src="avatarSrc" :alt="t('client.nav.avatar_alt', { name: user.name })" class="avatar">
           </button>
 
           <div

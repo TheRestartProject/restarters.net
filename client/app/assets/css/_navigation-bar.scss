@@ -287,37 +287,6 @@
   }
 }
 
-.user-name {
-  display: none;
-  font-size: 16px;
-  font-family: $font-family-sans-serif;
-  text-decoration: underline;
-  max-width: 170px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  overflow: hidden;
-  padding-left: 1px;
-  margin: auto auto auto 9px;
-
-  @include media-breakpoint-up(lg) {
-    display: inline-block;
-  }
-}
-
-.nav-link:focus {
-  .user-name {
-    text-decoration: none;
-    color: #000;
-  }
-}
-
-.nav-link:hover {
-  .user-name {
-    text-decoration: underline;
-    color: $brand;
-  }
-}
-
 .nav-wrapper {
   z-index: 1000;
   position: relative;

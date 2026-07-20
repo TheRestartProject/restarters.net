@@ -181,6 +181,7 @@
     },
     "nav": {
       "administrator": "Administrator",
+      "avatar_alt": "{name} Profile Picture",
       "brands": "Brands",
       "categories": "Categories",
       "dashboard": "Dashboard",

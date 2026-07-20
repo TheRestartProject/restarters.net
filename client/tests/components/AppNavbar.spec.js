@@ -6,6 +6,7 @@ import AppNavbar from '../../app/components/AppNavbar.vue'
 import { useAuthStore } from '../../app/stores/auth.js'
 import { useSessionStore } from '../../app/stores/session.js'
 import en from '../../i18n/locales/en.json'
+import clientEn from '../../i18n/locales/client-en.json'
 
 const NuxtLinkStub = {
   props: ['to'],
@@ -13,7 +14,7 @@ const NuxtLinkStub = {
 }
 
 function mountNavbar() {
-  const i18n = createI18n({ legacy: false, locale: 'en', messages: { en } })
+  const i18n = createI18n({ legacy: false, locale: 'en', messages: { en: { ...en, ...clientEn } } })
 
   return mount(AppNavbar, {
     global: {
@@ -57,6 +58,20 @@ describe('AppNavbar', () => {
     expect(wrapper.find('[data-testid="nav-user-menu"]').exists()).toBe(true)
     expect(wrapper.find('[data-testid="nav-admin-menu"]').exists()).toBe(false)
     expect(wrapper.find('[data-testid="nav-logout"]').exists()).toBe(true)
+  })
+
+  // develop's account toggle (resources/views/layouts/navbar.blade.php:107,109)
+  // is avatar-only, with the name carried as alt text ("{name} Profile
+  // Picture") rather than a visible <span> - the visible username was a
+  // parity gap.
+  it('renders the account toggle as avatar-only, with the name only in the img alt text', () => {
+    setLoggedInUser({ id: 5, name: 'Jane', role_name: 'Restarter', networks: [] })
+
+    const wrapper = mountNavbar()
+    const toggle = wrapper.find('[data-testid="nav-user-menu"]')
+
+    expect(toggle.text()).toBe('')
+    expect(toggle.find('img.avatar').attributes('alt')).toBe('Jane Profile Picture')
   })
 
   it('shows the admin menu for an Administrator', () => {
