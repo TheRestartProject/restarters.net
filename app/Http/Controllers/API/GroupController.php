@@ -845,28 +845,6 @@ class GroupController extends Controller
         }
     }
 
-    private function getUser() {
-        // We want to allow this call to work if a) we are logged in as a user, or b) we have a valid API token.
-        //
-        // This is a slightly odd thing to do, but it is necessary to get both the PHPUnit tests and the
-        // real client use of the API to work.
-        $user = Auth::user();
-
-        if (!$user) {
-            // SPA bearer tokens authenticate via the sanctum guard.
-            $user = auth('sanctum')->user();
-        }
-
-        if (!$user) {
-            $user = auth('api')->user();
-        }
-
-        if (!$user) {
-            throw new AuthenticationException();
-        }
-
-        return $user;
-    }
 
     /**
      * @OA\Get(

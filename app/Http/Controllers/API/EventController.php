@@ -25,6 +25,20 @@ use Illuminate\Support\Facades\Log;
 
 class EventController extends Controller
 {
+    /**
+     * @OA\Get(
+     *      path="/api/events/network/{date_from}/{date_to}",
+     *      operationId="getEventsByUsersNetworksLegacy",
+     *      tags={"Legacy", "Events"},
+     *      summary="Events across the authenticated user's networks (legacy, used by Repair Together)",
+     *      description="Legacy endpoint outside the /api/v2 surface, used by the Repair Together integration. Returns approved events for every group in every network the caller coordinates, each with per-event impact stats and widget URLs. Authenticated via the ?api_token= query string.",
+     *      security={{"ApiKeyAuth":{}}},
+     *      @OA\Parameter(name="date_from", in="path", required=false, description="Optional ISO-8601 lower bound on event start.", @OA\Schema(type="string", format="date-time")),
+     *      @OA\Parameter(name="date_to", in="path", required=false, description="Optional ISO-8601 upper bound on event end.", @OA\Schema(type="string", format="date-time")),
+     *      @OA\Response(response=200, description="A list of events with per-event impact stats and widget URLs.", @OA\JsonContent(type="array", @OA\Items(type="object"))),
+     *      @OA\Response(response=404, description="No events found for the caller's networks.")
+     * )
+     */
     public function getEventsByUsersNetworks(Request $request, $date_from = null, $date_to = null, $timezone = 'UTC')
     {
         $authenticatedUser = Auth::user();
@@ -146,6 +160,28 @@ class EventController extends Controller
         return $collection;
     }
 
+    /**
+     * @OA\Put(
+     *      path="/api/events/{id}/volunteers",
+     *      operationId="addVolunteerLegacy",
+     *      tags={"Legacy", "Events"},
+     *      summary="Add a volunteer to an event (legacy)",
+     *      description="Legacy endpoint outside the /api/v2 surface. Adds a registered or unregistered volunteer to an event; requires edit-party permission. When volunteer_email_address is supplied for a non-existent user, an invitation email is sent.",
+     *      security={{"ApiKeyAuth":{}}},
+     *      @OA\Parameter(name="id", in="path", required=true, description="Event id.", @OA\Schema(type="integer")),
+     *      @OA\RequestBody(
+     *          @OA\MediaType(mediaType="application/json", @OA\Schema(
+     *              @OA\Property(property="user", description="Existing user id, or 'not-registered'.", type="string", nullable=true),
+     *              @OA\Property(property="volunteer_email_address", type="string", format="email", nullable=true),
+     *              @OA\Property(property="full_name", type="string", nullable=true)
+     *          ))
+     *      ),
+     *      @OA\Response(response=200, description="Volunteer added.", @OA\JsonContent(@OA\Property(property="success", type="string", example="success"))),
+     *      @OA\Response(response=403, description="Caller lacks edit-party permission."),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound"),
+     *      @OA\Response(response=422, ref="#/components/responses/ValidationError")
+     * )
+     */
     public function addVolunteer(Request $request, $idevents): JsonResponse
     {
         $request->validate([
@@ -237,6 +273,19 @@ class EventController extends Controller
     }
 
 
+    /**
+     * @OA\Get(
+     *      path="/api/events/{id}/volunteers",
+     *      operationId="listVolunteersLegacy",
+     *      tags={"Legacy", "Events"},
+     *      summary="List an event's confirmed volunteers (legacy)",
+     *      description="Legacy endpoint outside the /api/v2 surface (the v2 replacement is GET /api/v2/events/{id}/attendees). Returns the event's confirmed volunteers.",
+     *      security={{"ApiKeyAuth":{}}},
+     *      @OA\Parameter(name="id", in="path", required=true, description="Event id.", @OA\Schema(type="integer")),
+     *      @OA\Response(response=200, description="The event's confirmed volunteers.", @OA\JsonContent(type="array", @OA\Items(type="object"))),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound")
+     * )
+     */
     public function listVolunteers(Request $request, $idevents): JsonResponse
     {
         $party = Party::findOrFail($idevents);
@@ -301,29 +350,6 @@ class EventController extends Controller
         return \App\Http\Resources\Party::make($party);
     }
 
-    private function getUser()
-    {
-        // We want to allow this call to work if a) we are logged in as a user, or b) we have a valid API token.
-        //
-        // This is a slightly odd thing to do, but it is necessary to get both the PHPUnit tests and the
-        // real client use of the API to work.
-        $user = Auth::user();
-
-        if (!$user) {
-            // SPA bearer tokens authenticate via the sanctum guard.
-            $user = auth('sanctum')->user();
-        }
-
-        if (!$user) {
-            $user = auth('api')->user();
-        }
-
-        if (!$user) {
-            throw new AuthenticationException();
-        }
-
-        return $user;
-    }
 
     /**
      * Resolve the acting user across all guards (web session, SPA sanctum
