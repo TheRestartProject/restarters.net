@@ -7,6 +7,7 @@ import { useGroupsStore } from '../../stores/groups.js'
 import { eventStartLocal, eventEndLocal } from '../../composables/useEventComputed.js'
 import RichTextEditor from '../forms/RichTextEditor.vue'
 import LocationPicker from '../forms/LocationPicker.vue'
+import EventVenueMap from './EventVenueMap.vue'
 import DatePicker from 'vue-datepicker-next'
 import 'vue-datepicker-next/index.css'
 // Admin-only network_data custom-field editor - genuinely generic (keyed
@@ -167,6 +168,25 @@ const groupLocationText = computed(() => selectedGroupDetail.value?.location?.lo
 // group's detail immediately on mount, in edit mode too, so this resolves
 // without any extra request.
 const autoApprove = computed(() => !!selectedGroupDetail.value?.auto_approve)
+
+// VenueAddress.vue:31-40 renders a map preview beside the address, gated on
+// `!online && lat !== null`. Ours had no preview at all. develop geocodes as
+// you type; this client leaves geocoding to the server
+// (GroupController/EventController geocode `location` themselves - see the
+// class doc comment), so coordinates are only known for an event that already
+// has them: edit, and duplicate-from-source. That covers the cases where
+// develop actually shows a map on load, and the preview is simply absent
+// while a brand-new address is still just text - which is also develop's
+// state until its own geocode returns.
+const venueLat = computed(() => {
+  const value = props.initialEvent?.lat
+  return typeof value === 'number' ? value : null
+})
+const venueLng = computed(() => {
+  const value = props.initialEvent?.lng
+  return typeof value === 'number' ? value : null
+})
+const showVenueMap = computed(() => !form.online && venueLat.value !== null && venueLng.value !== null)
 
 const submitting = ref(false)
 const generalError = ref('')
@@ -512,6 +532,13 @@ defineExpose({ submit })
           :help-text="t('events.field_venue_helper')"
           :error-text="t('events.address_error')"
           :has-error="!!fieldError('location')"
+        />
+        <EventVenueMap
+          v-if="showVenueMap"
+          :lat="venueLat"
+          :lng="venueLng"
+          class="mb-3"
+          data-testid="event-form-venue-map"
         />
         <div v-if="groupLocationText && !form.online" class="mb-3">
           <BButton variant="primary" size="sm" data-testid="event-form-use-group-location" @click="useGroupLocation">

@@ -381,6 +381,28 @@ describe('components/events/EventForm', () => {
     // just `:disabled="!creating"`. This previously asserted static text,
     // which is what the form actually rendered - so the assertion was pinning
     // the divergence rather than develop.
+    // VenueAddress.vue:31-40 shows a map beside the address, gated on
+    // `!online && lat !== null`. Coordinates are only known for an event that
+    // already has them (edit / duplicate-from-source) because this client
+    // leaves geocoding to the server.
+    it('shows the venue map when the event has coordinates, and hides it when online', async () => {
+      const wrapper = mountForm({
+        eventId: 5,
+        initialEvent: { ...EVENT, lat: 51.5, lng: -0.12 },
+      })
+
+      expect(wrapper.find('[data-testid="event-form-venue-map"]').exists()).toBe(true)
+
+      await wrapper.find('[data-testid="event-form-online"] input').setValue(true)
+      expect(wrapper.find('[data-testid="event-form-venue-map"]').exists()).toBe(false)
+    })
+
+    it('shows no venue map when the event has no coordinates', () => {
+      const wrapper = mountForm({ eventId: 5, initialEvent: EVENT })
+
+      expect(wrapper.find('[data-testid="event-form-venue-map"]').exists()).toBe(false)
+    })
+
     it('keeps the group select, disabled, while editing', () => {
       const wrapper = mountForm({ eventId: 5, initialEvent: EVENT })
 
