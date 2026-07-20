@@ -74,6 +74,21 @@ describe('AppNavbar', () => {
     expect(toggle.find('img.avatar').attributes('alt')).toBe('Jane Profile Picture')
   })
 
+  // develop's toggle also carries aria-label="Toggle account navigation" on
+  // the element itself (navbar.blade.php:107) - since an explicit
+  // aria-label wins the accessible-name computation over any descendant
+  // img alt, this (not the alt text above) is what actually governs the
+  // toggle's accessible name. Asserted separately so the two can't drift
+  // apart from each other.
+  it('labels the account toggle with an aria-label, matching develop', () => {
+    setLoggedInUser({ id: 5, name: 'Jane', role_name: 'Restarter', networks: [] })
+
+    const wrapper = mountNavbar()
+    const toggle = wrapper.find('[data-testid="nav-user-menu"]')
+
+    expect(toggle.attributes('aria-label')).toBe('Toggle account navigation')
+  })
+
   it('shows the admin menu for an Administrator', () => {
     setLoggedInUser({ id: 5, name: 'Ada', role_name: 'Administrator', networks: [] })
 

@@ -145,6 +145,7 @@ function goToWiki() {
             class="nav-link dropdown-toggle"
             aria-haspopup="true"
             :aria-expanded="menuOpen"
+            :aria-label="t('client.nav.toggle_account_nav')"
             data-testid="nav-user-menu"
             @click="toggleMenu"
           >
