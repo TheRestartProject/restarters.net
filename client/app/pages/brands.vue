@@ -47,7 +47,10 @@ const labels = computed(() => ({
   createButton: t('admin.create-new-brand'),
   editTitle: t('admin.edit-brand'),
   saveButton: t('admin.save-brand'),
-  deleteButton: t('partials.delete'),
+  // partials.delete does not exist in any locale - this rendered the
+  // literal string "partials.delete" on the button. Its siblings use
+  // per-entity keys (admin.delete-skill, admin.delete-tag).
+  deleteButton: t('admin.delete-brand'),
   cancel: t('partials.cancel'),
   emptyText: t('admin.no-brands'),
   confirmDeleteTitle: t('partials.are_you_sure'),

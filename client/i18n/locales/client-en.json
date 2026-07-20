@@ -202,7 +202,8 @@
       "not_found": "That network could not be found.",
       "stats_unavailable": "Stats are not available for this network right now.",
       "tags_load_error": "Sorry, we couldn't load this network's tags.",
-      "editing": "Editing {name}"
+      "editing": "Editing {name}",
+      "edit_forbidden": "You do not have permission to edit this network."
     },
     "notifications": {
       "discourse_aria": "Talk notifications",

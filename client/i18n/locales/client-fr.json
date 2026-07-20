@@ -202,7 +202,8 @@
       "not_found": "Ce réseau est introuvable.",
       "stats_unavailable": "Les statistiques ne sont pas disponibles pour ce réseau pour le moment.",
       "tags_load_error": "Désolé, nous n'avons pas pu charger les tags de ce réseau.",
-      "editing": "Modification de {name}"
+      "editing": "Modification de {name}",
+      "edit_forbidden": "Vous n'avez pas la permission de modifier ce réseau."
     },
     "notifications": {
       "discourse_aria": "Notifications Talk",

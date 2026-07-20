@@ -5,6 +5,7 @@ return [
   'skills' => 'Skills',
   'brand' => 'Brand',
   'category_name' => 'Category name',
+  'delete-brand' => 'Delete brand',
   'delete-skill' => 'Delete skill',
   'create-new-skill' => 'Create new skill',
   'create-new-tag' => 'Create new tag',

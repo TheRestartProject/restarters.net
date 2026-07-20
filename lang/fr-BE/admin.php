@@ -10,6 +10,7 @@ return [
   'create-new-brand' => 'Créer une nouvelle marque',
   'create-new-skill' => 'Créer une nouvelle compétence',
   'skills' => 'Compétences',
+  'delete-brand' => 'Effacer la marque',
   'delete-skill' => 'Effacer la compétence',
   'create-new-tag' => 'Créer une nouvelle étiquette',
   'name' => 'Nom',
