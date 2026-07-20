@@ -261,12 +261,41 @@ async function settle(page) {
   await dismissOnboardingModal(page)
 }
 
-async function shoot(page, viewport, slug, system) {
+// A blank shot is the single most dangerous output this harness can produce:
+// it looks like a captured page, gets diffed like a captured page, and when
+// BOTH sides are blank (or both are error pages) the pair reads as perfect
+// parity. Two pages shipped blank `__new` shots on the desktop run - one of
+// them because an unhandled H3Error during app initialization blanked the SPA,
+// which is a real bug the screenshot would otherwise have hidden behind a
+// tidy-looking pair.
+//
+// Every page here renders a nav and a footer, so anything under a few hundred
+// characters of body text is not a page. Reported at the END of the test
+// rather than thrown at the point of failure, so one bad page still doesn't
+// cost every page after it its capture (see the settle() comment).
+const MIN_BODY_TEXT = 200
+
+async function shoot(page, viewport, slug, system, blanks) {
   await settle(page)
+
+  const bodyText = await page.evaluate(() => (document.body.innerText || '').trim().length).catch(() => 0)
+  if (bodyText < MIN_BODY_TEXT) {
+    blanks.push(`${slug}__${system} @ ${viewport} (${bodyText} chars of body text)`)
+  }
+
   await page.screenshot({
     path: `${OUT}/${viewport}/${slug}__${system}.png`,
     fullPage: true,
   })
+}
+
+function reportBlanks(blanks) {
+  if (blanks.length) {
+    throw new Error(
+      `Captured ${blanks.length} effectively blank page(s) - these would diff as false matches:\n  ` +
+        blanks.join('\n  ')
+    )
+  }
 }
 
 for (const system of SYSTEMS) {
@@ -275,12 +304,14 @@ for (const system of SYSTEMS) {
       test.use({ viewport: { width: vp.width, height: vp.height } })
 
       test(`logged-out pages`, async ({ page }) => {
+        const blanks = []
         await suppressCookieNotice(page)
         for (const p of PAGES.filter((x) => !x.auth)) {
           await page.goto(`${system.base}${pathFor(p, system.name)}`, { waitUntil: 'domcontentloaded' })
           await dismissCookieBanner(page)
-          await shoot(page, vp.name, `${p.slug}--loggedout`, system.name)
+          await shoot(page, vp.name, `${p.slug}--loggedout`, system.name, blanks)
         }
+        reportBlanks(blanks)
       })
 
       test(`logged-in pages`, async ({ page }) => {
@@ -292,11 +323,13 @@ for (const system of SYSTEMS) {
         await system.login(page, system.base, system.email, system.password)
         await dismissCookieBanner(page)
 
+        const blanks = []
         for (const p of PAGES.filter((x) => x.auth)) {
           await page.goto(`${system.base}${pathFor(p, system.name)}`, { waitUntil: 'domcontentloaded' })
           await dismissCookieBanner(page)
-          await shoot(page, vp.name, p.slug, system.name)
+          await shoot(page, vp.name, p.slug, system.name, blanks)
         }
+        reportBlanks(blanks)
       })
     })
   }
