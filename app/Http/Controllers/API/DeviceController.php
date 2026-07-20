@@ -349,7 +349,7 @@ class DeviceController extends Controller {
      *        response=200,
      *        description="Successful operation. Returns the device and the owning event's stats, to save the client another API call to update its store.",
      *        @OA\JsonContent(
-     *            @OA\Property(property="id", type="integer", description="The id of the updated device"),
+     *            @OA\Property(property="id", type="string", description="The id of the updated device"),
      *            @OA\Property(property="device", ref="#/components/schemas/Device"),
      *            @OA\Property(property="stats", type="object", description="Party::getEventStats() for the device's event - the same shape as the stats block on GET /api/v2/events/{id}.",
      *                @OA\Property(property="co2_powered", type="number"),
@@ -482,7 +482,7 @@ class DeviceController extends Controller {
      *          response=200,
      *          description="Successful operation. Returns the owning event's stats, to save the client another API call to update its store.",
      *          @OA\JsonContent(
-     *              @OA\Property(property="id", type="integer", description="The id of the deleted device"),
+     *              @OA\Property(property="id", type="string", description="The id of the deleted device"),
      *              @OA\Property(property="stats", type="object", description="Party::getEventStats() for the device's (now former) event - the same shape as the stats block on GET /api/v2/events/{id}.",
      *                  @OA\Property(property="co2_powered", type="number"),
      *                  @OA\Property(property="co2_unpowered", type="number"),

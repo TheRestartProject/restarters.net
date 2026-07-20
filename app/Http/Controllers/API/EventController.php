@@ -776,7 +776,7 @@ class EventController extends Controller
      *        @OA\JsonContent(
      *            @OA\Property(
      *              property="id",
-     *              type="integer",
+     *              type="string",
      *              description="The event's id",
      *              example=1
      *            )

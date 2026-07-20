@@ -1130,7 +1130,7 @@ class GroupController extends Controller
      *        response=200,
      *        description="Successful operation",
      *        @OA\JsonContent(
-     *            @OA\Property(property="id", type="integer", description="Id of the edited group", example=1)
+     *            @OA\Property(property="id", type="string", description="Id of the edited group", example=1)
      *        )
      *     ),
      *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),

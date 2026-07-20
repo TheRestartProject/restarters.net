@@ -31,7 +31,11 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Throwable $exception)
     {
-        if ($request->wantsJson()) {
+        // /api/v2 is an API-only surface (the Nuxt SPA + documented OpenAPI
+        // contract): always render errors as JSON there, even when the caller
+        // didn't send an Accept: application/json header, so the response shape
+        // matches the documented #/components/responses/* error schemas.
+        if ($request->wantsJson() || $request->is('api/v2/*')) {
             if ($exception instanceof ValidationException) {
                 return response()->json(
                     ['message' => $exception->getMessage(), 'errors' => $exception->errors()],
