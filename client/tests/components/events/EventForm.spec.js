@@ -377,11 +377,17 @@ describe('components/events/EventForm', () => {
       expect(wrapper.find('[data-testid="event-form-date-stub"]').element.value).toBe('2026-08-20')
     })
 
-    it('shows the group as static text, not an editable select', () => {
+    // EventAddEdit.vue:17-22 keeps the SAME EventGroup control while editing,
+    // just `:disabled="!creating"`. This previously asserted static text,
+    // which is what the form actually rendered - so the assertion was pinning
+    // the divergence rather than develop.
+    it('keeps the group select, disabled, while editing', () => {
       const wrapper = mountForm({ eventId: 5, initialEvent: EVENT })
 
-      expect(wrapper.find('[data-testid="event-form-group"]').exists()).toBe(false)
-      expect(wrapper.text()).toContain('Acme Restarters')
+      const select = wrapper.find('[data-testid="event-form-group"]')
+      expect(select.exists()).toBe(true)
+      expect(select.attributes('disabled')).toBeDefined()
+      expect(select.text()).toContain('Acme Restarters')
     })
 
     it('shows the admin-only card for an admin while editing too, prefilled with the event\'s network_data', () => {

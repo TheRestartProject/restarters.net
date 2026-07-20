@@ -399,16 +399,26 @@ defineExpose({ submit })
         </div>
       </BFormGroup>
 
-      <div v-if="creating" class="event-form-group">
+      <!-- EventAddEdit.vue:17-22 renders the SAME EventGroup control while
+           editing, just `:disabled="!creating"` - a bordered, greyed field.
+           This used to swap it for plain text ("Event group: X"), so the edit
+           form lost the field entirely. -->
+      <div class="event-form-group">
         <BFormGroup :label="`${t('events.field_event_group')}:`" label-for="event-form-group">
           <select
             id="event-form-group"
             v-model.number="form.idgroups"
             class="form-select"
             :class="{ 'is-invalid': fieldError('idgroups') }"
+            :disabled="!creating"
             data-testid="event-form-group"
           >
             <option :value="null" />
+            <!-- While editing, `groups` isn't populated (the page only
+                 resolves it for create/duplicate), so the current group is
+                 offered explicitly - otherwise the disabled select would
+                 render blank instead of showing which group the event is in. -->
+            <option v-if="!creating && form.idgroups" :value="form.idgroups">{{ eventGroupName }}</option>
             <option v-for="g in groupOptionsSorted" :key="g.id" :value="g.id">{{ g.name }}</option>
           </select>
           <div v-if="fieldError('idgroups')" class="invalid-feedback d-block" data-testid="event-form-group-error">
@@ -416,9 +426,7 @@ defineExpose({ submit })
           </div>
         </BFormGroup>
       </div>
-      <div v-else class="event-form-group mb-3">
-        <strong>{{ t('events.field_event_group') }}:</strong> {{ eventGroupName }}
-      </div>
+
 
       <BFormGroup class="event-form-description" :label="`${t('events.field_event_desc')}:`" label-for="event-form-description">
         <RichTextEditor
@@ -717,12 +725,14 @@ defineExpose({ submit })
     grid-column: 2 / 3;
   }
 
-  // Below whichever column is taller (column 1 tops out at row 4/5's
-  // description, column 2 at row 3/4's address) - spans both columns, same
-  // as GroupForm.vue's .group-form-admin/.group-form-buttons.
+  // EventAddEdit.vue's .event-admin sits in the RIGHT-hand region at lg+
+  // (`grid-column: 2 / 4` of its 3-line grid), beside the description rather
+  // than spanning the full width beneath it. This used to span both columns,
+  // which pushed everything below it down and left a tall gap next to the
+  // description.
   .event-form-admin {
     grid-row: 5 / 6;
-    grid-column: 1 / 3;
+    grid-column: 2 / 3;
   }
 
   .event-form-approve {

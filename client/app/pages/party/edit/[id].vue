@@ -122,12 +122,20 @@ function onImageUploadError(message) {
     </BAlert>
 
     <template v-else-if="event">
-      <h1>{{ t('events.editing', { event: event.title }) }}</h1>
-      <p>
-        <NuxtLink :to="`/party/view/${id}`" class="headlink" data-testid="event-edit-view-link">
-          {{ t('client.events.view_event') }}
-        </NuxtLink>
-      </p>
+      <!-- edit.blade.php:20 interpolates the event NAME as the link into
+           events.editing itself, rather than adding a separate "View event"
+           link underneath. i18n-t keeps the interpolation translatable - the
+           name's position inside "Editing :event" differs by locale, so
+           concatenating around it would break fr/fr-BE. -->
+      <h1>
+        <i18n-t keypath="events.editing" tag="span" scope="global">
+          <template #event>
+            <NuxtLink :to="`/party/view/${id}`" class="event-edit-title-link" data-testid="event-edit-view-link">
+              {{ event.title }}
+            </NuxtLink>
+          </template>
+        </i18n-t>
+      </h1>
 
       <BAlert v-if="updatedMessage" :model-value="true" variant="success" dismissible data-testid="event-edit-success" @dismissed="updatedMessage = ''">
         {{ updatedMessage }}
@@ -177,3 +185,11 @@ function onImageUploadError(message) {
     </template>
   </div>
 </template>
+
+<style scoped>
+/* edit.blade.php:20 styles the interpolated link black + underlined. */
+.event-edit-title-link {
+  color: #000;
+  text-decoration: underline;
+}
+</style>
