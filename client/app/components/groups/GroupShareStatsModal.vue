@@ -35,12 +35,17 @@ const emit = defineEmits(['close'])
 
 const { t } = useI18n()
 
-const headlineUrl = computed(() => `/group/stats/${props.groupId}`)
+// Absolute against the Laravel origin - see EventShareStatsModal.vue for the
+// full rationale. Same defect, same fix: these widget routes belong to Laravel
+// and the embed code is copied onto other people's sites.
+const runtimeConfig = useRuntimeConfig()
+
+const headlineUrl = computed(() => `${runtimeConfig.public.apiBase}/group/stats/${props.groupId}`)
 const headlineEmbed = computed(
   () => `<iframe src="${headlineUrl.value}" frameborder="0" width="700" height="370"></iframe>`
 )
 
-const co2Url = computed(() => `/outbound/info/group/${props.groupId}/leaf`)
+const co2Url = computed(() => `${runtimeConfig.public.apiBase}/outbound/info/group/${props.groupId}/leaf`)
 const co2Embed = computed(() => `<iframe src="${co2Url.value}" frameborder="0" width="700" height="370"></iframe>`)
 
 function close() {

@@ -1,6 +1,6 @@
 import { mount } from '@vue/test-utils'
 import { createI18n } from 'vue-i18n'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import GroupShareStatsModal from '../../../app/components/groups/GroupShareStatsModal.vue'
 import en from '../../../i18n/locales/en.json'
 import clientEn from '../../../i18n/locales/client-en.json'
@@ -15,6 +15,13 @@ function mountComponent(props = {}) {
   })
 }
 
+// These widget routes are served by LARAVEL, not Nuxt, and the embed code is
+// copied onto other people's sites - so the URLs must be absolute. These
+// assertions previously pinned the root-relative form, which 404'd against the
+// SPA's own origin (Nuxt logged "Page not found: /party/stats/{id}/wide" on
+// every event page) and produced an embed snippet that could never resolve.
+vi.stubGlobal('useRuntimeConfig', () => ({ public: { apiBase: 'https://api.example.test' } }))
+
 describe('components/groups/GroupShareStatsModal', () => {
   it('renders nothing when show is false', () => {
     const wrapper = mountComponent({ show: false })
@@ -24,11 +31,11 @@ describe('components/groups/GroupShareStatsModal', () => {
   it('shows headline stats and CO2 embed codes/previews pointing at the public widget routes', () => {
     const wrapper = mountComponent({ show: true })
 
-    expect(wrapper.find('[data-testid="group-share-stats-headline-embed"]').element.value).toContain('/group/stats/5')
-    expect(wrapper.find('[data-testid="group-share-stats-headline-preview"]').attributes('src')).toBe('/group/stats/5')
+    expect(wrapper.find('[data-testid="group-share-stats-headline-embed"]').element.value).toContain('https://api.example.test/group/stats/5')
+    expect(wrapper.find('[data-testid="group-share-stats-headline-preview"]').attributes('src')).toBe('https://api.example.test/group/stats/5')
 
-    expect(wrapper.find('[data-testid="group-share-stats-co2-embed"]').element.value).toContain('/outbound/info/group/5/leaf')
-    expect(wrapper.find('[data-testid="group-share-stats-co2-preview"]').attributes('src')).toBe('/outbound/info/group/5/leaf')
+    expect(wrapper.find('[data-testid="group-share-stats-co2-embed"]').element.value).toContain('https://api.example.test/outbound/info/group/5/leaf')
+    expect(wrapper.find('[data-testid="group-share-stats-co2-preview"]').attributes('src')).toBe('https://api.example.test/outbound/info/group/5/leaf')
   })
 
   it('emits close when the modal hides', async () => {

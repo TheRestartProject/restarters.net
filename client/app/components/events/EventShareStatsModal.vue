@@ -47,12 +47,22 @@ const emit = defineEmits(['close'])
 
 const { t } = useI18n()
 
-const headlineUrl = computed(() => `/party/stats/${props.eventId}/wide`)
+// Absolute, against the Laravel origin - these widgets are served by Laravel
+// (routes/web.php:433,453), not by Nuxt. Root-relative URLs were doubly wrong
+// here: the preview iframe resolved against the SPA's own origin and 404'd
+// (Nuxt logged "Page not found: /party/stats/{id}/wide" on every event page),
+// and the embed code the user copies is meant to be pasted on THEIR site,
+// where a root-relative path can never resolve. develop builds these from
+// env('APP_URL') for the same reason
+// (includes/modals/event-share-stats.blade.php:33).
+const runtimeConfig = useRuntimeConfig()
+
+const headlineUrl = computed(() => `${runtimeConfig.public.apiBase}/party/stats/${props.eventId}/wide`)
 const headlineEmbed = computed(
   () => `<iframe src="${headlineUrl.value}" frameborder="0" width="700" height="370"></iframe>`
 )
 
-const co2Url = computed(() => `/outbound/info/party/${props.eventId}/leaf`)
+const co2Url = computed(() => `${runtimeConfig.public.apiBase}/outbound/info/party/${props.eventId}/leaf`)
 const co2Embed = computed(() => `<iframe src="${co2Url.value}" frameborder="0" width="700" height="370"></iframe>`)
 
 function close() {

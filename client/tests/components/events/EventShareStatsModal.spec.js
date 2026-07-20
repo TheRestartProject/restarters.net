@@ -1,6 +1,6 @@
 import { mount } from '@vue/test-utils'
 import { createI18n } from 'vue-i18n'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import EventShareStatsModal from '../../../app/components/events/EventShareStatsModal.vue'
 import en from '../../../i18n/locales/en.json'
 import clientEn from '../../../i18n/locales/client-en.json'
@@ -39,6 +39,13 @@ function mountComponent(props = {}) {
   })
 }
 
+// These widget routes are served by LARAVEL, not Nuxt, and the embed code is
+// copied onto other people's sites - so the URLs must be absolute. These
+// assertions previously pinned the root-relative form, which 404'd against the
+// SPA's own origin (Nuxt logged "Page not found: /party/stats/{id}/wide" on
+// every event page) and produced an embed snippet that could never resolve.
+vi.stubGlobal('useRuntimeConfig', () => ({ public: { apiBase: 'https://api.example.test' } }))
+
 describe('components/events/EventShareStatsModal', () => {
   it('renders nothing when show is false', () => {
     const wrapper = mountComponent({ show: false })
@@ -48,11 +55,11 @@ describe('components/events/EventShareStatsModal', () => {
   it('shows headline stats and CO2 embed codes/previews pointing at the public widget routes', () => {
     const wrapper = mountComponent({ show: true })
 
-    expect(wrapper.find('[data-testid="event-share-stats-headline-embed"]').element.value).toContain('/party/stats/7/wide')
-    expect(wrapper.find('[data-testid="event-share-stats-headline-preview"]').attributes('src')).toBe('/party/stats/7/wide')
+    expect(wrapper.find('[data-testid="event-share-stats-headline-embed"]').element.value).toContain('https://api.example.test/party/stats/7/wide')
+    expect(wrapper.find('[data-testid="event-share-stats-headline-preview"]').attributes('src')).toBe('https://api.example.test/party/stats/7/wide')
 
-    expect(wrapper.find('[data-testid="event-share-stats-co2-embed"]').element.value).toContain('/outbound/info/party/7/leaf')
-    expect(wrapper.find('[data-testid="event-share-stats-co2-preview"]').attributes('src')).toBe('/outbound/info/party/7/leaf')
+    expect(wrapper.find('[data-testid="event-share-stats-co2-embed"]').element.value).toContain('https://api.example.test/outbound/info/party/7/leaf')
+    expect(wrapper.find('[data-testid="event-share-stats-co2-preview"]').attributes('src')).toBe('https://api.example.test/outbound/info/party/7/leaf')
   })
 
   it('includes the share-stats message with the event date/name/fixed-device count', () => {
