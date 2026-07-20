@@ -389,9 +389,15 @@ class NetworkController extends Controller
         // and allInvited loaded or it's an N+1 - same eager-load as GroupController::getEventsForGroupv2
         // and Group::bulkGroupStats(). This endpoint has no upper bound on the date range, so an
         // unfiltered network can return a lot of events.
+        //
+        // theGroup is also rendered per event (via GroupSummary), and unlike
+        // getEventsForGroupv2 every event here can belong to a DIFFERENT group - so without
+        // eager-loading it (and the relations GroupSummary itself touches unconditionally:
+        // groupImage.image, networks - same set listSummaryv2 eager-loads) this scales with
+        // event count too, just less obviously than the stats N+1.
         $query = Party::join('groups', 'groups.idgroups', '=', 'events.group')
             ->join('group_network', 'group_network.group_id', '=', 'groups.idgroups')
-            ->with('allDevices')
+            ->with('allDevices', 'theGroup.networks', 'theGroup.groupImage.image')
             ->withCount('allInvited')
             ->where('group_network.network_id', $id)
             ->where('event_start_utc', '>=', $start)

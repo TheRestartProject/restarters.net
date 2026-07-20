@@ -86,9 +86,14 @@ class APIv2GroupResourceFieldsTest extends TestCase
     public function testAutoApproveFalseWithNoNetwork(): void
     {
         // getAutoApproveAttribute() (App\Group) returns false for a group with no networks at
-        // all - matches develop's "no networks = not auto-approved" behaviour.
+        // all - matches develop's "no networks = not auto-approved" behaviour. createGroup()
+        // hits '/' first, which runs CheckForRepairNetwork middleware and sets the acting
+        // user's repair_network to the default "restarters" network; createGroupv2 then
+        // auto-joins the new group to it. So sync([]) here to actually get to zero networks
+        // rather than relying on nothing having been auto-attached.
         $host = User::factory()->host()->create();
         $idgroups = $this->createGroupAsHost($host);
+        \App\Group::find($idgroups)->networks()->sync([]);
 
         $response = $this->get("/api/v2/groups/$idgroups");
         $response->assertSuccessful();
@@ -101,8 +106,12 @@ class APIv2GroupResourceFieldsTest extends TestCase
         $host = User::factory()->host()->create();
         $idgroups = $this->createGroupAsHost($host);
 
+        // sync() (not attach()) - createGroup() already auto-joins the default "restarters"
+        // network (see testAutoApproveFalseWithNoNetwork's comment); attach() would leave
+        // the group in two networks and this test needs "every network" to mean exactly the
+        // one being asserted on.
         $network = Network::factory()->create(['auto_approve_events' => true]);
-        \App\Group::find($idgroups)->networks()->attach($network->id);
+        \App\Group::find($idgroups)->networks()->sync([$network->id]);
 
         $response = $this->get("/api/v2/groups/$idgroups");
         $response->assertSuccessful();
@@ -117,7 +126,7 @@ class APIv2GroupResourceFieldsTest extends TestCase
 
         $autoApproving = Network::factory()->create(['auto_approve_events' => true]);
         $notAutoApproving = Network::factory()->create(['auto_approve_events' => false]);
-        \App\Group::find($idgroups)->networks()->attach([$autoApproving->id, $notAutoApproving->id]);
+        \App\Group::find($idgroups)->networks()->sync([$autoApproving->id, $notAutoApproving->id]);
 
         $response = $this->get("/api/v2/groups/$idgroups");
         $response->assertSuccessful();

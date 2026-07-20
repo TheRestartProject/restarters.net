@@ -649,8 +649,14 @@ class GroupController extends Controller
             // Eager-load the relations PartySummary::getEventStats() needs (per-event stats now shown
             // on the group events list), the same way Group::bulkGroupStats() does - otherwise each
             // event would trigger its own device/invited queries as the resource is built.
+            //
+            // theGroup (via GroupSummary, rendered per event too) is the same group every time here,
+            // but Eloquent doesn't dedupe lazy loads across model instances - without eager-loading it
+            // (and groupImage.image/networks, which GroupSummary touches unconditionally, same set
+            // listSummaryv2 eager-loads) this still scales with event count, just less obviously than
+            // the stats N+1.
             $parties = Party::undeleted()->forGroup($idgroups)
-                ->with('allDevices')
+                ->with('allDevices', 'theGroup.networks', 'theGroup.groupImage.image')
                 ->withCount('allInvited')
                 ->where('event_start_utc', '>=', $start)
                 ->where('event_end_utc', '<=', $end)
