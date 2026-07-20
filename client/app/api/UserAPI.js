@@ -56,10 +56,11 @@ export default class UserAPI extends BaseAPI {
   // picker (api-contracts-phase-c.md C4 task brief): `role` is the
   // app/Role.php int on the `users_groups` pivot (HOST=3 is
   // User::groupsInChargeOf()'s base case - "groups I'm in charge of").
-  // Not yet adopted by stores/groups.js#fetchMine() (that B4 code predates
-  // this endpoint landing and still falls back to the dashboard's
-  // your_groups - see docs/nuxt-migration/api-gaps.md); left alone here,
-  // out of scope for this slice.
+  // Adopted by stores/groups.js#fetchMine(). It previously said this was
+  // "not yet adopted ... out of scope for this slice", while fetchMine went
+  // on reading the dashboard's your_groups - which is capped at 5, so /group
+  // silently truncated anyone in six or more groups. The slice ended; the cap
+  // did not.
   myGroups() {
     return this.$get('/api/v2/users/me/groups')
   }
