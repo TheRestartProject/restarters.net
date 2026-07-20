@@ -131,7 +131,12 @@ class ExportClientTranslations extends Command
                 }
             }
 
-            $value = implode(' | ', array_map('trim', $stripped));
+            // No spaces around the pipe: matches Laravel's own bare '|' format
+            // exactly, so the exported string is byte-for-byte what a plain
+            // `str_replace(':count', ..., $laravelString)` would have produced
+            // pre-conversion - one less variable when comparing exported vs.
+            // source copy (dashboard.md parity gap #1).
+            $value = implode('|', array_map('trim', $stripped));
         }
 
         // Laravel :param → vue-i18n {param}. The negative lookbehind keeps

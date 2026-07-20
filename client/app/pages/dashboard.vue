@@ -6,7 +6,6 @@ import { useDashboardStore } from '~/stores/dashboard.js'
 import { useEventsStore } from '~/stores/events.js'
 import DashboardAddData from '~/components/dashboard/DashboardAddData.vue'
 import DashboardYourGroups from '~/components/dashboard/DashboardYourGroups.vue'
-import DashboardUpcomingEvents from '~/components/dashboard/DashboardUpcomingEvents.vue'
 import DashboardRightSidebar from '~/components/dashboard/DashboardRightSidebar.vue'
 import DashboardWhatsHappening from '~/components/dashboard/DashboardWhatsHappening.vue'
 import DashboardOnboardingModal from '~/components/dashboard/DashboardOnboardingModal.vue'
@@ -17,11 +16,12 @@ import DashboardOnboardingModal from '~/components/dashboard/DashboardOnboarding
 // functional spec (design.md §6.2 task brief). Section order (verified
 // against the live legacy dashboard, both breakpoints): welcome header ->
 // Getting started -> Your Groups (single panel; DashboardNoGroups nests
-// inside it as the empty state, not a separate panel) -> Add Data ->
-// What's happening. On desktop legacy sits Your Groups/Add Data in a left
-// column beside Getting started on the right - dashboard-grid below
-// reproduces that with grid-template-areas while keeping DOM order the
-// mobile (stacked) order.
+// inside it as the empty state, and Upcoming events nests inside it as the
+// has-groups branch's right-hand column - legacy's dyg-layout, not separate
+// panels) -> Add Data -> What's happening. On desktop legacy sits Your
+// Groups/Add Data in a left column beside Getting started on the right -
+// dashboard-grid below reproduces that with grid-template-areas while
+// keeping DOM order the mobile (stacked) order.
 definePageMeta({ auth: true })
 
 const { t } = useI18n()
@@ -97,8 +97,8 @@ onMounted(() => {
             :new-nearby-groups="newNearbyGroups"
             :nearby-groups="nearbyGroups"
             :has-location="hasLocation"
+            :events="upcomingEvents"
           />
-          <DashboardUpcomingEvents v-if="yourGroups.length" :events="upcomingEvents" class="dashboard-grid__events" />
         </div>
 
         <DashboardAddData :groups="yourGroups" :events="myEvents" class="dashboard-grid__adddata" />
@@ -127,12 +127,6 @@ onMounted(() => {
   grid-template-columns: 1fr;
   gap: 2rem;
 
-  &__yourgroups {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
-  }
-
   @media (min-width: 768px) {
     grid-template-columns: 2fr 1fr;
     grid-template-areas:
@@ -142,7 +136,6 @@ onMounted(() => {
 
     &__yourgroups {
       grid-area: yourgroups;
-      grid-template-columns: 1fr 1fr;
     }
 
     &__sidebar {
@@ -155,10 +148,6 @@ onMounted(() => {
 
     &__whatshappening {
       grid-area: whatshappening;
-    }
-
-    &__events {
-      align-self: start;
     }
   }
 }

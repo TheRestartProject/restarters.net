@@ -136,6 +136,7 @@
       "cluster_entertainment": "Loisirs et audiovisuel",
       "cluster_gadgets": "Gadgets électroniques",
       "cluster_household": "Cuisine et articles ménagers",
+      "column_event": "Événement",
       "column_hosts": "Hôtes",
       "column_location": "Lieu",
       "column_next_event": "Prochain événement",
@@ -159,6 +160,7 @@
       "no_results": "Aucun groupe ne correspond à votre recherche.",
       "page_of": "Page {page} sur {total}",
       "previous_page": "Précédent",
+      "share_this": "Partager",
       "stats_unavailable": "Les statistiques de ce groupe ne sont pas disponibles pour le moment."
     },
     "invite": {

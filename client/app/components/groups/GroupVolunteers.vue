@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useGroupsStore } from '../../stores/groups.js'
+import GroupCollapsibleSection from './GroupCollapsibleSection.vue'
 
 // GET /api/v2/groups/{id}/volunteers (already implemented server-side -
 // API\GroupController::getVolunteersForGroupv2). Functional spec:
@@ -71,11 +72,13 @@ async function confirmRemove(volunteer) {
 </script>
 
 <template>
-  <div data-testid="group-volunteers">
-    <h2>
-      {{ t('groups.volunteers') }}
-      <span v-if="volunteers.length" class="fw-normal">({{ volunteers.length }})</span>
-    </h2>
+  <GroupCollapsibleSection data-testid="group-volunteers" :count="volunteers.length">
+    <template #title>
+      <h2 class="mb-0">
+        {{ t('groups.volunteers') }}
+        <span v-if="volunteers.length" class="fw-normal">({{ volunteers.length }})</span>
+      </h2>
+    </template>
 
     <div v-if="loading" data-testid="group-volunteers-loading">
       <div class="placeholder-glow">
@@ -110,14 +113,15 @@ async function confirmRemove(volunteer) {
             </NuxtLink>
             <div>
               <NuxtLink :to="`/profile/${volunteer.user}`" class="fw-bold">{{ volunteer.name }}</NuxtLink>
-              <BBadge
+              <!-- develop's GroupVolunteer.vue .host class: plain uppercase
+                   brand-teal text, no pill/background. -->
+              <span
                 v-if="volunteer.host"
-                variant="primary"
-                class="ms-1"
+                class="host-label ms-1"
                 :data-testid="`group-volunteer-host-badge-${volunteer.user}`"
               >
                 {{ t('partials.host') }}
-              </BBadge>
+              </span>
               <div class="small text-muted d-flex align-items-center" :title="skillNames(volunteer)">
                 <svg
                   width="16"
@@ -152,36 +156,40 @@ async function confirmRemove(volunteer) {
                 {{ t('partials.cancel') }}
               </BButton>
             </template>
-            <template v-else>
-              <BButton
+            <!-- develop's GroupVolunteer.vue: a single no-caret pencil-icon
+                 dropdown (edit_ico_green.svg) replaces the row of inline
+                 buttons. -->
+            <BDropdown
+              v-else
+              variant="none"
+              no-caret
+              class="edit-dropdown"
+              :data-testid="`group-volunteer-edit-${volunteer.user}`"
+            >
+              <template #button-content>
+                <img :src="'/icons/edit_ico_green.svg'" alt="" width="24" height="24">
+              </template>
+              <BDropdownItem
                 v-if="volunteer.host && candemote"
-                size="sm"
-                variant="outline-secondary"
-                class="me-1"
                 :data-testid="`group-volunteer-remove-host-${volunteer.user}`"
                 @click="removeHostRole(volunteer)"
               >
                 {{ t('groups.remove_host_role') }}
-              </BButton>
-              <BButton
+              </BDropdownItem>
+              <BDropdownItem
                 v-if="!volunteer.host"
-                size="sm"
-                variant="outline-secondary"
-                class="me-1"
                 :data-testid="`group-volunteer-make-host-${volunteer.user}`"
                 @click="makeHost(volunteer)"
               >
                 {{ t('groups.make_host') }}
-              </BButton>
-              <BButton
-                size="sm"
-                variant="outline-danger"
+              </BDropdownItem>
+              <BDropdownItem
                 :data-testid="`group-volunteer-remove-${volunteer.user}`"
                 @click="askRemove(volunteer)"
               >
                 {{ t('groups.remove_volunteer') }}
-              </BButton>
-            </template>
+              </BDropdownItem>
+            </BDropdown>
           </div>
         </li>
       </ul>
@@ -192,7 +200,7 @@ async function confirmRemove(volunteer) {
         {{ t('groups.invite_to_group') }}
       </a>
     </div>
-  </div>
+  </GroupCollapsibleSection>
 </template>
 
 <style scoped>
@@ -216,5 +224,26 @@ async function confirmRemove(volunteer) {
 
 .skill-star--faded {
   opacity: 0.5;
+}
+
+/* develop's GroupVolunteer.vue .host: plain uppercase brand-teal text, no
+   badge/pill background. */
+.host-label {
+  text-transform: uppercase;
+  color: var(--bs-primary, #0394a6);
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+/* develop's GroupVolunteer.vue .edit-dropdown: an icon-only, borderless
+   toggle button for the pencil dropdown. */
+.edit-dropdown :deep(.dropdown-toggle) {
+  padding: 0;
+  border: 0;
+  background: none;
+}
+
+.edit-dropdown :deep(.dropdown-toggle::after) {
+  display: none;
 }
 </style>

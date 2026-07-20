@@ -1,11 +1,16 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-// GET /api/v2/groups/{id}/stats. Functional + visual spec: group/view.blade.php's
-// GroupStatsFacts / StatsImpact / GroupDevicesWorkedOn / GroupDevicesMostRepaired /
-// GroupDevicesBreakdown - the neo-brutalist stat-card boxes (shared StatsValue.vue
-// look, reused from the fixometer ImpactStats card here) rather than plain text.
+// GET /api/v2/groups/{id}/stats. Functional + visual spec:
+// group/view.blade.php's GroupStatsFacts + StatsImpact - group achievements
+// and environmental impact only (the neo-brutalist stat-card boxes, shared
+// StatsValue.vue look reused from the fixometer ImpactStats card here).
+// Sits between the header and the events list (GroupPage.vue's order); the
+// devices-worked-on/most-repaired-podium/cluster-breakdown sections that
+// used to live in this component moved out to GroupDevicesSummary.vue and
+// GroupDevicesBreakdown.vue, rendered after the events list, to match
+// develop's page order (parity gap 13).
 const props = defineProps({
   stats: {
     type: Object,
@@ -21,25 +26,13 @@ const props = defineProps({
   },
 })
 
+const emit = defineEmits(['share-stats'])
+
 const { t } = useI18n()
 
-const CLUSTERS = [
-  { id: 1, key: 'client.groups.cluster_computers' },
-  { id: 2, key: 'client.groups.cluster_gadgets' },
-  { id: 3, key: 'client.groups.cluster_entertainment' },
-  { id: 4, key: 'client.groups.cluster_household' },
-]
-
 const groupStats = computed(() => props.stats?.group_stats || null)
-const deviceStats = computed(() => props.stats?.device_stats || null)
-const clusterStats = computed(() => props.stats?.cluster_stats || null)
-const topDevices = computed(() => props.stats?.top_devices || [])
 
-const totalDevices = computed(() =>
-  deviceStats.value
-    ? (deviceStats.value.fixed || 0) + (deviceStats.value.repairable || 0) + (deviceStats.value.dead || 0)
-    : 0
-)
+const infoButton = ref(null)
 
 // GroupStatsFacts.vue: events (brand-teal) / participants / hours.
 const achievements = computed(() =>
@@ -52,23 +45,48 @@ const achievements = computed(() =>
     : []
 )
 
-// GroupDevicesWorkedOn.vue: total (brand-teal) / fixed / repairable / end-of-life.
-const items = computed(() =>
-  deviceStats.value
-    ? [
-        { icon: 'drill', count: totalDevices.value, label: t('partials.total'), testid: 'group-stats-total', primary: true },
-        { icon: 'fixed', count: deviceStats.value.fixed ?? 0, label: t('partials.fixed'), testid: 'group-stats-fixed' },
-        { icon: 'repairable', count: deviceStats.value.repairable ?? 0, label: t('partials.repairable'), testid: 'group-stats-repairable' },
-        { icon: 'dead', count: deviceStats.value.dead ?? 0, label: t('partials.end_of_life'), testid: 'group-stats-dead' },
-      ]
-    : []
-)
-
 // StatsImpact.vue rounds waste/CO2 to whole kg (the group page shows kg, not the
 // fixometer's tonnes).
 function kg(value) {
   return `${Math.round(value ?? 0).toLocaleString()} kg`
 }
+
+// StatsImpact.vue's notincluded(): the "not counting X/Y/Z devices" caveat,
+// built from dead/repairable/no-weight counts and joined with "and" when
+// more than one applies. events.to_be_recycled/to_be_repaired/no_weight are
+// reused as-is (already exported to the client, identical wording pattern to
+// the group-specific groups.not_counting intro).
+const notCounting = computed(() => {
+  if (!groupStats.value) {
+    return null
+  }
+
+  const parts = []
+
+  if (groupStats.value.dead_devices) {
+    parts.push(t('events.to_be_recycled', { value: groupStats.value.dead_devices }, groupStats.value.dead_devices))
+  }
+  if (groupStats.value.repairable_devices) {
+    parts.push(t('events.to_be_repaired', { value: groupStats.value.repairable_devices }, groupStats.value.repairable_devices))
+  }
+  if (groupStats.value.no_weight) {
+    parts.push(t('events.no_weight', { value: groupStats.value.no_weight }, groupStats.value.no_weight))
+  }
+
+  if (!parts.length) {
+    return null
+  }
+
+  const intro = t('groups.not_counting', parts.length)
+
+  if (parts.length === 1) {
+    return `${intro} ${parts[0]}.`
+  }
+
+  const last = parts[parts.length - 1]
+  const rest = parts.slice(0, -1)
+  return `${intro} ${rest.join(', ')} ${t('groups.and')} ${last}.`
+})
 </script>
 
 <template>
@@ -103,102 +121,42 @@ function kg(value) {
         </section>
 
         <section v-if="groupStats" class="group-stats__col" data-testid="group-stats-impact">
-          <h2>{{ t('groups.environmental_impact') }}</h2>
+          <h2>
+            {{ t('groups.environmental_impact') }}
+            <button ref="infoButton" type="button" class="info-toggle" data-testid="group-stats-impact-info">
+              <img :src="'/icons/info_ico_green.svg'" alt="" width="20" height="20">
+            </button>
+            <BPopover :target="infoButton" triggers="hover focus click" html data-testid="group-stats-impact-popover">
+              <!-- eslint-disable-next-line vue/no-v-html -->
+              <div v-html="t('groups.impact_calculation')" />
+            </BPopover>
+          </h2>
           <div class="stat-cards">
             <div class="stat-card" data-testid="group-stats-waste">
-              <img src="/images/trash.svg" alt="" class="stat-card__icon">
+              <img :src="'/images/trash.svg'" alt="" class="stat-card__icon">
               <div class="stat-card__count">{{ kg(groupStats.waste_total) }}</div>
               <div class="stat-card__label">{{ t('partials.waste_prevented') }}</div>
             </div>
             <div class="stat-card" data-testid="group-stats-co2">
-              <img src="/images/cloud-empty.svg" alt="" class="stat-card__icon">
+              <img :src="'/images/cloud-empty.svg'" alt="" class="stat-card__icon">
               <div class="stat-card__count">{{ kg(groupStats.co2_total) }}</div>
               <!-- eslint-disable-next-line vue/no-v-html -->
               <div class="stat-card__label" v-html="t('partials.co2')" />
+              <button
+                type="button"
+                class="btn btn-link p-0 small"
+                data-testid="group-stats-share"
+                @click="emit('share-stats')"
+              >
+                {{ t('client.groups.share_this') }}
+              </button>
             </div>
           </div>
+          <p v-if="notCounting" class="small text-muted mt-2" data-testid="group-stats-not-counting">
+            {{ notCounting }}
+          </p>
         </section>
       </div>
-
-      <div class="group-stats__row">
-        <section v-if="deviceStats" class="group-stats__col" data-testid="group-stats-devices">
-          <h2>{{ t('groups.total_devices') }}</h2>
-          <div class="stat-cards">
-            <div
-              v-for="card in items"
-              :key="card.testid"
-              class="stat-card"
-              :class="{ 'stat-card--primary': card.primary }"
-              :data-testid="card.testid"
-            >
-              <img :src="`/images/${card.icon}.svg`" alt="" class="stat-card__icon">
-              <div class="stat-card__count">{{ card.count }}</div>
-              <div class="stat-card__label">{{ card.label }}</div>
-            </div>
-          </div>
-        </section>
-
-        <section class="group-stats__col" data-testid="group-stats-top-devices">
-          <h2>{{ t('groups.most_repaired_devices') }}</h2>
-          <ol v-if="topDevices.length" class="mb-0">
-            <li
-              v-for="(device, index) in topDevices.slice(0, 3)"
-              :key="device.name + index"
-              :data-testid="`group-stats-top-device-${index}`"
-            >
-              {{ t(device.name) }} - {{ device.counter }}
-            </li>
-          </ol>
-        </section>
-      </div>
-
-      <section v-if="clusterStats" data-testid="group-stats-clusters">
-        <h2>{{ t('groups.device_breakdown') }}</h2>
-        <div class="cluster-grid">
-          <div
-            v-for="cluster in CLUSTERS"
-            :key="cluster.id"
-            class="cluster-box"
-            :data-testid="`group-stats-cluster-${cluster.id}`"
-          >
-            <h3 class="cluster-box__title">{{ t(cluster.key) }}</h3>
-            <template v-if="clusterStats[cluster.id]">
-              <div class="cluster-box__stats">
-                <div>
-                  <img src="/images/fixed.svg" alt="" class="cluster-box__icon">
-                  <div class="cluster-box__count">{{ clusterStats[cluster.id].fixed ?? 0 }}</div>
-                  <div class="small">{{ t('partials.fixed') }}</div>
-                </div>
-                <div>
-                  <img src="/images/repairable.svg" alt="" class="cluster-box__icon">
-                  <div class="cluster-box__count">{{ clusterStats[cluster.id].repairable ?? 0 }}</div>
-                  <div class="small">{{ t('partials.repairable') }}</div>
-                </div>
-                <div>
-                  <img src="/images/dead.svg" alt="" class="cluster-box__icon">
-                  <div class="cluster-box__count">{{ clusterStats[cluster.id].dead ?? 0 }}</div>
-                  <div class="small">{{ t('partials.end_of_life') }}</div>
-                </div>
-              </div>
-              <div class="cluster-box__most small text-muted">
-                <div v-if="clusterStats[cluster.id].most_seen?.name">
-                  {{ t('partials.most_seen') }}: {{ clusterStats[cluster.id].most_seen.name }}
-                  ({{ clusterStats[cluster.id].most_seen.count }})
-                </div>
-                <div v-if="clusterStats[cluster.id].most_repaired?.name">
-                  {{ t('partials.most_repaired') }}: {{ clusterStats[cluster.id].most_repaired.name }}
-                  ({{ clusterStats[cluster.id].most_repaired.count }})
-                </div>
-                <div v-if="clusterStats[cluster.id].least_repaired?.name">
-                  {{ t('partials.least_repaired') }}: {{ clusterStats[cluster.id].least_repaired.name }}
-                  ({{ clusterStats[cluster.id].least_repaired.count }})
-                </div>
-              </div>
-            </template>
-          </div>
-        </div>
-        <p class="small text-muted mt-2">{{ t('groups.no_unpowered_stats') }}</p>
-      </section>
     </template>
   </div>
 </template>
@@ -269,39 +227,13 @@ function kg(value) {
   line-height: 1.1;
 }
 
-.cluster-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 1rem;
-}
-
-.cluster-box {
-  padding: 0.75rem;
-  background: #fff;
-  border: 1px solid #222;
-  box-shadow: 4px 4px 0 #222;
-}
-
-.cluster-box__title {
-  font-size: 1rem;
-  font-weight: bold;
-  text-align: center;
-}
-
-.cluster-box__stats {
-  display: flex;
-  justify-content: space-around;
-  text-align: center;
-  margin-bottom: 0.5rem;
-}
-
-.cluster-box__icon {
-  height: 30px;
-}
-
-.cluster-box__count {
-  font-weight: bold;
-  font-size: 1.25rem;
-  color: var(--bs-primary, #0394a6);
+// StatsImpact.vue's info-icon popover trigger: an inline, borderless icon
+// button next to the "Environmental impact" heading.
+.info-toggle {
+  border: 0;
+  background: none;
+  padding: 0;
+  margin-left: 0.35rem;
+  vertical-align: middle;
 }
 </style>

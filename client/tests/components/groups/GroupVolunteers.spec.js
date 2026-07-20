@@ -6,10 +6,7 @@ import GroupVolunteers from '../../../app/components/groups/GroupVolunteers.vue'
 import { useGroupsStore } from '../../../app/stores/groups.js'
 import en from '../../../i18n/locales/en.json'
 import clientEn from '../../../i18n/locales/client-en.json'
-
-const NuxtLinkStub = { props: ['to'], template: '<a :href="to"><slot /></a>' }
-const BBadgeStub = { template: '<span v-bind="$attrs"><slot /></span>' }
-const BButtonStub = { template: '<button v-bind="$attrs"><slot /></button>' }
+import { GROUP_VIEW_STUBS } from '../../helpers/stubs.js'
 
 function mountComponent(props = {}) {
   const i18n = createI18n({ legacy: false, locale: 'en', messages: { en: { ...en, ...clientEn } } })
@@ -18,7 +15,7 @@ function mountComponent(props = {}) {
     props: { groupId: 5, ...props },
     global: {
       plugins: [i18n],
-      stubs: { NuxtLink: NuxtLinkStub, BBadge: BBadgeStub, BButton: BButtonStub },
+      stubs: GROUP_VIEW_STUBS,
     },
   })
 }
@@ -38,12 +35,27 @@ describe('components/groups/GroupVolunteers', () => {
     expect(wrapper.find('[data-testid="group-volunteers-empty"]').exists()).toBe(true)
   })
 
-  it('renders one row per volunteer with a host badge for hosts only', () => {
+  it('renders one row per volunteer with a host label for hosts only', () => {
     const wrapper = mountComponent({ volunteers: VOLUNTEERS })
 
     expect(wrapper.find('[data-testid="group-volunteer-10"]').exists()).toBe(true)
     expect(wrapper.find('[data-testid="group-volunteer-host-badge-10"]').exists()).toBe(true)
     expect(wrapper.find('[data-testid="group-volunteer-host-badge-11"]').exists()).toBe(false)
+  })
+
+  it('renders the host indicator as plain text, not a badge/pill (gap 16)', () => {
+    const wrapper = mountComponent({ volunteers: VOLUNTEERS })
+
+    const host = wrapper.find('[data-testid="group-volunteer-host-badge-10"]')
+    expect(host.element.tagName).toBe('SPAN')
+    expect(host.classes()).toContain('host-label')
+  })
+
+  it('shows a pencil edit-icon dropdown (not inline buttons) for editable rows (gap 3)', () => {
+    const wrapper = mountComponent({ volunteers: VOLUNTEERS, canedit: true })
+
+    expect(wrapper.find('[data-testid="group-volunteer-edit-11"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="group-volunteer-edit-11"] img').attributes('src')).toBe('/icons/edit_ico_green.svg')
   })
 
   it('hides manage actions when canedit is false', () => {

@@ -20,7 +20,31 @@ const BButtonStub = {
 }
 
 function mountComponent(props = {}) {
-  const i18n = createI18n({ legacy: false, locale: 'en', messages: { en: { ...en, ...clientEn } } })
+  // dashboard.groups_heading/add_event and groups.archived_group_title are
+  // new lang/*.php keys (this cluster's parity fixes) not yet in the
+  // generated client i18n JSON - the main agent regenerates that centrally
+  // (see DashboardWhatsHappening.spec.js for the same pattern), so they're
+  // overlaid here inline rather than editing client/i18n/locales/*.json
+  // directly.
+  const i18n = createI18n({
+    legacy: false,
+    locale: 'en',
+    messages: {
+      en: {
+        ...en,
+        ...clientEn,
+        dashboard: {
+          ...en.dashboard,
+          groups_heading: 'Groups',
+          add_event: 'Add',
+        },
+        groups: {
+          ...en.groups,
+          archived_group_title: 'This group was archived on {date}.',
+        },
+      },
+    },
+  })
 
   return mount(DashboardYourGroups, {
     props,
@@ -69,12 +93,13 @@ describe('components/dashboard/DashboardYourGroups', () => {
     expect(wrapper.find('[data-testid="your-groups-see-all"]').attributes('href')).toBe('/group')
   })
 
-  it('shows a role badge for each group', () => {
+  it('does not show a role badge for groups (parity gap #6 - legacy DashboardGroup.vue never shows one here)', () => {
     const wrapper = mountComponent({
-      groups: [{ id: 1, name: 'Host Group', role: 3, archived: false, image_url: null }],
+      groups: [{ id: 1, name: 'Fixers Group', role: 3, archived: false, image_url: null }],
     })
 
-    expect(wrapper.find('[data-testid="your-group-role-1"]').text()).toBe('Host')
+    expect(wrapper.find('[data-testid="your-group-role-1"]').exists()).toBe(false)
+    expect(wrapper.text()).not.toContain('Host')
   })
 
   it('shows an archived badge only for archived groups', () => {
@@ -87,6 +112,45 @@ describe('components/dashboard/DashboardYourGroups', () => {
 
     expect(wrapper.find('[data-testid="your-group-archived-1"]').exists()).toBe(false)
     expect(wrapper.find('[data-testid="your-group-archived-2"]').exists()).toBe(true)
+  })
+
+  it('titles the archived badge with the archive date when the API provides one', () => {
+    // dashboard's your_groups[] doesn't expose archived_at yet (see
+    // docs/nuxt-migration/api-gaps.md) - this future-proofs the binding so
+    // it lights up the moment the backend adds the field, without showing a
+    // bogus "undefined" tooltip meanwhile.
+    const withDate = mountComponent({
+      groups: [{ id: 1, name: 'Old Group', role: 4, archived: true, archived_at: '2025-01-01', image_url: null }],
+    })
+    expect(withDate.find('[data-testid="your-group-archived-1"]').attributes('title')).toBe(
+      'This group was archived on 2025-01-01.'
+    )
+
+    const withoutDate = mountComponent({
+      groups: [{ id: 2, name: 'Old Group', role: 4, archived: true, image_url: null }],
+    })
+    expect(withoutDate.find('[data-testid="your-group-archived-2"]').attributes('title')).toBeFalsy()
+  })
+
+  it('shows the "Groups" sub-heading above the group list', () => {
+    const wrapper = mountComponent({
+      groups: [{ id: 1, name: 'A Group', role: 4, archived: false, image_url: null }],
+    })
+
+    expect(wrapper.find('h3').text()).toBe('Groups')
+  })
+
+  it('embeds the upcoming-events section as the right-hand column of the SAME panel, not a sibling panel (parity gap #2)', () => {
+    const wrapper = mountComponent({
+      groups: [{ id: 1, name: 'A Group', role: 4, archived: false, image_url: null }],
+      events: [{ id: 5, title: 'An Event', start: '2026-08-01T10:00:00Z', group: { id: 1, name: 'A Group' } }],
+    })
+
+    // One CollapsibleSection (one title bar) wraps both the groups list and
+    // the events list.
+    expect(wrapper.findAll('[data-testid="dashboard-your-groups"]').length).toBe(1)
+    expect(wrapper.find('[data-testid="dashboard-upcoming-events"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="upcoming-event-link-5"]').exists()).toBe(true)
   })
 
   it('shows the newly-added highlight banner only when there are new nearby groups', () => {

@@ -2,26 +2,13 @@
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import DashboardNearbyGroups from '~/components/dashboard/DashboardNearbyGroups.vue'
+import DashboardUpcomingEvents from '~/components/dashboard/DashboardUpcomingEvents.vue'
 import CollapsibleSection from '~/components/CollapsibleSection.vue'
 
-// Role ints per app/Role.php (design.md contract - api-contracts-phase-b.md
-// B1 `your_groups[].role`). Not exported anywhere client-side yet (the
-// session's user.role_name is a string, not this int), so pinned here.
-const ROLE_LABELS = {
-  1: 'client.dashboard.role_root',
-  2: 'client.dashboard.role_administrator',
-  3: 'client.dashboard.role_host',
-  4: 'client.dashboard.role_restarter',
-  6: 'client.dashboard.role_network_coordinator',
-}
-
-const ROLE_VARIANTS = {
-  1: 'dark',
-  2: 'dark',
-  3: 'primary',
-  4: 'secondary',
-  6: 'info',
-}
+// Host role int per app/Role.php::HOST - gates the "Add" (event) button
+// DashboardUpcomingEvents shows next to its heading, matching legacy
+// DashboardYourGroups.vue's amAHost computed.
+const HOST_ROLE = 3
 
 const props = defineProps({
   groups: {
@@ -48,6 +35,13 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  // Upcoming events for the has-groups branch's right-hand column. Legacy
+  // renders Groups + Upcoming events inside ONE panel (its `dyg-layout`
+  // two-column grid), not two separate panels side by side.
+  events: {
+    type: Array,
+    default: () => [],
+  },
 })
 
 const { t } = useI18n()
@@ -56,14 +50,7 @@ const sortedGroups = computed(() =>
   [...props.groups].sort((a, b) => a.name.localeCompare(b.name))
 )
 
-function roleLabel(role) {
-  const key = ROLE_LABELS[role]
-  return key ? t(key) : null
-}
-
-function roleVariant(role) {
-  return ROLE_VARIANTS[role] || 'secondary'
-}
+const amAHost = computed(() => props.groups.some((g) => g.role === HOST_ROLE))
 </script>
 
 <template>
@@ -91,57 +78,59 @@ function roleVariant(role) {
         <DashboardNearbyGroups :nearby-groups="nearbyGroups" :has-location="hasLocation" />
       </div>
 
-      <template v-else>
-        <p>{{ t('dashboard.catch_up') }}</p>
+      <div v-else class="dyg-layout">
+        <div class="dyg-layout__groups">
+          <h3>{{ t('dashboard.groups_heading') }}</h3>
+          <p>{{ t('dashboard.catch_up') }}</p>
 
-        <ul class="list-unstyled" data-testid="your-groups-list">
-          <li
-            v-for="group in sortedGroups"
-            :key="group.id"
-            class="d-flex justify-content-between align-items-center py-2 border-bottom"
-            :data-testid="`your-group-${group.id}`"
-          >
-            <div class="d-flex align-items-center">
-              <img
-                :src="group.image_url || '/images/placeholder-avatar.webp'"
-                alt=""
-                width="48"
-                height="48"
-                class="group-avatar me-2"
-              >
-              <div>
-                <NuxtLink :to="`/group/view/${group.id}`" :data-testid="`your-group-link-${group.id}`">
-                  {{ group.name }}
-                </NuxtLink>
+          <ul class="list-unstyled" data-testid="your-groups-list">
+            <li
+              v-for="group in sortedGroups"
+              :key="group.id"
+              class="d-flex justify-content-between align-items-center py-2 border-bottom"
+              :data-testid="`your-group-${group.id}`"
+            >
+              <div class="d-flex align-items-center">
+                <img
+                  :src="group.image_url || '/images/placeholder-avatar.webp'"
+                  alt=""
+                  width="48"
+                  height="48"
+                  class="group-avatar me-2"
+                >
                 <div>
-                  <BBadge
-                    v-if="roleLabel(group.role)"
-                    :variant="roleVariant(group.role)"
-                    class="me-1"
-                    :data-testid="`your-group-role-${group.id}`"
-                  >
-                    {{ roleLabel(group.role) }}
-                  </BBadge>
-                  <BBadge
-                    v-if="group.archived"
-                    variant="secondary"
-                    pill
-                    :data-testid="`your-group-archived-${group.id}`"
-                  >
-                    {{ t('groups.archived_group') }}
-                  </BBadge>
+                  <NuxtLink :to="`/group/view/${group.id}`" :data-testid="`your-group-link-${group.id}`">
+                    {{ group.name }}
+                  </NuxtLink>
+                  <div>
+                    <!-- :title omitted when archived_at is unavailable (the
+                         dashboard API's your_groups[] doesn't expose it yet -
+                         see docs/nuxt-migration/api-gaps.md) rather than
+                         interpolating an "undefined" date. -->
+                    <BBadge
+                      v-if="group.archived"
+                      variant="secondary"
+                      pill
+                      :title="group.archived_at ? t('groups.archived_group_title', { date: group.archived_at }) : null"
+                      :data-testid="`your-group-archived-${group.id}`"
+                    >
+                      {{ t('groups.archived_group') }}
+                    </BBadge>
+                  </div>
                 </div>
               </div>
-            </div>
-          </li>
-        </ul>
+            </li>
+          </ul>
 
-        <div class="d-flex justify-content-end">
-          <NuxtLink to="/group" data-testid="your-groups-see-all">
-            {{ t('dashboard.see_all_groups') }}
-          </NuxtLink>
+          <div class="d-flex justify-content-end">
+            <NuxtLink to="/group" data-testid="your-groups-see-all">
+              {{ t('dashboard.see_all_groups') }}
+            </NuxtLink>
+          </div>
         </div>
-      </template>
+
+        <DashboardUpcomingEvents :events="events" :am-a-host="amAHost" class="dyg-layout__events" />
+      </div>
     </div>
   </CollapsibleSection>
 </template>
@@ -150,6 +139,21 @@ function roleVariant(role) {
 h2 {
   font-size: 1.1rem;
   font-weight: bold;
+}
+
+.dyg-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+
+  &__groups h3 {
+    font-size: 1rem;
+    font-weight: bold;
+  }
+
+  @media (min-width: 768px) {
+    grid-template-columns: 1fr 1fr;
+  }
 }
 
 .group-doodle {

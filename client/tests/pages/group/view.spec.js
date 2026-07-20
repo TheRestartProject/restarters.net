@@ -4,30 +4,10 @@ import { createI18n } from 'vue-i18n'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import GroupViewPage from '../../../app/pages/group/view/[id].vue'
 import { useGroupsStore } from '../../../app/stores/groups.js'
+import { useSessionStore } from '../../../app/stores/session.js'
 import en from '../../../i18n/locales/en.json'
 import clientEn from '../../../i18n/locales/client-en.json'
-
-const NuxtLinkStub = { props: ['to'], template: '<a :href="to"><slot /></a>' }
-const BAlertStub = { template: '<div><slot /></div>' }
-const BButtonStub = { template: '<button v-bind="$attrs"><slot /></button>' }
-const BBadgeStub = { template: '<span v-bind="$attrs"><slot /></span>' }
-const BModalStub = {
-  props: ['modelValue'],
-  emits: ['hide'],
-  template: '<div v-if="modelValue"><slot /></div>',
-}
-const BFormStub = { template: '<form @submit.prevent="$emit(\'submit\', $event)"><slot /></form>' }
-const BFormGroupStub = { template: '<div><slot /></div>' }
-
-const GLOBAL_STUBS = {
-  NuxtLink: NuxtLinkStub,
-  BAlert: BAlertStub,
-  BButton: BButtonStub,
-  BBadge: BBadgeStub,
-  BModal: BModalStub,
-  BForm: BFormStub,
-  BFormGroup: BFormGroupStub,
-}
+import { GROUP_VIEW_STUBS } from '../../helpers/stubs.js'
 
 const BASE_GROUP = {
   id: 5,
@@ -61,7 +41,7 @@ function mountPage() {
   return mount(GroupViewPage, {
     global: {
       plugins: [i18n],
-      stubs: GLOBAL_STUBS,
+      stubs: GROUP_VIEW_STUBS,
     },
   })
 }
@@ -80,6 +60,8 @@ describe('pages/group/view/[id]', () => {
     groupsStore.fetchEvents = vi.fn().mockResolvedValue([])
     groupsStore.fetchVolunteers = vi.fn().mockResolvedValue([])
     groupsStore.deleteGroup = vi.fn().mockResolvedValue({ archived: true })
+
+    useSessionStore().config = { discourse_url: 'https://talk.example.com' }
   })
 
   it('fetches the group, stats, events and volunteers for the routed id on mount', () => {
@@ -124,6 +106,15 @@ describe('pages/group/view/[id]', () => {
     expect(wrapper.find('[data-testid="group-view-website"]').exists()).toBe(true)
   })
 
+  it('renders a single GROUP ACTIONS dropdown instead of loose header buttons (gap 1)', () => {
+    groupsStore.current.data = BASE_GROUP
+    const wrapper = mountPage()
+
+    const dropdown = wrapper.find('[data-testid="group-actions-dropdown"]')
+    expect(dropdown.exists()).toBe(true)
+    expect(dropdown.text()).toContain('Group actions')
+  })
+
   describe('description read-more/read-less (gap 9)', () => {
     it('renders a short description in full with no toggle', () => {
       groupsStore.current.data = BASE_GROUP
@@ -163,37 +154,82 @@ describe('pages/group/view/[id]', () => {
     expect(email.find('a').attributes('href')).toBe('mailto:group@example.com')
   })
 
-  describe('permission-gated buttons', () => {
+  describe('About section (gap 4, 15)', () => {
+    it('shows the archived badge in the About section, not the header, when archived', () => {
+      groupsStore.current.data = { ...BASE_GROUP, archived_at: '2024-01-01T00:00:00Z' }
+      const wrapper = mountPage()
+
+      const description = wrapper.find('[data-testid="group-view-description"]')
+      expect(description.find('[data-testid="group-view-archived"]').exists()).toBe(true)
+
+      const header = wrapper.find('[data-testid="group-view-header"]')
+      expect(header.find('[data-testid="group-view-archived"]').exists()).toBe(false)
+    })
+
+    it('shows tags in the header regardless of archived state', () => {
+      groupsStore.current.data = { ...BASE_GROUP, tags: [{ id: 1, name: 'Repair' }] }
+      const wrapper = mountPage()
+
+      const header = wrapper.find('[data-testid="group-view-header"]')
+      expect(header.find('[data-testid="group-view-tag-1"]').exists()).toBe(true)
+    })
+
+    it('links to the Discourse group conversation when discourse_group + config are present', () => {
+      groupsStore.current.data = { ...BASE_GROUP, discourse_group: 'fixers-united' }
+      const wrapper = mountPage()
+
+      const talk = wrapper.find('[data-testid="group-view-talk"]')
+      expect(talk.exists()).toBe(true)
+      expect(talk.find('a').attributes('href')).toBe('https://talk.example.com/g/fixers-united')
+    })
+
+    it('does not render a Discourse link when the group has no discourse_group', () => {
+      groupsStore.current.data = BASE_GROUP
+      const wrapper = mountPage()
+
+      expect(wrapper.find('[data-testid="group-view-talk"]').exists()).toBe(false)
+    })
+  })
+
+  describe('permission-gated GROUP ACTIONS items (gap 1, 2)', () => {
     it('shows Edit only when can_edit is true', () => {
       groupsStore.current.data = { ...BASE_GROUP, permissions: { ...BASE_GROUP.permissions, can_edit: true } }
       const wrapper = mountPage()
-      expect(wrapper.find('[data-testid="group-view-edit"]').exists()).toBe(true)
+      expect(wrapper.find('[data-testid="group-actions-edit"]').exists()).toBe(true)
 
       groupsStore.current.data = BASE_GROUP
       const wrapperNoEdit = mountPage()
-      expect(wrapperNoEdit.find('[data-testid="group-view-edit"]').exists()).toBe(false)
+      expect(wrapperNoEdit.find('[data-testid="group-actions-edit"]').exists()).toBe(false)
+    })
+
+    it('shows Add event and Export group data only when can_edit is true', () => {
+      groupsStore.current.data = { ...BASE_GROUP, permissions: { ...BASE_GROUP.permissions, can_edit: true } }
+      const wrapper = mountPage()
+
+      expect(wrapper.find('[data-testid="group-actions-add-event"]').attributes('href')).toBe('/party/create/5')
+      expect(wrapper.find('[data-testid="group-actions-export"]').attributes('href')).toBe('/export/devices/group/5')
     })
 
     it('hides Archive entirely when can_perform_archive is false', () => {
       groupsStore.current.data = BASE_GROUP
       const wrapper = mountPage()
-      expect(wrapper.find('[data-testid="group-view-archive"]').exists()).toBe(false)
+      expect(wrapper.find('[data-testid="group-actions-archive"]').exists()).toBe(false)
     })
 
     it('shows Archive (not Delete) for a coordinator/admin when can_perform_archive is true', async () => {
       groupsStore.current.data = {
         ...BASE_GROUP,
-        permissions: { ...BASE_GROUP.permissions, can_perform_archive: true },
+        permissions: { ...BASE_GROUP.permissions, can_edit: true, can_perform_archive: true },
       }
       const wrapper = mountPage()
 
-      const button = wrapper.find('[data-testid="group-view-archive"]')
-      expect(button.exists()).toBe(true)
+      const item = wrapper.find('[data-testid="group-actions-archive"]')
+      expect(item.exists()).toBe(true)
       // labelled Archive, not Delete - it hits the reversible archive endpoint
-      expect(button.text()).toBe('Archive group')
+      expect(item.text()).toBe('Archive group')
       expect(wrapper.find('[data-testid="group-view-delete"]').exists()).toBe(false)
 
-      await button.trigger('click')
+      await item.trigger('click')
       expect(wrapper.find('[data-testid="group-view-archive-confirm"]').exists()).toBe(true)
 
       await wrapper.find('[data-testid="group-view-archive-confirm"]').trigger('click')
@@ -204,57 +240,67 @@ describe('pages/group/view/[id]', () => {
       groupsStore.current.data = { ...BASE_GROUP, permissions: { ...BASE_GROUP.permissions, can_edit: true } }
       groupsStore.memberIds = []
       const wrapper = mountPage()
-      expect(wrapper.find('[data-testid="group-view-invite"]').exists()).toBe(true)
+      expect(wrapper.find('[data-testid="group-actions-invite"]').exists()).toBe(true)
     })
 
     it('shows Invite when a member even without can_edit', () => {
       groupsStore.current.data = BASE_GROUP
       groupsStore.memberIds = [5]
       const wrapper = mountPage()
-      expect(wrapper.find('[data-testid="group-view-invite"]').exists()).toBe(true)
+      expect(wrapper.find('[data-testid="group-actions-invite"]').exists()).toBe(true)
     })
 
     it('hides Invite when neither can_edit nor a member', () => {
       groupsStore.current.data = BASE_GROUP
       groupsStore.memberIds = []
       const wrapper = mountPage()
-      expect(wrapper.find('[data-testid="group-view-invite"]').exists()).toBe(false)
+      expect(wrapper.find('[data-testid="group-actions-invite"]').exists()).toBe(false)
     })
   })
 
-  describe('join/leave integration', () => {
-    it('shows a join button wired to the store when not a member', async () => {
+  describe('join/leave integration (via GROUP ACTIONS)', () => {
+    it('shows a Join item wired to the store when not a member', async () => {
       groupsStore.current.data = BASE_GROUP
       groupsStore.memberIds = []
       groupsStore.join = vi.fn().mockResolvedValue()
 
       const wrapper = mountPage()
-      expect(wrapper.find('[data-testid="group-join-5"]').exists()).toBe(true)
+      expect(wrapper.find('[data-testid="group-actions-join"]').exists()).toBe(true)
 
-      await wrapper.find('[data-testid="group-join-5"]').trigger('click')
+      await wrapper.find('[data-testid="group-actions-join"]').trigger('click')
       expect(groupsStore.join).toHaveBeenCalledWith(5)
     })
 
-    it('shows a leave button wired to the store when a member', async () => {
+    it('shows a Leave item wired to the store when a member', async () => {
       groupsStore.current.data = BASE_GROUP
       groupsStore.memberIds = [5]
       groupsStore.leave = vi.fn().mockResolvedValue()
 
       const wrapper = mountPage()
-      expect(wrapper.find('[data-testid="group-leave-5"]').exists()).toBe(true)
+      expect(wrapper.find('[data-testid="group-actions-leave"]').exists()).toBe(true)
 
-      await wrapper.find('[data-testid="group-leave-5"]').trigger('click')
+      await wrapper.find('[data-testid="group-actions-leave"]').trigger('click')
       expect(groupsStore.leave).toHaveBeenCalledWith(5)
     })
   })
 
-  it('opens the invite modal from the invite button', async () => {
+  it('opens the invite modal from the GROUP ACTIONS invite item', async () => {
     groupsStore.current.data = { ...BASE_GROUP, permissions: { ...BASE_GROUP.permissions, can_edit: true } }
     const wrapper = mountPage()
 
     expect(wrapper.find('[data-testid="group-invite-form"]').exists()).toBe(false)
 
-    await wrapper.find('[data-testid="group-view-invite"]').trigger('click')
+    await wrapper.find('[data-testid="group-actions-invite"]').trigger('click')
     expect(wrapper.find('[data-testid="group-invite-form"]').exists()).toBe(true)
+  })
+
+  it('opens the share-stats modal from the GROUP ACTIONS share-stats item (gap 2)', async () => {
+    groupsStore.current.data = { ...BASE_GROUP, permissions: { ...BASE_GROUP.permissions, can_edit: true } }
+    const wrapper = mountPage()
+
+    expect(wrapper.find('[data-testid="group-share-stats-modal"]').exists()).toBe(false)
+
+    await wrapper.find('[data-testid="group-actions-share-stats"]').trigger('click')
+    expect(wrapper.find('[data-testid="group-share-stats-modal"]').exists()).toBe(true)
   })
 })

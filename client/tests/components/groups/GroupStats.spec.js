@@ -4,30 +4,27 @@ import { describe, expect, it } from 'vitest'
 import GroupStats from '../../../app/components/groups/GroupStats.vue'
 import en from '../../../i18n/locales/en.json'
 import clientEn from '../../../i18n/locales/client-en.json'
+import { GROUP_VIEW_STUBS } from '../../helpers/stubs.js'
 
 function mountComponent(props = {}) {
   const i18n = createI18n({ legacy: false, locale: 'en', messages: { en: { ...en, ...clientEn } } })
 
   return mount(GroupStats, {
     props,
-    global: { plugins: [i18n] },
+    global: { plugins: [i18n], stubs: GROUP_VIEW_STUBS },
   })
 }
 
 const STATS = {
-  group_stats: { parties: 4, participants: 20, hours_volunteered: 30 },
-  device_stats: { fixed: 5, repairable: 3, dead: 2 },
-  top_devices: [{ name: 'Laptop', counter: 5 }, { name: 'Toaster', counter: 3 }],
-  cluster_stats: {
-    1: {
-      fixed: 2,
-      repairable: 1,
-      dead: 0,
-      total: 3,
-      most_seen: { name: 'Laptop', count: 3 },
-      most_repaired: { name: 'Laptop', count: 2 },
-      least_repaired: { name: 'Mouse', count: 0 },
-    },
+  group_stats: {
+    parties: 4,
+    participants: 20,
+    hours_volunteered: 30,
+    waste_total: 12,
+    co2_total: 34,
+    dead_devices: 2,
+    repairable_devices: 1,
+    no_weight: 0,
   },
 }
 
@@ -47,30 +44,51 @@ describe('components/groups/GroupStats', () => {
     expect(wrapper.find('[data-testid="group-stats-unavailable"]').exists()).toBe(true)
   })
 
-  it('renders group facts, device stats and totals', () => {
+  it('renders group facts', () => {
     const wrapper = mountComponent({ stats: STATS })
 
     expect(wrapper.find('[data-testid="group-stats-parties"]').text()).toContain('4')
     expect(wrapper.find('[data-testid="group-stats-participants"]').text()).toContain('20')
     expect(wrapper.find('[data-testid="group-stats-hours"]').text()).toContain('30')
-    expect(wrapper.find('[data-testid="group-stats-fixed"]').text()).toContain('5')
-    expect(wrapper.find('[data-testid="group-stats-repairable"]').text()).toContain('3')
-    expect(wrapper.find('[data-testid="group-stats-dead"]').text()).toContain('2')
-    expect(wrapper.find('[data-testid="group-stats-total"]').text()).toContain('10')
   })
 
-  it('renders the top 3 devices', () => {
+  it('renders waste/CO2 impact cards', () => {
     const wrapper = mountComponent({ stats: STATS })
 
-    expect(wrapper.find('[data-testid="group-stats-top-device-0"]').text()).toContain('5')
-    expect(wrapper.find('[data-testid="group-stats-top-device-1"]').text()).toContain('3')
+    expect(wrapper.find('[data-testid="group-stats-waste"]').text()).toContain('12 kg')
+    expect(wrapper.find('[data-testid="group-stats-co2"]').text()).toContain('34 kg')
   })
 
-  it('renders cluster breakdown for populated clusters only', () => {
+  it('shows an info popover next to the Environmental impact heading (gap 9)', () => {
     const wrapper = mountComponent({ stats: STATS })
 
-    expect(wrapper.find('[data-testid="group-stats-cluster-1"]').text()).toContain('3')
-    // Cluster 2 has no data in cluster_stats - the section still renders (heading), but no numbers.
-    expect(wrapper.find('[data-testid="group-stats-cluster-2"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="group-stats-impact-info"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="group-stats-impact-popover"]').text()).toContain('How do we calculate environmental impact?')
+  })
+
+  it('emits share-stats when the CO2 card\'s Share this link is clicked (gap 9)', async () => {
+    const wrapper = mountComponent({ stats: STATS })
+
+    await wrapper.find('[data-testid="group-stats-share"]').trigger('click')
+    expect(wrapper.emitted('share-stats')).toBeTruthy()
+  })
+
+  it('shows the not-counting caveat when dead/repairable/no-weight devices exist (gap 10)', () => {
+    const wrapper = mountComponent({ stats: STATS })
+
+    const note = wrapper.find('[data-testid="group-stats-not-counting"]')
+    expect(note.exists()).toBe(true)
+    expect(note.text()).toContain('Not counting')
+    expect(note.text()).toContain('recycled')
+    expect(note.text()).toContain('repaired')
+    expect(note.text()).toContain('and')
+  })
+
+  it('omits the not-counting caveat when nothing is excluded', () => {
+    const wrapper = mountComponent({
+      stats: { group_stats: { ...STATS.group_stats, dead_devices: 0, repairable_devices: 0, no_weight: 0 } },
+    })
+
+    expect(wrapper.find('[data-testid="group-stats-not-counting"]').exists()).toBe(false)
   })
 })

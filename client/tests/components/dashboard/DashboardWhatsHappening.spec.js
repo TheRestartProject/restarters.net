@@ -109,13 +109,19 @@ describe('components/dashboard/DashboardWhatsHappening', () => {
     expect(link.attributes('href')).toBe('https://talk.restarters.net/t/fixing-kettles')
   })
 
-  it('shows no topics table when the API returns none, degrading to just the see-all link', async () => {
+  it('still shows the table header/chrome (with an empty body) when the API returns no topics, degrading to just header + see-all link', async () => {
+    // Parity gap #9: legacy DiscourseDiscussion.vue never gates the table
+    // itself - only the rows - so the comment-count/clock header icons stay
+    // visible even with zero topics.
     topicsResponse = { success: 'success', topics: [] }
 
     const wrapper = mountComponent()
     await flushPromises()
 
-    expect(wrapper.find('[data-testid="whats-happening-topics"]').exists()).toBe(false)
+    const table = wrapper.find('[data-testid="whats-happening-topics"]')
+    expect(table.exists()).toBe(true)
+    expect(table.find('thead').exists()).toBe(true)
+    expect(table.findAll('tbody > *').length).toBe(0)
     expect(wrapper.find('[data-testid="whats-happening-see-all"]').exists()).toBe(true)
   })
 })

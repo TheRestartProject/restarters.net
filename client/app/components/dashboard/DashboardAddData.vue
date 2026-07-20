@@ -1,6 +1,7 @@
 <script setup>
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import CollapsibleSection from '~/components/CollapsibleSection.vue'
 
 // Legacy DashboardAddData.vue: a group -> event picker that jumps to the
 // chosen event's view (/party/view/{id}) where the user adds repair data.
@@ -64,30 +65,47 @@ const addUrl = computed(() => (selectedEventId.value ? `/party/view/${selectedEv
 </script>
 
 <template>
-  <div v-if="groupOptions.length" class="panel" data-testid="dashboard-add-data">
-    <div class="d-flex align-items-center">
-      <h2 class="mb-0">{{ t('dashboard.add_data_heading') }}</h2>
-      <img src="/images/fixometer-doodle.svg" alt="" class="ms-4 d-none d-md-block add-data__doodle">
-    </div>
-    <div class="content-divider" />
-    <p>{{ t('dashboard.see_your_impact') }}:</p>
-    <div class="row g-2 align-items-end">
-      <div class="col-md-5">
-        <BFormSelect v-model="selectedGroupId" :options="groupOptions" data-testid="add-data-group" />
+  <div v-if="groupOptions.length" class="bg" data-testid="dashboard-add-data">
+    <CollapsibleSection>
+      <template #title>
+        <div class="d-flex align-items-center">
+          <h2 class="mb-0">{{ t('dashboard.add_data_heading') }}</h2>
+          <img src="/images/fixometer-doodle.svg" alt="" class="ms-4 d-none d-md-block add-data__doodle">
+        </div>
+      </template>
+
+      <div class="content-divider">
+        <p>{{ t('dashboard.see_your_impact') }}:</p>
+        <div class="row g-2 align-items-end">
+          <div class="col-md-5">
+            <BFormSelect v-model="selectedGroupId" :options="groupOptions" data-testid="add-data-group" />
+          </div>
+          <div class="col-md-5">
+            <BFormSelect v-model="selectedEventId" :options="eventOptions" data-testid="add-data-event" />
+          </div>
+          <div class="col-md-2 d-flex justify-content-md-end">
+            <NuxtLink v-if="addUrl" :to="addUrl" class="btn btn-primary" data-testid="add-data-add">
+              {{ t('dashboard.add_data_add') }}
+            </NuxtLink>
+          </div>
+        </div>
       </div>
-      <div class="col-md-5">
-        <BFormSelect v-model="selectedEventId" :options="eventOptions" data-testid="add-data-event" />
-      </div>
-      <div class="col-md-2 d-flex justify-content-md-end">
-        <NuxtLink v-if="addUrl" :to="addUrl" class="btn btn-primary" data-testid="add-data-add">
-          {{ t('dashboard.add_data_add') }}
-        </NuxtLink>
-      </div>
-    </div>
+    </CollapsibleSection>
   </div>
 </template>
 
 <style scoped>
+/* $brand-light / $black from app/assets/css/_variables.scss, hardcoded here
+   as other dashboard components already do in scoped styles (no global
+   variable import wired up for component <style> blocks - see
+   DashboardYourGroups.vue's .new-highlight for the same pattern). */
+.bg {
+  background-color: #4aaebc;
+  box-shadow: 5px 5px #222;
+  border: 1px solid #222;
+  padding: 30px;
+}
+
 .add-data__doodle {
   height: 2.5rem;
 }

@@ -50,7 +50,7 @@ function seeAll() {
     </template>
 
     <div class="content-divider">
-      <table v-if="topics.length" class="table talk-topics" data-testid="whats-happening-topics">
+      <table class="table talk-topics" data-testid="whats-happening-topics">
         <thead>
           <tr>
             <th />

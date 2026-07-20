@@ -8,6 +8,8 @@ return [
   'upcoming_events_subtitle' => 'Les événements à venir de vos Repair Cafés',
   'upcoming_events_title' => 'Evénements à venir',
   'your_groups_heading' => 'Vos Repair Cafés',
+  'groups_heading' => 'Repair Cafés',
+  'add_event' => 'Ajouter',
   'interested_starting' => 'Vous voulez lancer votre propre Repair Café?',
   'newly_added' => 'Ajouté(s) récemment: :count Repair Café(s) près de chez vous!',
   'no_groups' => '<strong>Vous ne suivez pas encore de Repair Cafés</strong><br />Il existe des <a href="/group/all">groupes communautaires dans le monde entier</a>. Vous êtes invité à suivre n\'importe quel groupe pour être averti lorsqu\'il organise des événements.',
