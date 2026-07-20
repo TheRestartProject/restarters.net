@@ -50,11 +50,25 @@ return [
     | Define the User, IP Address, User Agent and URL resolver implementations.
     |
     */
+    // NB the package reads `resolvers` (PLURAL) and only falls back to
+    // `resolver` when the plural key is absent - and it ships its own plural
+    // default, which is merged in, so the singular block below is never
+    // consulted. Setting the url resolver there alone had no effect at all;
+    // verified by reading config('audit.resolvers') at runtime.
+    'resolvers' => [
+        'user'       => OwenIt\Auditing\Resolvers\UserResolver::class,
+        'ip_address' => OwenIt\Auditing\Resolvers\IpAddressResolver::class,
+        'user_agent' => OwenIt\Auditing\Resolvers\UserAgentResolver::class,
+        // Strips query strings so ?api_token= credentials never reach the
+        // audits table - see App\Auditing\SanitisedUrlResolver.
+        'url'        => App\Auditing\SanitisedUrlResolver::class,
+    ],
+
     'resolver' => [
         'user'       => OwenIt\Auditing\Resolvers\UserResolver::class,
         'ip_address' => OwenIt\Auditing\Resolvers\IpAddressResolver::class,
         'user_agent' => OwenIt\Auditing\Resolvers\UserAgentResolver::class,
-        'url'        => OwenIt\Auditing\Resolvers\UrlResolver::class,
+        'url'        => App\Auditing\SanitisedUrlResolver::class,
     ],
 
     /*
