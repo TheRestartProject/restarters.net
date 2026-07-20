@@ -75,6 +75,7 @@ function retry() {
 // Same post-create navigation choice as pages/party/create/[[group_id]].vue
 // - see that file's onCreated comment for the full rationale.
 async function onCreated(id) {
+  eventsStore.justCreatedId = id
   await navigateTo(`/party/edit/${id}`)
 }
 </script>

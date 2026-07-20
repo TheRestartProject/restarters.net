@@ -44,6 +44,22 @@ const updatedMessage = ref('')
 const imageMessage = ref('')
 const imageError = ref('')
 
+// Consumed once, on arrival from the create/duplicate flow, then cleared from
+// the store immediately so that navigating away and back - or editing another
+// event - doesn't resurrect the "Event created!" banner. Captured into a local
+// ref because clearing the store value would otherwise hide the banner in the
+// same tick. develop gets this for free by never unmounting the component
+// (EventAddEditPage.vue), and drops the flag on the first save
+// (@edited="justCreated = false"), which onUpdated below mirrors.
+const justCreated = ref(false)
+
+onMounted(() => {
+  if (eventsStore.justCreatedId === id.value) {
+    justCreated.value = true
+  }
+  eventsStore.justCreatedId = null
+})
+
 useHead({ title: computed(() => (event.value ? `${t('events.editing', { event: event.value.title })}` : t('events.editing', { event: '' }))) })
 
 function load() {
@@ -59,6 +75,10 @@ function retry() {
 
 function onUpdated() {
   updatedMessage.value = t('events.save_event')
+  // EventAddEditPage.vue:11 - `@edited="justCreated = false"`. Once saved the
+  // event is no longer merely "just created", and the pre-submit notice the
+  // banner was suppressing becomes relevant again.
+  justCreated.value = false
   load()
 }
 
@@ -110,7 +130,7 @@ function onImageUploadError(message) {
         {{ updatedMessage }}
       </BAlert>
 
-      <EventForm :event-id="id" :initial-event="event" :is-admin="isAdmin" @updated="onUpdated" />
+      <EventForm :event-id="id" :initial-event="event" :is-admin="isAdmin" :just-created="justCreated" @updated="onUpdated" />
 
       <div class="mt-4 pt-3 border-top">
         <h2>{{ t('events.event_photos') }}</h2>

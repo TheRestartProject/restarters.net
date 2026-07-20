@@ -102,6 +102,16 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  // EventAddEditPage.vue:104 - set once the create succeeds, showing a green
+  // confirmation on the (now) edit form and suppressing the "what happens when
+  // you submit" notice, which no longer applies. develop keeps one component
+  // mounted across create->edit and swaps the URL with history.replaceState;
+  // this client really does navigate, so the create/duplicate pages hand the
+  // flag over through the events store (see justCreatedId there).
+  justCreated: {
+    type: Boolean,
+    default: false,
+  },
 })
 
 const emit = defineEmits(['created', 'updated'])
@@ -147,6 +157,16 @@ const groupOptionsSorted = computed(() => [...props.groups].sort((a, b) => a.nam
 
 const selectedGroupDetail = computed(() => groupsStore.details[form.idgroups] || null)
 const groupLocationText = computed(() => selectedGroupDetail.value?.location?.location || null)
+
+// EventAddEdit.vue:258 - `this.group ? this.group.auto_approve : false`.
+// A previous comment here claimed auto_approve wasn't exposed by the API and
+// used that to justify always showing the non-autoapproved copy; it is in fact
+// exposed (App\Http\Resources\Group:384) and means exactly what develop's does
+// (App\Group::getAutoApproveAttribute - true iff EVERY network the group
+// belongs to auto-approves events). The watcher below fetches the selected
+// group's detail immediately on mount, in edit mode too, so this resolves
+// without any extra request.
+const autoApprove = computed(() => !!selectedGroupDetail.value?.auto_approve)
 
 const submitting = ref(false)
 const generalError = ref('')
@@ -532,19 +552,47 @@ defineExpose({ submit })
         </BFormGroup>
       </div>
 
+      <!-- EventAddEdit.vue:94 -->
+      <BAlert v-if="justCreated" :model-value="true" variant="success" class="mt-2 mb-2" data-testid="event-form-created">
+        {{ autoApprove ? t('events.created_success_message_autoapproved') : t('events.created_success_message') }}
+      </BAlert>
+
       <div class="event-form-buttons d-flex align-items-center justify-content-between mt-3">
-        <!-- Group.auto_approve isn't exposed by GET /api/v2/groups/{id}
-             (App\Http\Resources\Group), so - like the NetworkCoordinator
-             approximations elsewhere in this file - this always shows the
-             non-autoapproved copy rather than guessing; the alternative
-             (showing nothing) would silently drop copy every host sees in
-             legacy. -->
+        <!-- EventAddEdit.vue:97-125. Two distinct branches, and the edit one
+             was missing here entirely - this used to render the notice only
+             while creating, so an editing host saw nothing where develop
+             shows them what saving will do. On edit develop also suppresses
+             it once the event is already approved-or-being-approved
+             (`!canApprove && moderate !== 'approve'`), and right after a
+             create (`!justCreated`), where the green alert above says it
+             better. -->
         <div v-if="creating" class="flex-grow-1 text-end pe-3" data-testid="event-form-notice">
-          {{ t('events.before_submit_text') }}
+          {{ autoApprove ? t('events.before_submit_text_autoapproved') : t('events.before_submit_text') }}
         </div>
-        <BButton type="submit" variant="primary" :disabled="submitting" data-testid="event-form-submit">
-          {{ creating ? t('events.create_event') : t('events.save_event') }}
-        </BButton>
+        <div v-else-if="!justCreated" class="flex-grow-1 text-end pe-3">
+          <span v-if="autoApprove" data-testid="event-form-notice">
+            {{ t('events.before_submit_text_autoapproved') }}
+          </span>
+          <span v-else-if="!canApprove && form.moderate !== 'approve'" data-testid="event-form-notice">
+            {{ t('events.before_submit_text') }}
+          </span>
+        </div>
+
+        <div class="d-flex align-items-center gap-2">
+          <!-- EventAddEdit.vue:127 - develop offers Duplicate from the edit
+               form as well as from the view page's actions dropdown. -->
+          <BButton
+            v-if="!creating"
+            variant="primary"
+            :to="`/party/duplicate/${eventId}`"
+            data-testid="event-form-duplicate"
+          >
+            {{ t('events.duplicate_event') }}
+          </BButton>
+          <BButton type="submit" variant="primary" :disabled="submitting" data-testid="event-form-submit">
+            {{ creating ? t('events.create_event') : t('events.save_event') }}
+          </BButton>
+        </div>
       </div>
     </div>
   </BForm>

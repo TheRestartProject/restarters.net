@@ -263,6 +263,31 @@ describe('components/events/EventForm', () => {
       expect(store.createEvent.mock.calls[1][0].timezone).toBe('Europe/London')
     })
 
+    // EventAddEdit.vue:99/258 - the notice tells the host what submitting will
+    // do, and that differs entirely when the group's networks auto-approve.
+    // This branch used to be unreachable: the component hardcoded the
+    // "a coordinator will confirm it" copy on the grounds that auto_approve
+    // wasn't available client-side, when GET /api/v2/groups/{id} had been
+    // returning it all along.
+    it('switches the "before submit" notice to the auto-approved copy for an auto-approving group', async () => {
+      groupsStore.fetchDetails = vi.fn(async (id) => {
+        const detail = { timezone: 'Europe/London', location: null, auto_approve: true }
+        groupsStore.details[id] = detail
+        return detail
+      })
+
+      const wrapper = mountForm({ groups: [{ id: 9, name: 'Acme Restarters' }] })
+      const notice = () => wrapper.find('[data-testid="event-form-notice"]').text()
+
+      expect(notice()).toBe('Once confirmed by a coordinator, your event will be made public.')
+
+      await wrapper.find('[data-testid="event-form-group"]').setValue('9')
+      await wrapper.vm.$nextTick()
+      await wrapper.vm.$nextTick()
+
+      expect(notice()).toBe('When you create or save this event, it will be made public.')
+    })
+
     it('shows a "use group location" shortcut that fills the location field, hidden when online', async () => {
       groupsStore.fetchDetails = vi.fn(async (id) => {
         const detail = { timezone: 'Europe/London', location: { location: 'Group HQ, London' } }
@@ -366,10 +391,36 @@ describe('components/events/EventForm', () => {
       expect(wrapper.findComponent(GroupNetworkDataStub).props('modelValue')).toEqual({ dummy: 'value' })
     })
 
-    it('does not show the "before submit" notice while editing (create-only, per develop)', () => {
+    // This previously asserted the notice was create-only "per develop". It is
+    // not: EventAddEdit.vue:116-125 renders it while editing too, hidden only
+    // once the event is approved-or-being-approved, or immediately after a
+    // create. The assertion was documenting the gap rather than develop.
+    it('shows the "before submit" notice while editing, for a non-approver', () => {
       const wrapper = mountForm({ eventId: 5, initialEvent: EVENT })
 
+      expect(wrapper.find('[data-testid="event-form-notice"]').exists()).toBe(true)
+    })
+
+    // EventAddEdit.vue:121's `!canApprove` half: someone who can approve the
+    // event themselves is not waiting on a coordinator, so the notice would be
+    // telling them something untrue.
+    it('hides the "before submit" notice while editing for someone who can approve', () => {
+      const wrapper = mountForm({ eventId: 5, initialEvent: EVENT, isAdmin: true })
+
       expect(wrapper.find('[data-testid="event-form-notice"]').exists()).toBe(false)
+    })
+
+    it('shows the creation confirmation instead of the notice when just created', () => {
+      const wrapper = mountForm({ eventId: 5, initialEvent: EVENT, justCreated: true })
+
+      expect(wrapper.find('[data-testid="event-form-created"]').exists()).toBe(true)
+      expect(wrapper.find('[data-testid="event-form-notice"]').exists()).toBe(false)
+    })
+
+    it('offers Duplicate from the edit form (EventAddEdit.vue:127)', () => {
+      const wrapper = mountForm({ eventId: 5, initialEvent: EVENT })
+
+      expect(wrapper.find('[data-testid="event-form-duplicate"]').exists()).toBe(true)
     })
 
     it('submits without groupid, round-tripping network_data', async () => {

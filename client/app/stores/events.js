@@ -42,6 +42,16 @@ export const useEventsStore = defineStore('events', {
     current: { data: null, loading: false, error: null },
     attendees: { data: { confirmed: [], invited: [] }, loading: false, error: null },
     devices: { data: [], loading: false, error: null },
+    // Id of an event created in this session that the user has just been
+    // redirected to the edit form for, so that form can show develop's green
+    // "Event created!" confirmation (EventAddEditPage.vue:104's justCreated).
+    // develop never navigates - it keeps one component mounted and rewrites
+    // the URL with history.replaceState - so the flag simply survives there.
+    // This client performs a real route change, hence the hand-off. Holds an
+    // id rather than a boolean so a later visit to a DIFFERENT event's edit
+    // form can't inherit a stale "just created" banner; the edit page clears
+    // it once consumed.
+    justCreatedId: null,
   }),
 
   actions: {
@@ -106,6 +116,17 @@ export const useEventsStore = defineStore('events', {
       const { $api } = useNuxtApp()
       const { data } = await $api.event.invite(id, payload)
       return data
+    },
+
+    // PUT /api/events/{id}/volunteers (gap 14, v1 - see api/EventAPI.js's
+    // addVolunteer doc comment). Errors are left for the caller
+    // (EventAddVolunteerModal.vue) to show inline, same convention as
+    // inviteVolunteers above. Doesn't refetch attendees itself - the page
+    // does that once the modal closes, same as legacy's EventAttendance.vue
+    // (`@hide="fetchVolunteers"` on its own EventAddVolunteerModal).
+    async addVolunteer(id, payload) {
+      const { $api } = useNuxtApp()
+      return $api.event.addVolunteer(id, payload)
     },
 
     // POST /api/v2/events/{id}/request-review - ask confirmed attendees to
@@ -253,6 +274,22 @@ export const useEventsStore = defineStore('events', {
         this.current.data = null
       }
       return returnedId
+    },
+
+    // PATCH /api/v2/events/{id}, participants/volunteers only (gap 13 -
+    // unblocked, replaces legacy's POST /party/update-quantity +
+    // update-volunteerquantity routes). Deliberately does NOT invalidate
+    // `current` like updateEvent above: EventAttendanceCount.vue's +/-
+    // stepper is a rapid, repeated interaction (matches legacy's own Vuex
+    // mutation, `this.event.volunteers = val` - an instant in-place local
+    // update, no reload) - invalidating+refetching on every click would
+    // flash the whole page's loading skeleton for what should feel instant.
+    async updateEventCount(id, payload, field, value) {
+      const { $api } = useNuxtApp()
+      await $api.event.update(id, payload)
+      if (this.current.data?.id === id && this.current.data.stats) {
+        this.current.data.stats[field] = value
+      }
     },
 
     // POST /api/v2/events/{id}/images (C1f/C4). Write-only from the

@@ -2,6 +2,7 @@
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAuth } from '~/composables/useAuth.js'
+import { useEventsStore } from '~/stores/events.js'
 import { useGroupsStore } from '~/stores/groups.js'
 import EventForm from '~/components/events/EventForm.vue'
 
@@ -18,6 +19,7 @@ const { t } = useI18n()
 const route = useRoute()
 const { hasRole } = useAuth()
 const groupsStore = useGroupsStore()
+const eventsStore = useEventsStore()
 
 const initialGroupId = computed(() => (route.params.group_id ? Number(route.params.group_id) : null))
 const isAdmin = computed(() => hasRole('Administrator'))
@@ -87,6 +89,10 @@ const cantCreate = computed(() => {
 // lands the user on the one page (edit) that shows the event's current
 // approval state.
 async function onCreated(id) {
+  // Hand the "just created" state across the navigation develop doesn't make,
+  // so the edit form still shows its green confirmation (EventAddEditPage.vue
+  // sets justCreated on the component it never leaves).
+  eventsStore.justCreatedId = id
   await navigateTo(`/party/edit/${id}`)
 }
 </script>

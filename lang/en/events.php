@@ -51,10 +51,26 @@ return [
   'invite_volunteers' => 'Invite volunteers',
   'invite_when_approved' => 'You can only invite volunteers when this event has been approved',
   'event_photos' => 'Photos',
+  // Already exists on develop's lang/en/events.php with this exact value -
+  // ported here rather than reworded, since this branch's copy of the file
+  // predates it.
+  'talk_thread' => 'View event conversation',
   'event_attendance' => 'Attendance',
   'confirmed' => 'Confirmed',
   'invited' => 'Invited',
   'invite_to_join' => 'Invite to join event',
+  // Already exist on develop's lang/en/events.php with these exact values
+  // (EventAddVolunteerModal.vue) - ported here rather than reworded, since
+  // this branch's copy of the file predates them.
+  'add_volunteer_modal_heading' => 'Add volunteer',
+  'group_member' => 'Group member',
+  'volunteer_attended_button' => 'Volunteer attended',
+  'option_default' => '-- Select --',
+  'option_not_registered' => 'Not registered on here',
+  'full_name' => 'Full name',
+  'full_name_helper' => 'Leave field blank if anonymous',
+  'volunteer_email_address' => 'Volunteer\'s email address (optional)',
+  'message_volunteer_email_address' => 'This field will invite the volunteer to join the group',
   'editing' => 'Editing :event',
   'add_new_event' => 'Add new event',
   'items_fixed' => 'Items fixed',
@@ -103,6 +119,9 @@ return [
   // develop's lang/en/events.php with these exact values; ported here rather
   // than reworded, since this branch's copy of the file predates them.
   'before_submit_text' => 'Once confirmed by a coordinator, your event will be made public.',
+  'before_submit_text_autoapproved' => 'When you create or save this event, it will be made public.',
+  'created_success_message' => 'Event created!  It will be approved by a coordinator shortly.  You can continue to edit it in the meantime.',
+  'created_success_message_autoapproved' => 'Event created! It is now public.',
   'event_actions' => 'Event actions',
   'event_details' => 'Details',
   'event_description' => 'Description',
