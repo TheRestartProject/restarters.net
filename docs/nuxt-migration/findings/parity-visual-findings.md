@@ -756,3 +756,32 @@ One fix regressed and was caught by screenshotting the element: the new
 `.stat-card--primary` rule was declared before `.stat-card` at equal
 specificity, so the card stayed white while its count was styled white -
 the number vanished entirely. Fixed by ordering and specificity.
+
+### 29-network-view (desktop) — 5 diffs, NOT yet fixed
+
+Verified by direct comparison of `29-network-view__{new,old}.png`.
+
+1. **"Groups to moderate" table has lost its panel.** develop wraps it in the
+   white/black-border/6px-shadow panel; ours renders flat on the page. Same
+   class of defect as the event page's `.ourtabs` - check every table on the
+   newly-covered pages for this, it is clearly systemic.
+2. **Its column headers are wrong.** develop uses ICON headers (A-Z, location
+   pin, person, person-star, calendar) each with a sort control. Ours uses
+   plain text headers (Name/Location/Hosts/Restarters/Next event) with no
+   sorting at all - so a feature is missing, not just a style.
+3. **The "Groups" section is a different thing entirely.** develop shows one
+   bordered sentence: "There is currently 1 group in the X network. View these
+   groups." Ours embeds the full groups browser - search-by-name,
+   search-by-location, country filter, network filter and a sortable table.
+   This is the largest single divergence found so far.
+4. **"Group requires moderation" loses its highlight.** develop gives the cell
+   a peach/amber background; ours renders a plain link.
+5. **"Network logo" dropzone is ours only** - develop's page has no such
+   section at this position.
+
+### Method note
+
+Page height was used to triage which pages to look at, and it produced two
+false leads (see the retraction above). The network page, by contrast, has a
+height ratio of 1.31 and is genuinely divergent. **Look at every pair.** The
+ratio is at best a hint about ordering, never evidence either way.
