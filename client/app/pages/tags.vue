@@ -17,13 +17,19 @@ import { useAdminRefdataStore } from '~/stores/adminRefdata.js'
 // component didn't have this (its ConfirmModal only ever showed static
 // text), but the field is already there for the taking on every row.
 //
-// parity-v2/admin-and-static.md gap 13: legacy puts Delete on the edit page
-// itself (an unconfirmed plain link), not a table-row action with a confirm
-// step - AdminCrudTable.vue's row button + confirm modal is KEPT here as an
-// intentional safety improvement (and is what surfaces the groups_count
-// in-use warning above) rather than reverted to match legacy's unconfirmed
-// link. Flagged for a product-owner call per that gap's own suggested
-// resolution.
+// parity-v2/admin-and-static.md gap 13: develop puts Delete on the EDIT
+// page (tags/edit.blade.php:55), not as a table-row action. Delete has
+// been MOVED into AdminCrudTable's edit form to match that placement -
+// this previously kept it on the row and called the difference an
+// 'intentional safety improvement ... flagged for a product-owner call',
+// which was parking a parity gap behind a decision nobody was asked to
+// make.
+//
+// The confirm step is deliberately NOT dropped: develop's is
+// `<a href="/tags/delete/{id}">`, a GET that deletes, so it is CSRF-able
+// and can fire from a prefetch or a crawler. Matching the placement is
+// parity; matching a destructive GET would import a vulnerability, the
+// same line already drawn over updateQuantity's IDOR.
 definePageMeta({ auth: true, role: 'Administrator' })
 
 const { t } = useI18n()

@@ -195,6 +195,10 @@ describe('components/admin/AdminCrudTable', () => {
     const wrapper = mountTable({ allowDelete: false })
     await flushPromises()
 
+    // Open the editor first - with delete moved in there, asserting absence
+    // without opening it would pass whether or not allowDelete is honoured.
+    await wrapper.find('[data-testid="widgets-edit-link-1"]').trigger('click')
+
     expect(wrapper.find('[data-testid="widgets-delete-1"]').exists()).toBe(false)
   })
 
@@ -331,6 +335,10 @@ describe('components/admin/AdminCrudTable', () => {
       const wrapper = mountTable()
       await flushPromises()
 
+      // Delete lives in the edit form now, matching develop's edit page.
+
+      await wrapper.find('[data-testid="widgets-edit-link-2"]').trigger('click')
+
       await wrapper.find('[data-testid="widgets-delete-2"]').trigger('click')
 
       const modal = wrapper.find('[data-testid="widgets-delete-modal"]')
@@ -342,6 +350,10 @@ describe('components/admin/AdminCrudTable', () => {
       const wrapper = mountTable()
       await flushPromises()
 
+      // Delete lives in the edit form now, matching develop's edit page.
+
+      await wrapper.find('[data-testid="widgets-edit-link-1"]').trigger('click')
+
       await wrapper.find('[data-testid="widgets-delete-1"]').trigger('click')
 
       expect(wrapper.find('[data-testid="widgets-delete-warning"]').exists()).toBe(false)
@@ -351,6 +363,10 @@ describe('components/admin/AdminCrudTable', () => {
       const deleteItem = vi.fn().mockResolvedValue(undefined)
       const wrapper = mountTable({ deleteItem })
       await flushPromises()
+
+      // Delete lives in the edit form now, matching develop's edit page.
+
+      await wrapper.find('[data-testid="widgets-edit-link-1"]').trigger('click')
 
       await wrapper.find('[data-testid="widgets-delete-1"]').trigger('click')
       await wrapper.find('[data-testid="widgets-delete-cancel"]').trigger('click')
@@ -363,6 +379,10 @@ describe('components/admin/AdminCrudTable', () => {
       const deleteItem = vi.fn().mockResolvedValue(undefined)
       const wrapper = mountTable({ deleteItem })
       await flushPromises()
+
+      // Delete lives in the edit form now, matching develop's edit page.
+
+      await wrapper.find('[data-testid="widgets-edit-link-1"]').trigger('click')
 
       await wrapper.find('[data-testid="widgets-delete-1"]').trigger('click')
       await wrapper.find('[data-testid="widgets-delete-confirm"]').trigger('click')
@@ -377,6 +397,10 @@ describe('components/admin/AdminCrudTable', () => {
       const deleteItem = vi.fn().mockRejectedValue({ status: 500, data: {} })
       const wrapper = mountTable({ deleteItem })
       await flushPromises()
+
+      // Delete lives in the edit form now, matching develop's edit page.
+
+      await wrapper.find('[data-testid="widgets-edit-link-1"]').trigger('click')
 
       await wrapper.find('[data-testid="widgets-delete-1"]').trigger('click')
       await wrapper.find('[data-testid="widgets-delete-confirm"]').trigger('click')

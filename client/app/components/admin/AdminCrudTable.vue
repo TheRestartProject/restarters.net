@@ -397,12 +397,11 @@ onMounted(load)
               </button>
               <template v-else>{{ field.label }}</template>
             </th>
-            <th v-if="allowDelete" />
           </tr>
         </thead>
         <tbody>
           <tr v-if="!displayItems.length" :data-testid="`${testidPrefix}-table-empty`">
-            <td :colspan="tableFields.length + (allowDelete ? 1 : 0)">{{ labels.emptyText }}</td>
+            <td :colspan="tableFields.length">{{ labels.emptyText }}</td>
           </tr>
           <tr v-for="item in displayItems" :key="item[primaryKey]" :data-testid="`${testidPrefix}-row-${item[primaryKey]}`">
             <td v-for="field in tableFields" :key="field.key">
@@ -423,16 +422,6 @@ onMounted(load)
               <slot v-else :name="`cell-${field.key}`" :item="item" :value="cellValue(item, field)">
                 {{ cellValue(item, field) }}
               </slot>
-            </td>
-            <td v-if="allowDelete">
-              <BButton
-                size="sm"
-                variant="outline-danger"
-                :data-testid="`${testidPrefix}-delete-${item[primaryKey]}`"
-                @click="confirmDelete(item)"
-              >
-                {{ labels.deleteButton }}
-              </BButton>
             </td>
           </tr>
         </tbody>
@@ -489,6 +478,22 @@ onMounted(load)
           {{ editError }}
         </p>
         <div class="d-flex justify-content-end gap-2 mt-3">
+          <!-- develop puts Delete on the EDIT page (tags/edit.blade.php:55),
+               not on every table row. Kept as a button with a confirm step
+               rather than develop's `<a href="/tags/delete/{id}">`: that is a
+               GET request that deletes, which is CSRF-able and can fire from a
+               prefetch or a crawler. Copying the placement is parity; copying
+               a destructive GET is importing a vulnerability, the same line
+               already drawn over updateQuantity's IDOR. -->
+          <BButton
+            v-if="allowDelete && editingItem"
+            variant="outline-danger"
+            class="me-auto"
+            :data-testid="`${testidPrefix}-delete-${editingItem[primaryKey]}`"
+            @click="confirmDelete(editingItem)"
+          >
+            {{ labels.deleteButton }}
+          </BButton>
           <BButton variant="outline-secondary" @click="showEdit = false">{{ labels.cancel }}</BButton>
           <BButton type="submit" variant="primary" :disabled="!editValid || saving" :data-testid="`${testidPrefix}-edit-submit`">
             {{ labels.saveButton }}
