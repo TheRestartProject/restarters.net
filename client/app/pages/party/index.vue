@@ -8,6 +8,7 @@ import { useEventPermissions } from '~/composables/useEventPermissions.js'
 import { useAuth } from '~/composables/useAuth.js'
 import { useClipboard } from '~/composables/useClipboard.js'
 import EventsList from '~/components/events/EventsList.vue'
+import EventFilters from '~/components/events/EventFilters.vue'
 import ModerationQueue from '~/components/moderation/ModerationQueue.vue'
 import AlertsBanner from '~/components/alerts/AlertsBanner.vue'
 import {
@@ -97,6 +98,58 @@ const hasLocation = computed(() => dashboardStore.data?.has_location !== false)
 const nearbyEmptyMessage = computed(() =>
   hasLocation.value ? t('groups.no_other_nearby_events') : t('events.no_location')
 )
+
+// "All other events" filter bar (gap 18) - legacy's GroupEventsScrollTableFilters.vue
+// (title/country/date-range, filters=true on the "all" GroupEventsTab). The
+// otherEvents list is already fully loaded client-side (single GET
+// /api/v2/users/me/events, see the file doc comment above), so - like
+// pages/party/all-past.vue's title search - this filters in memory rather
+// than re-fetching. Country options come from the events' own
+// group.country (be-events added it to UserController::shapeMyEvent, the
+// same GET /api/v2/users/me/events response this page already consumes),
+// deduped/sorted the same way the legacy multiselect's countryOptions
+// computed did.
+const allSearch = ref('')
+const allCountry = ref('')
+const allStart = ref('')
+const allEnd = ref('')
+
+const otherCountryOptions = computed(() => {
+  const countries = new Set()
+  for (const e of otherEvents.value) {
+    if (e.group?.country) countries.add(e.group.country)
+  }
+  return [...countries].sort((a, b) => a.localeCompare(b))
+})
+
+// Inclusive range check against the event's start instant, mirroring
+// legacy's date.isBetween(start, end, undefined, '[]') - approximated in
+// the browser's local timezone rather than a moment-timezone comparison,
+// which is precise enough for a day-granularity filter.
+function inDateRange(event) {
+  if (!allStart.value && !allEnd.value) return true
+  if (!event.start) return false
+
+  const eventDate = new Date(event.start)
+  if (allStart.value && eventDate < new Date(`${allStart.value}T00:00:00`)) return false
+  if (allEnd.value && eventDate > new Date(`${allEnd.value}T23:59:59`)) return false
+  return true
+}
+
+const hasAllFilters = computed(() => !!(allSearch.value || allCountry.value || allStart.value || allEnd.value))
+
+const filteredOtherEvents = computed(() => {
+  const term = allSearch.value.trim().toLowerCase()
+
+  return otherEvents.value.filter((e) => {
+    if (term) {
+      const haystack = [e.title, e.location, e.group?.name].filter(Boolean).join(' ').toLowerCase()
+      if (!haystack.includes(term)) return false
+    }
+    if (allCountry.value && e.group?.country !== allCountry.value) return false
+    return inDateRange(e)
+  })
+})
 
 function retry() {
   load()
@@ -242,7 +295,18 @@ onMounted(load)
             <EventsList :events="nearbyEvents" :empty-message="nearbyEmptyMessage" />
           </div>
           <div v-else class="pt-3" data-testid="party-other-panel-all">
-            <EventsList :events="otherEvents" :empty-message="t('groups.no_other_events')" />
+            <EventFilters
+              v-model:search="allSearch"
+              v-model:country="allCountry"
+              v-model:start="allStart"
+              v-model:end="allEnd"
+              :country-options="otherCountryOptions"
+              date-range
+            />
+            <EventsList
+              :events="filteredOtherEvents"
+              :empty-message="hasAllFilters ? t('client.events.no_search_results') : t('groups.no_other_events')"
+            />
           </div>
         </div>
       </template>

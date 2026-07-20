@@ -174,6 +174,83 @@ describe('pages/party/index (mine)', () => {
     expect(wrapper.find('[data-testid="event-card-3"]').exists()).toBe(false)
   })
 
+  describe('"all other events" filter bar (gap 18)', () => {
+    function allEvent(overrides = {}) {
+      return evt({ all: true, ...overrides })
+    }
+
+    beforeEach(() => {
+      eventsStore.myEvents.data = [
+        allEvent({
+          id: 10,
+          title: 'Repair Cafe',
+          start: '2026-08-01T10:00:00Z',
+          end: '2026-08-01T12:00:00Z',
+          group: { id: 1, name: 'Group A', country: 'UK' },
+        }),
+        allEvent({
+          id: 11,
+          title: 'Fixit Session',
+          start: '2026-09-01T10:00:00Z',
+          end: '2026-09-01T12:00:00Z',
+          group: { id: 2, name: 'Group B', country: 'France' },
+        }),
+      ]
+    })
+
+    it('populates the country dropdown from the distinct group.country values on the "all" events', async () => {
+      const wrapper = mountPage()
+      await wrapper.find('[data-testid="party-other-tab-all"]').trigger('click')
+
+      const options = wrapper.find('[data-testid="event-filters-country"]').findAll('option').map((o) => o.text())
+      expect(options).toEqual(['Filter by country', 'France', 'UK'])
+    })
+
+    it('narrows the list by title text', async () => {
+      const wrapper = mountPage()
+      await wrapper.find('[data-testid="party-other-tab-all"]').trigger('click')
+
+      const panel = wrapper.find('[data-testid="party-other-panel-all"]')
+      await panel.find('[data-testid="event-filters-search"]').setValue('Repair')
+
+      expect(panel.find('[data-testid="event-card-10"]').exists()).toBe(true)
+      expect(panel.find('[data-testid="event-card-11"]').exists()).toBe(false)
+    })
+
+    it('narrows the list by host-group country', async () => {
+      const wrapper = mountPage()
+      await wrapper.find('[data-testid="party-other-tab-all"]').trigger('click')
+
+      const panel = wrapper.find('[data-testid="party-other-panel-all"]')
+      await panel.find('[data-testid="event-filters-country"]').setValue('France')
+
+      expect(panel.find('[data-testid="event-card-10"]').exists()).toBe(false)
+      expect(panel.find('[data-testid="event-card-11"]').exists()).toBe(true)
+    })
+
+    it('narrows the list by a start/end date range', async () => {
+      const wrapper = mountPage()
+      await wrapper.find('[data-testid="party-other-tab-all"]').trigger('click')
+
+      const panel = wrapper.find('[data-testid="party-other-panel-all"]')
+      await panel.find('[data-testid="event-filters-start"]').setValue('2026-08-15')
+
+      expect(panel.find('[data-testid="event-card-10"]').exists()).toBe(false)
+      expect(panel.find('[data-testid="event-card-11"]').exists()).toBe(true)
+    })
+
+    it('shows the no-search-results empty message when the filters exclude everything', async () => {
+      const wrapper = mountPage()
+      await wrapper.find('[data-testid="party-other-tab-all"]').trigger('click')
+
+      const panel = wrapper.find('[data-testid="party-other-panel-all"]')
+      await panel.find('[data-testid="event-filters-search"]').setValue('nonexistent')
+
+      expect(panel.find('[data-testid="events-list-empty"]').exists()).toBe(true)
+      expect(panel.find('[data-testid="events-list-empty"]').text()).toBe('No events match your search.')
+    })
+  })
+
   it('marks a mine event as hosting when its group id has role HOST in dashboard your_groups', () => {
     dashboardStore.data = {
       your_groups: [{ id: 9, name: 'A Group', role: 3, archived: false, image_url: null }],

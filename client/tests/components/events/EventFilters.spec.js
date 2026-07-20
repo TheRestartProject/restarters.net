@@ -26,4 +26,45 @@ describe('components/events/EventFilters', () => {
 
     expect(wrapper.emitted('update:search')).toEqual([['cafe']])
   })
+
+  it('does not render the country or date controls by default (party/all-past.vue usage is unaffected)', () => {
+    const wrapper = mountComponent({ search: '' })
+
+    expect(wrapper.find('[data-testid="event-filters-country"]').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="event-filters-start"]').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="event-filters-end"]').exists()).toBe(false)
+  })
+
+  describe('gap 18: country + date-range filters', () => {
+    it('renders a country dropdown built from countryOptions and emits update:country on change', async () => {
+      const wrapper = mountComponent({ search: '', country: '', countryOptions: ['France', 'UK'] })
+
+      const select = wrapper.find('[data-testid="event-filters-country"]')
+      expect(select.exists()).toBe(true)
+      expect(select.findAll('option').map((o) => o.text())).toEqual([
+        'Filter by country',
+        'France',
+        'UK',
+      ])
+
+      await select.setValue('UK')
+
+      expect(wrapper.emitted('update:country')).toEqual([['UK']])
+    })
+
+    it('renders start/end date inputs when dateRange is set and emits update:start/update:end', async () => {
+      const wrapper = mountComponent({ search: '', dateRange: true, start: '', end: '' })
+
+      const start = wrapper.find('[data-testid="event-filters-start"]')
+      const end = wrapper.find('[data-testid="event-filters-end"]')
+      expect(start.attributes('type')).toBe('date')
+      expect(end.attributes('type')).toBe('date')
+
+      await start.setValue('2026-01-01')
+      await end.setValue('2026-01-31')
+
+      expect(wrapper.emitted('update:start')).toEqual([['2026-01-01']])
+      expect(wrapper.emitted('update:end')).toEqual([['2026-01-31']])
+    })
+  })
 })

@@ -81,6 +81,8 @@
       "edit_forbidden": "You don't have permission to edit this event.",
       "end_before_start": "The end time must be after the start time.",
       "end_required": "Please choose an end time.",
+      "filter_end_label": "End date",
+      "filter_start_label": "Start date",
       "group_required": "Please choose which group is hosting this event.",
       "groups_load_error": "Sorry, we couldn't load your groups.",
       "hosting": "Hosting",

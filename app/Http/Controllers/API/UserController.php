@@ -7,6 +7,7 @@ use App\EventsUsers;
 use App\Group;
 use App\Helpers\Fixometer;
 use App\Helpers\Geocoder;
+use App\Helpers\LcaStats;
 use App\Helpers\Tus;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\UserAdmin;
@@ -412,7 +413,30 @@ class UserController extends Controller
      *              @OA\Property(property="all", type="boolean", description="True for an event included only because it's nearby or generally upcoming, not because the user hosts/attends/belongs to its group"),
      *              @OA\Property(property="group", type="object", nullable=true,
      *                  @OA\Property(property="id", type="integer"),
-     *                  @OA\Property(property="name", type="string")
+     *                  @OA\Property(property="name", type="string"),
+     *                  @OA\Property(property="country", type="string", description="The host group's free-form country name (Fixometer::getCountryFromCountryCode of its country_code), empty string if not set.")
+     *              ),
+     *              @OA\Property(property="stats", type="object", description="Party::getEventStats() - the same shape as the stats block on GET /api/v2/events/{id}. participants/volunteers/invited/hours_volunteered are always populated; the device/waste/co2 counters are only non-zero once the event has started or finished.",
+     *                  @OA\Property(property="co2_powered", type="number"),
+     *                  @OA\Property(property="co2_unpowered", type="number"),
+     *                  @OA\Property(property="co2_total", type="number"),
+     *                  @OA\Property(property="waste_powered", type="number"),
+     *                  @OA\Property(property="waste_unpowered", type="number"),
+     *                  @OA\Property(property="waste_total", type="number"),
+     *                  @OA\Property(property="fixed_devices", type="number"),
+     *                  @OA\Property(property="fixed_powered", type="number"),
+     *                  @OA\Property(property="fixed_unpowered", type="number"),
+     *                  @OA\Property(property="repairable_devices", type="number"),
+     *                  @OA\Property(property="dead_devices", type="number"),
+     *                  @OA\Property(property="unknown_repair_status", type="number"),
+     *                  @OA\Property(property="devices_powered", type="number"),
+     *                  @OA\Property(property="devices_unpowered", type="number"),
+     *                  @OA\Property(property="no_weight_powered", type="number"),
+     *                  @OA\Property(property="no_weight_unpowered", type="number"),
+     *                  @OA\Property(property="participants", type="number"),
+     *                  @OA\Property(property="volunteers", type="number"),
+     *                  @OA\Property(property="hours_volunteered", type="number"),
+     *                  @OA\Property(property="invited", type="number")
      *              )
      *          )))
      *      ),
@@ -428,23 +452,42 @@ class UserController extends Controller
         // resolved via the sanctum/api guards.
         $attending = EventsUsers::where('user', $user->id)->where('status', '1')->pluck('event')->toArray();
 
+        // Computed once and passed down to every getEventStats() call below (mirrors
+        // Group::bulkGroupStats()/EventController::getEventsByUsersNetworks() "to speed things
+        // up a bit") rather than re-reading the same env vars per event.
+        $eEmissionRatio = LcaStats::getEmissionRatioPowered();
+        $uEmissionratio = LcaStats::getEmissionRatioUnpowered();
+
         $events = [];
         $seenIds = [];
 
-        foreach (Party::forUser([$user->id])->with(['theGroup.groupImage.image'])->reorder()->orderBy('event_start_utc', 'DESC')->get() as $event) {
-            $events[] = self::shapeMyEvent($event, $attending);
+        // allDevices is eager-loaded because this list mixes past/in-progress/future events -
+        // getEventStats() touches it for any event that has started, so without this each such
+        // event would trigger its own device query (N+1). withCount('allInvited') avoids the
+        // equivalent N+1 for the invited tally (see Party::getEventStats()'s all_invited_count
+        // comment).
+        foreach (
+            Party::forUser([$user->id])
+                ->with(['theGroup.groupImage.image', 'allDevices'])
+                ->withCount('allInvited')
+                ->reorder()->orderBy('event_start_utc', 'DESC')->get() as $event
+        ) {
+            $events[] = self::shapeMyEvent($event, $attending, $eEmissionRatio, $uEmissionratio);
             $seenIds[] = $event->idevents;
         }
 
         if (! is_null($user->latitude) && ! is_null($user->longitude)) {
+            // Strictly upcoming (event_start_utc >= now), so allDevices is never touched by
+            // getEventStats() here - no need to eager-load it, only the invited count.
             $nearbyEvents = Party::upcomingEventsInUserArea($user)
                 ->with(['theGroup.groupImage.image'])
+                ->withCount('allInvited')
                 ->whereNotIn('idevents', $seenIds)
                 ->get();
 
             foreach ($nearbyEvents as $event) {
                 if (Fixometer::userHasViewPartyPermission($event->idevents, $user->id)) {
-                    $row = self::shapeMyEvent($event, $attending);
+                    $row = self::shapeMyEvent($event, $attending, $eEmissionRatio, $uEmissionratio);
                     $row['nearby'] = true;
                     $row['all'] = true;
                     $events[] = $row;
@@ -453,13 +496,15 @@ class UserController extends Controller
             }
         }
 
+        // Strictly future too (event_start_utc > now) - same reasoning, no allDevices needed.
         $otherUpcoming = Party::with(['theGroup.networks', 'theGroup.groupImage.image'])->future()
+            ->withCount('allInvited')
             ->whereNotIn('idevents', $seenIds)
             ->get();
 
         foreach ($otherUpcoming as $event) {
             if (Fixometer::userHasViewPartyPermission($event->idevents, $user->id, $event)) {
-                $row = self::shapeMyEvent($event, $attending);
+                $row = self::shapeMyEvent($event, $attending, $eEmissionRatio, $uEmissionratio);
                 $row['all'] = true;
                 $events[] = $row;
             }
@@ -468,7 +513,7 @@ class UserController extends Controller
         return response()->json(['data' => $events]);
     }
 
-    private static function shapeMyEvent(Party $event, array $attending): array
+    private static function shapeMyEvent(Party $event, array $attending, $eEmissionRatio = null, $uEmissionratio = null): array
     {
         $group = $event->theGroup;
 
@@ -484,7 +529,17 @@ class UserController extends Controller
             'attending' => in_array($event->idevents, $attending),
             'nearby' => false,
             'all' => false,
-            'group' => $group ? ['id' => $group->idgroups, 'name' => $group->name] : null,
+            'group' => $group ? [
+                'id' => $group->idgroups,
+                'name' => $group->name,
+                'country' => Fixometer::getCountryFromCountryCode($group->country_code),
+            ] : null,
+            // Same shape as the "stats" block on GET /api/v2/events/{id} (App\Http\Resources\Party) -
+            // party/view/[id].vue already reads event.stats.{participants,volunteers,waste_total,
+            // co2_total,fixed_devices,repairable_devices,dead_devices,...} unconditionally, gating
+            // what it shows on finished/upcoming client-side. Do the same here rather than shipping
+            // two different per-event shapes.
+            'stats' => $event->getEventStats($eEmissionRatio, $uEmissionratio),
         ];
     }
 

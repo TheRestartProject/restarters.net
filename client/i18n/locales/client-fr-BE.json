@@ -81,6 +81,8 @@
       "edit_forbidden": "Vous n'avez pas la permission de modifier cet événement.",
       "end_before_start": "L'heure de fin doit être postérieure à l'heure de début.",
       "end_required": "Veuillez choisir une heure de fin.",
+      "filter_end_label": "Date de fin",
+      "filter_start_label": "Date de début",
       "group_required": "Veuillez choisir le groupe qui organise cet événement.",
       "groups_load_error": "Désolé, nous n'avons pas pu charger vos groupes.",
       "hosting": "Organisateur",
