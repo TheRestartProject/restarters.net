@@ -879,6 +879,83 @@ class GroupController extends Controller
      *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
      *     )
      */
+    /**
+     * @OA\Get(
+     *      path="/api/v2/groups/{id}/audits",
+     *      operationId="getGroupAuditsv2",
+     *      tags={"Groups"},
+     *      summary="Audit trail for a group",
+     *      description="Backs the edit page's Group log tab. Administrator only, matching the legacy edit view's gate. Strings are rendered server-side from the group-audits lang files, so the placeholder substitution stays in one place; heading and changes are HTML.",
+     *      security={{"apiToken":{}}},
+     *      @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Audit entries, newest first",
+     *          @OA\JsonContent(@OA\Property(property="data", type="array", @OA\Items(
+     *              @OA\Property(property="id", type="integer"),
+     *              @OA\Property(property="event", type="string", example="updated"),
+     *              @OA\Property(property="heading", type="string"),
+     *              @OA\Property(property="changes", type="array", @OA\Items(type="string"))
+     *          )))
+     *      ),
+     *      @OA\Response(response=403, description="Not an administrator"),
+     *      @OA\Response(response=404, description="No such group")
+     * )
+     */
+    public function auditsv2($id): JsonResponse
+    {
+        if ($resp = $this->requireAdministrator()) {
+            return $resp;
+        }
+
+        $group = Group::find($id);
+
+        if (! $group) {
+            return response()->json(['error' => 'No such group'], 404);
+        }
+
+        // Same shape and rationale as EventController::auditsv2 - see there.
+        $audits = $group->audits()->with('user')->orderBy('created_at', 'desc')->get();
+
+        return response()->json([
+            'data' => $audits->map(function ($audit) {
+                $changes = [];
+
+                foreach ($audit->getModified() as $attribute => $modified) {
+                    $key = 'group-audits.'.$audit->event.'.modified.'.$attribute;
+                    $line = __($key, $modified);
+
+                    if ($line !== $key) {
+                        $changes[] = $line;
+                    }
+                }
+
+                // SECURITY: audit_url is the full request URL, so for any write
+                // authenticated with ?api_token= it contains a VALID API TOKEN.
+                // laravel-auditing stores that verbatim, and the legacy view
+                // renders it to any Administrator opening the log. Strip the
+                // query string before rendering. NB this only stops the
+                // display - rows already in the audits table still hold the
+                // token, which needs a separate purge.
+                $metadata = $audit->getMetadata();
+
+                if (isset($metadata['audit_url']) && is_string($metadata['audit_url'])) {
+                    $metadata['audit_url'] = strtok($metadata['audit_url'], '?');
+                }
+
+                $headingKey = 'group-audits.'.$audit->event.'.metadata';
+                $heading = __($headingKey, $metadata);
+
+                return [
+                    'id' => $audit->id,
+                    'event' => $audit->event,
+                    'heading' => $heading === $headingKey ? null : $heading,
+                    'changes' => $changes,
+                ];
+            })->values()->all(),
+        ]);
+    }
+
     public function moderateGroupsv2(Request $request): JsonResponse {
         $user = $this->getUser();
         $ret = \App\Http\Resources\GroupCollection::make(Group::unapprovedVisibleTo($user->id));

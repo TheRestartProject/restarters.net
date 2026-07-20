@@ -581,8 +581,21 @@ class EventController extends Controller
                     }
                 }
 
+                // SECURITY: audit_url is the full request URL, so for any write
+                // authenticated with ?api_token= it contains a VALID API TOKEN.
+                // laravel-auditing stores that verbatim, and the legacy view
+                // renders it to any Administrator opening the log. Strip the
+                // query string before rendering. NB this only stops the
+                // display - rows already in the audits table still hold the
+                // token, which needs a separate purge.
+                $metadata = $audit->getMetadata();
+
+                if (isset($metadata['audit_url']) && is_string($metadata['audit_url'])) {
+                    $metadata['audit_url'] = strtok($metadata['audit_url'], '?');
+                }
+
                 $headingKey = 'event-audits.'.$audit->event.'.metadata';
-                $heading = __($headingKey, $audit->getMetadata());
+                $heading = __($headingKey, $metadata);
 
                 return [
                     'id' => $audit->id,

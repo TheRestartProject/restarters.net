@@ -125,6 +125,9 @@ Route::prefix('v2')->middleware(\App\Http\Middleware\VerifyUserConsentApi::class
             Route::get('{id}/events', [API\GroupController::class, 'getEventsForGroupv2']);
             Route::get('{id}/stats', [API\GroupMembershipController::class, 'statsv2']);
             Route::get('{id}', [API\GroupController::class, 'getGroupv2']);
+            // Audit trail for the edit page's Group log tab - Administrator
+            // only, matching group/edit.blade.php:11's gate.
+            Route::get('{id}/audits', [API\GroupController::class, 'auditsv2']);
             Route::post('', [API\GroupController::class, 'createGroupv2']);
             Route::patch('{id}', [API\GroupController::class, 'updateGroupv2']);
 
