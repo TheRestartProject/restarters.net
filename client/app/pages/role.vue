@@ -174,7 +174,12 @@ onMounted(load)
       <BButton variant="danger" data-testid="role-retry" @click="retry">{{ t('client.dashboard.retry') }}</BButton>
     </BAlert>
 
-    <div v-else class="table-responsive">
+    <!-- CategoriesTable.vue:2 / RolesTable.vue:2 / brands|skills|tags
+         index.blade: `class="table-responsive table-section"`.
+         `.table-section` is _tables.scss's white/20px-padding/1px-border/
+         6px-shadow panel - already ported here, just never applied, so
+         every admin table rendered flat on the page background. -->
+    <div v-else class="table-responsive table-section">
       <table class="table table-striped table-hover" data-testid="roles-table">
         <thead>
           <tr>

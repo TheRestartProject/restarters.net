@@ -52,7 +52,13 @@ onMounted(() => {
     <div v-if="!groups.length" class="text-muted" data-testid="network-groups-moderation-empty">
       {{ t('networks.show.none') }}
     </div>
-    <GroupsTable v-else :groups="groups" :show-join="false" :show-filters="false" approve />
+    <!-- GroupsRequiringModeration.vue:3 wraps the table in
+         `<section class="table-section">` - _tables.scss's white/20px-padding/
+         1px-black-border/6px-shadow panel, which we had already ported but
+         never applied here. That is where the missing panel came from. -->
+    <section v-else class="table-section">
+      <GroupsTable :groups="groups" :show-join="false" :show-filters="false" approve />
+    </section>
   </div>
 </template>
 
