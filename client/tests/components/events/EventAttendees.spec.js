@@ -171,8 +171,8 @@ describe('components/events/EventAttendees', () => {
     it('shows participant/volunteer counts when finished and the counts are available', () => {
       const wrapper = mountComponent({ upcoming: false, finished: true, participants: 12, volunteers: 3 })
 
-      expect(wrapper.find('[data-testid="event-attendees-participants"]').text()).toBe('12Participants')
-      expect(wrapper.find('[data-testid="event-attendees-volunteers"]').text()).toBe('3Volunteers')
+      expect(wrapper.find('[data-testid="event-attendees-participants"]').text()).toBe('Participants12')
+      expect(wrapper.find('[data-testid="event-attendees-volunteers"]').text()).toBe('Volunteers3')
     })
 
     it('shows the counts for an in-progress event too (not upcoming, not finished)', () => {
@@ -194,7 +194,7 @@ describe('components/events/EventAttendees', () => {
     it('shows just the volunteer count when only that is available', () => {
       const wrapper = mountComponent({ upcoming: false, finished: true, participants: null, volunteers: 3 })
       expect(wrapper.find('[data-testid="event-attendees-participants"]').exists()).toBe(false)
-      expect(wrapper.find('[data-testid="event-attendees-volunteers"]').text()).toBe('3Volunteers')
+      expect(wrapper.find('[data-testid="event-attendees-volunteers"]').text()).toBe('Volunteers3')
     })
 
     // Gap 13: EventAttendanceCount.vue's +/- stepper - editable for a

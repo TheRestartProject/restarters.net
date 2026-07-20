@@ -51,17 +51,21 @@ import EventDevicesPanel from '~/components/devices/EventDevicesPanel.vue'
 // stats" modal (gap 3, embed-code half only - see EventShareStatsModal.vue's
 // doc comment for what's deliberately not reproduced).
 //
-// NOT reproduced (backend gaps, see this task's final report): the
-// Discourse "Talk thread" link (gap 11) and the event-photos gallery
-// (gap 5) both need fields the v2 Event resource doesn't return today
-// (discourse_thread, images) - api-gaps.md already tracks the photos gap;
-// this pass surfaces the discourse_thread one too rather than fabricate
-// either. Inline-editable attendance headcounts (gap 13) and the "Add
-// volunteer" modal (gap 14) both need a v2 endpoint that doesn't exist -
-// the legacy POST /party/update-quantity, /party/update-volunteerquantity
-// and PUT /api/events/{id}/volunteers routes are outside the /api/v2
-// surface this client is scoped to (CLAUDE.md), so these stay read-only/
-// unbuilt rather than reaching for a non-v2 endpoint.
+// Gaps 5/11/13/14 are now BUILT - this comment used to say they were not,
+// on the grounds that the API didn't expose what they needed. It did:
+// - gap 11, Discourse "Talk thread": EventDetailsPanel.vue, from
+//   session config discourse_url + the resource's discourse_thread.
+// - gap 5, event photos: EventImagesGallery.vue, read-only. develop's
+//   EventImages/EventImage/EventImageModal carry no delete affordance at
+//   all (the "Remove file" dropzone belongs to the separate edit page), so
+//   a delete button here would be invention rather than parity.
+// - gap 13, inline headcounts: EventAttendanceCount.vue via
+//   updateHeadcount() below.
+// - gap 14, add volunteer: EventAddVolunteerModal.vue. PUT
+//   /api/events/{id}/volunteers sits under the same auth:sanctum,api group
+//   as every v2 route this client already calls, so the existing bearer
+//   token just works - it being outside the /api/v2 prefix was never the
+//   obstacle it was recorded as.
 
 const { t } = useI18n()
 const route = useRoute()
@@ -540,10 +544,14 @@ function closeAddVolunteer() {
         <section data-testid="event-view-stats">
           <h2>{{ t('events.items_fixed') }}</h2>
           <div class="d-flex flex-wrap gap-3">
-            <div class="stat-card" data-testid="event-view-stats-fixed">
+            <!-- EventStatsItems.vue:5 - the fixed-devices card is
+                 `variant="primary"` with NO `title` prop, i.e. a $brand-light
+                 filled card showing the count alone. The other two are plain
+                 white and DO carry a title. This one was rendering white with
+                 a "Fixed" label, so it was indistinguishable from them. -->
+            <div class="stat-card stat-card--primary" data-testid="event-view-stats-fixed">
               <img src="/images/fixed.svg" alt="" class="stat-card__icon">
               <div class="stat-card__count">{{ event.stats.fixed_devices ?? 0 }}</div>
-              <div class="stat-card__label">{{ t('partials.fixed') }}</div>
             </div>
             <div class="stat-card" data-testid="event-view-stats-powered">
               <img src="/images/powered.svg" alt="" class="stat-card__icon">
@@ -581,7 +589,12 @@ function closeAddVolunteer() {
               <!-- eslint-disable-next-line vue/no-v-html -->
               <div class="stat-card__label" v-html="t('partials.co2')" />
               <!-- eslint-disable-next-line vue/no-v-html -->
-              <div class="small" data-testid="event-view-impact-equivalent" v-html="equivalentConsumer(event.stats.co2_total)" />
+              <!-- StatsValue.vue:18 gates the equivalence description on
+                   `count > 0`, so develop shows nothing here for an event
+                   with no CO2 recorded. We rendered it unconditionally,
+                   producing "that's like growing 0 tree seedlings for 10
+                   years" on every zero-impact event. -->
+              <div v-if="event.stats.co2_total > 0" class="small" data-testid="event-view-impact-equivalent" v-html="equivalentConsumer(event.stats.co2_total)" />
               <!-- StatsValue.vue's "Share this" - the CO2-card trigger for
                    the social-image modal, distinct from the header
                    dropdown's "Share event stats" embed-code modal above
@@ -746,6 +759,17 @@ function closeAddVolunteer() {
 /* Neo-brutalist stat card - same look as components/groups/GroupStats.vue's
    .stat-card (white box, near-black border + offset shadow, teal value), for
    visual consistency across the group/event environmental-impact sections. */
+/* StatsValue.vue's `.impact-stat-primary`: $brand-light ground, white text.
+   Only the fixed-devices card uses it. */
+.stat-card--primary {
+  background: #4aaebc;
+  color: #fff;
+}
+
+.stat-card--primary .stat-card__count {
+  color: #fff;
+}
+
 .stat-card {
   flex: 1 1 0;
   min-width: 90px;

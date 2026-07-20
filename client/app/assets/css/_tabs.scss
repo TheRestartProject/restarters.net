@@ -332,3 +332,61 @@
     }
   }
 }
+
+// _events.scss:326,387 - the bordered tab panel used by the event page's
+// attendance and items sections. Global (as in develop) because both the
+// black default and the teal `ourtabs-brand` variant are needed by two
+// different components; scoping it to one of them meant the other silently
+// rendered its tabs and content flat on the page background.
+.ourtabs {
+  background-color: #fff;
+  border: 1px solid #000;
+  box-shadow: 5px 5px #000;
+
+  .nav-tabs {
+    border-bottom: none;
+  }
+
+  .nav-item {
+    width: 50%;
+  }
+
+  .nav-link {
+    width: 100%;
+    border: none;
+    border-right: 1px solid #000;
+    border-bottom: 1px solid #000;
+    border-radius: 0;
+    padding-top: 10px;
+    padding-left: calc(10% + 1px);
+    text-align: left;
+    text-transform: uppercase;
+    color: inherit;
+    background: none;
+  }
+
+  .nav-item:last-child .nav-link {
+    border-right: none;
+  }
+
+  .nav-link.active {
+    border-bottom-color: transparent;
+    background-color: #fff;
+  }
+
+  // The panel supplies its own padding; the tab content sits inside it.
+  > div:not(.nav) {
+    padding: 0 1rem 1rem;
+  }
+}
+
+// _events.scss:387 - the items-at-this-event variant, teal rather than black.
+.ourtabs.ourtabs-brand {
+  border: 1px solid #0394a6;
+  box-shadow: 5px 5px #0394a6;
+
+  .nav-link {
+    border-right-color: #0394a6;
+    border-bottom-color: #0394a6;
+  }
+}

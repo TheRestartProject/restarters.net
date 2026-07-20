@@ -117,9 +117,16 @@ async function confirmRemove() {
 
 <template>
   <div data-testid="event-attendees">
+    <!-- The count is MOBILE-ONLY. develop passes :count to CollapsibleSection
+         without `alwaysShowCount`, and that component renders it `d-md-none`
+         (CollapsibleSection.vue:16-17) - the count exists to encourage taps on
+         a collapsed mobile section, so at md+ develop's heading is a plain
+         "Attendance". This heading is hand-rolled rather than going through
+         EventCollapsibleSection (which already gets this right), so it showed
+         the count at every width. -->
     <h2>
       {{ t('events.event_attendance') }}
-      <span class="fw-normal">({{ confirmed.length + invited.length }})</span>
+      <span class="fw-normal d-md-none">({{ confirmed.length + invited.length }})</span>
     </h2>
 
     <div v-if="loading" data-testid="event-attendees-loading">
@@ -134,27 +141,41 @@ async function confirmRemove() {
         :class="{ 'attendance-layout--upcoming': upcoming }"
       >
         <div v-if="!upcoming && (participants !== null || volunteers !== null)" class="d-flex flex-wrap gap-4 mb-3 mb-md-0" data-testid="event-attendees-headcounts">
+          <!-- EventAttendance.vue:15-26: an icon plus a BOLD label ABOVE each
+               stepper, not a small muted caption beneath it. -->
           <div v-if="participants !== null" data-testid="event-attendees-participants">
+            <b class="attendance-count-label">
+              <img src="/icons/group_ico.svg" alt="" class="me-2 attendance-icon">
+              {{ t('events.stat-0') }}
+            </b>
             <EventAttendanceCount
+              class="mt-2 mb-4"
               :count="participants"
               :canedit="canedit"
               testid="event-attendees-participants-count"
               @change="emit('update-participants', $event)"
             />
-            <div class="small text-muted">{{ t('events.stat-0') }}</div>
           </div>
           <div v-if="volunteers !== null" data-testid="event-attendees-volunteers">
+            <b class="attendance-count-label">
+              <img src="/icons/volunteer_ico.svg" alt="" class="me-2 attendance-icon">
+              {{ t('events.stat-2') }}
+            </b>
             <EventAttendanceCount
+              class="mt-2"
               :count="volunteers"
               :canedit="canedit"
               testid="event-attendees-volunteers-count"
               @change="emit('update-volunteers', $event)"
             />
-            <div class="small text-muted">{{ t('events.stat-2') }}</div>
           </div>
         </div>
 
-        <div>
+        <!-- EventAttendance.vue wraps the tabs in `.ourtabs` (_events.scss:326)
+             - a white panel with a 1px black border and a 5px offset black
+             shadow. Without it the tabs and the volunteer list float loose on
+             the page background, which is how this rendered before. -->
+        <div class="ourtabs">
           <ul class="nav nav-tabs">
             <li class="nav-item">
               <button
@@ -313,6 +334,17 @@ async function confirmRemove() {
    EventAttendee.vue's .blackbord. */
 .attendee-row {
   border-bottom: 1px solid #000;
+}
+
+/* EventAttendance.vue:16 - the label sits above its stepper, as a block, so
+   the icon and text share a line and the stepper starts underneath. */
+.attendance-count-label {
+  display: block;
+}
+
+.attendance-icon {
+  width: 24px;
+  height: 24px;
 }
 
 /* Gap 22: bordered avatar, matching EventAttendee.vue's .profile. */

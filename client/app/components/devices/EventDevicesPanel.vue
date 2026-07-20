@@ -99,7 +99,11 @@ function onAdded() {
          a single CSS-grid reflow of the tabbed layout for every viewport,
          losing the mobile two-collapsible structure. -->
     <template v-else>
-      <div class="d-none d-md-block" data-testid="event-devices-desktop">
+      <!-- EventDevices.vue:10 - `b-tabs class="ourtabs ourtabs-brand"`, the
+           teal-bordered panel variant (_events.scss:387). This rendered flat
+           on the page background before, so the powered/unpowered tabs and the
+           item table had no panel around them at all. -->
+      <div class="d-none d-md-block ourtabs ourtabs-brand" data-testid="event-devices-desktop">
         <ul class="nav nav-tabs">
           <li class="nav-item">
             <button
