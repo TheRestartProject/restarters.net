@@ -1248,6 +1248,25 @@ class GroupController extends Controller
             $data['archived_at'] = $archived_at;
         }
 
+        // This is a PATCH, so a field the caller did not send must be left
+        // ALONE. $request->input() returns null for an absent key, and writing
+        // that null wiped real data: a PATCH sending only {name, phone}
+        // cleared the group's location, latitude and longitude outright.
+        // Observed against the parity fixtures.
+        //
+        // latitude/longitude/country_code are derived from `location` by the
+        // geocoder above rather than sent by the caller, so they follow
+        // whether `location` was sent.
+        $derivedFromLocation = ['latitude', 'longitude', 'country_code'];
+
+        $data = array_filter($data, function ($value, $field) use ($request, $derivedFromLocation) {
+            $sentAs = in_array($field, $derivedFromLocation, true)
+                ? 'location'
+                : ($field === 'free_text' ? 'description' : $field);
+
+            return $request->has($sentAs);
+        }, ARRAY_FILTER_USE_BOTH);
+
         if (isset($_FILES) && !empty($_FILES)) {
             // Update the group image.
             $file = new \FixometerFile();
