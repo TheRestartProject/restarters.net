@@ -15,6 +15,13 @@ export default class GroupAPI extends BaseAPI {
     return this.$get(`/api/v2/groups/${id}`)
   }
 
+  // GET /api/v2/groups/{id}/audits - the edit page's Group log tab.
+  // Administrator only; strings arrive pre-rendered as HTML (the placeholder
+  // substitution lives in the group-audits lang files server-side).
+  audits(id) {
+    return this.$get(`/api/v2/groups/${id}/audits`)
+  }
+
   create(payload) {
     return this.$post('/api/v2/groups', payload)
   }

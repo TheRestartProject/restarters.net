@@ -1,4 +1,4 @@
-import { mount } from '@vue/test-utils'
+import { flushPromises, mount } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
 import { createI18n } from 'vue-i18n'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -55,11 +55,16 @@ function mountPage() {
 describe('pages/group/edit/[id]', () => {
   let groupsStore
   let sessionStore
+  let mockApi
 
   beforeEach(() => {
     setActivePinia(createPinia())
     vi.stubGlobal('useRoute', () => ({ params: { id: '5' }, query: {}, fullPath: '/group/edit/5' }))
     vi.stubGlobal('navigateTo', vi.fn())
+
+    // The Group log tab calls $api.group.audits(id) lazily on first open.
+    mockApi = { group: { audits: vi.fn().mockResolvedValue({ data: [] }) } }
+    vi.stubGlobal('useNuxtApp', () => ({ $api: mockApi }))
 
     groupsStore = useGroupsStore()
     groupsStore.fetchCurrent = vi.fn().mockResolvedValue(BASE_GROUP)
@@ -150,4 +155,32 @@ describe('pages/group/edit/[id]', () => {
     const wrapper = mountPage()
     expect(wrapper.find('[data-testid="group-edit-archive"]').exists()).toBe(false)
   })
+  // group/edit.blade.php:11-15 - Group log tab, Administrator only, fetched
+  // lazily so landing on the edit form does not hit the endpoint.
+  describe('group log tab', () => {
+    it('is hidden from a non-administrator', async () => {
+      groupsStore.current.data = BASE_GROUP
+      sessionStore.user = { role: 4 }
+      const wrapper = mountPage()
+      await flushPromises()
+
+      expect(wrapper.find('[data-testid="group-edit-tab-log"]').exists()).toBe(false)
+    })
+
+    it('shows for an administrator and fetches only on open', async () => {
+      groupsStore.current.data = BASE_GROUP
+      sessionStore.user = { role: 2 }
+      const wrapper = mountPage()
+      await flushPromises()
+
+      expect(wrapper.find('[data-testid="group-edit-tab-log"]').exists()).toBe(true)
+      expect(mockApi.group.audits).not.toHaveBeenCalled()
+
+      await wrapper.find('[data-testid="group-edit-tab-log"]').trigger('click')
+      await flushPromises()
+
+      expect(mockApi.group.audits).toHaveBeenCalledWith(5)
+    })
+  })
+
 })

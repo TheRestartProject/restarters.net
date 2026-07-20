@@ -48,6 +48,31 @@ const canEdit = computed(() => !!permissions.value.can_edit)
 // (legacy GroupAddEditPage's canNetwork = Auth::user()->hasRole('Administrator')).
 const isAdmin = computed(() => sessionStore.user?.role === 1 || sessionStore.user?.role === 2)
 
+// group/edit.blade.php:11-15 - a Group log tab gated on
+// `$audits && hasRole(Administrator)`. Fetched lazily on first open: it is an
+// admin-only panel most page loads never show.
+const activeTab = ref('details')
+const audits = ref([])
+const auditsLoaded = ref(false)
+const auditsError = ref(false)
+const openAuditId = ref(null)
+
+async function showGroupLog() {
+  activeTab.value = 'log'
+
+  if (auditsLoaded.value) return
+
+  try {
+    const { $api } = useNuxtApp()
+    const { data } = await $api.group.audits(id.value)
+    audits.value = data || []
+  } catch {
+    auditsError.value = true
+  } finally {
+    auditsLoaded.value = true
+  }
+}
+
 const updatedMessage = ref('')
 
 useHead({ title: computed(() => (group.value ? `${t('groups.editing')} ${group.value.name}` : t('groups.editing'))) })
@@ -89,16 +114,69 @@ function onUpdated() {
 
     <div v-else-if="group" class="row justify-content-center">
       <div class="col-lg-12">
+        <!-- group/edit.blade.php:7-16. Both labels are hardcoded English in
+             develop too (no lang keys exist for them), so they are left as-is
+             here rather than inventing translations develop doesn't have. -->
         <ul class="nav nav-tabs" data-testid="group-edit-tabs">
           <li class="nav-item">
-            <span class="nav-link active">Group details</span>
+            <button
+              type="button"
+              class="nav-link"
+              :class="{ active: activeTab === 'details' }"
+              data-testid="group-edit-tab-details"
+              @click="activeTab = 'details'"
+            >
+              Group details
+            </button>
+          </li>
+          <li v-if="isAdmin" class="nav-item">
+            <button
+              type="button"
+              class="nav-link"
+              :class="{ active: activeTab === 'log' }"
+              data-testid="group-edit-tab-log"
+              @click="showGroupLog"
+            >
+              Group log
+            </button>
           </li>
         </ul>
+
+        <div v-if="isAdmin" v-show="activeTab === 'log'" class="group-edit-panel" data-testid="group-edit-pane-log">
+          <BAlert v-if="auditsError" :model-value="true" variant="danger" data-testid="group-edit-log-error">
+            {{ t('client.groups.load_error') }}
+          </BAlert>
+          <p v-else-if="auditsLoaded && !audits.length" class="text-muted" data-testid="group-edit-log-empty">
+            {{ t('group-audits.unavailable_audits') }}
+          </p>
+          <div v-else class="accordion" data-testid="group-edit-log-accordion">
+            <div v-for="audit in audits" :key="audit.id" class="accordion-item">
+              <h3 class="accordion-header">
+                <button
+                  type="button"
+                  class="accordion-button"
+                  :class="{ collapsed: openAuditId !== audit.id }"
+                  :data-testid="`group-edit-log-heading-${audit.id}`"
+                  @click="openAuditId = openAuditId === audit.id ? null : audit.id"
+                >
+                  <!-- eslint-disable-next-line vue/no-v-html -->
+                  <span v-html="audit.heading" />
+                </button>
+              </h3>
+              <div v-show="openAuditId === audit.id" class="accordion-body">
+                <ul class="list-unstyled mb-0">
+                  <!-- eslint-disable-next-line vue/no-v-html -->
+                  <li v-for="(change, i) in audit.changes" :key="i" v-html="change" />
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
 
         <!-- resources/sass/_edit.scss's .edit-panel (findings/parity-v2/
              group-forms.md #3): white bg, bordered, hard offset
              drop-shadow, and bold/16px form labels within it. -->
-        <div class="group-edit-panel">
+        <div v-show="activeTab === 'details'" class="group-edit-panel">
           <h1>
             {{ t('groups.editing') }}
             <NuxtLink :to="`/group/view/${id}`" class="headlink" data-testid="group-edit-view-link">{{ group.name }}</NuxtLink>
