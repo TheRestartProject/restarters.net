@@ -41,8 +41,26 @@ async function loadSection(store, key, force, request) {
   try {
     // await inside try so a synchronous throw from request() (e.g. a missing
     // $api in a test) is caught here, same as the original explicit actions.
-    const { data } = await request()
-    section.data = data || []
+    //
+    // GET /api/v2/moderate/{groups,events} are the odd ones out among v2
+    // endpoints: moderateGroupsv2/moderateEventsv2 (API\GroupController,
+    // API\EventController) both do `response()->json($resourceCollection)`,
+    // which skips Laravel's normal Responsable auto-wrap and returns a bare
+    // JSON array - not the `{"data": [...]}` envelope every other v2
+    // endpoint uses (confirmed via a live capture: 200 OK, body is
+    // `[{"id":1,...}]` directly). A plain `const { data } = ...` destructure
+    // silently produced `undefined` for that shape, so the queue rendered
+    // as "empty" with no error at all - a live, reproducible admin-facing
+    // bug (the moderation panel invisibly failing to show a genuinely
+    // unapproved group). Fixed here rather than server-side because
+    // develop's own Vuex consumer (resources/js/store/groups.js's
+    // getModerationRequired) already depends on the current bare-array
+    // shape (axios's own single `.data` unwrap lands on it correctly) -
+    // wrapping the response server-side would fix us and break develop,
+    // which is still the live parity reference. Tolerate both shapes so
+    // this keeps working if the envelope is ever normalised later.
+    const res = await request()
+    section.data = (Array.isArray(res) ? res : res?.data) || []
     section.loaded = true
     return section.data
   } catch (error) {
