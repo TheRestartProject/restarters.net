@@ -67,15 +67,11 @@ async function submitPhoto() {
       {{ feedback }}
     </BAlert>
 
-    <!-- profile.blade.php:145 labels the field "Profile picture:". The
-         control itself differs and deliberately stays as-is for now: develop
-         uses a plain multipart <input type="file"> plus a CHANGE MY PHOTO
-         submit, whereas this is the shared TusImageUpload (resumable tus)
-         used for every other image in the client - and develop itself uses a
-         dropzone for group images, so the pattern is not foreign to it.
-         Swapping transport would mean a different endpoint contract, so it is
-         recorded in findings/parity-visual-findings.md rather than changed
-         blind. -->
+    <!-- profile.blade.php:138-145 - labelled file input plus a CHANGE MY
+         PHOTO submit, rather than uploading the instant a file is chosen.
+         POST /api/v2/users/me/photo accepts this multipart shape as well as
+         the tus upload_key every other image in the client uses, sharing all
+         validation between them. -->
     <img v-if="photoUrl" :src="photoUrl" alt="" class="mb-3 profile-photo-preview">
 
     <form data-testid="profile-photo-form" @submit.prevent="submitPhoto">

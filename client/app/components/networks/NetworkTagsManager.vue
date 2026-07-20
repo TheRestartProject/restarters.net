@@ -10,8 +10,10 @@ import { useNetworksStore } from '~/stores/networks.js'
 // inline create form below the list - NOT components/admin/AdminCrudTable.
 // vue's generic modal-driven create flow + name-as-edit-link + text
 // "Delete" button (AdminCrudTable is shared by 5 other reference-data pages
-// and out of scope for this pass, so a bespoke component lives here instead
-// of reworking it - see parity-v2/networks.md gap #4's write-up). Edit
+// which is a DIFFERENT shape, so a bespoke component here is the parity
+// match - not a shortcut around reworking AdminCrudTable. Checked during the
+// deferral-comment audit: the wording read like a dodge, the code does not).
+// Edit
 // stays a modal here too, matching legacy's own edit-tag b-modal.
 const props = defineProps({
   networkId: {

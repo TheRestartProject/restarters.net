@@ -935,8 +935,11 @@ class GroupController extends Controller
                 // laravel-auditing stores that verbatim, and the legacy view
                 // renders it to any Administrator opening the log. Strip the
                 // query string before rendering. NB this only stops the
-                // display - rows already in the audits table still hold the
-                // token, which needs a separate purge.
+                // display. New rows no longer carry one either
+                // (App\Auditing\SanitisedUrlResolver), and `php artisan
+                // audits:scrub-urls` clears any written before that landed -
+                // this stays as defence in depth for environments that have
+                // not run it.
                 $metadata = $audit->getMetadata();
 
                 if (isset($metadata['audit_url']) && is_string($metadata['audit_url'])) {
