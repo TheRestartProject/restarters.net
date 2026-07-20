@@ -395,6 +395,17 @@ class UserController extends Controller
             ->with('groupImage.image')
             ->get();
 
+        // Next upcoming event per group, in ONE query. getNextUpcomingEvent()
+        // is per-group, so calling it inside the map below would be an N+1 -
+        // which is what the first version of this did.
+        $nextEvents = \App\Party::whereIn('group', $groups->pluck('idgroups'))
+            ->where('approved', true)
+            ->where('event_start_utc', '>=', date('Y-m-d H:i:s'))
+            ->orderBy('event_start_utc', 'asc')
+            ->get(['group', 'event_start_utc'])
+            ->groupBy('group')
+            ->map(fn ($rows) => $rows->first()->event_start_utc);
+
         return response()->json([
             'data' => $groups->map(fn ($group) => [
                 'id' => $group->idgroups,
@@ -408,8 +419,8 @@ class UserController extends Controller
                 ] : null,
                 'hosts' => (int) $group->all_hosts_count,
                 'restarters' => (int) $group->all_restarters_count,
-                'next_event' => ($next = $group->getNextUpcomingEvent()) ? [
-                    'start' => $next->event_start_utc,
+                'next_event' => isset($nextEvents[$group->idgroups]) ? [
+                    'start' => $nextEvents[$group->idgroups],
                 ] : null,
             ])->values()->all(),
         ]);
