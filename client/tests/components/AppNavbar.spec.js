@@ -1,7 +1,8 @@
 import { mount } from '@vue/test-utils'
+import { nextTick } from 'vue'
 import { createPinia, setActivePinia } from 'pinia'
 import { createI18n } from 'vue-i18n'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import AppNavbar from '../../app/components/AppNavbar.vue'
 import { useAuthStore } from '../../app/stores/auth.js'
 import { useSessionStore } from '../../app/stores/session.js'
@@ -129,5 +130,63 @@ describe('AppNavbar', () => {
 
     expect(authStore.logout).toHaveBeenCalledTimes(1)
     expect(navigateToMock).toHaveBeenCalledWith('/login')
+  })
+
+  // Mirrors legacy's resources/js/app.js scroll listener (hide-on-scroll
+  // for the mobile #nav-left bar) - see AppNavbar.vue's own doc comment for
+  // why 992/0 are the right numbers to stub here.
+  describe('mobile bottom bar hide-on-scroll', () => {
+    async function fireScroll(scrollY) {
+      window.pageYOffset = scrollY
+      window.dispatchEvent(new Event('scroll'))
+      // updateNavVisibility runs inside a requestAnimationFrame callback,
+      // then Vue needs a tick to flush navHidden's new value to the DOM.
+      vi.runOnlyPendingTimers()
+      await nextTick()
+    }
+
+    beforeEach(() => {
+      vi.useFakeTimers()
+      vi.stubGlobal('requestAnimationFrame', (cb) => setTimeout(cb, 0))
+      Object.defineProperty(window, 'innerWidth', { writable: true, configurable: true, value: 375 })
+      window.pageYOffset = 0
+    })
+
+    afterEach(() => {
+      vi.useRealTimers()
+    })
+
+    it('hides the bar on scroll down and shows it again on scroll up', async () => {
+      const wrapper = mountNavbar()
+      const navLeft = wrapper.find('[data-testid="nav-left"]')
+
+      expect(navLeft.classes()).not.toContain('nav-left--hidden')
+
+      await fireScroll(50)
+      expect(wrapper.find('[data-testid="nav-left"]').classes()).toContain('nav-left--hidden')
+
+      await fireScroll(20)
+      expect(wrapper.find('[data-testid="nav-left"]').classes()).not.toContain('nav-left--hidden')
+    })
+
+    it('does nothing at desktop widths, where the bar is not fixed anyway', async () => {
+      Object.defineProperty(window, 'innerWidth', { writable: true, configurable: true, value: 1200 })
+      const wrapper = mountNavbar()
+
+      await fireScroll(50)
+
+      expect(wrapper.find('[data-testid="nav-left"]').classes()).not.toContain('nav-left--hidden')
+    })
+
+    it('ignores a negative (rubber-band overscroll) reading', async () => {
+      const wrapper = mountNavbar()
+
+      await fireScroll(50)
+      expect(wrapper.find('[data-testid="nav-left"]').classes()).toContain('nav-left--hidden')
+
+      await fireScroll(-5)
+      // Unchanged - still hidden from the previous scroll-down.
+      expect(wrapper.find('[data-testid="nav-left"]').classes()).toContain('nav-left--hidden')
+    })
   })
 })

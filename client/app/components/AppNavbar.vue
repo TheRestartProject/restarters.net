@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useSessionStore } from '~/stores/session.js'
 import { useAuthStore } from '~/stores/auth.js'
@@ -79,6 +79,55 @@ function goToWiki() {
 
   goTo(base)
 }
+
+// Hide-on-scroll for the mobile bottom bar (#nav-left), matching legacy's
+// resources/js/app.js scroll listener: hides on scroll down, reappears on
+// scroll up, ignores momentum/rubber-band overscroll (a negative reading).
+// No minimum-distance threshold - legacy's own comparison doesn't have one
+// either, just direction. `.nav-left--hidden`'s transform is itself nested
+// inside `_navigation-bar.scss`'s `@include media-breakpoint-down(md)`
+// block, so it has no visual effect at wider viewports regardless - the
+// width check below is purely to skip the (otherwise harmless) work there,
+// not to fix a bug. 992 is Bootstrap's lg start, i.e. the same cutoff that
+// mixin compiles to.
+const MOBILE_NAV_BREAKPOINT = 992
+const navHidden = ref(false)
+// Legacy seeds this with the boolean `true` (coerces to 1 in the `<`
+// comparison below); 0 is the numeric equivalent for every reachable case -
+// a scroll event can't fire from position 0 to something lower - without
+// the odd-looking non-numeric initial value.
+let lastScrollPosition = 0
+let scrollTicking = false
+
+function updateNavVisibility() {
+  scrollTicking = false
+
+  if (window.innerWidth >= MOBILE_NAV_BREAKPOINT) {
+    return
+  }
+
+  const currentScrollPosition = window.pageYOffset || document.documentElement.scrollTop
+  if (currentScrollPosition < 0) {
+    return
+  }
+
+  navHidden.value = currentScrollPosition >= lastScrollPosition
+  lastScrollPosition = currentScrollPosition
+}
+
+function onScroll() {
+  if (scrollTicking) return
+  scrollTicking = true
+  window.requestAnimationFrame(updateNavVisibility)
+}
+
+onMounted(() => {
+  window.addEventListener('scroll', onScroll, { passive: true })
+})
+
+onUnmounted(() => {
+  window.removeEventListener('scroll', onScroll)
+})
 </script>
 
 <template>
@@ -87,7 +136,12 @@ function goToWiki() {
       <IconLogo />
     </NuxtLink>
 
-    <ul id="nav-left" class="nav-left d-flex justify-content-between w-100 pe-md-3">
+    <ul
+      id="nav-left"
+      class="nav-left d-flex justify-content-between w-100 pe-md-3"
+      :class="{ 'nav-left--hidden': navHidden }"
+      data-testid="nav-left"
+    >
       <li>
         <a :href="config.discourse_url || '#'" rel="noopener noreferrer" data-testid="nav-talk" @click.prevent="goToTalk">
           <IconTalk />
