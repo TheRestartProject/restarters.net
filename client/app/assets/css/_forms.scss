@@ -90,6 +90,22 @@ label.form-check-label {
   &[type='file'] {
     height: 50px;
   }
+
+  // Bootstrap 4 (bootstrap-vue, legacy's stack) shaded `:disabled` and
+  // `[readonly]` .form-controls identically; Bootstrap 5 dropped that
+  // pairing (its &:disabled rule in forms/_form-control.scss has no
+  // [readonly] counterpart), so a readonly field like GroupForm.vue's
+  // postcode input on create (LocationPicker.vue's :readonly="!canEditPostcode")
+  // renders with a plain white background instead of legacy's grey
+  // disabled-looking one, even though it genuinely is non-editable -
+  // findings/parity-v2 screenshot diff on /group/create. Restoring the
+  // pairing here fixes every readonly .form-control site-wide, not just
+  // that one field.
+  &:disabled,
+  &:read-only {
+    background-color: $input-disabled-bg;
+    opacity: 1;
+  }
 }
 
 .form-control-lg {

@@ -14,11 +14,15 @@ import 'quill/dist/quill.snow.css'
 // stylesheet) shows up as a stray empty text input in the middle of the
 // page (parity-shots/desktop/15-event-create__new.png).
 //
-// The htmlEditButton/quill-paste-smart modules the legacy editor used are
-// Quill-1-only plugins with no Quill-2 equivalents shipped here - dropped
-// rather than built against something that doesn't exist for this Quill
-// version. Paste is handled by Quill 2's own (safer) default clipboard
-// matcher instead.
+// Rendered-parity fix: htmlEditButton (the toolbar's "<>" view-HTML-source
+// button, quill-html-edit-button@3.x's default `buttonHTML: '<>'`) DOES
+// have a Quill 2 build now (peerDependency quill: '^2.x', matching the
+// quill@2.0.3 installed here) - registered below the same way legacy
+// registered the Quill-1 build, `htmlEditButton: {}` in modules (it
+// self-injects its own toolbar button; no separate `toolbar` array entry
+// needed, same as legacy's config). quill-paste-smart genuinely has no
+// Quill-2 build - paste is handled by Quill 2's own (safer) default
+// clipboard matcher instead.
 const props = defineProps({
   modelValue: {
     type: String,
@@ -46,7 +50,12 @@ function normalize(html) {
 }
 
 onMounted(async () => {
-  const { default: Quill } = await import('quill')
+  const [{ default: Quill }, { default: htmlEditButton }] = await Promise.all([
+    import('quill'),
+    import('quill-html-edit-button'),
+  ])
+
+  Quill.register('modules/htmlEditButton', htmlEditButton)
 
   quill = new Quill(editorEl.value, {
     theme: 'snow',
@@ -57,6 +66,7 @@ onMounted(async () => {
         ['link'],
         [{ header: '4' }, { header: '5' }, { header: '6' }],
       ],
+      htmlEditButton: {},
     },
   })
 

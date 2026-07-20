@@ -440,6 +440,7 @@ defineExpose({ submit })
           value-type="format"
           format="YYYY-MM-DD"
           input-class="form-control d-none d-lg-block"
+          :placeholder="t('events.no_date_selected')"
         />
         <input
           v-model="form.eventDate"

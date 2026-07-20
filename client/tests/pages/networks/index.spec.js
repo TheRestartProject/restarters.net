@@ -140,6 +140,35 @@ describe('pages/networks/index', () => {
     expect(wrapper.find('[data-testid="your-networks-empty"]').exists()).toBe(true)
   })
 
+  // develop's networks/index.blade.php always renders the table (headers
+  // included) - the empty message is a row inside tbody, not a
+  // replacement for the whole table (parity-v2 rendered-diff finding #2).
+  it('still shows the table headers when "Your networks" is empty', async () => {
+    setLoggedInUser({ id: 1, role_name: 'NetworkCoordinator', networks: [] })
+
+    const wrapper = mountPage()
+    await flushPromises()
+
+    const table = wrapper.get('[data-testid="your-networks-table"]')
+    expect(table.text()).toContain('Network')
+    expect(table.text()).toContain('Description')
+    expect(wrapper.get('[data-testid="your-networks-empty"]').text()).toBe('You are not a coordinator of any networks.')
+  })
+
+  // develop wraps each list section in the site's brand content-panel box
+  // (white fill, thin black border, hard offset drop-shadow) - Nuxt
+  // previously rendered both sections flat with no border/shadow at all
+  // (parity-v2 rendered-diff finding #1).
+  it('wraps "Your networks" and "All networks" in the .panel box treatment', async () => {
+    setLoggedInUser({ id: 1, role_name: 'Administrator', networks: [] })
+
+    const wrapper = mountPage()
+    await flushPromises()
+
+    expect(wrapper.get('[data-testid="your-networks-section"]').classes()).toContain('panel')
+    expect(wrapper.get('[data-testid="all-networks-section"]').classes()).toContain('panel')
+  })
+
   it('shows "All networks" for Administrators but not plain NetworkCoordinators', async () => {
     setLoggedInUser({ id: 1, role_name: 'Administrator', networks: [] })
     const adminWrapper = mountPage()

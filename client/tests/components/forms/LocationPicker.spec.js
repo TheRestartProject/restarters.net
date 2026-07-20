@@ -96,4 +96,20 @@ describe('components/forms/LocationPicker', () => {
     const withLatLng = mountPicker({ location: '', showLatLng: true })
     expect(withLatLng.find('[data-testid="location-picker-lat"]').exists()).toBe(true)
   })
+
+  // GroupForm.vue's postcode field on /group/create (canEditPostcode false
+  // during creation, gap 12) rendered with a plain white background instead
+  // of develop's greyed-out disabled look - traced to Bootstrap 5 dropping
+  // the `:disabled`/`[readonly]` pairing BootstrapVue's Bootstrap 4 had
+  // (fixed in app/assets/css/_forms.scss). This pins the functional half -
+  // the HTML `readonly` attribute itself - since jsdom doesn't apply the
+  // CSS fix for a computed-style assertion to check.
+  it('marks the postcode input readonly exactly when canEditPostcode is false', () => {
+    vi.stubGlobal('useNuxtApp', () => ({ $api: undefined }))
+    const locked = mountPicker({ location: '', canEditPostcode: false })
+    expect(locked.find('[data-testid="location-picker-postcode"]').attributes('readonly')).toBeDefined()
+
+    const unlocked = mountPicker({ location: '', canEditPostcode: true })
+    expect(unlocked.find('[data-testid="location-picker-postcode"]').attributes('readonly')).toBeUndefined()
+  })
 })

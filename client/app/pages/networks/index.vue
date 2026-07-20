@@ -86,14 +86,19 @@ function retry() {
     </BAlert>
 
     <template v-else>
-      <section class="mb-4" data-testid="your-networks-section">
+      <!-- develop's networks/index.blade.php wraps each list in a
+           <section class="table-section"> - table-section itself carries
+           no border/shadow (resources/sass/_table.scss: padding: 20px 0
+           only), but the rendered page shows each list in the site's
+           brand "content panel" box (white fill, thin black border, hard
+           offset drop-shadow) - the same look already ported here as the
+           global .panel class (app/assets/css/_panels.scss, used on
+           login/dashboard). Reusing that rather than inventing new CSS. -->
+      <section class="mb-4 panel" data-testid="your-networks-section">
         <h2>{{ t('networks.index.your_networks') }}</h2>
         <p>{{ t('networks.index.your_networks_explainer') }}</p>
 
-        <div v-if="!yourNetworks.length" class="text-muted" data-testid="your-networks-empty">
-          {{ t('networks.index.your_networks_no_networks') }}
-        </div>
-        <div v-else class="table-responsive">
+        <div class="table-responsive">
           <table class="table table-striped table-hover table-layout-fixed" data-testid="your-networks-table">
             <thead>
               <tr>
@@ -103,6 +108,14 @@ function retry() {
               </tr>
             </thead>
             <tbody>
+              <!-- Legacy always renders the table (headers included), even
+                   with no networks - the empty message is a row inside
+                   tbody, not a replacement for the whole table. -->
+              <tr v-if="!yourNetworks.length">
+                <td colspan="3" align="center" class="p-3 text-muted" data-testid="your-networks-empty">
+                  {{ t('networks.index.your_networks_no_networks') }}
+                </td>
+              </tr>
               <tr v-for="network in yourNetworks" :key="network.id" :data-testid="`your-network-row-${network.id}`">
                 <td>
                   <img :src="network.logo || '/images/placeholder-avatar.webp'" :alt="t('client.networks.logo_alt', { name: network.name })" style="width: auto; height: 50px">
@@ -119,14 +132,11 @@ function retry() {
         </div>
       </section>
 
-      <section v-if="showAllNetworks" data-testid="all-networks-section">
+      <section v-if="showAllNetworks" class="panel" data-testid="all-networks-section">
         <h2>{{ t('networks.index.all_networks') }}</h2>
         <p>{{ t('networks.index.all_networks_explainer') }}</p>
 
-        <div v-if="!allNetworks.length" class="text-muted" data-testid="all-networks-empty">
-          {{ t('networks.index.all_networks_no_networks') }}
-        </div>
-        <div v-else class="table-responsive">
+        <div class="table-responsive">
           <table class="table table-striped table-hover table-layout-fixed" data-testid="all-networks-table">
             <thead>
               <tr>
@@ -135,6 +145,11 @@ function retry() {
               </tr>
             </thead>
             <tbody>
+              <tr v-if="!allNetworks.length">
+                <td colspan="2" align="center" class="p-3 text-muted" data-testid="all-networks-empty">
+                  {{ t('networks.index.all_networks_no_networks') }}
+                </td>
+              </tr>
               <tr v-for="network in allNetworks" :key="network.id" :data-testid="`all-network-row-${network.id}`">
                 <td>
                   <img :src="network.logo || '/images/placeholder-avatar.webp'" :alt="t('client.networks.logo_alt', { name: network.name })" style="width: auto; height: 50px">
