@@ -19,9 +19,34 @@
 // Both targets are LOCAL DEV instances on the SAME seeded database, so no
 // production credentials are used and mutating flows can be exercised safely.
 // ESM: client/package.json is "type": "module" (same as client/e2e/*.test.js).
+import { readFileSync } from 'node:fs'
+import { fileURLToPath } from 'node:url'
+import { dirname, resolve } from 'node:path'
+
 import { test } from '@playwright/test'
 
 const OUT = process.env.PARITY_OUT || 'parity-shots'
+
+// Ids for the detail pages, published by parity-fixtures.php (which
+// `task parity:capture` runs before this spec). They MUST NOT be hardcoded:
+// every `migrate:fresh --seed` renumbers users, networks and events, and a
+// stale id renders as a 404/permission-denied page on BOTH systems - which
+// then gets "compared" as a matching pair and reported as parity. That is
+// exactly how the event view page stayed unverified for the whole migration.
+// Resolved relative to this file, not cwd, so it works whichever directory
+// playwright is invoked from.
+const FIXTURES = (() => {
+  const path = resolve(dirname(fileURLToPath(import.meta.url)), '../../parity-fixtures.json')
+  try {
+    return JSON.parse(readFileSync(path, 'utf8'))
+  } catch (e) {
+    throw new Error(
+      `Could not read ${path}: ${e.message}\n` +
+        'Run the fixtures first (task parity:capture does this for you):\n' +
+        '  task docker:run:bash -- "php artisan tinker parity-fixtures.php"'
+    )
+  }
+})()
 
 const VIEWPORTS = [
   { name: 'desktop', width: 1440, height: 900 },
@@ -71,6 +96,34 @@ const PAGES = [
   { slug: '21-admin-brands', path: '/brands', auth: true },
   { slug: '22-cookie-policy', path: '/about/cookie-policy', auth: false },
   { slug: '23-recover', path: '/user/recover', auth: false },
+  // --- pages 24-32: the coverage gap -------------------------------------
+  // Everything above was added ad hoc, and an audit of `client/app/pages`
+  // against this list found 17 routes that had NEVER been render-compared -
+  // including the event view page, which a manual check then showed was not
+  // at parity (its actions were not in a dropdown). Verifying a subset and
+  // reporting it as the whole is how that was missed, so these close the gap
+  // for every route that exists on BOTH systems at the same URL shape.
+  //
+  // Not listed, because develop has no equivalent at the same path and a
+  // capture would only compare our page against develop's 404:
+  //   /notifications, /user/consent, /group/map   - Nuxt-only
+  //   /forbidden                                  - develop uses /user/forbidden
+  //   /group/invite/[code], /party/invite/[code]  - need a live invite token
+  // These are tracked in the findings docs instead.
+  { slug: '24-group-index', path: '/group', auth: true },
+  { slug: '25-event-index', path: '/party', auth: true },
+  // NB develop's /party/view/{id} is a PUBLIC route that abort(404)s when
+  // Fixometer::userHasViewPartyPermission fails, rather than redirecting to
+  // login like the auth-gated routes do. So a logged-out 404 here is correct
+  // behaviour, not a missing event - jane hosts the group and attends the
+  // event, so it renders for her.
+  { slug: '26-event-view', path: `/party/view/${FIXTURES.event}`, auth: true },
+  { slug: '27-event-edit', path: `/party/edit/${FIXTURES.event}`, auth: true },
+  { slug: '28-group-edit', path: `/group/edit/${FIXTURES.group}`, auth: true },
+  { slug: '29-network-view', path: `/networks/${FIXTURES.network}`, auth: true },
+  { slug: '30-profile-view', path: `/profile/${FIXTURES.user}`, auth: true },
+  { slug: '31-profile-edit', path: `/profile/edit/${FIXTURES.user}`, auth: true },
+  { slug: '32-event-duplicate', path: `/party/duplicate/${FIXTURES.event}`, auth: true },
 ]
 
 // Both systems are LOCAL DEV instances sharing the same seeded database:

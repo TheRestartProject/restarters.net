@@ -13,6 +13,7 @@
 // NB Network and Group are mass-assignment guarded, so these use `new` plus
 // property assignment rather than create()/firstOrCreate().
 
+use App\EventsUsers;
 use App\Group;
 use App\Network;
 use App\Party;
@@ -113,6 +114,53 @@ foreach ([[$jane, Role::HOST], [$host, Role::HOST]] as [$u, $r]) {
 }
 
 $out[] = 'members='.UserGroups::where('group', $group->idgroups)->count();
+
+// --- event ---------------------------------------------------------------
+// The event VIEW page (/party/view/{id}) was never comparable before this,
+// because the fixtures created no events - so the capture had nothing to
+// render and the page went unverified for the whole migration. A PAST event
+// is used deliberately: develop's EventActions dropdown branches on
+// `finished`, and the finished branch carries the items most likely to
+// diverge (request review / share stats / export data).
+$event = Party::where('group', $group->idgroups)->first();
+if (!$event) {
+    $event = new Party;
+    $event->group = $group->idgroups;
+    $event->venue = 'Test Venue';
+    $event->location = 'London';
+    $event->latitude = 51.5074;
+    $event->longitude = -0.1278;
+    $event->free_text = 'A test event for parity.';
+    $event->event_start_utc = now()->subDays(7)->setTime(10, 0)->toDateTimeString();
+    $event->event_end_utc = now()->subDays(7)->setTime(13, 0)->toDateTimeString();
+    $event->approved = true;
+    $event->save();
+}
+$out[] = 'event='.$event->idevents;
+
+// jane attends it, so the attendance-gated dropdown items and the
+// attendance-gated discourse_thread field both have a realistic state.
+if (!EventsUsers::where('event', $event->idevents)->where('user', $jane->id)->exists()) {
+    $eu = new EventsUsers;
+    $eu->event = $event->idevents;
+    $eu->user = $jane->id;
+    $eu->status = 1;
+    $eu->role = Role::HOST;
+    $eu->save();
+}
+
 $out[] = 'events='.Party::where('group', $group->idgroups)->count();
+
+// Publish the ids for the capture harness. Every migrate:fresh renumbers
+// users/networks/events, so the harness must NOT hardcode them - it reads this
+// file to build detail-page URLs (/party/view/{id} etc.). Without this the
+// detail pages silently 404 and get "compared" as two error pages, which is
+// how the event view page went unverified for the whole migration.
+file_put_contents(base_path('parity-fixtures.json'), json_encode([
+    'group' => $group->idgroups,
+    'event' => $event->idevents,
+    'network' => $network->id,
+    'user' => $jane->id,
+], JSON_PRETTY_PRINT)."\n");
 
 echo 'FIXTURES '.implode(' ', $out)." END\n";

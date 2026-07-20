@@ -54,3 +54,4 @@ parity-shots/
 # The client reaches them through an /api/* endpoint so CORS applies and the
 # canvas stays untainted - see the stats-share composable.
 client/public/images/stats/
+parity-fixtures.json
