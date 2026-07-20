@@ -174,7 +174,11 @@ function sortCaretClass(key) {
     />
     <table class="table groups-table">
       <thead>
-        <tr>
+        <!-- Legacy's b-table hides the whole header row below md
+             (thead-tr-class="d-none d-md-table-row") rather than
+             collapsing individual headers - below md there's no sortable
+             header row at all, only the row-per-group list. -->
+        <tr class="groups-table-head-row">
           <th class="groups-table-photo-col">
             <span class="visually-hidden">{{ t('groups.group_image') }}</span>
           </th>
@@ -308,19 +312,19 @@ function sortCaretClass(key) {
               </BBadge>
             </div>
           </td>
-          <td v-if="optionalColumns.location">
+          <td v-if="optionalColumns.location" class="hidecell">
             <template v-if="row.location">
               {{ row.location.location }}
               <span v-if="row.location.country" class="text-muted small">{{ row.location.country }}</span>
             </template>
           </td>
-          <td v-if="optionalColumns.hosts" :data-testid="`group-row-hosts-${row.id}`">
+          <td v-if="optionalColumns.hosts" class="hidecell" :data-testid="`group-row-hosts-${row.id}`">
             {{ row.hosts ?? '' }}
           </td>
-          <td v-if="optionalColumns.restarters" :data-testid="`group-row-restarters-${row.id}`">
+          <td v-if="optionalColumns.restarters" class="hidecell" :data-testid="`group-row-restarters-${row.id}`">
             {{ row.restarters ?? '' }}
           </td>
-          <td v-if="optionalColumns.next_event" :data-testid="`group-row-next-event-${row.id}`">
+          <td v-if="optionalColumns.next_event" class="hidecell" :data-testid="`group-row-next-event-${row.id}`">
             <template v-if="row.nextEvent">{{ dateLabel(row.nextEvent.start) }}</template>
             <template v-else>{{ t('groups.upcoming_none_planned') }}</template>
           </td>
@@ -334,6 +338,34 @@ function sortCaretClass(key) {
 </template>
 
 <style scoped lang="scss">
+// Legacy's .hidecell (resources/js/components/GroupsTable.vue's SCSS):
+// location/hosts/restarters/next_event are hidden below md and shown as
+// table cells at md+, regardless of which optional columns a given page
+// has opted into via optionalColumns - that prop controls whether a column
+// exists on this page at all (a separate, Nuxt-side data-availability
+// concern - docs/nuxt-migration/api-gaps.md), this controls the same
+// column's responsiveness once it does. Without this, all opted-in columns
+// rendered at every width, overflowing a 390px viewport and running
+// together illegibly (mobile parity pass).
+.hidecell {
+  display: none;
+
+  @media (min-width: 768px) {
+    display: table-cell;
+  }
+}
+
+// Legacy hides the whole header row below md (thead-tr-class="d-none
+// d-md-table-row") rather than collapsing individual headers - see the
+// template's own comment above this row.
+.groups-table-head-row {
+  display: none;
+
+  @media (min-width: 768px) {
+    display: table-row;
+  }
+}
+
 .sort-header {
   display: inline-flex;
   align-items: center;

@@ -92,6 +92,14 @@ onMounted(() => {
 
 <template>
   <div class="container py-4" data-testid="group-all-page">
+    <!-- Legacy's group.index.blade.php renders GroupsRequiringModeration
+         BEFORE GroupsPage (whose own template opens with this h1) - not
+         after it. Order matters here, not just visibility (parity-v2/
+         groups-lists.md gap #2 says "above the h1/tabs"; this had drifted
+         to below the h1 - a mobile-only screenshot pass is what surfaced
+         it, since desktop's wider layout made the reordering easy to miss). -->
+    <ModerationQueue v-if="showModeration" type="groups" />
+
     <h1 class="d-flex justify-content-between align-items-start">
       <span class="d-flex align-items-center">
         {{ t('groups.groups') }}
@@ -102,8 +110,6 @@ onMounted(() => {
         <span class="d-none d-lg-block">{{ t('groups.create_groups') }}</span>
       </NuxtLink>
     </h1>
-
-    <ModerationQueue v-if="showModeration" type="groups" />
 
     <GroupsTabsNav active="all">
       <div v-if="groupsStore.namesLoading" data-testid="group-all-loading">

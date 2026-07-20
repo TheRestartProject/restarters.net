@@ -47,6 +47,11 @@ onMounted(() => {
 
 <template>
   <div class="container py-4" data-testid="group-mine-page">
+    <!-- Legacy's group.index.blade.php renders GroupsRequiringModeration
+         BEFORE GroupsPage (whose own template opens with this h1) - not
+         after it. See all.vue's matching comment. -->
+    <ModerationQueue v-if="showModeration" type="groups" />
+
     <h1 class="d-flex justify-content-between align-items-start">
       <span class="d-flex align-items-center">
         {{ t('groups.groups') }}
@@ -57,8 +62,6 @@ onMounted(() => {
         <span class="d-none d-lg-block">{{ t('groups.create_groups') }}</span>
       </NuxtLink>
     </h1>
-
-    <ModerationQueue v-if="showModeration" type="groups" />
 
     <GroupsTabsNav active="mine">
       <div v-if="groupsStore.mine.loading" data-testid="group-mine-loading">

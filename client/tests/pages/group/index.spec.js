@@ -137,6 +137,21 @@ describe('pages/group/index (mine)', () => {
       expect(wrapper.find('[data-testid="moderation-queue-groups"]').exists()).toBe(true)
     })
 
+    // Legacy's group.index.blade.php renders GroupsRequiringModeration
+    // BEFORE GroupsPage, whose own template opens with the "Groups" h1 -
+    // order, not just presence (a prior version had it after the h1,
+    // caught only by a mobile screenshot pass where the reordering was
+    // obvious; desktop's wider layout made it easy to miss).
+    it('renders before the page heading, not after it', () => {
+      setLoggedInUser({ id: 1, role_name: 'Administrator' })
+      useModerationStore().groups.data = [{ id: 9, name: 'Pending Fixers' }]
+
+      const wrapper = mountPage()
+      const html = wrapper.html()
+
+      expect(html.indexOf('moderation-queue-groups')).toBeLessThan(html.indexOf('group-create-link'))
+    })
+
     it('shows for a NetworkCoordinator', () => {
       setLoggedInUser({ id: 1, role_name: 'NetworkCoordinator' })
       useModerationStore().groups.data = [{ id: 9, name: 'Pending Fixers' }]

@@ -229,6 +229,36 @@ describe('components/groups/GroupsTable', () => {
     })
   })
 
+  // Legacy hides the whole sortable header row below md (thead-tr-class=
+  // "d-none d-md-table-row"), and the location/hosts/restarters/next_event
+  // columns individually below md (.hidecell) - without both, every opted-in
+  // column rendered at every width, overflowing a 390px mobile viewport and
+  // running the text together illegibly (mobile parity pass). CSS media
+  // queries aren't evaluated in this test environment, so this pins the
+  // classes that carry the responsive behaviour rather than actual computed
+  // widths.
+  describe('mobile responsiveness', () => {
+    it('marks the header row hidden below md', () => {
+      const wrapper = mountComponent({ groups: rows })
+
+      expect(wrapper.find('thead tr').classes()).toContain('groups-table-head-row')
+    })
+
+    it('marks the optional data columns hidden below md, when shown at all', () => {
+      const wrapper = mountComponent({ groups: rows })
+
+      expect(wrapper.find('[data-testid="group-row-hosts-1"]').classes()).toContain('hidecell')
+      expect(wrapper.find('[data-testid="group-row-restarters-1"]').classes()).toContain('hidecell')
+      expect(wrapper.find('[data-testid="group-row-next-event-1"]').classes()).toContain('hidecell')
+    })
+
+    it('does not mark the always-visible photo/name/join columns hidden', () => {
+      const wrapper = mountComponent({ groups: rows })
+
+      expect(wrapper.find('[data-testid="group-row-photo-1"]').element.closest('td').classList.contains('hidecell')).toBe(false)
+    })
+  })
+
   // gap #3: legacy always has a leading photo column, falling back to the
   // default profile placeholder when a group has no image.
   describe('photo column', () => {

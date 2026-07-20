@@ -151,6 +151,40 @@ describe('pages/group/nearby', () => {
     expect(wrapper.find('[data-testid="moderation-queue-groups"]').exists()).toBe(true)
   })
 
+  // Legacy shows GroupsRequiringModeration on every /group tab, unscoped by
+  // which tab is active - it's rendered once, above the shared tabs, not
+  // per-tab content. ModerationQueue here is wired the same way (a plain
+  // v-if="showModeration" with no dependency on groupsStore.nearby at all),
+  // but that's worth pinning explicitly: it must still show even when this
+  // particular tab's own content is in an empty/no-location state, proving
+  // it isn't accidentally coupled to this tab's data.
+  it('shows the moderation queue regardless of this tab\'s own empty/no-location state', () => {
+    setLoggedInUser({ id: 1, role_name: 'Administrator' })
+    useModerationStore().groups.data = [{ id: 9, name: 'Pending Fixers' }]
+    useDashboardStore().data = { has_location: false }
+    groupsStore.nearby.data = []
+
+    const wrapper = mountPage()
+
+    expect(wrapper.find('[data-testid="group-nearby-no-location"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="moderation-queue-groups"]').exists()).toBe(true)
+  })
+
+  // Legacy's group.index.blade.php renders GroupsRequiringModeration
+  // BEFORE GroupsPage, whose own template opens with the "Groups" h1 -
+  // order, not just presence (a prior version had it after the h1, caught
+  // only by a mobile screenshot pass where the reordering was obvious;
+  // desktop's wider layout made it easy to miss).
+  it('renders before the page heading, not after it', () => {
+    setLoggedInUser({ id: 1, role_name: 'Administrator' })
+    useModerationStore().groups.data = [{ id: 9, name: 'Pending Fixers' }]
+
+    const wrapper = mountPage()
+    const html = wrapper.html()
+
+    expect(html.indexOf('moderation-queue-groups')).toBeLessThan(html.indexOf('group-create-link'))
+  })
+
   // gap #1/#2: legacy's shared tab bar only ever has three tabs (no "Map"),
   // and its .ourtabs border/shadow box wraps the tab-content (here: the
   // heading + table) as well as the nav itself.
