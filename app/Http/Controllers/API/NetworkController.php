@@ -384,8 +384,15 @@ class NetworkController extends Controller
 
         // We need to explicity select events.*, otherwise the updated_at values we get back are from the group_network
         // table, which is mightily confusing.  We only want to return approved events on approved groups.
+        //
+        // Both PartySummary and Party (full) call getEventStats() per event, which needs allDevices
+        // and allInvited loaded or it's an N+1 - same eager-load as GroupController::getEventsForGroupv2
+        // and Group::bulkGroupStats(). This endpoint has no upper bound on the date range, so an
+        // unfiltered network can return a lot of events.
         $query = Party::join('groups', 'groups.idgroups', '=', 'events.group')
             ->join('group_network', 'group_network.group_id', '=', 'groups.idgroups')
+            ->with('allDevices')
+            ->withCount('allInvited')
             ->where('group_network.network_id', $id)
             ->where('event_start_utc', '>=', $start)
             ->where('event_end_utc', '<=', $end)

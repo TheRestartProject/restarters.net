@@ -632,6 +632,75 @@ class APIv2NetworkTest extends TestCase
         $this->assertEquals($event1->idevents, $json[0]['id']);
     }
 
+    /**
+     * PartySummary (and Party, on the includeDetails=true branch) each call getEventStats()
+     * per event, which needs the allDevices/allInvited relations loaded or it's an N+1 - see
+     * GroupNetworkStatsQueryTest::testGroupNetworkStatsQueryCountDoesNotScaleWithGroupCount and
+     * GroupViewTest::testGroupIndexQueryCountScalesWithO1NotN for the same pattern applied
+     * elsewhere. Regression check for the eager-loading added to getNetworkEventsv2.
+     *
+     * @dataProvider providerIncludeDetails
+     */
+    public function testEventsQueryCountDoesNotScaleWithEventCount($includeDetails): void {
+        $network = Network::factory()->create();
+
+        $addGroupWithPastEventAndDevice = function () use ($network) {
+            $group = Group::factory()->create(['approved' => true]);
+            $network->addGroup($group);
+
+            $event = Party::factory()->moderated()->create([
+                'group' => $group->idgroups,
+                'event_start_utc' => Carbon::parse('1pm last month')->toIso8601String(),
+                'event_end_utc' => Carbon::parse('3pm last month')->toIso8601String(),
+            ]);
+            \App\Device::factory()->fixed()->create([
+                'category' => 11,
+                'category_creation' => 11,
+                'event' => $event->idevents,
+            ]);
+        };
+
+        $url = "/api/v2/networks/{$network->id}/events" . ($includeDetails ? '?includeDetails=true' : '');
+
+        // 3 events.
+        for ($i = 0; $i < 3; $i++) {
+            $addGroupWithPastEventAndDevice();
+        }
+
+        // Warm up (first request may have extra overhead).
+        $this->get($url)->assertSuccessful();
+
+        DB::enableQueryLog();
+        $this->get($url)->assertSuccessful();
+        $queriesFor3 = count(DB::getQueryLog());
+        DB::disableQueryLog();
+        DB::flushQueryLog();
+
+        // 6 events.
+        for ($i = 0; $i < 3; $i++) {
+            $addGroupWithPastEventAndDevice();
+        }
+
+        DB::enableQueryLog();
+        $this->get($url)->assertSuccessful();
+        $queriesFor6 = count(DB::getQueryLog());
+        DB::disableQueryLog();
+        DB::flushQueryLog();
+
+        $this->assertLessThan(
+            $queriesFor3 * 1.5,
+            $queriesFor6,
+            "Query count scaled with event count — N+1 in getNetworkEventsv2. 3 events: $queriesFor3, 6 events: $queriesFor6"
+        );
+    }
+
+    public function providerIncludeDetails(): array {
+        return [
+            'summary' => [false],
+            'includeDetails' => [true],
+        ];
+    }
+
     public function testNetworkCoordinatorCanUpdateGroupTags(): void {
         $network = Network::factory()->create();
 
