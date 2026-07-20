@@ -59,6 +59,7 @@ return [
   'networks' => 'Réseaux',
   'show' => [
     'groups_count' => '{0} Il n\'y a actuellement aucun repair café dans le réseau :name.|{1} Il y a actuellement :count repair café dans le réseau :name.|[2,*] Il y a actuellement :count repair cafés dans le réseau :name.',
+    'view_groups_menuitem' => 'Voir les repair cafés',
     'view_groups_link' => 'Voir ces repair cafés.',
     'add_groups_menuitem' => 'Ajouter des repair cafés',
     'add_groups_modal_header' => 'Ajouter des repair cafés à :name',

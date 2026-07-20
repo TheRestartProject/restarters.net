@@ -59,6 +59,7 @@ return [
   ],
   'show' => [
     'groups_count' => '{0} There are currently no groups in the :name network.|{1} There is currently :count group in the :name network.|[2,*] There are currently :count groups in the :name network.',
+    'view_groups_menuitem' => 'View groups',
     'view_groups_link' => 'View these groups.',
     'add_groups_menuitem' => 'Add groups',
     'add_groups_modal_header' => 'Add groups to :name',

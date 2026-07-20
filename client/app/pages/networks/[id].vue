@@ -163,19 +163,22 @@ function retry() {
             {{ network.website }}
           </a>
         </div>
-        <!-- Single "Network Actions" dropdown (parity-v2/networks.md gap
-             #1), matching legacy's b-dropdown, not two always-visible
-             loose buttons. Legacy's third item, "View groups", targets
-             /group/network/{id} (GroupController@network, an "All Groups"
-             index scoped by network) - Nuxt's /group/all has no equivalent
-             network-scoping query param (out of scope: it's a group* page)
-             and this page's own Groups section below already lists every
-             group in the network inline (an intentional, richer
-             replacement - see that section's comment), so "View groups"
-             would be a dead link here and is deliberately dropped rather
-             than ported to a non-functional target. -->
-        <BDropdown v-if="canManage" variant="primary" placement="bottom-end" :text="t('networks.general.actions')" data-testid="network-show-actions">
-          <BDropdownItem data-testid="network-show-add-groups" @click="showAssociateModal = true">
+        <!-- NetworkPage.vue:13-18. Two gaps here, both hidden behind the
+             same stale note: develop gates the DROPDOWN on `isLoggedIn` and
+             only its add-groups item on canAssociateGroups, and its FIRST item
+             is "View groups" -> /group/network/{id}.
+             That item used to be dropped as "a dead link ... deliberately
+             dropped", on the grounds that /group/all had no network-scoping
+             query param and that this page listed every group inline anyway.
+             Neither holds any more: /group/all now honours ?network=, and the
+             inline listing was itself the divergence (develop shows a count
+             sentence). Both reasons were removed by other fixes, and the note
+             would have kept the gap invisible. -->
+        <BDropdown variant="primary" placement="bottom-end" :text="t('networks.general.actions')" data-testid="network-show-actions">
+          <BDropdownItem :to="`/group/all?network=${network.id}`" data-testid="network-show-view-groups">
+            {{ t('networks.show.view_groups_menuitem') }}
+          </BDropdownItem>
+          <BDropdownItem v-if="canManage" data-testid="network-show-add-groups" @click="showAssociateModal = true">
             {{ t('networks.show.add_groups_menuitem') }}
           </BDropdownItem>
           <BDropdownItem :href="`/export/networks/${network.id}/events`" data-testid="network-show-export-events">
