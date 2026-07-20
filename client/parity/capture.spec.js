@@ -43,7 +43,8 @@ const FIXTURES = (() => {
     throw new Error(
       `Could not read ${path}: ${e.message}\n` +
         'Run the fixtures first (task parity:capture does this for you):\n' +
-        '  task docker:run:bash -- "php artisan tinker parity-fixtures.php"'
+        '  task docker:run:bash -- "php artisan tinker parity-fixtures.php"',
+      { cause: e }
     )
   }
 })()
@@ -71,10 +72,7 @@ const PAGES = [
   { slug: '09-group-view', path: '/group/view/1', auth: true },
   // Everything below covers the remaining parity-v2 clusters (group forms,
   // networks, profile, admin CRUD, static). Each path was probed against the
-  // legacy instance first and returns 200/302 there - paths that 404 on
-  // legacy (/notifications, /user/consent, /forbidden, /group/map) are
-  // Nuxt-only or live at a different legacy URL, so they are NOT comparable
-  // here and are tracked in the findings docs instead.
+  // legacy instance first and returns 200/302 there.
   { slug: '10-group-create', path: '/group/create', auth: true },
   { slug: '11-networks', path: '/networks', auth: true },
   { slug: '12-profile', path: '/profile', auth: true },
@@ -104,12 +102,17 @@ const PAGES = [
   // reporting it as the whole is how that was missed, so these close the gap
   // for every route that exists on BOTH systems at the same URL shape.
   //
-  // Not listed, because develop has no equivalent at the same path and a
-  // capture would only compare our page against develop's 404:
-  //   /notifications, /user/consent, /group/map   - Nuxt-only
-  //   /forbidden                                  - develop uses /user/forbidden
-  //   /group/invite/[code], /party/invite/[code]  - need a live invite token
+  // Not listed, because develop genuinely has no equivalent and a capture
+  // would only compare our page against develop's 404:
+  //   /user/consent   - develop enforces consent via the verifyUserConsent
+  //                     middleware, with no standalone page
+  //   /group/map      - Nuxt-only
+  //   /group/invite/[code], /party/invite/[code] - need a live invite token
   // These are tracked in the findings docs instead.
+  //
+  // NB two pages that were ALSO written off as Nuxt-only turned out to exist
+  // on develop at a different URL - a 404 probe at our path is not evidence
+  // the page is absent, only that it isn't at that path. See `path` below.
   { slug: '24-group-index', path: '/group', auth: true },
   { slug: '25-event-index', path: '/party', auth: true },
   // NB develop's /party/view/{id} is a PUBLIC route that abort(404)s when
@@ -124,7 +127,20 @@ const PAGES = [
   { slug: '30-profile-view', path: `/profile/${FIXTURES.user}`, auth: true },
   { slug: '31-profile-edit', path: `/profile/edit/${FIXTURES.user}`, auth: true },
   { slug: '32-event-duplicate', path: `/party/duplicate/${FIXTURES.event}`, auth: true },
+  // Same page, different URL on each system. develop nests notifications under
+  // its /profile prefix and puts forbidden under /user; this client moved both
+  // to the top level. Probing OUR path against develop returned 404 for both,
+  // which is how they were first (wrongly) written off as Nuxt-only - the page
+  // was there all along, just somewhere else.
+  { slug: '33-notifications', path: { new: '/notifications', old: '/profile/notifications' }, auth: true },
+  { slug: '34-forbidden', path: { new: '/forbidden', old: '/user/forbidden' }, auth: false },
 ]
+
+// A page's path is either shared by both systems (a string) or per-system
+// (an object), for the pages this client deliberately re-homed.
+function pathFor(page, systemName) {
+  return typeof page.path === 'string' ? page.path : page.path[systemName]
+}
 
 // Both systems are LOCAL DEV instances sharing the same seeded database:
 //   new = the Nuxt SPA under development (restarters_client)
@@ -261,7 +277,7 @@ for (const system of SYSTEMS) {
       test(`logged-out pages`, async ({ page }) => {
         await suppressCookieNotice(page)
         for (const p of PAGES.filter((x) => !x.auth)) {
-          await page.goto(`${system.base}${p.path}`, { waitUntil: 'domcontentloaded' })
+          await page.goto(`${system.base}${pathFor(p, system.name)}`, { waitUntil: 'domcontentloaded' })
           await dismissCookieBanner(page)
           await shoot(page, vp.name, `${p.slug}--loggedout`, system.name)
         }
@@ -277,7 +293,7 @@ for (const system of SYSTEMS) {
         await dismissCookieBanner(page)
 
         for (const p of PAGES.filter((x) => x.auth)) {
-          await page.goto(`${system.base}${p.path}`, { waitUntil: 'domcontentloaded' })
+          await page.goto(`${system.base}${pathFor(p, system.name)}`, { waitUntil: 'domcontentloaded' })
           await dismissCookieBanner(page)
           await shoot(page, vp.name, p.slug, system.name)
         }
