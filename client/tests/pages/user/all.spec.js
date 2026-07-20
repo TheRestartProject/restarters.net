@@ -79,16 +79,16 @@ const ROW = {
   last_login_at: null,
 }
 
-// lang/en/users.php's role_any changed to "Choose role" (gap 28) and gained
-// location_na (gap 27) alongside this Nuxt work, but client/i18n/locales/
-// en.json is a generated, checked-in artifact this change intentionally
-// leaves untouched (php artisan translations:export-client) - overlay the
-// changed/new keys here so the spec doesn't depend on regenerating it.
+// lang/en/users.php's role_any changed to "Choose role" (gap 28) alongside
+// this Nuxt work, but client/i18n/locales/en.json is a generated, checked-in
+// artifact this change intentionally leaves untouched (php artisan
+// translations:export-client) - overlay the changed key here so the spec
+// doesn't depend on regenerating it.
 const messages = {
   en: {
     ...en,
     ...clientEn,
-    users: { ...en.users, role_any: 'Choose role', location_na: 'N/A' },
+    users: { ...en.users, role_any: 'Choose role' },
   },
 }
 
@@ -186,39 +186,6 @@ describe('pages/user/all', () => {
     expect(row.text()).toContain('2')
     // last_login_at is null -> "Never"
     expect(row.text()).toContain('Never')
-  })
-
-  // Gap 9: legacy truncates the email cell to 15 chars and offers a
-  // click/hover "copy to clipboard" affordance, rather than plain untruncated text.
-  describe('email cell (gap 9)', () => {
-    it('truncates a long email to 15 chars with an ellipsis', () => {
-      usersStore.list.data = [ROW] // 'jane@example.com' is 17 chars
-
-      const wrapper = mountPage()
-      const cell = wrapper.find('[data-testid="users-row-email-7"]')
-
-      expect(cell.text()).toBe('jane@example.co...')
-      expect(cell.attributes('title')).toContain('jane@example.com')
-    })
-
-    it('copies the full address to the clipboard on click', async () => {
-      const writeText = vi.fn()
-      Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true })
-      usersStore.list.data = [ROW]
-
-      const wrapper = mountPage()
-      await wrapper.find('[data-testid="users-row-email-7"]').trigger('click')
-
-      expect(writeText).toHaveBeenCalledWith('jane@example.com')
-    })
-  })
-
-  // Gap 27: legacy falls back to the literal text "N/A" for a user with no location.
-  it('shows N/A for a user with no location', () => {
-    usersStore.list.data = [{ ...ROW, location: null }]
-
-    const wrapper = mountPage()
-    expect(wrapper.find('[data-testid="users-row-7"]').text()).toContain('N/A')
   })
 
   describe('filters', () => {

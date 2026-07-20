@@ -269,6 +269,11 @@ Route::prefix('v2')->middleware(\App\Http\Middleware\VerifyUserConsentApi::class
 
         Route::prefix('/stats')->group(function() {
             Route::get('/latest-repaired-event', [API\DeviceController::class, 'latestRepairedEventv2']);
+            // CORS-enabled (this whole tree is under /api/*) proxy for the
+            // canvas-painted social-share image's background/decoration
+            // PNGs - see StatsShareImageController's own doc comment for why
+            // this can't just be a plain public/ static asset.
+            Route::get('/share-image/{filename}', [API\StatsShareImageController::class, 'shareImagev2']);
         });
 
         Route::prefix('/brands')->group(function() {

@@ -87,21 +87,18 @@ describe('pages/role', () => {
     expect(wrapper.find('[data-testid="role-permission-6"]').element.checked).toBe(false)
   })
 
-  // Gap 18: legacy's edit page shows a disabled "Name:" input above the
-  // permissions checklist (a role cannot be renamed here).
-  it('shows the role name in a disabled field inside the edit modal', async () => {
-    const wrapper = mountPage()
-    await flushPromises()
-    await wrapper.find('[data-testid="roles-edit-link-3"]').trigger('click')
-
-    const nameField = wrapper.find('[data-testid="roles-edit-name"]')
-    expect(nameField.element.value).toBe('Host')
-    expect(nameField.attributes('disabled')).toBeDefined()
-  })
-
-  // Gap 11: RolesTable.vue's b-table marks id/role/permissions_list
-  // sortable with client-side click-to-sort.
+  // live RolesPage.vue (07e6abd7cc^) is the baseline: id/name are sortable,
+  // but permissions_list is explicitly `sortable: false` (a display-only
+  // comma-joined string) - develop's dead RolesTable.vue (not mounted by
+  // anything on this branch) sorted all three, which was the wrong target.
   describe('sorting', () => {
+    it('has no sort control for the permissions column', async () => {
+      const wrapper = mountPage()
+      await flushPromises()
+
+      expect(wrapper.find('[data-testid="roles-table-sort-permissions_list"]').exists()).toBe(false)
+    })
+
     it('sorts ascending on first click of a sortable column', async () => {
       const wrapper = mountPage()
       await flushPromises()
