@@ -759,17 +759,6 @@ function closeAddVolunteer() {
 /* Neo-brutalist stat card - same look as components/groups/GroupStats.vue's
    .stat-card (white box, near-black border + offset shadow, teal value), for
    visual consistency across the group/event environmental-impact sections. */
-/* StatsValue.vue's `.impact-stat-primary`: $brand-light ground, white text.
-   Only the fixed-devices card uses it. */
-.stat-card--primary {
-  background: #4aaebc;
-  color: #fff;
-}
-
-.stat-card--primary .stat-card__count {
-  color: #fff;
-}
-
 .stat-card {
   flex: 1 1 0;
   min-width: 90px;
@@ -794,6 +783,21 @@ function closeAddVolunteer() {
   font-weight: bold;
   color: var(--bs-primary, #0394a6);
   line-height: 1;
+}
+
+/* StatsValue.vue's `.impact-stat-primary` / `.impact-stat-count-primary`:
+   $brand-light ground with white text; only the fixed-devices card uses it.
+   Deliberately declared AFTER `.stat-card` and doubled up on the class:
+   `.stat-card` sets `background: #fff` at the same specificity, so a
+   single-class rule placed earlier lost the cascade and rendered a white
+   card with white-on-white text - i.e. no visible count at all. */
+.stat-card.stat-card--primary {
+  background: #4aaebc;
+  color: #fff;
+}
+
+.stat-card.stat-card--primary .stat-card__count {
+  color: #fff;
 }
 
 .stat-card__label {
