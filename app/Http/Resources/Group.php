@@ -262,6 +262,14 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *          format="date-time",
  *     ),
  *     @OA\Property(
+ *          property="discourse_group",
+ *          title="discourse_group",
+ *          description="The slug of this group's linked Discourse group, if any. Combine with the session config's discourse_url as {discourse_url}/g/{discourse_group} to link to the group's conversation. Null if the group has no linked Discourse group.",
+ *          format="string",
+ *          nullable=true,
+ *          example="fixers-united"
+ *     ),
+ *     @OA\Property(
  *          property="shareable_link",
  *          title="shareable_link",
  *          description="A link that can be shared to let people join this group directly, without an email invite.",
@@ -354,7 +362,8 @@ class Group extends JsonResource
             'network_data' => $networkData,
             'full' => true,
             'email' => $this->email,
-            'archived_at' => $this->archived_at ? Carbon::parse($this->archived_at)->toIso8601String() : null
+            'archived_at' => $this->archived_at ? Carbon::parse($this->archived_at)->toIso8601String() : null,
+            'discourse_group' => $this->discourse_group,
         ];
 
         $ret['hosts'] = $this->resource->all_confirmed_hosts_count;

@@ -49,6 +49,7 @@ return [
   'invited' => 'Invité(s)',
   'invite_to_join' => 'Inviter à rejoindre l\'événement',
   'invite_volunteers' => 'Inviter des bénévoles',
+  'invite_when_approved' => 'Vous pourrez inviter des bénévoles uniquement quand cet événement aura été approuvé.',
   'organised_by' => 'Organisé par :group',
   'calendar_google' => 'Google Calendar',
   'calendar_ical' => 'iCal',
@@ -91,4 +92,29 @@ return [
   'geocode_failed' => 'Lieu non trouvé. Si vous ne parvenez pas à trouver le lieu où se trouve votre événement, essayez d\'indiquer un lieu plus général (tel qu\'un village ou une ville) ou une adresse spécifique, plutôt qu\'un nom de bâtiment.',
   'create_failed' => 'L\'événement <strong>n\'a pas pu</strong> être créé. Veuillez regarder les erreurs, les corriger, et essayer à nouveau.',
   'edit_failed' => 'L\'événement n\'a pas pu être édité.',
+
+  'event_actions' => 'Gestion de l\'événement',
+  'event_details' => 'Détails de l\'événement',
+  'event_description' => 'Description',
+  'share_event_stats' => 'Partager les statistiques de l\'événement',
+  'share_stats_header' => 'Partager vos statistiques',
+  'share_stats_message' => 'Bien joué! Le :date à :event_name nous avons été capables de réparer <strong>:number_devices appareils</strong>. Aidez-nous à partager la nouvelle en partageant l\'impact environnemental sur votre site.',
+  'headline_stats_dropdown' => 'Indice statistique',
+  'headline_stats_message' => 'Ce widget montre l\'indice statistique de votre événement ex: le nombre de participants, le nombre d\'heures de bénévolat',
+  'co2_equivalence_visualisation_dropdown' => 'Visualisation de l\'équivalence en CO<sub>2</sub>',
+  'infographic_message' => 'Une infographie facile à comprendre de l\'équivalent d\'émissions de CO<sub>2</sub> que votre repair café a empêché, comme par exemple l\'équivalent du nombre de voiture fabriquées',
+  'embed_code_header' => 'Intégrer code',
+  'read_more' => 'LIRE PLUS <img class="icon" src="/images/add-icon.svg" style="width: 20px;" />',
+  'read_less' => '<img class="icon" src="/images/minus-icon.svg" style="width: 20px;" /> LIRE MOINS',
+  'impact_calculation' => '<b>Comment calculons-nous l\'impact environnemental?</b><p>Pour les appareils électriques: Nous avons recherché le poids moyen et l\'empreinte de CO2 de produits parmi une série de catégories, du smartphone au sèche-cheveu. Lorsque vous encodez un appareil que vous avez réparé, nous utilisons ces moyennes pour estimer l\'impact de cette réparation basé sur la catégorie de l\'appareil. </p><p>Pour les objets non-électriques: lorsque vous encodez un objet non-électrique que vous avez réparé, nous utilisons son poids (que vous avez encodé). Nous n\'avons pas encore de données de références pour les objets non-électriques, ce qui ne nous permet pas de donner une estimation de CO2 évité.</p><p><a href="https://therestartproject.org/faq/" target="_blank" rel="nofollow">En savoir plus sur notre calcul d\'impact ici</a></p>',
+
+  'no_devices_added' => 'Pas d\'appareils ajoutés',
+  'add_a_device' => 'Ajouter un appareil',
+  'copied_to_clipboard' => 'Copié dans le presse-papier',
+
+  // Already exists on develop's lang/fr-BE/events.php with this exact
+  // value - ported here rather than reworded, since this branch's copy of
+  // the file predates it (same rationale as lang/en/events.php's RES
+  // gap-closure pass comment).
+  'before_submit_text' => 'Une fois confirmé par le responsable du réseau, votre événement sera rendu public sur la page d\'accueil du Restart Project.',
 ];

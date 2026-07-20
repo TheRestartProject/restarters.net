@@ -12,8 +12,17 @@ const AdminCrudTableStub = {
   template: '<div data-testid="stub-admin-crud-table" />',
 }
 
+// admin.description_optional is new alongside this Nuxt work (gap 22) but
+// client/i18n/locales/en.json is a generated, checked-in artifact this
+// change intentionally leaves untouched (php artisan translations:export-client)
+// - overlay it here so the spec doesn't depend on regenerating it. Same
+// convention as tests/pages/category.spec.js's co2_footprint overlay.
+const messages = {
+  en: { ...en, ...clientEn, admin: { ...en.admin, description_optional: 'Description (optional)' } },
+}
+
 function mountPage() {
-  const i18n = createI18n({ legacy: false, locale: 'en', messages: { en: { ...en, ...clientEn } } })
+  const i18n = createI18n({ legacy: false, locale: 'en', messages })
 
   return mount(SkillsPage, {
     global: {
@@ -53,13 +62,23 @@ describe('pages/skills', () => {
     expect(descriptionField.nullIfEmpty).toBe(true)
   })
 
-  it("formats the category table column through the same category labels", () => {
+  // Gap 5: develop's skills table has only two columns (Skill name,
+  // Description) - category is editable on the create/edit form only, never
+  // shown in the list.
+  it('lists only skill_name and description columns, not category', () => {
     const wrapper = mountPage()
     const table = wrapper.findComponent(AdminCrudTableStub)
-    const categoryColumn = table.props('tableFields').find((f) => f.key === 'category')
 
-    expect(categoryColumn.formatter(2)).toBe('Technical skills')
-    expect(categoryColumn.formatter(null)).toBe('')
+    expect(table.props('tableFields').map((f) => f.key)).toEqual(['skill_name', 'description'])
+  })
+
+  // Gap 22: legacy's create-skill modal labels this "Description (optional):",
+  // not the plain "Description:" every other description field uses.
+  it('labels the description field "Description (optional)"', () => {
+    const wrapper = mountPage()
+    const table = wrapper.findComponent(AdminCrudTableStub)
+
+    expect(table.props('formFields').find((f) => f.key === 'description').label).toBe('Description (optional)')
   })
 
   it('wires items and CRUD actions to the adminRefdata store', () => {

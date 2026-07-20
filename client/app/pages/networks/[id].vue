@@ -7,10 +7,11 @@ import { useNetworksStore } from '~/stores/networks.js'
 import { useGroupsStore } from '~/stores/groups.js'
 import NetworkStats from '~/components/networks/NetworkStats.vue'
 import AssociateGroupsModal from '~/components/networks/AssociateGroupsModal.vue'
+import NetworkGroupsModerationTable from '~/components/networks/NetworkGroupsModerationTable.vue'
+import NetworkEventsModerationTable from '~/components/networks/NetworkEventsModerationTable.vue'
+import NetworkTagsManager from '~/components/networks/NetworkTagsManager.vue'
 import TusImageUpload from '~/components/forms/TusImageUpload.vue'
-import AdminCrudTable from '~/components/admin/AdminCrudTable.vue'
 import GroupsTable from '~/components/groups/GroupsTable.vue'
-import ModerationQueue from '~/components/moderation/ModerationQueue.vue'
 
 // /networks/{id} - resources/views/networks/show.blade.php +
 // resources/js/components/NetworkPage.vue (design.md §6.2 Phase E task E1).
@@ -33,11 +34,16 @@ import ModerationQueue from '~/components/moderation/ModerationQueue.vue'
 // of link the fixometer uses for /export/devices), so a plain <a href> works
 // from the SPA without a session cookie.
 //
-// Groups/Events "requiring moderation" panels ARE ported below, scoped to
-// THIS network only (:networks="[id]", matching legacy GroupsRequiringModeration
-// / EventsRequiringModeration's `networks` prop) with always-visible headings
-// + a "None" fallback (alwaysShow), matching legacy NetworkPage.vue exactly -
-// unlike the unscoped, hide-when-empty usage on /party and /group/map.
+// Groups/Events "requiring moderation" sections use the network-specific
+// NetworkGroupsModerationTable / NetworkEventsModerationTable components
+// (parity-v2/networks.md gap #2 + #11), NOT the shared components/
+// moderation/ModerationQueue.vue used by /party and /group/map - legacy's
+// GroupsRequiringModeration/EventsRequiringModeration render the FULL
+// GroupsTable/GroupEventScrollTable here, not a bare name list. Section
+// ORDER also matches legacy exactly (gap #6): Header -> Impact -> About ->
+// Coordinators -> Groups-requiring-moderation -> Events-requiring-moderation
+// -> Groups -> Tags -> (Network logo management, appended at the very end -
+// see the section's own comment for why).
 definePageMeta({ auth: true })
 
 const { t } = useI18n()
@@ -103,9 +109,12 @@ const groupRows = computed(() =>
 
 const groupsCount = computed(() => (networksStore.groups.loading ? null : networksStore.groups.data.length))
 
+// Mirrors app/Network.php#groupsNotIn() exactly (parity-v2/networks.md gap
+// #9): every group not already in the network, archived or not - archived
+// groups are NOT excluded server-side, so they stay selectable here too.
 const candidateGroups = computed(() => {
   const inNetworkIds = new Set(networksStore.groups.data.map((g) => g.id))
-  return groupsStore.names.filter((g) => !g.archived_at && !inNetworkIds.has(g.id)).map((g) => ({ id: g.id, name: g.name }))
+  return groupsStore.names.filter((g) => !inNetworkIds.has(g.id)).map((g) => ({ id: g.id, name: g.name }))
 })
 
 function loadGroups() {
@@ -134,53 +143,6 @@ onMounted(() => {
 function retry() {
   loadNetwork()
 }
-
-// AdminCrudTable's callback-prop contract (design.md's D4-established
-// convention) - wraps stores/networks.js's tag actions with this page's
-// network id.
-function fetchTags() {
-  return networksStore.fetchTags(id.value)
-}
-function createTag(payload) {
-  return networksStore.createTag(id.value, payload)
-}
-function updateTag(tagId, payload) {
-  return networksStore.updateTag(id.value, tagId, payload)
-}
-function deleteTag(tagId) {
-  return networksStore.deleteTag(id.value, tagId)
-}
-
-const tagTableFields = computed(() => [
-  { key: 'name', label: t('networks.tags.name_label'), sortable: true },
-  { key: 'groups_count', label: t('networks.general.groups'), sortable: true },
-])
-
-const tagFormFields = computed(() => [
-  { key: 'name', label: t('networks.tags.name_label'), type: 'text', required: true, maxLength: 255 },
-  { key: 'description', label: t('networks.tags.description_label'), type: 'textarea', required: false, rows: 3, maxLength: 1000, nullIfEmpty: true },
-])
-
-const tagLabels = computed(() => ({
-  title: t('networks.tags.title'),
-  createButton: t('networks.tags.create'),
-  editTitle: t('networks.tags.edit_title'),
-  saveButton: t('admin.save-tag'),
-  deleteButton: t('networks.tags.delete'),
-  cancel: t('partials.cancel'),
-  emptyText: t('networks.tags.no_tags'),
-  confirmDeleteTitle: t('networks.tags.delete_confirm_title'),
-  loadError: t('client.networks.tags_load_error'),
-  retry: t('client.dashboard.retry'),
-  createSuccess: t('group-tags.create_success'),
-  updateSuccess: t('group-tags.update_success'),
-  deleteSuccess: t('group-tags.delete_success'),
-  createError: t('networks.tags.create_error'),
-  updateError: t('networks.tags.edit_error'),
-  deleteError: t('group-tags.delete_error'),
-  formatConfirmDelete: (item) => t('networks.tags.delete_confirm_message', { name: item.name }),
-  deleteWarning: (item) => (item.groups_count > 0 ? t('networks.tags.delete_warning', { count: item.groups_count }, item.groups_count) : ''),
-}))
 </script>
 
 <template>
@@ -214,40 +176,26 @@ const tagLabels = computed(() => ({
             {{ network.website }}
           </a>
         </div>
-        <a
-          v-if="canManage"
-          :href="`/export/networks/${network.id}/events`"
-          class="btn btn-outline-primary me-2"
-          data-testid="network-show-export-events"
-        >
-          {{ t('groups.export_event_list') }}
-        </a>
-        <BButton v-if="canManage" variant="primary" data-testid="network-show-add-groups" @click="showAssociateModal = true">
-          {{ t('networks.show.add_groups_menuitem') }}
-        </BButton>
+        <!-- Single "Network Actions" dropdown (parity-v2/networks.md gap
+             #1), matching legacy's b-dropdown, not two always-visible
+             loose buttons. Legacy's third item, "View groups", targets
+             /group/network/{id} (GroupController@network, an "All Groups"
+             index scoped by network) - Nuxt's /group/all has no equivalent
+             network-scoping query param (out of scope: it's a group* page)
+             and this page's own Groups section below already lists every
+             group in the network inline (an intentional, richer
+             replacement - see that section's comment), so "View groups"
+             would be a dead link here and is deliberately dropped rather
+             than ported to a non-functional target. -->
+        <BDropdown v-if="canManage" variant="primary" placement="bottom-end" :text="t('networks.general.actions')" data-testid="network-show-actions">
+          <BDropdownItem data-testid="network-show-add-groups" @click="showAssociateModal = true">
+            {{ t('networks.show.add_groups_menuitem') }}
+          </BDropdownItem>
+          <BDropdownItem :href="`/export/networks/${network.id}/events`" data-testid="network-show-export-events">
+            {{ t('groups.export_event_list') }}
+          </BDropdownItem>
+        </BDropdown>
       </div>
-
-      <!-- Groups/events awaiting moderation, for Administrators and this
-           network's coordinators (legacy network page showed both queues,
-           scoped to this network - :networks="[id]" - with an always-visible
-           heading + "None" message rather than hiding the section). -->
-      <template v-if="canManage">
-        <ModerationQueue type="groups" :networks="[id]" :always-show="true" />
-        <ModerationQueue type="events" :networks="[id]" :always-show="true" />
-      </template>
-
-      <section v-if="canManage" class="mb-4" data-testid="network-logo-manage">
-        <h2>{{ t('client.networks.logo_heading') }}</h2>
-        <TusImageUpload
-          :current-image-url="network.logo || ''"
-          data-testid="network-logo-upload"
-          @uploaded="onLogoUploaded"
-          @upload-error="logoError = $event"
-        />
-        <BAlert v-if="logoError" :model-value="true" variant="danger" class="mt-2" data-testid="network-logo-error">
-          {{ logoError }}
-        </BAlert>
-      </section>
 
       <section class="mb-4">
         <h2>{{ t('networks.general.impact') }}</h2>
@@ -270,7 +218,7 @@ const tagLabels = computed(() => ({
             v-for="coordinator in network.coordinators"
             :key="coordinator.id"
             :to="`/profile/${coordinator.id}`"
-            class="d-flex align-items-center gap-2 p-2 pe-3 border rounded-pill text-decoration-none coordinator-card"
+            class="d-flex align-items-center gap-2 p-2 pe-3 text-decoration-none coordinator-card"
             :data-testid="`network-coordinator-${coordinator.id}`"
           >
             <img
@@ -285,6 +233,30 @@ const tagLabels = computed(() => ({
         </div>
       </section>
 
+      <!-- Groups/events awaiting moderation, for Administrators and this
+           network's coordinators - the network-specific rich tables (gap
+           #2/#11), not the shared components/moderation/ModerationQueue.vue
+           bare-link list used elsewhere. Always-visible heading + "None"
+           fallback, matching legacy NetworkPage.vue exactly. -->
+      <template v-if="canManage">
+        <section class="mb-4" data-testid="network-groups-moderation">
+          <h2>{{ t('networks.moderation.groups_title') }}</h2>
+          <NetworkGroupsModerationTable :network-id="id" />
+        </section>
+        <section class="mb-4" data-testid="network-events-moderation">
+          <h2>{{ t('networks.moderation.events_title') }}</h2>
+          <NetworkEventsModerationTable :network-id="id" />
+        </section>
+      </template>
+
+      <!-- Legacy's "Groups" section is just a count sentence + a "View
+           groups" link out to /group/network/{id} - it never lists groups
+           inline. That destination has no Nuxt equivalent (see the header
+           dropdown's comment above), so the richer inline GroupsTable +
+           tag filter already built here is kept as a deliberate,
+           functionally-superior divergence rather than regressed to a
+           link with nowhere useful to go (parity-v2/networks.md gap #3 -
+           flagged for explicit sign-off there). -->
       <section class="mb-4">
         <div class="d-flex justify-content-between align-items-center mb-2">
           <h2 class="mb-0">{{ t('networks.general.groups') }}</h2>
@@ -313,22 +285,32 @@ const tagLabels = computed(() => ({
         <GroupsTable v-else :groups="groupRows" :show-join="false" :show-filters="true" />
       </section>
 
-      <div v-if="canManage" class="row">
-        <section class="col-lg-6" data-testid="tags-management">
-          <AdminCrudTable
-            display-key="name"
-            :table-fields="tagTableFields"
-            :form-fields="tagFormFields"
-            :labels="tagLabels"
-            testid-prefix="tag"
-            :items="networksStore.tags.data"
-            :fetch-items="fetchTags"
-            :create-item="createTag"
-            :update-item="updateTag"
-            :delete-item="deleteTag"
-          />
-        </section>
-      </div>
+      <section v-if="canManage" class="mb-4" data-testid="tags-management">
+        <h2>{{ t('networks.tags.title') }}</h2>
+        <NetworkTagsManager :network-id="id" />
+      </section>
+
+      <!-- Network logo management: legacy has no such section on the show
+           page at all (logo upload is a separate, primitive /networks/
+           {id}/edit page - a single <input type=file> + full-page-reload
+           form, resources/views/networks/edit.blade.php). Kept inline here
+           instead (parity-v2/networks.md gap #8), using the same TUS
+           upload infrastructure every other image upload on the Nuxt app
+           already uses, rather than porting a strictly worse primitive
+           file-input page - but appended at the very end, after Tags, so
+           it doesn't disturb the legacy section order above (gap #6). -->
+      <section v-if="canManage" class="mb-4" data-testid="network-logo-manage">
+        <h2>{{ t('client.networks.logo_heading') }}</h2>
+        <TusImageUpload
+          :current-image-url="network.logo || ''"
+          data-testid="network-logo-upload"
+          @uploaded="onLogoUploaded"
+          @upload-error="logoError = $event"
+        />
+        <BAlert v-if="logoError" :model-value="true" variant="danger" class="mt-2" data-testid="network-logo-error">
+          {{ logoError }}
+        </BAlert>
+      </section>
 
       <BModal :model-value="showDescriptionModal" :title="network.name" size="lg" ok-only data-testid="network-description-modal" @hide="showDescriptionModal = false">
         <!-- eslint-disable-next-line vue/no-v-html -->
@@ -345,3 +327,23 @@ const tagLabels = computed(() => ({
     </template>
   </div>
 </template>
+
+<style scoped lang="scss">
+// Coordinator pill cards (parity-v2/networks.md gap #7): matches legacy
+// NetworkPage.vue's .coordinator-card exactly - 2px solid black border,
+// pill radius, hover border-color/box-shadow - rather than bare Bootstrap
+// utility classes with no hover affordance.
+.coordinator-card {
+  border: 2px solid #000;
+  border-radius: 50px;
+  background: #fff;
+  color: inherit;
+  transition: box-shadow 0.2s, border-color 0.2s;
+
+  &:hover {
+    border-color: var(--bs-primary, #0394a6);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    text-decoration: none;
+  }
+}
+</style>

@@ -1,10 +1,11 @@
 <script setup>
-import { onMounted } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useFixometerStore } from '~/stores/fixometer.js'
 import { useAuth } from '~/composables/useAuth.js'
 import ImpactStats from '~/components/fixometer/ImpactStats.vue'
 import DevicesSearchTable from '~/components/fixometer/DevicesSearchTable.vue'
+import AddDataModal from '~/components/fixometer/AddDataModal.vue'
 
 // /fixometer - resources/views/fixometer/index.blade.php +
 // resources/js/components/FixometerPage.vue are the functional spec
@@ -31,13 +32,22 @@ definePageMeta({ auth: true })
 // on this page rather than switched by legacy's b-tabs. DevicesSearchTable
 // also exists standalone at /device/search (see that page's doc comment) -
 // this page embeds the same component inline to match the legacy's
-// single-page layout, and keeps a link through to the standalone page for
-// anyone who wants a page of their own to bookmark/share.
+// single-page layout. Gap fix: a prior version also added a "Browse repair
+// records" button linking through to /device/search here, but legacy's
+// FixometerPage.vue header row has only the (Administrator-only) export
+// button - browsing already happens in place, via the embedded table below.
 const { t } = useI18n()
 useHead({ title: t('devices.fixometer') })
 
 const fixometerStore = useFixometerStore()
-const { loggedIn, hasRole } = useAuth()
+const { hasRole } = useAuth()
+
+// Gap fix (HIGH): FixometerHeading.vue's "Add Data" button is unconditional
+// (rendered even logged-out) and opens AddDataModal.vue, an in-page group/
+// event picker - a prior version gated the button on `loggedIn` and linked
+// straight to /dashboard instead. AddDataModal.vue itself handles the
+// logged-out/no-groups case (same warning branch legacy shows either way).
+const showAddData = ref(false)
 
 function retry() {
   fixometerStore.fetchImpactData({ force: true })
@@ -57,19 +67,12 @@ onMounted(() => {
         <h1 class="mb-0">{{ t('devices.fixometer') }}</h1>
         <img src="/images/fixometer-doodle.svg" class="d-none d-md-block fixometer-doodle" alt="">
       </div>
-      <!--
-        FixometerHeading.vue's "Add Data" button is unconditional in the
-        legacy app (AddDataModal.vue self-guides logged-out/groupless users
-        to "follow a group first"). Porting that full group/event picker
-        modal is out of scope here - see docs/nuxt-migration/api-gaps.md -
-        so this links straight to /dashboard (where a host/admin's own
-        groups and events are already listed) and is only shown once
-        logged in, a deliberate simplification.
-      -->
-      <NuxtLink v-if="loggedIn" to="/dashboard" class="btn btn-primary" data-testid="fixometer-add-data">
+      <BButton variant="primary" data-testid="fixometer-add-data" @click="showAddData = true">
         {{ t('devices.add_data_button') }}
-      </NuxtLink>
+      </BButton>
     </div>
+
+    <AddDataModal :show="showAddData" @close="showAddData = false" />
 
     <hr class="fixometer-hr">
 
@@ -111,18 +114,18 @@ onMounted(() => {
                anonymous-access web route (routes/web.php - "also called from
                https://therestartproject.org/download-dataset"), but the
                legacy button itself is Administrator-gated, so this matches
-               that rather than the route's own (looser) access. -->
+               that rather than the route's own (looser) access. No separate
+               "browse records" link/button here - legacy's FixometerPage.vue
+               header row has only this one button; browsing IS the
+               DevicesSearchTable embedded directly below, not a route away. -->
           <a
             v-if="hasRole('Administrator')"
             href="/export/devices"
-            class="btn btn-outline-primary"
+            class="btn btn-primary"
             data-testid="fixometer-export-devices"
           >
             {{ t('devices.export_device_data') }}
           </a>
-          <NuxtLink to="/device/search" class="btn btn-outline-primary" data-testid="fixometer-browse-records">
-            {{ t('client.fixometer.browse_records') }}
-          </NuxtLink>
         </div>
       </div>
 

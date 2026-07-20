@@ -1,4 +1,4 @@
-import { mount } from '@vue/test-utils'
+import { flushPromises, mount } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
 import { createI18n } from 'vue-i18n'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -45,7 +45,7 @@ const LocationPickerStub = {
   props: ['location', 'postcode', 'lat', 'lng', 'hasError', 'canEditPostcode'],
   emits: ['update:location', 'update:postcode', 'update:lat', 'update:lng'],
   template:
-    '<input data-testid="location-picker-input" :value="location" @input="$emit(\'update:location\', $event.target.value)" />',
+    '<input data-testid="location-picker-input" :value="location" :data-can-edit-postcode="canEditPostcode" @input="$emit(\'update:location\', $event.target.value)" />',
 }
 const BFormStub = {
   emits: ['submit'],
@@ -58,22 +58,24 @@ const BCardStub = { template: '<div><slot /></div>' }
 const BCardHeaderStub = { template: '<div><slot /></div>' }
 const BCardBodyStub = { template: '<div><slot /></div>' }
 const TusImageUploadStub = {
-  props: ['currentImageUrl'],
+  props: { currentImageUrl: String, compact: Boolean },
   emits: ['uploaded', 'upload-error'],
   template:
     '<div data-testid="stub-tus-image-upload"><button data-testid="stub-upload-ok" @click="$emit(\'uploaded\', { uploadKey: \'key123\' })" /><button data-testid="stub-upload-fail" @click="$emit(\'upload-error\', \'boom\')" /></div>',
 }
-const BFormCheckboxGroupStub = {
-  props: ['modelValue', 'options'],
+// Stands in for GroupMultiSelect.vue (unit-tested on its own) - a button per
+// option is enough to drive GroupForm's payload/permission-gating tests
+// without re-testing the search/chip/grouping UI here.
+const GroupMultiSelectStub = {
+  props: ['modelValue', 'options', 'testid'],
   emits: ['update:modelValue'],
-  template: '<div><label v-for="o in options" :key="o.value"><input type="checkbox" :value="o.value" @change="toggle(o.value)"> {{ o.text }}</label></div>',
-  methods: {
-    toggle(value) {
-      const current = this.modelValue || []
-      const next = current.includes(value) ? current.filter((v) => v !== value) : [...current, value]
-      this.$emit('update:modelValue', next)
-    },
-  },
+  template:
+    '<div :data-testid="testid"><button v-for="o in options" :key="o.value" :data-testid="`${testid}-select-${o.value}`" @click="$emit(\'update:modelValue\', [...modelValue, o.value])" /></div>',
+}
+const GroupNetworkDataStub = {
+  props: ['modelValue'],
+  emits: ['update:modelValue'],
+  template: '<div data-testid="stub-group-network-data" />',
 }
 
 const GLOBAL_STUBS = {
@@ -86,12 +88,43 @@ const GLOBAL_STUBS = {
   BCard: BCardStub,
   BCardHeader: BCardHeaderStub,
   BCardBody: BCardBodyStub,
-  BFormCheckboxGroup: BFormCheckboxGroupStub,
   TusImageUpload: TusImageUploadStub,
+  GroupMultiSelect: GroupMultiSelectStub,
+  GroupNetworkData: GroupNetworkDataStub,
+}
+
+// groups.duplicate and networks.edit.* are new copy (findings/parity-v2/
+// group-forms.md #5 and #7) added to lang/en/groups.php and
+// lang/en/networks.php, but the generated client/i18n/locales/en.json is
+// regenerated centrally via `php artisan translations:export-client` - so
+// they're supplied inline here rather than by editing the checked-in
+// locale file, exactly matching the copy that will land there.
+const LANG_OVERRIDES = {
+  groups: {
+    duplicate: 'That group name ({name}) already exists.  If it\'s yours, please go to the Groups page using the menu and edit it.',
+  },
+  networks: {
+    edit: {
+      add_new_field: 'Add new field',
+      new_field_name: 'New field name',
+      add_field: 'Add field',
+    },
+  },
 }
 
 function mountForm(props = {}) {
-  const i18n = createI18n({ legacy: false, locale: 'en', messages: { en: { ...en, ...clientEn } } })
+  const i18n = createI18n({
+    legacy: false,
+    locale: 'en',
+    messages: {
+      en: {
+        ...en,
+        ...clientEn,
+        groups: { ...en.groups, ...LANG_OVERRIDES.groups },
+        networks: { ...en.networks, edit: { ...en.networks?.edit, ...LANG_OVERRIDES.networks.edit } },
+      },
+    },
+  })
 
   return mount(GroupForm, {
     props,
@@ -180,7 +213,7 @@ describe('components/groups/GroupForm', () => {
       expect(store.createGroup).not.toHaveBeenCalled()
     })
 
-    it('renders server-side 422 field errors and a general error banner', async () => {
+    it('renders server-side 422 field errors and a general error message', async () => {
       const store = useGroupsStore()
       store.createGroup = vi.fn().mockRejectedValue({
         status: 422,
@@ -193,12 +226,20 @@ describe('components/groups/GroupForm', () => {
       await wrapper.vm.$nextTick()
 
       expect(wrapper.find('[data-testid="group-form-name-error"]').text()).toContain('already exists')
+      // gap 10: plain bold-red text next to the submit button, not a boxed
+      // alert at the top of the form.
       expect(wrapper.find('[data-testid="group-form-error"]').exists()).toBe(true)
+      expect(wrapper.find('[data-testid="group-form-error"]').classes()).toContain('text-danger')
     })
 
-    it('shows the image picker (gap: legacy GroupAddEdit.vue sets the photo at creation time)', () => {
+    it('shows the image picker (legacy GroupAddEdit.vue sets the photo at creation time)', () => {
       const wrapper = mountForm()
       expect(wrapper.findComponent(TusImageUploadStub).exists()).toBe(true)
+    })
+
+    it('uses the compact 100x100 thumbnail picker, matching legacy GroupImage.vue (gap 13)', () => {
+      const wrapper = mountForm()
+      expect(wrapper.findComponent(TusImageUploadStub).props('compact')).toBe(true)
     })
 
     it('uploads the selected image after createGroup resolves, in order, before emitting created', async () => {
@@ -257,6 +298,58 @@ describe('components/groups/GroupForm', () => {
       await wrapper.find('[data-testid="stub-upload-fail"]').trigger('click')
       expect(wrapper.find('[data-testid="group-form-image-error"]').text()).toBe('boom')
     })
+
+    it('keeps the postcode read-only, regardless of role (gap 12: no `|| creating` override)', () => {
+      const wrapper = mountForm({ isAdmin: true })
+      expect(wrapper.find('[data-testid="location-picker-input"]').attributes('data-can-edit-postcode')).toBe('false')
+    })
+
+    it('shows the groups_approval_text next to the submit button, not in a page header (gap 9)', () => {
+      const wrapper = mountForm()
+      const buttons = wrapper.find('[data-testid="group-form-buttons"]')
+      expect(buttons.text()).toContain('Group submissions need to be approved by an administrator')
+    })
+  })
+
+  describe('duplicate name check (gap 7)', () => {
+    it('shows a bold red warning under the Name field and blocks submission', async () => {
+      const store = useGroupsStore()
+      store.createGroup = vi.fn()
+      store.names = [{ id: 9, name: 'Fixers United', archived_at: null }]
+
+      const wrapper = mountForm()
+      await fillRequiredFields(wrapper)
+      await wrapper.vm.$nextTick()
+
+      const warning = wrapper.find('[data-testid="group-form-duplicate-name"]')
+      expect(warning.exists()).toBe(true)
+      expect(warning.text()).toContain('Fixers United')
+
+      await wrapper.find('[data-testid="group-form"]').trigger('submit')
+      expect(store.createGroup).not.toHaveBeenCalled()
+    })
+
+    it('does not warn when the only name match is the group being edited', async () => {
+      const store = useGroupsStore()
+      store.updateGroup = vi.fn().mockResolvedValue(5)
+      store.names = [{ id: 5, name: 'Fixers United', archived_at: null }]
+
+      const wrapper = mountForm({ groupId: 5, initialGroup: { name: 'Fixers United', description: '<p>x</p>', location: { location: 'Anytown' } } })
+      await wrapper.vm.$nextTick()
+
+      expect(wrapper.find('[data-testid="group-form-duplicate-name"]').exists()).toBe(false)
+    })
+
+    it('does not warn when the name is unique', async () => {
+      const store = useGroupsStore()
+      store.names = [{ id: 9, name: 'Someone Else', archived_at: null }]
+
+      const wrapper = mountForm()
+      await fillRequiredFields(wrapper)
+      await wrapper.vm.$nextTick()
+
+      expect(wrapper.find('[data-testid="group-form-duplicate-name"]').exists()).toBe(false)
+    })
   })
 
   describe('edit mode', () => {
@@ -309,7 +402,7 @@ describe('components/groups/GroupForm', () => {
       const store = useGroupsStore()
       store.updateGroup = vi.fn().mockResolvedValue(5)
       store.fetchTags = vi.fn().mockResolvedValue([])
-      store.tags.data = [{ id: 9, name: 'Repair Café', network_name: null }]
+      store.tags.data = [{ id: 9, name: 'Repair Café', network_id: null, network_name: null }]
 
       const unapproved = { ...GROUP, approved: false }
       const wrapper = mountForm({ groupId: 5, initialGroup: unapproved, permissions: { can_demote: true }, isAdmin: false })
@@ -320,6 +413,9 @@ describe('components/groups/GroupForm', () => {
 
       await wrapper.find('[data-testid="group-form-area"]').setValue('New Area')
       await wrapper.find('[data-testid="group-form-moderate"]').setValue('approve')
+      // GROUP.tags already includes id 9 (see initialGroup below), so
+      // form.tagIds starts as [9] - just verifying it round-trips through
+      // to the payload here, not re-selecting it.
       await wrapper.find('[data-testid="group-form"]').trigger('submit')
       await wrapper.vm.$nextTick()
 
@@ -334,11 +430,13 @@ describe('components/groups/GroupForm', () => {
       store.updateGroup = vi.fn().mockResolvedValue(5)
 
       const wrapper = mountForm({ groupId: 5, initialGroup: GROUP, permissions: { can_demote: false }, isAdmin: true })
-      await wrapper.vm.$nextTick()
-      await wrapper.vm.$nextTick()
+      await flushPromises()
 
       expect(wrapper.find('[data-testid="group-form-networks"]').exists()).toBe(true)
 
+      // GROUP.networks already includes id 1, so networkIds starts as [1] -
+      // submitting without any further interaction is enough to check it
+      // round-trips through to the payload.
       await wrapper.find('[data-testid="group-form"]').trigger('submit')
       await wrapper.vm.$nextTick()
 
@@ -351,25 +449,60 @@ describe('components/groups/GroupForm', () => {
       expect(wrapper.find('[data-testid="group-form-moderate"]').exists()).toBe(false)
     })
 
-    it('does not render its own image picker (group/edit/[id].vue already renders one above the form)', () => {
+    it('renders the network-data editor for admins/moderators (gap 5)', () => {
+      const wrapper = mountForm({ groupId: 5, initialGroup: GROUP, permissions: { can_demote: true } })
+      expect(wrapper.findComponent(GroupNetworkDataStub).exists()).toBe(true)
+      expect(wrapper.findComponent(GroupNetworkDataStub).props('modelValue')).toEqual({ dummy: 'value' })
+    })
+
+    it('shows the image picker in edit mode too (gap 8: repositioned, not removed)', () => {
       const wrapper = mountForm({ groupId: 5, initialGroup: GROUP })
-      expect(wrapper.findComponent(TusImageUploadStub).exists()).toBe(false)
+      expect(wrapper.findComponent(TusImageUploadStub).exists()).toBe(true)
+    })
+
+    it('uploads immediately (not deferred) when an image is picked in edit mode', async () => {
+      const store = useGroupsStore()
+      store.uploadGroupImage = vi.fn().mockResolvedValue({ image_url: '/uploads/new.png' })
+
+      const wrapper = mountForm({ groupId: 5, initialGroup: GROUP })
+      await wrapper.find('[data-testid="stub-upload-ok"]').trigger('click')
+
+      expect(store.uploadGroupImage).toHaveBeenCalledWith(5, 'key123')
+    })
+
+    it('shows an image upload error message when the immediate edit-mode upload fails', async () => {
+      const store = useGroupsStore()
+      store.uploadGroupImage = vi.fn().mockRejectedValue(new Error('boom'))
+
+      const wrapper = mountForm({ groupId: 5, initialGroup: GROUP })
+      await wrapper.find('[data-testid="stub-upload-ok"]').trigger('click')
+      await wrapper.vm.$nextTick()
+
+      expect(wrapper.find('[data-testid="group-form-image-error"]').exists()).toBe(true)
+    })
+
+    it('allows postcode edits for moderators (gap 12)', () => {
+      const wrapper = mountForm({ groupId: 5, initialGroup: GROUP, permissions: { can_demote: true } })
+      expect(wrapper.find('[data-testid="location-picker-input"]').attributes('data-can-edit-postcode')).toBe('true')
     })
   })
 
-  describe('location map preview (gap 10)', () => {
+  describe('location map preview (gap 10 / gap 15)', () => {
     it('is hidden until lat/lng are set', () => {
       const wrapper = mountForm()
       expect(wrapper.find('[data-testid="group-form-map-preview"]').exists()).toBe(false)
     })
 
-    it('shows a marker at the geocoded lat/lng once set', () => {
+    it('shows a marker at the geocoded lat/lng once set, zoomed to 11 (matching GroupLocationMap.vue)', () => {
       const wrapper = mountForm({
         groupId: 5,
         initialGroup: { location: { location: 'Anytown', lat: 1, lng: 2 } },
       })
       const preview = wrapper.find('[data-testid="group-form-map-preview"]')
       expect(preview.exists()).toBe(true)
+
+      const map = wrapper.findComponent(LMapStub)
+      expect(map.props('zoom')).toBe(11)
 
       const marker = wrapper.findComponent(LMarkerStub)
       expect(marker.exists()).toBe(true)

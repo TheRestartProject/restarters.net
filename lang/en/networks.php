@@ -9,16 +9,33 @@ return [
     'particular_network' => ':networkName network',
     'groups' => 'Groups',
     'about' => 'About',
+    'actions' => 'Network Actions',
     'coordinators' => 'Network Coordinators',
     'impact' => 'Impact'
   ],
   'stats' => [
     'groups' => '{1} Group|[0,*] Groups',
     'events' => '{1} Event|[0,*] Events',
+    'waste_diverted' => 'Waste Diverted',
+    'co2_prevented' => 'CO2 Prevented',
+  ],
+  'moderation' => [
+    // Legacy lang/en/groups.php#groups_title_admin / events.php#
+    // events_title_admin / groups.php#group_requires_moderation were
+    // dropped from THIS branch's en/fr/fr-BE lang files by the "Laravel
+    // becomes API-only" cleanup (still present in it/nl/de/es/no and on
+    // origin/develop) - restoring them there is out of scope for this
+    // pass (lang/en/groups.php isn't an editable file here), so the exact
+    // legacy copy is kept under this new networks.* namespace instead.
+    'groups_title' => 'Groups to moderate',
+    'events_title' => 'Events to moderate',
+    'group_requires_moderation' => 'Group requires moderation',
   ],
   'tags' => [
     'title' => 'Group Tags',
     'no_tags' => 'No tags created yet.',
+    'new_tag_placeholder' => 'New tag name...',
+    'description_placeholder' => 'Description (optional)',
     'create' => 'Create Tag',
     'create_error' => 'Failed to create tag. Please try again.',
     'edit' => 'Edit',
@@ -50,5 +67,8 @@ return [
     'none' => 'None',
   ],
   'edit' => [
+    'add_new_field' => 'Add new field',
+    'new_field_name' => 'New field name',
+    'add_field' => 'Add field',
   ],
 ];

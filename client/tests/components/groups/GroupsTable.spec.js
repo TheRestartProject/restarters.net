@@ -1,7 +1,10 @@
 import { mount } from '@vue/test-utils'
+import { createPinia, setActivePinia } from 'pinia'
 import { createI18n } from 'vue-i18n'
-import { describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import GroupsTable from '../../../app/components/groups/GroupsTable.vue'
+import { useGroupsStore } from '../../../app/stores/groups.js'
+import { useNetworksStore } from '../../../app/stores/networks.js'
 import en from '../../../i18n/locales/en.json'
 import clientEn from '../../../i18n/locales/client-en.json'
 
@@ -31,6 +34,14 @@ const rows = [
 ]
 
 describe('components/groups/GroupsTable', () => {
+  // GroupsTableFilters (rendered whenever showFilters is set) reads network/
+  // tag options straight from the shared stores rather than via props.
+  beforeEach(() => {
+    setActivePinia(createPinia())
+    useNetworksStore().fetchList = vi.fn().mockResolvedValue([])
+    useGroupsStore().fetchTags = vi.fn().mockResolvedValue([])
+  })
+
   it('shows an empty-state row when there are no groups', () => {
     const wrapper = mountComponent({ groups: [] })
 
@@ -144,9 +155,13 @@ describe('components/groups/GroupsTable', () => {
   })
 
   describe('filter bar', () => {
+    // tagIds/networkIds mirror what pages/group/all.vue's `rows` computed
+    // sources straight from the names index (network_ids/tag_ids, PR #887 -
+    // see GroupsTable.vue's matchesFilters doc comment), available
+    // immediately rather than waiting on per-row hydration.
     const filterableRows = [
-      { id: 1, name: 'London Fixers', location: { location: 'London', country: 'UK' }, tags: [{ tag_name: 'electronics' }] },
-      { id: 2, name: 'Paris Repairers', location: { location: 'Paris', country: 'France' }, tags: [{ tag_name: 'textiles' }] },
+      { id: 1, name: 'London Fixers', location: { location: 'London', country: 'UK' }, tagIds: [5], networkIds: [10] },
+      { id: 2, name: 'Paris Repairers', location: { location: 'Paris', country: 'France' }, tagIds: [6], networkIds: [11] },
     ]
 
     it('does not render the filter bar unless showFilters is set', () => {
@@ -177,13 +192,77 @@ describe('components/groups/GroupsTable', () => {
       expect(wrapper.find('[data-testid="group-row-2"]').exists()).toBe(false)
     })
 
-    it('filters rows by tag', async () => {
+    it('filters rows by network', async () => {
+      useNetworksStore().list.data = [
+        { id: 10, name: 'Network A' },
+        { id: 11, name: 'Network B' },
+      ]
+
       const wrapper = mountComponent({ groups: filterableRows, showFilters: true })
       await wrapper.find('[data-testid="groups-table-filters-toggle"]').trigger('click')
-      await wrapper.find('[data-testid="groups-table-filter-tags"]').setValue('textiles')
+      await wrapper.find('[data-testid="groups-table-filter-network"]').setValue('11')
 
       expect(wrapper.find('[data-testid="group-row-2"]').exists()).toBe(true)
       expect(wrapper.find('[data-testid="group-row-1"]').exists()).toBe(false)
+    })
+
+    it('hides the tag filter unless showTags is set', () => {
+      const wrapper = mountComponent({ groups: filterableRows, showFilters: true })
+      expect(wrapper.find('[data-testid="groups-table-filter-tags"]').exists()).toBe(false)
+    })
+
+    // gap #6/#11: the tag filter is a dropdown gated on showTags (matching
+    // legacy's Administrator/NetworkCoordinator-only tag search), not the
+    // free-text search every other field uses.
+    it('filters rows by tag, when showTags is set', async () => {
+      useGroupsStore().tags.data = [
+        { id: 5, name: 'electronics' },
+        { id: 6, name: 'textiles' },
+      ]
+
+      const wrapper = mountComponent({ groups: filterableRows, showFilters: true, showTags: true })
+      await wrapper.find('[data-testid="groups-table-filters-toggle"]').trigger('click')
+      await wrapper.find('[data-testid="groups-table-filter-tags"]').setValue('6')
+
+      expect(wrapper.find('[data-testid="group-row-2"]').exists()).toBe(true)
+      expect(wrapper.find('[data-testid="group-row-1"]').exists()).toBe(false)
+    })
+  })
+
+  // gap #3: legacy always has a leading photo column, falling back to the
+  // default profile placeholder when a group has no image.
+  describe('photo column', () => {
+    it('renders a photo cell for every row, falling back to the placeholder', () => {
+      const wrapper = mountComponent({ groups: rows })
+
+      const photo = wrapper.find('[data-testid="group-row-photo-1"]')
+      expect(photo.exists()).toBe(true)
+      expect(photo.attributes('src')).toContain('/images/placeholder-avatar.webp')
+    })
+
+    it('uses the row image when present', () => {
+      const wrapper = mountComponent({ groups: [{ id: 1, name: 'Zeta Fixers', image: 'https://example.com/photo.jpg' }] })
+
+      expect(wrapper.find('[data-testid="group-row-photo-1"]').attributes('src')).toBe('https://example.com/photo.jpg')
+    })
+  })
+
+  // gap #11: tag badges under the name, gated by showTags (the page
+  // role-gates this to Administrator/NetworkCoordinator).
+  describe('tag badges', () => {
+    it('are hidden unless showTags is set', () => {
+      const wrapper = mountComponent({ groups: [{ id: 1, name: 'Zeta Fixers', tags: [{ id: 5, name: 'Scotland' }] }] })
+
+      expect(wrapper.find('[data-testid="group-row-tags-1"]').exists()).toBe(false)
+    })
+
+    it('render under the name when showTags is set', () => {
+      const wrapper = mountComponent({
+        groups: [{ id: 1, name: 'Zeta Fixers', tags: [{ id: 5, name: 'Scotland' }] }],
+        showTags: true,
+      })
+
+      expect(wrapper.find('[data-testid="group-row-tags-1"]').text()).toBe('Scotland')
     })
   })
 })

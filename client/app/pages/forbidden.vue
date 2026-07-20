@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watchEffect } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAuth } from '~/composables/useAuth.js'
 
@@ -9,12 +9,23 @@ import { useAuth } from '~/composables/useAuth.js'
 // be here. Gives concrete recourse rather than a dead end: how to report
 // it, a diagnostics block the user can paste into the report, and - when
 // logged in - ways back into the app.
+//
+// Legacy's forbidden.blade.php `@extends('layouts.app')`, which only drops
+// to the guest ("plain") header for `Auth::guest()` - anyone already signed
+// in (the common case for a 403) sees the full site nav, not the bare
+// logged-out chrome. `layout: 'plain'` below is just the initial/guest
+// default; the watchEffect swaps to 'default' once the session resolves a
+// logged-in user.
 definePageMeta({ layout: 'plain' })
 
 const { t } = useI18n()
 useHead({ title: t('client.forbidden.title') })
 
 const { user, loggedIn, logout } = useAuth()
+
+watchEffect(() => {
+  setPageLayout(loggedIn.value ? 'default' : 'plain')
+})
 
 // Captured client-side on mount for the diagnostics block below - there's
 // no server-rendered request to read Request::url()/URL::previous() from
@@ -42,6 +53,8 @@ async function logoutAndReturn() {
 <template>
   <div class="container py-5" data-testid="forbidden-page">
     <h1>{{ t('client.forbidden.title') }}</h1>
+    <img class="rounded img-fluid" src="/images/broken-toaster.png" :alt="t('client.forbidden.image_alt')">
+
     <p>{{ t('client.forbidden.text') }}</p>
 
     <p>{{ t('client.forbidden.report_intro') }}</p>
@@ -67,24 +80,16 @@ async function logoutAndReturn() {
     <p>{{ t('client.forbidden.thanks') }}</p>
 
     <div v-if="loggedIn" data-testid="forbidden-recovery">
-      <p class="mb-1">{{ t('client.forbidden.recovery_intro') }}</p>
-      <ul>
-        <li>
-          <BButton variant="link" class="p-0" data-testid="forbidden-back-link" @click="goBack">
-            {{ t('client.forbidden.back_link') }}
-          </BButton>
-        </li>
-        <li>
-          <NuxtLink to="/dashboard" data-testid="forbidden-dashboard-link">{{ t('client.forbidden.dashboard_link') }}</NuxtLink>
-        </li>
-        <li>
-          <BButton variant="link" class="p-0" data-testid="forbidden-logout-link" @click="logoutAndReturn">
-            {{ t('client.forbidden.logout_link') }}
-          </BButton>
-        </li>
-      </ul>
+      <p class="mb-1">
+        {{ t('client.forbidden.recovery_back_prefix') }}
+        <BButton variant="link" class="p-0 align-baseline" data-testid="forbidden-back-link" @click="goBack">{{ t('client.forbidden.back_link') }}</BButton>{{ t('client.forbidden.recovery_back_middle') }}
+        <NuxtLink to="/dashboard" data-testid="forbidden-dashboard-link">{{ t('client.forbidden.dashboard_link') }}</NuxtLink>.
+      </p>
+      <p>
+        {{ t('client.forbidden.recovery_logout_prefix') }}
+        <BButton variant="link" class="p-0 align-baseline" data-testid="forbidden-logout-link" @click="logoutAndReturn">{{ t('client.forbidden.logout_link') }}</BButton>
+        {{ t('client.forbidden.recovery_logout_suffix') }}
+      </p>
     </div>
-
-    <NuxtLink to="/" data-testid="forbidden-home-link">{{ t('client.forbidden.home_link') }}</NuxtLink>
   </div>
 </template>

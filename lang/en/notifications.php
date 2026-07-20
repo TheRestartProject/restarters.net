@@ -3,6 +3,7 @@
 return [
     'notifications' => 'Notifications',
     'mark_as_read' => 'Mark as read',
+    'marked_as_read' => 'Marked as read',
     'mark_all_as_read' => 'Mark all notifications as read',
     'greeting' => 'Hello!',
     'view_event' => 'View event',

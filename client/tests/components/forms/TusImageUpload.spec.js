@@ -33,6 +33,8 @@ class MockUppy {
 
   destroy() {}
 
+  addFile() {}
+
   emitComplete(result) {
     this.handlers.complete?.(result)
   }
@@ -99,5 +101,61 @@ describe('components/forms/TusImageUpload', () => {
     lastUppyInstance.emitUploadError({}, { message: 'Network error' })
 
     expect(wrapper.emitted('upload-error')[0]).toEqual(['Network error'])
+  })
+
+  // findings/parity-v2/group-forms.md #13: GroupForm.vue's compact
+  // 100x100 thumbnail picker, matching legacy GroupImage.vue's vue-dropzone
+  // - a separate render path from the default Dashboard one above, so none
+  // of those tests (or their consumers) are affected by this.
+  describe('compact mode', () => {
+    it('does not mount a Dashboard panel', async () => {
+      const wrapper = await mountUpload({ compact: true })
+      expect(wrapper.find('[data-testid="tus-image-upload-dashboard"]').exists()).toBe(false)
+      expect(lastUppyInstance.usedPlugins.some((p) => p.Plugin.name === 'Dashboard')).toBe(false)
+    })
+
+    it('shows the current image, or the grey upload placeholder when there is none, in a 100x100 thumbnail', async () => {
+      let wrapper = await mountUpload({ compact: true, currentImageUrl: '/uploads/mid_1.png' })
+      expect(wrapper.find('[data-testid="tus-image-upload-preview"]').attributes('src')).toBe('/uploads/mid_1.png')
+
+      wrapper = await mountUpload({ compact: true })
+      expect(wrapper.find('[data-testid="tus-image-upload-preview"]').attributes('src')).toBe('/images/upload_ico_grey.svg')
+    })
+
+    it('opens the file picker when the thumbnail is clicked', async () => {
+      const wrapper = await mountUpload({ compact: true })
+      const input = wrapper.find('[data-testid="tus-image-upload-file-input"]').element
+      const clickSpy = vi.spyOn(input, 'click')
+
+      await wrapper.find('[data-testid="tus-image-upload-dropzone"]').trigger('click')
+
+      expect(clickSpy).toHaveBeenCalled()
+    })
+
+    it('shows an instant local preview and calls uppy.addFile when a file is picked', async () => {
+      const wrapper = await mountUpload({ compact: true })
+      const file = new File(['x'], 'photo.png', { type: 'image/png' })
+      const addFileSpy = vi.spyOn(lastUppyInstance, 'addFile')
+      vi.stubGlobal('URL', { ...URL, createObjectURL: vi.fn().mockReturnValue('blob:local-preview') })
+
+      const input = wrapper.find('[data-testid="tus-image-upload-file-input"]')
+      Object.defineProperty(input.element, 'files', { value: [file], configurable: true })
+      await input.trigger('change')
+
+      expect(addFileSpy).toHaveBeenCalledWith(expect.objectContaining({ name: 'photo.png', type: 'image/png' }))
+      expect(wrapper.find('[data-testid="tus-image-upload-preview"]').attributes('src')).toBe('blob:local-preview')
+    })
+
+    it('shows a spinner while uploading, that clears on complete', async () => {
+      const wrapper = await mountUpload({ compact: true })
+
+      lastUppyInstance.handlers.upload?.()
+      await wrapper.vm.$nextTick()
+      expect(wrapper.find('.tus-image-upload__thumb-spinner').exists()).toBe(true)
+
+      lastUppyInstance.emitComplete({ successful: [{ tus: { uploadUrl: 'http://localhost:8001/api/tus/abc123' } }] })
+      await wrapper.vm.$nextTick()
+      expect(wrapper.find('.tus-image-upload__thumb-spinner').exists()).toBe(false)
+    })
   })
 })

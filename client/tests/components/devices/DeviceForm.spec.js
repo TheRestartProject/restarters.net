@@ -11,13 +11,23 @@ const BFormStub = { emits: ['submit'], template: '<form @submit.prevent="$emit(\
 const BFormGroupStub = { template: '<div><slot /></div>' }
 const BAlertStub = { template: '<div><slot /></div>' }
 const BButtonStub = { template: '<button v-bind="$attrs"><slot /></button>' }
-const DevicePhotosStub = { props: ['eventId', 'deviceId', 'images'], template: '<div data-testid="device-photos-stub" />' }
+const DevicePhotosStub = {
+  props: ['eventId', 'deviceId', 'images', 'readonly'],
+  template: '<div data-testid="device-photos-stub" :data-readonly="readonly" />',
+}
+// Same shape as DevicesSearchTable.spec.js's BModalStub.
+const BModalStub = {
+  props: ['modelValue', 'title'],
+  emits: ['hide'],
+  template: '<div v-if="modelValue" :data-modal-title="title"><slot /></div>',
+}
 
 const GLOBAL_STUBS = {
   BForm: BFormStub,
   BFormGroup: BFormGroupStub,
   BAlert: BAlertStub,
   BButton: BButtonStub,
+  BModal: BModalStub,
   DevicePhotos: DevicePhotosStub,
 }
 
@@ -351,6 +361,93 @@ describe('components/devices/DeviceForm', () => {
 
       expect(wrapper.find('[data-testid="device-form-item-type-warning"]').exists()).toBe(false)
       expect(wrapper.find('[data-testid="device-form-brand-warning"]').exists()).toBe(false)
+    })
+  })
+
+  // Gap fix (HIGH): components/fixometer/DevicesSearchTable.vue's row-
+  // details panel reuses this exact form - readonly for non-admins, or
+  // editable with an inline delete for admins - via these three props
+  // (EventDevice.vue's own `disabled`/`deleteButton`/`cancelButton`).
+  describe('readonly/deleteButton/cancelButton (gap 2/3)', () => {
+    function editDevice(overrides = {}) {
+      return {
+        id: 7,
+        item_type: 'Kettle',
+        category: { id: 10, name: 'Toaster', powered: true },
+        brand: 'Acme',
+        model: 'K1',
+        age: 2,
+        estimate: 0,
+        problem: 'Broken',
+        notes: 'Some notes',
+        repair_status: 'Fixed',
+        images: [],
+        ...overrides,
+      }
+    }
+
+    it('disables every field and hides the button row entirely when readonly', () => {
+      const wrapper = mountForm({ device: editDevice(), readonly: true })
+
+      for (const testid of ['device-form-item-type', 'device-form-category', 'device-form-brand', 'device-form-model', 'device-form-age', 'device-form-status']) {
+        expect(wrapper.find(`[data-testid="${testid}"]`).attributes('disabled')).toBeDefined()
+      }
+      expect(wrapper.find('[data-testid="device-photos-stub"]').attributes('data-readonly')).toBe('true')
+      expect(wrapper.find('[data-testid="device-form-submit"]').exists()).toBe(false)
+      expect(wrapper.find('[data-testid="device-form-cancel"]').exists()).toBe(false)
+      expect(wrapper.find('[data-testid="device-form-delete"]').exists()).toBe(false)
+    })
+
+    it('hides the Cancel button when cancelButton is false, but keeps Save', () => {
+      const wrapper = mountForm({ device: editDevice(), cancelButton: false })
+
+      expect(wrapper.find('[data-testid="device-form-submit"]').exists()).toBe(true)
+      expect(wrapper.find('[data-testid="device-form-cancel"]').exists()).toBe(false)
+    })
+
+    it('shows an inline Delete button behind its own confirm modal when deleteButton is true', async () => {
+      const store = useDevicesStore()
+      store.deleteDevice = vi.fn().mockResolvedValue()
+
+      const wrapper = mountForm({ device: editDevice(), deleteButton: true, cancelButton: false })
+
+      expect(wrapper.find('[data-modal-title]').exists()).toBe(false)
+      await wrapper.find('[data-testid="device-form-delete"]').trigger('click')
+      expect(store.deleteDevice).not.toHaveBeenCalled()
+      expect(wrapper.find('[data-modal-title]').exists()).toBe(true)
+
+      await wrapper.find('[data-testid="device-form-delete-confirm"]').trigger('click')
+      await wrapper.vm.$nextTick()
+
+      expect(store.deleteDevice).toHaveBeenCalledWith(5, 7)
+      expect(wrapper.emitted('deleted')).toBeTruthy()
+    })
+
+    it('shows a generic error and does not emit deleted when the delete call fails', async () => {
+      const store = useDevicesStore()
+      store.deleteDevice = vi.fn().mockRejectedValue({ status: 500 })
+
+      const wrapper = mountForm({ device: editDevice(), deleteButton: true })
+
+      await wrapper.find('[data-testid="device-form-delete"]').trigger('click')
+      await wrapper.find('[data-testid="device-form-delete-confirm"]').trigger('click')
+      await wrapper.vm.$nextTick()
+
+      expect(wrapper.find('[data-testid="device-form-error"]').exists()).toBe(true)
+      expect(wrapper.emitted('deleted')).toBeFalsy()
+    })
+
+    it('does not call the store when the delete confirm is cancelled', async () => {
+      const store = useDevicesStore()
+      store.deleteDevice = vi.fn().mockResolvedValue()
+
+      const wrapper = mountForm({ device: editDevice(), deleteButton: true })
+
+      await wrapper.find('[data-testid="device-form-delete"]').trigger('click')
+      await wrapper.find('[data-testid="device-form-delete-cancel"]').trigger('click')
+
+      expect(store.deleteDevice).not.toHaveBeenCalled()
+      expect(wrapper.find('[data-modal-title]').exists()).toBe(false)
     })
   })
 })

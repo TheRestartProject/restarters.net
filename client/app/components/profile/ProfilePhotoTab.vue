@@ -43,8 +43,13 @@ function onUploadError(message) {
 </script>
 
 <template>
-  <div data-testid="profile-photo-tab">
+  <div class="edit-panel" data-testid="profile-photo-tab">
     <h4>{{ t('profile.change_photo') }}</h4>
+    <!-- Legacy repeats the same lang string as a description paragraph
+         underneath the heading (profile.blade.php: both the <h4> and the
+         <p> use @lang('profile.change_photo')) - matched verbatim rather
+         than "fixed" so the wording stays in sync if that key changes. -->
+    <p>{{ t('profile.change_photo') }}</p>
 
     <BAlert v-if="feedback" :model-value="true" :variant="feedbackVariant" dismissible data-testid="profile-photo-feedback" @dismissed="feedback = ''">
       {{ feedback }}

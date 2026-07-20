@@ -646,7 +646,12 @@ class GroupController extends Controller
             $start = Carbon::parse($request->get('start', '1970-01-01'))->setTimezone('UTC')->toIso8601String();
             $end = Carbon::parse($request->get('end', '3000-01-01'))->setTimezone('UTC')->toIso8601String();
 
+            // Eager-load the relations PartySummary::getEventStats() needs (per-event stats now shown
+            // on the group events list), the same way Group::bulkGroupStats() does - otherwise each
+            // event would trigger its own device/invited queries as the resource is built.
             $parties = Party::undeleted()->forGroup($idgroups)
+                ->with('allDevices')
+                ->withCount('allInvited')
                 ->where('event_start_utc', '>=', $start)
                 ->where('event_end_utc', '<=', $end)
                 ->get();

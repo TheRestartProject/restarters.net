@@ -14,6 +14,7 @@ return [
   'language_updated' => 'Language preference updated',
   'page_title' => 'Profile & Preferences',
   'profile' => 'Profile',
+  'other_profile' => ':name\'s profile',
   'account' => 'Account',
   'email_preferences' => 'Email preferences',
   'calendars' => [

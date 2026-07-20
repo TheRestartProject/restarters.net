@@ -87,7 +87,7 @@ async function save() {
 </script>
 
 <template>
-  <div data-testid="password-tab">
+  <div class="edit-panel" data-testid="password-tab">
     <h4>{{ t('auth.change_password') }}</h4>
     <p>{{ t('auth.change_password_text') }}</p>
 

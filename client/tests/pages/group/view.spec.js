@@ -303,4 +303,28 @@ describe('pages/group/view/[id]', () => {
     await wrapper.find('[data-testid="group-actions-share-stats"]').trigger('click')
     expect(wrapper.find('[data-testid="group-share-stats-modal"]').exists()).toBe(true)
   })
+
+  // develop opens two DIFFERENT modals from what look like the same "share
+  // stats" idea: GROUP ACTIONS' "Share group stats" dropdown item (above)
+  // opens the embed-code modal (GroupShareStatsModal), but the CO2 card's
+  // own "Share this" link (GroupStats.vue's @share-stats, StatsImpact.vue's
+  // `share` handler in develop) opens the canvas-painted social-image
+  // generator (StatsShareModal/StatsShare.vue) instead - a separate
+  // feature. Confirms the CO2 card's button is wired to the canvas modal,
+  // not the embed one, and that they don't both open together.
+  it('opens the canvas share-image modal (not the embed modal) from the CO2 card\'s Share this link', async () => {
+    groupsStore.current.data = BASE_GROUP
+    groupsStore.stats.data = {
+      group_stats: { co2_total: 600, waste_total: 12, dead_devices: 0, repairable_devices: 0, no_weight: 0 },
+    }
+    const wrapper = mountPage()
+
+    expect(wrapper.find('[data-testid="stats-share-image-modal"]').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="group-share-stats-modal"]').exists()).toBe(false)
+
+    await wrapper.find('[data-testid="group-stats-share"]').trigger('click')
+
+    expect(wrapper.find('[data-testid="stats-share-image-modal"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="group-share-stats-modal"]').exists()).toBe(false)
+  })
 })

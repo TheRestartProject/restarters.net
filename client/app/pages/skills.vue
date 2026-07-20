@@ -21,6 +21,14 @@ import { useAdminRefdataStore } from '~/stores/adminRefdata.js'
 // gap: a dedicated /api/v2/skill-categories endpoint would be nice-to-have
 // but the client can't get this wrong without the server's own validation
 // also rejecting it.
+//
+// parity-v2/admin-and-static.md gap 13: legacy puts Delete on the edit page
+// itself (an unconfirmed plain link), not a table-row action with a confirm
+// step - AdminCrudTable.vue's row button + confirm modal is KEPT here as an
+// intentional safety improvement (skills are attached to volunteers - see
+// the delete-confirm wording below) rather than reverted to match legacy's
+// unconfirmed link. Flagged for a product-owner call per that gap's own
+// suggested resolution.
 definePageMeta({ auth: true, role: 'Administrator' })
 
 const { t } = useI18n()
@@ -44,6 +52,10 @@ const categoryOptions = computed(() => [
 ])
 const categoryLookup = computed(() => Object.fromEntries(categoryOptions.value.map((o) => [o.value, o.text])))
 
+// live SkillsPage.vue (07e6abd7cc^) is the baseline: 3 columns (skill_name/
+// category/description) and a plain "Description" label - develop's Blade
+// (2 columns, "Description (optional)") is the wrong target for this branch,
+// which had already migrated this page to its own Vue2 shape pre-Phase-F.
 const tableFields = computed(() => [
   { key: 'skill_name', label: t('admin.skill-name'), sortable: true },
   { key: 'category', label: t('admin.category'), sortable: true, formatter: (value) => (value != null ? categoryLookup.value[value] || value : '') },

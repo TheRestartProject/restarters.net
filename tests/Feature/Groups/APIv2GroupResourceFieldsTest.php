@@ -81,4 +81,32 @@ class APIv2GroupResourceFieldsTest extends TestCase
 
         $this->assertFalse($response->json('data.is_member'));
     }
+
+    public function testDiscourseGroupNullWhenNotLinked(): void
+    {
+        $host = User::factory()->host()->create();
+        $idgroups = $this->createGroupAsHost($host);
+
+        $response = $this->get("/api/v2/groups/$idgroups");
+        $response->assertSuccessful();
+
+        $this->assertNull($response->json('data.discourse_group'));
+    }
+
+    public function testDiscourseGroupReturnedWhenLinked(): void
+    {
+        $host = User::factory()->host()->create();
+        $idgroups = $this->createGroupAsHost($host);
+
+        // discourse_group isn't in Group::$fillable (it's set by direct property assignment in
+        // Group::createDiscourseGroup(), not mass-assignment), so update() would silently no-op it.
+        $group = \App\Group::find($idgroups);
+        $group->discourse_group = 'fixers-united';
+        $group->save();
+
+        $response = $this->get("/api/v2/groups/$idgroups");
+        $response->assertSuccessful();
+
+        $this->assertEquals('fixers-united', $response->json('data.discourse_group'));
+    }
 }

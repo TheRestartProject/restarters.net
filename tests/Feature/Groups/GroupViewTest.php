@@ -123,6 +123,38 @@ class GroupViewTest extends TestCase
         self::assertEquals(Party::latest()->first()->idevents, $events[0]['id']);
     }
 
+    public function testEventsListIncludesPerEventStats(): void {
+        // GroupPage.vue's events list shows per-event participant/volunteer/device stats
+        // (ported from GroupEventsScrollTable.vue's stats(event) getter) - GET
+        // /api/v2/groups/{id}/events needs to return them per event, not just event
+        // metadata, so the client isn't forced into an N+1 fetch per row.
+        $this->loginAsTestUser(Role::ADMINISTRATOR);
+        $id = $this->createGroup();
+        $this->assertNotNull($id);
+
+        $event = Party::factory()->moderated()->create([
+            'event_start_utc' => Carbon::parse('2 days ago')->toIso8601String(),
+            'event_end_utc' => Carbon::parse('2 days ago +2 hours')->toIso8601String(),
+            'group' => $id,
+            'pax' => 3,
+            'volunteers' => 2,
+        ]);
+        Device::factory()->fixed()->create([
+            'category' => 11,
+            'category_creation' => 11,
+            'event' => $event->idevents,
+        ]);
+
+        $response = $this->get("/api/v2/groups/$id/events");
+        $response->assertSuccessful();
+        $events = json_decode($response->getContent(), true)['data'];
+
+        $this->assertArrayHasKey('stats', $events[0]);
+        $this->assertEquals(1, $events[0]['stats']['fixed_devices']);
+        $this->assertEquals(3, $events[0]['stats']['participants']);
+        $this->assertEquals(2, $events[0]['stats']['volunteers']);
+    }
+
     public function testGroupIndexNextEventIsEagerLoaded(): void
     {
         $this->loginAsTestUser(Role::ADMINISTRATOR);

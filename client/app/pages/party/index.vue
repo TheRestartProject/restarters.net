@@ -9,6 +9,7 @@ import { useAuth } from '~/composables/useAuth.js'
 import { useClipboard } from '~/composables/useClipboard.js'
 import EventsList from '~/components/events/EventsList.vue'
 import EventFilters from '~/components/events/EventFilters.vue'
+import EventCollapsibleSection from '~/components/events/EventCollapsibleSection.vue'
 import ModerationQueue from '~/components/moderation/ModerationQueue.vue'
 import AlertsBanner from '~/components/alerts/AlertsBanner.vue'
 import {
@@ -52,12 +53,23 @@ const showModeration = computed(() => hasRole('Administrator') || hasRole('Netwo
 const profileStore = useProfileStore()
 const { copy } = useClipboard()
 const showCalendarModal = ref(false)
+// Gap 24: develop's CalendarAddModal shows an inline "copied to clipboard"
+// confirmation once the copy button has been used (vue-clipboard2's
+// copySucceed handler) - useClipboard() doesn't report success/failure, so
+// this is the optimistic equivalent: true as soon as a copy is requested.
+const calendarCopied = ref(false)
 
 function openCalendarModal() {
   showCalendarModal.value = true
+  calendarCopied.value = false
   if (!profileStore.calendars.data) {
     profileStore.fetchCalendars().catch(() => {})
   }
+}
+
+function copyCalendarLink(url) {
+  copy(url)
+  calendarCopied.value = true
 }
 
 const mineTab = ref('upcoming')
@@ -166,26 +178,20 @@ onMounted(load)
 
 <template>
   <div class="container py-4" data-testid="party-mine-page">
-    <AlertsBanner />
-
-    <div class="d-flex align-items-center justify-content-between">
-      <div class="d-flex align-items-center">
-        <h1 class="mb-0">{{ t('events.your_events') }}</h1>
-        <button
-          type="button"
-          class="btn btn-link p-0 ms-2"
-          :aria-label="t('calendars.copy_button_label')"
-          data-testid="party-calendar-button"
-          @click="openCalendarModal"
-        >
-          <svg width="24" height="16" viewBox="0 0 46.175 30" aria-hidden="true">
-            <g transform="translate(10.49 -52.43)">
-              <path d="M16.058,54.462a1.219,1.219,0,0,0,0,1.721A12.363,12.363,0,0,1,19.7,64.976a1.216,1.216,0,0,0,2.432,0,14.775,14.775,0,0,0-4.353-10.514A1.22,1.22,0,0,0,16.058,54.462Z" transform="translate(8.003 0.512)" />
-              <path d="M25.387,68.595V65.286a8.613,8.613,0,0,0-7.417-8.548V54.308a1.217,1.217,0,0,0-2.434,0v1.513c-.522-.031-1.024-.05-1.221-.05H-2.657v-1.3a1.305,1.305,0,0,0-1.306-1.306,1.306,1.306,0,0,0-1.306,1.306v1.3H-6.573a3.917,3.917,0,0,0-3.917,3.917V75.355a3.917,3.917,0,0,0,3.917,3.917H12.348a4.769,4.769,0,0,0,9.024-.6h5.173a2.4,2.4,0,0,0,1.55-4.239A7.633,7.633,0,0,1,25.387,68.595ZM-7.879,59.688a1.305,1.305,0,0,1,1.306-1.306H11.571a8.611,8.611,0,0,0-2.31,2.611H-7.879ZM-6.573,76.66a1.306,1.306,0,0,1-1.306-1.306V63.6H8.287a8.7,8.7,0,0,0-.167,1.682v3.308A7.643,7.643,0,0,1,5.4,74.44a2.4,2.4,0,0,0-.841,1.825,2.322,2.322,0,0,0,.04.4Zm23.326,3.135a2.322,2.322,0,0,1-1.573-.627,2.37,2.37,0,0,1-.418-.5h3.982A2.34,2.34,0,0,1,16.753,79.795Zm1.366-3.539-2.87.008-8.267.022a10.052,10.052,0,0,0,3.569-7.691V65.286a6.117,6.117,0,0,1,.261-1.682,6.188,6.188,0,0,1,12.142,1.682v3.308a10,10,0,0,0,3.525,7.64Z" transform="translate(0 0.202)" />
-              <path d="M22.03,52.786a1.217,1.217,0,0,0-1.721,1.721A12.355,12.355,0,0,1,23.95,63.3a1.216,1.216,0,1,0,2.432,0A14.766,14.766,0,0,0,22.03,52.786Z" transform="translate(9.303 0)" />
-            </g>
-          </svg>
-        </button>
+    <!-- Gap 6: page-level 'Events' h1 + doodle, matching develop's
+         events/index.blade.php (the distinct 'Your events' heading lives on
+         the collapsible section below, not here). -->
+    <div class="d-flex align-items-center mb-4">
+      <h1 class="mb-0 me-4">{{ t('events.events') }}</h1>
+      <div class="me-auto d-none d-md-block" aria-hidden="true">
+        <svg width="52" height="76" viewBox="0 0 52 76">
+          <g fill="none" stroke="#000" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" transform="translate(1.03 1)">
+            <path d="M12.223 56.957c-3.494-7.434-7.211-14.645-9.367-20.37-2.007-5.278-2.082-11 2.825-10.631C9.324 26.253 14.3 37.4 14.3 37.4a134.293 134.293 0 0 1-.669-20.964C14.3 7.073 13.487 1.2 18.022 1.2c4.312 0 4.312 7.063 4.312 14.274s-.149 14.051.446 13.307c.595-.818.52-7.583 4.758-7.434 4.163.223 3.866 6.914 3.866 6.914s.372-4.684 3.717-4.684c3.42 0 4.535 7.657 4.535 7.657s.372-4.981 4.163-4.386c6.022.892 1.338 22.377-1.784 30.852" transform="translate(-1.332 -1.2)" />
+            <path d="M8.847 0H0" transform="translate(12.155 9.07)" />
+            <path d="M0 0l8.847 1.636" transform="translate(12.155 11.151)" />
+            <path d="M11.918 10.886S4.707.7 1.733 4.418s8.7 8.029 10.185 7.806-3.643 8.624-6.839 6.1c-3.42-2.754 1.338-4.762 6.839-7.438z" transform="translate(-1.25 -1.816)" />
+          </g>
+        </svg>
       </div>
       <NuxtLink
         v-if="canCreateEvents"
@@ -197,7 +203,13 @@ onMounted(load)
       </NuxtLink>
     </div>
 
-    <ModerationQueue v-if="showModeration" type="events" class="mt-3" />
+    <ModerationQueue v-if="showModeration" type="events" class="mb-3" />
+
+    <!-- Gap 20: AlertsBanner sits after the moderation queue, matching
+         GroupEvents.vue's slot order (h1/add-event row + moderation queue
+         come from the blade wrapper, then AlertBanner is the first thing
+         inside GroupEvents.vue itself). -->
+    <AlertsBanner />
 
     <div v-if="eventsStore.myEvents.loading" data-testid="party-mine-loading">
       <div class="placeholder-glow mb-3">
@@ -218,7 +230,27 @@ onMounted(load)
     </BAlert>
 
     <template v-else>
-      <div data-testid="party-mine-content">
+      <!-- Gap 7: mobile-collapsed-by-default section with a count badge next
+           to the heading, matching GroupEvents.vue's CollapsibleSection. -->
+      <EventCollapsibleSection :count="upcomingMine.length" data-testid="party-mine-content">
+        <template #title>
+          <h2 class="mb-0 d-flex align-items-center">
+            {{ t('events.your_events') }}
+            <!-- Gap 16: filled primary icon button next to the section
+                 heading (develop's b-btn variant=primary + subs_cal_ico.svg),
+                 not the outer page h1. -->
+            <button
+              type="button"
+              class="btn btn-primary btn-sm ms-2 d-flex align-items-center"
+              :aria-label="t('calendars.copy_button_label')"
+              data-testid="party-calendar-button"
+              @click="openCalendarModal"
+            >
+              <img src="/images/subs_cal_ico.svg" alt="" width="20" height="20">
+            </button>
+          </h2>
+        </template>
+
         <ul class="nav nav-tabs">
           <li class="nav-item">
             <button
@@ -255,16 +287,18 @@ onMounted(load)
           <EventsList
             :events="pastMine"
             :hosted-group-ids="hostedGroupIds"
+            :is-admin="hasRole('Administrator')"
             :empty-message="t('groups.no_past_events')"
+            past
           />
         </div>
-      </div>
+      </EventCollapsibleSection>
 
       <template v-if="showOther">
-        <hr>
-
-        <div data-testid="party-other-events">
-          <h2>{{ t('events.other_events') }}</h2>
+        <EventCollapsibleSection :count="nearbyEvents.length + otherEvents.length" class="mt-4" data-testid="party-other-events">
+          <template #title>
+            <h2 class="mb-0">{{ t('events.other_events') }}</h2>
+          </template>
 
           <ul class="nav nav-tabs">
             <li class="nav-item">
@@ -308,13 +342,13 @@ onMounted(load)
               :empty-message="hasAllFilters ? t('client.events.no_search_results') : t('groups.no_other_events')"
             />
           </div>
-        </div>
+        </EventCollapsibleSection>
       </template>
     </template>
 
     <BModal
       :model-value="showCalendarModal"
-      :title="t('profile.calendars.my_events')"
+      :title="t('groups.calendar_copy_title', { group: t('groups.groups_title1').toLowerCase() })"
       no-footer
       data-testid="party-calendar-modal"
       @hide="showCalendarModal = false"
@@ -328,6 +362,16 @@ onMounted(load)
         {{ t('client.profile.load_error') }}
       </BAlert>
       <template v-else-if="profileStore.calendars.data">
+        <!-- Gap 24: title (above) matches GroupEvents.vue's
+             translatedCalendarTitle (groups.calendar_copy_title) - that
+             key's copy doesn't itself vary by group, but it's the correct
+             develop source key, replacing an unrelated static title
+             (profile.calendars.my_events - "My events", still used by
+             CalendarsTab.vue). The description text below already used
+             the right pattern (groups.calendar_copy_description with a
+             :group param, falling back to groups.groups_title1 lowercased
+             on this no-group "my events" page - develop does the same). -->
+        <p data-testid="party-calendar-description">{{ t('groups.calendar_copy_description', { group: t('groups.groups_title1').toLowerCase() }) }}</p>
         <div class="input-group mb-3">
           <input
             type="text"
@@ -339,11 +383,30 @@ onMounted(load)
           <BButton
             variant="primary"
             data-testid="party-calendar-copy"
-            @click="copy(profileStore.calendars.data.user_url)"
+            @click="copyCalendarLink(profileStore.calendars.data.user_url)"
           >
             {{ t('profile.calendars.copy_link') }}
           </BButton>
         </div>
+        <BAlert
+          v-if="calendarCopied"
+          :model-value="true"
+          variant="info"
+          data-testid="party-calendar-copied"
+        >
+          {{ t('events.copied_to_clipboard') }}
+        </BAlert>
+        <!-- Gap 24: external "Find out more" help link, matching
+             CalendarAddModal.vue's hardcoded Restarters Talk article. -->
+        <a
+          href="https://talk.restarters.net/t/fixometer-how-to-add-repair-events-to-your-calendar-application/1770"
+          target="_blank"
+          rel="noopener"
+          class="d-block mb-2"
+          data-testid="party-calendar-find-out-more"
+        >
+          {{ t('calendars.find_out_more') }}
+        </a>
         <NuxtLink :to="`/profile/edit/${user?.id}`" data-testid="party-calendar-see-all">
           {{ t('calendars.see_all_calendars') }}
         </NuxtLink>

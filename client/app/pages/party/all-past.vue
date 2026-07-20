@@ -2,6 +2,7 @@
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useEventsStore } from '~/stores/events.js'
+import { useAuth } from '~/composables/useAuth.js'
 import EventsList from '~/components/events/EventsList.vue'
 import EventFilters from '~/components/events/EventFilters.vue'
 import { eventIsFinished } from '~/composables/useEventComputed.js'
@@ -16,6 +17,7 @@ const { t } = useI18n()
 useHead({ title: t('events.events') })
 
 const eventsStore = useEventsStore()
+const { hasRole } = useAuth()
 const search = ref('')
 
 const events = computed(() => {
@@ -82,7 +84,9 @@ onMounted(() => {
 
       <EventsList
         :events="filtered"
+        :is-admin="hasRole('Administrator')"
         :empty-message="search ? t('client.events.no_search_results') : t('groups.no_past_events')"
+        past
       />
     </template>
   </div>

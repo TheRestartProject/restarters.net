@@ -19,9 +19,22 @@ const BModalStub = {
   template: '<div v-if="modelValue" :data-modal-title="title"><slot /></div>',
 }
 const DeviceFormStub = {
-  props: ['eventId', 'device', 'powered'],
-  emits: ['saved', 'cancel'],
-  template: '<div data-testid="device-form-stub">{{ eventId }}:{{ device && device.id }}:{{ powered }}</div>',
+  props: ['eventId', 'device', 'powered', 'readonly', 'deleteButton', 'cancelButton'],
+  emits: ['saved', 'cancel', 'deleted'],
+  template:
+    '<div data-testid="device-form-stub" :data-readonly="readonly" :data-delete-button="deleteButton" :data-cancel-button="cancelButton">{{ eventId }}:{{ device && device.id }}:{{ powered }}</div>',
+}
+// bootstrap-vue-next's BPagination is only stubbed to keep the paging
+// assertions independent of its internal page-number rendering; the
+// data-testid on <BPagination> in the real template falls through onto
+// this stub's single root element automatically.
+const BPaginationStub = {
+  props: ['modelValue'],
+  emits: ['update:modelValue'],
+  template:
+    '<div><span data-testid="pagination-page">{{ modelValue }}</span>' +
+    '<button type="button" data-testid="pagination-next" @click="$emit(\'update:modelValue\', modelValue + 1)">next</button>' +
+    '<button type="button" data-testid="pagination-prev" @click="$emit(\'update:modelValue\', modelValue - 1)">prev</button></div>',
 }
 
 function mountComponent() {
@@ -34,7 +47,14 @@ function mountComponent() {
   return mount(DevicesSearchTable, {
     global: {
       plugins: [i18n],
-      stubs: { NuxtLink: NuxtLinkStub, BBadge: BBadgeStub, BButton: BButtonStub, BModal: BModalStub, DeviceForm: DeviceFormStub },
+      stubs: {
+        NuxtLink: NuxtLinkStub,
+        BBadge: BBadgeStub,
+        BButton: BButtonStub,
+        BModal: BModalStub,
+        DeviceForm: DeviceFormStub,
+        BPagination: BPaginationStub,
+      },
     },
   })
 }
@@ -167,6 +187,17 @@ describe('components/fixometer/DevicesSearchTable', () => {
     expect(wrapper.find('[data-testid="device-search-empty"]').exists()).toBe(true)
   })
 
+  // Gap fix: a prior version also rendered a "N items found" count line
+  // above the table - legacy's FixometerRecordsTable.vue has no such line
+  // (just devices.table_intro's "Press the 'i' icons..." instructions).
+  it('does not render a results-count line - only the "i" icon instructions', async () => {
+    const wrapper = mountComponent()
+    await flushPromises()
+
+    expect(wrapper.find('[data-testid="device-search-count"]').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="device-search-table-intro"]').exists()).toBe(true)
+  })
+
   it('still renders the table with column headers when there are no results', async () => {
     // Matches legacy b-table (show-empty): the column scaffold stays put on an
     // empty result set, rather than the whole table vanishing.
@@ -255,7 +286,11 @@ describe('components/fixometer/DevicesSearchTable', () => {
     expect(wrapper.find('[data-testid="device-search-details-2"]').exists()).toBe(true)
   })
 
-  it('toggles a read-only details row via the info icon', async () => {
+  // Gap fix (HIGH): the expanded row renders the real (read-only) DeviceForm
+  // now, not an abbreviated <dl> - field-level assertions belong to
+  // DeviceForm.spec.js, this just checks the row wires the right device
+  // through in the right (readonly, no delete/cancel) mode.
+  it('toggles a readonly DeviceForm details row via the info icon, for a non-admin', async () => {
     mockApi.device.search.mockResolvedValue({
       data: { items: [device({ model: 'AB-100', problem: 'Full assessment text' })], count: 1 },
     })
@@ -267,32 +302,41 @@ describe('components/fixometer/DevicesSearchTable', () => {
     await wrapper.find('[data-testid="device-search-info-1"]').trigger('click')
     const details = wrapper.find('[data-testid="device-search-details-1"]')
     expect(details.exists()).toBe(true)
-    expect(details.text()).toContain('AB-100')
-    expect(details.text()).toContain('Full assessment text')
+    const form = details.findComponent(DeviceFormStub)
+    expect(form.props('device').id).toBe(1)
+    expect(form.props('readonly')).toBe(true)
+    expect(form.props('deleteButton')).toBe(false)
+    expect(form.props('cancelButton')).toBe(false)
 
     await wrapper.find('[data-testid="device-search-info-1"]').trigger('click')
     expect(wrapper.find('[data-testid="device-search-details-1"]').exists()).toBe(false)
   })
 
-  it('paginates: next/prev change the page param and are bounded', async () => {
-    mockApi.device.search.mockResolvedValue({ data: { items: [device()], count: 45 } })
+  // Gap fix (HIGH): legacy's b-pagination, a numbered page-jump control,
+  // only rendered above one page - not a prev/next bar that stays visible
+  // with a single page.
+  describe('pagination', () => {
+    it('is hidden when there is only one page of results', async () => {
+      mockApi.device.search.mockResolvedValue({ data: { items: [device()], count: 5 } })
+      const wrapper = mountComponent()
+      await flushPromises()
 
-    const wrapper = mountComponent()
-    await flushPromises()
+      expect(wrapper.find('[data-testid="device-search-pagination"]').exists()).toBe(false)
+    })
 
-    expect(wrapper.find('[data-testid="device-search-prev-page"]').attributes('disabled')).toBeDefined()
+    it('shows a numbered pager above one page, and changing it re-runs the search', async () => {
+      mockApi.device.search.mockResolvedValue({ data: { items: [device()], count: 45 } })
+      const wrapper = mountComponent()
+      await flushPromises()
 
-    mockApi.device.search.mockClear()
-    await wrapper.find('[data-testid="device-search-next-page"]').trigger('click')
-    await flushPromises()
+      expect(wrapper.find('[data-testid="device-search-pagination"]').exists()).toBe(true)
 
-    expect(mockApi.device.search).toHaveBeenCalledWith(expect.objectContaining({ page: 2 }))
-    expect(wrapper.find('[data-testid="device-search-page-indicator"]').text()).toContain('2')
+      mockApi.device.search.mockClear()
+      await wrapper.find('[data-testid="pagination-next"]').trigger('click')
+      await flushPromises()
 
-    mockApi.device.search.mockClear()
-    await wrapper.find('[data-testid="device-search-prev-page"]').trigger('click')
-    await flushPromises()
-    expect(mockApi.device.search).toHaveBeenCalledWith(expect.objectContaining({ page: 1 }))
+      expect(mockApi.device.search).toHaveBeenCalledWith(expect.objectContaining({ page: 2 }))
+    })
   })
 
   it('shows the search error state when the store has an error', async () => {
@@ -309,56 +353,60 @@ describe('components/fixometer/DevicesSearchTable', () => {
     expect(wrapper.find('[data-testid="device-search-error"]').exists()).toBe(true)
   })
 
-  // Gap fix (MEDIUM): legacy FixometerRecordsTable.vue gave Administrators
-  // inline edit + delete on every row; this table used to offer only the
-  // read-only 'i' info toggle for every viewer, including admins.
+  // Gap fix (HIGH): legacy FixometerRecordsTable.vue gives every row exactly
+  // ONE toggle - edit-pencil for admins, info for everyone else - opening
+  // the row into the SAME DeviceForm, readonly for non-admins or editable
+  // with an inline delete for admins. A prior version showed the read-only
+  // info toggle PLUS separate always-visible Edit/Delete text links for
+  // admins - three controls instead of one.
   describe('admin edit/delete', () => {
-    it('does not show edit/delete controls for a non-admin viewer', async () => {
+    it('shows only the info icon (no edit-pencil) for a non-admin viewer', async () => {
       mockApi.device.search.mockResolvedValue({ data: { items: [device()], count: 1 } })
       const wrapper = mountComponent()
       await flushPromises()
 
-      expect(wrapper.find('[data-testid="device-search-edit-1"]').exists()).toBe(false)
-      expect(wrapper.find('[data-testid="device-search-delete-1"]').exists()).toBe(false)
-      // The read-only info toggle is unaffected.
       expect(wrapper.find('[data-testid="device-search-info-1"]').exists()).toBe(true)
+      expect(wrapper.find('[data-testid="device-search-edit-1"]').exists()).toBe(false)
     })
 
-    it('shows edit/delete controls for an Administrator', async () => {
+    it('shows only the edit-pencil icon (no separate info toggle) for an Administrator', async () => {
       setAdmin()
       mockApi.device.search.mockResolvedValue({ data: { items: [device()], count: 1 } })
       const wrapper = mountComponent()
       await flushPromises()
 
       expect(wrapper.find('[data-testid="device-search-edit-1"]').exists()).toBe(true)
-      expect(wrapper.find('[data-testid="device-search-delete-1"]').exists()).toBe(true)
-      // The read-only info toggle is still there too - a pure addition, not a swap.
-      expect(wrapper.find('[data-testid="device-search-info-1"]').exists()).toBe(true)
+      expect(wrapper.find('[data-testid="device-search-info-1"]').exists()).toBe(false)
     })
 
-    it('swaps the row for DeviceForm when an admin clicks Edit, and re-runs the search on save', async () => {
+    it('opens the row into an editable, deletable DeviceForm for an admin, and re-runs the search on save', async () => {
       setAdmin()
       mockApi.device.search.mockResolvedValue({ data: { items: [device()], count: 1 } })
       const wrapper = mountComponent()
       await flushPromises()
 
       await wrapper.find('[data-testid="device-search-edit-1"]').trigger('click')
-      expect(wrapper.find('[data-testid="device-search-row-1"]').exists()).toBe(false)
+      // A pure addition alongside the row, not a swap - the summary row stays.
+      expect(wrapper.find('[data-testid="device-search-row-1"]').exists()).toBe(true)
+
       const form = wrapper.findComponent(DeviceFormStub)
       expect(form.exists()).toBe(true)
       expect(form.props('eventId')).toBe(55)
       expect(form.props('device').id).toBe(1)
       expect(form.props('powered')).toBe(true)
+      expect(form.props('readonly')).toBe(false)
+      expect(form.props('deleteButton')).toBe(true)
+      expect(form.props('cancelButton')).toBe(false)
 
       mockApi.device.search.mockClear()
       await form.vm.$emit('saved')
       await flushPromises()
 
       expect(mockApi.device.search).toHaveBeenCalledTimes(1)
-      expect(wrapper.find('[data-testid="device-search-row-1"]').exists()).toBe(true)
+      expect(wrapper.find('[data-testid="device-search-details-1"]').exists()).toBe(false)
     })
 
-    it('closes the edit form on cancel without re-running the search', async () => {
+    it('re-runs the search and closes the row when DeviceForm emits deleted', async () => {
       setAdmin()
       mockApi.device.search.mockResolvedValue({ data: { items: [device()], count: 1 } })
       const wrapper = mountComponent()
@@ -366,67 +414,26 @@ describe('components/fixometer/DevicesSearchTable', () => {
 
       await wrapper.find('[data-testid="device-search-edit-1"]').trigger('click')
       mockApi.device.search.mockClear()
-      await wrapper.findComponent(DeviceFormStub).vm.$emit('cancel')
+      await wrapper.findComponent(DeviceFormStub).vm.$emit('deleted')
+      await flushPromises()
+
+      expect(mockApi.device.search).toHaveBeenCalledTimes(1)
+      expect(wrapper.find('[data-testid="device-search-details-1"]').exists()).toBe(false)
+    })
+
+    it('re-clicking the edit-pencil closes the row without re-running the search', async () => {
+      setAdmin()
+      mockApi.device.search.mockResolvedValue({ data: { items: [device()], count: 1 } })
+      const wrapper = mountComponent()
+      await flushPromises()
+
+      await wrapper.find('[data-testid="device-search-edit-1"]').trigger('click')
+      mockApi.device.search.mockClear()
+      await wrapper.find('[data-testid="device-search-edit-1"]').trigger('click')
       await flushPromises()
 
       expect(mockApi.device.search).not.toHaveBeenCalled()
-      expect(wrapper.find('[data-testid="device-search-row-1"]').exists()).toBe(true)
-    })
-
-    it('requires a delete confirm-modal click before calling the store, then re-runs the search', async () => {
-      setAdmin()
-      mockApi.device.search.mockResolvedValue({ data: { items: [device()], count: 1 } })
-      const store = useDevicesStore()
-      store.deleteDevice = vi.fn().mockResolvedValue()
-
-      const wrapper = mountComponent()
-      await flushPromises()
-
-      await wrapper.find('[data-testid="device-search-delete-1"]').trigger('click')
-      expect(store.deleteDevice).not.toHaveBeenCalled()
-      expect(wrapper.find('[data-testid="device-search-delete-modal"]').exists()).toBe(true)
-
-      mockApi.device.search.mockClear()
-      await wrapper.find('[data-testid="device-search-delete-confirm"]').trigger('click')
-      await flushPromises()
-
-      expect(store.deleteDevice).toHaveBeenCalledWith(55, 1)
-      expect(mockApi.device.search).toHaveBeenCalledTimes(1)
-      expect(wrapper.find('[data-testid="device-search-delete-modal"]').exists()).toBe(false)
-    })
-
-    it('does not call the store when delete is cancelled', async () => {
-      setAdmin()
-      mockApi.device.search.mockResolvedValue({ data: { items: [device()], count: 1 } })
-      const store = useDevicesStore()
-      store.deleteDevice = vi.fn().mockResolvedValue()
-
-      const wrapper = mountComponent()
-      await flushPromises()
-
-      await wrapper.find('[data-testid="device-search-delete-1"]').trigger('click')
-      await wrapper.find('[data-testid="device-search-delete-cancel"]').trigger('click')
-      await flushPromises()
-
-      expect(store.deleteDevice).not.toHaveBeenCalled()
-      expect(wrapper.find('[data-testid="device-search-delete-modal"]').exists()).toBe(false)
-    })
-
-    it('shows an error and keeps the modal open when delete fails', async () => {
-      setAdmin()
-      mockApi.device.search.mockResolvedValue({ data: { items: [device()], count: 1 } })
-      const store = useDevicesStore()
-      store.deleteDevice = vi.fn().mockRejectedValue({ status: 500 })
-
-      const wrapper = mountComponent()
-      await flushPromises()
-
-      await wrapper.find('[data-testid="device-search-delete-1"]').trigger('click')
-      await wrapper.find('[data-testid="device-search-delete-confirm"]').trigger('click')
-      await flushPromises()
-
-      expect(wrapper.find('[data-testid="device-search-delete-modal"]').exists()).toBe(true)
-      expect(wrapper.find('[data-testid="device-search-delete-error"]').exists()).toBe(true)
+      expect(wrapper.find('[data-testid="device-search-details-1"]').exists()).toBe(false)
     })
   })
 })

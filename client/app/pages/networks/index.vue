@@ -93,28 +93,30 @@ function retry() {
         <div v-if="!yourNetworks.length" class="text-muted" data-testid="your-networks-empty">
           {{ t('networks.index.your_networks_no_networks') }}
         </div>
-        <table v-else class="table table-striped table-hover table-layout-fixed" data-testid="your-networks-table">
-          <thead>
-            <tr>
-              <th scope="col" width="20%" />
-              <th scope="col" width="20%">{{ t('networks.general.network') }}</th>
-              <th scope="col">{{ t('networks.index.description') }}</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="network in yourNetworks" :key="network.id" :data-testid="`your-network-row-${network.id}`">
-              <td>
-                <img :src="network.logo || '/images/placeholder-avatar.webp'" :alt="t('client.networks.logo_alt', { name: network.name })" style="width: auto; height: 50px">
-              </td>
-              <td>
-                <NuxtLink :to="`/networks/${network.id}`" :data-testid="`your-network-link-${network.id}`">
-                  {{ network.name }}
-                </NuxtLink>
-              </td>
-              <td :data-testid="`your-network-description-${network.id}`">{{ network.description }}</td>
-            </tr>
-          </tbody>
-        </table>
+        <div v-else class="table-responsive">
+          <table class="table table-striped table-hover table-layout-fixed" data-testid="your-networks-table">
+            <thead>
+              <tr>
+                <th scope="col" width="20%" />
+                <th scope="col" width="20%">{{ t('networks.general.network') }}</th>
+                <th scope="col">{{ t('networks.index.description') }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="network in yourNetworks" :key="network.id" :data-testid="`your-network-row-${network.id}`">
+                <td>
+                  <img :src="network.logo || '/images/placeholder-avatar.webp'" :alt="t('client.networks.logo_alt', { name: network.name })" style="width: auto; height: 50px">
+                </td>
+                <td>
+                  <NuxtLink :to="`/networks/${network.id}`" :data-testid="`your-network-link-${network.id}`">
+                    {{ network.name }}
+                  </NuxtLink>
+                </td>
+                <td :data-testid="`your-network-description-${network.id}`">{{ network.description }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </section>
 
       <section v-if="showAllNetworks" data-testid="all-networks-section">
@@ -124,26 +126,28 @@ function retry() {
         <div v-if="!allNetworks.length" class="text-muted" data-testid="all-networks-empty">
           {{ t('networks.index.all_networks_no_networks') }}
         </div>
-        <table v-else class="table table-striped table-hover table-layout-fixed" data-testid="all-networks-table">
-          <thead>
-            <tr>
-              <th scope="col" width="20%" />
-              <th scope="col" width="20%">{{ t('networks.general.network') }}</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="network in allNetworks" :key="network.id" :data-testid="`all-network-row-${network.id}`">
-              <td>
-                <img :src="network.logo || '/images/placeholder-avatar.webp'" :alt="t('client.networks.logo_alt', { name: network.name })" style="width: auto; height: 50px">
-              </td>
-              <td>
-                <NuxtLink :to="`/networks/${network.id}`" :data-testid="`all-network-link-${network.id}`">
-                  {{ network.name }}
-                </NuxtLink>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+        <div v-else class="table-responsive">
+          <table class="table table-striped table-hover table-layout-fixed" data-testid="all-networks-table">
+            <thead>
+              <tr>
+                <th scope="col" width="20%" />
+                <th scope="col" width="20%">{{ t('networks.general.network') }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="network in allNetworks" :key="network.id" :data-testid="`all-network-row-${network.id}`">
+                <td>
+                  <img :src="network.logo || '/images/placeholder-avatar.webp'" :alt="t('client.networks.logo_alt', { name: network.name })" style="width: auto; height: 50px">
+                </td>
+                <td>
+                  <NuxtLink :to="`/networks/${network.id}`" :data-testid="`all-network-link-${network.id}`">
+                    {{ network.name }}
+                  </NuxtLink>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </section>
     </template>
   </div>

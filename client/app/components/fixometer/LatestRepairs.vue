@@ -56,9 +56,15 @@ const groupImageUrl = computed(() => uploadedImageUrl(props.latestData?.group?.i
       </div>
     </div>
 
-    <div v-else-if="!latestData" class="text-muted latest-repairs__placeholder" data-testid="latest-repairs-empty">
-      {{ t('client.fixometer.no_latest_repairs') }}
-    </div>
+    <!-- Legacy FixometerLatestData.vue's `latestData` prop was `required:
+         true` - it never handled a null/missing latest-repaired-event at
+         all, so the grid cell simply rendered nothing when there wasn't one
+         yet (confirmed against a fresh/empty-data screenshot of develop: no
+         card, no text, no border - just blank space). Render nothing here
+         too rather than a "No repairs recorded yet." message, to match -
+         the empty div is kept (rather than v-if removing it outright) so
+         this state stays targetable by data-testid. -->
+    <div v-else-if="!latestData" class="latest-repairs__placeholder" data-testid="latest-repairs-empty" />
 
     <div v-else class="latest-repairs__card" data-testid="latest-repairs-content">
       <div class="latest-repairs__title">

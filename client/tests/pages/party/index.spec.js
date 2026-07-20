@@ -279,6 +279,20 @@ describe('pages/party/index (mine)', () => {
       expect(profileStore.fetchCalendars).toHaveBeenCalledTimes(1)
     })
 
+    // Gap 24: the title used the wrong lang key (profile.calendars.my_events,
+    // "My events" - unrelated boilerplate also used by CalendarsTab.vue)
+    // instead of GroupEvents.vue's translatedCalendarTitle
+    // (groups.calendar_copy_title), the same key its own description text
+    // beside it already correctly used.
+    it('uses groups.calendar_copy_title, matching develop\'s CalendarAddModal, not the unrelated profile.calendars.my_events copy', async () => {
+      const wrapper = mountPage()
+      await wrapper.find('[data-testid="party-calendar-button"]').trigger('click')
+
+      expect(wrapper.find('[data-testid="party-calendar-modal"]').attributes('data-title')).toBe(
+        'Access all group events in your personal calendar'
+      )
+    })
+
     it('exposes the iCal URL with a working copy button once loaded', async () => {
       profileStore.calendars.data = { user_url: 'https://example.test/calendar/user/abc' }
 
@@ -319,5 +333,54 @@ describe('pages/party/index (mine)', () => {
       expect(wrapper.find('[data-testid="party-calendar-error"]').exists()).toBe(true)
       expect(wrapper.find('[data-testid="party-calendar-url"]').exists()).toBe(false)
     })
+
+    // Gap 24: description text, "Find out more" help link and an inline
+    // "copied to clipboard" confirmation, matching develop's CalendarAddModal.
+    it('shows a description and a "Find out more" help link', async () => {
+      profileStore.calendars.data = { user_url: 'https://example.test/calendar/user/abc' }
+
+      const wrapper = mountPage()
+      await wrapper.find('[data-testid="party-calendar-button"]').trigger('click')
+
+      expect(wrapper.find('[data-testid="party-calendar-description"]').exists()).toBe(true)
+      const link = wrapper.find('[data-testid="party-calendar-find-out-more"]')
+      expect(link.attributes('href')).toContain('talk.restarters.net')
+      expect(link.attributes('target')).toBe('_blank')
+    })
+
+    it('shows a copied-to-clipboard confirmation only after the copy button is used', async () => {
+      profileStore.calendars.data = { user_url: 'https://example.test/calendar/user/abc' }
+      Object.defineProperty(navigator, 'clipboard', { value: { writeText: vi.fn() }, configurable: true })
+
+      const wrapper = mountPage()
+      await wrapper.find('[data-testid="party-calendar-button"]').trigger('click')
+
+      expect(wrapper.find('[data-testid="party-calendar-copied"]').exists()).toBe(false)
+
+      await wrapper.find('[data-testid="party-calendar-copy"]').trigger('click')
+      expect(wrapper.find('[data-testid="party-calendar-copied"]').exists()).toBe(true)
+    })
+  })
+
+  // Gap 6: page-level 'Events' h1, distinct from the 'Your events' section
+  // heading (which now carries the calendar button - gap 16).
+  it('shows a page-level "Events" h1 and a distinct "Your events" section heading', () => {
+    const wrapper = mountPage()
+
+    expect(wrapper.find('h1').text()).toBe('Events')
+    expect(wrapper.find('[data-testid="party-mine-content"]').text()).toContain('Your events')
+  })
+
+  // Gap 7: mobile-collapsible sections with a count badge next to the heading.
+  it('shows a count badge on the "Your events" and "Other events" section headings', () => {
+    eventsStore.myEvents.data = [
+      evt({ id: 1, title: 'Upcoming', start: '2026-08-20T10:00:00Z', end: '2026-08-20T12:00:00Z' }),
+      evt({ id: 2, title: 'Nearby', start: '2026-08-20T10:00:00Z', end: '2026-08-20T12:00:00Z', nearby: true }),
+    ]
+
+    const wrapper = mountPage()
+
+    expect(wrapper.find('[data-testid="party-mine-content"] [data-testid="event-collapsible-count-badge"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="party-other-events"] [data-testid="event-collapsible-count-badge"]').exists()).toBe(true)
   })
 })

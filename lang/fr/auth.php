@@ -28,6 +28,7 @@ return [
   'profile_admin' => 'Administrateur',
   'profile_admin_text' => 'Les administrateurs ont ici la possibilité de changer le rôle d\'un utilisateur ou de ses groupes attribués',
   'user_role' => 'Rôle d\'utilisateur',
+  'choose_role' => 'Choisir un rôle',
   'assigned_groups' => 'Attribués aux Repair Cafés',
   'save_user' => 'Sauver utilisateur',
   'login_before_using_shareable_link' => 'Pour compléter votre invitation, veuillez créer un compte ci-dessous, ou si vous avez déjà un compte <a href=":login_url">connectez-vous</a>.',

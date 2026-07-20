@@ -12,6 +12,7 @@ vi.stubGlobal('useNuxtApp', () => ({ $api: undefined, $i18n: undefined }))
 vi.stubGlobal('defineNuxtPlugin', (fn: unknown) => fn)
 vi.stubGlobal('defineNuxtRouteMiddleware', (fn: unknown) => fn)
 vi.stubGlobal('navigateTo', vi.fn())
+vi.stubGlobal('setPageLayout', vi.fn())
 
 // Page-level macros/composables (design.md §6/§8: pages rely on Nuxt
 // macros - definePageMeta, useHead - and router composables; stub safe

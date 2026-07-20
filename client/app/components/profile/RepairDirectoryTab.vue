@@ -63,7 +63,7 @@ async function save() {
 </script>
 
 <template>
-  <div data-testid="repair-directory-tab">
+  <div class="edit-panel" data-testid="repair-directory-tab">
     <h4>{{ t('profile.repair_directory') }}</h4>
 
     <BAlert v-if="feedback" :model-value="true" :variant="feedbackVariant" dismissible data-testid="repair-dir-feedback" @dismissed="feedback = ''">
@@ -83,10 +83,12 @@ async function save() {
         </BFormSelect>
       </BFormGroup>
 
-      <div class="d-flex justify-content-end">
-        <BButton type="submit" variant="primary" :disabled="saving || loading || selected === current" data-testid="repair-dir-save">
-          {{ t('auth.save_user') }}
-        </BButton>
+      <div class="button-group row">
+        <div class="offset-9 col-sm-3 d-flex align-items-center justify-content-end">
+          <BButton type="submit" variant="primary" :disabled="saving || loading || selected === current" data-testid="repair-dir-save">
+            {{ t('auth.save_user') }}
+          </BButton>
+        </div>
       </div>
     </BForm>
   </div>

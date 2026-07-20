@@ -46,7 +46,51 @@ const editError = ref('')
 const feedback = ref('')
 const feedbackVariant = ref('success')
 
-const editTitle = computed(() => (editingRole.value ? `${t('admin.edit-role')}: ${editingRole.value.name}` : t('admin.edit-role')))
+// Role names ("Restarter", "Administrator", ...) are the raw roles.role DB
+// column value - see PublicProfileView.vue's doc comment for why t() (not
+// plain interpolation) is required: those literal strings are themselves
+// top-level i18n keys (lang/en.json et al, exported flat into
+// i18n/locales/{en,fr,fr-BE}.json), translating e.g. Restarter -> "Repairer".
+const editTitle = computed(() => (editingRole.value ? `${t('admin.edit-role')}: ${t(editingRole.value.name)}` : t('admin.edit-role')))
+
+// live RolesPage.vue (07e6abd7cc^) marks id/name sortable but
+// permissions_list explicitly `sortable: false` (it's a display-only
+// comma-joined string, not develop's dead RolesTable.vue, which sorted all
+// three) - reimplemented locally (this page isn't built on AdminCrudTable.vue,
+// see the doc comment above), same sort-ascending-then-toggle-descending
+// pattern as that component's own sortByColumn/sortIndicator.
+const sortKey = ref(null)
+const sortDesc = ref(false)
+
+const sortedRoles = computed(() => {
+  if (!sortKey.value) return adminStore.roles.data
+
+  const key = sortKey.value
+  const sorted = [...adminStore.roles.data].sort((a, b) => {
+    const av = a[key]
+    const bv = b[key]
+    if (av == null && bv == null) return 0
+    if (av == null) return -1
+    if (bv == null) return 1
+    if (typeof av === 'number' && typeof bv === 'number') return av - bv
+    return String(av).localeCompare(String(bv))
+  })
+  return sortDesc.value ? sorted.reverse() : sorted
+})
+
+function sortIndicator(key) {
+  if (sortKey.value !== key) return ''
+  return sortDesc.value ? '▼' : '▲'
+}
+
+function sortByColumn(key) {
+  if (sortKey.value === key) {
+    sortDesc.value = !sortDesc.value
+  } else {
+    sortKey.value = key
+    sortDesc.value = false
+  }
+}
 
 function openEditModal(role) {
   editingRole.value = role
@@ -131,19 +175,27 @@ onMounted(load)
     </BAlert>
 
     <div v-else class="table-responsive">
-      <table class="table" data-testid="roles-table">
+      <table class="table table-striped table-hover" data-testid="roles-table">
         <thead>
           <tr>
-            <th>{{ t('admin.role_id') }}</th>
-            <th>{{ t('admin.role') }}</th>
+            <th>
+              <button type="button" class="sort-header" data-testid="roles-table-sort-id" @click="sortByColumn('id')">
+                {{ t('admin.role_id') }} {{ sortIndicator('id') }}
+              </button>
+            </th>
+            <th>
+              <button type="button" class="sort-header" data-testid="roles-table-sort-name" @click="sortByColumn('name')">
+                {{ t('admin.role') }} {{ sortIndicator('name') }}
+              </button>
+            </th>
             <th>{{ t('admin.role_permissions') }}</th>
           </tr>
         </thead>
         <tbody>
-          <tr v-for="role in adminStore.roles.data" :key="role.id" :data-testid="`roles-row-${role.id}`">
+          <tr v-for="role in sortedRoles" :key="role.id" :data-testid="`roles-row-${role.id}`">
             <td>{{ role.id }}</td>
             <td>
-              <a href="#" :data-testid="`roles-edit-link-${role.id}`" @click.prevent="openEditModal(role)">{{ role.name }}</a>
+              <a href="#" :data-testid="`roles-edit-link-${role.id}`" @click.prevent="openEditModal(role)">{{ t(role.name) }}</a>
             </td>
             <td class="text-muted">{{ role.permissions_list }}</td>
           </tr>
@@ -178,3 +230,13 @@ onMounted(load)
     </BModal>
   </div>
 </template>
+
+<style scoped lang="scss">
+.sort-header {
+  background: none;
+  border: 0;
+  padding: 0;
+  font-weight: bold;
+  cursor: pointer;
+}
+</style>

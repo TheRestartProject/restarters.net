@@ -43,6 +43,7 @@ return [
   'online_event_question' => 'Online event?',
   'organised_by' => 'Organised by :group',
   'invite_volunteers' => 'Invite volunteers',
+  'invite_when_approved' => 'You can only invite volunteers when this event has been approved',
   'event_photos' => 'Photos',
   'event_attendance' => 'Attendance',
   'confirmed' => 'Confirmed',
@@ -91,4 +92,33 @@ return [
   'geocode_failed' => 'Location not found. If you are unable to find the location of your event, please try a more general location (such as village/town), or a specific street address, rather than a building name.',
   'create_failed' => 'Event could <strong>not</strong> be created. Please look at the reported errors, correct them, and try again.',
   'edit_failed' => 'Event could not be edited.',
+
+  // RES gap-closure pass (parity-v2/events.md) - keys below already exist on
+  // develop's lang/en/events.php with these exact values; ported here rather
+  // than reworded, since this branch's copy of the file predates them.
+  'before_submit_text' => 'Once confirmed by a coordinator, your event will be made public.',
+  'event_actions' => 'Event actions',
+  'event_details' => 'Details',
+  'event_description' => 'Description',
+  'share_event_stats' => 'Share event stats',
+  'share_stats_header' => 'Share your stats',
+  'share_stats_message' => 'Well done! On the :date at :event_name we were able to repair <strong>:number_devices items</strong>. Help us spread the message by sharing your impact on your website.',
+  'headline_stats_dropdown' => 'Headline stats',
+  'headline_stats_message' => 'This widget shows the headline stats for your event e.g. the number of participants; the hours volunteered',
+  'co2_equivalence_visualisation_dropdown' => 'CO<sub>2</sub> equivalence visualisation',
+  'infographic_message' => 'An infographic of an easy-to-understand equivalent of the CO<sub>2</sub> emissions that your group has prevented',
+  'embed_code_header' => 'Embed code',
+  'read_more' => 'READ MORE&nbsp;<img class="icon" src="/images/add-icon.svg" style="width: 20px;" />',
+  'read_less' => '<img class="icon" src="/images/minus-icon.svg" style="width: 20px;" />&nbsp;READ LESS',
+  'impact_calculation' => '<p><strong>How do we calculate environmental impact?</strong></p>
+<p>We\'ve researched the average weight and CO<sub>2</sub>e footprint of products across a range of categories, from smartphones to t-shirts. When you enter an item that you\'ve repaired, we use these averages to estimate the impact of that repair based on the category of the item.</p>
+<p>For misc items, we apply a generic CO<sub>2</sub>e to weight ratio to estimate the impact of each successful repair.</p>
+<p><a href="https://talk.restarters.net/t/how-do-we-measure-the-environmental-impact-of-events/6077" target="_blank" rel="nofollow">Learn more about how we calculate impact here</a></p>',
+
+  // New for this pass (not on develop under this name - develop's
+  // equivalents live in partials.php, which is outside this task's file
+  // scope; same English copy, kept under events.php instead).
+  'no_devices_added' => 'No devices added',
+  'add_a_device' => 'Add a device',
+  'copied_to_clipboard' => 'Copied to clipboard.',
 ];

@@ -109,8 +109,12 @@ async function save() {
 </script>
 
 <template>
-  <div data-testid="profile-info-tab">
-    <h3>{{ t('general.profile') }}</h3>
+  <div class="edit-panel" data-testid="profile-info-tab">
+    <!-- Legacy shows a different heading when an Administrator edits someone
+         else's profile (profile.blade.php's Auth::id() == $user->id check):
+         own profile gets an <h3>, someone else's gets an <h4> "X's profile". -->
+    <h3 v-if="isOwnProfile" data-testid="profile-info-heading">{{ t('general.profile') }}</h3>
+    <h4 v-else data-testid="profile-info-heading">{{ t('profile.other_profile', { name: source.data?.name }) }}</h4>
     <p>{{ t('general.profile_content') }}</p>
 
     <BAlert v-if="feedback" :model-value="true" :variant="feedbackVariant" dismissible data-testid="profile-info-feedback" @dismissed="feedback = ''">

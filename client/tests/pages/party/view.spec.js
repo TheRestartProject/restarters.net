@@ -36,6 +36,19 @@ const BModalStub = {
 }
 const BFormStub = { template: '<form @submit.prevent="$emit(\'submit\', $event)"><slot /></form>' }
 const BFormGroupStub = { template: '<div><slot /></div>' }
+// GAP 2/3/15: EventActionsDropdown/EventShareStatsModal/the CO2 info popover
+// use BDropdown/BDropdownItem/BPopover - stubbed the same way
+// tests/helpers/stubs.js does for the group-view parity work (renders
+// unconditionally, no floating-ui positioning to simulate).
+const BDropdownStub = {
+  props: ['text', 'variant', 'noCaret'],
+  template: '<div v-bind="$attrs">{{ text }}<slot /></div>',
+}
+const BDropdownItemStub = {
+  props: ['to', 'href', 'disabled'],
+  template: '<a v-bind="$attrs" :href="to || href" :class="{ disabled }"><slot /></a>',
+}
+const BPopoverStub = { props: ['target'], template: '<div><slot /></div>' }
 
 const GLOBAL_STUBS = {
   NuxtLink: NuxtLinkStub,
@@ -45,6 +58,9 @@ const GLOBAL_STUBS = {
   BModal: BModalStub,
   BForm: BFormStub,
   BFormGroup: BFormGroupStub,
+  BDropdown: BDropdownStub,
+  BDropdownItem: BDropdownItemStub,
+  BPopover: BPopoverStub,
 }
 
 function baseEvent(overrides = {}) {
@@ -107,6 +123,24 @@ function mountPage() {
           no_weight: '{value} misc or unpowered item with no weight estimate|{value} misc or unpowered items with no weight estimate',
           'stat-0': 'Participants',
           'stat-2': 'Volunteers',
+          // RES gap-closure pass (parity-v2/events.md) - same overlay
+          // pattern for the new lang/en/events.php keys gaps 2/3/9/12/15
+          // introduced (see that file's own doc comment - these already
+          // exist verbatim on develop, just not yet in the generated JSON).
+          event_actions: 'Event actions',
+          event_details: 'Details',
+          event_description: 'Description',
+          share_event_stats: 'Share event stats',
+          share_stats_header: 'Share your stats',
+          share_stats_message: 'Well done! On the {date} at {event_name} we were able to repair <strong>{number_devices} items</strong>.',
+          headline_stats_dropdown: 'Headline stats',
+          headline_stats_message: 'This widget shows the headline stats for your event',
+          co2_equivalence_visualisation_dropdown: 'CO2 equivalence visualisation',
+          infographic_message: 'An infographic of an easy-to-understand equivalent of the CO2 emissions.',
+          embed_code_header: 'Embed code',
+          read_more: 'READ MORE',
+          read_less: 'READ LESS',
+          impact_calculation: '<p>How do we calculate environmental impact?</p>',
         },
       },
     },
@@ -205,35 +239,44 @@ describe('pages/party/view/[id]', () => {
     expect(wrapper2.find('[data-testid="event-view-moderation-note"]').exists()).toBe(false)
   })
 
+  // Audit regression fix: a logged-in viewer used to get a standalone
+  // "event-attend" button AND the dropdown's own RSVP item at the same time
+  // (EventActionsDropdown.vue never had a standalone RSVP entry point for
+  // logged-in users in develop - see its doc comment) - RSVP for a
+  // logged-in viewer now lives solely in the dropdown's
+  // `event-actions-rsvp` item; the anonymous "log in to RSVP" link is the
+  // only variant left outside the dropdown, since the dropdown doesn't
+  // render at all when !loggedIn.
   describe('RSVP button states', () => {
-    it('shows a login link when not attending and logged out', () => {
+    it('shows a login link when not attending and logged out, with no dropdown at all', () => {
       eventsStore.current.data = baseEvent({ attending: false })
       authStore.token = null
 
       const wrapper = mountPage()
       expect(wrapper.find('[data-testid="event-view-login-to-rsvp"]').exists()).toBe(true)
-      expect(wrapper.find('[data-testid="event-attend"]').exists()).toBe(false)
+      expect(wrapper.find('[data-testid="event-actions-dropdown"]').exists()).toBe(false)
     })
 
-    it('shows an RSVP button wired to the store when not attending and logged in', async () => {
+    it('shows the dropdown\'s RSVP item wired to the store when not attending and logged in, with no standalone button', async () => {
       eventsStore.current.data = baseEvent({ attending: false })
       authStore.token = 'a-token'
 
       const wrapper = mountPage()
-      const button = wrapper.find('[data-testid="event-attend"]')
-      expect(button.exists()).toBe(true)
+      expect(wrapper.find('[data-testid="event-view-login-to-rsvp"]').exists()).toBe(false)
+      const item = wrapper.find('[data-testid="event-actions-rsvp"]')
+      expect(item.exists()).toBe(true)
 
-      await button.trigger('click')
+      await item.trigger('click')
       expect(eventsStore.attend).toHaveBeenCalledWith(5)
     })
 
-    it('shows the attending banner with a cancel button wired to the store when attending', async () => {
+    it('shows the attending banner with a cancel button wired to the store when attending, and hides the RSVP item', async () => {
       eventsStore.current.data = baseEvent({ attending: true })
       authStore.token = 'a-token'
 
       const wrapper = mountPage()
       expect(wrapper.find('[data-testid="event-view-rsvp-banner"]').exists()).toBe(true)
-      expect(wrapper.find('[data-testid="event-attend"]').exists()).toBe(false)
+      expect(wrapper.find('[data-testid="event-actions-rsvp"]').exists()).toBe(false)
 
       await wrapper.find('[data-testid="event-view-unattend"]').trigger('click')
       expect(eventsStore.unattend).toHaveBeenCalledWith(5)
@@ -255,7 +298,7 @@ describe('pages/party/view/[id]', () => {
       eventsStore.attend = vi.fn().mockResolvedValue({ attending: true, prompt_follow_group: true })
 
       const wrapper = mountPage()
-      await wrapper.find('[data-testid="event-attend"]').trigger('click')
+      await wrapper.find('[data-testid="event-actions-rsvp"]').trigger('click')
       await wrapper.vm.$nextTick()
 
       expect(wrapper.find('[data-testid="event-view-follow-prompt"]').exists()).toBe(true)
@@ -267,89 +310,109 @@ describe('pages/party/view/[id]', () => {
     })
   })
 
+  // Gap 2: Edit/Duplicate/Delete/Invite are now items inside the single
+  // EventActionsDropdown, not standalone buttons - `event-view-*` testids
+  // become `event-actions-*`, and the dropdown only renders at all for a
+  // logged-in viewer (authStore.token), same as the rest of the dropdown's
+  // authenticated-only actions.
   describe('permission-gated buttons', () => {
     it('shows Edit/Duplicate/Delete only when Administrator', () => {
       eventsStore.current.data = baseEvent()
       authStore.user = { role_name: 'Administrator' }
+      authStore.token = 'a-token'
 
       const wrapper = mountPage()
-      expect(wrapper.find('[data-testid="event-view-edit"]').exists()).toBe(true)
-      expect(wrapper.find('[data-testid="event-view-duplicate"]').exists()).toBe(true)
-      expect(wrapper.find('[data-testid="event-view-delete"]').exists()).toBe(true)
+      expect(wrapper.find('[data-testid="event-actions-edit"]').exists()).toBe(true)
+      expect(wrapper.find('[data-testid="event-actions-duplicate"]').exists()).toBe(true)
+      expect(wrapper.find('[data-testid="event-actions-delete"]').exists()).toBe(true)
     })
 
     it('shows Edit/Delete when memberships report the user hosts the event\'s group', () => {
       eventsStore.current.data = baseEvent({ group: { id: 9, name: 'Acme Restarters' } })
       groupsStore.memberships = [{ id: 9, name: 'Acme Restarters', role: 3 }]
       authStore.user = { role_name: 'Restarter' }
+      authStore.token = 'a-token'
 
       const wrapper = mountPage()
-      expect(wrapper.find('[data-testid="event-view-edit"]').exists()).toBe(true)
+      expect(wrapper.find('[data-testid="event-actions-edit"]').exists()).toBe(true)
     })
 
     it('hides Edit/Duplicate/Delete for a plain Restarter not hosting the group', () => {
       eventsStore.current.data = baseEvent()
       authStore.user = { role_name: 'Restarter' }
+      authStore.token = 'a-token'
       groupsStore.memberships = []
 
       const wrapper = mountPage()
-      expect(wrapper.find('[data-testid="event-view-edit"]').exists()).toBe(false)
-      expect(wrapper.find('[data-testid="event-view-duplicate"]').exists()).toBe(false)
-      expect(wrapper.find('[data-testid="event-view-delete"]').exists()).toBe(false)
+      expect(wrapper.find('[data-testid="event-actions-edit"]').exists()).toBe(false)
+      expect(wrapper.find('[data-testid="event-actions-duplicate"]').exists()).toBe(false)
+      expect(wrapper.find('[data-testid="event-actions-delete"]').exists()).toBe(false)
     })
 
     it('disables Delete when the event still has devices', () => {
       eventsStore.current.data = baseEvent()
       devicesStore.byEvent[5] = { data: [{ id: 1 }], loading: false, error: null, loaded: true }
       authStore.user = { role_name: 'Administrator' }
+      authStore.token = 'a-token'
 
       const wrapper = mountPage()
-      const button = wrapper.find('[data-testid="event-view-delete"]')
-      expect(button.exists()).toBe(true)
-      expect(button.attributes('disabled')).toBeDefined()
+      const item = wrapper.find('[data-testid="event-actions-delete"]')
+      expect(item.exists()).toBe(true)
+      expect(item.classes()).toContain('disabled')
     })
 
     it('enables Delete and wires up the confirm flow when the event has zero devices', async () => {
       eventsStore.current.data = baseEvent()
       devicesStore.byEvent[5] = { data: [], loading: false, error: null, loaded: true }
       authStore.user = { role_name: 'Administrator' }
+      authStore.token = 'a-token'
 
       const wrapper = mountPage()
-      const button = wrapper.find('[data-testid="event-view-delete"]')
-      expect(button.attributes('disabled')).toBeUndefined()
+      const item = wrapper.find('[data-testid="event-actions-delete"]')
+      expect(item.classes()).not.toContain('disabled')
 
-      await button.trigger('click')
+      await item.trigger('click')
       expect(wrapper.find('[data-testid="event-view-delete-confirm"]').exists()).toBe(true)
 
       await wrapper.find('[data-testid="event-view-delete-confirm"]').trigger('click')
       expect(eventsStore.deleteEvent).toHaveBeenCalledWith(5)
     })
 
-    it('shows Invite volunteers only when canedit, upcoming and approved', () => {
-      eventsStore.current.data = baseEvent({ approved: true })
+    // EventActions.vue's canedit Invite item requires isAttending too, not
+    // just canedit/upcoming/approved (audit fix - the item used to show for
+    // any canedit host regardless of whether they'd RSVPed themselves).
+    it('shows Invite volunteers only when canedit, attending, upcoming and approved', () => {
+      eventsStore.current.data = baseEvent({ approved: true, attending: true })
       authStore.user = { role_name: 'Administrator' }
+      authStore.token = 'a-token'
 
       const wrapper = mountPage()
-      expect(wrapper.find('[data-testid="event-view-invite"]').exists()).toBe(true)
+      expect(wrapper.find('[data-testid="event-actions-invite"]').exists()).toBe(true)
     })
 
-    it('hides Invite volunteers for a non-editing attendee (stricter than legacy - api-gaps.md)', () => {
+    // EventActions.vue's non-canedit Invite item is just `attending &&
+    // upcoming` (no approved check) - a non-editing attendee gets it too,
+    // matching legacy exactly (this used to be deliberately stricter than
+    // legacy - see git history - which was itself the audit-flagged gap).
+    it('shows Invite volunteers for a non-editing attendee too, matching develop', () => {
       eventsStore.current.data = baseEvent({ approved: true, attending: true })
       authStore.user = { role_name: 'Restarter' }
+      authStore.token = 'a-token'
       groupsStore.memberships = []
 
       const wrapper = mountPage()
-      expect(wrapper.find('[data-testid="event-view-invite"]').exists()).toBe(false)
+      expect(wrapper.find('[data-testid="event-actions-invite"]').exists()).toBe(true)
     })
 
-    it('opens the invite modal from the invite button', async () => {
-      eventsStore.current.data = baseEvent({ approved: true })
+    it('opens the invite modal from the invite dropdown item', async () => {
+      eventsStore.current.data = baseEvent({ approved: true, attending: true })
       authStore.user = { role_name: 'Administrator' }
+      authStore.token = 'a-token'
 
       const wrapper = mountPage()
       expect(wrapper.find('[data-testid="event-invite-form"]').exists()).toBe(false)
 
-      await wrapper.find('[data-testid="event-view-invite"]').trigger('click')
+      await wrapper.find('[data-testid="event-actions-invite"]').trigger('click')
       expect(wrapper.find('[data-testid="event-invite-form"]').exists()).toBe(true)
     })
   })
@@ -473,6 +536,151 @@ describe('pages/party/view/[id]', () => {
       eventsStore.current.data = baseEvent()
       const wrapper = mountPage()
       expect(wrapper.find('[data-testid="event-attendees-headcounts"]').exists()).toBe(false)
+    })
+  })
+
+  // Gap 9/10: EventDetailsPanel's icon+bordered rows, including named hosts
+  // sourced from the confirmed attendee list (role === EVENT_ROLE_HOST) -
+  // no new endpoint, just useEventAttendance(id).hosts over data the page
+  // already fetches.
+  describe('event details panel (gap 9/10)', () => {
+    it('renders the details panel with date/time rows', () => {
+      eventsStore.current.data = baseEvent()
+      const wrapper = mountPage()
+
+      expect(wrapper.find('[data-testid="event-details-panel"]').exists()).toBe(true)
+      expect(wrapper.find('[data-testid="event-details-time"]').exists()).toBe(true)
+    })
+
+    it('lists confirmed attendees with role HOST as named hosts', () => {
+      eventsStore.current.data = baseEvent()
+      eventsStore.attendees.data = {
+        confirmed: [
+          { id: 1, user: 20, role: 3, volunteer: { name: 'Jo Host', user_skills: [] } },
+          { id: 2, user: 21, role: 4, volunteer: { name: 'Sam Guest', user_skills: [] } },
+        ],
+        invited: [],
+      }
+
+      const wrapper = mountPage()
+      const hosts = wrapper.find('[data-testid="event-details-hosts"]')
+      expect(hosts.text()).toContain('Jo Host')
+      expect(hosts.text()).not.toContain('Sam Guest')
+    })
+
+    it('does not render a hosts row when nobody confirmed has role HOST', () => {
+      eventsStore.current.data = baseEvent()
+      eventsStore.attendees.data = { confirmed: [], invited: [] }
+
+      const wrapper = mountPage()
+      expect(wrapper.find('[data-testid="event-details-hosts"]').exists()).toBe(false)
+    })
+  })
+
+  // Gap 12: description truncated behind a Read more/Read less toggle,
+  // using text-clipper for the same tag-safe 440-character cut
+  // EventDescription.vue's ReadMore uses (not a CSS max-height clamp -
+  // that approximation cut off at a different point than develop).
+  describe('description truncation (gap 12)', () => {
+    it('shows a Read more toggle for a long description, clips the rendered HTML, and expands to the full text on click', async () => {
+      eventsStore.current.data = baseEvent({ description: `<p>${'a'.repeat(500)}</p>` })
+      const wrapper = mountPage()
+
+      const toggle = wrapper.find('[data-testid="event-view-description-toggle"]')
+      expect(toggle.exists()).toBe(true)
+      const content = wrapper.find('[data-testid="event-view-description-content"]')
+      expect(content.text().length).toBeLessThan(500)
+
+      await toggle.trigger('click')
+      expect(wrapper.find('[data-testid="event-view-description-content"]').text().length).toBe(500)
+    })
+
+    it('does not show a Read more toggle for a short description', () => {
+      eventsStore.current.data = baseEvent({ description: '<p>Short.</p>' })
+      const wrapper = mountPage()
+      expect(wrapper.find('[data-testid="event-view-description-toggle"]').exists()).toBe(false)
+      expect(wrapper.find('[data-testid="event-view-description-content"]').text()).toBe('Short.')
+    })
+
+    // EventDescription.vue's CollapsibleSection hide-title: the "Event
+    // description" heading only shows below md.
+    it('hides the "Event description" heading at md and up', () => {
+      eventsStore.current.data = baseEvent({ description: '<p>Short.</p>' })
+      const wrapper = mountPage()
+      const heading = wrapper.find('[data-testid="event-view-description"] h2')
+      expect(heading.exists()).toBe(true)
+      expect(heading.classes()).toContain('d-block')
+      expect(heading.classes()).toContain('d-md-none')
+    })
+  })
+
+  // Gap 2: every event action lives in one EventActionsDropdown.
+  describe('event actions dropdown (gap 2)', () => {
+    it('offers Request review/Share stats/Export for a finished, editable event', () => {
+      eventsStore.current.data = baseEvent({ start: '2020-01-01T10:00:00+00:00', end: '2020-01-01T12:00:00+00:00' })
+      authStore.user = { role_name: 'Administrator' }
+      authStore.token = 'a-token'
+
+      const wrapper = mountPage()
+      expect(wrapper.find('[data-testid="event-actions-request-review"]').exists()).toBe(true)
+      expect(wrapper.find('[data-testid="event-actions-share-stats"]').exists()).toBe(true)
+      expect(wrapper.find('[data-testid="event-actions-export"]').attributes('href')).toBe('/export/devices/event/5')
+    })
+
+    it('offers an RSVP item for an upcoming event when not attending', () => {
+      eventsStore.current.data = baseEvent({ attending: false })
+      authStore.user = { role_name: 'Administrator' }
+      authStore.token = 'a-token'
+
+      const wrapper = mountPage()
+      expect(wrapper.find('[data-testid="event-actions-rsvp"]').exists()).toBe(true)
+    })
+
+    it('offers a follow-group item when the viewer is not in the hosting group', () => {
+      eventsStore.current.data = baseEvent({ group: { id: 9, name: 'Acme Restarters' } })
+      authStore.user = { role_name: 'Administrator' }
+      authStore.token = 'a-token'
+      groupsStore.memberships = []
+
+      const wrapper = mountPage()
+      expect(wrapper.find('[data-testid="event-actions-follow-group"]').exists()).toBe(true)
+    })
+  })
+
+  // Gap 3: "Share event stats" opens a modal (dropdown item + CO2-card
+  // "Share this" button both wire to it).
+  describe('share event stats (gap 3)', () => {
+    it('opens the share-stats modal from the dropdown item', async () => {
+      eventsStore.current.data = baseEvent({ start: '2020-01-01T10:00:00+00:00', end: '2020-01-01T12:00:00+00:00' })
+      authStore.user = { role_name: 'Administrator' }
+      authStore.token = 'a-token'
+
+      const wrapper = mountPage()
+      expect(wrapper.find('[data-testid="event-share-stats-modal"]').exists()).toBe(false)
+
+      await wrapper.find('[data-testid="event-actions-share-stats"]').trigger('click')
+      expect(wrapper.find('[data-testid="event-share-stats-modal"]').exists()).toBe(true)
+    })
+
+    it('opens the share-stats modal from the CO2-card share button, for a finished event', async () => {
+      eventsStore.current.data = baseEvent({ start: '2020-01-01T10:00:00+00:00', end: '2020-01-01T12:00:00+00:00' })
+      const wrapper = mountPage()
+
+      await wrapper.find('[data-testid="event-view-impact-share"]').trigger('click')
+      expect(wrapper.find('[data-testid="event-share-stats-modal"]').exists()).toBe(true)
+    })
+  })
+
+  // Gap 15: fixed-items stats get the same icon-card treatment as the
+  // impact cards, plus a CO2-equivalence description and info popover.
+  describe('stats/impact cards (gap 15)', () => {
+    it('shows an icon card for fixed devices and a CO2-equivalence description', () => {
+      eventsStore.current.data = baseEvent({ start: '2020-01-01T10:00:00+00:00', end: '2020-01-01T12:00:00+00:00' })
+      const wrapper = mountPage()
+
+      expect(wrapper.find('[data-testid="event-view-stats-fixed"] img').exists()).toBe(true)
+      expect(wrapper.find('[data-testid="event-view-impact-equivalent"]').exists()).toBe(true)
+      expect(wrapper.find('[data-testid="event-view-impact-info"]').exists()).toBe(true)
     })
   })
 })

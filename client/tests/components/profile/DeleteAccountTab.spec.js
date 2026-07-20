@@ -48,6 +48,17 @@ describe('components/profile/DeleteAccountTab', () => {
     expect(wrapper.find('[data-testid="delete-account-modal"]').exists()).toBe(false)
   })
 
+  // findings/parity-v2/profile-notifs-auth.md gap 8 was diffed against
+  // origin/develop's older, since-superseded Blade (which happens to leave
+  // this tab unwrapped) rather than this branch's own pre-Phase-F Vue
+  // component (git show 07e6abd7cc^:resources/js/components/
+  // DeleteAccountTab.vue), which DOES wrap in .edit-panel like every other
+  // profile tab - pins that so it can't silently regress again.
+  it('wraps its root in .edit-panel, matching every other profile tab', () => {
+    const wrapper = mountComponent()
+    expect(wrapper.find('[data-testid="delete-account-tab"]').classes()).toContain('edit-panel')
+  })
+
   it('opens the confirmation modal on delete-account-button click', async () => {
     const wrapper = mountComponent()
     await wrapper.find('[data-testid="delete-account-button"]').trigger('click')

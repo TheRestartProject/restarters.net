@@ -79,7 +79,7 @@ async function save() {
 </script>
 
 <template>
-  <div data-testid="email-preferences-tab">
+  <div class="edit-panel" data-testid="email-preferences-tab">
     <h4>{{ t('general.email_alerts') }}</h4>
     <!-- eslint-disable-next-line vue/no-v-html -->
     <p v-html="t('general.email_alerts_text')" />
@@ -93,11 +93,15 @@ async function save() {
         {{ t('general.email_alerts_pref2') }}
       </BFormCheckbox>
 
-      <div class="d-flex justify-content-between align-items-center mt-3">
-        <a class="btn-preferences" :href="platformPreferencesUrl">{{ t('auth.set_preferences') }}</a>
-        <BButton type="submit" variant="primary" :disabled="saving" data-testid="email-preferences-save">
-          {{ t('auth.save_preferences') }}
-        </BButton>
+      <div class="button-group row mt-3">
+        <div class="col-sm-9 d-flex align-items-center justify-content-start">
+          <a class="btn-preferences" :href="platformPreferencesUrl">{{ t('auth.set_preferences') }}</a>
+        </div>
+        <div class="col-sm-3 d-flex align-items-center justify-content-end">
+          <BButton type="submit" variant="primary" :disabled="saving" data-testid="email-preferences-save">
+            {{ t('auth.save_preferences') }}
+          </BButton>
+        </div>
       </div>
     </BForm>
   </div>

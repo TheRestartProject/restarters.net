@@ -39,6 +39,38 @@ const PAGES = [
   { slug: '06-groups-all', path: '/group/all', auth: true },
   { slug: '07-events-all', path: '/party/all', auth: true },
   { slug: '08-groups-nearby', path: '/group/nearby', auth: true },
+  // Detail pages: same URL shape on both systems (legacy /group/view/{id} =
+  // GroupController::view; Nuxt /group/view/{id}). Group id 1 = the seeded
+  // "Tag Test Group" (playwright:seed-data). These were the pages the earlier
+  // 8-page harness never covered - exactly where visual diffs were missed.
+  { slug: '09-group-view', path: '/group/view/1', auth: true },
+  // Everything below covers the remaining parity-v2 clusters (group forms,
+  // networks, profile, admin CRUD, static). Each path was probed against the
+  // legacy instance first and returns 200/302 there - paths that 404 on
+  // legacy (/notifications, /user/consent, /forbidden, /group/map) are
+  // Nuxt-only or live at a different legacy URL, so they are NOT comparable
+  // here and are tracked in the findings docs instead.
+  { slug: '10-group-create', path: '/group/create', auth: true },
+  { slug: '11-networks', path: '/networks', auth: true },
+  { slug: '12-profile', path: '/profile', auth: true },
+  // NB 07-events-all, 13-events-past and 14-device-search have NO usable
+  // `old` reference: develop's routes/web.php:335,370,371 point at
+  // PartyController::allUpcoming / ::allPast / DeviceController::search,
+  // none of which exist on develop - so those three pages 500 for any
+  // logged-in user there and the `__old` shot is just the error page.
+  // The Nuxt versions render correctly, i.e. this branch FIXES them.
+  // Compare them against develop's source, not against these screenshots.
+  { slug: '13-events-past', path: '/party/all-past', auth: true },
+  { slug: '14-device-search', path: '/device/search', auth: true },
+  { slug: '15-event-create', path: '/party/create', auth: true },
+  { slug: '16-admin-categories', path: '/category', auth: true },
+  { slug: '17-admin-roles', path: '/role', auth: true },
+  { slug: '18-admin-skills', path: '/skills', auth: true },
+  { slug: '19-admin-tags', path: '/tags', auth: true },
+  { slug: '20-admin-users', path: '/user/all', auth: true },
+  { slug: '21-admin-brands', path: '/brands', auth: true },
+  { slug: '22-cookie-policy', path: '/about/cookie-policy', auth: false },
+  { slug: '23-recover', path: '/user/recover', auth: false },
 ]
 
 // Both systems are LOCAL DEV instances sharing the same seeded database:
@@ -97,10 +129,34 @@ async function dismissCookieBanner(page) {
   }
 }
 
+// The Nuxt SPA revived the (dead-in-develop) post-registration onboarding
+// modal, so it covers the dashboard for low-login users. Dismiss it before
+// shooting so the underlying page can be compared against develop, which
+// never shows it (see docs/nuxt-migration/findings/parity-v2).
+async function dismissOnboardingModal(page) {
+  try {
+    const close = page.getByTestId('onboarding-close')
+    if (await close.isVisible({ timeout: 800 })) {
+      await close.click({ timeout: 2000 })
+      await page.waitForTimeout(400)
+    }
+  } catch {
+    // not present - fine
+  }
+}
+
+// KNOWN CAPTURE ARTIFACT - do not chase these as parity diffs:
+// the legacy nav's message/notification counters are fed by Discourse. When
+// the restarters_discourse container isn't running (the usual case for a
+// parity run) those counters render as "--" placeholders in every `__old`
+// shot and the legacy request blocks ~5s on a cURL timeout first. The Nuxt
+// side degrades to "0" instead. That difference is an environment artifact,
+// not a design regression.
 async function settle(page) {
   await page.waitForLoadState('networkidle').catch(() => {})
   // Let async widgets/stat counters paint.
   await page.waitForTimeout(1200)
+  await dismissOnboardingModal(page)
 }
 
 async function shoot(page, viewport, slug, system) {

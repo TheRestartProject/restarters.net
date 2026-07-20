@@ -52,7 +52,7 @@ function copy(text) {
 </script>
 
 <template>
-  <div data-testid="calendars-tab">
+  <div class="edit-panel" data-testid="calendars-tab">
     <h3>{{ t('profile.calendars.title') }}</h3>
     <p>
       {{ t('profile.calendars.explainer') }}
@@ -63,7 +63,11 @@ function copy(text) {
       {{ t('client.profile.load_error') }}
     </BAlert>
 
-    <template v-else-if="!loading && profileStore.calendars.data">
+    <div v-else-if="loading" class="text-center my-3" data-testid="calendars-loading">
+      <BSpinner small />
+    </div>
+
+    <template v-else-if="profileStore.calendars.data">
       <h5>{{ t('profile.calendars.my_events') }}</h5>
       <div class="input-group mb-4">
         <input type="text" class="form-control" readonly :value="profileStore.calendars.data.user_url" data-testid="calendars-user-url">
@@ -89,10 +93,12 @@ function copy(text) {
 
       <h5>{{ t('profile.calendars.events_by_area') }}</h5>
       <div class="input-group mb-3">
-        <select v-model="selectedArea" class="form-control" data-testid="calendars-area-select">
+        <label class="visually-hidden" for="calendars-area-select">{{ t('profile.calendars.events_by_area') }}</label>
+        <select id="calendars-area-select" v-model="selectedArea" class="form-control" data-testid="calendars-area-select">
           <option v-for="area in profileStore.calendars.data.group_areas" :key="area" :value="area">{{ area }}</option>
         </select>
-        <input v-if="selectedArea" type="text" class="form-control" readonly :value="areaUrl">
+        <label v-if="selectedArea" class="visually-hidden" for="calendars-area-url">{{ t('profile.calendars.events_by_area') }}</label>
+        <input v-if="selectedArea" id="calendars-area-url" type="text" class="form-control" readonly :value="areaUrl">
         <BButton variant="primary" :disabled="!selectedArea" @click="copy(areaUrl)">{{ t('profile.calendars.copy_link') }}</BButton>
       </div>
     </template>

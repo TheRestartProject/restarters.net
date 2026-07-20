@@ -46,9 +46,12 @@ onMounted(() => {
   adminStore.fetchClusters().catch(() => {})
 })
 
+// Cluster names ("Kitchen and Household Items", ...) are the raw
+// clusters.name DB column value, same top-level-i18n-key mechanism as role
+// names - see PublicProfileView.vue's doc comment.
 const clusterOptions = computed(() => [
   { value: null, text: '—' },
-  ...adminStore.clusters.data.map((c) => ({ value: c.id, text: c.name })),
+  ...adminStore.clusters.data.map((c) => ({ value: c.id, text: t(c.name) })),
 ])
 
 // Wrapped in computed() (rather than plain consts) so everything stays
@@ -73,9 +76,24 @@ const RELIABILITY_COLORS = {
 const RELIABILITY_FALLBACK_COLOR = RELIABILITY_COLORS[6]
 const reliabilityColor = (level) => RELIABILITY_COLORS[level] || RELIABILITY_FALLBACK_COLOR
 
+// live CategoriesPage.vue (07e6abd7cc^) is the baseline for all of the
+// below, not develop's older Blade/CategoriesTable.vue (which isn't mounted
+// by anything and was a parity-doc false lead): "Category name" as the
+// column header (not "Name"), a blank cluster cell rather than an "N/A"
+// fallback, and footprint_reliability sortable (its formatter returns a
+// plain badge colour + text pair, not markup CategoriesPage.vue itself
+// treats specially).
 const tableFields = computed(() => [
   { key: 'name', label: t('admin.category_name'), sortable: true },
-  { key: 'cluster_name', label: t('admin.category_cluster'), sortable: true },
+  {
+    key: 'cluster_name',
+    label: t('admin.category_cluster'),
+    sortable: true,
+    // cluster_name is the same raw, top-level-i18n-keyed DB string as
+    // clusterOptions above - translate it here too rather than rendering
+    // it as-is.
+    formatter: (value) => (value ? t(value) : value),
+  },
   { key: 'weight', label: t('admin.weight'), sortable: true },
   { key: 'footprint', label: t('admin.co2_footprint'), sortable: true },
   {

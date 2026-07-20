@@ -42,11 +42,14 @@ const MOCK_SKILLS = [
   { id: 102, skill_name: 'Soldering', description: null, category: 2 },
 ]
 
-function mountRegister(query = {}, { skillList } = {}) {
+function mountRegister(query = {}, { skillList, emailAvailable } = {}) {
   const i18n = createI18n({ legacy: false, locale: 'en', messages: { en: { ...en, ...clientEn } } })
   vi.stubGlobal('useRoute', () => ({ query, params: {}, fullPath: '/user/register' }))
   vi.stubGlobal('useNuxtApp', () => ({
-    $api: { skill: { list: skillList || vi.fn().mockResolvedValue({ data: MOCK_SKILLS }) } },
+    $api: {
+      skill: { list: skillList || vi.fn().mockResolvedValue({ data: MOCK_SKILLS }) },
+      auth: { emailAvailable: emailAvailable || vi.fn().mockResolvedValue({ data: { available: true, message: 'Email is available' } }) },
+    },
   }))
 
   return mount(RegisterPage, {
@@ -132,6 +135,29 @@ describe('pages/user/register', () => {
     expect(wrapper.text()).toContain('Soldering')
     // No leftover hardcoded 1-8 ids from the old placeholder scheme.
     expect(wrapper.find('[data-testid="register-skill-1"]').exists()).toBe(false)
+  })
+
+  // Gap fix: GET /api/v2/skills orders alphabetically (SkillController::
+  // listSkillsv2's own doc comment), but legacy's register-new.blade.php
+  // looped over Skills::where('category', $key)->get() with no ORDER BY -
+  // i.e. DB/insertion order (database/seeders/DefaultSkills.php). Re-sort by
+  // id client-side so the chip order matches legacy rather than the API's.
+  it('orders skill chips within a category by id, not the API-alphabetical order', async () => {
+    const unordered = [
+      { id: 4, skill_name: 'Finding venues', description: null, category: 1 },
+      { id: 1, skill_name: 'Publicising events', description: null, category: 1 },
+      { id: 2, skill_name: 'Recruiting volunteers', description: null, category: 1 },
+    ]
+    const skillList = vi.fn().mockResolvedValue({ data: unordered })
+    const wrapper = mountRegister({}, { skillList })
+    await Promise.resolve()
+    await Promise.resolve()
+
+    const ids = wrapper
+      .findAll('[data-testid^="register-skill-"]')
+      .map((input) => input.attributes('data-testid').replace('register-skill-', ''))
+
+    expect(ids).toEqual(['1', '2', '4'])
   })
 
   it('shows an error state when the skills fetch fails', async () => {
@@ -259,5 +285,58 @@ describe('pages/user/register', () => {
     expect(wrapper.find('[data-testid="register-email-error"]').text()).toBe(
       'The email has already been taken.'
     )
+  })
+
+  // Gap 3: legacy's step-2 email field checks availability on blur
+  // (EmailValidation.vue -> POST /user/register/check-valid-email) and
+  // shows an inline error immediately, rather than only surfacing a taken
+  // email after the full form is submitted.
+  describe('email availability check on blur (gap 3)', () => {
+    it('calls GET /api/v2/auth/email-available on blur and shows the server message when taken', async () => {
+      const emailAvailable = vi.fn().mockResolvedValue({ data: { available: false, message: 'An account with this email address already exists.' } })
+      const wrapper = mountRegister({}, { emailAvailable })
+      await Promise.resolve()
+      await clickNext(wrapper)
+
+      await wrapper.find('[data-testid="register-email"]').setValue('taken@bloggs.net')
+      await wrapper.find('[data-testid="register-email"]').trigger('blur')
+      await Promise.resolve()
+      await Promise.resolve()
+
+      expect(emailAvailable).toHaveBeenCalledWith('taken@bloggs.net')
+      expect(wrapper.find('[data-testid="register-email-error"]').text()).toBe(
+        'An account with this email address already exists.'
+      )
+    })
+
+    it('clears the availability error once the user edits the field again', async () => {
+      const emailAvailable = vi.fn().mockResolvedValue({ data: { available: false, message: 'Taken' } })
+      const wrapper = mountRegister({}, { emailAvailable })
+      await Promise.resolve()
+      await clickNext(wrapper)
+
+      await wrapper.find('[data-testid="register-email"]').setValue('taken@bloggs.net')
+      await wrapper.find('[data-testid="register-email"]').trigger('blur')
+      await Promise.resolve()
+      await Promise.resolve()
+      expect(wrapper.find('[data-testid="register-email-error"]').exists()).toBe(true)
+
+      await wrapper.find('[data-testid="register-email"]').setValue('other@bloggs.net')
+      expect(wrapper.find('[data-testid="register-email-error"]').exists()).toBe(false)
+    })
+
+    it('does not show an error when the address is available', async () => {
+      const emailAvailable = vi.fn().mockResolvedValue({ data: { available: true, message: 'Email is available' } })
+      const wrapper = mountRegister({}, { emailAvailable })
+      await Promise.resolve()
+      await clickNext(wrapper)
+
+      await wrapper.find('[data-testid="register-email"]').setValue('free@bloggs.net')
+      await wrapper.find('[data-testid="register-email"]').trigger('blur')
+      await Promise.resolve()
+      await Promise.resolve()
+
+      expect(wrapper.find('[data-testid="register-email-error"]').exists()).toBe(false)
+    })
   })
 })

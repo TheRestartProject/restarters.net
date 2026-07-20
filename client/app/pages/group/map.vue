@@ -68,6 +68,7 @@ const rows = computed(() =>
       id,
       name: summary?.name ?? entry?.name ?? '',
       archivedAt: summary?.archived_at ?? entry?.archived_at ?? null,
+      image: summary?.image ?? null,
       location: summary?.location ?? null,
       hosts: summary?.hosts ?? null,
       restarters: summary?.restarters ?? null,
@@ -104,10 +105,11 @@ onMounted(() => {
     <h1 class="d-flex justify-content-between align-items-start">
       <span class="d-flex align-items-center">
         {{ t('groups.groups') }}
-        <img src="/images/group_doodle_ico.svg" alt="" class="ms-3 d-none d-md-inline-block" style="height: 40px">
+        <img src="/images/group_doodle_ico.svg" alt="" class="ms-3" style="height: 76px">
       </span>
       <NuxtLink to="/group/create" class="btn btn-primary" data-testid="group-create-link">
-        {{ t('groups.create_groups') }}
+        <span class="d-block d-lg-none">{{ t('groups.create_groups_mobile2') }}</span>
+        <span class="d-none d-lg-block">{{ t('groups.create_groups') }}</span>
       </NuxtLink>
     </h1>
 
@@ -146,6 +148,11 @@ onMounted(() => {
           data-testid="group-map-search"
         >
       </div>
+
+      <p data-testid="group-map-count">
+        <!-- eslint-disable-next-line vue/no-v-html -->
+        <span v-html="t('groups.group_count_map', { count: rows.length }, rows.length)" />
+      </p>
 
       <GroupsTable v-model:hovered-id="hoveredId" :groups="rows" />
     </template>

@@ -5,6 +5,9 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import GroupNearbyPage from '../../../app/pages/group/nearby.vue'
 import { useGroupsStore } from '../../../app/stores/groups.js'
 import { useDashboardStore } from '../../../app/stores/dashboard.js'
+import { useProfileStore } from '../../../app/stores/profile.js'
+import { useAuthStore } from '../../../app/stores/auth.js'
+import { useModerationStore } from '../../../app/stores/moderation.js'
 import en from '../../../i18n/locales/en.json'
 import clientEn from '../../../i18n/locales/client-en.json'
 
@@ -12,8 +15,27 @@ const NuxtLinkStub = { props: ['to'], template: '<a :href="to"><slot /></a>' }
 const BAlertStub = { template: '<div><slot /></div>' }
 const BButtonStub = { template: '<button v-bind="$attrs"><slot /></button>' }
 
+// groups.nearest_groups/nearest_groups_change/create_groups_mobile2 are new
+// keys (lang/en/groups.php) not yet re-exported to en.json - injected here
+// so these specs exercise the real copy rather than the untranslated key
+// fallback.
 function mountPage() {
-  const i18n = createI18n({ legacy: false, locale: 'en', messages: { en: { ...en, ...clientEn } } })
+  const i18n = createI18n({
+    legacy: false,
+    locale: 'en',
+    messages: {
+      en: {
+        ...en,
+        ...clientEn,
+        groups: {
+          ...en.groups,
+          nearest_groups: 'These are the groups that are within 50 km of {location}',
+          nearest_groups_change: '(change)',
+          create_groups_mobile2: 'Add new',
+        },
+      },
+    },
+  })
 
   return mount(GroupNearbyPage, {
     global: {
@@ -23,6 +45,10 @@ function mountPage() {
   })
 }
 
+function setLoggedInUser(user) {
+  useAuthStore().user = user
+}
+
 describe('pages/group/nearby', () => {
   let groupsStore
 
@@ -30,6 +56,8 @@ describe('pages/group/nearby', () => {
     setActivePinia(createPinia())
     groupsStore = useGroupsStore()
     groupsStore.fetchNearby = vi.fn().mockResolvedValue([])
+    useProfileStore().fetchProfileInfo = vi.fn().mockResolvedValue(null)
+    useModerationStore().fetchGroups = vi.fn().mockResolvedValue([])
   })
 
   it('calls groupsStore.fetchNearby() on mount', () => {
@@ -78,12 +106,12 @@ describe('pages/group/nearby', () => {
     expect(wrapper.find('[data-testid="group-nearby-empty"]').exists()).toBe(false)
   })
 
-  it('renders a card per nearby group', () => {
+  it('renders a row per nearby group in the shared GroupsTable (gap #5)', () => {
     groupsStore.nearby.data = [{ id: 5, name: 'Riverside Fixers', distance: 2.1, location: 'Riverside', image_url: null }]
 
     const wrapper = mountPage()
 
-    expect(wrapper.find('[data-testid="group-card-5"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="group-row-5"]').exists()).toBe(true)
     expect(wrapper.find('[data-testid="group-join-5"]').exists()).toBe(true)
   })
 
@@ -94,5 +122,46 @@ describe('pages/group/nearby', () => {
     const wrapper = mountPage()
 
     expect(wrapper.find('[data-testid="group-leave-5"]').exists()).toBe(true)
+  })
+
+  it('shows the "within 50 km of :location (change)" heading above the table (gap #12)', () => {
+    groupsStore.nearby.data = [{ id: 5, name: 'Riverside Fixers', distance: 2.1, location: 'Riverside', image_url: null }]
+    useProfileStore().info.data = { location: 'Bristol' }
+
+    const wrapper = mountPage()
+
+    const heading = wrapper.find('[data-testid="group-nearby-heading"]')
+    expect(heading.text()).toContain('These are the groups that are within 50 km of Bristol')
+    expect(wrapper.find('[data-testid="group-nearby-location-change"]').attributes('href')).toBe('/profile/edit')
+  })
+
+  it('shows the mobile-length create-group label alongside the full label', () => {
+    const wrapper = mountPage()
+
+    expect(wrapper.find('[data-testid="group-create-link"]').text()).toContain('Add new')
+    expect(wrapper.find('[data-testid="group-create-link"]').text()).toContain('Add a new group')
+  })
+
+  it('shows the groups moderation queue for an Administrator', () => {
+    setLoggedInUser({ id: 1, role_name: 'Administrator' })
+    useModerationStore().groups.data = [{ id: 9, name: 'Pending Fixers' }]
+
+    const wrapper = mountPage()
+
+    expect(wrapper.find('[data-testid="moderation-queue-groups"]').exists()).toBe(true)
+  })
+
+  // gap #1/#2: legacy's shared tab bar only ever has three tabs (no "Map"),
+  // and its .ourtabs border/shadow box wraps the tab-content (here: the
+  // heading + table) as well as the nav itself.
+  it('has no Map tab, and renders the table inside the shared tabs panel box', () => {
+    groupsStore.nearby.data = [{ id: 5, name: 'Riverside Fixers', distance: 2.1, location: 'Riverside', image_url: null }]
+
+    const wrapper = mountPage()
+
+    expect(wrapper.find('[data-testid="groups-tab-map"]').exists()).toBe(false)
+    expect(
+      wrapper.find('[data-testid="groups-tabs-panel"] [data-testid="group-nearby-list"]').exists()
+    ).toBe(true)
   })
 })

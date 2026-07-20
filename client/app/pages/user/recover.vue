@@ -3,7 +3,10 @@ import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '~/stores/auth.js'
 
-definePageMeta({ layout: 'plain' })
+// legacy forgot-password.blade.php shows just a centered logo, no impact-
+// stats bar - unlike the other plain-layout pages (login/register/reset) -
+// see layouts/plain-minimal.vue's own doc comment.
+definePageMeta({ layout: 'plain-minimal' })
 
 const { t } = useI18n()
 useHead({ title: t('auth.forgotten_pw') })

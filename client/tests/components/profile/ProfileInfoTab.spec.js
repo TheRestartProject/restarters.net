@@ -34,8 +34,25 @@ const PROFILE_RESPONSE = {
   ages: ['1990'],
 }
 
+// lang/en/profile.php gained `other_profile` alongside this Nuxt work (RES
+// gap-closure pass, gap 7) but client/i18n/locales/en.json is a generated,
+// checked-in artifact this change intentionally leaves untouched (php
+// artisan translations:export-client) - overlay the new key here so the
+// spec doesn't depend on regenerating it. Same convention as
+// PublicProfileView.spec.js's users.view_profile_on_talk/not_on_talk overlay.
+const messages = {
+  en: {
+    ...en,
+    ...clientEn,
+    profile: {
+      ...en.profile,
+      other_profile: "{name}'s profile",
+    },
+  },
+}
+
 function mountComponent(props = {}) {
-  const i18n = createI18n({ legacy: false, locale: 'en', messages: { en: { ...en, ...clientEn } } })
+  const i18n = createI18n({ legacy: false, locale: 'en', messages })
 
   return mount(ProfileInfoTab, {
     props,
@@ -111,7 +128,33 @@ describe('components/profile/ProfileInfoTab', () => {
     expect(wrapper.find('[data-testid="profile-email-error"]').text()).toBe('The email has already been taken.')
   })
 
+  it('shows the own-profile <h3> heading', async () => {
+    profileStore.fetchProfileInfo = vi.fn().mockResolvedValue(PROFILE_RESPONSE)
+    profileStore.info.data = PROFILE_RESPONSE
+
+    const wrapper = mountComponent()
+    await Promise.resolve()
+    await Promise.resolve()
+
+    const heading = wrapper.find('[data-testid="profile-info-heading"]')
+    expect(heading.element.tagName).toBe('H3')
+    expect(heading.text()).toBe('Your profile')
+  })
+
   describe('editing someone else\'s profile (isOwnProfile: false)', () => {
+    it('shows an <h4> "X\'s profile" heading instead of the own-profile <h3>, matching the legacy conditional', async () => {
+      profileStore.fetchUserProfile = vi.fn().mockResolvedValue(PROFILE_RESPONSE)
+      profileStore.userProfile.data = PROFILE_RESPONSE
+
+      const wrapper = mountComponent({ targetId: 42, isOwnProfile: false })
+      await Promise.resolve()
+      await Promise.resolve()
+
+      const heading = wrapper.find('[data-testid="profile-info-heading"]')
+      expect(heading.element.tagName).toBe('H4')
+      expect(heading.text()).toBe("Jane's profile")
+    })
+
     it('fetches via fetchUserProfile(targetId) and saves via updateUserProfile(targetId, payload), not the me/* actions', async () => {
       profileStore.fetchUserProfile = vi.fn().mockResolvedValue(PROFILE_RESPONSE)
       profileStore.userProfile.data = PROFILE_RESPONSE

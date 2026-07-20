@@ -2,15 +2,16 @@
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useGroupRole } from '../../composables/useGroupRole.js'
+import { useUploadedImageUrl } from '../../composables/useUploadedImageUrl.js'
 import GroupJoinButton from './GroupJoinButton.vue'
 import GroupsTableFilters from './GroupsTableFilters.vue'
 
-// Sortable groups table shared by /group (mine) and /group/all
-// (resources/js/components/GroupsTable.vue is the functional spec - column
-// set and sort behaviour, not markup/styling).
+// Sortable groups table shared by /group (mine), /group/nearby, /group/all
+// and /group/map (resources/js/components/GroupsTable.vue is the functional
+// spec - column set, icon-only headers and sort behaviour, not just markup).
 //
-// Rows are pre-normalised by the page: {id, name, archivedAt, role,
-// location: {location, country} | null, hosts, restarters,
+// Rows are pre-normalised by the page: {id, name, archivedAt, role, image,
+// tags, location: {location, country} | null, hosts, restarters,
 // nextEvent: {start} | null, isMember}. Any optional field may be
 // null/undefined (e.g. All Groups rows only get location/hosts/restarters/
 // nextEvent once GroupsStore#fetchDetails has hydrated them - see
@@ -25,6 +26,13 @@ const props = defineProps({
     default: () => ({ location: true, hosts: true, restarters: true, next_event: true }),
   },
   showRole: {
+    type: Boolean,
+    default: false,
+  },
+  // Tag badges under the group name (legacy: Administrator/NetworkCoordinator
+  // only, gated by the page - GET /api/v2/groups/{id}'s `tags` is already
+  // filtered server-side to what the caller's role may see).
+  showTags: {
     type: Boolean,
     default: false,
   },
@@ -54,26 +62,36 @@ const emit = defineEmits(['update:hoveredId'])
 
 const { t, locale } = useI18n()
 const { roleLabelKey, roleVariant } = useGroupRole()
+const { uploadedImageUrl } = useUploadedImageUrl()
+
+const DEFAULT_PROFILE = '/images/placeholder-avatar.webp'
+
+function imageSrc(row) {
+  return uploadedImageUrl(row.image) || DEFAULT_PROFILE
+}
 
 const sortKey = ref('name')
 const sortDesc = ref(false)
 
-const filters = ref({ name: '', location: '', country: '', tags: '' })
+const filters = ref({ name: '', location: '', country: '', tags: '', network: '' })
 
 function matchesFilters(row) {
   const f = filters.value
   const has = (haystack, needle) =>
     !needle || String(haystack || '').toLowerCase().includes(needle.toLowerCase())
 
-  const tagText = Array.isArray(row.tags)
-    ? row.tags.map((tag) => tag?.tag_name ?? tag?.name ?? tag).join(' ')
-    : (row.tags || '')
+  // Tag/network dropdowns filter by id (row.tagIds/row.networkIds - the
+  // names-index's tag_ids/network_ids, available immediately rather than
+  // waiting on per-row hydration - see pages/group/all.vue's `rows`
+  // computed), not by matching display text.
+  const matchesId = (ids, needle) => !needle || (Array.isArray(ids) && ids.map(String).includes(String(needle)))
 
   return (
     has(row.name, f.name) &&
     has(row.location?.location, f.location) &&
     has(row.location?.country, f.country) &&
-    has(tagText, f.tags)
+    matchesId(row.tagIds, f.tags) &&
+    matchesId(row.networkIds, f.network)
   )
 }
 
@@ -133,72 +151,116 @@ function dateLabel(iso) {
   return new Date(iso).toLocaleDateString(locale.value, { day: 'numeric', month: 'short', year: 'numeric' })
 }
 
-function sortIndicator(key) {
-  // Every column is sortable, so show a neutral up/down affordance on the
-  // inactive ones (matching legacy, where all headers carried a sort arrow)
-  // and the resolved direction on the active one.
-  if (sortKey.value !== key) return '↕'
-  return sortDesc.value ? '▼' : '▲'
+function sortCaretClass(key) {
+  // Every column is sortable. Legacy (bootstrap-vue's b-table) shows a
+  // paired up/down arrow glyph next to every sortable header, darkening
+  // whichever direction is currently active; render the same paired
+  // up+down carets here (the .sort-carets/.sort-caret markup/styles below)
+  // rather than a single directional triangle, and darken the resolved
+  // direction - a CSS caret rather than a unicode character embedded in
+  // the (icon-only, gap #4) header label.
+  if (sortKey.value !== key) return ''
+  return sortDesc.value ? 'sort-carets--desc' : 'sort-carets--asc'
 }
 </script>
 
 <template>
   <div data-testid="groups-table">
-    <GroupsTableFilters v-if="showFilters" @update:filters="filters = $event" />
-    <table class="table">
+    <GroupsTableFilters
+      v-if="showFilters"
+      :groups="groups"
+      :show-tags="showTags"
+      @update:filters="filters = $event"
+    />
+    <table class="table groups-table">
       <thead>
         <tr>
+          <th class="groups-table-photo-col">
+            <span class="visually-hidden">{{ t('groups.group_image') }}</span>
+          </th>
           <th>
-            <button type="button" class="sort-header" data-testid="groups-table-sort-name" @click="sortBy('name')">
-              {{ t('groups.groups_name') }} {{ sortIndicator('name') }}
+            <button
+              type="button"
+              class="sort-header"
+              :aria-label="t('groups.groups_name')"
+              data-testid="groups-table-sort-name"
+              @click="sortBy('name')"
+            >
+              <img src="/icons/group_name_ico.svg" alt="" class="col-icon">
+              <span class="sort-carets" :class="sortCaretClass('name')" aria-hidden="true">
+                <span class="sort-caret sort-caret--up" />
+                <span class="sort-caret sort-caret--down" />
+              </span>
             </button>
           </th>
           <th v-if="optionalColumns.location">
             <button
               type="button"
               class="sort-header"
+              :aria-label="t('client.groups.column_location')"
               data-testid="groups-table-sort-location"
               @click="sortBy('location')"
             >
-              {{ t('client.groups.column_location') }} {{ sortIndicator('location') }}
+              <img src="/icons/map_marker_ico.svg" alt="" class="col-icon">
+              <span class="sort-carets" :class="sortCaretClass('location')" aria-hidden="true">
+                <span class="sort-caret sort-caret--up" />
+                <span class="sort-caret sort-caret--down" />
+              </span>
             </button>
           </th>
           <th v-if="optionalColumns.hosts">
             <button
               type="button"
               class="sort-header"
+              :aria-label="t('client.groups.column_hosts')"
               data-testid="groups-table-sort-hosts"
               @click="sortBy('hosts')"
             >
-              {{ t('client.groups.column_hosts') }} {{ sortIndicator('hosts') }}
+              <img src="/icons/user_ico.svg" alt="" class="col-icon col-icon--small">
+              <span class="sort-carets" :class="sortCaretClass('hosts')" aria-hidden="true">
+                <span class="sort-caret sort-caret--up" />
+                <span class="sort-caret sort-caret--down" />
+              </span>
             </button>
           </th>
           <th v-if="optionalColumns.restarters">
             <button
               type="button"
               class="sort-header"
+              :aria-label="t('client.groups.column_restarters')"
               data-testid="groups-table-sort-restarters"
               @click="sortBy('restarters')"
             >
-              {{ t('client.groups.column_restarters') }} {{ sortIndicator('restarters') }}
+              <img src="/icons/volunteer_ico-thick.svg" alt="" class="col-icon">
+              <span class="sort-carets" :class="sortCaretClass('restarters')" aria-hidden="true">
+                <span class="sort-caret sort-caret--up" />
+                <span class="sort-caret sort-caret--down" />
+              </span>
             </button>
           </th>
           <th v-if="optionalColumns.next_event">
             <button
               type="button"
               class="sort-header"
+              :aria-label="t('client.groups.column_next_event')"
               data-testid="groups-table-sort-next_event"
               @click="sortBy('next_event')"
             >
-              {{ t('client.groups.column_next_event') }} {{ sortIndicator('next_event') }}
+              <img src="/icons/events_ico.svg" alt="" class="col-icon">
+              <span class="sort-carets" :class="sortCaretClass('next_event')" aria-hidden="true">
+                <span class="sort-caret sort-caret--up" />
+                <span class="sort-caret sort-caret--down" />
+              </span>
             </button>
           </th>
-          <th v-if="showJoin" />
+          <th v-if="showJoin">
+            <span class="visually-hidden">{{ t('groups.join_group_button') }}</span>
+          </th>
         </tr>
       </thead>
       <tbody>
         <tr v-if="!sortedGroups.length" data-testid="groups-table-empty">
-          <td :colspan="6">
+          <td :colspan="7">
             {{ t('client.groups.no_results') }}
           </td>
         </tr>
@@ -210,6 +272,9 @@ function sortIndicator(key) {
           @mouseenter="emit('update:hoveredId', row.id)"
           @mouseleave="emit('update:hoveredId', null)"
         >
+          <td class="groups-table-photo-col">
+            <img :src="imageSrc(row)" alt="" class="group-photo" :data-testid="`group-row-photo-${row.id}`">
+          </td>
           <td>
             <NuxtLink :to="`/group/view/${row.id}`" :data-testid="`group-row-link-${row.id}`">
               {{ row.name }}
@@ -230,6 +295,16 @@ function sortIndicator(key) {
                 :data-testid="`group-row-archived-${row.id}`"
               >
                 {{ t('groups.archived_group') }}
+              </BBadge>
+            </div>
+            <div v-if="showTags && row.tags && row.tags.length" class="mt-1" :data-testid="`group-row-tags-${row.id}`">
+              <BBadge
+                v-for="tag in row.tags"
+                :key="tag.id"
+                variant="secondary"
+                class="me-1 tag-badge"
+              >
+                {{ tag.tag_name ?? tag.name }}
               </BBadge>
             </div>
           </td>
@@ -260,11 +335,76 @@ function sortIndicator(key) {
 
 <style scoped lang="scss">
 .sort-header {
+  display: inline-flex;
+  align-items: center;
   background: none;
   border: 0;
   padding: 0;
   font-weight: bold;
   cursor: pointer;
+}
+
+.col-icon {
+  width: 30px;
+  height: 30px;
+}
+
+.col-icon--small {
+  width: 25px;
+  height: 25px;
+}
+
+// Paired up/down carets, matching legacy's b-table sortable-header icon
+// (both arrows always shown; the active direction darkens, the other stays
+// muted) rather than a single directional triangle.
+.sort-carets {
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: center;
+  margin-left: 4px;
+  vertical-align: middle;
+}
+
+.sort-caret {
+  display: block;
+  width: 0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+}
+
+.sort-caret--up {
+  border-bottom: 5px solid #adb5bd;
+  margin-bottom: 2px;
+}
+
+.sort-caret--down {
+  border-top: 5px solid #adb5bd;
+}
+
+.sort-carets--asc .sort-caret--up {
+  border-bottom-color: #000;
+}
+
+.sort-carets--desc .sort-caret--down {
+  border-top-color: #000;
+}
+
+.groups-table-photo-col {
+  width: 90px;
+}
+
+.group-photo {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border: 1px solid #000;
+}
+
+.tag-badge {
+  font-size: 0.75rem;
+  font-weight: normal;
+  padding: 0.2em 0.5em;
 }
 
 .group-row-hovered {

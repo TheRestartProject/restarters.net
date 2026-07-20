@@ -13,6 +13,7 @@ import GroupVolunteers from '~/components/groups/GroupVolunteers.vue'
 import GroupEventsList from '~/components/groups/GroupEventsList.vue'
 import GroupInviteModal from '~/components/groups/GroupInviteModal.vue'
 import GroupShareStatsModal from '~/components/groups/GroupShareStatsModal.vue'
+import StatsShareImageModal from '~/components/events/StatsShareImageModal.vue'
 import GroupCollapsibleSection from '~/components/groups/GroupCollapsibleSection.vue'
 
 // /group/view/[id] - resources/views/group/view.blade.php +
@@ -85,13 +86,29 @@ const strippedDescription = computed(() => {
 
 const showReadMore = computed(() => strippedDescription.value.length > DESCRIPTION_LIMIT)
 
+// StatsImpact.vue's :count="Math.round(stats.co2_total)" passed to
+// StatsShareModal - the CO2e total the canvas image's headline/visualisation
+// are built from.
+const shareImageCount = computed(() => Math.round(groupsStore.stats.data?.group_stats?.co2_total ?? 0))
+
 const truncatedDescription = computed(() => {
   if (!showReadMore.value) return strippedDescription.value
   return strippedDescription.value.substring(0, DESCRIPTION_LIMIT) + '...'
 })
 
 const showInvite = ref(false)
+// GroupShareStatsModal (the header's "Share group stats" dropdown item -
+// GroupActions.vue's @share-stats) is the embed-code modal. StatsShareImage-
+// Modal (GroupStats.vue's own CO2-card "Share this" button - a SEPARATE
+// @share-stats emit on a different component) is develop's canvas-painted
+// social-image generator (StatsImpact.vue's `share` handler opened
+// StatsShareModal, not the embed modal) - two different features that
+// happen to share an event name on their respective emitters. Imported from
+// components/events/ because the canvas painter/modal pair has no group- or
+// event-specific logic (only the `count` prop differs) and was shared
+// unchanged between the two pages in develop too.
 const showShareStats = ref(false)
+const showShareImage = ref(false)
 const confirmingArchive = ref(false)
 const archiving = ref(false)
 
@@ -322,7 +339,7 @@ onMounted(() => {
         :stats="groupsStore.stats.data"
         :loading="groupsStore.stats.loading"
         :error="!!groupsStore.stats.error"
-        @share-stats="showShareStats = true"
+        @share-stats="showShareImage = true"
       />
 
       <hr>
@@ -348,6 +365,11 @@ onMounted(() => {
         :group-id="id"
         :group-name="group.name"
         @close="showShareStats = false"
+      />
+      <StatsShareImageModal
+        :show="showShareImage"
+        :count="shareImageCount"
+        @close="showShareImage = false"
       />
     </template>
   </div>

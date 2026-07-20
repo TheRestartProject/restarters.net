@@ -94,16 +94,22 @@ class APIv2DashboardTest extends TestCase
         $this->assertEquals('My Group0', $entry['name']);
         $this->assertEquals(\App\Role::HOST, $entry['role']);
         $this->assertFalse($entry['archived']);
+        $this->assertNull($entry['archived_at']);
         $this->assertNull($entry['image_url']);
 
-        // Archive it and confirm the flag flips.
-        Group::find($idgroups)->update(['archived_at' => now()]);
+        // Archive it and confirm the flag (and archived_at, which GroupArchivedBadge-equivalent
+        // UI needs to render the archived-since date) both flip. archived_at is a DATE column
+        // (see database/migrations/2024_08_27_123452_group_archive.php), so the time-of-day is
+        // truncated on save - compare against midnight, matching Group.php's own convention.
+        $archivedAt = now()->startOfDay();
+        Group::find($idgroups)->update(['archived_at' => $archivedAt]);
         $this->app['auth']->forgetGuards();
         $this->actingAs($host);
 
         $response = $this->get('/api/v2/dashboard?api_token=dash-tok-3');
         $entry = collect($response->json('data.your_groups'))->firstWhere('id', $idgroups);
         $this->assertTrue($entry['archived']);
+        $this->assertEquals($archivedAt->toIso8601String(), $entry['archived_at']);
     }
 
     public function testYourGroupsCappedAtFive(): void

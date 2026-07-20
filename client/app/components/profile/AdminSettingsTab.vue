@@ -81,7 +81,7 @@ async function save() {
 </script>
 
 <template>
-  <div data-testid="admin-settings-tab">
+  <div class="edit-panel" data-testid="admin-settings-tab">
     <h4>{{ t('auth.profile_admin') }}</h4>
     <p>{{ t('auth.profile_admin_text') }}</p>
 
@@ -98,7 +98,8 @@ async function save() {
         <div class="col-lg-6">
           <BFormGroup :label="`${t('auth.user_role')}:`" label-for="admin-role-select">
             <BFormSelect id="admin-role-select" v-model="role" data-testid="admin-role-select">
-              <option v-for="r in data.roles" :key="r.value" :value="r.value">{{ r.label }}</option>
+              <option :value="null" disabled>{{ t('auth.choose_role') }}</option>
+              <option v-for="r in data.roles" :key="r.value" :value="r.value">{{ t(r.label) }}</option>
             </BFormSelect>
           </BFormGroup>
         </div>

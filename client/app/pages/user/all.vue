@@ -2,6 +2,7 @@
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAuth } from '~/composables/useAuth.js'
+import { useClipboard } from '~/composables/useClipboard.js'
 import { useUsersStore } from '~/stores/users.js'
 import { useAdminRefdataStore } from '~/stores/adminRefdata.js'
 import AdminSettingsTab from '~/components/profile/AdminSettingsTab.vue'
@@ -27,12 +28,22 @@ import AdminSettingsTab from '~/components/profile/AdminSettingsTab.vue'
 // filter (gap 24) reuses the same permissions catalogue as
 // AdminSettingsTab's checkbox matrix (useAdminRefdataStore, already fetched
 // for /role's RolesPage) rather than duplicating a fetch in this store.
+//
+// parity-v2/admin-and-static.md gap 8 (distinct numbering from the gaps
+// referenced just above, which are from an earlier findings pass): legacy's
+// user list has no per-row quick-role-edit action, only the Name link to a
+// full /user/edit/{id} page. KEPT here rather than removed - the Name link
+// already reaches the same role editor (ProfileTabs.vue's AdminSettingsTab,
+// shown to admins on /profile/edit/{id}), so this button is a redundant
+// but non-regressive shortcut, not a capability legacy lacks. Flagged for a
+// product-owner call per that gap's own suggested resolution.
 definePageMeta({ auth: true, role: 'Administrator' })
 
 const { t, tm } = useI18n()
 useHead({ title: t('users.title') })
 
 const { hasRole } = useAuth()
+const { copy } = useClipboard()
 const usersStore = useUsersStore()
 const adminRefdataStore = useAdminRefdataStore()
 
@@ -48,6 +59,12 @@ const sortDesc = ref(false)
 
 const editingUserId = ref(null)
 const editingUserName = ref('')
+
+// Gap 6: legacy's filter <aside> is a Bootstrap collapse, hidden by default
+// below the md breakpoint and toggled by a "Reveal filters" button (with an
+// inline close control inside the panel) - this page rendered it as an
+// always-visible, non-collapsible block on every screen size.
+const filtersOpen = ref(false)
 
 const columns = [
   { key: 'name', labelKey: 'users.name', sortKey: 'name' },
@@ -72,9 +89,12 @@ const countryOptions = computed(() => {
   return [{ value: '', text: '' }, ...options]
 })
 
+// Role names ("Restarter", "Administrator", ...) are the raw roles.role DB
+// column value - see PublicProfileView.vue's doc comment for why t() is
+// required (they're themselves top-level i18n keys).
 const roleOptions = computed(() => [
   { value: '', text: t('users.role_any') },
-  ...usersStore.roles.data.map((r) => ({ value: r.id, text: r.name })),
+  ...usersStore.roles.data.map((r) => ({ value: r.id, text: t(r.name) })),
 ])
 
 const permissionOptions = computed(() =>
@@ -130,20 +150,6 @@ function sortIndicator(column) {
   return sortDesc.value ? '▼' : '▲'
 }
 
-function previousPage() {
-  const current = usersStore.list.meta.current_page
-  if (current > 1) {
-    fetch(current - 1)
-  }
-}
-
-function nextPage() {
-  const current = usersStore.list.meta.current_page
-  if (current < usersStore.list.meta.last_page) {
-    fetch(current + 1)
-  }
-}
-
 function humanise(iso) {
   if (!iso) return t('users.never')
   try {
@@ -151,6 +157,20 @@ function humanise(iso) {
   } catch {
     return iso
   }
+}
+
+// Gap 9: legacy truncates the email cell to 15 chars (Str::limit) and wraps
+// it in a hover popover offering "Click/press to copy" - reused here as a
+// native title tooltip (shows the full address on hover) plus a click
+// handler through the shared useClipboard composable, rather than building
+// a bespoke Bootstrap popover for a single cell.
+function truncateEmail(email) {
+  if (!email) return ''
+  return email.length > 15 ? `${email.slice(0, 15)}...` : email
+}
+
+function copyEmail(email) {
+  copy(email)
 }
 
 function openRoleModal(row) {
@@ -253,9 +273,28 @@ onMounted(() => {
       </BButton>
     </div>
 
+    <!-- Gap 6: mobile-only "Reveal filters" toggle for the collapsible
+         filter panel below - always visible from md upward, matching
+         legacy's d-md-none reveal button. -->
+    <button
+      type="button"
+      class="btn btn-secondary d-md-none mb-3 w-100"
+      data-testid="users-filter-reveal"
+      @click="filtersOpen = !filtersOpen"
+    >
+      {{ t('client.users.reveal_filters') }}
+    </button>
+
     <div class="row">
       <div class="col-md-4 col-lg-3">
-        <aside class="panel p-3">
+        <aside class="panel p-3 d-md-block" :class="{ 'd-none': !filtersOpen }" data-testid="users-filter-panel">
+          <button
+            type="button"
+            class="btn-close d-md-none float-end"
+            aria-label="Close"
+            data-testid="users-filter-close"
+            @click="filtersOpen = false"
+          />
           <form data-testid="users-filter-form" @submit.prevent="applyFilters">
             <div class="mb-3">
               <label class="form-label" for="filter-name">{{ t('users.name') }}</label>
@@ -344,7 +383,7 @@ onMounted(() => {
 
         <template v-else>
           <div class="table-responsive panel">
-            <table class="table" data-testid="users-table">
+            <table class="table table-striped" data-testid="users-table">
               <thead>
                 <tr>
                   <th v-for="column in columns" :key="column.key">
@@ -372,10 +411,30 @@ onMounted(() => {
                       {{ row.name }}
                     </NuxtLink>
                   </td>
-                  <td>{{ row.email }}</td>
-                  <td>{{ row.role_name }}</td>
-                  <td>{{ row.location }}</td>
+                  <td>
+                    <span
+                      class="hover-pointer"
+                      role="button"
+                      tabindex="0"
+                      :title="`${row.email} - ${t('client.users.click_to_copy')}`"
+                      :data-testid="`users-row-email-${row.id}`"
+                      @click="copyEmail(row.email)"
+                      @keydown.enter="copyEmail(row.email)"
+                    >{{ truncateEmail(row.email) }}</span>
+                  </td>
+                  <td>{{ t(row.role_name) }}</td>
+                  <td>{{ row.location || t('users.location_na') }}</td>
                   <td>{{ row.country_name }}</td>
+                  <!-- parity-v2/admin-and-static.md gap 10: legacy wraps this
+                       count in a hover popover listing the member's actual
+                       group names (partials/usergroups-popover.blade.php).
+                       Left as a bare count - BACKEND GAP: UserAdmin (API\
+                       UserController::listUsersv2) only returns
+                       `groups_count` (withCount('groups')), never the group
+                       names themselves, so there's nothing to render in a
+                       popover without faking data; needs a
+                       `groups: [{id, name}]` (or similar) field added
+                       server-side first. -->
                   <td>{{ row.groups_count }}</td>
                   <td :title="row.created_at">{{ humanise(row.created_at) }}</td>
                   <td :title="row.last_login_at">{{ humanise(row.last_login_at) }}</td>
@@ -393,27 +452,21 @@ onMounted(() => {
               </tbody>
             </table>
 
-            <div class="d-flex justify-content-between align-items-center mt-3" data-testid="users-pagination">
-              <BButton
-                variant="secondary"
-                :disabled="usersStore.list.meta.current_page <= 1"
-                data-testid="users-pagination-prev"
-                @click="previousPage"
-              >
-                {{ t('client.groups.previous_page') }}
-              </BButton>
-              <span data-testid="users-pagination-indicator">
-                {{ t('client.groups.page_of', { page: usersStore.list.meta.current_page, total: usersStore.list.meta.last_page }) }}
-              </span>
-              <BButton
-                variant="secondary"
-                :disabled="usersStore.list.meta.current_page >= usersStore.list.meta.last_page"
-                data-testid="users-pagination-next"
-                @click="nextPage"
-              >
-                {{ t('client.groups.next_page') }}
-              </BButton>
-            </div>
+            <!-- Gap 7: legacy uses Laravel's full numbered paginator
+                 ($userlist->links()), letting users jump directly to any
+                 page - a bare Previous/Next pair can't. Same BPagination
+                 widget used elsewhere for this (pages/notifications.vue,
+                 DevicesSearchTable.vue). -->
+            <BPagination
+              v-if="usersStore.list.meta.last_page > 1"
+              :model-value="usersStore.list.meta.current_page"
+              :total-rows="usersStore.list.meta.total"
+              :per-page="usersStore.list.meta.per_page"
+              align="center"
+              class="mt-3"
+              data-testid="users-pagination"
+              @update:model-value="fetch"
+            />
 
             <p v-if="usersStore.list.meta.total > 0" class="text-center mt-2" data-testid="users-showing">
               {{ t('users.showing', { from: usersStore.list.meta.from, to: usersStore.list.meta.to, total: usersStore.list.meta.total }) }}
@@ -467,7 +520,7 @@ onMounted(() => {
         <BFormGroup :label="`${t('users.role')}:`" label-for="create-user-role">
           <BFormSelect id="create-user-role" v-model="createForm.role" required data-testid="create-user-role">
             <option value="" />
-            <option v-for="r in usersStore.roles.data" :key="r.id" :value="r.id">{{ r.name }}</option>
+            <option v-for="r in usersStore.roles.data" :key="r.id" :value="r.id">{{ t(r.name) }}</option>
           </BFormSelect>
           <div v-if="createFieldError('role')" class="invalid-feedback d-block" data-testid="create-user-role-error">
             {{ createFieldError('role') }}
@@ -513,6 +566,10 @@ onMounted(() => {
   border: 0;
   padding: 0;
   font-weight: bold;
+  cursor: pointer;
+}
+
+.hover-pointer {
   cursor: pointer;
 }
 </style>

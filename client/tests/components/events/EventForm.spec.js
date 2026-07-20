@@ -52,6 +52,17 @@ const BFormCheckboxStub = {
   template:
     '<label><input type="checkbox" :checked="modelValue" v-bind="$attrs" @change="$emit(\'update:modelValue\', $event.target.checked)" /><slot /></label>',
 }
+const BCardStub = { template: '<div><slot /></div>' }
+const BCardHeaderStub = { template: '<div><slot /></div>' }
+const BCardBodyStub = { template: '<div><slot /></div>' }
+// Stands in for GroupNetworkData.vue (unit-tested on its own, and reused
+// as-is here rather than duplicated - see EventForm.vue's import comment) -
+// same stub shape tests/components/groups/GroupForm.spec.js uses for it.
+const GroupNetworkDataStub = {
+  props: ['modelValue'],
+  emits: ['update:modelValue'],
+  template: '<div data-testid="stub-group-network-data" />',
+}
 
 const GLOBAL_STUBS = {
   RichTextEditor: RichTextEditorStub,
@@ -61,6 +72,10 @@ const GLOBAL_STUBS = {
   BAlert: BAlertStub,
   BButton: BButtonStub,
   BFormCheckbox: BFormCheckboxStub,
+  BCard: BCardStub,
+  BCardHeader: BCardHeaderStub,
+  BCardBody: BCardBodyStub,
+  GroupNetworkData: GroupNetworkDataStub,
 }
 
 function mountForm(props = {}) {
@@ -117,12 +132,13 @@ describe('components/events/EventForm', () => {
     })
 
     it('submits the exact payload field names createEventv2 expects and emits created', async () => {
+      groupsStore.fetchDetails = vi.fn().mockResolvedValue({ timezone: 'Europe/London', location: null })
+
       const store = useEventsStore()
       store.createEvent = vi.fn().mockResolvedValue(42)
 
       const wrapper = mountForm({ groups: [{ id: 9, name: 'Acme Restarters' }] })
       await fillRequiredFields(wrapper)
-      await wrapper.find('[data-testid="event-form-timezone"]').setValue('Europe/London')
       await wrapper.find('[data-testid="event-form"]').trigger('submit')
       await wrapper.vm.$nextTick()
 
@@ -135,6 +151,7 @@ describe('components/events/EventForm', () => {
         online: false,
         link: null,
         timezone: 'Europe/London',
+        network_data: '{}',
         groupid: 9,
       })
       expect(wrapper.emitted('created')).toEqual([[42]])
@@ -210,10 +227,10 @@ describe('components/events/EventForm', () => {
       expect(wrapper.find('[data-testid="event-form-group"]').element.value).toBe('9')
     })
 
-    it('defaults the timezone from the selected group and lets it be overridden', async () => {
+    it('defaults the timezone from the selected group and lets it be overridden (admin only - see the admin-only card test below)', async () => {
       groupsStore.fetchDetails = vi.fn().mockResolvedValue({ timezone: 'Europe/Paris', location: { location: 'Paris HQ' } })
 
-      const wrapper = mountForm({ groups: [{ id: 9, name: 'Acme Restarters' }, { id: 10, name: 'Other Group' }] })
+      const wrapper = mountForm({ isAdmin: true, groups: [{ id: 9, name: 'Acme Restarters' }, { id: 10, name: 'Other Group' }] })
       await wrapper.find('[data-testid="event-form-group"]').setValue('9')
       await wrapper.vm.$nextTick()
       await wrapper.vm.$nextTick()
@@ -254,6 +271,40 @@ describe('components/events/EventForm', () => {
       const wrapper = mountForm({ groups: [{ id: 9, name: 'Acme Restarters' }], isAdmin: true })
       expect(wrapper.find('[data-testid="event-approve"]').exists()).toBe(false)
     })
+
+    it('shows the admin-only card (network_data editor + timezone override) for an admin, even while creating', () => {
+      const wrapper = mountForm({ groups: [{ id: 9, name: 'Acme Restarters' }], isAdmin: true })
+
+      expect(wrapper.find('[data-testid="event-form-admin"]').exists()).toBe(true)
+      expect(wrapper.find('[data-testid="event-form-timezone"]').exists()).toBe(true)
+      expect(wrapper.findComponent(GroupNetworkDataStub).exists()).toBe(true)
+    })
+
+    it('hides the admin-only card and the timezone override for a non-admin', () => {
+      const wrapper = mountForm({ groups: [{ id: 9, name: 'Acme Restarters' }], isAdmin: false })
+
+      expect(wrapper.find('[data-testid="event-form-admin"]').exists()).toBe(false)
+      expect(wrapper.find('[data-testid="event-form-timezone"]').exists()).toBe(false)
+    })
+
+    it('submits network_data edited via the admin-only card', async () => {
+      const store = useEventsStore()
+      store.createEvent = vi.fn().mockResolvedValue(42)
+
+      const wrapper = mountForm({ groups: [{ id: 9, name: 'Acme Restarters' }], isAdmin: true })
+      await fillRequiredFields(wrapper)
+      await wrapper.findComponent(GroupNetworkDataStub).vm.$emit('update:modelValue', { widgets: '3' })
+      await wrapper.find('[data-testid="event-form"]').trigger('submit')
+      await wrapper.vm.$nextTick()
+
+      expect(store.createEvent.mock.calls[0][0].network_data).toBe(JSON.stringify({ widgets: '3' }))
+    })
+
+    it('shows the "before submit" notice beside the create button', () => {
+      const wrapper = mountForm({ groups: [{ id: 9, name: 'Acme Restarters' }] })
+
+      expect(wrapper.find('[data-testid="event-form-notice"]').text()).toContain('made public')
+    })
   })
 
   describe('edit mode', () => {
@@ -287,6 +338,19 @@ describe('components/events/EventForm', () => {
 
       expect(wrapper.find('[data-testid="event-form-group"]').exists()).toBe(false)
       expect(wrapper.text()).toContain('Acme Restarters')
+    })
+
+    it('shows the admin-only card for an admin while editing too, prefilled with the event\'s network_data', () => {
+      const wrapper = mountForm({ eventId: 5, initialEvent: EVENT, isAdmin: true })
+
+      expect(wrapper.find('[data-testid="event-form-admin"]').exists()).toBe(true)
+      expect(wrapper.findComponent(GroupNetworkDataStub).props('modelValue')).toEqual({ dummy: 'value' })
+    })
+
+    it('does not show the "before submit" notice while editing (create-only, per develop)', () => {
+      const wrapper = mountForm({ eventId: 5, initialEvent: EVENT })
+
+      expect(wrapper.find('[data-testid="event-form-notice"]').exists()).toBe(false)
     })
 
     it('submits without groupid, round-tripping network_data', async () => {
@@ -370,12 +434,12 @@ describe('components/events/EventForm', () => {
       expect(wrapper.find('[data-testid="event-form-group"]').element.value).toBe('9')
     })
 
-    it('submits as a create (groupid, no network_data/moderate) once the date is filled in', async () => {
+    it('submits as a create (groupid, no moderate) once the date is filled in, round-tripping the source event\'s network_data', async () => {
       const store = useEventsStore()
       store.createEvent = vi.fn().mockResolvedValue(99)
 
       const wrapper = mountForm({
-        initialEvent: SOURCE_EVENT,
+        initialEvent: { ...SOURCE_EVENT, network_data: { widgets: '3' } },
         isDuplicate: true,
         groups: [{ id: 9, name: 'Acme Restarters' }],
       })
@@ -384,9 +448,8 @@ describe('components/events/EventForm', () => {
       await wrapper.vm.$nextTick()
 
       expect(store.createEvent).toHaveBeenCalledWith(
-        expect.objectContaining({ groupid: 9, start: '2026-09-01T09:00:00Z' })
+        expect.objectContaining({ groupid: 9, start: '2026-09-01T09:00:00Z', network_data: JSON.stringify({ widgets: '3' }) })
       )
-      expect(store.createEvent.mock.calls[0][0]).not.toHaveProperty('network_data')
       expect(store.createEvent.mock.calls[0][0]).not.toHaveProperty('moderate')
       expect(wrapper.emitted('created')).toEqual([[99]])
     })

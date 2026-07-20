@@ -16,6 +16,14 @@ import { useAdminRefdataStore } from '~/stores/adminRefdata.js'
 // drives an extra in-use warning in the delete modal - the legacy Vue
 // component didn't have this (its ConfirmModal only ever showed static
 // text), but the field is already there for the taking on every row.
+//
+// parity-v2/admin-and-static.md gap 13: legacy puts Delete on the edit page
+// itself (an unconfirmed plain link), not a table-row action with a confirm
+// step - AdminCrudTable.vue's row button + confirm modal is KEPT here as an
+// intentional safety improvement (and is what surfaces the groups_count
+// in-use warning above) rather than reverted to match legacy's unconfirmed
+// link. Flagged for a product-owner call per that gap's own suggested
+// resolution.
 definePageMeta({ auth: true, role: 'Administrator' })
 
 const { t } = useI18n()

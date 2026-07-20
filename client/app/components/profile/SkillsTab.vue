@@ -70,7 +70,7 @@ async function save() {
 </script>
 
 <template>
-  <div data-testid="skills-tab">
+  <div class="edit-panel" data-testid="skills-tab">
     <h4>{{ t('general.repair_skills') }}</h4>
     <p>{{ t('general.repair_skills_content') }}</p>
 

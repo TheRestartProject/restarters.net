@@ -52,4 +52,24 @@ describe('components/groups/GroupDevicesBreakdown', () => {
     expect(panel.find('img[src="/images/most-repaired_ico.svg"]').exists()).toBe(true)
     expect(panel.find('img[src="/images/least-repaired_ico.svg"]').exists()).toBe(true)
   })
+
+  it('shows fixed/repairable/dead as a percentage of the cluster total, not a word label (parity: breakdown figures)', () => {
+    const wrapper = mountComponent({ clusterStats: CLUSTER_STATS })
+
+    // fixed: 2, repairable: 1, dead: 0, total: 3.
+    const panel = wrapper.find('[data-testid="group-stats-cluster-1"]')
+    expect(panel.text()).toContain('66.67%')
+    expect(panel.text()).toContain('33.33%')
+    expect(panel.text()).not.toContain('Fixed')
+    expect(panel.text()).not.toContain('Repairable')
+    expect(panel.text()).not.toContain('End-of-life')
+
+    // most-seen/most-repaired/least-repaired keep their device-name subtitle.
+    expect(panel.text()).toContain('Laptop')
+  })
+
+  it('shows a divider between the fixed/repairable/dead trio and the most-seen/repaired trio (parity: divider)', () => {
+    const wrapper = mountComponent({ clusterStats: CLUSTER_STATS })
+    expect(wrapper.find('[data-testid="group-stats-cluster-1-divider"]').exists()).toBe(true)
+  })
 })

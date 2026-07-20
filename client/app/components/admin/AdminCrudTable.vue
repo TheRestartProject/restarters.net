@@ -1,5 +1,6 @@
 <script setup>
 import { computed, onMounted, reactive, ref } from 'vue'
+import AdminCrudFormField from './AdminCrudFormField.vue'
 
 // Generic reference-data CRUD table, built from PR #863's
 // resources/js/components/AdminCrudPage.vue prop contract (design.md §6.2
@@ -376,7 +377,7 @@ onMounted(load)
     </BAlert>
 
     <div v-else class="table-responsive">
-      <table class="table" :data-testid="`${testidPrefix}-table`">
+      <table class="table table-striped table-hover" :data-testid="`${testidPrefix}-table`">
         <thead>
           <tr>
             <th v-for="field in tableFields" :key="field.key">
@@ -441,53 +442,15 @@ onMounted(load)
       @hide="showCreate = false; resetCreateForm()"
     >
       <BForm :data-testid="`${testidPrefix}-create-form`" @submit.prevent="submitCreate">
-        <BFormGroup
+        <AdminCrudFormField
           v-for="field in formFields"
           :key="`create-${field.key}`"
-          :label="`${field.label}:`"
-          :label-for="`${testidPrefix}-create-${field.key}`"
-        >
-          <BFormSelect
-            v-if="field.type === 'select'"
-            :id="`${testidPrefix}-create-${field.key}`"
-            v-model="createForm[field.key]"
-            :data-testid="`${testidPrefix}-create-${field.key}`"
-          >
-            <option v-for="opt in field.options" :key="String(opt.value)" :value="opt.value">{{ opt.text }}</option>
-          </BFormSelect>
-          <textarea
-            v-else-if="field.type === 'textarea'"
-            :id="`${testidPrefix}-create-${field.key}`"
-            v-model="createForm[field.key]"
-            class="form-control"
-            :class="{ 'is-invalid': fieldError(createFieldErrors, field.key) }"
-            :rows="field.rows || 3"
-            :maxlength="field.maxLength"
-            :data-testid="`${testidPrefix}-create-${field.key}`"
-          />
-          <input
-            v-else-if="field.type === 'number'"
-            :id="`${testidPrefix}-create-${field.key}`"
-            v-model.number="createForm[field.key]"
-            type="number"
-            class="form-control"
-            :class="{ 'is-invalid': fieldError(createFieldErrors, field.key) }"
-            :data-testid="`${testidPrefix}-create-${field.key}`"
-          >
-          <input
-            v-else
-            :id="`${testidPrefix}-create-${field.key}`"
-            v-model="createForm[field.key]"
-            type="text"
-            class="form-control"
-            :class="{ 'is-invalid': fieldError(createFieldErrors, field.key) }"
-            :maxlength="field.maxLength"
-            :data-testid="`${testidPrefix}-create-${field.key}`"
-          >
-          <div v-if="fieldError(createFieldErrors, field.key)" class="invalid-feedback d-block" :data-testid="`${testidPrefix}-create-${field.key}-error`">
-            {{ fieldError(createFieldErrors, field.key) }}
-          </div>
-        </BFormGroup>
+          :field="field"
+          :model-value="createForm[field.key]"
+          :error="fieldError(createFieldErrors, field.key)"
+          :testid="`${testidPrefix}-create-${field.key}`"
+          @update:model-value="createForm[field.key] = $event"
+        />
         <p v-if="createError && !Object.keys(createFieldErrors).length" class="text-danger" :data-testid="`${testidPrefix}-create-error`">
           {{ createError }}
         </p>
@@ -508,53 +471,15 @@ onMounted(load)
       @hide="showEdit = false; resetEditForm()"
     >
       <BForm :data-testid="`${testidPrefix}-edit-form`" @submit.prevent="submitEdit">
-        <BFormGroup
+        <AdminCrudFormField
           v-for="field in formFields"
           :key="`edit-${field.key}`"
-          :label="`${field.label}:`"
-          :label-for="`${testidPrefix}-edit-${field.key}`"
-        >
-          <BFormSelect
-            v-if="field.type === 'select'"
-            :id="`${testidPrefix}-edit-${field.key}`"
-            v-model="editForm[field.key]"
-            :data-testid="`${testidPrefix}-edit-${field.key}`"
-          >
-            <option v-for="opt in field.options" :key="String(opt.value)" :value="opt.value">{{ opt.text }}</option>
-          </BFormSelect>
-          <textarea
-            v-else-if="field.type === 'textarea'"
-            :id="`${testidPrefix}-edit-${field.key}`"
-            v-model="editForm[field.key]"
-            class="form-control"
-            :class="{ 'is-invalid': fieldError(editFieldErrors, field.key) }"
-            :rows="field.rows || 3"
-            :maxlength="field.maxLength"
-            :data-testid="`${testidPrefix}-edit-${field.key}`"
-          />
-          <input
-            v-else-if="field.type === 'number'"
-            :id="`${testidPrefix}-edit-${field.key}`"
-            v-model.number="editForm[field.key]"
-            type="number"
-            class="form-control"
-            :class="{ 'is-invalid': fieldError(editFieldErrors, field.key) }"
-            :data-testid="`${testidPrefix}-edit-${field.key}`"
-          >
-          <input
-            v-else
-            :id="`${testidPrefix}-edit-${field.key}`"
-            v-model="editForm[field.key]"
-            type="text"
-            class="form-control"
-            :class="{ 'is-invalid': fieldError(editFieldErrors, field.key) }"
-            :maxlength="field.maxLength"
-            :data-testid="`${testidPrefix}-edit-${field.key}`"
-          >
-          <div v-if="fieldError(editFieldErrors, field.key)" class="invalid-feedback d-block" :data-testid="`${testidPrefix}-edit-${field.key}-error`">
-            {{ fieldError(editFieldErrors, field.key) }}
-          </div>
-        </BFormGroup>
+          :field="field"
+          :model-value="editForm[field.key]"
+          :error="fieldError(editFieldErrors, field.key)"
+          :testid="`${testidPrefix}-edit-${field.key}`"
+          @update:model-value="editForm[field.key] = $event"
+        />
         <p v-if="editError && !Object.keys(editFieldErrors).length" class="text-danger" :data-testid="`${testidPrefix}-edit-error`">
           {{ editError }}
         </p>

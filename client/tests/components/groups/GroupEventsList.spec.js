@@ -99,6 +99,28 @@ describe('components/groups/GroupEventsList', () => {
     expect(viewer.find('[data-testid="group-events-export"]').exists()).toBe(false)
   })
 
+  it('shows the group name + "Events" heading, with the calendar button beside it (parity: heading + icon)', () => {
+    const wrapper = mountComponent({ events: EVENTS, showCalendar: true })
+
+    const heading = wrapper.find('[data-testid="group-events-heading"]')
+    expect(heading.text()).toBe('Fixers United Events')
+
+    // The calendar-subscribe button sits next to the heading, not grouped
+    // with the export/add-event actions on the right.
+    const headingRow = heading.element.parentElement
+    expect(headingRow.querySelector('[data-testid="group-events-calendar"]')).not.toBeNull()
+  })
+
+  it('wraps the tab nav and panels in a bordered box (parity: tabs styling)', () => {
+    const wrapper = mountComponent({ events: EVENTS })
+
+    const box = wrapper.find('[data-testid="group-events-tabs"]')
+    expect(box.exists()).toBe(true)
+    expect(box.classes()).toContain('events-tabs')
+    expect(box.find('[data-testid="group-events-tab-upcoming"]').exists()).toBe(true)
+    expect(box.find('[data-testid="group-events-panel-upcoming"]').exists()).toBe(true)
+  })
+
   it('shows a calendar-subscribe button and modal only when showCalendar is true (gap 5)', async () => {
     const hidden = mountComponent({ events: EVENTS, showCalendar: false })
     expect(hidden.find('[data-testid="group-events-calendar"]').exists()).toBe(false)

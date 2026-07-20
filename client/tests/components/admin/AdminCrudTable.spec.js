@@ -1,4 +1,5 @@
 import { flushPromises, mount } from '@vue/test-utils'
+import { createI18n } from 'vue-i18n'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import AdminCrudTable from '../../../app/components/admin/AdminCrudTable.vue'
 
@@ -22,6 +23,7 @@ const BModalStub = {
   emits: ['hide'],
   template: '<div v-if="modelValue" :data-modal-title="title"><slot /></div>',
 }
+const NuxtLinkStub = { props: ['to'], template: '<a :href="to"><slot /></a>' }
 
 const GLOBAL_STUBS = {
   BAlert: BAlertStub,
@@ -30,7 +32,11 @@ const GLOBAL_STUBS = {
   BFormGroup: BFormGroupStub,
   BFormSelect: BFormSelectStub,
   BModal: BModalStub,
+  NuxtLink: NuxtLinkStub,
 }
+
+// AdminCrudTable's edit-modal breadcrumb (gap 1) reads general.menu_fixometer.
+const i18n = createI18n({ legacy: false, locale: 'en', messages: { en: { general: { menu_fixometer: 'Fixometer' } } } })
 
 const TABLE_FIELDS = [
   { key: 'name', label: 'Name', sortable: true },
@@ -85,7 +91,7 @@ function mountTable(props = {}, slots = {}) {
       ...props,
     },
     slots,
-    global: { stubs: GLOBAL_STUBS },
+    global: { plugins: [i18n], stubs: GLOBAL_STUBS },
   })
 }
 
@@ -240,6 +246,23 @@ describe('components/admin/AdminCrudTable', () => {
       expect(wrapper.find('[data-testid="widgets-edit-name"]').element.value).toBe('Widget One')
     })
 
+    // Gap 1: legacy's edit view is a full page under a "FIXOMETER > <Entity>
+    // > Edit <Entity>" breadcrumb; this modal had no navigation-hierarchy
+    // equivalent at all.
+    it('shows a Dashboard > Entity > Edit Entity breadcrumb, and the middle crumb closes back to the list', async () => {
+      const wrapper = mountTable()
+      await flushPromises()
+      await wrapper.find('[data-testid="widgets-edit-link-1"]').trigger('click')
+
+      const breadcrumb = wrapper.find('[data-testid="widgets-edit-breadcrumb"]')
+      expect(breadcrumb.text()).toContain('Fixometer')
+      expect(breadcrumb.text()).toContain('Widgets') // labels.title
+      expect(breadcrumb.text()).toContain('Edit widget') // labels.editTitle
+
+      await breadcrumb.findAll('a')[1].trigger('click')
+      expect(wrapper.find('[data-testid="widgets-edit-modal"]').exists()).toBe(false)
+    })
+
     it('submits the id and trimmed payload via updateItem, shows success feedback and closes', async () => {
       const updateItem = vi.fn().mockResolvedValue({ id: 1, name: 'Widget One (edited)', kind: 1, notes: 'Some notes', weight: 2.5 })
       const wrapper = mountTable({ updateItem })
@@ -283,6 +306,37 @@ describe('components/admin/AdminCrudTable', () => {
       expect(wrapper.find('[data-testid="widgets-edit-name-error"]').text()).toBe('The name has already been taken.')
       // The generic <p> error is suppressed once a field-level error exists.
       expect(wrapper.find('[data-testid="widgets-edit-error"]').exists()).toBe(false)
+    })
+  })
+
+  describe('two-column edit layout (gap 12)', () => {
+    // category/edit.blade.php and tags/edit.blade.php group fields into two
+    // Bootstrap columns; opt-in via editTwoColumn + a per-field `column`.
+    const TWO_COLUMN_FIELDS = [
+      { key: 'name', label: 'Name', type: 'text', required: true, maxLength: 255 },
+      { key: 'kind', label: 'Kind', type: 'select', required: true, options: [{ value: 1, text: 'Alpha' }, { value: 2, text: 'Beta' }] },
+      { key: 'notes', label: 'Notes', type: 'textarea', required: false, nullIfEmpty: true, column: 'right' },
+    ]
+
+    it('still renders every field (in a two-column layout) when editTwoColumn is set', async () => {
+      const wrapper = mountTable({ editTwoColumn: true, formFields: TWO_COLUMN_FIELDS })
+      await flushPromises()
+
+      await wrapper.find('[data-testid="widgets-edit-link-1"]').trigger('click')
+
+      expect(wrapper.find('[data-testid="widgets-edit-name"]').exists()).toBe(true)
+      expect(wrapper.find('[data-testid="widgets-edit-kind"]').exists()).toBe(true)
+      expect(wrapper.find('[data-testid="widgets-edit-notes"]').exists()).toBe(true)
+    })
+
+    it('does not affect the create form, which stays single-column regardless', async () => {
+      const wrapper = mountTable({ editTwoColumn: true, formFields: TWO_COLUMN_FIELDS })
+      await flushPromises()
+
+      await wrapper.find('[data-testid="widgets-add-button"]').trigger('click')
+
+      expect(wrapper.find('[data-testid="widgets-create-name"]').exists()).toBe(true)
+      expect(wrapper.find('[data-testid="widgets-create-notes"]').exists()).toBe(true)
     })
   })
 

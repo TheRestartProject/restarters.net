@@ -39,18 +39,23 @@ describe('components/devices/EventDevicesPanel', () => {
     expect(wrapper.find('[data-testid="event-devices-tab-powered"]').exists()).toBe(false)
   })
 
-  it('splits devices into powered/unpowered tabs by category.powered', async () => {
+  // Gap 23: the desktop tabs (event-devices-desktop) show one category's
+  // table at a time; the mobile two-collapsible layout (a separate DOM
+  // subtree, see below) shows both simultaneously - so this scopes its
+  // assertions to the desktop subtree specifically.
+  it('splits devices into powered/unpowered tabs by category.powered (desktop)', async () => {
     const powered = device({ id: 1, category: { powered: true } })
     const unpowered = device({ id: 2, category: { powered: false } })
     const wrapper = mountPanel({ devices: [powered, unpowered] })
+    const desktop = wrapper.find('[data-testid="event-devices-desktop"]')
 
-    expect(wrapper.find('[data-testid="row-1"]').exists()).toBe(true)
-    expect(wrapper.find('[data-testid="row-2"]').exists()).toBe(false)
+    expect(desktop.find('[data-testid="row-1"]').exists()).toBe(true)
+    expect(desktop.find('[data-testid="row-2"]').exists()).toBe(false)
 
     await wrapper.find('[data-testid="event-devices-tab-unpowered"]').trigger('click')
 
-    expect(wrapper.find('[data-testid="row-2"]').exists()).toBe(true)
-    expect(wrapper.find('[data-testid="row-1"]').exists()).toBe(false)
+    expect(desktop.find('[data-testid="row-2"]').exists()).toBe(true)
+    expect(desktop.find('[data-testid="row-1"]').exists()).toBe(false)
   })
 
   it('does not show add buttons or the canedit column when canedit is false', () => {
@@ -103,6 +108,95 @@ describe('components/devices/EventDevicesPanel', () => {
       const wrapper = mountPanel()
       await wrapper.find('[data-testid="event-devices-tab-unpowered"]').trigger('click')
       expect(wrapper.find('[data-testid="event-devices-description"]').text()).toContain('unpowered item')
+    })
+  })
+
+  // Gap fix (HIGH): legacy wraps the whole panel in <CollapsibleSection
+  // collapsed> - collapsed by default on mobile - not a bare, always-
+  // expanded heading.
+  it('is collapsed on mobile by default (CollapsibleSection collapsed-on-mobile)', () => {
+    const wrapper = mountPanel()
+    const toggle = wrapper.find('[data-testid="collapsible-toggle"]')
+    expect(toggle.exists()).toBe(true)
+    expect(toggle.attributes('aria-expanded')).toBe('false')
+  })
+
+  it('carries the #devices-section anchor id AddDataModal links to', () => {
+    const wrapper = mountPanel()
+    expect(wrapper.attributes('id')).toBe('devices-section')
+  })
+
+  // Gap fix (MEDIUM): legacy pairs each waste/CO2 figure in the tab title
+  // with its own icon (trash_brand.svg / co2_brand.svg), not plain text.
+  describe('tab waste/CO2 icons (gap 8)', () => {
+    it('shows the waste and CO2 icons beside their figures when stats are supplied', () => {
+      const wrapper = mountPanel({ stats: { waste_powered: 12.4, co2_powered: 3.2, waste_unpowered: 0, co2_unpowered: 0 } })
+      const tab = wrapper.find('[data-testid="event-devices-tab-powered"]')
+
+      const icons = tab.findAll('img')
+      expect(icons.map((i) => i.attributes('src'))).toEqual(['/images/trash_brand.svg', '/images/co2_brand.svg'])
+      expect(tab.text()).toContain('12 kg')
+      expect(tab.text()).toContain('3 kg')
+    })
+
+    it('shows no impact figures when stats is null', () => {
+      const wrapper = mountPanel({ stats: null })
+      expect(wrapper.find('[data-testid="event-devices-tab-powered"]').findAll('img')).toHaveLength(0)
+    })
+  })
+
+  // Gap 23: EventDevices.vue pairs the "Items at this event" heading with a
+  // TV icon (tv.svg), desktop-only.
+  it('shows the TV icon beside the heading, desktop-only', () => {
+    const wrapper = mountPanel()
+    const icon = wrapper.find('.devices-title-icon')
+    expect(icon.exists()).toBe(true)
+    expect(icon.attributes('src')).toBe('/images/tv.svg')
+    expect(icon.classes()).toContain('d-none')
+    expect(icon.classes()).toContain('d-md-block')
+  })
+
+  // Gap 23: mobile replaces the desktop tabs with two independent,
+  // individually-collapsible sections (both potentially open/visible at
+  // once) - EventDevices.vue's `d-block d-md-none` branch.
+  describe('mobile double-collapsible layout (gap 23)', () => {
+    it('shows both a powered and an unpowered mobile section, each collapsed by default', () => {
+      const wrapper = mountPanel()
+      const mobile = wrapper.find('[data-testid="event-devices-mobile"]')
+
+      const poweredSection = mobile.find('[data-testid="event-devices-powered-mobile"]')
+      const unpoweredSection = mobile.find('[data-testid="event-devices-unpowered-mobile"]')
+      expect(poweredSection.exists()).toBe(true)
+      expect(unpoweredSection.exists()).toBe(true)
+
+      expect(poweredSection.find('[data-testid="collapsible-toggle"]').attributes('aria-expanded')).toBe('false')
+      expect(unpoweredSection.find('[data-testid="collapsible-toggle"]').attributes('aria-expanded')).toBe('false')
+    })
+
+    it('shows each category\'s own devices in its own mobile section, independent of the desktop active tab', () => {
+      const powered = device({ id: 1, category: { powered: true } })
+      const unpowered = device({ id: 2, category: { powered: false } })
+      const wrapper = mountPanel({ devices: [powered, unpowered] })
+      const mobile = wrapper.find('[data-testid="event-devices-mobile"]')
+
+      expect(mobile.find('[data-testid="event-devices-powered-mobile"]').find('[data-testid="row-1"]').exists()).toBe(true)
+      expect(mobile.find('[data-testid="event-devices-unpowered-mobile"]').find('[data-testid="row-2"]').exists()).toBe(true)
+    })
+
+    it('shows the mobile add-device buttons under their own testids when canedit', () => {
+      const wrapper = mountPanel({ canedit: true })
+      expect(wrapper.find('[data-testid="add-powered-device-mobile"]').exists()).toBe(true)
+      expect(wrapper.find('[data-testid="add-unpowered-device-mobile"]').exists()).toBe(true)
+    })
+
+    it('opens the DeviceForm from the mobile add button, sharing state with the desktop add button', async () => {
+      const wrapper = mountPanel({ canedit: true })
+
+      await wrapper.find('[data-testid="add-powered-device-mobile"]').trigger('click')
+      expect(wrapper.findAllComponents(DeviceFormStub)).toHaveLength(2)
+
+      await wrapper.findComponent(DeviceFormStub).vm.$emit('saved', { id: 9 })
+      expect(wrapper.find('[data-testid="device-form-stub"]').exists()).toBe(false)
     })
   })
 })

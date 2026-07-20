@@ -6,10 +6,7 @@ import EventCard from '../../../app/components/events/EventCard.vue'
 import { useEventsStore } from '../../../app/stores/events.js'
 import en from '../../../i18n/locales/en.json'
 import clientEn from '../../../i18n/locales/client-en.json'
-
-const NuxtLinkStub = { props: ['to'], template: '<a :href="to"><slot /></a>' }
-const BBadgeStub = { template: '<span v-bind="$attrs"><slot /></span>' }
-const BButtonStub = { template: '<button v-bind="$attrs"><slot /></button>' }
+import { NuxtLinkStub, BBadgeStub, BButtonStub } from '../../helpers/stubs.js'
 
 function baseEvent(overrides = {}) {
   return {
@@ -26,8 +23,26 @@ function baseEvent(overrides = {}) {
   }
 }
 
+// Gap 1: EventCard is now one <tr> of EventsList.vue's table - mounted
+// standalone here (outside a <table>), same approach GroupVolunteers'
+// row-level components use, since Vue mounts via DOM APIs rather than an
+// HTML-parser that would otherwise foster-parent a bare <tr>.
 function mountComponent(props = {}) {
-  const i18n = createI18n({ legacy: false, locale: 'en', messages: { en: { ...en, ...clientEn } } })
+  // events.no_devices_added/add_a_device are new lang/en/events.php keys
+  // (gap 18) not yet in the generated client i18n JSON - overlaid inline
+  // per DashboardWhatsHappening.spec.js's established pattern rather than
+  // editing client/i18n/locales/*.json directly.
+  const i18n = createI18n({
+    legacy: false,
+    locale: 'en',
+    messages: {
+      en: {
+        ...en,
+        ...clientEn,
+        events: { ...en.events, no_devices_added: 'No devices added', add_a_device: 'Add a device' },
+      },
+    },
+  })
 
   return mount(EventCard, {
     props: { event: baseEvent(), ...props },
@@ -50,6 +65,19 @@ describe('components/events/EventCard', () => {
     expect(wrapper.find('[data-testid="event-card-date-42"]').text()).toContain('AUG')
     expect(wrapper.find('[data-testid="event-card-link-42"]').attributes('href')).toBe('/party/view/42')
     expect(wrapper.find('[data-testid="event-card-group-42"]').attributes('href')).toBe('/group/view/3')
+  })
+
+  // Gap 1: GroupEventsScrollTableDateLong.vue's long-date column (full date
+  // + start/end time + timezone) - useEventComputed.js already derives all
+  // four fields, this column just needed wiring up.
+  it('renders the long-date column with full date, start/end time and timezone', () => {
+    const wrapper = mountComponent()
+
+    const cell = wrapper.find('[data-testid="event-card-datelong-42"]')
+    expect(cell.text()).toContain('Sat 1st Aug 2026')
+    expect(cell.text()).toContain('11:00')
+    expect(cell.text()).toContain('13:00')
+    expect(cell.text()).toContain('Europe/London')
   })
 
   it('shows the venue when the event is not online', () => {
@@ -115,20 +143,20 @@ describe('components/events/EventCard', () => {
     expect(store.attend).toHaveBeenCalledTimes(1)
   })
 
-  describe('per-event numbers (gap 17)', () => {
-    it('shows invited/volunteers chips for an upcoming event when the backend provides them', () => {
-      const wrapper = mountComponent({ event: baseEvent({ stats: { invited: 12, volunteers: 3 } }) })
+  // Gap 17: a full-row highlight for events you're attending, in addition
+  // to the badge (GroupEventScrollTable.vue's rowClass()/.attending).
+  it('adds an "attending" row class when attending, not otherwise', () => {
+    expect(mountComponent({ event: baseEvent({ attending: true }) }).classes()).toContain('attending')
+    expect(mountComponent({ event: baseEvent({ attending: false }) }).classes()).not.toContain('attending')
+  })
 
-      expect(wrapper.find('[data-testid="event-card-upcoming-stats-42"]').exists()).toBe(true)
+  describe('per-event numbers (gap 1/17) - table columns', () => {
+    it('shows invited/volunteers cells for an upcoming (non-past) row when the backend provides them', () => {
+      const wrapper = mountComponent({ event: baseEvent({ stats: { invited: 12, volunteers: 3 } }), past: false })
+
       expect(wrapper.find('[data-testid="event-card-stat-invited-42"]').text()).toContain('12')
       expect(wrapper.find('[data-testid="event-card-stat-volunteers-42"]').text()).toContain('3')
-      expect(wrapper.find('[data-testid="event-card-past-stats-42"]').exists()).toBe(false)
-    })
-
-    it('renders no upcoming-stats row when the event carries no stats block', () => {
-      const wrapper = mountComponent()
-
-      expect(wrapper.find('[data-testid="event-card-upcoming-stats-42"]').exists()).toBe(false)
+      expect(wrapper.find('[data-testid="event-card-stat-participants-42"]').exists()).toBe(false)
     })
 
     function pastEvent(statsOverrides = {}) {
@@ -148,10 +176,9 @@ describe('components/events/EventCard', () => {
       })
     }
 
-    it('shows the past stats row (participants/volunteers/waste/co2/device breakdown) for a finished event', () => {
-      const wrapper = mountComponent({ event: pastEvent() })
+    it('shows the past-columns row (participants/volunteers/waste/co2/device breakdown) for a finished event', () => {
+      const wrapper = mountComponent({ event: pastEvent(), past: true })
 
-      expect(wrapper.find('[data-testid="event-card-past-stats-42"]').exists()).toBe(true)
       expect(wrapper.find('[data-testid="event-card-stat-participants-42"]').text()).toContain('5')
       expect(wrapper.find('[data-testid="event-card-stat-volunteers-42"]').text()).toContain('2')
       expect(wrapper.find('[data-testid="event-card-stat-waste-42"]').text()).toContain('12 kg')
@@ -159,47 +186,64 @@ describe('components/events/EventCard', () => {
       expect(wrapper.find('[data-testid="event-card-stat-fixed-42"]').text()).toContain('3')
       expect(wrapper.find('[data-testid="event-card-stat-repairable-42"]').text()).toContain('1')
       expect(wrapper.find('[data-testid="event-card-stat-dead-42"]').text()).toContain('0')
-      expect(wrapper.find('[data-testid="event-card-upcoming-stats-42"]').exists()).toBe(false)
+      expect(wrapper.find('[data-testid="event-card-stat-invited-42"]').exists()).toBe(false)
     })
 
     it('flags zero participants with a danger highlight (legacy dangerIfZero)', () => {
-      const wrapper = mountComponent({ event: pastEvent({ participants: 0 }) })
+      const wrapper = mountComponent({ event: pastEvent({ participants: 0 }), past: true })
 
       expect(wrapper.find('[data-testid="event-card-stat-participants-42"]').classes()).toContain('bg-danger-subtle')
     })
 
     it('flags one-or-fewer volunteers with a danger highlight (legacy dangerIfOne)', () => {
-      const wrapper = mountComponent({ event: pastEvent({ volunteers: 1 }) })
+      const wrapper = mountComponent({ event: pastEvent({ volunteers: 1 }), past: true })
 
       expect(wrapper.find('[data-testid="event-card-stat-volunteers-42"]').classes()).toContain('bg-danger-subtle')
     })
 
     it('does not flag participants/volunteers above their danger thresholds', () => {
-      const wrapper = mountComponent({ event: pastEvent({ participants: 5, volunteers: 2 }) })
+      const wrapper = mountComponent({ event: pastEvent({ participants: 5, volunteers: 2 }), past: true })
 
       expect(wrapper.find('[data-testid="event-card-stat-participants-42"]').classes()).not.toContain('bg-danger-subtle')
       expect(wrapper.find('[data-testid="event-card-stat-volunteers-42"]').classes()).not.toContain('bg-danger-subtle')
     })
 
-    it('flags all three device counts with a danger highlight when a finished event recorded no devices at all', () => {
-      const wrapper = mountComponent({ event: pastEvent({ fixed_devices: 0, repairable_devices: 0, dead_devices: 0 }) })
+    // Gap 18: "No devices added / Add a device" replaces the device/waste/
+    // co2 stat cells (colspan) instead of red-tinting them, when a finished
+    // event recorded zero devices. GroupEventScrollTable.vue's noDevices()
+    // also requires canedit - a read-only visitor shouldn't get an
+    // "add a device" link they can't use.
+    it('shows "No devices added / Add a device" (colspan 7) instead of the stat cells for a canedit viewer when a finished event recorded no devices at all', () => {
+      const wrapper = mountComponent({ event: pastEvent({ fixed_devices: 0, repairable_devices: 0, dead_devices: 0 }), past: true, canedit: true })
 
-      expect(wrapper.find('[data-testid="event-card-stat-fixed-42"]').classes()).toContain('bg-danger-subtle')
-      expect(wrapper.find('[data-testid="event-card-stat-repairable-42"]').classes()).toContain('bg-danger-subtle')
-      expect(wrapper.find('[data-testid="event-card-stat-dead-42"]').classes()).toContain('bg-danger-subtle')
+      const cell = wrapper.find('[data-testid="event-card-no-devices"]')
+      expect(cell.exists()).toBe(true)
+      expect(cell.attributes('colspan')).toBe('7')
+      expect(cell.text()).toContain('No devices added')
+      expect(cell.text()).toContain('Add a device')
+      expect(wrapper.find('[data-testid="event-card-stat-fixed-42"]').exists()).toBe(false)
+      expect(wrapper.find('[data-testid="event-card-stat-waste-42"]').exists()).toBe(false)
     })
 
-    it('does not flag the device counts when at least one device was recorded', () => {
-      const wrapper = mountComponent({ event: pastEvent() })
+    it('shows the (zero) stat cells instead of the no-devices message for a non-canedit viewer', () => {
+      const wrapper = mountComponent({ event: pastEvent({ fixed_devices: 0, repairable_devices: 0, dead_devices: 0 }), past: true, canedit: false })
 
+      expect(wrapper.find('[data-testid="event-card-no-devices"]').exists()).toBe(false)
+      expect(wrapper.find('[data-testid="event-card-stat-fixed-42"]').text()).toContain('0')
+    })
+
+    it('does not show the no-devices message when at least one device was recorded', () => {
+      const wrapper = mountComponent({ event: pastEvent(), past: true })
+
+      expect(wrapper.find('[data-testid="event-card-no-devices"]').exists()).toBe(false)
       expect(wrapper.find('[data-testid="event-card-stat-fixed-42"]').classes()).not.toContain('bg-danger-subtle')
     })
 
-    it('renders cleanly with no stats row when a finished event has no stats block yet', () => {
-      const wrapper = mountComponent({ event: baseEvent({ start: '2020-01-01T10:00:00Z', end: '2020-01-01T12:00:00Z' }) })
+    it('renders cleanly with empty stat cells when a finished event has no stats block yet', () => {
+      const wrapper = mountComponent({ event: baseEvent({ start: '2020-01-01T10:00:00Z', end: '2020-01-01T12:00:00Z' }), past: true })
 
-      expect(wrapper.find('[data-testid="event-card-past-stats-42"]').exists()).toBe(false)
-      expect(wrapper.find('[data-testid="event-card-upcoming-stats-42"]').exists()).toBe(false)
+      expect(wrapper.find('[data-testid="event-card-stat-participants-42"]').text()).toBe('')
+      expect(wrapper.find('[data-testid="event-card-no-devices"]').exists()).toBe(false)
     })
   })
 })

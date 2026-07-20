@@ -185,3 +185,39 @@ watch(
     </div>
   </div>
 </template>
+
+<style>
+/* Unscoped deliberately: every panel component this page mounts
+   (ProfileInfoTab/SkillsTab/ProfilePhotoTab/PasswordTab/LanguageTab/
+   AdminSettingsTab/EmailPreferencesTab/CalendarsTab/RepairDirectoryTab/
+   DeleteAccountTab) renders its own root `.edit-panel` div, so the class
+   needs to be visible across all of those separate SFCs rather than
+   scoped to this one. Ported from legacy resources/sass/_edit.scss's
+   `.edit-panel` (values converted from that partial's Fixometer-only
+   $brand/$brand-black, which are both #222 there - not the teal $brand
+   used elsewhere in this app), including its `label` rule - every one of
+   this branch's pre-Phase-F profile tab components (git show
+   07e6abd7cc^:resources/js/components/DeleteAccountTab.vue etc.) wrapped
+   in `.edit-panel` too, DeleteAccountTab included - it's only
+   origin/develop's older, since-superseded Blade that leaves it
+   unwrapped (docs/nuxt-migration/findings/parity-v2/profile-notifs-auth.md
+   gap 8 was diffed against that stale baseline). */
+.edit-panel {
+  background-color: #fff;
+  border: 1px solid #222;
+  box-shadow: 5px 5px #222;
+  padding: 20px;
+  margin: 0 0 30px 0;
+}
+
+.edit-panel label {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+@media (min-width: 992px) {
+  .edit-panel {
+    padding: 30px;
+  }
+}
+</style>

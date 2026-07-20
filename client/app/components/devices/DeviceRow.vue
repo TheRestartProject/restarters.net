@@ -85,54 +85,84 @@ async function confirmDelete() {
   <tr v-if="!editing" :data-testid="`event-device-${device.id}`">
     <td>{{ device.item_type || '-' }}</td>
     <td>{{ device.category ? t(device.category.name) : '-' }}</td>
-    <td v-if="powered">{{ device.brand }}</td>
-    <td>{{ parseFloat(device.age) ? device.age : '-' }}</td>
-    <td>{{ device.short_problem }}</td>
-    <td>
+    <!-- Gap fix (MEDIUM): legacy hides Brand/Age/Assessment/Status/Spare-parts
+         below md (EventDeviceList.vue's `d-none d-md-table-cell` fields). -->
+    <td v-if="powered" class="d-none d-md-table-cell">{{ device.brand }}</td>
+    <td class="d-none d-md-table-cell">{{ parseFloat(device.age) ? device.age : '-' }}</td>
+    <td class="d-none d-md-table-cell">{{ device.short_problem }}</td>
+    <td class="d-none d-md-table-cell">
       <BBadge v-if="statusLabel" :variant="statusVariant" :data-testid="`event-device-status-${device.id}`">
         {{ statusLabel }}
       </BBadge>
     </td>
-    <td class="text-center">
+    <td class="text-center d-none d-md-table-cell">
       <span v-if="sparePartsNeeded" :data-testid="`event-device-spare-parts-${device.id}`">&#10003;</span>
     </td>
     <td v-if="canedit" class="text-end">
+      <!-- Gap fix (MEDIUM): legacy uses small icon buttons
+           (edit_ico_green.svg/delete_ico_red.svg), not text links. -->
+      <button type="button" class="device-row-icon-btn me-2" :data-testid="`event-device-edit-${device.id}`" @click="edit">
+        <img src="/icons/edit_ico_green.svg" class="device-row-icon-btn__icon" alt="">
+        <span class="visually-hidden">{{ t('client.devices.edit') }}</span>
+      </button>
+      <button
+        type="button"
+        class="device-row-icon-btn"
+        :data-testid="`event-device-delete-${device.id}`"
+        @click="askDelete"
+      >
+        <img src="/icons/delete_ico_red.svg" class="device-row-icon-btn__icon" alt="">
+        <span class="visually-hidden">{{ t('devices.delete_device') }}</span>
+      </button>
       <div v-if="deleteError" class="small text-danger" :data-testid="`event-device-delete-error-${device.id}`">
         {{ deleteError }}
       </div>
-      <template v-if="confirmingDelete">
-        <span class="small me-1">{{ t('devices.confirm_delete') }}</span>
-        <button
-          type="button"
-          class="btn btn-sm btn-link text-danger p-0 me-2"
-          :disabled="deleting"
-          :data-testid="`event-device-delete-confirm-${device.id}`"
-          @click="confirmDelete"
-        >
-          {{ t('partials.yes') }}
-        </button>
-        <button type="button" class="btn btn-sm btn-link p-0" @click="cancelDelete">
-          {{ t('partials.cancel') }}
-        </button>
-      </template>
-      <template v-else>
-        <button type="button" class="btn btn-sm btn-link p-0 me-2" :data-testid="`event-device-edit-${device.id}`" @click="edit">
-          {{ t('client.devices.edit') }}
-        </button>
-        <button
-          type="button"
-          class="btn btn-sm btn-link text-danger p-0"
-          :data-testid="`event-device-delete-${device.id}`"
-          @click="askDelete"
-        >
-          {{ t('devices.delete_device') }}
-        </button>
-      </template>
     </td>
   </tr>
-  <tr v-else :data-testid="`event-device-editing-${device.id}`">
+  <tr v-else class="device-row-editing" :data-testid="`event-device-editing-${device.id}`">
     <td :colspan="(powered ? 7 : 6) + (canedit ? 1 : 0)" class="p-0">
       <DeviceForm :event-id="eventId" :device="device" :powered="powered" @saved="onSaved" @cancel="onCancel" />
     </td>
   </tr>
+
+  <!-- Gap fix (MEDIUM): a modal confirm dialog (matching legacy's
+       ConfirmModal), not an inline row-replacement Yes/Cancel swap. -->
+  <BModal
+    v-if="canedit"
+    :model-value="confirmingDelete"
+    :title="t('devices.delete_device')"
+    no-footer
+    :data-testid="`event-device-delete-modal-${device.id}`"
+    @hide="cancelDelete"
+  >
+    <p>{{ t('devices.confirm_delete') }}</p>
+    <div class="d-flex justify-content-end gap-2">
+      <BButton variant="outline-secondary" @click="cancelDelete">
+        {{ t('partials.cancel') }}
+      </BButton>
+      <BButton
+        variant="danger"
+        :disabled="deleting"
+        :data-testid="`event-device-delete-confirm-${device.id}`"
+        @click="confirmDelete"
+      >
+        {{ t('devices.delete_device') }}
+      </BButton>
+    </div>
+  </BModal>
 </template>
+
+<style scoped>
+.device-row-icon-btn {
+  display: inline-flex;
+  padding: 0;
+  border: 0;
+  background: none;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.device-row-icon-btn__icon {
+  width: 1.1rem;
+}
+</style>

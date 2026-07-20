@@ -1,4 +1,4 @@
-import { mount } from '@vue/test-utils'
+import { mount, flushPromises } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
 import { createI18n } from 'vue-i18n'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -8,6 +8,14 @@ import en from '../../../i18n/locales/en.json'
 import clientEn from '../../../i18n/locales/client-en.json'
 
 const BBadgeStub = { template: '<span v-bind="$attrs"><slot /></span>' }
+const BButtonStub = { template: '<button v-bind="$attrs"><slot /></button>' }
+// Same shape as DevicesSearchTable.spec.js's BModalStub - only renders its
+// slot while open.
+const BModalStub = {
+  props: ['modelValue', 'title'],
+  emits: ['hide'],
+  template: '<div v-if="modelValue" :data-modal-title="title"><slot /></div>',
+}
 const DeviceFormStub = {
   props: ['eventId', 'device', 'powered'],
   emits: ['saved', 'cancel'],
@@ -39,7 +47,7 @@ function mountRow(props = {}) {
     props: { device: device(), eventId: 5, powered: true, ...props },
     global: {
       plugins: [i18n],
-      stubs: { BBadge: BBadgeStub, DeviceForm: DeviceFormStub },
+      stubs: { BBadge: BBadgeStub, BButton: BButtonStub, BModal: BModalStub, DeviceForm: DeviceFormStub },
     },
   })
 }
@@ -104,18 +112,23 @@ describe('components/devices/DeviceRow', () => {
     expect(wrapper.find('[data-testid="event-device-1"]').exists()).toBe(true)
   })
 
-  it('requires a delete confirm click before calling the store', async () => {
+  // Gap fix (MEDIUM): legacy EventDeviceSummary.vue uses a modal confirm
+  // dialog (ConfirmModal), not an inline row-replacement Yes/Cancel swap.
+  it('requires a delete confirm-modal click before calling the store', async () => {
     const store = useDevicesStore()
     store.deleteDevice = vi.fn().mockResolvedValue()
 
     const wrapper = mountRow({ canedit: true })
 
+    expect(wrapper.find('[data-modal-title]').exists()).toBe(false)
     await wrapper.find('[data-testid="event-device-delete-1"]').trigger('click')
     expect(store.deleteDevice).not.toHaveBeenCalled()
-    expect(wrapper.find('[data-testid="event-device-delete-confirm-1"]').exists()).toBe(true)
+    expect(wrapper.find('[data-modal-title]').exists()).toBe(true)
 
     await wrapper.find('[data-testid="event-device-delete-confirm-1"]').trigger('click')
+    await flushPromises()
     expect(store.deleteDevice).toHaveBeenCalledWith(5, 1)
+    expect(wrapper.find('[data-modal-title]').exists()).toBe(false)
   })
 
   it('shows an error message when delete fails', async () => {

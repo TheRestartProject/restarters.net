@@ -10,6 +10,12 @@ import clientEn from '../../../i18n/locales/client-en.json'
 const NuxtLinkStub = { props: ['to'], template: '<a :href="to"><slot /></a>' }
 const BBadgeStub = { template: '<span v-bind="$attrs"><slot /></span>' }
 const BButtonStub = { template: '<button v-bind="$attrs"><slot /></button>' }
+const BModalStub = {
+  props: ['modelValue', 'title'],
+  emits: ['hide'],
+  template: '<div v-if="modelValue"><slot /></div>',
+}
+const BPopoverStub = { props: ['target'], template: '<div><slot /></div>' }
 
 function confirmedAttendee(overrides = {}) {
   return {
@@ -41,7 +47,7 @@ function mountComponent(props = {}) {
     props: { eventId: 5, confirmed: [], invited: [], ...props },
     global: {
       plugins: [i18n],
-      stubs: { NuxtLink: NuxtLinkStub, BBadge: BBadgeStub, BButton: BButtonStub },
+      stubs: { NuxtLink: NuxtLinkStub, BBadge: BBadgeStub, BButton: BButtonStub, BModal: BModalStub, BPopover: BPopoverStub },
     },
   })
 }
@@ -74,13 +80,17 @@ describe('components/events/EventAttendees', () => {
     expect(wrapper.find('[data-testid="event-attendee-host-badge-2"]').exists()).toBe(false)
   })
 
-  it('shows the attendee email only when volunteer.email is present (server-gated visibility)', () => {
+  // Audit fix: develop's EventAttendee.vue never shows email on the
+  // confirmed-attendee row at all (only inside the add-volunteer modal,
+  // which is backend-blocked and unbuilt here) - this used to render it
+  // inline whenever the (server-gated) field was present, which was more
+  // exposure than develop's own UI.
+  it('never renders the attendee email, even when volunteer.email is present', () => {
     const withEmail = confirmedAttendee({ id: 1, volunteer: { id: 10, name: 'Sam', email: 'sam@example.com', user_skills: [] } })
-    const withoutEmail = confirmedAttendee({ id: 2, user: 11, volunteer: { id: 11, name: 'Jo', user_skills: [] } })
-    const wrapper = mountComponent({ confirmed: [withEmail, withoutEmail] })
+    const wrapper = mountComponent({ confirmed: [withEmail] })
 
-    expect(wrapper.find('[data-testid="event-attendee-email-1"]').text()).toBe('sam@example.com')
-    expect(wrapper.find('[data-testid="event-attendee-email-2"]').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="event-attendee-email-1"]').exists()).toBe(false)
+    expect(wrapper.text()).not.toContain('sam@example.com')
   })
 
   it('renders a manually-added (unregistered) volunteer using fullName, with no profile link', () => {
@@ -130,28 +140,64 @@ describe('components/events/EventAttendees', () => {
     expect(wrapper.emitted('invite')).toBeTruthy()
   })
 
-  describe('total headcounts (gap D3)', () => {
+  // Gap 21: develop's !upcoming grid condition shows headcounts for
+  // in-progress events too, not just finished ones.
+  describe('total headcounts (gap D3/21)', () => {
     it('shows participant/volunteer counts when finished and the counts are available', () => {
-      const wrapper = mountComponent({ finished: true, participants: 12, volunteers: 3 })
+      const wrapper = mountComponent({ upcoming: false, finished: true, participants: 12, volunteers: 3 })
 
       expect(wrapper.find('[data-testid="event-attendees-participants"]').text()).toBe('12Participants')
       expect(wrapper.find('[data-testid="event-attendees-volunteers"]').text()).toBe('3Volunteers')
     })
 
-    it('does not show headcounts for an upcoming (not finished) event', () => {
-      const wrapper = mountComponent({ finished: false, participants: 12, volunteers: 3 })
+    it('shows the counts for an in-progress event too (not upcoming, not finished)', () => {
+      const wrapper = mountComponent({ upcoming: false, finished: false, participants: 4, volunteers: 1 })
+
+      expect(wrapper.find('[data-testid="event-attendees-headcounts"]').exists()).toBe(true)
+    })
+
+    it('does not show headcounts for an upcoming event', () => {
+      const wrapper = mountComponent({ upcoming: true, finished: false, participants: 12, volunteers: 3 })
       expect(wrapper.find('[data-testid="event-attendees-headcounts"]').exists()).toBe(false)
     })
 
     it('does not show headcounts when the counts are unavailable, even if finished', () => {
-      const wrapper = mountComponent({ finished: true, participants: null, volunteers: null })
+      const wrapper = mountComponent({ upcoming: false, finished: true, participants: null, volunteers: null })
       expect(wrapper.find('[data-testid="event-attendees-headcounts"]').exists()).toBe(false)
     })
 
     it('shows just the volunteer count when only that is available', () => {
-      const wrapper = mountComponent({ finished: true, participants: null, volunteers: 3 })
+      const wrapper = mountComponent({ upcoming: false, finished: true, participants: null, volunteers: 3 })
       expect(wrapper.find('[data-testid="event-attendees-participants"]').exists()).toBe(false)
       expect(wrapper.find('[data-testid="event-attendees-volunteers"]').text()).toBe('3Volunteers')
+    })
+  })
+
+  // Gap 22: bordered avatar, plain uppercase "Host" text, and a real
+  // confirm modal (not an inline Yes/Cancel row) for the remove button.
+  describe('attendee row treatment (gap 22)', () => {
+    it('shows a plain uppercase Host label (not a badge) only for role HOST', () => {
+      const host = confirmedAttendee({ id: 1, role: 3 })
+      const guest = confirmedAttendee({ id: 2, role: 4, user: 11 })
+      const wrapper = mountComponent({ confirmed: [host, guest] })
+
+      expect(wrapper.find('[data-testid="event-attendee-host-badge-1"]').exists()).toBe(true)
+      expect(wrapper.find('[data-testid="event-attendee-host-badge-2"]').exists()).toBe(false)
+    })
+
+    it('opens a shared confirm modal (not an inline row) when removing, and calls the store on confirm', async () => {
+      const store = useEventsStore()
+      store.removeAttendee = vi.fn().mockResolvedValue()
+
+      const wrapper = mountComponent({ confirmed: [confirmedAttendee({ id: 7 })], canedit: true })
+
+      expect(wrapper.find('[data-testid="event-attendee-remove-modal"]').exists()).toBe(false)
+
+      await wrapper.find('[data-testid="event-attendee-remove-7"]').trigger('click')
+      expect(wrapper.find('[data-testid="event-attendee-remove-modal"]').exists()).toBe(true)
+
+      await wrapper.find('[data-testid="event-attendee-remove-confirm-7"]').trigger('click')
+      expect(store.removeAttendee).toHaveBeenCalledWith(5, 7)
     })
   })
 })

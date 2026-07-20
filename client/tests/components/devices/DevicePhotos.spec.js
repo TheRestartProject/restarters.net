@@ -77,6 +77,20 @@ describe('components/devices/DevicePhotos', () => {
     expect(store.deleteDeviceImage).toHaveBeenCalledWith(5, 7, 9)
   })
 
+  // Gap fix (HIGH): DeviceForm.vue's readonly rendering (DevicesSearchTable's
+  // row-details panel for non-admins) hides the remove button and upload
+  // widget, leaving just the existing photos - EventDevice.vue passes its
+  // own `disabled` straight through to DeviceImages the same way.
+  describe('readonly', () => {
+    it('hides the remove button and the upload widget, but keeps the photos', () => {
+      const wrapper = mountPhotos({ images: [{ idxref: 1, path: 'a.jpg' }], readonly: true })
+
+      expect(wrapper.findAll('[data-testid="device-photo"]')).toHaveLength(1)
+      expect(wrapper.find('[data-testid="device-photo-remove-1"]').exists()).toBe(false)
+      expect(wrapper.findComponent(TusImageUploadStub).exists()).toBe(false)
+    })
+  })
+
   describe('5-image cap (gap 14)', () => {
     it('shows the upload widget when under the limit', () => {
       const wrapper = mountPhotos({ images: [{ idxref: 1, path: 'a.jpg' }] })

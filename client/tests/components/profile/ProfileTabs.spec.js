@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs'
+import { join } from 'node:path'
 import { mount } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
 import { createI18n } from 'vue-i18n'
@@ -142,6 +144,21 @@ describe('components/profile/ProfileTabs', () => {
 
       const tab = wrapper.find('[data-testid="stub-repair-directory"]')
       expect(tab.attributes('data-target-id')).toBe('7')
+    })
+  })
+
+  // The shared .edit-panel class (unscoped, see the block's own comment) is
+  // never applied via getComputedStyle in a jsdom mount, so this asserts on
+  // the raw source text instead - same approach tests/config-sanity.spec.js
+  // uses for nuxt.config.ts. Pins _edit.scss's `label { font-size: 16px;
+  // font-weight: 700 }` rule, which both baselines (origin/develop and this
+  // branch's own pre-Phase-F Vue components) agree on and which was
+  // dropped when .edit-panel was first ported here.
+  describe('.edit-panel CSS (unscoped block)', () => {
+    const source = readFileSync(join(process.cwd(), 'app/components/profile/ProfileTabs.vue'), 'utf-8')
+
+    it('bolds and enlarges labels inside .edit-panel, matching _edit.scss', () => {
+      expect(source).toMatch(/\.edit-panel\s+label\s*\{[^}]*font-size:\s*16px;[^}]*font-weight:\s*700;?[^}]*\}/)
     })
   })
 })

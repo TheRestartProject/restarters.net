@@ -11,26 +11,17 @@ import clientEn from '../../../i18n/locales/client-en.json'
 const NuxtLinkStub = { props: ['to'], template: '<a :href="to"><slot /></a>' }
 const BAlertStub = { template: '<div><slot /></div>' }
 const BButtonStub = { template: '<button v-bind="$attrs"><slot /></button>' }
-const BFormGroupStub = { template: '<div><slot /></div>' }
 const GroupFormStub = {
   props: ['groupId', 'initialGroup', 'permissions', 'isAdmin'],
   emits: ['updated'],
   template: '<button data-testid="stub-updated" @click="$emit(\'updated\', groupId)" />',
-}
-const TusImageUploadStub = {
-  props: ['currentImageUrl'],
-  emits: ['uploaded', 'upload-error'],
-  template:
-    '<div><button data-testid="stub-upload-ok" @click="$emit(\'uploaded\', { uploadKey: \'key123\' })" /><button data-testid="stub-upload-fail" @click="$emit(\'upload-error\', \'boom\')" /></div>',
 }
 
 const GLOBAL_STUBS = {
   NuxtLink: NuxtLinkStub,
   BAlert: BAlertStub,
   BButton: BButtonStub,
-  BFormGroup: BFormGroupStub,
   GroupForm: GroupFormStub,
-  TusImageUpload: TusImageUploadStub,
 }
 
 const BASE_GROUP = {
@@ -85,7 +76,6 @@ describe('pages/group/edit/[id]', () => {
     groupsStore = useGroupsStore()
     groupsStore.fetchCurrent = vi.fn().mockResolvedValue(BASE_GROUP)
     groupsStore.deleteGroup = vi.fn().mockResolvedValue({ archived: true })
-    groupsStore.uploadGroupImage = vi.fn().mockResolvedValue({ image_url: '/uploads/new.png' })
 
     sessionStore = useSessionStore()
     sessionStore.user = { role: 4 }
@@ -151,22 +141,14 @@ describe('pages/group/edit/[id]', () => {
     expect(groupsStore.fetchCurrent).toHaveBeenCalledTimes(2)
   })
 
-  it('calls uploadGroupImage with the emitted upload key', async () => {
+  // gap 4: an always-present "Group details" tab strip above the form, so
+  // the page's chrome matches develop even without a "Group log" audit tab
+  // (no API for that - see this page's own doc comment).
+  it('shows the always-present Group details tab', () => {
     groupsStore.current.data = BASE_GROUP
     const wrapper = mountPage()
 
-    await wrapper.find('[data-testid="stub-upload-ok"]').trigger('click')
-
-    expect(groupsStore.uploadGroupImage).toHaveBeenCalledWith(5, 'key123')
-  })
-
-  it('shows an image upload error message from TusImageUpload', async () => {
-    groupsStore.current.data = BASE_GROUP
-    const wrapper = mountPage()
-
-    await wrapper.find('[data-testid="stub-upload-fail"]').trigger('click')
-
-    expect(wrapper.find('[data-testid="group-edit-image-error"]').text()).toBe('boom')
+    expect(wrapper.find('[data-testid="group-edit-tabs"]').text()).toContain('Group details')
   })
 
   describe('archive', () => {

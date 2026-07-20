@@ -53,7 +53,7 @@ async function save() {
 </script>
 
 <template>
-  <div data-testid="language-tab">
+  <div class="edit-panel" data-testid="language-tab">
     <h4>{{ t('profile.language_panel_title') }}</h4>
 
     <BAlert v-if="feedback" :model-value="true" :variant="feedbackVariant" dismissible data-testid="language-feedback" @dismissed="feedback = ''">

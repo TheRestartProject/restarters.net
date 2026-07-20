@@ -86,8 +86,13 @@ describe('pages/forbidden', () => {
     expect(navigateToMock).toHaveBeenCalledWith('/login')
   })
 
-  it('still shows the Back to home link', () => {
+  it('does not show a "back to home" link (no equivalent in the legacy page)', () => {
     const wrapper = mountPage()
-    expect(wrapper.find('[data-testid="forbidden-home-link"]').attributes('href')).toBe('/')
+    expect(wrapper.find('[data-testid="forbidden-home-link"]').exists()).toBe(false)
+  })
+
+  it('shows the broken-toaster illustration below the heading', () => {
+    const wrapper = mountPage()
+    expect(wrapper.find('img[src="/images/broken-toaster.png"]').exists()).toBe(true)
   })
 })

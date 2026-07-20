@@ -1,8 +1,10 @@
-import { mount } from '@vue/test-utils'
+import { mount, flushPromises } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
 import { createI18n } from 'vue-i18n'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import ConsentPage from '../../../app/pages/user/consent.vue'
+import { useSessionStore } from '../../../app/stores/session.js'
+import { useProfileStore } from '../../../app/stores/profile.js'
 import en from '../../../i18n/locales/en.json'
 import clientEn from '../../../i18n/locales/client-en.json'
 
@@ -12,115 +14,308 @@ import clientEn from '../../../i18n/locales/client-en.json'
 // different field. Legacy register-new.blade.php (07e6abd7cc^) pairs:
 //   consent_gdpr        <-> reg-step-4-label1  (Personal Data)
 //   consent_future_data <-> reg-step-4-label2  (Repair Data)
-//   consent_past_data   <-> reg-step-4-label3  (Historical Repair Data)
+// consent_past_data (Historical Repair Data, reg-step-4-label3) has no
+// checkbox at all in the Auth::check() branch this page ports - it's
+// auto-granted (see the "Rebuild as the same wizard" gap-4 fix).
 
-// Minimal stubs that render the default slot and keep the data-testid, so the
-// v-html label text is queryable per checkbox.
-const passthrough = (tag = 'div') => ({
-  inheritAttrs: true,
-  template: `<${tag} v-bind="$attrs"><slot /></${tag}>`,
-})
+const NuxtLinkStub = { props: ['to'], template: '<a :href="to"><slot /></a>' }
 
-function mountConsent() {
+const bvnStubs = {
+  BForm: { template: '<form @submit.prevent="$emit(\'submit\', $event)"><slot /></form>' },
+  BFormGroup: { template: '<div><slot /></div>' },
+  BFormInput: {
+    props: ['modelValue'],
+    template:
+      '<input :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" v-bind="$attrs" />',
+  },
+  BFormSelect: {
+    props: ['modelValue'],
+    template:
+      '<select :value="modelValue" @change="$emit(\'update:modelValue\', $event.target.value)" v-bind="$attrs"><slot /></select>',
+  },
+  BFormCheckbox: {
+    props: ['modelValue'],
+    template:
+      '<label v-bind="$attrs"><input type="checkbox" :checked="modelValue" @change="$emit(\'update:modelValue\', $event.target.checked)" /><slot /></label>',
+  },
+  BButton: { template: '<button v-bind="$attrs"><slot /></button>' },
+  BAlert: { template: '<div><slot /></div>' },
+}
+
+// GET /api/v2/skills, grouped by App\Helpers\Fixometer::skillCategories()
+// (1 = Organising, 2 = Technical) - same fixture as register.spec.js.
+const MOCK_SKILLS = [
+  { id: 101, skill_name: 'Event organising', description: null, category: 1 },
+  { id: 102, skill_name: 'Soldering', description: null, category: 2 },
+]
+
+function mountConsent({ skillList, consent, updateSkills, updateEmailPreferences } = {}) {
   const i18n = createI18n({ legacy: false, locale: 'en', messages: { en: { ...en, ...clientEn } } })
+  vi.stubGlobal('useRoute', () => ({ query: {}, params: {}, fullPath: '/user/consent' }))
+  vi.stubGlobal('useNuxtApp', () => ({
+    $api: {
+      skill: { list: skillList || vi.fn().mockResolvedValue({ data: MOCK_SKILLS }) },
+      auth: { consent: consent || vi.fn().mockResolvedValue({}) },
+    },
+  }))
 
-  return mount(ConsentPage, {
+  const wrapper = mount(ConsentPage, {
     global: {
       plugins: [i18n],
-      mocks: {
-        $api: { auth: { consent: vi.fn() } },
-      },
-      stubs: {
-        BForm: passthrough('form'),
-        BFormGroup: passthrough('div'),
-        BFormSelect: { template: '<select><slot /></select>' },
-        BFormInput: passthrough('input'),
-        // Real checkbox input nested in the label (unlike the other
-        // passthrough stubs) so v-model interaction can be driven from
-        // tests, while `.text()` on the testid'd label still picks up the
-        // v-html slot content for the legal-notice pairing checks below.
-        BFormCheckbox: {
-          props: ['modelValue'],
-          template:
-            '<label v-bind="$attrs"><input type="checkbox" :checked="modelValue" @change="$emit(\'update:modelValue\', $event.target.checked)" /><slot /></label>',
-        },
-        BButton: passthrough('button'),
-        BAlert: passthrough('div'),
-      },
+      stubs: { NuxtLink: NuxtLinkStub, ...bvnStubs },
     },
   })
+
+  const profileStore = useProfileStore()
+  profileStore.updateSkills = updateSkills || vi.fn().mockResolvedValue({ tags: [] })
+  profileStore.updateEmailPreferences = updateEmailPreferences || vi.fn().mockResolvedValue({ invites: false })
+
+  return { wrapper, profileStore }
+}
+
+async function clickNext(wrapper) {
+  await wrapper.find('[data-testid="consent-next"]').trigger('click')
+}
+
+async function clickPrev(wrapper) {
+  await wrapper.find('[data-testid="consent-prev"]').trigger('click')
+}
+
+async function fillStep2(wrapper) {
+  await wrapper.find('[data-testid="consent-age"]').setValue('1990')
+  await wrapper.find('[data-testid="consent-country"]').setValue('GB')
+}
+
+async function goToStep4(wrapper) {
+  await clickNext(wrapper) // step 1 -> 2
+  await fillStep2(wrapper)
+  await clickNext(wrapper) // step 2 -> 3
+  await clickNext(wrapper) // step 3 -> 4
 }
 
 describe('pages/user/consent', () => {
+  let sessionStore
+  let navigateToMock
+
   beforeEach(() => {
     setActivePinia(createPinia())
-    vi.stubGlobal('useNuxtApp', () => ({ $api: { auth: { consent: vi.fn() } } }))
-    vi.stubGlobal('navigateTo', vi.fn())
-    vi.stubGlobal('useRoute', () => ({ query: {}, params: {}, fullPath: '/user/consent' }))
+    navigateToMock = vi.fn()
+    vi.stubGlobal('navigateTo', navigateToMock)
+    sessionStore = useSessionStore()
+    sessionStore.user = { id: 9, name: 'Jane Bloggs', email: 'jane@bloggs.net' }
+    sessionStore.fetch = vi.fn().mockResolvedValue()
   })
 
-  it('pairs each consent checkbox with the correct legal notice', () => {
-    const wrapper = mountConsent()
+  // Gap 4: the same 4-step wizard as anonymous registration (skills, personal
+  // info, contact preferences, consent), not a single flat form.
+  it('renders the same 4-step wizard as register.vue, one step at a time', async () => {
+    const { wrapper } = mountConsent()
+    await flushPromises()
 
-    const gdpr = wrapper.get('[data-testid="consent-gdpr"]').text()
-    const past = wrapper.get('[data-testid="consent-past-data"]').text()
-    const future = wrapper.get('[data-testid="consent-future-data"]').text()
+    expect(wrapper.find('[data-testid="consent-step-1"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="consent-step-2"]').exists()).toBe(false)
+    expect(wrapper.text()).toContain('Step 1 of 4')
 
-    expect(gdpr).toContain('Personal Data')
-    expect(gdpr).not.toContain('Historical Repair Data')
+    await clickNext(wrapper)
+    expect(wrapper.find('[data-testid="consent-step-1"]').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="consent-step-2"]').exists()).toBe(true)
 
-    expect(past).toContain('Historical Repair Data')
-
-    expect(future).toContain('Repair Data')
-    expect(future).not.toContain('Personal Data')
-    expect(future).not.toContain('Historical')
+    await clickPrev(wrapper)
+    expect(wrapper.find('[data-testid="consent-step-1"]').exists()).toBe(true)
   })
 
-  it('renders the step-4 intro copy above the checkboxes', () => {
-    const wrapper = mountConsent()
-    expect(wrapper.get('[data-testid="consent-intro"]').text()).toContain(
-      en.registration['reg-step-4']
-    )
+  it('fetches skills from the API and renders them as chip buttons grouped by category (step 1)', async () => {
+    const skillList = vi.fn().mockResolvedValue({ data: MOCK_SKILLS })
+    const { wrapper } = mountConsent({ skillList })
+    await flushPromises()
+
+    expect(skillList).toHaveBeenCalled()
+    expect(wrapper.find('[data-testid="consent-skill-101"]').exists()).toBe(true)
+    expect(wrapper.text()).toContain('Event organising')
   })
 
-  it('offers ages from 18 (not 16), matching register.vue and legacy', () => {
-    const wrapper = mountConsent()
+  it('pre-fills name/email from the session and disables both (step 2)', async () => {
+    const { wrapper } = mountConsent()
+    await flushPromises()
+    await clickNext(wrapper)
+
+    const name = wrapper.find('[data-testid="consent-name"]')
+    const email = wrapper.find('[data-testid="consent-email"]')
+    expect(name.element.value).toBe('Jane Bloggs')
+    expect(name.attributes('disabled')).toBeDefined()
+    expect(email.element.value).toBe('jane@bloggs.net')
+    expect(email.attributes('disabled')).toBeDefined()
+  })
+
+  it('has no password fields on step 2 (Auth::check() branch skips the password fieldset)', async () => {
+    const { wrapper } = mountConsent()
+    await flushPromises()
+    await clickNext(wrapper)
+
+    expect(wrapper.find('[data-testid="consent-password"]').exists()).toBe(false)
+    expect(wrapper.text()).not.toContain('Password')
+  })
+
+  it('includes a gender field on step 2', async () => {
+    const { wrapper } = mountConsent()
+    await flushPromises()
+    await clickNext(wrapper)
+
+    expect(wrapper.find('[data-testid="consent-gender"]').exists()).toBe(true)
+  })
+
+  it('offers ages from 18 (not 16), matching register.vue and legacy', async () => {
+    const { wrapper } = mountConsent()
+    await flushPromises()
+    await clickNext(wrapper)
+
     const currentYear = new Date().getFullYear()
-    const years = wrapper.findAll('#consent-age option').map((o) => Number(o.attributes('value')))
-
+    const years = wrapper
+      .findAll('#consent-age option')
+      .map((o) => o.attributes('value'))
+      .filter((v) => v !== '')
+      .map(Number)
     expect(Math.max(...years)).toBe(currentYear - 18)
     expect(Math.min(...years)).toBe(currentYear - 99)
   })
 
-  it('offers a newsletter opt-in, reusing the register.vue step-3 label', () => {
-    const wrapper = mountConsent()
-    const newsletter = wrapper.get('[data-testid="consent-newsletter"]')
+  it('offers both a newsletter opt-in and an invites checkbox on step 3', async () => {
+    const { wrapper } = mountConsent()
+    await flushPromises()
+    await clickNext(wrapper) // step 2
+    await fillStep2(wrapper)
+    await clickNext(wrapper) // step 3
 
+    const newsletter = wrapper.get('[data-testid="consent-newsletter"]')
+    const invites = wrapper.get('[data-testid="consent-invites"]')
     expect(newsletter.text()).toContain(en.registration['reg-step-3-label1'])
-    expect(newsletter.get('input').element.checked).toBe(false)
+    expect(invites.text()).toContain(en.registration['reg-step-3-label2'])
   })
 
-  it('defaults the newsletter opt-in unchecked and includes it in the consent payload', async () => {
+  it('pairs each consent checkbox with the correct legal notice, and has no visible Historical Repair Data checkbox (step 4)', async () => {
+    const { wrapper } = mountConsent()
+    await flushPromises()
+    await goToStep4(wrapper)
+
+    const gdpr = wrapper.get('[data-testid="consent-gdpr"]').text()
+    const future = wrapper.get('[data-testid="consent-future-data"]').text()
+
+    expect(gdpr).toContain('Personal Data')
+    expect(gdpr).not.toContain('Historical Repair Data')
+    expect(future).toContain('Repair Data')
+    expect(future).not.toContain('Personal Data')
+
+    // Gap 11: legacy auto-grants consent_past_data via a hidden input in
+    // this branch - no visible "Historical Repair Data" checkbox.
+    expect(wrapper.find('[data-testid="consent-past-data"]').exists()).toBe(false)
+  })
+
+  it('renders the step-4 intro copy above the checkboxes', async () => {
+    const { wrapper } = mountConsent()
+    await flushPromises()
+    await goToStep4(wrapper)
+
+    expect(wrapper.get('[data-testid="consent-intro"]').text()).toContain(en.registration['reg-step-4'])
+  })
+
+  it('does not submit when the GDPR/future-data consents are unchecked', async () => {
+    const consent = vi.fn()
+    const { wrapper } = mountConsent({ consent })
+    await flushPromises()
+    await goToStep4(wrapper)
+
+    await wrapper.find('[data-testid="consent-form"]').trigger('submit')
+    await flushPromises()
+
+    expect(consent).not.toHaveBeenCalled()
+    expect(wrapper.find('[data-testid="consent-gdpr-error"]').exists()).toBe(true)
+  })
+
+  it('submits age/country/gender/city/newsletter plus consent_past_data auto-granted true, refreshes the session and redirects', async () => {
     const consent = vi.fn().mockResolvedValue({})
-    vi.stubGlobal('useNuxtApp', () => ({ $api: { auth: { consent } } }))
+    const { wrapper } = mountConsent({ consent })
+    await flushPromises()
 
-    const wrapper = mountConsent()
+    await clickNext(wrapper) // step 2
+    await wrapper.find('[data-testid="consent-age"]').setValue('1990')
+    await wrapper.find('[data-testid="consent-country"]').setValue('GB')
+    await wrapper.find('[data-testid="consent-gender"]').setValue('Non-binary')
+    await wrapper.find('[data-testid="consent-city"]').setValue('London')
+    await clickNext(wrapper) // step 3
+    await wrapper.find('[data-testid="consent-newsletter"] input').setValue(true)
+    await clickNext(wrapper) // step 4
 
-    await wrapper.get('[data-testid="consent-gdpr"] input').setValue(true)
-    await wrapper.get('[data-testid="consent-past-data"] input').setValue(true)
-    await wrapper.get('[data-testid="consent-future-data"] input').setValue(true)
-    await wrapper.get('[data-testid="consent-form"]').trigger('submit')
-    await Promise.resolve()
-    await Promise.resolve()
+    await wrapper.find('[data-testid="consent-gdpr"] input').setValue(true)
+    await wrapper.find('[data-testid="consent-future-data"] input').setValue(true)
+    await wrapper.find('[data-testid="consent-form"]').trigger('submit')
+    await flushPromises()
 
-    expect(consent).toHaveBeenCalledWith(expect.objectContaining({ newsletter: false }))
+    expect(consent).toHaveBeenCalledWith({
+      age: '1990',
+      country: 'GB',
+      city: 'London',
+      gender: 'Non-binary',
+      newsletter: true,
+      consent_gdpr: true,
+      consent_past_data: true,
+      consent_future_data: true,
+    })
+    expect(sessionStore.fetch).toHaveBeenCalled()
+    expect(navigateToMock).toHaveBeenCalledWith('/dashboard')
+  })
 
-    consent.mockClear()
-    await wrapper.get('[data-testid="consent-newsletter"] input').setValue(true)
-    await wrapper.get('[data-testid="consent-form"]').trigger('submit')
-    await Promise.resolve()
-    await Promise.resolve()
+  it('persists step-1 skill selections via PATCH /users/me/skills after consent succeeds', async () => {
+    const consent = vi.fn().mockResolvedValue({})
+    const updateSkills = vi.fn().mockResolvedValue({ tags: [101] })
+    const { wrapper } = mountConsent({ consent, updateSkills })
+    await flushPromises()
 
-    expect(consent).toHaveBeenCalledWith(expect.objectContaining({ newsletter: true }))
+    await wrapper.find('[data-testid="consent-skill-101"]').setValue(true)
+    await goToStep4(wrapper)
+    await wrapper.find('[data-testid="consent-gdpr"] input').setValue(true)
+    await wrapper.find('[data-testid="consent-future-data"] input').setValue(true)
+    await wrapper.find('[data-testid="consent-form"]').trigger('submit')
+    await flushPromises()
+
+    expect(updateSkills).toHaveBeenCalledWith({ tags: [101] })
+  })
+
+  it('persists the invites preference via PATCH /users/me/preferences after consent succeeds', async () => {
+    const consent = vi.fn().mockResolvedValue({})
+    const updateEmailPreferences = vi.fn().mockResolvedValue({ invites: true })
+    const { wrapper } = mountConsent({ consent, updateEmailPreferences })
+    await flushPromises()
+
+    await clickNext(wrapper) // step 2
+    await fillStep2(wrapper)
+    await clickNext(wrapper) // step 3
+    await wrapper.find('[data-testid="consent-invites"] input').setValue(true)
+    await clickNext(wrapper) // step 4
+    await wrapper.find('[data-testid="consent-gdpr"] input').setValue(true)
+    await wrapper.find('[data-testid="consent-future-data"] input').setValue(true)
+    await wrapper.find('[data-testid="consent-form"]').trigger('submit')
+    await flushPromises()
+
+    expect(updateEmailPreferences).toHaveBeenCalledWith({ invites: true })
+  })
+
+  it('renders 422 field errors, jumping back to the step that owns the field', async () => {
+    const consent = vi.fn().mockRejectedValue({
+      status: 422,
+      data: { message: 'Validation failed', errors: { age: ['The age field is required.'] } },
+    })
+    const { wrapper } = mountConsent({ consent })
+    await flushPromises()
+    await goToStep4(wrapper)
+
+    await wrapper.find('[data-testid="consent-gdpr"] input').setValue(true)
+    await wrapper.find('[data-testid="consent-future-data"] input').setValue(true)
+    await wrapper.find('[data-testid="consent-form"]').trigger('submit')
+    await flushPromises()
+
+    // `age` lives on step 2 - the error must actually be visible, not
+    // stranded on step 4 where the user submitted from.
+    expect(wrapper.find('[data-testid="consent-step-2"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="consent-age-error"]').text()).toBe('The age field is required.')
   })
 })

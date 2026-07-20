@@ -14,6 +14,11 @@ import { useAdminRefdataStore } from '~/stores/adminRefdata.js'
 // `?editId=N` reproduces the legacy `/brands/edit/{id}` bookmark as a query
 // param instead of a separate path route - see AdminCrudTable.vue's own doc
 // comment and docs/nuxt-migration/api-gaps.md Phase D.
+//
+// live BrandsPage.vue (07e6abd7cc^) is the baseline, not develop's older
+// Blade (which predates this branch's own Blade->Vue2 admin migration and
+// never got a delete UI at all) - BrandsPage.vue DOES wire a real delete
+// button + ConfirmModal, same shape as its skills/tags siblings.
 definePageMeta({ auth: true, role: 'Administrator' })
 
 const { t } = useI18n()

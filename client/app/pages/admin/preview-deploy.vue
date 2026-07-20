@@ -6,8 +6,16 @@ import { useI18n } from 'vue-i18n'
 // admin/preview-deploy page (which couldn't authenticate the post-cutover SPA
 // admin, who holds a bearer token, not a web session). Drives
 // GET/POST /api/v2/admin/preview-deploys (API\PreviewDeployController).
+//
+// Gap 23: the confirmation is a BModal with separate Cancel/Deploy buttons
+// rather than legacy's blocking window.confirm() - kept as an intentional
+// modernization (consistent styling with the rest of the SPA's confirm
+// flows, and testable in Playwright, unlike a native dialog); the message
+// text itself (admin.preview_deploy_confirm) matches legacy verbatim.
 definePageMeta({ auth: true, role: 'Administrator' })
-useHead({ title: 'Preview deploy' })
+// Gap 14: legacy's <title>/H1 read "Deploy Preview Branch" / "Deploy Preview
+// Branch to restarters.dev".
+useHead({ title: 'Deploy Preview Branch' })
 
 const { t } = useI18n()
 const { $api } = useNuxtApp()
@@ -26,6 +34,11 @@ const showConfirm = ref(false)
 // Blade's admin/preview-deploy.blade.php always offered a "Main branches"
 // optgroup (develop/master) ahead of any open-PR branches, so the select is
 // never empty/disabled when there are zero open PRs.
+//
+// Gap 24: legacy's PR option text is a plain "#N Title (branch)"; this adds
+// an em-dash and "@author" - kept as an intentional improvement (knowing
+// who opened a PR is useful when picking one to deploy) rather than
+// reverting to strictly match legacy's format.
 const options = computed(() => {
   const groups = [
     {
@@ -91,8 +104,11 @@ onMounted(load)
 
 <template>
   <div class="container py-4" data-testid="preview-deploy-page">
-    <h1>PR preview deploy</h1>
-    <p>Deploy an open pull request's branch to <strong>restarters-dev</strong> (the build takes ~15 minutes).</p>
+    <h1>Deploy Preview Branch to restarters.dev</h1>
+    <p class="text-muted">
+      Select a branch or open PR to deploy to <strong>restarters-dev</strong>. The container will rebuild and restore
+      the latest overnight database backup (~15 minutes total).
+    </p>
 
     <div v-if="loading" class="placeholder-glow" data-testid="preview-deploy-loading">
       <span class="placeholder col-6" style="height: 2.5rem" />
@@ -108,12 +124,15 @@ onMounted(load)
       </BAlert>
 
       <div class="d-flex flex-wrap gap-2 align-items-end" style="max-width: 720px">
-        <BFormSelect
-          v-model="selectedBranch"
-          :options="options"
-          class="flex-grow-1"
-          data-testid="preview-deploy-select"
-        />
+        <div class="flex-grow-1">
+          <label for="preview-deploy-select" class="form-label"><strong>{{ t('admin.branch_to_deploy') }}</strong></label>
+          <BFormSelect
+            id="preview-deploy-select"
+            v-model="selectedBranch"
+            :options="options"
+            data-testid="preview-deploy-select"
+          />
+        </div>
         <BButton
           variant="primary"
           :disabled="deploying || !selectedBranch"
@@ -145,6 +164,7 @@ onMounted(load)
 
     <hr class="mt-4">
     <p class="text-muted small">
+      {{ t('admin.preview_deploy_queued') }}
       <a :href="WORKFLOWS_URL" target="_blank" rel="noopener noreferrer">{{ t('admin.view_workflows') }}</a>
     </p>
   </div>

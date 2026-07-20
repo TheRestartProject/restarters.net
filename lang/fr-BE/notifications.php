@@ -3,6 +3,7 @@
 return [
     'notifications' => 'Notifications',
     'mark_as_read' => 'Marquer comme lu',
+    'marked_as_read' => 'Marqué comme lu',
     'mark_all_as_read' => 'Marquer toutes les notifications comme lues',
     'greeting' => 'Bonjour !',
     'email_footer' => 'Si vous avez des questions ou des problèmes, veuillez contacter <a href="mailto:community@therestartproject.org">community@therestartproject.org</a>.',

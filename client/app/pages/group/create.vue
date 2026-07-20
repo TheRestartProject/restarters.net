@@ -23,10 +23,29 @@ async function onCreated(id) {
 
 <template>
   <div class="container py-4" data-testid="group-create-page">
-    <h1>{{ t('general.new_group') }}</h1>
-    <p>{{ t('groups.add_groups_content') }}</p>
-    <p class="text-muted">{{ t('groups.groups_approval_text') }}</p>
+    <div class="row justify-content-center">
+      <div class="col-lg-12">
+        <!-- resources/views/group/create.blade.php's b-card.box (findings/
+             parity-v2/group-forms.md #2): white bg, hard offset
+             drop-shadow, 1px solid black border, square corners. -->
+        <div class="group-create-box">
+          <h1>{{ t('general.new_group') }}</h1>
+          <p>{{ t('groups.add_groups_content') }}</p>
 
-    <GroupForm @created="onCreated" />
+          <GroupForm @created="onCreated" />
+        </div>
+      </div>
+    </div>
   </div>
 </template>
+
+<style scoped>
+.group-create-box {
+  background-color: #fff;
+  border: 1px solid #222;
+  box-shadow: 5px 5px #222;
+  border-radius: 0;
+  margin-top: 1.5rem;
+  padding: 1.5rem;
+}
+</style>

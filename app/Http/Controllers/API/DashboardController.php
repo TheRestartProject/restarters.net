@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Group;
 use App\Http\Controllers\Controller;
 use App\Party;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -32,6 +33,7 @@ class DashboardController extends Controller
      *                      @OA\Property(property="name", type="string"),
      *                      @OA\Property(property="role", type="integer"),
      *                      @OA\Property(property="archived", type="boolean"),
+     *                      @OA\Property(property="archived_at", type="string", format="date-time", nullable=true, description="If present, this group has been archived and is no longer active. Same value as Group.archived_at."),
      *                      @OA\Property(property="image_url", type="string", nullable=true)
      *                  )),
      *                  @OA\Property(property="nearby_groups", type="array", @OA\Items(
@@ -103,6 +105,7 @@ class DashboardController extends Controller
                 'name' => $group->name,
                 'role' => (int) $group->role,
                 'archived' => ! is_null($group->archived_at),
+                'archived_at' => $group->archived_at ? Carbon::parse($group->archived_at)->toIso8601String() : null,
                 'image_url' => $group->realImageUrl(),
             ];
         })->values()->all();

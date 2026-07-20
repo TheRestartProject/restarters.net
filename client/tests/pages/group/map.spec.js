@@ -24,8 +24,25 @@ const GroupMapStub = {
   template: '<div class="stub-groupmap" data-testid="stub-group-map" />',
 }
 
+// groups.group_count_map/create_groups_mobile2 are new keys (lang/en/groups.php)
+// not yet re-exported to en.json - injected here so these specs exercise the
+// real copy rather than the untranslated key fallback.
 function mountPage() {
-  const i18n = createI18n({ legacy: false, locale: 'en', messages: { en: { ...en, ...clientEn } } })
+  const i18n = createI18n({
+    legacy: false,
+    locale: 'en',
+    messages: {
+      en: {
+        ...en,
+        ...clientEn,
+        groups: {
+          ...en.groups,
+          group_count_map: 'There is <b>{count} group</b>.  Zoom out to see more.|There are <b>{count} groups</b>.  Zoom out to see more.',
+          create_groups_mobile2: 'Add new',
+        },
+      },
+    },
+  })
 
   return mount(GroupMapPage, {
     global: {
@@ -174,5 +191,27 @@ describe('pages/group/map', () => {
 
     await wrapper.find('[data-testid="group-row-1"]').trigger('mouseenter')
     expect(wrapper.findComponent(GroupMapStub).props('hoveredId')).toBe(1)
+  })
+
+  // gap #15: the "zoom out to see more" count copy is map-specific
+  // (groups.group_count_map), distinct from /group/all's plain
+  // groups.group_count.
+  it('shows a "zoom out to see more" group count above the list', () => {
+    groupsStore.names = [
+      { id: 1, name: 'Alpha', lat: 51, lng: 0, archived_at: null },
+      { id: 2, name: 'Beta', lat: 52, lng: 1, archived_at: null },
+    ]
+
+    const wrapper = mountPage()
+
+    expect(wrapper.find('[data-testid="group-map-count"]').text()).toContain('There are')
+    expect(wrapper.find('[data-testid="group-map-count"]').text()).toContain('Zoom out to see more')
+  })
+
+  it('shows the mobile-length create-group label alongside the full label', () => {
+    const wrapper = mountPage()
+
+    expect(wrapper.find('[data-testid="group-create-link"]').text()).toContain('Add new')
+    expect(wrapper.find('[data-testid="group-create-link"]').text()).toContain('Add a new group')
   })
 })

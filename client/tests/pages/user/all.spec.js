@@ -43,6 +43,14 @@ const BFormSelectStub = {
   emits: ['update:modelValue'],
   template: '<select :value="modelValue" @change="$emit(\'update:modelValue\', Number($event.target.value))"><slot /></select>',
 }
+// Same convention as tests/pages/notifications.spec.js's BPagination stub
+// (gap 7: a numbered paginator replacing the old prev/next pair) - clicking
+// it emits the next page number so tests can assert the page-jump handler.
+const BPaginationStub = {
+  props: ['modelValue'],
+  emits: ['update:modelValue'],
+  template: '<div @click="$emit(\'update:modelValue\', modelValue + 1)"><slot /></div>',
+}
 
 const GLOBAL_STUBS = {
   NuxtLink: NuxtLinkStub,
@@ -53,6 +61,7 @@ const GLOBAL_STUBS = {
   BFormGroup: BFormGroupStub,
   BFormInput: BFormInputStub,
   BFormSelect: BFormSelectStub,
+  BPagination: BPaginationStub,
   AdminSettingsTab: AdminSettingsTabStub,
 }
 
@@ -70,8 +79,21 @@ const ROW = {
   last_login_at: null,
 }
 
+// lang/en/users.php's role_any changed to "Choose role" (gap 28) and gained
+// location_na (gap 27) alongside this Nuxt work, but client/i18n/locales/
+// en.json is a generated, checked-in artifact this change intentionally
+// leaves untouched (php artisan translations:export-client) - overlay the
+// changed/new keys here so the spec doesn't depend on regenerating it.
+const messages = {
+  en: {
+    ...en,
+    ...clientEn,
+    users: { ...en.users, role_any: 'Choose role', location_na: 'N/A' },
+  },
+}
+
 function mountPage() {
-  const i18n = createI18n({ legacy: false, locale: 'en', messages: { en: { ...en, ...clientEn } } })
+  const i18n = createI18n({ legacy: false, locale: 'en', messages })
 
   return mount(UserAllPage, {
     global: {
@@ -154,12 +176,49 @@ describe('pages/user/all', () => {
     expect(row.exists()).toBe(true)
     expect(row.find('[data-testid="users-row-link-7"]').attributes('href')).toBe('/profile/edit/7')
     expect(row.text()).toContain('Jane Fixit')
-    expect(row.text()).toContain('Restarter')
+    // role_name is the raw roles.role DB value ("Restarter") - it's t()'d
+    // (see the page's own comment), and the generated en.json translates
+    // that literal string to "Repairer" (a top-level i18n key, same
+    // mechanism PublicProfileView.vue uses for role_name).
+    expect(row.text()).toContain('Repairer')
     expect(row.text()).toContain('London')
     expect(row.text()).toContain('United Kingdom')
     expect(row.text()).toContain('2')
     // last_login_at is null -> "Never"
     expect(row.text()).toContain('Never')
+  })
+
+  // Gap 9: legacy truncates the email cell to 15 chars and offers a
+  // click/hover "copy to clipboard" affordance, rather than plain untruncated text.
+  describe('email cell (gap 9)', () => {
+    it('truncates a long email to 15 chars with an ellipsis', () => {
+      usersStore.list.data = [ROW] // 'jane@example.com' is 17 chars
+
+      const wrapper = mountPage()
+      const cell = wrapper.find('[data-testid="users-row-email-7"]')
+
+      expect(cell.text()).toBe('jane@example.co...')
+      expect(cell.attributes('title')).toContain('jane@example.com')
+    })
+
+    it('copies the full address to the clipboard on click', async () => {
+      const writeText = vi.fn()
+      Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true })
+      usersStore.list.data = [ROW]
+
+      const wrapper = mountPage()
+      await wrapper.find('[data-testid="users-row-email-7"]').trigger('click')
+
+      expect(writeText).toHaveBeenCalledWith('jane@example.com')
+    })
+  })
+
+  // Gap 27: legacy falls back to the literal text "N/A" for a user with no location.
+  it('shows N/A for a user with no location', () => {
+    usersStore.list.data = [{ ...ROW, location: null }]
+
+    const wrapper = mountPage()
+    expect(wrapper.find('[data-testid="users-row-7"]').text()).toContain('N/A')
   })
 
   describe('filters', () => {
@@ -199,6 +258,38 @@ describe('pages/user/all', () => {
       await wrapper.find('[data-testid="users-filter-form"]').trigger('submit')
 
       expect(usersStore.fetchList).toHaveBeenCalledWith({ page: 1, name: 'Jane' })
+    })
+
+    // Gap 28: legacy's role filter defaults to "Choose role", not "Any role".
+    it('labels the default role filter option "Choose role"', () => {
+      const wrapper = mountPage()
+      const defaultOption = wrapper.find('[data-testid="users-filter-role"] option')
+
+      expect(defaultOption.text()).toBe('Choose role')
+    })
+  })
+
+  // Gap 6: legacy's filter <aside> is a Bootstrap collapse, hidden by
+  // default below the md breakpoint and toggled by a "Reveal filters"
+  // button, with an inline close control inside the panel itself.
+  describe('mobile filter reveal (gap 6)', () => {
+    it('starts collapsed, and the reveal button opens it', async () => {
+      const wrapper = mountPage()
+
+      expect(wrapper.find('[data-testid="users-filter-panel"]').classes()).toContain('d-none')
+
+      await wrapper.find('[data-testid="users-filter-reveal"]').trigger('click')
+
+      expect(wrapper.find('[data-testid="users-filter-panel"]').classes()).not.toContain('d-none')
+    })
+
+    it('the close control inside the panel collapses it again', async () => {
+      const wrapper = mountPage()
+      await wrapper.find('[data-testid="users-filter-reveal"]').trigger('click')
+
+      await wrapper.find('[data-testid="users-filter-close"]').trigger('click')
+
+      expect(wrapper.find('[data-testid="users-filter-panel"]').classes()).toContain('d-none')
     })
   })
 
@@ -244,46 +335,31 @@ describe('pages/user/all', () => {
       usersStore.list.meta = { current_page: 2, last_page: 3, per_page: 30, total: 61, from: 31, to: 60 }
     })
 
-    it('shows the current/last page and the showing-range text', () => {
+    it('shows the showing-range text', () => {
       const wrapper = mountPage()
 
-      expect(wrapper.find('[data-testid="users-pagination-indicator"]').text()).toContain('2')
-      expect(wrapper.find('[data-testid="users-pagination-indicator"]').text()).toContain('3')
       expect(wrapper.find('[data-testid="users-showing"]').text()).toContain('31')
       expect(wrapper.find('[data-testid="users-showing"]').text()).toContain('60')
       expect(wrapper.find('[data-testid="users-showing"]').text()).toContain('61')
     })
 
-    it('advances to the next page and re-fetches', async () => {
+    // Gap 7: legacy uses Laravel's full numbered paginator ($userlist->links()),
+    // letting users jump directly to any page - not a bare Previous/Next pair.
+    it('renders a BPagination widget instead of prev/next buttons when there is more than one page', async () => {
       const wrapper = mountPage()
-      usersStore.fetchList.mockClear()
 
-      await wrapper.find('[data-testid="users-pagination-next"]').trigger('click')
+      const pagination = wrapper.find('[data-testid="users-pagination"]')
+      expect(pagination.exists()).toBe(true)
 
+      await pagination.trigger('click')
       expect(usersStore.fetchList).toHaveBeenCalledWith({ page: 3 })
     })
 
-    it('goes back to the previous page and re-fetches', async () => {
-      const wrapper = mountPage()
-      usersStore.fetchList.mockClear()
-
-      await wrapper.find('[data-testid="users-pagination-prev"]').trigger('click')
-
-      expect(usersStore.fetchList).toHaveBeenCalledWith({ page: 1 })
-    })
-
-    it('disables next on the last page', () => {
-      usersStore.list.meta = { current_page: 3, last_page: 3, per_page: 30, total: 61, from: 61, to: 61 }
+    it('hides the paginator entirely when there is only one page', () => {
+      usersStore.list.meta = { current_page: 1, last_page: 1, per_page: 30, total: 5, from: 1, to: 5 }
       const wrapper = mountPage()
 
-      expect(wrapper.find('[data-testid="users-pagination-next"]').attributes('disabled')).toBeDefined()
-    })
-
-    it('disables previous on the first page', () => {
-      usersStore.list.meta = { current_page: 1, last_page: 3, per_page: 30, total: 61, from: 1, to: 30 }
-      const wrapper = mountPage()
-
-      expect(wrapper.find('[data-testid="users-pagination-prev"]').attributes('disabled')).toBeDefined()
+      expect(wrapper.find('[data-testid="users-pagination"]').exists()).toBe(false)
     })
   })
 

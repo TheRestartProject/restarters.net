@@ -4,12 +4,15 @@ import { useI18n } from 'vue-i18n'
 import { useEventsStore } from '~/stores/events.js'
 import { useEventComputed } from '~/composables/useEventComputed.js'
 
-// Single-event summary card for EventsList.vue (/party, /party/all,
-// /party/all-past - api-contracts-phase-c.md C2). Styling precedent:
-// GroupCard.vue (card form factor) crossed with
-// GroupEventsScrollTableDateShort.vue's day/month date block
-// (resources/js/mixins/event.js's `dayofmonth`/`month` computeds, now
-// ported via useEventComputed - see that module's doc comment).
+// One <tr> of EventsList.vue's table (/party, /party/all, /party/all-past -
+// api-contracts-phase-c.md C2). Gap 1: develop renders this bucket as a
+// scrollable data TABLE (GroupEventScrollTable.vue, b-table + fields()),
+// not a card list - this component now renders a single table row to match,
+// with EventsList.vue supplying the <table>/<thead> shell. Column set/icons
+// mirror GroupEventScrollTable.vue's fields(): date box, title (+group name,
+// venue/online), then either invited/volunteers (upcoming) or participants/
+// volunteers/waste/co2/fixed/repairable/dead (past, `past` prop), plus an
+// actions column (RSVP button).
 const props = defineProps({
   event: {
     type: Object,
@@ -23,78 +26,68 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  // Audit fix: GroupEventScrollTable.vue's noDevices() gates the "no
+  // devices added" CTA on `this.canedit` too, not just zero devices - a
+  // read-only visitor shouldn't get an "add a device" link they can't use.
+  // Not derivable from `hosting` alone (an Administrator can edit a group
+  // they don't host) - EventsList.vue combines its own isAdmin prop with
+  // the per-row `hosting` it already computes for this.
+  canedit: {
+    type: Boolean,
+    default: false,
+  },
+  // Column set to render, matching GroupEventScrollTable.vue's `past` prop:
+  // false renders invited/volunteers (upcoming/nearby/all buckets), true
+  // renders participants/volunteers/waste/co2/fixed/repairable/dead
+  // (finished buckets). EventsList.vue passes this through unchanged for
+  // every row in a given table, since a single table only ever shows one
+  // bucket at a time.
+  past: {
+    type: Boolean,
+    default: false,
+  },
 })
 
 const { t } = useI18n()
 const eventsStore = useEventsStore()
 const pending = ref(false)
 
-const { attending, dayOfMonth, month, finished } = useEventComputed(() => props.event)
+const { attending, dayOfMonth, month, date, start, end, timezone } = useEventComputed(() => props.event)
 
-// Per-event numbers (RES gap-closure pass, gap 17) - legacy's
+// Per-event numbers (RES gap-closure pass, gap 1/17) - legacy's
 // GroupEventScrollTable.vue showed these as icon+number table cells
 // (invited/volunteers for upcoming events; participants/volunteers/waste/
 // co2/fixed_devices/repairable_devices/dead_devices for finished ones).
 // be-events confirmed (2026-07-20) everything lives on a single
 // `event.stats` object, always present, same shape GET /api/v2/events/{id}
-// already returns and party/view/[id].vue already reads - participants/
-// volunteers/invited are populated regardless of event timing, the device/
-// waste/co2 counters are naturally 0 before the event starts. EventCard has
-// no icon assets for invited/volunteers and is a compact card rather than a
-// table, so this renders the same numbers as a small wrapping chip row
-// instead, guarded field-by-field so a card whose stats haven't loaded yet
-// still renders cleanly (no stats row at all).
-const upcomingStats = computed(() => {
-  const stats = props.event.stats
-  if (finished.value || !stats) return []
+// already returns - guarded field-by-field so a row whose stats haven't
+// loaded yet still renders cleanly (no stat cells at all, matching
+// GroupEventsScrollTableNumber's `v-if="value !== null"`).
+const stats = computed(() => props.event.stats || null)
 
-  const result = []
-  if (stats.invited != null) {
-    result.push({ key: 'invited', label: t('events.invited'), value: stats.invited })
-  }
-  if (stats.volunteers != null) {
-    result.push({ key: 'volunteers', label: t('groups.volunteers'), value: stats.volunteers })
-  }
-  return result
-})
+const invited = computed(() => stats.value?.invited ?? null)
+const volunteers = computed(() => stats.value?.volunteers ?? null)
 
-// Mirrors legacy's dangerIfZero/dangerIfOne/noDevicesError `cell-danger`
-// treatment (resources/js/components/GroupEventScrollTable.vue - be-events
-// confirmed these exact thresholds), collapsed per-stat rather than
-// per-table-cell: participants flagged at zero, volunteers flagged at one
-// or fewer (legacy's dangerIfOne - a lone host with no other volunteers
-// still counts as a warning), and the three device counts flagged together
-// when a finished event recorded no devices at all.
-const pastStats = computed(() => {
-  const stats = props.event.stats
-  if (!finished.value || !stats) return []
+const participants = computed(() => stats.value?.participants ?? null)
+const pastVolunteers = computed(() => stats.value?.volunteers ?? null)
+const waste = computed(() => stats.value?.waste_total ?? null)
+const co2 = computed(() => stats.value?.co2_total ?? null)
+const fixedDevices = computed(() => stats.value?.fixed_devices ?? null)
+const repairableDevices = computed(() => stats.value?.repairable_devices ?? null)
+const deadDevices = computed(() => stats.value?.dead_devices ?? null)
 
-  const deviceFieldsPresent = stats.fixed_devices != null || stats.repairable_devices != null || stats.dead_devices != null
-  const noDevices = deviceFieldsPresent && (stats.fixed_devices ?? 0) + (stats.repairable_devices ?? 0) + (stats.dead_devices ?? 0) === 0
+const participantsDanger = computed(() => participants.value !== null && participants.value <= 0)
+const volunteersDanger = computed(() => pastVolunteers.value !== null && pastVolunteers.value <= 1)
 
-  const result = []
-  if (stats.participants != null) {
-    result.push({ key: 'participants', label: t('groups.participants'), value: stats.participants, danger: stats.participants <= 0 })
-  }
-  if (stats.volunteers != null) {
-    result.push({ key: 'volunteers', label: t('groups.volunteers'), value: stats.volunteers, danger: stats.volunteers <= 1 })
-  }
-  if (stats.waste_total != null) {
-    result.push({ key: 'waste', label: t('partials.waste_prevented'), value: `${Math.round(stats.waste_total)} kg` })
-  }
-  if (stats.co2_total != null) {
-    result.push({ key: 'co2', labelHtml: t('partials.co2'), value: `${Math.round(stats.co2_total)} kg` })
-  }
-  if (stats.fixed_devices != null) {
-    result.push({ key: 'fixed', label: t('partials.fixed'), value: stats.fixed_devices, danger: noDevices })
-  }
-  if (stats.repairable_devices != null) {
-    result.push({ key: 'repairable', label: t('partials.repairable'), value: stats.repairable_devices, danger: noDevices })
-  }
-  if (stats.dead_devices != null) {
-    result.push({ key: 'dead', label: t('partials.end_of_life'), value: stats.dead_devices, danger: noDevices })
-  }
-  return result
+// Gap 18: when a finished event recorded zero devices, develop shows
+// explanatory text + a direct "add a device" link instead of the device/
+// waste/co2 stat numbers (GroupEventScrollTable.vue's noDevices()/
+// noDevicesError()). A plain <table> (unlike b-table) can colspan, so this
+// replaces the whole stats block in one cell rather than legacy's
+// single-cell squeeze workaround.
+const noDevices = computed(() => {
+  if (!props.past || !stats.value || !props.canedit) return false
+  return (fixedDevices.value ?? 0) + (repairableDevices.value ?? 0) + (deadDevices.value ?? 0) === 0
 })
 
 async function onToggleAttendance() {
@@ -115,15 +108,35 @@ async function onToggleAttendance() {
 </script>
 
 <template>
-  <div class="event-card d-flex align-items-center py-2 border-bottom" :data-testid="`event-card-${event.id}`">
-    <div class="datebox text-center fw-bold me-3" :data-testid="`event-card-date-${event.id}`">
-      <div class="day">{{ dayOfMonth }}</div>
-      <div class="month">{{ month }}</div>
-    </div>
+  <tr
+    class="event-card"
+    :class="{ attending }"
+    :data-testid="`event-card-${event.id}`"
+  >
+    <td class="datecell text-center fw-bold" :data-testid="`event-card-date-${event.id}`">
+      <div class="datebox mx-auto">
+        <div class="day">{{ dayOfMonth }}</div>
+        <div class="month">{{ month }}</div>
+      </div>
+    </td>
 
-    <div class="flex-grow-1">
+    <!-- Gap 1: GroupEventsScrollTableDateLong.vue's long-date column (full
+         date, start-end time - end hidden below md, matching its own
+         `d-none d-md-inline` - plus a small clock-icon/timezone line).
+         useEventComputed.js already derives all four fields; this column
+         was never wired up to render them. -->
+    <td class="text-start small" :data-testid="`event-card-datelong-${event.id}`">
+      <div>{{ date }}</div>
+      <div>{{ start }} <span class="d-none d-md-inline">- {{ end }}</span></div>
+      <div class="text-muted">
+        <img src="/images/clock.svg" alt="" class="datelong-icon">
+        {{ timezone }}
+      </div>
+    </td>
+
+    <td>
       <NuxtLink :to="`/party/view/${event.id}`" :data-testid="`event-card-link-${event.id}`">
-        {{ event.title }}
+        <b>{{ event.title }}</b>
       </NuxtLink>
 
       <BBadge
@@ -154,48 +167,85 @@ async function onToggleAttendance() {
           - {{ event.location }}
         </span>
       </div>
+    </td>
 
-      <div v-if="upcomingStats.length" class="d-flex flex-wrap gap-1 mt-1" :data-testid="`event-card-upcoming-stats-${event.id}`">
-        <span
-          v-for="stat in upcomingStats"
-          :key="stat.key"
-          class="badge bg-light text-dark border fw-normal"
-          :data-testid="`event-card-stat-${stat.key}-${event.id}`"
-        >
-          {{ stat.value }} {{ stat.label }}
-        </span>
-      </div>
+    <template v-if="!past">
+      <td class="text-center" :data-testid="`event-card-stat-invited-${event.id}`">
+        {{ invited }}
+      </td>
+      <td class="text-center" :data-testid="`event-card-stat-volunteers-${event.id}`">
+        {{ volunteers }}
+      </td>
+    </template>
 
-      <div v-if="pastStats.length" class="d-flex flex-wrap gap-1 mt-1" :data-testid="`event-card-past-stats-${event.id}`">
-        <span
-          v-for="stat in pastStats"
-          :key="stat.key"
-          class="badge fw-normal"
-          :class="stat.danger ? 'bg-danger-subtle text-danger-emphasis border border-danger-subtle' : 'bg-light text-dark border'"
-          :data-testid="`event-card-stat-${stat.key}-${event.id}`"
-        >
-          {{ stat.value }}
-          <!-- eslint-disable-next-line vue/no-v-html -->
-          <span v-if="stat.labelHtml" v-html="stat.labelHtml" />
-          <template v-else>{{ stat.label }}</template>
-        </span>
-      </div>
-    </div>
+    <template v-else-if="noDevices">
+      <!-- 7 stat columns in the past-bucket field set (participants/
+           volunteers/waste/co2/fixed/repairable/dead) - was colspan="5",
+           squeezing this row into the wrong width. -->
+      <td colspan="7" class="text-center small" data-testid="event-card-no-devices">
+        {{ t('events.no_devices_added') }}
+        <NuxtLink :to="`/party/view/${event.id}`">{{ t('events.add_a_device') }}</NuxtLink>
+      </td>
+    </template>
+    <template v-else-if="past">
+      <td
+        class="text-center"
+        :class="{ 'bg-danger-subtle text-danger-emphasis': participantsDanger }"
+        :data-testid="`event-card-stat-participants-${event.id}`"
+      >
+        {{ participants }}
+      </td>
+      <td
+        class="text-center"
+        :class="{ 'bg-danger-subtle text-danger-emphasis': volunteersDanger }"
+        :data-testid="`event-card-stat-volunteers-${event.id}`"
+      >
+        {{ pastVolunteers }}
+      </td>
+      <td class="text-center" :data-testid="`event-card-stat-waste-${event.id}`">
+        {{ waste !== null ? `${Math.round(waste)} kg` : null }}
+      </td>
+      <td class="text-center" :data-testid="`event-card-stat-co2-${event.id}`">
+        {{ co2 !== null ? `${Math.round(co2)} kg` : null }}
+      </td>
+      <td class="text-center" :data-testid="`event-card-stat-fixed-${event.id}`">
+        {{ fixedDevices }}
+      </td>
+      <td class="text-center" :data-testid="`event-card-stat-repairable-${event.id}`">
+        {{ repairableDevices }}
+      </td>
+      <td class="text-center" :data-testid="`event-card-stat-dead-${event.id}`">
+        {{ deadDevices }}
+      </td>
+    </template>
 
-    <BButton
-      variant="outline-primary"
-      size="sm"
-      class="text-nowrap ms-2"
-      :disabled="pending"
-      :data-testid="attending ? `event-unattend-${event.id}` : `event-attend-${event.id}`"
-      @click="onToggleAttendance"
-    >
-      {{ attending ? t('events.rsvp_button') : t('events.RSVP') }}
-    </BButton>
-  </div>
+    <td class="text-end text-nowrap">
+      <BButton
+        variant="outline-primary"
+        size="sm"
+        :disabled="pending"
+        :data-testid="attending ? `event-unattend-${event.id}` : `event-attend-${event.id}`"
+        @click="onToggleAttendance"
+      >
+        {{ attending ? t('events.rsvp_button') : t('events.RSVP') }}
+      </BButton>
+    </td>
+  </tr>
 </template>
 
 <style scoped>
+/* Gap 17: full-row highlight for events you're attending (develop's
+   GroupEventScrollTable.vue rowClass()/.attending, incl. a black date
+   cell) - in addition to the badge, not instead of it. */
+.event-card.attending {
+  background-color: var(--bs-secondary-bg, #eee);
+}
+
+.event-card.attending .datecell {
+  background-color: #000;
+  color: #fff;
+}
+
 .datebox {
   width: 48px;
 }
@@ -203,5 +253,10 @@ async function onToggleAttendance() {
 .datebox .day {
   font-size: 1.5rem;
   line-height: 1.5rem;
+}
+
+.datelong-icon {
+  width: 10px;
+  margin-bottom: 2px;
 }
 </style>

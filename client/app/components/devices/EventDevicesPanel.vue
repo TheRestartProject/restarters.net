@@ -1,8 +1,8 @@
 <script setup>
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import DeviceRow from './DeviceRow.vue'
-import DeviceForm from './DeviceForm.vue'
+import EventDeviceTable from './EventDeviceTable.vue'
+import CollapsibleSection from '../CollapsibleSection.vue'
 
 // Wires DeviceRow.vue/DeviceForm.vue into the event view page
 // (api-contracts-phase-c.md C5; design.md §6.2 C5 task brief). Functional
@@ -48,6 +48,12 @@ const props = defineProps({
 
 const { t } = useI18n()
 
+// Gap fix (HIGH): legacy wraps the whole "Items at this event" block (both
+// tabs, both tables, add buttons) in one top-level <CollapsibleSection
+// collapsed> (EventDevices.vue) - collapsed by default on mobile (desktop
+// is always expanded, matching CollapsibleSection.vue's own `collapsedOnMobile`
+// semantics - see its doc comment). A prior version rendered a bare,
+// always-expanded heading with no collapse behaviour at all.
 const activeTab = ref('powered')
 const addingPowered = ref(false)
 const addingUnpowered = ref(false)
@@ -66,11 +72,16 @@ function onAdded() {
 </script>
 
 <template>
-  <div data-testid="event-devices">
-    <h2>
-      {{ t('devices.title_items_at_event') }}
-      <span class="fw-normal">({{ devices.length }})</span>
-    </h2>
+  <CollapsibleSection id="devices-section" collapsed-on-mobile data-testid="event-devices">
+    <template #title>
+      <h2 class="mb-0 d-flex align-items-center">
+        <!-- Gap 23: EventDevices.vue pairs the heading with a TV icon
+             (desktop only - `d-none d-md-block` on the b-img itself). -->
+        <img src="/images/tv.svg" alt="" class="devices-title-icon d-none d-md-block me-2">
+        {{ t('devices.title_items_at_event') }}
+        <span class="fw-normal">({{ devices.length }})</span>
+      </h2>
+    </template>
 
     <!-- Stale-while-revalidate: only swap to the spinner when there is no
          data yet. A forced refresh (e.g. after a photo upload) must NOT
@@ -82,135 +93,208 @@ function onAdded() {
       </div>
     </div>
 
+    <!-- Gap 23: EventDevices.vue's content is desktop tabs (one table
+         visible at a time) vs mobile two independent, individually-
+         collapsible sections (both potentially visible at once) - this was
+         a single CSS-grid reflow of the tabbed layout for every viewport,
+         losing the mobile two-collapsible structure. -->
     <template v-else>
-      <ul class="nav nav-tabs">
-        <li class="nav-item">
-          <button
-            type="button"
-            class="nav-link"
-            :class="{ active: activeTab === 'powered' }"
-            data-testid="event-devices-tab-powered"
-            @click="activeTab = 'powered'"
-          >
-            <b>{{ t('devices.title_powered') }}</b> ({{ powered.length }})
-            <template v-if="stats">
-              {{ t('client.devices.tab_impact', { waste: round(stats.waste_powered), co2: round(stats.co2_powered) }) }}
-            </template>
-          </button>
-        </li>
-        <li class="nav-item">
-          <button
-            type="button"
-            class="nav-link"
-            :class="{ active: activeTab === 'unpowered' }"
-            data-testid="event-devices-tab-unpowered"
-            @click="activeTab = 'unpowered'"
-          >
-            <b>{{ t('devices.title_unpowered') }}</b> ({{ unpowered.length }})
-            <template v-if="stats">
-              {{ t('client.devices.tab_impact', { waste: round(stats.waste_unpowered), co2: round(stats.co2_unpowered) }) }}
-            </template>
-          </button>
-        </li>
-      </ul>
+      <div class="d-none d-md-block" data-testid="event-devices-desktop">
+        <ul class="nav nav-tabs">
+          <li class="nav-item">
+            <button
+              type="button"
+              class="nav-link"
+              :class="{ active: activeTab === 'powered' }"
+              data-testid="event-devices-tab-powered"
+              @click="activeTab = 'powered'"
+            >
+              <div class="d-flex justify-content-between align-items-center">
+                <div><b>{{ t('devices.title_powered') }}</b> ({{ powered.length }})</div>
+                <!-- Gap fix (MEDIUM): legacy pairs each waste/CO2 figure with
+                     its own icon (trash_brand.svg / co2_brand.svg) in the tab
+                     title, rather than plain inline text. -->
+                <div v-if="stats" class="d-flex align-items-center event-devices-tab-impact">
+                  <span class="me-2">
+                    <img :src="'/images/trash_brand.svg'" class="event-devices-tab-impact__icon" alt="">
+                    {{ round(stats.waste_powered) }} kg
+                  </span>
+                  <span>
+                    <img :src="'/images/co2_brand.svg'" class="event-devices-tab-impact__icon" alt="">
+                    {{ round(stats.co2_powered) }} kg
+                  </span>
+                </div>
+              </div>
+            </button>
+          </li>
+          <li class="nav-item">
+            <button
+              type="button"
+              class="nav-link"
+              :class="{ active: activeTab === 'unpowered' }"
+              data-testid="event-devices-tab-unpowered"
+              @click="activeTab = 'unpowered'"
+            >
+              <div class="d-flex justify-content-between align-items-center">
+                <div><b>{{ t('devices.title_unpowered') }}</b> ({{ unpowered.length }})</div>
+                <div v-if="stats" class="d-flex align-items-center event-devices-tab-impact">
+                  <span class="me-2">
+                    <img :src="'/images/trash_brand.svg'" class="event-devices-tab-impact__icon" alt="">
+                    {{ round(stats.waste_unpowered) }} kg
+                  </span>
+                  <span>
+                    <img :src="'/images/co2_brand.svg'" class="event-devices-tab-impact__icon" alt="">
+                    {{ round(stats.co2_unpowered) }} kg
+                  </span>
+                </div>
+              </div>
+            </button>
+          </li>
+        </ul>
 
-      <!-- Gap D5: same explanatory copy DevicesSearchTable.vue shows under
-           its powered/unpowered toggle, reusing the fixometer's existing
-           devices.description_powered/description_unpowered lang keys
-           (contain a <b> tag, hence v-html). -->
-      <p class="text-brand small" data-testid="event-devices-description">
-        <!-- eslint-disable-next-line vue/no-v-html -->
-        <span v-html="activeTab === 'powered' ? t('devices.description_powered') : t('devices.description_unpowered')" />
-      </p>
+        <!-- Gap D5: same explanatory copy DevicesSearchTable.vue shows under
+             its powered/unpowered toggle, reusing the fixometer's existing
+             devices.description_powered/description_unpowered lang keys
+             (contain a <b> tag, hence v-html). -->
+        <p class="text-brand small" data-testid="event-devices-description">
+          <!-- eslint-disable-next-line vue/no-v-html -->
+          <span v-html="activeTab === 'powered' ? t('devices.description_powered') : t('devices.description_unpowered')" />
+        </p>
 
-      <div v-if="activeTab === 'powered'">
-        <div class="table-responsive pt-3">
-          <table class="table" data-testid="event-devices-table-powered">
-            <thead>
-              <tr>
-                <th>{{ t('devices.item_type_short') }}</th>
-                <th>{{ t('devices.category') }}</th>
-                <th>{{ t('devices.brand') }}</th>
-                <th>{{ t('devices.age') }}</th>
-                <th>{{ t('devices.devices_description') }}</th>
-                <th>{{ t('devices.status') }}</th>
-                <th>{{ t('devices.spare_parts') }}</th>
-                <th v-if="canedit" />
-              </tr>
-            </thead>
-            <tbody>
-              <DeviceRow
-                v-for="d in powered"
-                :key="d.id"
-                :device="d"
-                :event-id="eventId"
-                :powered="true"
-                :canedit="canedit"
-              />
-              <tr v-if="powered.length === 0">
-                <td :colspan="canedit ? 8 : 7" class="text-muted" data-testid="event-devices-empty">
-                  {{ t('client.events.no_devices') }}
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <BButton
-          v-if="canedit"
-          variant="primary"
-          class="mb-3"
-          data-testid="add-powered-device-desktop"
-          @click="addingPowered = !addingPowered"
-        >
-          {{ t('partials.add_device_powered') }}
-        </BButton>
-        <DeviceForm v-if="addingPowered" :event-id="eventId" :powered="true" @saved="onAdded" @cancel="addingPowered = false" />
+        <!-- Gap fix (MEDIUM): legacy hides Brand/Age/Assessment/Status/
+             Spare-parts below md (EventDeviceList.vue's `d-none
+             d-md-table-cell` fields) instead of scrolling a full-width
+             table on mobile. -->
+        <EventDeviceTable
+          v-if="activeTab === 'powered'"
+          :devices="powered"
+          powered
+          :event-id="eventId"
+          :canedit="canedit"
+          :adding="addingPowered"
+          @toggle-add="addingPowered = !addingPowered"
+          @saved="onAdded"
+        />
+        <EventDeviceTable
+          v-else
+          :devices="unpowered"
+          :powered="false"
+          :event-id="eventId"
+          :canedit="canedit"
+          :adding="addingUnpowered"
+          @toggle-add="addingUnpowered = !addingUnpowered"
+          @saved="onAdded"
+        />
       </div>
 
-      <div v-else>
-        <div class="table-responsive pt-3">
-          <table class="table" data-testid="event-devices-table-unpowered">
-            <thead>
-              <tr>
-                <th>{{ t('devices.item_type_short') }}</th>
-                <th>{{ t('devices.category') }}</th>
-                <th>{{ t('devices.age') }}</th>
-                <th>{{ t('devices.devices_description') }}</th>
-                <th>{{ t('devices.status') }}</th>
-                <th>{{ t('devices.spare_parts') }}</th>
-                <th v-if="canedit" />
-              </tr>
-            </thead>
-            <tbody>
-              <DeviceRow
-                v-for="d in unpowered"
-                :key="d.id"
-                :device="d"
-                :event-id="eventId"
-                :powered="false"
-                :canedit="canedit"
-              />
-              <tr v-if="unpowered.length === 0">
-                <td :colspan="canedit ? 7 : 6" class="text-muted" data-testid="event-devices-empty">
-                  {{ t('client.events.no_devices') }}
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+      <div class="d-block d-md-none" data-testid="event-devices-mobile">
+        <CollapsibleSection collapsed-on-mobile data-testid="event-devices-powered-mobile">
+          <template #title>
+            <div class="d-flex justify-content-between align-items-center small">
+              <div><b>{{ t('devices.title_powered') }}</b></div>
+              <div v-if="stats" class="d-flex align-items-center event-devices-tab-impact ms-2">
+                <span class="me-2">
+                  <img :src="'/images/trash_brand.svg'" class="event-devices-tab-impact__icon" alt="">
+                  {{ round(stats.waste_powered) }}
+                </span>
+                <span>
+                  <img :src="'/images/co2_brand.svg'" class="event-devices-tab-impact__icon" alt="">
+                  {{ round(stats.co2_powered) }}
+                </span>
+              </div>
+            </div>
+          </template>
+          <p class="text-brand small" data-testid="event-devices-description-powered-mobile">
+            <!-- eslint-disable-next-line vue/no-v-html -->
+            <span v-html="t('devices.description_powered')" />
+          </p>
+          <EventDeviceTable
+            :devices="powered"
+            powered
+            :event-id="eventId"
+            :canedit="canedit"
+            :adding="addingPowered"
+            variant="mobile"
+            @toggle-add="addingPowered = !addingPowered"
+            @saved="onAdded"
+          />
+        </CollapsibleSection>
 
-        <BButton
-          v-if="canedit"
-          variant="primary"
-          class="mb-3"
-          data-testid="add-unpowered-device-desktop"
-          @click="addingUnpowered = !addingUnpowered"
-        >
-          {{ t('partials.add_device_unpowered') }}
-        </BButton>
-        <DeviceForm v-if="addingUnpowered" :event-id="eventId" :powered="false" @saved="onAdded" @cancel="addingUnpowered = false" />
+        <CollapsibleSection collapsed-on-mobile data-testid="event-devices-unpowered-mobile">
+          <template #title>
+            <div class="d-flex justify-content-between align-items-center small">
+              <div><b>{{ t('devices.title_unpowered') }}</b></div>
+              <div v-if="stats" class="d-flex align-items-center event-devices-tab-impact ms-2">
+                <span class="me-2">
+                  <img :src="'/images/trash_brand.svg'" class="event-devices-tab-impact__icon" alt="">
+                  {{ round(stats.waste_unpowered) }}
+                </span>
+                <span>
+                  <img :src="'/images/co2_brand.svg'" class="event-devices-tab-impact__icon" alt="">
+                  {{ round(stats.co2_unpowered) }}
+                </span>
+              </div>
+            </div>
+          </template>
+          <p class="text-brand small" data-testid="event-devices-description-unpowered-mobile">
+            <!-- eslint-disable-next-line vue/no-v-html -->
+            <span v-html="t('devices.description_unpowered')" />
+          </p>
+          <EventDeviceTable
+            :devices="unpowered"
+            :powered="false"
+            :event-id="eventId"
+            :canedit="canedit"
+            :adding="addingUnpowered"
+            variant="mobile"
+            @toggle-add="addingUnpowered = !addingUnpowered"
+            @saved="onAdded"
+          />
+        </CollapsibleSection>
       </div>
     </template>
-  </div>
+  </CollapsibleSection>
 </template>
+
+<style scoped lang="scss">
+.devices-title-icon {
+  width: 20px;
+}
+
+.event-devices-tab-impact {
+  // Lowercased, like the figures elsewhere on this panel (legacy's `.lower`
+  // class in EventDevices.vue).
+  text-transform: lowercase;
+  font-size: 0.85rem;
+}
+
+.event-devices-tab-impact__icon {
+  width: 1rem;
+  margin-right: 0.15rem;
+  margin-bottom: 0.15rem;
+}
+
+// Gap fix (MEDIUM): compact mobile card layout, matching
+// FixometerRecordsTable.vue's equivalent treatment for the fixometer/
+// device-search table - below md, hidden columns (d-none d-md-table-cell
+// above, and on DeviceRow.vue's own cells) drop out and the remaining
+// cells reflow into a 2-column grid. :deep() is needed to reach
+// DeviceRow.vue's <tr>/<td> - a separate SFC rendered inside this table.
+// DeviceRow's own edit-swap row (.device-row-editing, a single wide <td>
+// holding DeviceForm) is excluded, same as DevicesSearchTable.vue excludes
+// its own .device-search-details row.
+@media (max-width: 767.98px) {
+  .event-devices-table :deep(tbody tr:not(.device-row-editing)) {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    padding-bottom: 0.3rem;
+    border-bottom: 1px solid #222;
+  }
+
+  .event-devices-table :deep(tbody tr:not(.device-row-editing) > td) {
+    width: 100%;
+    border-bottom: none !important;
+    padding: 0.2rem 0;
+  }
+}
+</style>

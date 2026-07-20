@@ -5,7 +5,9 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import GroupVolunteers from '../../../app/components/groups/GroupVolunteers.vue'
 import { useGroupsStore } from '../../../app/stores/groups.js'
 import en from '../../../i18n/locales/en.json'
+import fr from '../../../i18n/locales/fr.json'
 import clientEn from '../../../i18n/locales/client-en.json'
+import clientFr from '../../../i18n/locales/client-fr.json'
 import { GROUP_VIEW_STUBS } from '../../helpers/stubs.js'
 
 function mountComponent(props = {}) {
@@ -20,8 +22,32 @@ function mountComponent(props = {}) {
   })
 }
 
+// French-locale mount, used only to prove a value actually round-trips
+// through t() (most English translations of these keys are identity
+// strings, e.g. "Soldering" -> "Soldering", so an English-only assertion
+// can't tell a real t() call apart from a raw passthrough that happens to
+// look the same - see PublicProfileView.spec.js's mountViewFr for the same
+// reasoning applied to role names).
+function mountComponentFr(props = {}) {
+  const i18n = createI18n({ legacy: false, locale: 'fr', messages: { fr: { ...fr, ...clientFr } } })
+
+  return mount(GroupVolunteers, {
+    props: { groupId: 5, ...props },
+    global: {
+      plugins: [i18n],
+      stubs: GROUP_VIEW_STUBS,
+    },
+  })
+}
+
+// The API's Skill resource returns `skill_name`, not `name` (the field the
+// component used to read, which rendered blank regardless of locale -
+// GroupVolunteers.vue's skillNames() doc comment). "Publicising events" is
+// a real skill name in the exported 143-key set, with a French translation
+// that actually differs from the raw string, so it proves a genuine t()
+// call rather than a passthrough that happens to look identical.
 const VOLUNTEERS = [
-  { id: 1, user: 10, name: 'Sam', host: true, image: null, skills: [{ id: 1, name: 'Soldering' }] },
+  { id: 1, user: 10, name: 'Sam', host: true, image: null, skills: [{ id: 1, skill_name: 'Publicising events' }] },
   { id: 2, user: 11, name: 'Jo', host: false, image: null, skills: [] },
 ]
 
@@ -103,5 +129,29 @@ describe('components/groups/GroupVolunteers', () => {
     const wrapper = mountComponent({ volunteers: VOLUNTEERS })
     await wrapper.find('[data-testid="group-volunteers-invite-link"]').trigger('click')
     expect(wrapper.emitted('invite')).toBeTruthy()
+  })
+
+  // The API's Skill resource returns `skill_name`; a prior version read
+  // `s.name`, which doesn't exist on the response, so the tooltip rendered
+  // blank in every locale regardless of translation.
+  it('reads skill_name (the field the API actually returns), not name', () => {
+    const wrapper = mountComponent({ volunteers: VOLUNTEERS })
+
+    const tooltip = wrapper.find('[data-testid="group-volunteer-10"] .text-muted').attributes('title')
+    expect(tooltip).not.toBe('')
+    expect(tooltip).toContain('Publicising events')
+  })
+
+  // Skill names are real translation keys (Laravel's JSON lang files,
+  // resolved via @lang() in develop), the same mechanism role names use -
+  // see GroupVolunteers.vue's skillNames() doc comment. Assert against
+  // French specifically: an English-only assertion can't distinguish a
+  // real t() call from a raw passthrough when the English translation
+  // happens to equal the raw string.
+  it('translates skill names via i18n in French too, not a raw passthrough', () => {
+    const wrapper = mountComponentFr({ volunteers: VOLUNTEERS })
+
+    const tooltip = wrapper.find('[data-testid="group-volunteer-10"] .text-muted').attributes('title')
+    expect(tooltip).toContain('Promouvoir des événements')
   })
 })

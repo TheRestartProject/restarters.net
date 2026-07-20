@@ -1,12 +1,18 @@
 <script setup>
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import 'quill/dist/quill.snow.css'
 
 // Thin Quill 2 wrapper (design.md §6.2 B6 task brief: "Quill 2 thin
 // wrapper, .ql-editor class preserved for e2e parity" - resources/js/
 // components/RichTextEditor.vue is the functional spec, but that one wraps
 // Quill 1 via vue2-editor, which has no Vue 3 build). Quill itself creates
 // the `.ql-editor`/`.ql-container`/`.ql-toolbar` classes when it mounts, so
-// no extra markup is needed to preserve them for e2e selectors.
+// no extra markup is needed to preserve them for e2e selectors. The snow
+// theme's own CSS import above is required, not cosmetic: without it the
+// toolbar buttons render as a row of unstyled boxes and Quill's internal
+// `.ql-clipboard` paste-staging div (normally hidden off-screen by this
+// stylesheet) shows up as a stray empty text input in the middle of the
+// page (parity-shots/desktop/15-event-create__new.png).
 //
 // The htmlEditButton/quill-paste-smart modules the legacy editor used are
 // Quill-1-only plugins with no Quill-2 equivalents shipped here - dropped

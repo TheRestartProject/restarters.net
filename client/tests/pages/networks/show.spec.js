@@ -7,6 +7,7 @@ import { useAuthStore } from '../../../app/stores/auth.js'
 import { useSessionStore } from '../../../app/stores/session.js'
 import { useNetworksStore } from '../../../app/stores/networks.js'
 import { useGroupsStore } from '../../../app/stores/groups.js'
+import { BDropdownItemStub, BDropdownStub } from '../../helpers/stubs.js'
 import en from '../../../i18n/locales/en.json'
 import clientEn from '../../../i18n/locales/client-en.json'
 
@@ -27,17 +28,21 @@ const AssociateGroupsModalStub = {
   emits: ['close'],
   template: '<div v-if="show" data-testid="stub-associate-modal" :data-candidate-count="candidates.length" />',
 }
-const AdminCrudTableStub = {
-  props: ['items', 'displayKey', 'tableFields', 'formFields', 'labels', 'testidPrefix', 'editId', 'fetchItems', 'createItem', 'updateItem', 'deleteItem'],
-  template: '<div data-testid="stub-admin-crud-table" :data-item-count="items.length" />',
+const NetworkTagsManagerStub = {
+  props: ['networkId'],
+  template: '<div data-testid="stub-network-tags-manager" :data-network-id="networkId" />',
+}
+const NetworkGroupsModerationTableStub = {
+  props: ['networkId'],
+  template: '<div data-testid="stub-network-groups-moderation-table" :data-network-id="networkId" />',
+}
+const NetworkEventsModerationTableStub = {
+  props: ['networkId'],
+  template: '<div data-testid="stub-network-events-moderation-table" :data-network-id="networkId" />',
 }
 const GroupsTableStub = {
   props: ['groups', 'showJoin'],
   template: '<div data-testid="stub-groups-table" :data-row-count="groups.length" />',
-}
-const ModerationQueueStub = {
-  props: ['type', 'networks', 'alwaysShow'],
-  template: '<div :data-testid="`stub-moderation-queue-${type}`" :data-networks="JSON.stringify(networks)" :data-always-show="alwaysShow" />',
 }
 
 const GLOBAL_STUBS = {
@@ -45,11 +50,14 @@ const GLOBAL_STUBS = {
   BAlert: BAlertStub,
   BButton: BButtonStub,
   BModal: BModalStub,
+  BDropdown: BDropdownStub,
+  BDropdownItem: BDropdownItemStub,
   NetworkStats: NetworkStatsStub,
   AssociateGroupsModal: AssociateGroupsModalStub,
-  AdminCrudTable: AdminCrudTableStub,
+  NetworkTagsManager: NetworkTagsManagerStub,
+  NetworkGroupsModerationTable: NetworkGroupsModerationTableStub,
+  NetworkEventsModerationTable: NetworkEventsModerationTableStub,
   GroupsTable: GroupsTableStub,
-  ModerationQueue: ModerationQueueStub,
 }
 
 function setLoggedInUser(user) {
@@ -58,18 +66,24 @@ function setLoggedInUser(user) {
   useAuthStore().token = 'tok-1'
 }
 
-// lang/en/networks.php gained `general.coordinators` alongside this Nuxt
-// work (RES gap-closure pass) but client/i18n/locales/en.json is a
-// generated, checked-in artifact this change intentionally leaves untouched
-// (php artisan translations:export-client) - overlay the new key here so
-// the spec doesn't depend on regenerating it.
+// lang/en/networks.php gained `general.coordinators`/`general.actions`/
+// `moderation.*` alongside this Nuxt work (RES gap-closure pass) but
+// client/i18n/locales/en.json is a generated, checked-in artifact this
+// change intentionally leaves untouched (php artisan
+// translations:export-client) - overlay the new keys here so the spec
+// doesn't depend on regenerating it.
 const messages = {
   en: {
     ...en,
     ...clientEn,
     networks: {
       ...en.networks,
-      general: { ...en.networks.general, coordinators: 'Network Coordinators' },
+      general: { ...en.networks.general, coordinators: 'Network Coordinators', actions: 'Network Actions' },
+      moderation: {
+        groups_title: 'Groups to moderate',
+        events_title: 'Events to moderate',
+        group_requires_moderation: 'Group requires moderation',
+      },
     },
   },
 }
@@ -212,31 +226,34 @@ describe('pages/networks/[id]', () => {
       expect(card8.get('img').attributes('src')).toBe('/images/placeholder-avatar.webp')
     })
 
-    it('scopes the moderation queues to this network and always shows them', async () => {
+    it('renders the network-scoped groups/events moderation tables, always, with the legacy heading copy', async () => {
       const wrapper = mountPage()
       await flushPromises()
 
-      const groupsQueue = wrapper.get('[data-testid="stub-moderation-queue-groups"]')
-      expect(groupsQueue.attributes('data-networks')).toBe('[1]')
-      expect(groupsQueue.attributes('data-always-show')).toBe('true')
+      const groupsSection = wrapper.get('[data-testid="network-groups-moderation"]')
+      expect(groupsSection.text()).toContain('Groups to moderate')
+      expect(groupsSection.get('[data-testid="stub-network-groups-moderation-table"]').attributes('data-network-id')).toBe('1')
 
-      const eventsQueue = wrapper.get('[data-testid="stub-moderation-queue-events"]')
-      expect(eventsQueue.attributes('data-networks')).toBe('[1]')
-      expect(eventsQueue.attributes('data-always-show')).toBe('true')
+      const eventsSection = wrapper.get('[data-testid="network-events-moderation"]')
+      expect(eventsSection.text()).toContain('Events to moderate')
+      expect(eventsSection.get('[data-testid="stub-network-events-moderation-table"]').attributes('data-network-id')).toBe('1')
     })
 
     it('always renders tags management (view access implies manage access)', async () => {
       const wrapper = mountPage()
       await flushPromises()
 
-      expect(wrapper.find('[data-testid="tags-management"]').exists()).toBe(true)
-      expect(wrapper.find('[data-testid="stub-admin-crud-table"]').attributes('data-item-count')).toBe('1')
+      const section = wrapper.get('[data-testid="tags-management"]')
+      expect(section.get('[data-testid="stub-network-tags-manager"]').attributes('data-network-id')).toBe('1')
     })
 
-    it('shows the "Add groups" action', async () => {
+    it('shows the "Add groups" action inside the Network Actions dropdown', async () => {
       const wrapper = mountPage()
       await flushPromises()
 
+      const dropdown = wrapper.find('[data-testid="network-show-actions"]')
+      expect(dropdown.exists()).toBe(true)
+      expect(dropdown.text()).toContain('Network Actions')
       expect(wrapper.find('[data-testid="network-show-add-groups"]').exists()).toBe(true)
     })
 
@@ -249,7 +266,7 @@ describe('pages/networks/[id]', () => {
       expect(link.attributes('href')).toBe('/export/networks/1/events')
     })
 
-    it('opens the associate-groups modal with candidates excluding groups already in the network', async () => {
+    it('opens the associate-groups modal with candidates excluding only groups already in the network (archived groups stay selectable, matching Network::groupsNotIn())', async () => {
       groupsStore.names = [
         { id: 9, name: 'Tag Test Group', archived_at: null },
         { id: 10, name: 'Fixers United', archived_at: null },
@@ -263,8 +280,8 @@ describe('pages/networks/[id]', () => {
 
       const modal = wrapper.find('[data-testid="stub-associate-modal"]')
       expect(modal.exists()).toBe(true)
-      // 9 is already in the network, 11 is archived - only 10 is a candidate.
-      expect(modal.attributes('data-candidate-count')).toBe('1')
+      // 9 is already in the network - 10 and 11 (archived) are both candidates.
+      expect(modal.attributes('data-candidate-count')).toBe('2')
     })
 
     it('re-fetches groups filtered by tag when the tag filter changes', async () => {

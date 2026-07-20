@@ -20,6 +20,8 @@ const messages = {
       open_pull_requests: 'Open pull requests',
       preview_deploy_confirm:
         'This will redeploy restarters.dev with the selected branch and restore the overnight database. Continue?',
+      branch_to_deploy: 'Branch to deploy',
+      preview_deploy_queued: 'Deploys are queued as GitHub Actions runs.',
       view_workflows: 'View running workflows →',
     },
   },
@@ -62,6 +64,34 @@ function stubApi({ prs = [], deployResponse } = {}) {
 describe('pages/admin/preview-deploy', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
+  })
+
+  // Gap 14: legacy's <title>/H1 read "Deploy Preview Branch" / "Deploy
+  // Preview Branch to restarters.dev".
+  it('shows the legacy H1 wording', async () => {
+    stubApi({ prs: [] })
+    const wrapper = mountPage()
+    await flushPromises()
+
+    expect(wrapper.find('h1').text()).toBe('Deploy Preview Branch to restarters.dev')
+  })
+
+  // Gap 15: legacy shows a bold "Branch to deploy" label above the select.
+  it('labels the branch select "Branch to deploy"', async () => {
+    stubApi({ prs: [] })
+    const wrapper = mountPage()
+    await flushPromises()
+
+    expect(wrapper.find('label[for="preview-deploy-select"]').text()).toBe('Branch to deploy')
+  })
+
+  // Gap 25: legacy has a lead-in sentence before the workflow-runs link.
+  it('shows the "Deploys are queued..." lead-in before the workflows link', async () => {
+    stubApi({ prs: [] })
+    const wrapper = mountPage()
+    await flushPromises()
+
+    expect(wrapper.text()).toContain('Deploys are queued as GitHub Actions runs.')
   })
 
   it('offers a Main branches group (develop/master) and enables Deploy even with zero open PRs', async () => {

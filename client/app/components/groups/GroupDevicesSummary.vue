@@ -150,6 +150,11 @@ function podiumHeight(position) {
 
 .stat-card__label {
   line-height: 1.1;
+  /* GroupDevicesWorkedOn.vue wraps these cards in .text-lowercase - "total"
+     is already lowercase in the lang string, but "Fixed"/"Repairable"/
+     "End-of-life" need the CSS transform to match (partials.php keeps them
+     capitalised for reuse elsewhere, e.g. device tables). */
+  text-transform: lowercase;
 }
 
 // GroupDeviceRepairPodium.vue: three boxes, 1st place tallest, laid out

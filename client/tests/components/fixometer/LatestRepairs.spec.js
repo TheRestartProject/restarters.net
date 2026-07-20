@@ -27,9 +27,16 @@ describe('components/fixometer/LatestRepairs', () => {
     expect(wrapper.find('[data-testid="latest-repairs-loading"]').exists()).toBe(true)
   })
 
-  it('shows an empty state when there is no finished-event-with-repairs yet', () => {
+  // Gap fix: legacy FixometerLatestData.vue's `latestData` prop was
+  // `required: true` - it never handled a null/missing latest-repaired-event,
+  // so the grid cell rendered nothing at all (no card, no text). A prior
+  // version showed a "No repairs recorded yet." message here instead, which
+  // develop's rendered output doesn't have.
+  it('shows an empty placeholder with no visible text when there is no finished-event-with-repairs yet', () => {
     const wrapper = mountComponent({ latestData: null })
-    expect(wrapper.find('[data-testid="latest-repairs-empty"]').exists()).toBe(true)
+    const empty = wrapper.find('[data-testid="latest-repairs-empty"]')
+    expect(empty.exists()).toBe(true)
+    expect(empty.text()).toBe('')
   })
 
   it('renders the group link and the waste-prevented string with the event id and rounded-up amount', () => {

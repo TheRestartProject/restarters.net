@@ -57,14 +57,17 @@ const { t } = useI18n()
 const devicesStore = useDevicesStore()
 const { hasRole } = useAuth()
 
-// Gap fix (MEDIUM): legacy FixometerRecordsTable.vue gave Administrators an
-// inline edit + delete on every row (the row-details slot rendered
-// EventDevice with :edit="isAdmin" :delete-button="true"); this table only
-// ever offered the read-only 'i' info toggle, a real capability loss for
-// admins. Ported below as admin-only edit/delete controls alongside the
-// existing (unchanged) info toggle, reusing DeviceForm.vue - same
-// edit-in-place idiom as components/devices/DeviceRow.vue - rather than a
-// second bespoke form.
+// Gap fix (HIGH): legacy FixometerRecordsTable.vue gives every row exactly
+// ONE toggle control - an edit-pencil icon for admins, an info icon for
+// everyone else - which opens the SAME row-details panel: EventDevice.vue,
+// disabled (view-only) for non-admins, editable with an inline delete for
+// admins (:edit="isAdmin" :delete-button="true" :cancel-button="false"). A
+// prior version exposed THREE always-visible admin controls (info toggle +
+// separate Edit/Delete text links) and only showed an abbreviated <dl> in
+// the details panel. Both are fixed below: `expanded` (already existed for
+// the info toggle) now doubles as the admin edit-open state too, and the
+// details panel always renders the real DeviceForm - readonly for
+// non-admins, editable+deletable for admins - instead of the <dl>.
 const isAdmin = computed(() => hasRole('Administrator'))
 
 // FixometerFilters.vue's two collapsible sections (ITEM & REPAIR INFO /
@@ -122,59 +125,14 @@ function toggleDetails(id) {
   expanded.value = next
 }
 
-// Admin-only inline edit: swaps the row for DeviceForm.vue, same pattern as
-// DeviceRow.vue's editing state. Search results aren't cached in the store
-// (unlike byEvent[id]), so a save/delete re-runs the current search rather
-// than relying on the store's optimistic patch to update this list.
-const editingId = ref(null)
-
-function startEdit(id) {
-  editingId.value = id
-}
-
-function onDeviceSaved() {
-  editingId.value = null
+// Search results aren't cached in the store (unlike byEvent[id]), so a
+// save/delete from within the expanded row's DeviceForm re-runs the current
+// search rather than relying on the store's optimistic patch to update this
+// list - closing the row again (matching legacy's `closed(row)` handler,
+// which both refreshes the table and calls `row.toggleDetails()`).
+function onRowClosed(id) {
+  expanded.value = new Set([...expanded.value].filter((x) => x !== id))
   runSearch()
-}
-
-function cancelEdit() {
-  editingId.value = null
-}
-
-// Admin-only delete, behind a single shared confirm modal - same idiom as
-// components/admin/AdminCrudTable.vue's delete-confirm BModal.
-const deletingDevice = ref(null)
-const showDeleteConfirm = ref(false)
-const deleting = ref(false)
-const deleteError = ref('')
-
-function askDelete(device) {
-  deletingDevice.value = device
-  deleteError.value = ''
-  showDeleteConfirm.value = true
-}
-
-function cancelDelete() {
-  showDeleteConfirm.value = false
-  deletingDevice.value = null
-}
-
-async function confirmDelete() {
-  if (!deletingDevice.value) return
-
-  deleting.value = true
-  deleteError.value = ''
-
-  try {
-    await devicesStore.deleteDevice(deletingDevice.value.eventid, deletingDevice.value.id)
-    showDeleteConfirm.value = false
-    deletingDevice.value = null
-    runSearch()
-  } catch {
-    deleteError.value = t('client.devices.delete_failed')
-  } finally {
-    deleting.value = false
-  }
 }
 
 const clusters = computed(() => devicesStore.clusters)
@@ -249,7 +207,6 @@ const devices = computed(() => devicesStore.searchResults.data)
 const count = computed(() => devicesStore.searchResults.count)
 const loading = computed(() => devicesStore.searchResults.loading)
 const error = computed(() => devicesStore.searchResults.error)
-const totalPages = computed(() => Math.max(1, Math.ceil(count.value / PAGE_SIZE)))
 
 function toggleLabel(label, n) {
   return n === null || n === undefined ? label : `${label} (${n.toLocaleString()})`
@@ -270,14 +227,6 @@ function statusLabel(device) {
 function formatDate(value) {
   return value ? moment(value).format('DD/MM/YYYY') : ''
 }
-
-function previousPage() {
-  if (page.value > 1) page.value -= 1
-}
-
-function nextPage() {
-  if (page.value < totalPages.value) page.value += 1
-}
 </script>
 
 <template>
@@ -287,7 +236,13 @@ function nextPage() {
          a wide right column, both inside one teal-bordered container. Single
          column on narrow viewports. -->
     <div class="device-search-layout">
-      <div class="device-search-layout__filters">
+      <!-- Gap fix (MEDIUM): legacy's filter rail (FixometerFilters.vue) is
+           desktop-only - mobile gets an entirely separate, filter-less pair
+           of CollapsibleSections (FixometerPage.vue's `d-block d-md-none`
+           block). This keeps one unified layout (see this component's own
+           top-of-file doc comment) but hides the rail below md to match,
+           rather than mounting a second filter-less table. -->
+      <div class="device-search-layout__filters d-none d-md-block">
         <div class="device-search-section mb-3" data-testid="device-search-item-info">
       <button
         type="button"
@@ -314,11 +269,8 @@ function nextPage() {
             </select>
           </div>
 
-          <div v-if="filters.powered" class="col-sm-6 col-md-4">
-            <label class="form-label" for="device-search-brand">{{ t('devices.brand') }}</label>
-            <input id="device-search-brand" v-model="filters.brand" type="text" class="form-control" data-testid="device-search-brand">
-          </div>
-
+          <!-- Gap fix (MEDIUM): FixometerFilters.vue orders Model before Brand
+               for powered items - a prior version had them swapped. -->
           <div class="col-sm-6 col-md-4">
             <label class="form-label" for="device-search-model">
               {{ filters.powered ? t('devices.model') : t('devices.model_or_type') }}
@@ -339,6 +291,11 @@ function nextPage() {
               class="form-control"
               data-testid="device-search-item-type"
             >
+          </div>
+
+          <div v-if="filters.powered" class="col-sm-6 col-md-4">
+            <label class="form-label" for="device-search-brand">{{ t('devices.brand') }}</label>
+            <input id="device-search-brand" v-model="filters.brand" type="text" class="form-control" data-testid="device-search-brand">
           </div>
 
           <div class="col-sm-6 col-md-4">
@@ -378,6 +335,13 @@ function nextPage() {
             <input id="device-search-group" v-model="filters.group" type="text" class="form-control" data-testid="device-search-group">
           </div>
 
+          <!-- Gap fix (MEDIUM, accepted simplification): legacy uses
+               b-form-datepicker (a styled calendar-button widget); this
+               migration deliberately drops vue-multiselect-family widgets
+               throughout (design.md §2 - see also EventFilters.vue's
+               identical from/to date pair), so a plain native
+               <input type="date"> stands in here too rather than a
+               one-off themed picker for just this table. -->
           <div class="col-sm-6 col-md-4">
             <label class="form-label" for="device-search-from-date">{{ t('devices.from_date') }}</label>
             <input id="device-search-from-date" v-model="filters.from_date" type="date" class="form-control" data-testid="device-search-from-date">
@@ -430,10 +394,9 @@ function nextPage() {
     </div>
 
     <template v-else>
-      <p data-testid="device-search-count">
-        {{ t('client.devices.results_count', { count }, count) }}
-      </p>
-
+      <!-- Legacy FixometerRecordsTable.vue has no results-count line of its
+           own (just devices.table_intro below) - a prior version added one,
+           which doesn't appear on /fixometer in develop. -->
       <!-- Legacy devices.table_intro: how to use the 'i' info icons + sortable
            column heads. -->
       <p class="text-brand small" data-testid="device-search-table-intro">
@@ -447,14 +410,18 @@ function nextPage() {
            Sortable heads (item/category/brand/group/status/date) mirror the
            legacy FixometerRecordsTable; Assessment was not sortable there. -->
       <div class="table-responsive">
-        <table class="table" data-testid="device-search-results">
+        <table class="table device-search-table" data-testid="device-search-results">
           <thead>
             <tr>
               <th><FixometerSortHeader :label="t('devices.model_or_type')" sort-key="item_type" :active-key="sortBy" :desc="sortDesc" @sort="toggleSort" /></th>
               <th><FixometerSortHeader :label="t('devices.category')" sort-key="category" :active-key="sortBy" :desc="sortDesc" @sort="toggleSort" /></th>
-              <th v-if="filters.powered"><FixometerSortHeader :label="t('devices.brand')" sort-key="brand" :active-key="sortBy" :desc="sortDesc" @sort="toggleSort" /></th>
-              <th><FixometerSortHeader :label="t('devices.assessment')" /></th>
-              <th><FixometerSortHeader :label="t('devices.group')" sort-key="groupname" :active-key="sortBy" :desc="sortDesc" @sort="toggleSort" /></th>
+              <!-- Gap fix (MEDIUM): legacy hides Brand/Assessment/Group below
+                   md (FixometerRecordsTable.vue's `d-none d-md-table-cell`
+                   fields), and restyles the remaining cells into a compact
+                   2-column grid on mobile (see the scoped style block below). -->
+              <th v-if="filters.powered" class="d-none d-md-table-cell"><FixometerSortHeader :label="t('devices.brand')" sort-key="brand" :active-key="sortBy" :desc="sortDesc" @sort="toggleSort" /></th>
+              <th class="d-none d-md-table-cell"><FixometerSortHeader :label="t('devices.assessment')" /></th>
+              <th class="d-none d-md-table-cell"><FixometerSortHeader :label="t('devices.group')" sort-key="groupname" :active-key="sortBy" :desc="sortDesc" @sort="toggleSort" /></th>
               <th><FixometerSortHeader :label="t('devices.status')" sort-key="repair_status" :active-key="sortBy" :desc="sortDesc" @sort="toggleSort" /></th>
               <th><FixometerSortHeader :label="t('devices.devices_date')" sort-key="created_at" :active-key="sortBy" :desc="sortDesc" @sort="toggleSort" /></th>
               <th />
@@ -467,142 +434,83 @@ function nextPage() {
               </td>
             </tr>
             <template v-for="device in devices" :key="device.id">
-              <tr v-if="isAdmin && editingId === device.id" :data-testid="`device-search-editing-${device.id}`">
-                <td :colspan="filters.powered ? 8 : 7" class="p-0">
+              <tr :data-testid="`device-search-row-${device.id}`">
+                <td>{{ device.item_type || '-' }}</td>
+                <td>{{ device.category ? t(device.category.name) : '-' }}</td>
+                <td v-if="filters.powered" class="d-none d-md-table-cell">{{ device.brand || '-' }}</td>
+                <td class="d-none d-md-table-cell">
+                  <span class="device-search-assessment">{{ device.short_problem || '-' }}</span>
+                </td>
+                <td class="d-none d-md-table-cell">{{ device.groupname || '-' }}</td>
+                <td>
+                  <BBadge v-if="statusLabel(device)" :variant="deviceStatusVariant(device)" :data-testid="`device-search-status-${device.id}`">
+                    {{ statusLabel(device) }}
+                  </BBadge>
+                </td>
+                <td>{{ formatDate(device.created_at) }}</td>
+                <td class="text-end">
+                  <!-- Gap fix (HIGH): a single toggle - edit-pencil for
+                       admins, info for everyone else - matching legacy's
+                       show_details slot exactly (one edit_ico_green.svg or
+                       info_ico_green.svg icon, no separate Edit/Delete
+                       links). -->
+                  <button
+                    type="button"
+                    class="device-search-info"
+                    :class="{ 'device-search-info--on': expanded.has(device.id) }"
+                    :aria-expanded="expanded.has(device.id)"
+                    :data-testid="isAdmin ? `device-search-edit-${device.id}` : `device-search-info-${device.id}`"
+                    @click="toggleDetails(device.id)"
+                  >
+                    <img :src="isAdmin ? '/icons/edit_ico_green.svg' : '/icons/info_ico_green.svg'" class="device-search-info__icon" alt="">
+                    <span class="visually-hidden">{{ t('devices.table_intro') }}</span>
+                  </button>
+                </td>
+              </tr>
+              <tr
+                v-if="expanded.has(device.id)"
+                class="device-search-details"
+                :data-testid="`device-search-details-${device.id}`"
+              >
+                <td :colspan="filters.powered ? 8 : 7">
+                  <!-- Gap fix (HIGH): the full device form (repair status,
+                       next steps, spare parts, barrier, notes, weight,
+                       images) instead of an abbreviated summary - disabled/
+                       read-only for non-admins, editable with an inline
+                       delete for admins. No cancel button: the row's own
+                       toggle above already closes this panel. -->
                   <DeviceForm
                     :event-id="device.eventid"
                     :device="device"
                     :powered="filters.powered"
-                    @saved="onDeviceSaved"
-                    @cancel="cancelEdit"
+                    :readonly="!isAdmin"
+                    :delete-button="isAdmin"
+                    :cancel-button="false"
+                    @saved="onRowClosed(device.id)"
+                    @deleted="onRowClosed(device.id)"
                   />
+                  <NuxtLink :to="`/party/view/${device.eventid}`" :data-testid="`device-search-view-${device.id}`">
+                    {{ t('client.events.view_event') }}
+                  </NuxtLink>
                 </td>
               </tr>
-              <template v-else>
-                <tr :data-testid="`device-search-row-${device.id}`">
-                  <td>{{ device.item_type || '-' }}</td>
-                  <td>{{ device.category ? t(device.category.name) : '-' }}</td>
-                  <td v-if="filters.powered">{{ device.brand || '-' }}</td>
-                  <td>{{ device.short_problem || '-' }}</td>
-                  <td>{{ device.groupname || '-' }}</td>
-                  <td>
-                    <BBadge v-if="statusLabel(device)" :variant="deviceStatusVariant(device)" :data-testid="`device-search-status-${device.id}`">
-                      {{ statusLabel(device) }}
-                    </BBadge>
-                  </td>
-                  <td>{{ formatDate(device.created_at) }}</td>
-                  <td class="text-end">
-                    <button
-                      type="button"
-                      class="device-search-info"
-                      :class="{ 'device-search-info--on': expanded.has(device.id) }"
-                      :aria-expanded="expanded.has(device.id)"
-                      :data-testid="`device-search-info-${device.id}`"
-                      @click="toggleDetails(device.id)"
-                    >
-                      <span aria-hidden="true">i</span>
-                      <span class="visually-hidden">{{ t('devices.table_intro') }}</span>
-                    </button>
-                    <template v-if="isAdmin">
-                      <button
-                        type="button"
-                        class="btn btn-sm btn-link p-0 ms-2"
-                        :data-testid="`device-search-edit-${device.id}`"
-                        @click="startEdit(device.id)"
-                      >
-                        {{ t('client.devices.edit') }}
-                      </button>
-                      <button
-                        type="button"
-                        class="btn btn-sm btn-link text-danger p-0 ms-2"
-                        :data-testid="`device-search-delete-${device.id}`"
-                        @click="askDelete(device)"
-                      >
-                        {{ t('devices.delete_device') }}
-                      </button>
-                    </template>
-                  </td>
-                </tr>
-                <tr
-                  v-if="expanded.has(device.id)"
-                  class="device-search-details"
-                  :data-testid="`device-search-details-${device.id}`"
-                >
-                  <td :colspan="filters.powered ? 8 : 7">
-                    <dl class="device-search-details__grid">
-                      <div>
-                        <dt>{{ t('devices.model') }}</dt>
-                        <dd>{{ device.model || '-' }}</dd>
-                      </div>
-                      <div>
-                        <dt>{{ t('devices.age') }}</dt>
-                        <dd>{{ device.age ?? '-' }}</dd>
-                      </div>
-                      <div v-if="device.spare_parts">
-                        <dt>{{ t('devices.spare_parts') }}</dt>
-                        <dd>{{ device.spare_parts }}</dd>
-                      </div>
-                      <div class="device-search-details__wide">
-                        <dt>{{ t('devices.assessment') }}</dt>
-                        <dd>{{ device.problem || '-' }}</dd>
-                      </div>
-                    </dl>
-                    <NuxtLink :to="`/party/view/${device.eventid}`" :data-testid="`device-search-view-${device.id}`">
-                      {{ t('client.events.view_event') }}
-                    </NuxtLink>
-                  </td>
-                </tr>
-              </template>
             </template>
           </tbody>
         </table>
       </div>
 
-      <div v-if="devices.length" class="d-flex justify-content-between align-items-center mt-3">
-        <button
-          type="button"
-          class="btn btn-secondary"
-          :disabled="page <= 1"
-          data-testid="device-search-prev-page"
-          @click="previousPage"
-        >
-          {{ t('client.devices.previous_page') }}
-        </button>
-        <span data-testid="device-search-page-indicator">
-          {{ t('client.devices.page_of', { page, total: totalPages }) }}
-        </span>
-        <button
-          type="button"
-          class="btn btn-secondary"
-          :disabled="page >= totalPages"
-          data-testid="device-search-next-page"
-          @click="nextPage"
-        >
-          {{ t('client.devices.next_page') }}
-        </button>
-      </div>
-
-      <BModal
-        v-if="isAdmin"
-        :model-value="showDeleteConfirm"
-        :title="t('devices.delete_device')"
-        no-footer
-        data-testid="device-search-delete-modal"
-        @hide="cancelDelete"
-      >
-        <p>{{ t('devices.confirm_delete') }}</p>
-        <p v-if="deleteError" class="text-danger" data-testid="device-search-delete-error">
-          {{ deleteError }}
-        </p>
-        <div class="d-flex justify-content-end gap-2">
-          <BButton variant="outline-secondary" data-testid="device-search-delete-cancel" @click="cancelDelete">
-            {{ t('partials.cancel') }}
-          </BButton>
-          <BButton variant="danger" :disabled="deleting" data-testid="device-search-delete-confirm" @click="confirmDelete">
-            {{ t('devices.delete_device') }}
-          </BButton>
-        </div>
-      </BModal>
+      <!-- Gap fix (HIGH): legacy's b-pagination, a numbered page-jump
+           control, only rendered above one page - not the prev/next-only
+           bar this replaces (which also stayed visible for a single page). -->
+      <BPagination
+        v-if="count > PAGE_SIZE"
+        v-model="page"
+        :total-rows="count"
+        :per-page="PAGE_SIZE"
+        aria-controls="device-search-results"
+        class="mt-3"
+        data-testid="device-search-pagination"
+      />
     </template>
       </div>
     </div>
@@ -610,15 +518,18 @@ function nextPage() {
 </template>
 
 <style scoped lang="scss">
-// Two-column Repair Records card (legacy FixometerPage.vue): a narrow filter
-// rail beside the tabbed results, together in one teal-bordered container.
-// Stacks to a single column below the lg breakpoint.
+// Two-column Repair Records layout (legacy FixometerPage.vue's .fp-layout):
+// a narrow filter rail beside the tabbed results. .fp-layout itself has no
+// border - it's just a grid; the two halves are separately boxed (the filter
+// rail's individual accordion sections below, the results column here),
+// with a visible gap between them, not one continuous border wrapping both -
+// a prior version wrapped the whole grid in a single teal border/padding,
+// which visually fused the two into one box. Stacks to a single column below
+// the lg breakpoint.
 .device-search-layout {
   display: grid;
   grid-template-columns: 1fr;
   gap: 1rem;
-  padding: 1rem;
-  border: 1px solid #0394a6;
 
   @media (min-width: 992px) {
     grid-template-columns: minmax(220px, 300px) 1fr;
@@ -626,8 +537,13 @@ function nextPage() {
   }
 }
 
+// legacy's b-tabs (.ourtabs.ourtabs-brand): one teal border + offset shadow
+// wrapping both the nav-tab strip and its tab-content (table) below it.
 .device-search-layout__results {
   min-width: 0;
+  padding: 1rem;
+  border: 1px solid #0394a6;
+  box-shadow: 5px 5px 0 0 #0394a6;
 }
 
 // In the two-column layout the filter rail is narrow, so its fields (a
@@ -710,55 +626,62 @@ function nextPage() {
   margin: 0;
 }
 
-// Per-row 'i' info toggle - a small circular brand-teal badge (legacy used
-// info_ico_green.svg); filled when its details row is open.
+// Per-row edit/info toggle - legacy's single edit_ico_green.svg (admin) or
+// info_ico_green.svg (everyone else) icon; a filled circle backdrop while
+// its details row is open.
 .device-search-info {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 1.5rem;
-  height: 1.5rem;
+  width: 1.75rem;
+  height: 1.75rem;
   padding: 0;
   border: 1px solid #0394a6;
   border-radius: 50%;
   background: #fff;
-  color: #0394a6;
-  font-style: italic;
-  font-weight: bold;
-  font-family: Georgia, 'Times New Roman', serif;
-  line-height: 1;
   cursor: pointer;
 
   &--on {
-    background: #0394a6;
-    color: #fff;
+    background: #cdeaee;
   }
+}
+
+.device-search-info__icon {
+  width: 1.1rem;
+  height: 1.1rem;
 }
 
 .device-search-details > td {
   background: #f5f7fa;
 }
 
-.device-search-details__grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 0.25rem 1.5rem;
-  margin: 0 0 0.5rem;
-
-  dt {
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    color: #6c757d;
-    margin: 0;
-  }
-
-  dd {
-    margin: 0 0 0.5rem;
-  }
+// Gap fix (LOW): FixometerRecordsTable.vue clamps the Assessment cell to 3
+// lines (v-line-clamp="3") so a long assessment can't grow the row height
+// unpredictably.
+.device-search-assessment {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
-.device-search-details__wide {
-  grid-column: 1 / -1;
+// Gap fix (MEDIUM): FixometerRecordsTable.vue's mobile treatment - below the
+// md breakpoint, hidden columns (d-none d-md-table-cell above) drop out and
+// the remaining cells in each row reflow into a compact 2-column grid,
+// rather than a horizontally-scrolling full-width table.
+@media (max-width: 767.98px) {
+  .device-search-table :deep(tbody tr:not(.device-search-details)) {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    padding-bottom: 0.3rem;
+    border-bottom: 1px solid #222;
+  }
+
+  .device-search-table :deep(tbody tr:not(.device-search-details) > td) {
+    width: 100%;
+    border-bottom: none !important;
+    padding: 0.2rem 0;
+  }
 }
 </style>
 

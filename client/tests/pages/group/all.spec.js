@@ -4,6 +4,8 @@ import { createI18n } from 'vue-i18n'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import GroupAllPage from '../../../app/pages/group/all.vue'
 import { useGroupsStore } from '../../../app/stores/groups.js'
+import { useAuthStore } from '../../../app/stores/auth.js'
+import { useModerationStore } from '../../../app/stores/moderation.js'
 import en from '../../../i18n/locales/en.json'
 import clientEn from '../../../i18n/locales/client-en.json'
 
@@ -12,8 +14,15 @@ const BAlertStub = { template: '<div><slot /></div>' }
 const BButtonStub = { template: '<button v-bind="$attrs"><slot /></button>' }
 const BBadgeStub = { template: '<span v-bind="$attrs"><slot /></span>' }
 
+// groups.create_groups_mobile2 is a new key (lang/en/groups.php) not yet
+// re-exported to en.json - injected here so the mobile-label test exercises
+// the real copy rather than the untranslated key fallback.
 function mountPage() {
-  const i18n = createI18n({ legacy: false, locale: 'en', messages: { en: { ...en, ...clientEn } } })
+  const i18n = createI18n({
+    legacy: false,
+    locale: 'en',
+    messages: { en: { ...en, ...clientEn, groups: { ...en.groups, create_groups_mobile2: 'Add new' } } },
+  })
 
   return mount(GroupAllPage, {
     global: {
@@ -21,6 +30,10 @@ function mountPage() {
       stubs: { NuxtLink: NuxtLinkStub, BAlert: BAlertStub, BButton: BButtonStub, BBadge: BBadgeStub },
     },
   })
+}
+
+function setLoggedInUser(user) {
+  useAuthStore().user = user
 }
 
 function namedGroups(count) {
@@ -40,6 +53,7 @@ describe('pages/group/all', () => {
     groupsStore = useGroupsStore()
     groupsStore.fetchNames = vi.fn().mockResolvedValue([])
     groupsStore.fetchDetails = vi.fn().mockResolvedValue(null)
+    useModerationStore().fetchGroups = vi.fn().mockResolvedValue([])
   })
 
   it('calls groupsStore.fetchNames() with includeArchived on mount', () => {
@@ -65,7 +79,9 @@ describe('pages/group/all', () => {
     expect(groupsStore.fetchNames).toHaveBeenCalledTimes(2)
   })
 
-  it('filters rows by the search box', async () => {
+  // The name/location/country/tags search is GroupsTable's own built-in
+  // filter bar now (show-filters, gap #6), not a page-level search box.
+  it('filters rows via the GroupsTable filter bar', async () => {
     groupsStore.names = [
       { id: 1, name: 'Alpha Fixers', archived_at: null },
       { id: 2, name: 'Beta Fixers', archived_at: null },
@@ -73,45 +89,69 @@ describe('pages/group/all', () => {
 
     const wrapper = mountPage()
     expect(wrapper.findAll('tbody tr[data-testid^="group-row-"]')).toHaveLength(2)
+    expect(wrapper.find('[data-testid="groups-table-filters"]').exists()).toBe(true)
 
-    await wrapper.find('[data-testid="group-all-search"]').setValue('Alpha')
+    await wrapper.find('[data-testid="groups-table-filter-name"]').setValue('Alpha')
 
     const rows = wrapper.findAll('tbody tr[data-testid^="group-row-"]')
     expect(rows).toHaveLength(1)
     expect(rows[0].attributes('data-testid')).toBe('group-row-1')
   })
 
-  it('hides archived groups until the include-archived checkbox is ticked', async () => {
+  // Legacy has no archived-hiding toggle anywhere - archived groups are
+  // always listed, just badge-marked (gap #14/#3): no such checkbox exists
+  // on this page, and archived groups are never excluded from the list.
+  it('shows archived groups by default, with no toggle to hide them', () => {
     groupsStore.names = [
       { id: 1, name: 'Active Group', archived_at: null },
       { id: 2, name: 'Old Group', archived_at: '2024-01-01T00:00:00Z' },
     ]
 
     const wrapper = mountPage()
-    expect(wrapper.findAll('tbody tr[data-testid^="group-row-"]')).toHaveLength(1)
-
-    await wrapper.find('[data-testid="group-all-include-archived"]').setValue(true)
-
+    expect(wrapper.find('[data-testid="group-all-include-archived"]').exists()).toBe(false)
     expect(wrapper.findAll('tbody tr[data-testid^="group-row-"]')).toHaveLength(2)
   })
 
-  it('paginates 20 rows per page', async () => {
+  // GET /api/v2/groups/names carries network_ids/tag_ids per group (PR
+  // #887) - GroupsTable's network/tag filter dropdowns need these
+  // immediately, without waiting on per-row fetchDetails hydration.
+  it('passes each row its network_ids/tag_ids from the names index', () => {
+    groupsStore.names = [{ id: 1, name: 'Alpha Fixers', archived_at: null, network_ids: [3], tag_ids: [7] }]
+
+    const wrapper = mountPage()
+    const table = wrapper.findComponent({ name: 'GroupsTable' })
+
+    expect(table.props('groups')[0].networkIds).toEqual([3])
+    expect(table.props('groups')[0].tagIds).toEqual([7])
+  })
+
+  // gap #1/#2: legacy's shared tab bar only ever has three tabs (no "Map"),
+  // and its .ourtabs border/shadow box wraps the tab-content (here: the
+  // count + filters + table) as well as the nav itself.
+  it('has no Map tab, and renders the table inside the shared tabs panel box', () => {
+    groupsStore.names = [{ id: 1, name: 'Alpha Fixers', archived_at: null }]
+
+    const wrapper = mountPage()
+
+    expect(wrapper.find('[data-testid="groups-tab-map"]').exists()).toBe(false)
+    expect(
+      wrapper.find('[data-testid="groups-tabs-panel"] [data-testid="groups-table"]').exists()
+    ).toBe(true)
+  })
+
+  // No pagination UI at all (gap #7) - the full filtered list renders.
+  it('renders the full filtered list with no pagination controls', () => {
     groupsStore.names = namedGroups(25)
 
     const wrapper = mountPage()
 
-    expect(wrapper.findAll('tbody tr[data-testid^="group-row-"]')).toHaveLength(20)
-    expect(wrapper.find('[data-testid="group-all-page-indicator"]').text()).toContain('1')
-    expect(wrapper.find('[data-testid="group-all-page-indicator"]').text()).toContain('2')
-    expect(wrapper.find('[data-testid="group-all-prev-page"]').attributes('disabled')).toBeDefined()
-
-    await wrapper.find('[data-testid="group-all-next-page"]').trigger('click')
-
-    expect(wrapper.findAll('tbody tr[data-testid^="group-row-"]')).toHaveLength(5)
-    expect(wrapper.find('[data-testid="group-all-next-page"]').attributes('disabled')).toBeDefined()
+    expect(wrapper.findAll('tbody tr[data-testid^="group-row-"]')).toHaveLength(25)
+    expect(wrapper.find('[data-testid="group-all-next-page"]').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="group-all-prev-page"]').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="group-all-page-indicator"]').exists()).toBe(false)
   })
 
-  it('hydrates details for the rows on the current page', () => {
+  it('hydrates details for every row in the filtered list', () => {
     groupsStore.names = [
       { id: 1, name: 'Alpha Fixers', archived_at: null },
       { id: 2, name: 'Beta Fixers', archived_at: null },
@@ -123,14 +163,35 @@ describe('pages/group/all', () => {
     expect(groupsStore.fetchDetails).toHaveBeenCalledWith(2)
   })
 
-  it('toggles an optional column off via the column preferences checkboxes', async () => {
-    groupsStore.names = [{ id: 1, name: 'Alpha Fixers', archived_at: null }]
-
+  it('shows the mobile-length create-group label alongside the full label', () => {
     const wrapper = mountPage()
-    expect(wrapper.find('[data-testid="groups-table-sort-hosts"]').exists()).toBe(true)
 
-    await wrapper.find('[data-testid="group-all-column-toggle-hosts"]').trigger('change')
+    expect(wrapper.find('[data-testid="group-create-link"]').text()).toContain('Add new')
+    expect(wrapper.find('[data-testid="group-create-link"]').text()).toContain('Add a new group')
+  })
 
-    expect(wrapper.find('[data-testid="groups-table-sort-hosts"]').exists()).toBe(false)
+  describe('moderation queue and tag badges (Administrator/NetworkCoordinator only)', () => {
+    it('are hidden for a plain Host', () => {
+      setLoggedInUser({ id: 1, role_name: 'Host' })
+      groupsStore.names = [{ id: 1, name: 'Alpha Fixers', archived_at: null }]
+      groupsStore.details = { 1: { location: null, hosts: null, restarters: null, next_event: null, tags: [{ id: 5, name: 'Scotland' }] } }
+
+      const wrapper = mountPage()
+
+      expect(wrapper.find('[data-testid="moderation-queue-groups"]').exists()).toBe(false)
+      expect(wrapper.find('[data-testid="group-row-tags-1"]').exists()).toBe(false)
+    })
+
+    it('show for an Administrator', () => {
+      setLoggedInUser({ id: 1, role_name: 'Administrator' })
+      useModerationStore().groups.data = [{ id: 9, name: 'Pending Fixers' }]
+      groupsStore.names = [{ id: 1, name: 'Alpha Fixers', archived_at: null }]
+      groupsStore.details = { 1: { location: null, hosts: null, restarters: null, next_event: null, tags: [{ id: 5, name: 'Scotland' }] } }
+
+      const wrapper = mountPage()
+
+      expect(wrapper.find('[data-testid="moderation-queue-groups"]').exists()).toBe(true)
+      expect(wrapper.find('[data-testid="group-row-tags-1"]').text()).toContain('Scotland')
+    })
   })
 })

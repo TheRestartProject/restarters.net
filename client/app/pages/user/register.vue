@@ -33,10 +33,17 @@ const allSkills = ref([])
 const skillsLoading = ref(true)
 const skillsError = ref(false)
 
+// GET /api/v2/skills orders alphabetically (a deliberate general-listing
+// convenience - see SkillController::listSkillsv2's own doc comment), but
+// the legacy blade looped over `Skills::where('category', $key)->get()` with
+// no ORDER BY, i.e. DB/insertion order (database/seeders/DefaultSkills.php's
+// row order). Re-sort by id here to match that order rather than the API's.
 const skillCategories = computed(() =>
   SKILL_CATEGORIES.map((category) => ({
     ...category,
-    skills: allSkills.value.filter((skill) => skill.category === category.id),
+    skills: allSkills.value
+      .filter((skill) => skill.category === category.id)
+      .sort((a, b) => a.id - b.id),
   }))
 )
 
@@ -99,6 +106,30 @@ const fieldErrors = ref({})
 
 function fieldError(field) {
   return fieldErrors.value[field]?.[0] || ''
+}
+
+// Legacy's step-2 email field is a dedicated `emailvalidation` component
+// (resources/js/components/EmailValidation.vue) that checks availability
+// on blur (POST /user/register/check-valid-email) and shows an inline
+// invalid-feedback error immediately, rather than only surfacing a taken
+// email after the full form is submitted. GET /api/v2/auth/email-available
+// is the v2 equivalent (AuthAPI.js#emailAvailable) - already implemented
+// server-side, just not wired up here yet.
+const emailAvailabilityError = ref('')
+
+async function checkEmailAvailable() {
+  if (!form.email) {
+    return
+  }
+
+  try {
+    const { data } = await $api.auth.emailAvailable(form.email)
+    emailAvailabilityError.value = data?.available ? '' : data?.message || ''
+  } catch {
+    // Best-effort, same as the legacy component: a failed availability
+    // check doesn't block the user, the real validation happens on submit.
+    emailAvailabilityError.value = ''
+  }
 }
 
 // Which step each field lives on, so a 422 targeting e.g. `email` (step 2)
@@ -264,9 +295,17 @@ async function submit() {
                 </div>
                 <div class="col-lg-6">
                   <BFormGroup :label="`${t('auth.email_address')}:`" label-for="email">
-                    <BFormInput id="email" v-model="form.email" type="email" required data-testid="register-email" />
-                    <div v-if="fieldError('email')" class="invalid-feedback d-block" data-testid="register-email-error">
-                      {{ fieldError('email') }}
+                    <BFormInput
+                      id="email"
+                      v-model="form.email"
+                      type="email"
+                      required
+                      data-testid="register-email"
+                      @update:model-value="emailAvailabilityError = ''"
+                      @blur="checkEmailAvailable"
+                    />
+                    <div v-if="fieldError('email') || emailAvailabilityError" class="invalid-feedback d-block" data-testid="register-email-error">
+                      {{ fieldError('email') || emailAvailabilityError }}
                     </div>
                   </BFormGroup>
                 </div>
@@ -422,12 +461,11 @@ async function submit() {
 </template>
 
 <style scoped>
-/* Step-scoped layout only - the .panel/.btn-checkbox chrome itself comes
-   from the global brand styles (_panels.scss/_buttons.scss). */
-.registration-wizard {
-  max-width: 760px;
-}
-
+/* Step-scoped layout - the .panel chrome itself comes from the global brand
+   styles (_panels.scss). registration-wizard deliberately has no max-width:
+   legacy's register-new.blade.php has no narrowing wrapper of its own, so
+   the wizard fills the bootstrap .container it sits in (~1140px), not a
+   separate, narrower cap. */
 .registration-step {
   position: relative;
 }
@@ -442,5 +480,52 @@ async function submit() {
 
 .registration-step h3 {
   padding-right: 100px;
+}
+
+/* Skill toggle buttons (step 1): resources/sass/_buttons.scss's
+   label.btn.btn-checkbox - flat light-gray, no border/shadow, sentence-case
+   - not the global _buttons.scss .btn-checkbox { @extend .btn-primary },
+   which is the bordered/shadowed/uppercase look used everywhere else
+   .btn-checkbox appears. That global rule was ported from the widget CSS
+   bundle (resources/global/css/app.scss) header_plain.blade.php now loads;
+   register-new.blade.php originally loaded resources/sass/app.scss instead
+   (git show 07e6abd7cc^, the commit before Phase F deleted both the Blade
+   view and that stylesheet) - restore its rule here, scoped to this page,
+   rather than touching the shared global stylesheet other .btn-checkbox
+   consumers (e.g. SkillsTab.vue) still rely on.
+   !important on the properties that need to beat @extend .btn-primary's own
+   !important background-color, matching the legacy rule's own !importants. */
+.btn-checkbox {
+  width: 100%;
+  font-size: 16px;
+  padding: 16px;
+  padding-bottom: 13px;
+  margin-bottom: 15px;
+  background-color: #e4e4e4 !important;
+  background-image: none !important;
+  border: none !important;
+  border-bottom: 3px solid #b6b6b6 !important;
+  color: #000;
+  border-radius: 0;
+  text-transform: none !important;
+  letter-spacing: normal;
+  font-weight: 400 !important;
+  box-shadow: none !important;
+}
+
+input[type='checkbox']:focus + .btn-checkbox {
+  background-color: #e4e4e4;
+  padding: 16px;
+  color: #000;
+  border-radius: 0;
+}
+
+input[type='checkbox']:checked + .btn-checkbox {
+  background-color: #ffbe5f !important;
+  padding: 16px;
+  border: 0 !important;
+  color: #222 !important;
+  font-size: 16px;
+  border-radius: 0;
 }
 </style>

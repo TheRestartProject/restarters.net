@@ -2,6 +2,9 @@
 
 return [
   'edit' => [
+    'add_new_field' => 'Ajouter un nouveau champ',
+    'new_field_name' => 'Nouveau nom de champ',
+    'add_field' => 'Ajouter le champ',
   ],
   'general' => [
     'network' => 'Réseau',
@@ -9,16 +12,26 @@ return [
     'particular_network' => 'Réseau :networkName',
     'groups' => 'Repair Cafés',
     'about' => 'Plus d\'informations',
+    'actions' => 'Gestion du Réseaux',
     'coordinators' => 'Coordinateurs du réseau',
     'impact' => 'Impact',
   ],
   'stats' => [
     'groups' => '{1} Repair Café|[0,*] Repair Cafés',
     'events' => '{1} Événement|[0,*] Événements',
+    'waste_diverted' => 'Déchets évités',
+    'co2_prevented' => 'CO2 évité',
+  ],
+  'moderation' => [
+    'groups_title' => 'Repair Cafés à modérer',
+    'events_title' => 'Evénements à approuver',
+    'group_requires_moderation' => 'Repair Café a besoin de modération',
   ],
   'tags' => [
     'title' => 'Etiquettes du Repair Café',
     'no_tags' => 'Aucune etiquette créée.',
+    'new_tag_placeholder' => 'Nom de la nouvelle etiquette...',
+    'description_placeholder' => 'Description (facultatif)',
     'create' => 'Créer une etiquette',
     'create_error' => 'Échec de la création de l\'etiquette. Veuillez réessayer.',
     'edit' => 'Modifier',

@@ -50,16 +50,20 @@ async function deleteAccount() {
 </script>
 
 <template>
-  <div data-testid="delete-account-tab">
+  <div class="edit-panel" data-testid="delete-account-tab">
     <BAlert v-if="feedback" :model-value="true" variant="danger" dismissible data-testid="delete-account-feedback" @dismissed="feedback = ''">
       {{ feedback }}
     </BAlert>
 
-    <div class="alert alert-danger d-flex justify-content-between align-items-center flex-wrap gap-2">
-      <span>{{ t('auth.delete_account_text') }}</span>
-      <BButton variant="danger" :disabled="deleting" data-testid="delete-account-button" @click="showModal = true">
-        {{ t('auth.delete_account') }}
-      </BButton>
+    <div class="alert alert-danger">
+      <div class="row">
+        <div class="col-md-8 d-flex flex-column align-content-center">{{ t('auth.delete_account_text') }}</div>
+        <div class="col-md-4 d-flex flex-column align-content-center">
+          <BButton variant="danger" :disabled="deleting" data-testid="delete-account-button" @click="showModal = true">
+            {{ t('auth.delete_account') }}
+          </BButton>
+        </div>
+      </div>
     </div>
 
     <BModal :model-value="showModal" :title="t('partials.are_you_sure')" no-footer data-testid="delete-account-modal" @hide="showModal = false">

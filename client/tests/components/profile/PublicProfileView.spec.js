@@ -6,7 +6,9 @@ import PublicProfileView from '../../../app/components/profile/PublicProfileView
 import { useAuthStore } from '../../../app/stores/auth.js'
 import { useUsersStore } from '../../../app/stores/users.js'
 import en from '../../../i18n/locales/en.json'
+import fr from '../../../i18n/locales/fr.json'
 import clientEn from '../../../i18n/locales/client-en.json'
+import clientFr from '../../../i18n/locales/client-fr.json'
 
 const NuxtLinkStub = { props: ['to'], template: '<a :href="to"><slot /></a>' }
 const BAlertStub = { template: '<div><slot /></div>' }
@@ -41,6 +43,27 @@ const messages = {
 
 function mountView(props) {
   const i18n = createI18n({ legacy: false, locale: 'en', messages })
+
+  return mount(PublicProfileView, {
+    props,
+    global: {
+      plugins: [i18n],
+      stubs: { NuxtLink: NuxtLinkStub, BAlert: BAlertStub },
+    },
+  })
+}
+
+// French-locale mount, used only to prove a value actually round-trips
+// through t() (most English translations of these keys are identity
+// strings, e.g. "Electronics repair" -> "Electronics repair", so an
+// English-only assertion can't tell a real t() call apart from a raw
+// passthrough that happens to look the same).
+function mountViewFr(props) {
+  const i18n = createI18n({
+    legacy: false,
+    locale: 'fr',
+    messages: { fr: { ...fr, ...clientFr } },
+  })
 
   return mount(PublicProfileView, {
     props,
@@ -115,14 +138,67 @@ describe('components/profile/PublicProfileView', () => {
       usersStore.publicProfile.data = PROFILE
     })
 
-    it('renders name, role, location, skills, groups and biography', () => {
+    // PROFILE.role_name is 'Restarter' - legacy's @lang() translates the raw
+    // roles.role DB value via lang/en.json (Restarter -> "Repairer"), not a
+    // literal passthrough, so the rendered label is "Repairer", not
+    // "Restarter".
+    it('renders name, translated role, location, skills and biography', () => {
       const wrapper = mountView({ userId: 42 })
 
       expect(wrapper.find('[data-testid="profile-view-name"]').text()).toBe('Jane Fixit')
-      expect(wrapper.find('[data-testid="profile-view-role-location"]').text()).toBe('Restarter, London')
+      expect(wrapper.find('[data-testid="profile-view-role-location"]').text()).toBe('Repairer, London')
       expect(wrapper.find('[data-testid="profile-view-skills"]').text()).toContain('Electronics repair')
-      expect(wrapper.find('[data-testid="profile-view-groups"]').text()).toContain('Chiswick Fixers')
       expect(wrapper.find('[data-testid="profile-view-bio"]').text()).toBe('I love fixing things.')
+    })
+
+    // Gap fix: legacy's `@lang(Fixometer::getRoleName($user->role))` prints
+    // the raw roles.role column ("Administrator", "Restarter",
+    // "NetworkCoordinator", ...) translated via Laravel's JSON translation
+    // files (lang/en.json et al, not lang/en/*.php) - a prior version showed
+    // the raw role_name untranslated for everything except a hand-mapped
+    // "Administrator" -> "Admin" special case (also wrong: it hardcoded
+    // "Admin" even in French, where develop shows "Administrateur"). Pin a
+    // few different roles through the real i18n keys instead, so any role
+    // silently reverting to the raw API string is caught.
+    it.each([
+      ['Administrator', 'Admin'],
+      ['Restarter', 'Repairer'],
+      ['NetworkCoordinator', 'Network Coordinator'],
+      ['Host', 'Host'],
+    ])('translates role_name %s to %s via i18n, not a hand-mapped special case', (role_name, expected) => {
+      usersStore.publicProfile.data = { ...PROFILE, role_name }
+      const wrapper = mountView({ userId: 42 })
+
+      expect(wrapper.find('[data-testid="profile-view-role-location"]').text()).toBe(`${expected}, London`)
+    })
+
+    // The exact regression this fix corrects: a prior version hardcoded
+    // "Admin" for the Administrator role in every locale, including French,
+    // where develop actually shows "Administrateur".
+    it('translates role_name via i18n in French too, not the English-only hand-mapped label', () => {
+      usersStore.publicProfile.data = { ...PROFILE, role_name: 'Administrator' }
+      const wrapper = mountViewFr({ userId: 42 })
+
+      expect(wrapper.find('[data-testid="profile-view-role-location"]').text()).toBe('Administrateur, London')
+    })
+
+    // Skill names are translated the same way (see the "My skills" list) -
+    // "Publicising events" is a real skill name in the exported 143-key set,
+    // and its French translation actually differs from the raw string, so
+    // this proves a real t() call rather than a passthrough that happens to
+    // look identical in English.
+    it('translates skill names via i18n too, not a raw passthrough', () => {
+      usersStore.publicProfile.data = { ...PROFILE, skills: [{ id: 1, name: 'Publicising events' }] }
+      const wrapper = mountViewFr({ userId: 42 })
+
+      expect(wrapper.find('[data-testid="profile-view-skills"]').text()).toContain('Promouvoir des événements')
+    })
+
+    it('does not render a Groups panel (no equivalent in the legacy public profile page)', () => {
+      const wrapper = mountView({ userId: 42 })
+
+      expect(wrapper.find('[data-testid="profile-view-groups"]').exists()).toBe(false)
+      expect(wrapper.find('[data-testid="profile-view-no-groups"]').exists()).toBe(false)
     })
 
     it('falls back to the no-bio message when biography is null', () => {
@@ -132,14 +208,6 @@ describe('components/profile/PublicProfileView', () => {
       expect(wrapper.find('[data-testid="profile-view-bio"]').text()).toBe(
         'Jane Fixit has not yet entered a biography.',
       )
-    })
-
-    it('shows a no-groups message when groups is empty', () => {
-      usersStore.publicProfile.data = { ...PROFILE, groups: [] }
-      const wrapper = mountView({ userId: 42 })
-
-      expect(wrapper.find('[data-testid="profile-view-no-groups"]').exists()).toBe(true)
-      expect(wrapper.find('[data-testid="profile-view-groups"]').exists()).toBe(false)
     })
 
     it('shows the edit link when viewing your own profile', () => {

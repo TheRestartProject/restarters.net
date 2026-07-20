@@ -15,6 +15,9 @@ const BButtonStub = { template: '<button v-bind="$attrs"><slot /></button>' }
 // stubbed here so this page-level suite doesn't also need a working $api
 // mock for its onMounted() searches/metadata fetches.
 const DevicesSearchTableStub = { template: '<div data-testid="devices-search-table-stub" />' }
+// AddDataModal.spec.js covers its own fetch/render logic - stubbed here so
+// this page-level suite doesn't also need dashboard/events $api mocks.
+const AddDataModalStub = { props: ['show'], template: '<div v-if="show" data-testid="add-data-modal-stub" />' }
 
 function mountPage() {
   const i18n = createI18n({ legacy: false, locale: 'en', messages: { en: { ...en, ...clientEn } } })
@@ -22,7 +25,13 @@ function mountPage() {
   return mount(FixometerPage, {
     global: {
       plugins: [i18n],
-      stubs: { NuxtLink: NuxtLinkStub, BAlert: BAlertStub, BButton: BButtonStub, DevicesSearchTable: DevicesSearchTableStub },
+      stubs: {
+        NuxtLink: NuxtLinkStub,
+        BAlert: BAlertStub,
+        BButton: BButtonStub,
+        DevicesSearchTable: DevicesSearchTableStub,
+        AddDataModal: AddDataModalStub,
+      },
     },
   })
 }
@@ -58,7 +67,7 @@ describe('pages/fixometer', () => {
     expect(fixometerStore.fetchLatestRepaired).toHaveBeenCalledWith({ force: true })
   })
 
-  it('renders the impact stats, the embedded repair-records table, and a link through to the standalone device search page', async () => {
+  it('renders the impact stats and the embedded repair-records table', async () => {
     fixometerStore.impactData.data = { participants: 5, hours_volunteered: 100, waste_total: 100, co2_total: 100 }
     fixometerStore.impactData.loaded = true
 
@@ -67,25 +76,35 @@ describe('pages/fixometer', () => {
 
     expect(wrapper.find('[data-testid="impact-stats"]').exists()).toBe(true)
     expect(wrapper.find('[data-testid="devices-search-table-stub"]').exists()).toBe(true)
-    const link = wrapper.find('[data-testid="fixometer-browse-records"]')
-    expect(link.attributes('href')).toBe('/device/search')
   })
 
-  it('only shows the "Add Data" button when logged in', async () => {
+  // Gap fix: a prior version also rendered a "Browse repair records" link
+  // through to /device/search here - legacy's FixometerPage.vue header row
+  // has only the (Administrator-only) export button; browsing already
+  // happens in place, via the embedded table above.
+  it('does not render a separate "browse records" link - the embedded table is the browse UI', async () => {
     const wrapper = mountPage()
     await flushPromises()
-    expect(wrapper.find('[data-testid="fixometer-add-data"]').exists()).toBe(false)
 
-    const authStore = useAuthStore()
-    authStore.token = 'a-token'
-    authStore.user = { id: 1, role_name: 'Restarter' }
-    await flushPromises()
-
-    expect(wrapper.find('[data-testid="fixometer-add-data"]').exists()).toBe(true)
-    expect(wrapper.find('[data-testid="fixometer-add-data"]').attributes('href')).toBe('/dashboard')
+    expect(wrapper.find('[data-testid="fixometer-browse-records"]').exists()).toBe(false)
   })
 
-  it('only shows the "Download all data" export link for Administrators', async () => {
+  // Gap fix (HIGH): legacy's "Add Data" button is unconditional (rendered
+  // even logged-out) and opens AddDataModal.vue - a prior version gated it
+  // on `loggedIn` and linked straight to /dashboard instead.
+  it('shows the "Add Data" button unconditionally (even logged-out) and opens the picker modal', async () => {
+    const wrapper = mountPage()
+    await flushPromises()
+
+    const button = wrapper.find('[data-testid="fixometer-add-data"]')
+    expect(button.exists()).toBe(true)
+    expect(wrapper.find('[data-testid="add-data-modal-stub"]').exists()).toBe(false)
+
+    await button.trigger('click')
+    expect(wrapper.find('[data-testid="add-data-modal-stub"]').exists()).toBe(true)
+  })
+
+  it('only shows the "Download all data" export link for Administrators, as a solid primary button', async () => {
     fixometerStore.impactData.data = { participants: 5, hours_volunteered: 100, waste_total: 100, co2_total: 100 }
     fixometerStore.impactData.loaded = true
 
@@ -101,5 +120,9 @@ describe('pages/fixometer', () => {
     const exportLink = wrapper.find('[data-testid="fixometer-export-devices"]')
     expect(exportLink.exists()).toBe(true)
     expect(exportLink.attributes('href')).toBe('/export/devices')
+    // Gap fix (LOW): legacy's export button is variant="primary" (solid),
+    // not the outline style a prior version used.
+    expect(exportLink.classes()).toContain('btn-primary')
+    expect(exportLink.classes()).not.toContain('btn-outline-primary')
   })
 })

@@ -45,6 +45,19 @@ const isAdmin = computed(() => hasRole('Administrator'))
 
 const avatarUrl = computed(() => uploadedImageUrl(profile.value?.avatar_url))
 
+// Legacy profile-new.blade.php: `@lang(App\Helpers\Fixometer::getRoleName($user->role))`
+// - getRoleName() returns the raw `roles.role` DB column ("Administrator",
+// "Restarter", "NetworkCoordinator", ...), and @lang() translates it via
+// Laravel's JSON translation files (lang/en.json et al - NOT lang/en/*.php,
+// which is why grepping the PHP lang files for "Administrator" turns up
+// nothing). Those JSON files translate every role name (en: Administrator ->
+// "Admin", Restarter -> "Repairer", NetworkCoordinator -> "Network
+// Coordinator"; fr/fr-BE: Administrator -> "Administrateur", etc) and are
+// already exported as flat top-level keys in i18n/locales/{en,fr,fr-BE}.json
+// (php artisan translations:export-client) - t() resolves the role name
+// straight through those, matching @lang() exactly, in every locale.
+const roleLabel = computed(() => (profile.value?.role_name ? t(profile.value.role_name) : ''))
+
 useHead({ title: t('profile.profile') })
 
 function load() {
@@ -95,14 +108,15 @@ watch(() => props.userId, load)
               <div class="align-self-center">
                 <h3 data-testid="profile-view-name">{{ profile.name }}</h3>
                 <p data-testid="profile-view-role-location">
-                  {{ profile.role_name }}<template v-if="profile.location">, {{ profile.location }}</template>
+                  {{ roleLabel }}<template v-if="profile.location">, {{ profile.location }}</template>
                 </p>
                 <p v-if="profile.on_talk" data-testid="profile-view-talk-link">
                   <a :href="profile.talk_profile_url" target="_blank" rel="noopener noreferrer">{{ t('users.view_profile_on_talk') }}</a>
                 </p>
-                <p v-else-if="isAdmin" class="text-muted" data-testid="profile-view-not-on-talk">
-                  {{ t('users.not_on_talk') }}
-                </p>
+                <!-- Legacy renders this as a bare text node (no <p>, no class) -
+                     an inline, unstyled <span> is the closest Vue equivalent
+                     that still gives the test suite something to select. -->
+                <span v-else-if="isAdmin" data-testid="profile-view-not-on-talk">{{ t('users.not_on_talk') }}</span>
               </div>
             </div>
           </div>
@@ -119,18 +133,8 @@ watch(() => props.userId, load)
         <div class="col-sm-12 col-md-4 order-md-2 panel">
           <h4>{{ t('profile.my_skills') }}</h4>
           <ul class="nav flex-column" data-testid="profile-view-skills">
-            <li v-for="skill in profile.skills || []" :key="skill.id">{{ skill.name }}</li>
+            <li v-for="skill in profile.skills || []" :key="skill.id">{{ t(skill.name) }}</li>
           </ul>
-        </div>
-
-        <div class="col-sm-12 col-md-4 order-md-3 panel">
-          <h4>{{ t('users.groups') }}</h4>
-          <ul v-if="(profile.groups || []).length" class="nav flex-column" data-testid="profile-view-groups">
-            <li v-for="group in profile.groups" :key="group.id">
-              <NuxtLink :to="`/group/view/${group.id}`">{{ group.name }}</NuxtLink>
-            </li>
-          </ul>
-          <p v-else data-testid="profile-view-no-groups">{{ t('client.profile.no_groups') }}</p>
         </div>
 
         <div class="col-sm-12 col-md-6 order-md-1 panel">

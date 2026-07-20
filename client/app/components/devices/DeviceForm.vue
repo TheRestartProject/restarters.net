@@ -23,10 +23,17 @@ import DevicePhotos from './DevicePhotos.vue'
 // native <select>/<input list=datalist> here - natively keyboard-operable,
 // no extra dependency.
 //
-// Delete is deliberately NOT a button on this form: DeviceRow.vue (the
-// summary row this form replaces while editing) already owns its own
-// delete icon + confirm, matching EventDeviceSummary.vue's inline
-// <EventDevice ... /> usage, which never passes `deleteButton` either.
+// Delete is NOT shown by default: DeviceRow.vue (the summary row this form
+// replaces while editing) owns its own delete icon + confirm, matching
+// EventDeviceSummary.vue's inline <EventDevice ... /> usage, which never
+// passes `deleteButton` either. The optional `deleteButton`/`readonly`/
+// `cancelButton` props below port EventDevice.vue's own props of the same
+// name, for the OTHER legacy usage this form now also covers: gap fix
+// (HIGH) - components/fixometer/DevicesSearchTable.vue's row-details
+// panel, which (like FixometerRecordsTable.vue's row-details slot) renders
+// this exact form disabled for a read-only viewer, or editable with an
+// inline delete for an admin - :cancel-button="false" either way, since
+// the row's own toggle icon already closes it.
 const CATEGORY_MISC_POWERED = 46
 const CATEGORY_MISC_UNPOWERED = 50
 
@@ -59,9 +66,26 @@ const props = defineProps({
     type: Boolean,
     required: true,
   },
+  // View-only rendering (EventDevice.vue's `disabled`, i.e. `!edit && !add`):
+  // every field disabled, Save/Cancel hidden entirely.
+  readonly: {
+    type: Boolean,
+    default: false,
+  },
+  // Shows an inline Delete button (behind its own confirm modal) next to
+  // Save - EventDevice.vue's `deleteButton` prop. Only meaningful while
+  // editing.
+  deleteButton: {
+    type: Boolean,
+    default: false,
+  },
+  cancelButton: {
+    type: Boolean,
+    default: true,
+  },
 })
 
-const emit = defineEmits(['saved', 'cancel'])
+const emit = defineEmits(['saved', 'cancel', 'deleted'])
 
 const { t } = useI18n()
 const devicesStore = useDevicesStore()
@@ -256,6 +280,35 @@ function cancel() {
   emit('cancel')
 }
 
+// EventDevice.vue's confirmDeleteDevice()/deleteDevice(): a ConfirmModal
+// gate before the actual delete, same idiom as DevicesSearchTable.vue's
+// (now-removed) admin delete modal and components/admin/AdminCrudTable.vue.
+const confirmingDelete = ref(false)
+const deleting = ref(false)
+
+function askDelete() {
+  confirmingDelete.value = true
+}
+
+function cancelDeleteConfirm() {
+  confirmingDelete.value = false
+}
+
+async function confirmDeleteDevice() {
+  confirmingDelete.value = false
+  deleting.value = true
+  generalError.value = ''
+
+  try {
+    await devicesStore.deleteDevice(props.eventId, props.device.id)
+    emit('deleted')
+  } catch {
+    generalError.value = t('client.devices.delete_failed')
+  } finally {
+    deleting.value = false
+  }
+}
+
 defineExpose({ submit })
 </script>
 
@@ -278,6 +331,7 @@ defineExpose({ submit })
             type="text"
             class="form-control"
             list="device-form-item-type-list"
+            :disabled="readonly"
             data-testid="device-form-item-type"
           >
           <datalist id="device-form-item-type-list">
@@ -294,6 +348,7 @@ defineExpose({ submit })
             v-model.number="form.category"
             class="form-select"
             :class="{ 'is-invalid': missingCategory, 'border-warning': categorySuggested }"
+            :disabled="readonly"
             data-testid="device-form-category"
           >
             <option :value="null" />
@@ -316,6 +371,7 @@ defineExpose({ submit })
             type="text"
             class="form-control"
             list="device-form-brand-list"
+            :disabled="readonly"
             data-testid="device-form-brand"
           >
           <datalist id="device-form-brand-list">
@@ -327,7 +383,14 @@ defineExpose({ submit })
         </BFormGroup>
 
         <BFormGroup :label="`${t('devices.model')}:`" label-for="device-form-model">
-          <input id="device-form-model" v-model="form.model" type="text" class="form-control" data-testid="device-form-model">
+          <input
+            id="device-form-model"
+            v-model="form.model"
+            type="text"
+            class="form-control"
+            :disabled="readonly"
+            data-testid="device-form-model"
+          >
         </BFormGroup>
 
         <BFormGroup :label="`${t('devices.age')}:`" label-for="device-form-age">
@@ -339,6 +402,7 @@ defineExpose({ submit })
             step="0.5"
             max="500"
             class="form-control"
+            :disabled="readonly"
             data-testid="device-form-age"
           >
           <small class="form-text text-muted">{{ t('devices.age_approx') }}</small>
@@ -353,6 +417,7 @@ defineExpose({ submit })
             step="0.1"
             max="500"
             class="form-control"
+            :disabled="readonly"
             data-testid="device-form-weight"
           >
           <small class="form-text text-muted">
@@ -360,14 +425,20 @@ defineExpose({ submit })
           </small>
         </BFormGroup>
 
-        <DevicePhotos v-if="editing" :event-id="eventId" :device-id="device.id" :images="device.images || []" />
+        <DevicePhotos v-if="editing" :event-id="eventId" :device-id="device.id" :images="device.images || []" :readonly="readonly" />
       </div>
 
       <div class="device-form-card" data-testid="device-form-card-repair">
         <h3>{{ t('devices.title_repair') }}</h3>
 
         <BFormGroup :label="`${t('devices.repair_status')}:`" label-for="device-form-status">
-          <select id="device-form-status" v-model="form.repairStatus" class="form-select" data-testid="device-form-status">
+          <select
+            id="device-form-status"
+            v-model="form.repairStatus"
+            class="form-select"
+            :disabled="readonly"
+            data-testid="device-form-status"
+          >
             <option value="" />
             <option :value="STATUS_FIXED">{{ t('partials.fixed') }}</option>
             <option :value="STATUS_REPAIRABLE">{{ t('partials.repairable') }}</option>
@@ -376,21 +447,39 @@ defineExpose({ submit })
         </BFormGroup>
 
         <BFormGroup v-if="showNextSteps" :label="`${t('devices.repair_details')}:`" label-for="device-form-next-steps">
-          <select id="device-form-next-steps" v-model="form.nextSteps" class="form-select" data-testid="device-form-next-steps">
+          <select
+            id="device-form-next-steps"
+            v-model="form.nextSteps"
+            class="form-select"
+            :disabled="readonly"
+            data-testid="device-form-next-steps"
+          >
             <option value="" />
             <option v-for="n in options.next_steps" :key="n" :value="n">{{ t(nextStepLabel(n)) }}</option>
           </select>
         </BFormGroup>
 
         <BFormGroup v-if="showSpareParts" :label="`${t('devices.spare_parts')}:`" label-for="device-form-spare-parts">
-          <select id="device-form-spare-parts" v-model="form.spareParts" class="form-select" data-testid="device-form-spare-parts">
+          <select
+            id="device-form-spare-parts"
+            v-model="form.spareParts"
+            class="form-select"
+            :disabled="readonly"
+            data-testid="device-form-spare-parts"
+          >
             <option value="" />
             <option v-for="p in options.spare_parts" :key="p" :value="p">{{ t(sparePartsLabel(p)) }}</option>
           </select>
         </BFormGroup>
 
         <BFormGroup v-if="showBarrier" :label="`${t('partials.choose_barriers')}:`" label-for="device-form-barrier">
-          <select id="device-form-barrier" v-model="form.barrier" class="form-select" data-testid="device-form-barrier">
+          <select
+            id="device-form-barrier"
+            v-model="form.barrier"
+            class="form-select"
+            :disabled="readonly"
+            data-testid="device-form-barrier"
+          >
             <option value="" />
             <option v-for="b in options.barriers" :key="b.id" :value="b.name">{{ t(b.name) }}</option>
           </select>
@@ -401,7 +490,14 @@ defineExpose({ submit })
         <h3>{{ t('devices.title_assessment') }}</h3>
 
         <BFormGroup :label="`${t('devices.devices_description')}:`" label-for="device-form-problem">
-          <textarea id="device-form-problem" v-model="form.problem" rows="4" class="form-control" data-testid="device-form-problem" />
+          <textarea
+            id="device-form-problem"
+            v-model="form.problem"
+            rows="4"
+            class="form-control"
+            :disabled="readonly"
+            data-testid="device-form-problem"
+          />
         </BFormGroup>
 
         <BFormGroup :label="`${t('client.devices.notes')}:`" label-for="device-form-notes">
@@ -411,6 +507,7 @@ defineExpose({ submit })
             rows="4"
             class="form-control"
             :placeholder="t('devices.placeholder_notes')"
+            :disabled="readonly"
             data-testid="device-form-notes"
           />
         </BFormGroup>
@@ -423,14 +520,36 @@ defineExpose({ submit })
       </select>
     </BFormGroup>
 
-    <div class="d-flex gap-2 justify-content-center mt-3">
-      <BButton type="submit" variant="primary" :disabled="submitting" data-testid="device-form-submit">
+    <div v-if="!readonly || (editing && deleteButton)" class="d-flex gap-2 justify-content-center mt-3">
+      <BButton v-if="!readonly" type="submit" variant="primary" :disabled="submitting" data-testid="device-form-submit">
         {{ editing ? t('partials.save') : t('partials.add_device') }}
       </BButton>
-      <BButton variant="tertiary" data-testid="device-form-cancel" @click="cancel">
+      <BButton v-if="editing && deleteButton" variant="danger" data-testid="device-form-delete" @click="askDelete">
+        {{ t('devices.delete_device') }}
+      </BButton>
+      <BButton v-if="cancelButton && !readonly" variant="tertiary" data-testid="device-form-cancel" @click="cancel">
         {{ t('partials.cancel') }}
       </BButton>
     </div>
+
+    <BModal
+      v-if="editing && deleteButton"
+      :model-value="confirmingDelete"
+      :title="t('devices.delete_device')"
+      no-footer
+      data-testid="device-form-delete-modal"
+      @hide="cancelDeleteConfirm"
+    >
+      <p>{{ t('devices.confirm_delete') }}</p>
+      <div class="d-flex justify-content-end gap-2">
+        <BButton variant="outline-secondary" data-testid="device-form-delete-cancel" @click="cancelDeleteConfirm">
+          {{ t('partials.cancel') }}
+        </BButton>
+        <BButton variant="danger" :disabled="deleting" data-testid="device-form-delete-confirm" @click="confirmDeleteDevice">
+          {{ t('devices.delete_device') }}
+        </BButton>
+      </div>
+    </BModal>
   </BForm>
 </template>
 

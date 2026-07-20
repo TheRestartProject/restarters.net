@@ -28,6 +28,13 @@ const props = defineProps({
     type: Array,
     default: () => [],
   },
+  // EventDevice.vue passes its own `disabled` straight through to
+  // DeviceImages' `disabled` prop - view-only rendering hides the remove
+  // button and the upload widget, leaving just the existing photos.
+  readonly: {
+    type: Boolean,
+    default: false,
+  },
 })
 
 const { t } = useI18n()
@@ -79,6 +86,7 @@ async function removeImage(image) {
       <div v-for="image in images" :key="image.idxref" class="position-relative" data-testid="device-photo">
         <img :src="uploadedImageUrl(image.path)" width="100" height="100" style="object-fit: cover" alt="">
         <button
+          v-if="!readonly"
           type="button"
           class="btn btn-sm btn-light position-absolute top-0 end-0 p-1 lh-1"
           :disabled="deletingIdxref === image.idxref || uploading"
@@ -91,7 +99,7 @@ async function removeImage(image) {
       </div>
     </div>
 
-    <TusImageUpload v-if="!atLimit" @uploaded="onUploaded" @upload-error="onUploadError" />
+    <TusImageUpload v-if="!readonly && !atLimit" @uploaded="onUploaded" @upload-error="onUploadError" />
 
     <BAlert v-if="uploadError" :model-value="true" variant="danger" data-testid="device-photos-error">
       {{ uploadError }}

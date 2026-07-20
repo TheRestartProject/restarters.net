@@ -1,5 +1,6 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
+import clip from 'text-clipper'
 import { useToastStore } from '~/stores/toast.js'
 import { useI18n } from 'vue-i18n'
 import { useEventsStore } from '~/stores/events.js'
@@ -7,11 +8,14 @@ import { useGroupsStore } from '~/stores/groups.js'
 import { useDevicesStore } from '~/stores/devices.js'
 import { useAuth } from '~/composables/useAuth.js'
 import { useEventComputed } from '~/composables/useEventComputed.js'
-import { useCalendarLinks } from '~/composables/useCalendarLinks.js'
+import { useEventAttendance } from '~/composables/useEventAttendance.js'
+import { useCo2Equivalent } from '~/composables/useCo2Equivalent.js'
 import { useUploadedImageUrl } from '~/composables/useUploadedImageUrl.js'
 import EventAttendees from '~/components/events/EventAttendees.vue'
 import EventInviteModal from '~/components/events/EventInviteModal.vue'
-import EventVenueMap from '~/components/events/EventVenueMap.vue'
+import EventDetailsPanel from '~/components/events/EventDetailsPanel.vue'
+import EventActionsDropdown from '~/components/events/EventActionsDropdown.vue'
+import EventShareStatsModal from '~/components/events/EventShareStatsModal.vue'
 import EventDevicesPanel from '~/components/devices/EventDevicesPanel.vue'
 
 // /party/view/[id] - resources/views/events/view.blade.php +
@@ -25,12 +29,36 @@ import EventDevicesPanel from '~/components/devices/EventDevicesPanel.vue'
 //
 // Device add/edit/delete (C5) is wired in via
 // components/devices/EventDevicesPanel.vue, gated on the same `canedit`
-// approximation as the Edit/Duplicate/Delete event buttons below - it
+// approximation as the Edit/Duplicate/Delete event actions below - it
 // renders read-only rows for everyone else. The create/edit/duplicate
 // *event* forms + moderation-approve `.event-approve` select (C4) remain
 // separate pages/slices; this page only shows the muted "requires
 // moderation" note EventDescription.vue already shows today, no approve
 // control.
+//
+// RES gap-closure pass (parity-v2/events.md, gaps 2/3/4/8/9/10/12/15/21):
+// header consolidated into a single EventActionsDropdown (gap 2) with the
+// 5px/1px border treatment + vertical divider (gap 8); date/time/hosts/
+// link/location pulled into EventDetailsPanel with icons + bordered rows
+// (gap 9) including named hosts (gap 10, sourced from the attendee list -
+// no new endpoint); page laid out in EventPage.vue's 2-col grid at md+
+// (gap 4); description truncated with a Read more/less toggle (gap 12);
+// items-fixed/environmental-impact side by side with a CO2 equivalence
+// description + info popover + share button (gap 15); a "Share event
+// stats" modal (gap 3, embed-code half only - see EventShareStatsModal.vue's
+// doc comment for what's deliberately not reproduced).
+//
+// NOT reproduced (backend gaps, see this task's final report): the
+// Discourse "Talk thread" link (gap 11) and the event-photos gallery
+// (gap 5) both need fields the v2 Event resource doesn't return today
+// (discourse_thread, images) - api-gaps.md already tracks the photos gap;
+// this pass surfaces the discourse_thread one too rather than fabricate
+// either. Inline-editable attendance headcounts (gap 13) and the "Add
+// volunteer" modal (gap 14) both need a v2 endpoint that doesn't exist -
+// the legacy POST /party/update-quantity, /party/update-volunteerquantity
+// and PUT /api/events/{id}/volunteers routes are outside the /api/v2
+// surface this client is scoped to (CLAUDE.md), so these stay read-only/
+// unbuilt rather than reaching for a non-v2 endpoint.
 
 const { t } = useI18n()
 const route = useRoute()
@@ -42,8 +70,9 @@ const { hasRole, loggedIn } = useAuth()
 const id = computed(() => Number(route.params.id))
 
 const event = computed(() => eventsStore.current.data)
-const { upcoming, finished, dayOfMonth, month, date, start, end } = useEventComputed(event)
-const calendarLinks = useCalendarLinks(event)
+const { upcoming, finished, dayOfMonth, month } = useEventComputed(event)
+const { hosts } = useEventAttendance(id)
+const { equivalentConsumer } = useCo2Equivalent()
 const { uploadedImageUrl } = useUploadedImageUrl()
 
 const isAttending = computed(() => !!event.value?.attending)
@@ -127,13 +156,36 @@ const notIncludedNote = computed(() => {
   return `${t('events.not_counting', parts.length)} ${parts.join(', ')}.`
 })
 
+// Gap 12: develop truncates the description to 440 characters behind a
+// Read more/Read less toggle (EventDescription.vue's ReadMore, max-chars
+// 440), using text-clipper for mid-tag-safe HTML clipping (a plain
+// substring cut can sever a tag half-open) - a CSS max-height clamp
+// approximated this before, but the cutoff point visibly differed from
+// develop's. `needsTruncating` is simplified from ReadMore's own version:
+// that component compares html-to-text renderings of the original vs
+// clipped HTML (to tolerate text-clipper's own serialization not being
+// byte-identical even when nothing was cut) - a direct string comparison
+// is enough here, since text-clipper returns the *original* string
+// unchanged whenever clipping wasn't needed.
+const descriptionExpanded = ref(false)
+const clippedDescription = computed(() => {
+  const html = event.value?.description
+  return html ? clip(html, 440, { html: true }) : ''
+})
+const descriptionNeedsTruncating = computed(() => {
+  const html = event.value?.description
+  return !!html && clippedDescription.value !== html
+})
+
 const showInvite = ref(false)
+const showShareStats = ref(false)
 const confirmingDelete = ref(false)
 const deleting = ref(false)
 const attendPending = ref(false)
 const requestingReview = ref(false)
 const showFollowPrompt = ref(false)
 const nowFollowing = ref(false)
+const co2InfoButton = ref(null)
 
 useHead({ title: computed(() => event.value?.title || t('events.events')) })
 
@@ -296,16 +348,24 @@ async function confirmDelete() {
         {{ t('client.events.now_following_group') }}
       </BAlert>
 
-      <!-- Header -->
-      <header class="d-flex flex-wrap justify-content-between mb-4" data-testid="event-view-header">
-        <div class="d-flex">
-          <div class="datebox text-center fw-bold me-3" data-testid="event-view-date">
-            <div class="day">{{ dayOfMonth }}</div>
-            <div class="month">{{ month }}</div>
+      <!-- Header (gap 8: 5px top border, 1px bottom border, vertical divider
+           between the date/title block and the group/actions block). -->
+      <header class="event-header mb-4" data-testid="event-view-header">
+        <div class="eh-layout">
+          <div class="d-flex eh-left">
+            <div class="datebox text-center fw-bold me-3" data-testid="event-view-date">
+              <div class="day">{{ dayOfMonth }}</div>
+              <div class="month">{{ month }}</div>
+            </div>
+            <div>
+              <h1 data-testid="event-view-title">
+                {{ event.title }}
+                <BBadge v-if="event.online" variant="primary" pill data-testid="event-view-online">{{ t('events.online') }}</BBadge>
+              </h1>
+            </div>
           </div>
-          <div>
-            <h1 data-testid="event-view-title">{{ event.title }}</h1>
 
+          <div class="eh-right d-flex justify-content-between align-items-start flex-wrap gap-2">
             <div v-if="event.group" class="d-flex align-items-center mb-1">
               <img :src="groupImage" alt="" width="32" height="32" class="rounded-circle me-2 group-avatar">
               <span>
@@ -316,210 +376,168 @@ async function confirmDelete() {
               </span>
             </div>
 
-            <div class="small text-muted" data-testid="event-view-datetime">
-              {{ date }} &middot; {{ start }}-{{ end }} ({{ event.timezone }})
-            </div>
-
-            <div v-if="event.online" class="small" data-testid="event-view-online">
-              {{ t('events.online_event') }}
-            </div>
-            <div v-else-if="event.location" class="small" data-testid="event-view-venue">
-              {{ event.location }}
-              <a
-                v-if="event.lat && event.lng"
-                :href="`https://www.openstreetmap.org/?mlat=${event.lat}&mlon=${event.lng}#map=20/${event.lat}/${event.lng}`"
-                target="_blank"
-                rel="noopener"
-                class="ms-1"
+            <div class="d-flex align-items-start gap-2 flex-wrap">
+              <!-- Audit regression: a logged-in viewer used to get this
+                   standalone button AND the dropdown's own RSVP item at the
+                   same time (EventActionsDropdown.vue never had a standalone
+                   RSVP entry point for logged-in users in develop - see its
+                   doc comment). The anonymous "log in to RSVP" link isn't a
+                   duplicate (the dropdown doesn't render at all when
+                   !loggedIn), so it's the only variant left here. -->
+              <NuxtLink
+                v-if="!isAttending && !finished && !loggedIn"
+                to="/login"
+                class="btn btn-primary"
+                data-testid="event-view-login-to-rsvp"
               >
-                {{ t('events.view_map') }}
-              </a>
-            </div>
+                {{ t('events.RSVP') }}
+              </NuxtLink>
 
-            <!-- Optional host-set external link (Party::$link, only present
-                 on the resource when set - EventForm.vue's "Event link"
-                 field is the write side; gap D2). -->
-            <div v-if="event.link" class="small" data-testid="event-view-link">
-              {{ t('events.field_event_link') }}:
-              <a :href="event.link" target="_blank" rel="noopener" data-testid="event-view-link-anchor">{{ event.link }}</a>
-            </div>
-
-            <!-- Small static venue map (gap D4) - only for in-person events
-                 with coordinates; the text "view map" link above stays for
-                 everyone (screen readers, and online/no-coords events keep
-                 the location text with no map). -->
-            <EventVenueMap
-              v-if="!event.online && event.lat && event.lng"
-              :lat="event.lat"
-              :lng="event.lng"
-              class="mt-2"
-            />
-
-            <div v-if="calendarLinks && upcoming" class="dropdown mt-2" data-testid="event-view-calendar-dropdown">
-              <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                {{ t('calendars.add_to_calendar') }}
-              </button>
-              <ul class="dropdown-menu">
-                <li><a class="dropdown-item" target="_blank" rel="noopener" :href="calendarLinks.google" data-testid="event-view-calendar-google">{{ t('events.calendar_google') }}</a></li>
-                <li><a class="dropdown-item" target="_blank" rel="noopener" :href="calendarLinks.webOutlook" data-testid="event-view-calendar-outlook">{{ t('events.calendar_outlook') }}</a></li>
-                <li><a class="dropdown-item" target="_blank" rel="noopener" :href="calendarLinks.ics" data-testid="event-view-calendar-ics">{{ t('events.calendar_ical') }}</a></li>
-                <li><a class="dropdown-item" target="_blank" rel="noopener" :href="calendarLinks.yahoo" data-testid="event-view-calendar-yahoo">{{ t('events.calendar_yahoo') }}</a></li>
-              </ul>
+              <!-- Gap 2: every other event action lives in one dropdown. -->
+              <EventActionsDropdown
+                v-if="loggedIn"
+                :event-id="id"
+                :canedit="canedit"
+                :candelete="candelete"
+                :is-admin="isAdmin"
+                :is-attending="isAttending"
+                :upcoming="upcoming"
+                :approved="approved"
+                :finished="finished"
+                :in-group="inGroup"
+                :has-group="!!event.group"
+                @rsvp="onRsvp"
+                @invite="showInvite = true"
+                @request-review="onRequestReview"
+                @share-stats="showShareStats = true"
+                @follow-group="joinHostingGroup"
+                @delete="askDelete"
+              />
             </div>
           </div>
-        </div>
-
-        <div class="d-flex align-items-start gap-2 flex-wrap">
-          <BButton
-            v-if="!isAttending && !finished && loggedIn"
-            variant="primary"
-            :disabled="attendPending"
-            data-testid="event-attend"
-            @click="onRsvp"
-          >
-            {{ t('events.RSVP') }}
-          </BButton>
-          <NuxtLink
-            v-else-if="!isAttending && !finished && !loggedIn"
-            to="/login"
-            class="btn btn-primary"
-            data-testid="event-view-login-to-rsvp"
-          >
-            {{ t('events.RSVP') }}
-          </NuxtLink>
-
-          <!-- api-contracts-phase-c.md C1d gates POST .../invites to
-               host/NC/admin, stricter than the legacy button's
-               isAttending-only visibility (EventActions.vue) - gated by
-               `canedit` here so the button isn't shown to attendees who
-               would just get a 403 (docs/nuxt-migration/api-gaps.md). -->
-          <BButton
-            v-if="canedit && upcoming && approved"
-            variant="outline-primary"
-            data-testid="event-view-invite"
-            @click="showInvite = true"
-          >
-            {{ t('events.invite_volunteers') }}
-          </BButton>
-
-          <BButton
-            v-if="!inGroup && event.group"
-            variant="outline-info"
-            data-testid="event-view-follow-group"
-            @click="joinHostingGroup"
-          >
-            {{ t('groups.join_group_button') }}
-          </BButton>
-
-          <NuxtLink v-if="canedit" :to="`/party/edit/${id}`" class="btn btn-outline-primary" data-testid="event-view-edit">
-            {{ t('events.edit_event') }}
-          </NuxtLink>
-          <NuxtLink v-if="canedit" :to="`/party/duplicate/${id}`" class="btn btn-outline-secondary" data-testid="event-view-duplicate">
-            {{ t('events.duplicate_event') }}
-          </NuxtLink>
-
-          <BButton
-            v-if="canedit && finished"
-            variant="outline-secondary"
-            :disabled="requestingReview"
-            data-testid="event-view-request-review"
-            @click="onRequestReview"
-          >
-            {{ t('client.events.request_review') }}
-          </BButton>
-
-          <a v-if="finished && canedit" :href="`/export/devices/event/${id}`" class="btn btn-outline-secondary" data-testid="event-view-export">
-            {{ t('devices.export_event_data') }}
-          </a>
-
-          <template v-if="canedit">
-            <template v-if="confirmingDelete">
-              <span class="small align-self-center">{{ t('events.confirm_delete') }}</span>
-              <BButton variant="danger" :disabled="deleting" data-testid="event-view-delete-confirm" @click="confirmDelete">
-                {{ t('partials.yes') }}
-              </BButton>
-              <BButton variant="link" @click="cancelDelete">{{ t('partials.cancel') }}</BButton>
-            </template>
-            <BButton
-              v-else
-              variant="outline-danger"
-              :disabled="!candelete"
-              data-testid="event-view-delete"
-              @click="askDelete"
-            >
-              {{ t('events.delete_event') }}
-            </BButton>
-          </template>
         </div>
       </header>
 
-      <!-- Description -->
-      <section class="mb-4" data-testid="event-view-description">
-        <!-- eslint-disable-next-line vue/no-v-html -->
-        <div v-if="event.description" v-html="event.description" />
-        <p v-if="!approved" class="small text-muted" data-testid="event-view-moderation-note">
-          {{ t('partials.event_requires_moderation_by_an_admin') }}.
-        </p>
-      </section>
+      <!-- Gap 4: 2-column grid at md+ (details+description left, attendance
+           right), matching EventPage.vue's .ep-layout. -->
+      <div class="ep-layout mb-4">
+        <div>
+          <EventDetailsPanel :event="event" :hosts="hosts" />
 
-      <!-- Attendance -->
-      <EventAttendees
-        :event-id="id"
-        :confirmed="eventsStore.attendees.data.confirmed"
-        :invited="eventsStore.attendees.data.invited"
-        :loading="eventsStore.attendees.loading"
-        :canedit="canedit"
-        :upcoming="upcoming"
-        :approved="approved"
-        :finished="finished"
-        :participants="event.stats ? (event.stats.participants ?? 0) : null"
-        :volunteers="event.stats ? (event.stats.volunteers ?? 0) : null"
-        class="mb-4"
-        @invite="showInvite = true"
-      />
-
-      <!-- Stats (event.stats, already on the resource - api-contracts-phase-c.md C1a) -->
-      <section v-if="finished && event.stats" class="mb-4" data-testid="event-view-stats">
-        <h2>{{ t('events.items_fixed') }}</h2>
-        <div class="d-flex flex-wrap gap-4">
-          <div data-testid="event-view-stats-fixed">
-            <div class="h3 mb-0">{{ event.stats.fixed_devices ?? 0 }}</div>
-            <div class="small text-muted">{{ t('partials.fixed') }}</div>
-          </div>
-          <div data-testid="event-view-stats-powered">
-            <div class="h3 mb-0">{{ event.stats.fixed_powered ?? 0 }}</div>
-            <div class="small text-muted">{{ t('devices.powered_items') }}</div>
-          </div>
-          <div data-testid="event-view-stats-unpowered">
-            <div class="h3 mb-0">{{ event.stats.fixed_unpowered ?? 0 }}</div>
-            <div class="small text-muted">{{ t('devices.unpowered_items') }}</div>
-          </div>
+          <section class="mt-4" data-testid="event-view-description">
+            <!-- EventDescription.vue wraps this in a CollapsibleSection
+                 with `hide-title` - the heading itself only ever shows
+                 below md (the collapsible-toggle affordance goes with it;
+                 out of scope here, see the audit note this comment
+                 replaced). -->
+            <h2 class="d-block d-md-none">{{ t('events.event_description') }}</h2>
+            <div
+              v-if="event.description"
+              class="description-content"
+              data-testid="event-view-description-content"
+            >
+              <!-- eslint-disable-next-line vue/no-v-html -->
+              <div v-html="descriptionNeedsTruncating && !descriptionExpanded ? clippedDescription : event.description" />
+            </div>
+            <button
+              v-if="descriptionNeedsTruncating"
+              type="button"
+              class="btn btn-link px-0"
+              data-testid="event-view-description-toggle"
+              @click="descriptionExpanded = !descriptionExpanded"
+            >
+              <!-- eslint-disable-next-line vue/no-v-html -->
+              <span v-html="descriptionExpanded ? t('events.read_less') : t('events.read_more')" />
+            </button>
+            <p v-if="!approved" class="small text-muted" data-testid="event-view-moderation-note">
+              {{ t('partials.event_requires_moderation_by_an_admin') }}.
+            </p>
+          </section>
         </div>
-      </section>
 
-      <!-- Environmental impact (gap D1) - waste/CO2 totals, modelled on
-           components/groups/GroupStats.vue's group-stats-impact stat cards
-           for visual consistency (same neo-brutalist box in this page's
-           <style>). -->
-      <section v-if="finished && event.stats" class="mb-4" data-testid="event-view-impact">
-        <h2>{{ t('events.environmental_impact') }}</h2>
-        <div class="d-flex flex-wrap gap-3">
-          <div class="stat-card" data-testid="event-view-impact-waste">
-            <img src="/images/trash.svg" alt="" class="stat-card__icon">
-            <div class="stat-card__count">{{ kg(event.stats.waste_total) }}</div>
-            <div class="stat-card__label">{{ t('partials.waste_prevented') }}</div>
-          </div>
-          <div class="stat-card" data-testid="event-view-impact-co2">
-            <img src="/images/cloud-empty.svg" alt="" class="stat-card__icon">
-            <div class="stat-card__count">{{ kg(event.stats.co2_total) }}</div>
-            <!-- eslint-disable-next-line vue/no-v-html -->
-            <div class="stat-card__label" v-html="t('partials.co2')" />
-          </div>
+        <div>
+          <!-- Attendance -->
+          <EventAttendees
+            :event-id="id"
+            :confirmed="eventsStore.attendees.data.confirmed"
+            :invited="eventsStore.attendees.data.invited"
+            :loading="eventsStore.attendees.loading"
+            :canedit="canedit"
+            :upcoming="upcoming"
+            :approved="approved"
+            :finished="finished"
+            :participants="event.stats ? (event.stats.participants ?? 0) : null"
+            :volunteers="event.stats ? (event.stats.volunteers ?? 0) : null"
+            @invite="showInvite = true"
+          />
         </div>
-        <p v-if="notIncludedNote" class="small text-muted mt-2 mb-0" data-testid="event-view-impact-notincluded">
-          {{ notIncludedNote }}
-        </p>
-      </section>
+      </div>
+
+      <!-- Stats (event.stats, already on the resource - api-contracts-phase-c.md C1a).
+           Gap 15: items-fixed and environmental-impact side by side in a
+           2-column grid with a divider, both using the same icon-card
+           treatment. -->
+      <div v-if="finished && event.stats" class="stats-grid mb-4">
+        <section data-testid="event-view-stats">
+          <h2>{{ t('events.items_fixed') }}</h2>
+          <div class="d-flex flex-wrap gap-3">
+            <div class="stat-card" data-testid="event-view-stats-fixed">
+              <img src="/images/fixed.svg" alt="" class="stat-card__icon">
+              <div class="stat-card__count">{{ event.stats.fixed_devices ?? 0 }}</div>
+              <div class="stat-card__label">{{ t('partials.fixed') }}</div>
+            </div>
+            <div class="stat-card" data-testid="event-view-stats-powered">
+              <img src="/images/powered.svg" alt="" class="stat-card__icon">
+              <div class="stat-card__count">{{ event.stats.fixed_powered ?? 0 }}</div>
+              <div class="stat-card__label">{{ t('devices.powered_items') }}</div>
+            </div>
+            <div class="stat-card" data-testid="event-view-stats-unpowered">
+              <img src="/images/unpowered.svg" alt="" class="stat-card__icon">
+              <div class="stat-card__count">{{ event.stats.fixed_unpowered ?? 0 }}</div>
+              <div class="stat-card__label">{{ t('devices.unpowered_items') }}</div>
+            </div>
+          </div>
+        </section>
+
+        <section data-testid="event-view-impact">
+          <h2>
+            {{ t('events.environmental_impact') }}
+            <button ref="co2InfoButton" type="button" class="info-toggle" data-testid="event-view-impact-info">
+              <img src="/icons/info_ico_green.svg" alt="" width="20" height="20">
+            </button>
+            <BPopover :target="co2InfoButton" triggers="hover focus click" html data-testid="event-view-impact-popover">
+              <!-- eslint-disable-next-line vue/no-v-html -->
+              <div v-html="t('events.impact_calculation')" />
+            </BPopover>
+          </h2>
+          <div class="d-flex flex-wrap gap-3">
+            <div class="stat-card" data-testid="event-view-impact-waste">
+              <img src="/images/trash.svg" alt="" class="stat-card__icon">
+              <div class="stat-card__count">{{ kg(event.stats.waste_total) }}</div>
+              <div class="stat-card__label">{{ t('partials.waste_prevented') }}</div>
+            </div>
+            <div class="stat-card" data-testid="event-view-impact-co2">
+              <img src="/images/cloud-empty.svg" alt="" class="stat-card__icon">
+              <div class="stat-card__count">{{ kg(event.stats.co2_total) }}</div>
+              <!-- eslint-disable-next-line vue/no-v-html -->
+              <div class="stat-card__label" v-html="t('partials.co2')" />
+              <!-- eslint-disable-next-line vue/no-v-html -->
+              <div class="small" data-testid="event-view-impact-equivalent" v-html="equivalentConsumer(event.stats.co2_total)" />
+              <button
+                type="button"
+                class="btn btn-link p-0 small"
+                data-testid="event-view-impact-share"
+                @click="showShareStats = true"
+              >
+                {{ t('events.share_event_stats') }}
+              </button>
+            </div>
+          </div>
+          <p v-if="notIncludedNote" class="small text-muted mt-2 mb-0" data-testid="event-view-impact-notincluded">
+            {{ notIncludedNote }}
+          </p>
+        </section>
+      </div>
 
       <!-- Devices (C5: add/edit/delete for canedit viewers, read-only rows for everyone else) -->
       <EventDevicesPanel
@@ -531,6 +549,33 @@ async function confirmDelete() {
       />
 
       <EventInviteModal :show="showInvite" :event-id="id" @close="showInvite = false" />
+
+      <EventShareStatsModal
+        :show="showShareStats"
+        :event-id="id"
+        :event-date="event.start"
+        :event-name="event.title"
+        :fixed-devices="event.stats ? (event.stats.fixed_devices ?? 0) : 0"
+        @close="showShareStats = false"
+      />
+
+      <BModal
+        :model-value="confirmingDelete"
+        :title="t('events.delete_event')"
+        no-footer
+        data-testid="event-view-delete-modal"
+        @hide="cancelDelete"
+      >
+        <p>{{ t('events.confirm_delete') }}</p>
+        <div class="d-flex justify-content-end gap-2">
+          <BButton variant="outline-secondary" @click="cancelDelete">
+            {{ t('partials.cancel') }}
+          </BButton>
+          <BButton variant="danger" :disabled="deleting" data-testid="event-view-delete-confirm" @click="confirmDelete">
+            {{ t('partials.yes') }}
+          </BButton>
+        </div>
+      </BModal>
     </template>
   </div>
 </template>
@@ -555,6 +600,71 @@ async function confirmDelete() {
    squashing them (gap D7). */
 .group-avatar {
   object-fit: cover;
+}
+
+/* Gap 8: 5px top border / 1px bottom border on the whole header, with a
+   vertical divider (border-right on the left column) between the date/
+   title block and the group/actions block at md+ - matches
+   EventHeading.vue's .border-top-very-thick/.border-bottom-thin/.bord. */
+.event-header {
+  border-top: 5px solid #000;
+  border-bottom: 1px solid #000;
+  padding: 1rem 0;
+}
+
+.eh-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  row-gap: 0.75rem;
+}
+
+@media (min-width: 768px) {
+  .eh-layout {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .eh-left {
+    border-right: 1px solid #000;
+    padding-right: 1rem;
+  }
+
+  .eh-right {
+    padding-left: 1rem;
+  }
+}
+
+/* Gap 4: 2-column grid at md+ (details+description left, attendance
+   right), matching EventPage.vue's .ep-layout. */
+.ep-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  row-gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .ep-layout {
+    grid-template-columns: 1fr 1fr;
+    column-gap: 2rem;
+  }
+}
+
+/* Gap 15: items-fixed/environmental-impact side by side with a divider. */
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  row-gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .stats-grid {
+    grid-template-columns: 1fr 1fr;
+    column-gap: 2rem;
+  }
+
+  .stats-grid > section:last-child {
+    border-left: 1px solid #000;
+    padding-left: 2rem;
+  }
 }
 
 /* Neo-brutalist stat card - same look as components/groups/GroupStats.vue's
@@ -588,5 +698,15 @@ async function confirmDelete() {
 
 .stat-card__label {
   line-height: 1.1;
+}
+
+/* StatsImpact.vue's info-icon popover trigger: an inline, borderless icon
+   button next to the "Environmental impact" heading. */
+.info-toggle {
+  border: 0;
+  background: none;
+  padding: 0;
+  margin-left: 0.35rem;
+  vertical-align: middle;
 }
 </style>
