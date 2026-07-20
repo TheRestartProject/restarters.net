@@ -126,7 +126,8 @@ describe('pages/admin/preview-deploy', () => {
   // not a BModal - matched here.
   it('clicking Deploy asks for confirmation with the legacy message before deploying', async () => {
     const { deploy } = stubApi({ prs: [] })
-    const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true)
+    const confirmSpy = vi.fn().mockReturnValue(true)
+    vi.stubGlobal('confirm', confirmSpy)
     const wrapper = mountPage()
     await flushPromises()
 
@@ -138,21 +139,17 @@ describe('pages/admin/preview-deploy', () => {
     )
     expect(deploy).toHaveBeenCalledWith('develop')
     expect(wrapper.find('[data-testid="preview-deploy-feedback"]').exists()).toBe(true)
-
-    confirmSpy.mockRestore()
   })
 
   it('does not deploy when the confirmation is dismissed', async () => {
     const { deploy } = stubApi({ prs: [] })
-    const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(false)
+    vi.stubGlobal('confirm', vi.fn().mockReturnValue(false))
     const wrapper = mountPage()
     await flushPromises()
 
     await wrapper.find('[data-testid="preview-deploy-submit"]').trigger('click')
 
     expect(deploy).not.toHaveBeenCalled()
-
-    confirmSpy.mockRestore()
   })
 
   it('links to the GitHub Actions workflow run list', async () => {

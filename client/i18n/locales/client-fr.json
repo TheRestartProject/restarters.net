@@ -234,8 +234,6 @@
     "users": {
       "create_user": "Créer un nouvel utilisateur",
       "create_user_title": "Ajouter un nouvel utilisateur",
-      "edit_role": "Modifier le rôle",
-      "edit_role_for": "Modifier le rôle : {name}",
       "load_error": "Désolé, nous n'avons pas pu charger la liste des utilisateurs.",
       "password_mismatch": "Les mots de passe ne correspondent pas",
       "permission": "Permission",
