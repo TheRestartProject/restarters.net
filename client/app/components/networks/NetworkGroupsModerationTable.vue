@@ -2,7 +2,7 @@
 import { computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useModerationStore } from '~/stores/moderation.js'
-import { useUploadedImageUrl } from '~/composables/useUploadedImageUrl.js'
+import GroupsTable from '~/components/groups/GroupsTable.vue'
 
 // Groups-awaiting-moderation table for /networks/{id}'s "Groups to moderate"
 // section (parity-v2/networks.md gap #2 + #11). Legacy NetworkPage.vue
@@ -11,7 +11,12 @@ import { useUploadedImageUrl } from '~/composables/useUploadedImageUrl.js'
 // restarters / next-event, plus a trailing "Group requires moderation" link
 // column) - not the plain name-only <ul> the shared components/moderation/
 // ModerationQueue.vue renders on /party and /group/map. Built as a
-// standalone table here rather than reusing components/groups/GroupsTable.
+// Renders GroupsTable in `approve` mode, exactly as develop's
+// GroupsRequiringModeration does - it is nothing but a fetching wrapper
+// around <GroupsTable :groups approve />. This used to hand-roll its own
+// plain-text-header table, which cost the moderation queue the panel
+// treatment, the icon column headers, the sorting and the amber
+// requires-moderation cell all at once.
 // vue (which has no "approve" trailing-column mode and is out of scope for
 // this pass - see parity-v2/networks.md gap #2's write-up) or extending
 // ModerationQueue.vue (shared with /party and /group/map, also out of
@@ -25,11 +30,8 @@ const props = defineProps({
   },
 })
 
-const { t, locale } = useI18n()
+const { t } = useI18n()
 const moderationStore = useModerationStore()
-const { uploadedImageUrl } = useUploadedImageUrl()
-
-const DEFAULT_PROFILE = '/images/placeholder-avatar.webp'
 
 // Client-side network scoping, same approach as ModerationQueue.vue - the
 // /moderate/groups endpoint returns every group the caller's role can see,
@@ -39,14 +41,6 @@ const groups = computed(() =>
     (g) => Array.isArray(g.networks) && g.networks.some((n) => n.id === props.networkId)
   )
 )
-
-function imageSrc(row) {
-  return uploadedImageUrl(row.image) || DEFAULT_PROFILE
-}
-
-function dateLabel(iso) {
-  return new Date(iso).toLocaleDateString(locale.value, { day: 'numeric', month: 'short', year: 'numeric' })
-}
 
 onMounted(() => {
   moderationStore.fetchGroups().catch(() => {})
@@ -58,58 +52,7 @@ onMounted(() => {
     <div v-if="!groups.length" class="text-muted" data-testid="network-groups-moderation-empty">
       {{ t('networks.show.none') }}
     </div>
-    <table v-else class="table network-moderation-table">
-      <thead>
-        <tr>
-          <th class="network-moderation-photo-col"><span class="visually-hidden">{{ t('groups.group_image') }}</span></th>
-          <th>{{ t('groups.groups_name') }}</th>
-          <th>{{ t('client.groups.column_location') }}</th>
-          <th>{{ t('client.groups.column_hosts') }}</th>
-          <th>{{ t('client.groups.column_restarters') }}</th>
-          <th>{{ t('client.groups.column_next_event') }}</th>
-          <th />
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="row in groups" :key="row.id" :data-testid="`network-groups-moderation-row-${row.id}`">
-          <td class="network-moderation-photo-col">
-            <img :src="imageSrc(row)" alt="" class="network-moderation-photo">
-          </td>
-          <td>
-            <NuxtLink :to="`/group/view/${row.id}`" :data-testid="`network-groups-moderation-link-${row.id}`">
-              {{ row.name }}
-            </NuxtLink>
-            <div>
-              <BBadge v-if="row.archived_at" variant="secondary" pill>{{ t('groups.archived_group') }}</BBadge>
-            </div>
-            <div v-if="row.tags && row.tags.length" class="mt-1">
-              <BBadge v-for="tag in row.tags" :key="tag.id" variant="secondary" class="me-1 tag-badge">{{ tag.name }}</BBadge>
-            </div>
-          </td>
-          <td>
-            <template v-if="row.location">
-              {{ row.location.location }}
-              <span v-if="row.location.country" class="text-muted small">{{ row.location.country }}</span>
-            </template>
-          </td>
-          <td>{{ row.hosts ?? '' }}</td>
-          <td>{{ row.restarters ?? '' }}</td>
-          <td>
-            <template v-if="row.next_event">{{ dateLabel(row.next_event.start) }}</template>
-            <template v-else>{{ t('groups.upcoming_none_planned') }}</template>
-          </td>
-          <td>
-            <NuxtLink
-              :to="`/group/edit/${row.id}`"
-              class="network-moderation-flag"
-              :data-testid="`network-groups-moderation-flag-${row.id}`"
-            >
-              {{ t('networks.moderation.group_requires_moderation') }}
-            </NuxtLink>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <GroupsTable v-else :groups="groups" :show-join="false" :show-filters="false" approve />
   </div>
 </template>
 

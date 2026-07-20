@@ -157,3 +157,14 @@
     }
   }
 }
+
+// _events.scss:307,311 - the amber/blue cell washes used to flag a row that
+// needs action. `.cell-warning` marks a group or event awaiting moderation;
+// without it the moderation queue's call-to-action reads as an ordinary link.
+.cell-warning {
+  background-color: #fde5c3;
+}
+
+.cell-info {
+  background-color: #d1e5e6;
+}

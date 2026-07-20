@@ -40,6 +40,16 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  // GroupsTable.vue's `approve` (develop): swaps the join column for an amber
+  // "requires moderation" cell linking to the group's edit page. develop's
+  // GroupsRequiringModeration is nothing but a fetching wrapper around
+  // <GroupsTable :groups approve />, so the moderation queue gets this whole
+  // table for free - panel, icon column headers, sorting. Ours previously
+  // hand-rolled a separate plain-text-header table for it and lost all three.
+  approve: {
+    type: Boolean,
+    default: false,
+  },
   // Optional row<->marker hover linking for /group/map (GroupMap.vue): the
   // id whose row/pin should be highlighted, and update:hoveredId to report
   // back which row the pointer is over. Unused (stays null, no visual
@@ -257,8 +267,10 @@ function sortCaretClass(key) {
               </span>
             </button>
           </th>
-          <th v-if="showJoin">
-            <span class="visually-hidden">{{ t('groups.join_group_button') }}</span>
+          <th v-if="showJoin || approve">
+            <span class="visually-hidden">
+              {{ approve ? t('networks.group_requires_moderation') : t('groups.join_group_button') }}
+            </span>
           </th>
         </tr>
       </thead>
@@ -328,7 +340,12 @@ function sortCaretClass(key) {
             <template v-if="row.nextEvent">{{ dateLabel(row.nextEvent.start) }}</template>
             <template v-else>{{ t('groups.upcoming_none_planned') }}</template>
           </td>
-          <td v-if="showJoin">
+          <td v-if="approve" class="cell-warning p-2">
+            <NuxtLink :to="`/group/edit/${row.id}`" :data-testid="`groups-table-moderate-${row.id}`">
+              {{ t('networks.group_requires_moderation') }}
+            </NuxtLink>
+          </td>
+          <td v-else-if="showJoin">
             <GroupJoinButton :group-id="row.id" :group-name="row.name" :is-member="!!row.isMember" />
           </td>
         </tr>

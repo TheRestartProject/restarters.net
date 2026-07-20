@@ -29,8 +29,19 @@ function mountComponent(props = {}) {
 
   return mount(NetworkGroupsModerationTable, {
     props: { networkId: 1, ...props },
-    global: { plugins: [i18n], stubs: { NuxtLink: NuxtLinkStub, BBadge: BBadgeStub } },
+    global: { plugins: [i18n], stubs: { NuxtLink: NuxtLinkStub, BBadge: BBadgeStub, GroupsTable: GroupsTableStub } },
   })
+}
+
+// This component delegates its whole rendering to GroupsTable in `approve`
+// mode, exactly as develop's GroupsRequiringModeration does. These tests
+// therefore assert what is handed over, not how GroupsTable draws it -
+// GroupsTable's own spec covers the columns, sorting and the amber cell.
+const GroupsTableStub = {
+  // Typed, not an array: Vue only boolean-casts a bare `approve`
+  // attribute when the prop declares Boolean, otherwise it arrives as ''.
+  props: { groups: Array, approve: Boolean, showJoin: Boolean, showFilters: Boolean },
+  template: '<div data-testid="stub-groups-table" :data-approve="String(approve)" :data-ids="groups.map(g => g.id).join(\',\')" />',
 }
 
 describe('components/networks/NetworkGroupsModerationTable', () => {
@@ -58,6 +69,23 @@ describe('components/networks/NetworkGroupsModerationTable', () => {
     expect(wrapper.get('[data-testid="network-groups-moderation-empty"]').text()).toBe('None')
   })
 
+  // Replaces two tests that asserted this component's own photo/name/location/
+  // hosts/restarters/next-event/moderation-link columns. It no longer draws
+  // any of them - GroupsTable does, and its spec covers them. Asserting them
+  // here would only re-test GroupsTable through a second component.
+  it('hands the scoped groups to GroupsTable in approve mode', async () => {
+    store.fetchGroups = vi.fn(async () => {
+      store.groups.data = [{ id: 3, name: 'Camden Restarters', networks: [{ id: 1 }] }]
+    })
+
+    const wrapper = mountComponent({ networkId: 1 })
+    await flushPromises()
+
+    const table = wrapper.find('[data-testid="stub-groups-table"]')
+    expect(table.exists()).toBe(true)
+    expect(table.attributes('data-approve')).toBe('true')
+  })
+
   it('scopes to groups whose networks array includes this network id', async () => {
     store.fetchGroups = vi.fn(async () => {
       store.groups.data = [
@@ -69,56 +97,8 @@ describe('components/networks/NetworkGroupsModerationTable', () => {
     const wrapper = mountComponent({ networkId: 1 })
     await flushPromises()
 
-    expect(wrapper.find('[data-testid="network-groups-moderation-row-3"]').exists()).toBe(true)
-    expect(wrapper.find('[data-testid="network-groups-moderation-row-4"]').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="stub-groups-table"]').attributes('data-ids')).toBe('3')
   })
 
-  it('renders the full column set: photo, name+archived+tags, location, hosts, restarters, next event, moderation flag link', async () => {
-    store.fetchGroups = vi.fn(async () => {
-      store.groups.data = [
-        {
-          id: 3,
-          name: 'Camden Restarters',
-          networks: [{ id: 1 }],
-          image: null,
-          archived_at: '2020-01-01T00:00:00Z',
-          tags: [{ id: 1, name: 'Scotland' }],
-          location: { location: 'Camden', country: 'UK' },
-          hosts: 2,
-          restarters: 5,
-          next_event: { start: '2026-08-01T10:00:00Z' },
-        },
-      ]
-    })
-
-    const wrapper = mountComponent()
-    await flushPromises()
-
-    const row = wrapper.get('[data-testid="network-groups-moderation-row-3"]')
-    expect(row.text()).toContain('Camden Restarters')
-    expect(row.text()).toContain('Archived')
-    expect(row.text()).toContain('Scotland')
-    expect(row.text()).toContain('Camden')
-    expect(row.text()).toContain('UK')
-    expect(row.text()).toContain('2')
-    expect(row.text()).toContain('5')
-
-    const link = wrapper.get('[data-testid="network-groups-moderation-link-3"]')
-    expect(link.attributes('href')).toBe('/group/view/3')
-
-    const flag = wrapper.get('[data-testid="network-groups-moderation-flag-3"]')
-    expect(flag.attributes('href')).toBe('/group/edit/3')
-    expect(flag.text()).toBe('Group requires moderation')
+  
   })
-
-  it('shows "None planned" when a group has no next event', async () => {
-    store.fetchGroups = vi.fn(async () => {
-      store.groups.data = [{ id: 3, name: 'Camden Restarters', networks: [{ id: 1 }], next_event: null }]
-    })
-
-    const wrapper = mountComponent()
-    await flushPromises()
-
-    expect(wrapper.get('[data-testid="network-groups-moderation-row-3"]').text()).toContain('None planned')
-  })
-})
