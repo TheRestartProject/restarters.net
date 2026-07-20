@@ -728,3 +728,31 @@ Not investigated yet: the other 8 newly-covered pages. `12-profile` and
 `30-profile-view` are both ~30% shorter than develop's at both viewports,
 which is a content difference rather than a render artifact and should be the
 next thing checked.
+
+### 26-event-view — the 7 diffs above, resolved
+
+Five were real and are fixed (commit "restore the event page's tab panels and
+stat treatments"): both tab sections had lost their `.ourtabs` panel entirely,
+the headcount labels sat below their steppers instead of above, the attendance
+heading showed its mobile-only count at desktop width, the fixed-devices card
+was missing its `variant="primary"` teal treatment, and the CO2 equivalence
+line rendered at zero where develop gates it on `count > 0`.
+
+**Two were my error, and are retracted:**
+
+- *"Inline map"* — NOT a diff. develop's `EventDetails.vue:72` renders an
+  `l-map` exactly as we do; its capture simply failed to load tiles, which is
+  what made the two screenshots disagree. Reading a difference in rendered
+  output as a difference in intent, without checking the source, is what
+  produced this.
+- *"12-profile / 30-profile-view are ~30% shorter than develop"* — NOT a
+  content difference. Rendered side by side the two pages are
+  indistinguishable: same panels, same header card, same Biography/My skills
+  columns. develop's page is simply taller because of trailing whitespace
+  above its footer. **Page height is not a reliable diff signal** and should
+  not be used as one again; it was what flagged this in the first place.
+
+One fix regressed and was caught by screenshotting the element: the new
+`.stat-card--primary` rule was declared before `.stat-card` at equal
+specificity, so the card stayed white while its count was styled white -
+the number vanished entirely. Fixed by ordering and specificity.
