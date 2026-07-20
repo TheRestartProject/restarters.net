@@ -19,9 +19,13 @@ import GroupsTable from '~/components/groups/GroupsTable.vue'
 // treatment, the icon column headers, the sorting and the amber
 // requires-moderation cell all at once.
 const props = defineProps({
+  // Optional, matching develop's GroupsRequiringModeration `networks` prop
+  // (required:false, default null). null = no network filtering, which is what
+  // /group needs - develop renders this same component there with the viewer's
+  // own network ids, not a single network's.
   networkId: {
     type: Number,
-    required: true,
+    default: null,
   },
 })
 
@@ -31,11 +35,12 @@ const moderationStore = useModerationStore()
 // Client-side network scoping, same approach as ModerationQueue.vue - the
 // /moderate/groups endpoint returns every group the caller's role can see,
 // there's no server-side network filter (matching legacy).
-const groups = computed(() =>
-  moderationStore.groups.data.filter(
+const groups = computed(() => {
+  if (props.networkId == null) return moderationStore.groups.data
+  return moderationStore.groups.data.filter(
     (g) => Array.isArray(g.networks) && g.networks.some((n) => n.id === props.networkId)
   )
-)
+})
 
 onMounted(() => {
   moderationStore.fetchGroups().catch(() => {})

@@ -5,7 +5,7 @@ import { useGroupsStore } from '~/stores/groups.js'
 import { useAuth } from '~/composables/useAuth.js'
 import GroupsTabsNav from '~/components/groups/GroupsTabsNav.vue'
 import GroupsTable from '~/components/groups/GroupsTable.vue'
-import ModerationQueue from '~/components/moderation/ModerationQueue.vue'
+import GroupsRequiringModeration from '~/components/networks/NetworkGroupsModerationTable.vue'
 
 // /group (mine) - resources/views/group/index.blade.php (tab="mine") +
 // resources/js/components/GroupsPage.vue's "Your Groups" tab is the
@@ -50,7 +50,12 @@ onMounted(() => {
     <!-- Legacy's group.index.blade.php renders GroupsRequiringModeration
          BEFORE GroupsPage (whose own template opens with this h1) - not
          after it. See all.vue's matching comment. -->
-    <ModerationQueue v-if="showModeration" type="groups" />
+    <!-- group/index.blade.php:53 renders <GroupsRequiringModeration/>, i.e.
+         the full GroupsTable(approve) - panel, icon column headers, sorting,
+         amber requires-moderation cell. This used the plain name-only
+         ModerationQueue, the same substitution already corrected on the
+         network page. -->
+    <GroupsRequiringModeration v-if="showModeration" />
 
     <h1 class="d-flex justify-content-between align-items-start">
       <span class="d-flex align-items-center">

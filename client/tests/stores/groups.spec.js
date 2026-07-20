@@ -32,6 +32,9 @@ describe('stores/groups', () => {
       dashboard: {
         fetch: vi.fn(),
       },
+      user: {
+        myGroups: vi.fn(),
+      },
     }
 
     vi.stubGlobal('useNuxtApp', () => ({ $api: mockApi }))
@@ -201,14 +204,12 @@ describe('stores/groups', () => {
   })
 
   describe('fetchMine', () => {
-    it('populates mine.data from the dashboard your_groups and seeds memberIds', async () => {
-      mockApi.dashboard.fetch.mockResolvedValueOnce({
-        data: {
-          your_groups: [{ id: 1, name: 'A', role: 3, archived: false, image_url: null }],
-          nearby_groups: [],
-          new_nearby_groups: [],
-          upcoming_events: [],
-        },
+    // Sourced from GET /api/v2/users/me/groups, which is uncapped - the
+    // dashboard's your_groups is capped at 5 alphabetically, so a member of
+    // six or more groups silently saw only five.
+    it('populates mine.data from users/me/groups and seeds memberIds', async () => {
+      mockApi.user.myGroups.mockResolvedValueOnce({
+        data: [{ id: 1, name: 'A', role: 3, archived: false, image_url: null }],
       })
 
       const store = useGroupsStore()
@@ -222,7 +223,7 @@ describe('stores/groups', () => {
 
     it('sets mine.error and rethrows on failure', async () => {
       const apiError = { status: 500 }
-      mockApi.dashboard.fetch.mockRejectedValueOnce(apiError)
+      mockApi.user.myGroups.mockRejectedValueOnce(apiError)
 
       const store = useGroupsStore()
       await expect(store.fetchMine()).rejects.toEqual(apiError)
@@ -337,16 +338,14 @@ describe('stores/groups', () => {
   describe('fetchCurrent', () => {
     it('populates current.data and details[id], and seeds mine when memberIds is empty', async () => {
       mockApi.group.get.mockResolvedValueOnce({ data: { id: 5, name: 'Group 5', permissions: {} } })
-      mockApi.dashboard.fetch.mockResolvedValueOnce({
-        data: { your_groups: [], nearby_groups: [], new_nearby_groups: [], upcoming_events: [] },
-      })
+      mockApi.user.myGroups.mockResolvedValueOnce({ data: [] })
 
       const store = useGroupsStore()
       await store.fetchCurrent(5)
 
       expect(store.current.data).toEqual({ id: 5, name: 'Group 5', permissions: {} })
       expect(store.details[5]).toEqual({ id: 5, name: 'Group 5', permissions: {} })
-      expect(mockApi.dashboard.fetch).toHaveBeenCalledTimes(1)
+      expect(mockApi.user.myGroups).toHaveBeenCalledTimes(1)
     })
 
     it('does not seed mine when memberIds is already known', async () => {
@@ -356,7 +355,7 @@ describe('stores/groups', () => {
       store.memberIds = [5]
       await store.fetchCurrent(5)
 
-      expect(mockApi.dashboard.fetch).not.toHaveBeenCalled()
+      expect(mockApi.user.myGroups).not.toHaveBeenCalled()
     })
 
     it('sets current.error and rethrows on failure', async () => {

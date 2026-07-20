@@ -169,8 +169,19 @@ export const useGroupsStore = defineStore('groups', {
       }
     },
 
-    // See the class doc comment: sourced from the dashboard endpoint's
-    // your_groups (max 5) until a real "my groups" endpoint exists.
+    // GET /api/v2/users/me/groups (UserController::getMyGroupsv2), which is
+    // UNCAPPED. This used to read the dashboard endpoint's your_groups, which
+    // is capped at 5 alphabetically - so /group silently showed a member of
+    // six or more groups only the first five, with no indication any were
+    // missing. UserAPI.js recorded that the real endpoint had landed and that
+    // adopting it was "out of scope for this slice"; the cap outlived the
+    // slice. Same capped-source bug already fixed once on party/view/[id].vue,
+    // where it hid the device panel from hosts of a 6th group.
+    //
+    // NB this payload is {id, name, role, archived, image_url} - it carries no
+    // location/hosts/restarters/next_event, which develop's /group table does
+    // show. Those columns remain a genuine API gap (see api-gaps.md); the cap
+    // was not.
     async fetchMine() {
       const { $api } = useNuxtApp()
 
@@ -178,9 +189,14 @@ export const useGroupsStore = defineStore('groups', {
       this.mine.error = null
 
       try {
-        const { data } = await $api.dashboard.fetch()
-        this.mine.data = data.your_groups
-        this.memberIds = [...new Set([...this.memberIds, ...data.your_groups.map((g) => g.id)])]
+        const { data } = await $api.user.myGroups()
+        this.mine.data = (data || []).map((group) => ({
+          ...group,
+          // The dashboard payload named this `archived`; keep both shapes
+          // working for existing consumers of `mine`.
+          archived: group.archived,
+        }))
+        this.memberIds = [...new Set([...this.memberIds, ...this.mine.data.map((g) => g.id)])]
         return this.mine.data
       } catch (error) {
         this.mine.error = error
