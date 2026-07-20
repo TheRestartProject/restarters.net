@@ -359,7 +359,16 @@ class UserController extends Controller
      *              @OA\Property(property="name", type="string"),
      *              @OA\Property(property="role", type="integer"),
      *              @OA\Property(property="archived", type="boolean"),
-     *              @OA\Property(property="image_url", type="string", nullable=true)
+     *              @OA\Property(property="image_url", type="string", nullable=true),
+     *              @OA\Property(property="location", type="object", nullable=true,
+     *                  @OA\Property(property="location", type="string"),
+     *                  @OA\Property(property="country", type="string", nullable=true)
+     *              ),
+     *              @OA\Property(property="hosts", type="integer"),
+     *              @OA\Property(property="restarters", type="integer"),
+     *              @OA\Property(property="next_event", type="object", nullable=true,
+     *                  @OA\Property(property="start", type="string")
+     *              )
      *          )))
      *      ),
      *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated")
@@ -369,12 +378,20 @@ class UserController extends Controller
     {
         $user = Auth::user();
 
+        // location/country and the host/restarter counts are selected and
+        // counted here rather than left to the caller: the /group list renders
+        // develop's full GroupsTable (name / location / hosts / restarters /
+        // next event), and this is the only uncapped source of "groups I am
+        // in". Without them the client had to switch four columns off, which
+        // read as a design choice rather than the missing payload it was.
+        // withCount avoids an N+1 over allHosts/allRestarters.
         $groups = Group::join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
             ->where('users_groups.user', $user->id)
             ->whereNull('users_groups.deleted_at')
             ->orderBy('groups.name', 'ASC')
-            ->groupBy('groups.idgroups', 'groups.name', 'users_groups.role', 'groups.archived_at')
-            ->select(['groups.idgroups', 'groups.name', 'users_groups.role', 'groups.archived_at'])
+            ->groupBy('groups.idgroups', 'groups.name', 'users_groups.role', 'groups.archived_at', 'groups.location', 'groups.country_code')
+            ->select(['groups.idgroups', 'groups.name', 'users_groups.role', 'groups.archived_at', 'groups.location', 'groups.country_code'])
+            ->withCount(['allHosts', 'allRestarters'])
             ->with('groupImage.image')
             ->get();
 
@@ -385,6 +402,15 @@ class UserController extends Controller
                 'role' => (int) $group->role,
                 'archived' => ! is_null($group->archived_at),
                 'image_url' => $group->realImageUrl(),
+                'location' => $group->location ? [
+                    'location' => $group->location,
+                    'country' => \App\Helpers\Fixometer::getCountryFromCountryCode($group->country_code),
+                ] : null,
+                'hosts' => (int) $group->all_hosts_count,
+                'restarters' => (int) $group->all_restarters_count,
+                'next_event' => ($next = $group->getNextUpcomingEvent()) ? [
+                    'start' => $next->event_start_utc,
+                ] : null,
             ])->values()->all(),
         ]);
     }

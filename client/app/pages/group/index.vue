@@ -23,16 +23,21 @@ const groupsStore = useGroupsStore()
 const { hasRole } = useAuth()
 const showModeration = computed(() => hasRole('Administrator') || hasRole('NetworkCoordinator'))
 
-// GET /api/v2/dashboard's your_groups (max 5) is the only source for "groups
-// the current user belongs to" today - see stores/groups.js's doc comment
-// and docs/nuxt-migration/api-gaps.md. It carries no location/hosts/
-// restarters/next_event, so those columns are switched off here.
+// Rows come from the UNCAPPED GET /api/v2/users/me/groups, which now also
+// carries location/hosts/restarters/next_event - so develop's full column set
+// renders. Both halves of this used to be wrong: the source was the
+// dashboard's your_groups (capped at 5) and the four columns were switched
+// off because that payload lacked them.
 const rows = computed(() =>
   groupsStore.mine.data.map((group) => ({
     id: group.id,
     name: group.name,
     archivedAt: group.archived ? true : null,
     isMember: true,
+    location: group.location || null,
+    hosts: group.hosts,
+    restarters: group.restarters,
+    nextEvent: group.next_event || null,
   }))
 )
 
@@ -88,7 +93,7 @@ onMounted(() => {
         <div v-else data-testid="group-mine-table">
           <GroupsTable
             :groups="rows"
-            :optional-columns="{ location: false, hosts: false, restarters: false, next_event: false }"
+            :optional-columns="{ location: true, hosts: true, restarters: true, next_event: true }"
           />
         </div>
       </template>

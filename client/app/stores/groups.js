@@ -178,10 +178,10 @@ export const useGroupsStore = defineStore('groups', {
     // slice. Same capped-source bug already fixed once on party/view/[id].vue,
     // where it hid the device panel from hosts of a 6th group.
     //
-    // NB this payload is {id, name, role, archived, image_url} - it carries no
-    // location/hosts/restarters/next_event, which develop's /group table does
-    // show. Those columns remain a genuine API gap (see api-gaps.md); the cap
-    // was not.
+    // The payload now also carries location/hosts/restarters/next_event, which
+    // develop's /group table shows - they were added to getMyGroupsv2 rather
+    // than left as a gap, since this is the only uncapped "groups I am in"
+    // source and the client was switching four columns off for want of them.
     async fetchMine() {
       const { $api } = useNuxtApp()
 
