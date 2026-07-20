@@ -607,6 +607,21 @@ class EventController extends Controller
         ]);
     }
 
+    /**
+     * @OA\Get(
+     *      path="/api/v2/moderate/events",
+     *      operationId="moderateEventsv2",
+     *      tags={"Events"},
+     *      summary="Events awaiting moderation",
+     *      description="Events requiring moderation across every network the caller coordinates (all networks for an Administrator). Returns a bare array, not a {data:...} envelope. Deduped by id - an event whose group belongs to several networks would otherwise appear once per network.",
+     *      security={{"apiToken":{}}},
+     *      @OA\Response(
+     *          response=200,
+     *          description="Events awaiting moderation, soonest first",
+     *          @OA\JsonContent(type="array", @OA\Items(type="object"))
+     *      )
+     * )
+     */
     public function moderateEventsv2(Request $request)
     {
         // Get the user that the API has been authenticated as.
