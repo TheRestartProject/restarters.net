@@ -27,6 +27,10 @@ return [
   'cancel' => 'Annuler',
   'close' => 'Fermer',
   'download' => 'Télécharger',
+  // Already exists on develop's lang/fr-BE/partials.php with this exact
+  // value - ported here rather than reworded, since this branch's copy of
+  // the file predates it.
+  'share_this' => 'Partager ceci',
   'powered_only' => '(calculé pour les objets électriques uniquement)',
   'add_device_powered' => 'Ajouter appareil électrique',
   'add_device_unpowered' => 'Ajouter appareil non-électrique',

@@ -32,6 +32,10 @@ return [
   'cancel' => 'Cancel',
   'close' => 'Close',
   'download' => 'Download',
+  // Already exists on develop's lang/en/partials.php with this exact value
+  // (StatsValue.vue's CO2-card "Share this" trigger) - ported here rather
+  // than reworded, since this branch's copy of the file predates it.
+  'share_this' => 'Share this',
   'skills' => 'skill|skills',
   'something_wrong' => 'Something has gone wrong',
   'are_you_sure' => 'Are you sure?',
