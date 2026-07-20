@@ -53,6 +53,9 @@ const imageError = ref('')
 // (@edited="justCreated = false"), which onUpdated below mirrors.
 const justCreated = ref(false)
 
+// edit.blade.php's Details/Photos tabs; details is active by default.
+const activeTab = ref('details')
+
 onMounted(() => {
   if (eventsStore.justCreatedId === id.value) {
     justCreated.value = true
@@ -130,10 +133,43 @@ function onImageUploadError(message) {
         {{ updatedMessage }}
       </BAlert>
 
-      <EventForm :event-id="id" :initial-event="event" :is-admin="isAdmin" :just-created="justCreated" @updated="onUpdated" />
+      <!-- edit.blade.php:30-42 - Details / Photos tabs above the panel. This
+           rendered the form bare with Photos as a section BELOW it, so the
+           page had no tab structure at all. develop's third tab, Event log, is
+           gated on `$audits && Administrator`; there is no API endpoint for an
+           event's audit trail, so it is genuinely not buildable yet - but that
+           only ever explained the missing log CONTENT, never the missing tabs.
+      -->
+      <ul class="nav nav-tabs" data-testid="event-edit-tabs">
+        <li class="nav-item">
+          <button
+            type="button"
+            class="nav-link"
+            :class="{ active: activeTab === 'details' }"
+            data-testid="event-edit-tab-details"
+            @click="activeTab = 'details'"
+          >
+            {{ t('events.event_details') }}
+          </button>
+        </li>
+        <li class="nav-item">
+          <button
+            type="button"
+            class="nav-link"
+            :class="{ active: activeTab === 'photos' }"
+            data-testid="event-edit-tab-photos"
+            @click="activeTab = 'photos'"
+          >
+            {{ t('events.event_photos') }}
+          </button>
+        </li>
+      </ul>
 
-      <div class="mt-4 pt-3 border-top">
-        <h2>{{ t('events.event_photos') }}</h2>
+      <div v-show="activeTab === 'details'" data-testid="event-edit-pane-details">
+        <EventForm :event-id="id" :initial-event="event" :is-admin="isAdmin" :just-created="justCreated" @updated="onUpdated" />
+      </div>
+
+      <div v-show="activeTab === 'photos'" class="pt-3" data-testid="event-edit-pane-photos">
         <TusImageUpload @uploaded="onImageUploaded" @upload-error="onImageUploadError" />
         <div v-if="imageMessage" class="text-success" data-testid="event-edit-image-success">{{ imageMessage }}</div>
         <div v-if="imageError" class="text-danger" data-testid="event-edit-image-error">{{ imageError }}</div>

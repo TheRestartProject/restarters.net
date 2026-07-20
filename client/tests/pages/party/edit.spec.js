@@ -169,4 +169,35 @@ describe('pages/party/edit/[id]', () => {
 
     expect(wrapper.find('[data-testid="event-edit-image-error"]').exists()).toBe(true)
   })
+  // edit.blade.php:30-42 - Details / Photos tabs above the panel. The page used
+  // to render the form bare with Photos as a section below it, i.e. no tab
+  // structure at all. develop's third tab (Event log) is gated on
+  // `$audits && Administrator` and has no API endpoint yet, so it is absent
+  // here by necessity rather than by choice.
+  describe('tabs', () => {
+    function mountEditable() {
+      authStore.user = { role_name: 'Administrator' }
+      eventsStore.current.data = BASE_EVENT
+      return mountPage()
+    }
+
+    it('shows Details and Photos tabs, with Details active and Photos hidden', () => {
+      const wrapper = mountEditable()
+
+      expect(wrapper.find('[data-testid="event-edit-tab-details"]').exists()).toBe(true)
+      expect(wrapper.find('[data-testid="event-edit-tab-photos"]').exists()).toBe(true)
+      expect(wrapper.find('[data-testid="event-edit-tab-details"]').classes()).toContain('active')
+      expect(wrapper.find('[data-testid="event-edit-pane-photos"]').attributes('style')).toContain('display: none')
+    })
+
+    it('switches to the Photos pane on click', async () => {
+      const wrapper = mountEditable()
+
+      await wrapper.find('[data-testid="event-edit-tab-photos"]').trigger('click')
+
+      expect(wrapper.find('[data-testid="event-edit-pane-photos"]').attributes('style') || '').not.toContain('display: none')
+      expect(wrapper.find('[data-testid="event-edit-pane-details"]').attributes('style')).toContain('display: none')
+    })
+  })
+
 })
