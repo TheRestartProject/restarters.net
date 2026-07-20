@@ -99,9 +99,30 @@ By kind: missing-feature=25, styling=27, missing-content=13, layout=31, data=9
 
 ### 06-groups-all (mobile) — Fixed bottom mobile navigation bar  [layout]
 
-- **OLD (correct):** No bottom navigation bar is present.
-- **NEW (SPA):** A fixed bottom bar with 5 icons (chat, events, calendar/map, people, box) is shown, overlapping the pagination controls above it.
-- **Likely cause:** New sitewide mobile nav chrome added in the SPA rebuild; not present in the legacy app. Also visually overlaps the pagination row directly above it.
+> **RETRACTED — this entry is wrong. Do not act on it.**
+> develop DOES have the fixed bottom nav. Verified in source:
+> `resources/global/css/components/_navigation-bar.scss` puts `.nav-left` at
+> `position: fixed; bottom: 0` under `media-breakpoint-down(md)`;
+> `resources/views/layouts/navbar.blade.php` renders the same five items
+> (Talk / Fixometer / Events / Groups / Wiki); `header.blade.php` loads that
+> SCSS and includes that navbar. Both current mobile captures show the bar on
+> BOTH sides.
+> Acting on this entry would have deleted a real feature — it was nearly
+> removed on the strength of it.
+> The capture batch behind this entry is unreliable: the very next entry
+> (07-events-all) records that its OLD screenshot was a 500 error page, and
+> the NEW side came from a dev server with a stale Vite build.
+> The overlap it describes is also an artefact — Playwright freezes
+> `position: fixed` elements at one spot when stitching a full-page shot.
+>
+> One REAL gap did come out of re-examining this: develop's `app.js` toggles
+> `.nav-left--hidden` on scroll (hide down / show up). We ported the CSS class
+> but never apply it, so our bar never hides. That is a MISSING feature, the
+> opposite of what this entry claimed.
+
+- ~~**OLD (correct):** No bottom navigation bar is present.~~
+- ~~**NEW (SPA):** A fixed bottom bar with 5 icons is shown, overlapping the pagination controls above it.~~
+- ~~**Likely cause:** New sitewide mobile nav chrome added in the SPA rebuild.~~
 
 ### 07-events-all (mobile) — Page load / whole page  [data]
 
