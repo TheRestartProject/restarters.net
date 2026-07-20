@@ -112,8 +112,34 @@ const SYSTEMS = [
   },
 ]
 
-// The live site shows a cookie banner that covers page content and would
-// otherwise poison every screenshot.
+// Suppress the cookie notice BEFORE the page's own scripts run, rather than
+// clicking it away afterwards. Clicking is unreliable: the banner is fixed to
+// the viewport, and at mobile widths it covers a tall strip of the page, so a
+// missed or late click silently obscures exactly the region under comparison.
+// That cost a real verification - the groups-list row/header restack could not
+// be checked at 390px because the banner sat over it in both captures.
+//
+//   new  = Nuxt reads localStorage 'restarters_cookie_consent' === 'accepted'
+//          (client/app/composables/useCookieConsent.js)
+//   old  = legacy gates gdprCookieNotice() on `!window.noCookieNotice`
+//          (origin/develop resources/js/app.js:334)
+//
+// addInitScript runs on every navigation in the context, so this survives the
+// page.goto() loop without needing to be re-applied per page.
+async function suppressCookieNotice(page) {
+  await page.addInitScript(() => {
+    try {
+      window.noCookieNotice = true
+      localStorage.setItem('restarters_cookie_consent', 'accepted')
+    } catch {
+      // storage unavailable before navigation - the click fallback still runs
+    }
+  })
+}
+
+// Fallback for anything the pre-seed misses (e.g. a banner variant keyed on
+// something else). Kept deliberately: belt-and-braces, since a banner in a
+// screenshot invalidates that page's comparison rather than merely looking untidy.
 async function dismissCookieBanner(page) {
   for (const sel of ['#cookie-ok', 'button:has-text("OK")', '.cookie-settings-ok', '#cookiescript_accept']) {
     try {
@@ -173,6 +199,7 @@ for (const system of SYSTEMS) {
       test.use({ viewport: { width: vp.width, height: vp.height } })
 
       test(`logged-out pages`, async ({ page }) => {
+        await suppressCookieNotice(page)
         for (const p of PAGES.filter((x) => !x.auth)) {
           await page.goto(`${system.base}${p.path}`, { waitUntil: 'domcontentloaded' })
           await dismissCookieBanner(page)
@@ -185,6 +212,7 @@ for (const system of SYSTEMS) {
           !system.email || !system.password,
           `No credentials for ${system.name} (set PARITY_${system.name.toUpperCase()}_EMAIL/PASSWORD)`
         )
+        await suppressCookieNotice(page)
         await system.login(page, system.base, system.email, system.password)
         await dismissCookieBanner(page)
 
