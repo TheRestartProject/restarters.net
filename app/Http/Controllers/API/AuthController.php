@@ -225,7 +225,7 @@ class AuthController extends Controller
             'name' => $request->input('name'),
             'email' => $request->input('email'),
             'password' => Hash::make($request->input('password')),
-            'recovery' => substr(bin2hex(openssl_random_pseudo_bytes(32)), 0, 24),
+            'recovery' => Fixometer::generateHash(),
             'recovery_expires' => date('Y-m-d H:i:s', time() + (24 * 60 * 60)),
             'country_code' => $request->input('country'),
             'location' => $request->input('city'),
@@ -320,7 +320,7 @@ class AuthController extends Controller
         }
 
         $user->update([
-            'recovery' => substr(bin2hex(openssl_random_pseudo_bytes(32)), 0, 24),
+            'recovery' => Fixometer::generateHash(),
             'recovery_expires' => date('Y-m-d H:i:s', time() + (24 * 60 * 60)),
         ]);
 
@@ -379,7 +379,7 @@ class AuthController extends Controller
             // Rotate the recovery token so the just-used reset link cannot be
             // replayed within its 24h window (an intercepted/forwarded link
             // must be single-use). Mirrors UserController::updateMyPasswordv2.
-            'recovery' => substr(bin2hex(openssl_random_pseudo_bytes(32)), 0, 24),
+            'recovery' => Fixometer::generateHash(),
             'recovery_expires' => strftime('%Y-%m-%d %X', time() + (24 * 60 * 60)),
         ]);
 

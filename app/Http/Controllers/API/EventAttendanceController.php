@@ -343,7 +343,7 @@ class EventAttendanceController extends Controller
                 continue;
             }
 
-            $hash = substr(bin2hex(openssl_random_pseudo_bytes(32)), 0, 24);
+            $hash = Fixometer::generateHash();
             $url = url('/party/accept-invite/'.$idevents.'/'.$hash);
 
             if ($userEvent) {
@@ -368,7 +368,7 @@ class EventAttendanceController extends Controller
         }
 
         foreach ($nonUserEmails as $nonUserEmail) {
-            $hash = substr(bin2hex(openssl_random_pseudo_bytes(32)), 0, 24);
+            $hash = Fixometer::generateHash();
 
             $invite = Invite::create([
                 'record_id' => $idevents,

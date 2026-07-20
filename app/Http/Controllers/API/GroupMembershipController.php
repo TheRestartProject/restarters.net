@@ -233,7 +233,7 @@ class GroupMembershipController extends Controller
                 continue;
             }
 
-            $hash = substr(bin2hex(openssl_random_pseudo_bytes(32)), 0, 24);
+            $hash = Fixometer::generateHash();
             $url = url('/group/accept-invite/'.$group->idgroups.'/'.$hash);
 
             if ($userGroup) {
@@ -258,7 +258,7 @@ class GroupMembershipController extends Controller
         }
 
         foreach ($nonUserEmails as $nonUserEmail) {
-            $hash = substr(bin2hex(openssl_random_pseudo_bytes(32)), 0, 24);
+            $hash = Fixometer::generateHash();
 
             $invite = Invite::create([
                 'record_id' => $group->idgroups,

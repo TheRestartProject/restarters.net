@@ -748,6 +748,16 @@ class Fixometer
      * @param   [type]      $model
      * @return  [type]
      */
+    /**
+     * A 24-character hex token, used for recovery codes and invite/RSVP
+     * hashes. Extracted from ten byte-identical inline copies across the API
+     * controllers (2026-07 API audit).
+     */
+    public static function generateHash(): string
+    {
+        return substr(bin2hex(openssl_random_pseudo_bytes(32)), 0, 24);
+    }
+
     public static function generateUniqueShareableCode($model, $column)
     {
         do {

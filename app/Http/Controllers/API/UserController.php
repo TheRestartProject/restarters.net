@@ -1534,7 +1534,7 @@ class UserController extends Controller
         $target->save();
 
         $target->update([
-            'recovery' => substr(bin2hex(openssl_random_pseudo_bytes(32)), 0, 24),
+            'recovery' => Fixometer::generateHash(),
             'recovery_expires' => strftime('%Y-%m-%d %X', time() + (24 * 60 * 60)),
         ]);
 
@@ -1946,7 +1946,7 @@ class UserController extends Controller
             'name' => $validated['name'],
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
-            'recovery' => substr(bin2hex(openssl_random_pseudo_bytes(32)), 0, 24),
+            'recovery' => Fixometer::generateHash(),
             'recovery_expires' => date('Y-m-d H:i:s', time() + (24 * 60 * 60)),
             'calendar_hash' => Str::random(15),
             // username is NOT NULL with no default - filled below via generateAndSetUsername(),

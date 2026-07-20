@@ -246,7 +246,7 @@ class EventController extends Controller
             // Send email.
             $from = User::find(Auth::user()->id);
 
-            $hash = substr(bin2hex(openssl_random_pseudo_bytes(32)), 0, 24);
+            $hash = Fixometer::generateHash();
             $url = url('/user/register/'.$hash);
 
             $invite = Invite::create([
