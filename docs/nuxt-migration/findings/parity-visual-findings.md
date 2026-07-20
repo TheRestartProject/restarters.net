@@ -808,3 +808,31 @@ page exists.
 **Outstanding: build `/networks/[id]/edit`** (name, description, website,
 logo, and whatever else `NetworkController@edit`/`@update` accepts). Until
 then the view page carries a control develop does not have there.
+
+### 24-group-index (/group) — 3 gaps, NOT yet fixed
+
+develop's `/group` (see `24-group-index__old.png`) renders, top to bottom: the
+groups-requiring-moderation table in a panel (icon column headers, amber
+"Group requires moderation" cell), a "Groups" heading with an
+ADD A NEW GROUP button, and a THREE-TAB panel - Your groups / Other groups
+nearby / All groups - whose table has icon headers, sortable columns and an
+UNFOLLOW GROUP action. Ours renders at chrome height by comparison.
+
+1. **Moderation queue is the wrong component.** Ours uses
+   `components/moderation/ModerationQueue.vue` (a plain name-only list);
+   develop renders the full `GroupsTable(approve)`. This is the SAME defect
+   already fixed on the network page - `GroupsTable` now has develop's
+   `approve` mode, so the fix is to use it here too.
+2. **"Your groups" is capped at 5 and missing four columns.** The page comment
+   says `GET /api/v2/dashboard`'s `your_groups` (max 5) "is the only source for
+   groups the current user belongs to today", and switches off the
+   location/hosts/restarters/next_event columns because that payload lacks
+   them. **Verify that claim before accepting it** - `GET /api/v2/users/me/
+   groups` is uncapped and carries per-group role, and is already used by
+   pages/party/view/[id].vue for exactly this reason (an earlier fix there
+   called out the capped-at-5 source as a bug that hid the device panel from
+   hosts of a 6th group). If it also carries the four columns, both the cap
+   and the missing columns are self-inflicted. This has the same shape as the
+   `auto_approve` claim, which was likewise false.
+3. **Confirm the three-tab structure** (Your groups / Other groups nearby /
+   All groups) exists and is panelled the same way.
