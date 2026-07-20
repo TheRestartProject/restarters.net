@@ -19,13 +19,19 @@ import RepairDirectoryTab from './RepairDirectoryTab.vue'
 // tab-content panels (a sixth, "Notifications", is a plain external nav
 // link, not a panel - it always routes to /notifications).
 //
-// Tab visibility deliberately does NOT match the legacy Blade page 1:1 -
-// see stores/profile.js's class doc comment for why the Profile/
-// Account(-self-parts)/Email-preferences/Calendars tabs are gated on
-// `isOwnProfile` alone here, not `isOwnProfile || isAdmin`. The two
-// id-scoped families (Account's admin-settings section, and the standalone
-// Repair Directory tab) keep their legacy visibility rules exactly, since
-// they are safe to use against someone else's id.
+// Tab visibility now matches the legacy Blade page far more closely than
+// it used to (full-parity gap 5 - see stores/profile.js's class doc
+// comment for the id-scoped `/users/{id}/profile|skills|preferences|
+// password` + DELETE `/users/{id}` endpoints this closes the gap with):
+// Profile/Account/Email are gated on `isOwnProfile || isAdmin`, same as
+// Account already was. Calendars and the Notifications link stay
+// self-only - no id-scoped counterpart exists for either - and so does
+// ProfilePhotoTab within the Profile panel and LanguageTab within the
+// Account panel (see below). Every component fed by an id-scoped call
+// takes `targetId`/`isOwnProfile` props and picks `/me/*` vs `/{id}/*`
+// itself; the two families that were ALREADY genuinely id-scoped before
+// this (Account's admin-settings section, and the standalone Repair
+// Directory tab) are unaffected.
 const props = defineProps({
   targetId: {
     type: Number,
@@ -44,9 +50,9 @@ const props = defineProps({
 const { t } = useI18n()
 const profileStore = useProfileStore()
 
-const showProfileTab = computed(() => props.isOwnProfile)
+const showProfileTab = computed(() => props.isOwnProfile || props.isAdmin)
 const showAccountTab = computed(() => props.isOwnProfile || props.isAdmin)
-const showEmailTab = computed(() => props.isOwnProfile)
+const showEmailTab = computed(() => props.isOwnProfile || props.isAdmin)
 const showCalendarsTab = computed(() => props.isOwnProfile)
 const showNotificationsLink = computed(() => props.isOwnProfile)
 // See stores/profile.js's repairDirectoryVisible getter doc comment: a
@@ -143,28 +149,30 @@ watch(
 
     <div class="col-lg-8 col-xl-9">
       <div v-if="showProfileTab" v-show="activeTab === 'profile'" data-testid="profile-tab-panel-profile">
-        <ProfileInfoTab />
+        <ProfileInfoTab :target-id="targetId" :is-own-profile="isOwnProfile" />
         <div class="row row-end">
           <div class="col-lg-6">
-            <SkillsTab />
+            <SkillsTab :target-id="targetId" :is-own-profile="isOwnProfile" />
           </div>
           <div class="col-lg-6">
-            <ProfilePhotoTab />
+            <!-- No id-scoped photo-upload endpoint - self-only, see the
+                 class doc comment above. -->
+            <ProfilePhotoTab v-if="isOwnProfile" />
           </div>
         </div>
       </div>
 
       <div v-if="showAccountTab" v-show="activeTab === 'account'" data-testid="profile-tab-panel-account">
-        <template v-if="isOwnProfile">
-          <PasswordTab />
-          <LanguageTab />
-        </template>
+        <PasswordTab :target-id="targetId" :is-own-profile="isOwnProfile" />
+        <!-- No id-scoped language endpoint - self-only, see the class doc
+             comment above. -->
+        <LanguageTab v-if="isOwnProfile" />
         <AdminSettingsTab v-if="isAdmin" :target-id="targetId" />
-        <DeleteAccountTab v-if="isOwnProfile" />
+        <DeleteAccountTab :target-id="targetId" :is-own-profile="isOwnProfile" />
       </div>
 
       <div v-if="showEmailTab" v-show="activeTab === 'email'" data-testid="profile-tab-panel-email">
-        <EmailPreferencesTab />
+        <EmailPreferencesTab :target-id="targetId" :is-own-profile="isOwnProfile" />
       </div>
 
       <div v-if="showCalendarsTab" v-show="activeTab === 'calendars'" data-testid="profile-tab-panel-calendars">

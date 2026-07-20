@@ -4,6 +4,7 @@ namespace Tests\Feature\Users;
 
 use App\Role;
 use App\User;
+use DB;
 use Tests\TestCase;
 
 class APIv2UsersTest extends TestCase
@@ -121,5 +122,42 @@ class APIv2UsersTest extends TestCase
         $this->assertNotFalse($alphaIdx);
         $this->assertNotFalse($zetaIdx);
         $this->assertLessThan($zetaIdx, $alphaIdx);
+    }
+
+    public function testListUsersFilterByPermissions(): void
+    {
+        $admin = User::factory()->administrator()->create(['api_token' => 'admin1']);
+        $this->actingAs($admin);
+
+        $matchingHost = User::factory()->host()->create(['name' => 'Permission Match Host']);
+        User::factory()->restarter()->create(['name' => 'Permission Mismatch Restarter']);
+
+        $permission1 = DB::table('permissions')->insertGetId([
+            'permission' => 'Test Permission Filter 1',
+            'purpose' => 'Testing',
+            'slug' => 'test-permission-filter-1',
+        ], 'idpermissions');
+        $permission2 = DB::table('permissions')->insertGetId([
+            'permission' => 'Test Permission Filter 2',
+            'purpose' => 'Testing',
+            'slug' => 'test-permission-filter-2',
+        ], 'idpermissions');
+
+        // Host holds BOTH permissions; Restarter holds only one - filtering on both ids
+        // must exclude Restarter even though it partially matches.
+        DB::table('roles_permissions')->insert([
+            ['role' => Role::HOST, 'permission' => $permission1],
+            ['role' => Role::HOST, 'permission' => $permission2],
+            ['role' => Role::RESTARTER, 'permission' => $permission1],
+        ]);
+
+        $response = $this->getJson(
+            "/api/v2/users?api_token=admin1&permissions[]={$permission1}&permissions[]={$permission2}"
+        );
+        $response->assertSuccessful();
+
+        $names = array_column($response->json('data'), 'name');
+        $this->assertContains('Permission Match Host', $names);
+        $this->assertNotContains('Permission Mismatch Restarter', $names);
     }
 }

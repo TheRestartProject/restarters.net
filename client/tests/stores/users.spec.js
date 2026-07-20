@@ -12,6 +12,7 @@ describe('stores/users', () => {
       user: {
         list: vi.fn(),
         get: vi.fn(),
+        create: vi.fn(),
       },
       role: {
         list: vi.fn(),
@@ -86,6 +87,27 @@ describe('stores/users', () => {
       const store = useUsersStore()
       await expect(store.fetchRoles()).rejects.toEqual(apiError)
       expect(store.roles.error).toEqual(apiError)
+    })
+  })
+
+  describe('createUser', () => {
+    it('posts the payload straight through and returns the created user', async () => {
+      mockApi.user.create.mockResolvedValueOnce({ data: { id: 99, name: 'Jane Fixit' } })
+
+      const store = useUsersStore()
+      const payload = { name: 'Jane Fixit', email: 'jane@example.com', role: 4, password: 'secret123' }
+      const data = await store.createUser(payload)
+
+      expect(mockApi.user.create).toHaveBeenCalledWith(payload)
+      expect(data).toEqual({ id: 99, name: 'Jane Fixit' })
+    })
+
+    it('does not catch - lets the caller render field errors (422 convention)', async () => {
+      const apiError = { status: 422, data: { errors: { email: ['The email has already been taken.'] } } }
+      mockApi.user.create.mockRejectedValueOnce(apiError)
+
+      const store = useUsersStore()
+      await expect(store.createUser({ name: 'X', email: 'x@x.com', role: 4, password: 'a' })).rejects.toEqual(apiError)
     })
   })
 

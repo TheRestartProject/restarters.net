@@ -1,14 +1,28 @@
 <script setup>
-import { onMounted, ref } from 'vue'
+import { ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useProfileStore } from '~/stores/profile.js'
 import { useSessionStore } from '~/stores/session.js'
 
-// GET/PATCH /api/v2/users/me/preferences. Functional spec:
+// GET/PATCH /api/v2/users/me/preferences (own profile) or GET/PATCH
+// /api/v2/users/{id}/preferences (gap 5 - an Administrator editing someone
+// else's, via profileStore.fetchUserEmailPreferences/
+// updateUserEmailPreferences). Functional spec:
 // resources/js/components/EmailPreferencesTab.vue +
-// resources/views/user/profile/email-preferences.blade.php. Always
-// operates on Auth::user() - see stores/profile.js's class doc comment for
-// why this tab is only ever shown while editing one's own profile.
+// resources/views/user/profile/email-preferences.blade.php. See
+// stores/profile.js's class doc comment for why the two are kept as
+// separate store actions/state slots.
+const props = defineProps({
+  targetId: {
+    type: Number,
+    default: null,
+  },
+  isOwnProfile: {
+    type: Boolean,
+    default: true,
+  },
+})
+
 const { t } = useI18n()
 const profileStore = useProfileStore()
 const sessionStore = useSessionStore()
@@ -24,23 +38,34 @@ const feedbackVariant = ref('success')
 // the legacy Blade partial did, from that base URL.
 const platformPreferencesUrl = `${sessionStore.config?.discourse_url || ''}/u/${sessionStore.user?.username || ''}/preferences/emails`
 
-onMounted(async () => {
-  try {
-    const data = await profileStore.fetchEmailPreferences()
-    invites.value = !!data.invites
-  } catch {
-    // Load error is rendered by the retry state below.
-  } finally {
-    loading.value = false
-  }
-})
+// Watches (not a plain onMounted) - same convention as ProfileInfoTab.vue's
+// own targetId/isOwnProfile watcher.
+watch(
+  () => [props.isOwnProfile, props.targetId],
+  async ([isOwnProfile, targetId]) => {
+    loading.value = true
+    try {
+      const data = isOwnProfile
+        ? await profileStore.fetchEmailPreferences()
+        : await profileStore.fetchUserEmailPreferences(targetId)
+      invites.value = !!data.invites
+    } catch {
+      // Load error is rendered by the retry state below.
+    } finally {
+      loading.value = false
+    }
+  },
+  { immediate: true },
+)
 
 async function save() {
   saving.value = true
   feedback.value = ''
 
   try {
-    const data = await profileStore.updateEmailPreferences({ invites: !!invites.value })
+    const data = props.isOwnProfile
+      ? await profileStore.updateEmailPreferences({ invites: !!invites.value })
+      : await profileStore.updateUserEmailPreferences(props.targetId, { invites: !!invites.value })
     invites.value = !!data.invites
     feedback.value = t('profile.preferences_updated')
     feedbackVariant.value = 'success'

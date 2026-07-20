@@ -23,6 +23,7 @@ use DB;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -173,13 +174,52 @@ class UserController extends Controller
      */
     public function getMyEmailPreferencesv2(): JsonResponse
     {
-        $user = Auth::user();
+        return response()->json([
+            'data' => $this->emailPreferencesData(Auth::user()),
+        ]);
+    }
+
+    /**
+     * @OA\Get(
+     *      path="/api/v2/users/{id}/preferences",
+     *      operationId="getUserPreferencesv2",
+     *      tags={"Users"},
+     *      summary="Administrator (or self): get a user's email preferences",
+     *      description="Id-scoped mirror of GET /users/me/preferences, so an admin edit form can be pre-filled with the target's current value before PATCHing it. Authorised via UserPolicy::update (self-or-Administrator).",
+     *      security={{"apiToken":{}}},
+     *      @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="data", type="object",
+     *                  @OA\Property(property="invites", type="boolean")
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound")
+     * )
+     */
+    public function getUserPreferencesv2(int $id): JsonResponse
+    {
+        $target = User::findOrFail($id);
+        $this->authorize('update', $target);
 
         return response()->json([
-            'data' => [
-                'invites' => (bool) $user->invites,
-            ],
+            'data' => $this->emailPreferencesData($target),
         ]);
+    }
+
+    /**
+     * Shared body of getMyEmailPreferencesv2/getUserPreferencesv2.
+     */
+    private function emailPreferencesData(User $user): array
+    {
+        return [
+            'invites' => (bool) $user->invites,
+        ];
     }
 
     /**
@@ -210,19 +250,64 @@ class UserController extends Controller
      */
     public function updateMyEmailPreferencesv2(Request $request): JsonResponse
     {
+        return response()->json([
+            'data' => $this->applyEmailPreferencesUpdate($request, Auth::user()),
+        ]);
+    }
+
+    /**
+     * @OA\Patch(
+     *      path="/api/v2/users/{id}/preferences",
+     *      operationId="updateUserPreferencesv2",
+     *      tags={"Users"},
+     *      summary="Administrator (or self): update a user's email preferences",
+     *      description="Id-scoped mirror of PATCH /users/me/preferences. Authorised via UserPolicy::update (self-or-Administrator).",
+     *      security={{"apiToken":{}}},
+     *      @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent(
+     *              @OA\Property(property="invites", type="boolean")
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="data", type="object",
+     *                  @OA\Property(property="invites", type="boolean")
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound"),
+     *      @OA\Response(response=422, ref="#/components/responses/ValidationError")
+     * )
+     */
+    public function updateUserPreferencesv2(Request $request, int $id): JsonResponse
+    {
+        $target = User::findOrFail($id);
+        $this->authorize('update', $target);
+
+        return response()->json([
+            'data' => $this->applyEmailPreferencesUpdate($request, $target),
+        ]);
+    }
+
+    /**
+     * Shared body of updateMyEmailPreferencesv2/updateUserPreferencesv2.
+     */
+    private function applyEmailPreferencesUpdate(Request $request, User $user): array
+    {
         $validated = $request->validate([
             'invites' => 'required|boolean',
         ]);
 
-        $user = Auth::user();
         $user->invites = $validated['invites'] ? 1 : 0;
         $user->save();
 
-        return response()->json([
-            'data' => [
-                'invites' => (bool) $user->invites,
-            ],
-        ]);
+        return $this->emailPreferencesData($user);
     }
 
     /**
@@ -794,21 +879,73 @@ class UserController extends Controller
      */
     public function getMyProfilev2(): JsonResponse
     {
-        $user = Auth::user();
+        return response()->json([
+            'data' => $this->profileData(Auth::user()),
+        ]);
+    }
+
+    /**
+     * @OA\Get(
+     *      path="/api/v2/users/{id}/profile",
+     *      operationId="getUserProfilev2",
+     *      tags={"Users"},
+     *      summary="Administrator (or self): get a user's profile info",
+     *      description="Id-scoped mirror of GET /users/me/profile, so an admin edit form can be pre-filled with the target's current values before PATCHing them. Authorised via UserPolicy::update (self-or-Administrator).",
+     *      security={{"apiToken":{}}},
+     *      @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="data", type="object",
+     *                  @OA\Property(property="name", type="string"),
+     *                  @OA\Property(property="email", type="string"),
+     *                  @OA\Property(property="country_code", type="string", nullable=true),
+     *                  @OA\Property(property="location", type="string", nullable=true),
+     *                  @OA\Property(property="age", type="string", nullable=true),
+     *                  @OA\Property(property="gender", type="string", nullable=true),
+     *                  @OA\Property(property="biography", type="string", nullable=true),
+     *                  @OA\Property(property="countries", type="array", @OA\Items(
+     *                      @OA\Property(property="code", type="string"),
+     *                      @OA\Property(property="name", type="string")
+     *                  )),
+     *                  @OA\Property(property="ages", type="array", @OA\Items(type="string"))
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound")
+     * )
+     */
+    public function getUserProfilev2(int $id): JsonResponse
+    {
+        $target = User::findOrFail($id);
+        $this->authorize('update', $target);
 
         return response()->json([
-            'data' => [
-                'name' => $user->name,
-                'email' => $user->email,
-                'country_code' => $user->country_code,
-                'location' => $user->location,
-                'age' => $user->age,
-                'gender' => $user->gender,
-                'biography' => $user->biography,
-                'countries' => $this->profileCountryOptions(),
-                'ages' => $this->profileAgeOptions(),
-            ],
+            'data' => $this->profileData($target),
         ]);
+    }
+
+    /**
+     * Shared body of getMyProfilev2/getUserProfilev2. Deliberately NOT shared with
+     * applyProfileUpdate()'s return value - the PATCH response (see updateMyProfilev2's
+     * @OA doc) omits the countries/ages option lists that only a GET-for-editing needs.
+     */
+    private function profileData(User $user): array
+    {
+        return [
+            'name' => $user->name,
+            'email' => $user->email,
+            'country_code' => $user->country_code,
+            'location' => $user->location,
+            'age' => $user->age,
+            'gender' => $user->gender,
+            'biography' => $user->biography,
+            'countries' => $this->profileCountryOptions(),
+            'ages' => $this->profileAgeOptions(),
+        ];
     }
 
     /**
@@ -852,14 +989,77 @@ class UserController extends Controller
      */
     public function updateMyProfilev2(Request $request, Geocoder $geocoder): JsonResponse
     {
+        return response()->json([
+            'data' => $this->applyProfileUpdate($request, Auth::user(), $geocoder),
+        ]);
+    }
+
+    /**
+     * @OA\Patch(
+     *      path="/api/v2/users/{id}/profile",
+     *      operationId="updateUserProfilev2",
+     *      tags={"Users"},
+     *      summary="Administrator (or self): update a user's profile info",
+     *      description="Id-scoped mirror of PATCH /users/me/profile - identical validation and persistence, targeting the resolved user instead of Auth::user(). Authorised via UserPolicy::update (self-or-Administrator).",
+     *      security={{"apiToken":{}}},
+     *      @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent(
+     *              required={"name", "email", "age", "country"},
+     *              @OA\Property(property="name", type="string"),
+     *              @OA\Property(property="email", type="string"),
+     *              @OA\Property(property="age", type="string"),
+     *              @OA\Property(property="country", type="string"),
+     *              @OA\Property(property="townCity", type="string", nullable=true),
+     *              @OA\Property(property="gender", type="string", nullable=true),
+     *              @OA\Property(property="biography", type="string", nullable=true)
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="data", type="object",
+     *                  @OA\Property(property="name", type="string"),
+     *                  @OA\Property(property="email", type="string"),
+     *                  @OA\Property(property="country_code", type="string", nullable=true),
+     *                  @OA\Property(property="location", type="string", nullable=true),
+     *                  @OA\Property(property="age", type="string", nullable=true),
+     *                  @OA\Property(property="gender", type="string", nullable=true),
+     *                  @OA\Property(property="biography", type="string", nullable=true)
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound"),
+     *      @OA\Response(response=422, ref="#/components/responses/ValidationError")
+     * )
+     */
+    public function updateUserProfilev2(Request $request, Geocoder $geocoder, int $id): JsonResponse
+    {
+        $target = User::findOrFail($id);
+        $this->authorize('update', $target);
+
+        return response()->json([
+            'data' => $this->applyProfileUpdate($request, $target, $geocoder),
+        ]);
+    }
+
+    /**
+     * Shared body of updateMyProfilev2/updateUserProfilev2 so the self and admin paths can
+     * never drift. $user is Auth::user() for the self route, or the resolved+authorised
+     * target for the id-scoped admin route.
+     */
+    private function applyProfileUpdate(Request $request, User $user, Geocoder $geocoder): array
+    {
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255',
             'age' => 'required',
             'country' => 'required',
         ]);
-
-        $user = Auth::user();
 
         $user->update([
             'name' => $request->input('name'),
@@ -889,17 +1089,15 @@ class UserController extends Controller
 
         $user->save();
 
-        return response()->json([
-            'data' => [
-                'name' => $user->name,
-                'email' => $user->email,
-                'country_code' => $user->country_code,
-                'location' => $user->location,
-                'age' => $user->age,
-                'gender' => $user->gender,
-                'biography' => $user->biography,
-            ],
-        ]);
+        return [
+            'name' => $user->name,
+            'email' => $user->email,
+            'country_code' => $user->country_code,
+            'location' => $user->location,
+            'age' => $user->age,
+            'gender' => $user->gender,
+            'biography' => $user->biography,
+        ];
     }
 
     /**
@@ -931,8 +1129,57 @@ class UserController extends Controller
      */
     public function getMySkillsv2(): JsonResponse
     {
-        $user = Auth::user();
+        return response()->json([
+            'data' => $this->skillsData(Auth::user()),
+        ]);
+    }
 
+    /**
+     * @OA\Get(
+     *      path="/api/v2/users/{id}/skills",
+     *      operationId="getUserSkillsv2",
+     *      tags={"Users"},
+     *      summary="Administrator (or self): get the repair-skills catalogue and a user's current selection",
+     *      description="Id-scoped mirror of GET /users/me/skills, so an admin edit form can be pre-filled with the target's current selection before PATCHing it. Authorised via UserPolicy::update (self-or-Administrator).",
+     *      security={{"apiToken":{}}},
+     *      @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="data", type="object",
+     *                  @OA\Property(property="categories", type="array", @OA\Items(
+     *                      @OA\Property(property="id", type="integer"),
+     *                      @OA\Property(property="label", type="string"),
+     *                      @OA\Property(property="skills", type="array", @OA\Items(
+     *                          @OA\Property(property="id", type="integer"),
+     *                          @OA\Property(property="name", type="string")
+     *                      ))
+     *                  )),
+     *                  @OA\Property(property="selected", type="array", @OA\Items(type="integer"))
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound")
+     * )
+     */
+    public function getUserSkillsv2(int $id): JsonResponse
+    {
+        $target = User::findOrFail($id);
+        $this->authorize('update', $target);
+
+        return response()->json([
+            'data' => $this->skillsData($target),
+        ]);
+    }
+
+    /**
+     * Shared body of getMySkillsv2/getUserSkillsv2.
+     */
+    private function skillsData(User $user): array
+    {
         $selected = UsersSkills::where('user', $user->id)
             ->pluck('skill')
             ->map(fn ($id) => (int) $id)
@@ -959,12 +1206,10 @@ class UserController extends Controller
             ];
         }
 
-        return response()->json([
-            'data' => [
-                'categories' => $categories,
-                'selected' => $selected,
-            ],
-        ]);
+        return [
+            'categories' => $categories,
+            'selected' => $selected,
+        ];
     }
 
     /**
@@ -995,12 +1240,61 @@ class UserController extends Controller
      */
     public function updateMySkillsv2(Request $request): JsonResponse
     {
+        return response()->json([
+            'data' => $this->applySkillsUpdate($request, Auth::user()),
+        ]);
+    }
+
+    /**
+     * @OA\Patch(
+     *      path="/api/v2/users/{id}/skills",
+     *      operationId="updateUserSkillsv2",
+     *      tags={"Users"},
+     *      summary="Administrator (or self): replace a user's repair skills",
+     *      description="Id-scoped mirror of PATCH /users/me/skills. Authorised via UserPolicy::update (self-or-Administrator).",
+     *      security={{"apiToken":{}}},
+     *      @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent(
+     *              @OA\Property(property="tags", type="array", @OA\Items(type="integer"))
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="data", type="object",
+     *                  @OA\Property(property="tags", type="array", @OA\Items(type="integer"))
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound"),
+     *      @OA\Response(response=422, ref="#/components/responses/ValidationError")
+     * )
+     */
+    public function updateUserSkillsv2(Request $request, int $id): JsonResponse
+    {
+        $target = User::findOrFail($id);
+        $this->authorize('update', $target);
+
+        return response()->json([
+            'data' => $this->applySkillsUpdate($request, $target),
+        ]);
+    }
+
+    /**
+     * Shared body of updateMySkillsv2/updateUserSkillsv2.
+     */
+    private function applySkillsUpdate(Request $request, User $user): array
+    {
         $validated = $request->validate([
             'tags' => 'nullable|array',
             'tags.*' => 'integer',
         ]);
 
-        $user = Auth::user();
         $skills = $validated['tags'] ?? [];
 
         $user->skillsold()->sync($skills);
@@ -1018,11 +1312,9 @@ class UserController extends Controller
             ->values()
             ->all();
 
-        return response()->json([
-            'data' => [
-                'tags' => $currentSkillIds,
-            ],
-        ]);
+        return [
+            'tags' => $currentSkillIds,
+        ];
     }
 
     /**
@@ -1056,15 +1348,86 @@ class UserController extends Controller
      */
     public function updateMyPasswordv2(Request $request): JsonResponse
     {
-        $validated = $request->validate([
-            'current_password' => 'required|string',
-            'new_password' => 'required|string',
-            'new_password_confirmation' => 'required|string',
-        ]);
-
         // This endpoint always operates on the authenticated user - there is no id
         // parameter, so there is no possibility of targeting another user's password.
         $user = Auth::user();
+        $this->applyPasswordUpdate($request, $user, $user);
+
+        return response()->json([
+            'data' => [
+                'success' => true,
+            ],
+        ]);
+    }
+
+    /**
+     * @OA\Patch(
+     *      path="/api/v2/users/{id}/password",
+     *      operationId="updateUserPasswordv2",
+     *      tags={"Users"},
+     *      summary="Administrator (or self): change a user's password",
+     *      description="Id-scoped mirror of PATCH /users/me/password. Authorised via UserPolicy::update (self-or-Administrator). When an Administrator resets ANOTHER user's password, current_password is not required or checked (matching the legacy admin edit-user form, which lets admins set a new password directly); when acting on your own id, current_password is still required, exactly as the self route.",
+     *      security={{"apiToken":{}}},
+     *      @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent(
+     *              required={"new_password", "new_password_confirmation"},
+     *              @OA\Property(property="current_password", type="string", description="Required only when the target id is the acting user's own id"),
+     *              @OA\Property(property="new_password", type="string"),
+     *              @OA\Property(property="new_password_confirmation", type="string")
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="data", type="object",
+     *                  @OA\Property(property="success", type="boolean")
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound"),
+     *      @OA\Response(response=422, ref="#/components/responses/ValidationError")
+     * )
+     */
+    public function updateUserPasswordv2(Request $request, int $id): JsonResponse
+    {
+        $actor = Auth::user();
+        $target = User::findOrFail($id);
+        $this->authorize('update', $target);
+
+        $this->applyPasswordUpdate($request, $actor, $target);
+
+        return response()->json([
+            'data' => [
+                'success' => true,
+            ],
+        ]);
+    }
+
+    /**
+     * Shared body of updateMyPasswordv2/updateUserPasswordv2. $actor is who is making the
+     * request, $target is whose password is being changed - they are the same User instance
+     * on the self route. current_password is only required/checked when $actor === $target;
+     * an Administrator resetting another user's password doesn't know (and shouldn't need)
+     * the target's current password.
+     */
+    private function applyPasswordUpdate(Request $request, User $actor, User $target): void
+    {
+        $isSelf = $actor->id == $target->id;
+
+        $rules = [
+            'new_password' => 'required|string',
+            'new_password_confirmation' => 'required|string',
+        ];
+        if ($isSelf) {
+            $rules['current_password'] = 'required|string';
+        }
+
+        $validated = $request->validate($rules);
 
         if ($validated['new_password'] !== $validated['new_password_confirmation']) {
             throw ValidationException::withMessages([
@@ -1072,28 +1435,22 @@ class UserController extends Controller
             ]);
         }
 
-        if (! Hash::check($validated['current_password'], $user->password)) {
+        if ($isSelf && ! Hash::check($validated['current_password'], $target->password)) {
             throw ValidationException::withMessages([
                 'current_password' => [__('profile.password_old_mismatch')],
             ]);
         }
 
-        $oldPassword = $user->password;
-        $user->setPassword(Hash::make($validated['new_password']));
-        $user->save();
+        $oldPassword = $target->password;
+        $target->setPassword(Hash::make($validated['new_password']));
+        $target->save();
 
-        $user->update([
+        $target->update([
             'recovery' => substr(bin2hex(openssl_random_pseudo_bytes(32)), 0, 24),
             'recovery_expires' => strftime('%Y-%m-%d %X', time() + (24 * 60 * 60)),
         ]);
 
-        event(new PasswordChanged($user, $oldPassword));
-
-        return response()->json([
-            'data' => [
-                'success' => true,
-            ],
-        ]);
+        event(new PasswordChanged($target, $oldPassword));
     }
 
     /**
@@ -1417,6 +1774,108 @@ class UserController extends Controller
     }
 
     /**
+     * @OA\Delete(
+     *      path="/api/v2/users/{id}",
+     *      operationId="deleteUserv2",
+     *      tags={"Users"},
+     *      summary="Administrator (or self): soft-delete a user's account",
+     *      description="Id-scoped mirror of DELETE /users/me. Authorised via UserPolicy::delete (self-or-Administrator).",
+     *      security={{"apiToken":{}}},
+     *      @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="data", type="object",
+     *                  @OA\Property(property="success", type="boolean")
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound")
+     * )
+     */
+    public function deleteUserv2(int $id): JsonResponse
+    {
+        $target = User::findOrFail($id);
+
+        $this->authorize('delete', $target);
+
+        $target->delete(); // Will be anonymised automatically by event handlers (see postSoftDeleteUser).
+
+        return response()->json([
+            'data' => [
+                'success' => true,
+            ],
+        ]);
+    }
+
+    /**
+     * @OA\Post(
+     *      path="/api/v2/users",
+     *      operationId="createUserv2",
+     *      tags={"Users"},
+     *      summary="Administrator-only: create a new user account",
+     *      description="Port of the legacy 'Create new user' admin form (UserController::create / includes/modals/create-user.blade.php), adapted so the admin sets the initial password directly rather than a randomly-generated one that was never emailed to anyone. No consent is recorded and no admin-new-user notification is sent - both are specific to self-registration (AuthController::registerv2).",
+     *      security={{"apiToken":{}}},
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent(
+     *              required={"name", "email", "role", "password"},
+     *              @OA\Property(property="name", type="string"),
+     *              @OA\Property(property="email", type="string"),
+     *              @OA\Property(property="role", type="integer", description="A roles.idroles value"),
+     *              @OA\Property(property="password", type="string")
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=201,
+     *          description="Created",
+     *          @OA\JsonContent(@OA\Property(property="data", ref="#/components/schemas/UserAdmin"))
+     *      ),
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *      @OA\Response(response=422, ref="#/components/responses/ValidationError")
+     * )
+     */
+    public function createUserv2(Request $request): JsonResponse
+    {
+        $this->authorize('create', User::class);
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email',
+            // min:6 matches AuthController::registerv2's password rule - this is the same
+            // account, just created by an Administrator instead of via self-registration.
+            'password' => 'required|string|min:6',
+            'role' => 'required|integer|exists:roles,idroles',
+        ]);
+
+        $user = User::create([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => Hash::make($validated['password']),
+            'recovery' => substr(bin2hex(openssl_random_pseudo_bytes(32)), 0, 24),
+            'recovery_expires' => date('Y-m-d H:i:s', time() + (24 * 60 * 60)),
+            'calendar_hash' => Str::random(15),
+            // username is NOT NULL with no default - filled below via generateAndSetUsername(),
+            // exactly like AuthController::registerv2.
+            'username' => '',
+        ]);
+
+        // role excluded from $fillable (security: privilege escalation via mass assignment)
+        // - must be set via direct assignment, matching registerv2/updateAdminSettingsv2.
+        $user->role = $validated['role'];
+        $user->generateAndSetUsername();
+        $user->save();
+
+        return response()->json([
+            'data' => (new UserAdmin($user))->toArray($request),
+        ], 201);
+    }
+
+    /**
      * @OA\Get(
      *      path="/api/v2/users",
      *      operationId="listUsersv2",
@@ -1429,6 +1888,7 @@ class UserController extends Controller
      *      @OA\Parameter(name="location", in="query", required=false, @OA\Schema(type="string")),
      *      @OA\Parameter(name="country", in="query", required=false, @OA\Schema(type="string")),
      *      @OA\Parameter(name="role", in="query", required=false, @OA\Schema(type="integer")),
+     *      @OA\Parameter(name="permissions[]", in="query", required=false, description="Only return users whose role holds ALL of these permission ids", @OA\Schema(type="array", @OA\Items(type="integer"))),
      *      @OA\Parameter(name="sort", in="query", required=false, @OA\Schema(type="string", enum={"name","email","role","location","country","created_at","updated_at"})),
      *      @OA\Parameter(name="sortdir", in="query", required=false, @OA\Schema(type="string", enum={"asc","desc"})),
      *      @OA\Parameter(name="page", in="query", required=false, @OA\Schema(type="integer")),
@@ -1469,6 +1929,25 @@ class UserController extends Controller
         }
         if (($role = $request->input('role')) !== null && $role !== '') {
             $query->where('users.role', '=', (int) $role);
+        }
+
+        $validated = $request->validate([
+            'permissions' => 'sometimes|array',
+            'permissions.*' => 'integer',
+        ]);
+        if (! empty($validated['permissions'])) {
+            // Permissions are held by roles (roles_permissions), not directly by users -
+            // mirrors the legacy UserController::search, which filtered on
+            // array_column($User->getRolePermissions($user->role), 'idpermissions').
+            // Restrict to roles that hold EVERY selected permission.
+            $permissionIds = $validated['permissions'];
+            $query->whereIn('users.role', function ($subquery) use ($permissionIds) {
+                $subquery->select('role')
+                    ->from('roles_permissions')
+                    ->whereIn('permission', $permissionIds)
+                    ->groupBy('role')
+                    ->havingRaw('COUNT(DISTINCT permission) = ?', [count($permissionIds)]);
+            });
         }
 
         $sortMap = [

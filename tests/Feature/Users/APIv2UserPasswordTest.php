@@ -135,4 +135,77 @@ class APIv2UserPasswordTest extends TestCase
         // Attacker's own password changed instead.
         $this->assertTrue(Hash::check('newPassword123', $attacker->fresh()->password));
     }
+
+    public function testAdminCanResetAnotherUsersPasswordWithoutCurrentPassword(): void
+    {
+        $admin = User::factory()->administrator()->create(['api_token' => 'tok1']);
+        $target = User::factory()->restarter()->create([
+            'password' => Hash::make('originalPassword'),
+        ]);
+        $this->actingAs($admin);
+
+        // No current_password field at all - an Administrator resetting someone else's
+        // password doesn't know it, matching the legacy admin edit-user form.
+        $response = $this->patchJson("/api/v2/users/{$target->id}/password?api_token=tok1", [
+            'new_password' => 'adminSetPassword1',
+            'new_password_confirmation' => 'adminSetPassword1',
+        ]);
+
+        $response->assertSuccessful();
+        $this->assertTrue(Hash::check('adminSetPassword1', $target->fresh()->password));
+    }
+
+    public function testNonAdminCannotResetAnotherUsersPassword(): void
+    {
+        $attacker = User::factory()->host()->create(['api_token' => 'tok1']);
+        $target = User::factory()->restarter()->create([
+            'password' => Hash::make('originalPassword'),
+        ]);
+        $this->actingAs($attacker);
+
+        $response = $this->patchJson("/api/v2/users/{$target->id}/password?api_token=tok1", [
+            'new_password' => 'attackerSetPassword1',
+            'new_password_confirmation' => 'attackerSetPassword1',
+        ]);
+
+        $response->assertStatus(403);
+        $this->assertTrue(Hash::check('originalPassword', $target->fresh()->password));
+    }
+
+    public function testSelfViaIdRouteStillRequiresCurrentPassword(): void
+    {
+        $user = User::factory()->host()->create([
+            'api_token' => 'tok1',
+            'password' => Hash::make('originalPassword'),
+        ]);
+        $this->actingAs($user);
+
+        // Own id via the admin-shaped route, but still self - current_password must still
+        // be required and checked, exactly as the /users/me/password route.
+        $response = $this->patchJson("/api/v2/users/{$user->id}/password?api_token=tok1", [
+            'new_password' => 'newPassword123',
+            'new_password_confirmation' => 'newPassword123',
+        ]);
+        $response->assertStatus(422);
+
+        $response = $this->patchJson("/api/v2/users/{$user->id}/password?api_token=tok1", [
+            'current_password' => 'originalPassword',
+            'new_password' => 'newPassword123',
+            'new_password_confirmation' => 'newPassword123',
+        ]);
+        $response->assertSuccessful();
+        $this->assertTrue(Hash::check('newPassword123', $user->fresh()->password));
+    }
+
+    public function testPasswordUnknownIdReturns404(): void
+    {
+        $admin = User::factory()->administrator()->create(['api_token' => 'tok1']);
+        $this->actingAs($admin);
+
+        $response = $this->patchJson('/api/v2/users/999999999/password?api_token=tok1', [
+            'new_password' => 'newPassword123',
+            'new_password_confirmation' => 'newPassword123',
+        ]);
+        $response->assertStatus(404);
+    }
 }

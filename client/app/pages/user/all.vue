@@ -1,7 +1,9 @@
 <script setup>
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useAuth } from '~/composables/useAuth.js'
 import { useUsersStore } from '~/stores/users.js'
+import { useAdminRefdataStore } from '~/stores/adminRefdata.js'
 import AdminSettingsTab from '~/components/profile/AdminSettingsTab.vue'
 
 // /user/all - resources/views/user/all.blade.php +
@@ -19,17 +21,28 @@ import AdminSettingsTab from '~/components/profile/AdminSettingsTab.vue'
 // for D1's /profile/edit/[[id]] Account tab) in a modal, exactly the "role
 // editor modal -> PATCH /users/{id}/admin-settings" the task brief asks
 // for - reusing it rather than re-implementing the role/groups/preferences/
-// permissions form a second time. The legacy page's "Create new user" modal
-// is not ported - see stores/users.js's class doc comment.
+// permissions form a second time. The "Create new user" button/modal (gap
+// 13) ports `includes/modals/create-user.blade.php` onto POST /api/v2/users
+// (stores/users.js#createUser) - see submitCreate() below. The Permission
+// filter (gap 24) reuses the same permissions catalogue as
+// AdminSettingsTab's checkbox matrix (useAdminRefdataStore, already fetched
+// for /role's RolesPage) rather than duplicating a fetch in this store.
 definePageMeta({ auth: true, role: 'Administrator' })
 
 const { t, tm } = useI18n()
 useHead({ title: t('users.title') })
 
+const { hasRole } = useAuth()
 const usersStore = useUsersStore()
+const adminRefdataStore = useAdminRefdataStore()
 
-const filters = reactive({ name: '', email: '', location: '', country: '', role: '' })
-const appliedFilters = reactive({ name: '', email: '', location: '', country: '', role: '' })
+// Belt-and-braces UX-level gate on top of the page-level Administrator-only
+// definePageMeta above (same convention as ProfileTabs.vue's isAdmin prop) -
+// GET/POST /api/v2/users both 403 server-side regardless.
+const isAdmin = computed(() => hasRole('Administrator'))
+
+const filters = reactive({ name: '', email: '', location: '', country: '', role: '', permissions: [] })
+const appliedFilters = reactive({ name: '', email: '', location: '', country: '', role: '', permissions: [] })
 const sortBy = ref('')
 const sortDesc = ref(false)
 
@@ -64,6 +77,10 @@ const roleOptions = computed(() => [
   ...usersStore.roles.data.map((r) => ({ value: r.id, text: r.name })),
 ])
 
+const permissionOptions = computed(() =>
+  adminRefdataStore.permissions.data.map((p) => ({ value: p.id, text: p.name })),
+)
+
 // The store's own meta.current_page (not a locally-tracked page ref) is the
 // single source of truth for "what page are we on" - it's what the server
 // actually returned, so prev/next always reflect reality instead of
@@ -75,6 +92,10 @@ function buildParams(targetPage) {
   if (appliedFilters.location) params.location = appliedFilters.location
   if (appliedFilters.country) params.country = appliedFilters.country
   if (appliedFilters.role !== '') params.role = appliedFilters.role
+  // Literal bracketed key (not `permissions`) so the query string carries
+  // `permissions[]=1&permissions[]=2` - PHP only gathers repeated query
+  // params into an array under that syntax, otherwise it's last-one-wins.
+  if (appliedFilters.permissions.length) params['permissions[]'] = appliedFilters.permissions
   if (sortBy.value) {
     params.sort = sortBy.value
     params.sortdir = sortDesc.value ? 'desc' : 'asc'
@@ -152,15 +173,85 @@ function retry() {
   fetch()
 }
 
+// Create-user modal (gap 13) - `passwordRepeat` never leaves this component,
+// matching PasswordTab.vue's own client-only mismatch check: it's checked
+// in submitCreate() before stores/users.js#createUser is ever called, and
+// isn't part of the POST body (see UserAPI.js#create's doc comment).
+const showCreateModal = ref(false)
+const createForm = reactive({ name: '', email: '', role: '', password: '', passwordRepeat: '' })
+const createSaving = ref(false)
+const createGeneralError = ref('')
+const createFieldErrors = ref({})
+
+function createFieldError(field) {
+  return createFieldErrors.value[field]?.[0] || ''
+}
+
+function openCreateModal() {
+  showCreateModal.value = true
+}
+
+// Just resets/hides - unlike closeRoleModal, nothing can have been saved by
+// the time this runs (AdminSettingsTab has its own in-modal save button;
+// this form's submit button IS the save, handled by submitCreate below), so
+// dismissing without submitting needs no re-fetch.
+function closeCreateModal() {
+  showCreateModal.value = false
+  createForm.name = ''
+  createForm.email = ''
+  createForm.role = ''
+  createForm.password = ''
+  createForm.passwordRepeat = ''
+  createGeneralError.value = ''
+  createFieldErrors.value = {}
+}
+
+async function submitCreate() {
+  createSaving.value = true
+  createGeneralError.value = ''
+  createFieldErrors.value = {}
+
+  if (createForm.password !== createForm.passwordRepeat) {
+    createFieldErrors.value = { passwordRepeat: [t('client.users.password_mismatch')] }
+    createSaving.value = false
+    return
+  }
+
+  try {
+    await usersStore.createUser({
+      name: createForm.name,
+      email: createForm.email,
+      role: createForm.role,
+      password: createForm.password,
+    })
+    closeCreateModal()
+    // Refresh whatever page we're on, same convention as closeRoleModal.
+    fetch(usersStore.list.meta.current_page)
+  } catch (err) {
+    if (err?.status === 422) {
+      createFieldErrors.value = err.data?.errors || {}
+    }
+    createGeneralError.value = t('general.error_occurred')
+  } finally {
+    createSaving.value = false
+  }
+}
+
 onMounted(() => {
   usersStore.fetchRoles()
+  adminRefdataStore.fetchPermissions()
   fetch()
 })
 </script>
 
 <template>
   <div class="container py-4" data-testid="user-all-page">
-    <h1>{{ t('users.title') }}</h1>
+    <div class="d-flex align-items-center flex-wrap mb-2">
+      <h1 class="mb-0 me-3">{{ t('users.title') }}</h1>
+      <BButton v-if="isAdmin" variant="primary" class="ms-auto" data-testid="user-all-create-button" @click="openCreateModal">
+        {{ t('client.users.create_user') }}
+      </BButton>
+    </div>
 
     <div class="row">
       <div class="col-md-4 col-lg-3">
@@ -213,6 +304,20 @@ onMounted(() => {
               <label class="form-label" for="filter-role">{{ t('users.role') }}</label>
               <select id="filter-role" v-model="filters.role" class="form-select" data-testid="users-filter-role">
                 <option v-for="opt in roleOptions" :key="opt.value" :value="opt.value">{{ opt.text }}</option>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label" for="filter-permissions">{{ t('client.users.permission') }}</label>
+              <select
+                id="filter-permissions"
+                v-model="filters.permissions"
+                class="form-select"
+                multiple
+                size="6"
+                data-testid="users-filter-permissions"
+              >
+                <option v-for="opt in permissionOptions" :key="opt.value" :value="opt.value">{{ opt.text }}</option>
               </select>
             </div>
 
@@ -331,6 +436,73 @@ onMounted(() => {
           {{ t('partials.cancel') }}
         </BButton>
       </div>
+    </BModal>
+
+    <BModal
+      :model-value="showCreateModal"
+      :title="t('client.users.create_user_title')"
+      no-footer
+      data-testid="create-user-modal"
+      @hide="closeCreateModal"
+    >
+      <BAlert v-if="createGeneralError" :model-value="true" variant="danger" data-testid="create-user-error">
+        {{ createGeneralError }}
+      </BAlert>
+
+      <BForm data-testid="create-user-form" @submit.prevent="submitCreate">
+        <BFormGroup :label="`${t('users.name')}:`" label-for="create-user-name">
+          <BFormInput id="create-user-name" v-model="createForm.name" required data-testid="create-user-name" />
+          <div v-if="createFieldError('name')" class="invalid-feedback d-block" data-testid="create-user-name-error">
+            {{ createFieldError('name') }}
+          </div>
+        </BFormGroup>
+
+        <BFormGroup :label="`${t('users.email')}:`" label-for="create-user-email">
+          <BFormInput id="create-user-email" v-model="createForm.email" type="email" required data-testid="create-user-email" />
+          <div v-if="createFieldError('email')" class="invalid-feedback d-block" data-testid="create-user-email-error">
+            {{ createFieldError('email') }}
+          </div>
+        </BFormGroup>
+
+        <BFormGroup :label="`${t('users.role')}:`" label-for="create-user-role">
+          <BFormSelect id="create-user-role" v-model="createForm.role" required data-testid="create-user-role">
+            <option value="" />
+            <option v-for="r in usersStore.roles.data" :key="r.id" :value="r.id">{{ r.name }}</option>
+          </BFormSelect>
+          <div v-if="createFieldError('role')" class="invalid-feedback d-block" data-testid="create-user-role-error">
+            {{ createFieldError('role') }}
+          </div>
+        </BFormGroup>
+
+        <BFormGroup :label="`${t('auth.password')}:`" label-for="create-user-password">
+          <BFormInput id="create-user-password" v-model="createForm.password" type="password" required data-testid="create-user-password" />
+          <div v-if="createFieldError('password')" class="invalid-feedback d-block" data-testid="create-user-password-error">
+            {{ createFieldError('password') }}
+          </div>
+        </BFormGroup>
+
+        <BFormGroup :label="`${t('auth.repeat_password')}:`" label-for="create-user-password-repeat">
+          <BFormInput
+            id="create-user-password-repeat"
+            v-model="createForm.passwordRepeat"
+            type="password"
+            required
+            data-testid="create-user-password-repeat"
+          />
+          <div v-if="createFieldError('passwordRepeat')" class="invalid-feedback d-block" data-testid="create-user-password-repeat-error">
+            {{ createFieldError('passwordRepeat') }}
+          </div>
+        </BFormGroup>
+
+        <div class="d-flex justify-content-end gap-2 mt-3">
+          <BButton variant="outline-secondary" data-testid="create-user-cancel" @click="closeCreateModal">
+            {{ t('partials.cancel') }}
+          </BButton>
+          <BButton type="submit" variant="primary" :disabled="createSaving" data-testid="create-user-submit">
+            {{ t('client.users.create_user_title') }}
+          </BButton>
+        </div>
+      </BForm>
     </BModal>
   </div>
 </template>

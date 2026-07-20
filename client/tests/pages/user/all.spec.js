@@ -4,6 +4,8 @@ import { createI18n } from 'vue-i18n'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import UserAllPage from '../../../app/pages/user/all.vue'
 import { useUsersStore } from '../../../app/stores/users.js'
+import { useAdminRefdataStore } from '../../../app/stores/adminRefdata.js'
+import { useAuthStore } from '../../../app/stores/auth.js'
 import en from '../../../i18n/locales/en.json'
 import clientEn from '../../../i18n/locales/client-en.json'
 
@@ -19,12 +21,38 @@ const AdminSettingsTabStub = {
   props: ['targetId'],
   template: '<div data-testid="stub-admin-settings" :data-target-id="targetId" />',
 }
+// Same shape as components/profile/ProfileInfoTab.spec.js's BForm*
+// stubs - real elements so v-model/setValue work in tests. `emits` must be
+// declared explicitly here (unlike those other spec files, which never
+// assert call *counts* on the submit handler): without it, Vue's attrs
+// fallthrough attaches the parent's onSubmit listener directly onto this
+// stub's root <form> IN ADDITION to the explicit $emit below, so a single
+// triggered 'submit' event invokes the handler twice.
+const BFormStub = { emits: ['submit'], template: '<form @submit.prevent="$emit(\'submit\', $event)"><slot /></form>' }
+const BFormGroupStub = { template: '<div><slot /></div>' }
+const BFormInputStub = {
+  props: ['modelValue'],
+  emits: ['update:modelValue'],
+  template: '<input :value="modelValue" @input="$emit(\'update:modelValue\', $event.target.value)" v-bind="$attrs" />',
+}
+// Coerces to Number, same as AdminSettingsTab.spec.js's own BFormSelectStub -
+// the only BFormSelect on this page is the create-user role field, bound to
+// numeric role ids (matching AdminSettingsTab's role select).
+const BFormSelectStub = {
+  props: ['modelValue'],
+  emits: ['update:modelValue'],
+  template: '<select :value="modelValue" @change="$emit(\'update:modelValue\', Number($event.target.value))"><slot /></select>',
+}
 
 const GLOBAL_STUBS = {
   NuxtLink: NuxtLinkStub,
   BAlert: BAlertStub,
   BButton: BButtonStub,
   BModal: BModalStub,
+  BForm: BFormStub,
+  BFormGroup: BFormGroupStub,
+  BFormInput: BFormInputStub,
+  BFormSelect: BFormSelectStub,
   AdminSettingsTab: AdminSettingsTabStub,
 }
 
@@ -55,23 +83,38 @@ function mountPage() {
 
 describe('pages/user/all', () => {
   let usersStore
+  let adminRefdataStore
 
   beforeEach(() => {
     setActivePinia(createPinia())
 
+    // useAuth()'s hasRole() reads authStore.user.role_name directly (mirrors
+    // DevicesSearchTable.spec.js's setLoggedInUser) - the create-user button
+    // is gated on it in addition to the page-level definePageMeta role.
+    useAuthStore().user = { role_name: 'Administrator' }
+
     usersStore = useUsersStore()
     usersStore.fetchList = vi.fn().mockResolvedValue([])
     usersStore.fetchRoles = vi.fn().mockResolvedValue([])
+    usersStore.createUser = vi.fn().mockResolvedValue({ id: 99 })
     usersStore.roles.data = [
       { id: 3, name: 'Host' },
       { id: 4, name: 'Restarter' },
     ]
+
+    adminRefdataStore = useAdminRefdataStore()
+    adminRefdataStore.fetchPermissions = vi.fn().mockResolvedValue([])
+    adminRefdataStore.permissions.data = [
+      { id: 1, name: 'Manage groups' },
+      { id: 2, name: 'Manage users' },
+    ]
   })
 
-  it('fetches roles and the first page of users on mount', () => {
+  it('fetches roles, permissions and the first page of users on mount', () => {
     mountPage()
 
     expect(usersStore.fetchRoles).toHaveBeenCalled()
+    expect(adminRefdataStore.fetchPermissions).toHaveBeenCalled()
     expect(usersStore.fetchList).toHaveBeenCalledWith({ page: 1 })
   })
 
@@ -273,6 +316,120 @@ describe('pages/user/all', () => {
 
       expect(wrapper.find('[data-testid="users-role-modal"]').exists()).toBe(false)
       expect(usersStore.fetchList).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  describe('permission filter (gap 24)', () => {
+    it('sends selected permission ids under the permissions[] key, omitted when none selected', async () => {
+      const wrapper = mountPage()
+      usersStore.fetchList.mockClear()
+
+      await wrapper.find('[data-testid="users-filter-permissions"]').setValue(['1', '2'])
+      await wrapper.find('[data-testid="users-filter-form"]').trigger('submit')
+
+      expect(usersStore.fetchList).toHaveBeenCalledWith({ page: 1, 'permissions[]': [1, 2] })
+    })
+  })
+
+  describe('create-user modal (gap 13)', () => {
+    it('shows the create button only for admins', () => {
+      const wrapper = mountPage()
+      expect(wrapper.find('[data-testid="user-all-create-button"]').exists()).toBe(true)
+    })
+
+    it('hides the create button for a non-Administrator', () => {
+      useAuthStore().user = { role_name: 'Host' }
+      const wrapper = mountPage()
+      expect(wrapper.find('[data-testid="user-all-create-button"]').exists()).toBe(false)
+    })
+
+    it('is closed by default and opens on the create button', async () => {
+      const wrapper = mountPage()
+      expect(wrapper.find('[data-testid="create-user-modal"]').exists()).toBe(false)
+
+      await wrapper.find('[data-testid="user-all-create-button"]').trigger('click')
+
+      expect(wrapper.find('[data-testid="create-user-modal"]').exists()).toBe(true)
+    })
+
+    it('rejects a mismatched password confirmation without calling the API', async () => {
+      const wrapper = mountPage()
+      await wrapper.find('[data-testid="user-all-create-button"]').trigger('click')
+
+      await wrapper.find('[data-testid="create-user-name"]').setValue('Jane Fixit')
+      await wrapper.find('[data-testid="create-user-email"]').setValue('jane@example.com')
+      await wrapper.find('[data-testid="create-user-role"]').setValue('4')
+      await wrapper.find('[data-testid="create-user-password"]').setValue('secret123')
+      await wrapper.find('[data-testid="create-user-password-repeat"]').setValue('different')
+      await wrapper.find('[data-testid="create-user-form"]').trigger('submit')
+
+      expect(usersStore.createUser).not.toHaveBeenCalled()
+      expect(wrapper.find('[data-testid="create-user-password-repeat-error"]').exists()).toBe(true)
+    })
+
+    it('posts {name, email, role, password} (no passwordRepeat) when the confirmation matches, then closes and refreshes the list', async () => {
+      const wrapper = mountPage()
+      await wrapper.find('[data-testid="user-all-create-button"]').trigger('click')
+      usersStore.fetchList.mockClear()
+
+      await wrapper.find('[data-testid="create-user-name"]').setValue('Jane Fixit')
+      await wrapper.find('[data-testid="create-user-email"]').setValue('jane@example.com')
+      await wrapper.find('[data-testid="create-user-role"]').setValue('4')
+      await wrapper.find('[data-testid="create-user-password"]').setValue('secret123')
+      await wrapper.find('[data-testid="create-user-password-repeat"]').setValue('secret123')
+      await wrapper.find('[data-testid="create-user-form"]').trigger('submit')
+      await Promise.resolve()
+      await Promise.resolve()
+
+      expect(usersStore.createUser).toHaveBeenCalledWith({
+        name: 'Jane Fixit',
+        email: 'jane@example.com',
+        role: 4,
+        password: 'secret123',
+      })
+      expect(wrapper.find('[data-testid="create-user-modal"]').exists()).toBe(false)
+      expect(usersStore.fetchList).toHaveBeenCalledTimes(1)
+    })
+
+    it('renders a 422 field error from the server and keeps the modal open', async () => {
+      usersStore.createUser = vi.fn().mockRejectedValue({
+        status: 422,
+        data: { errors: { email: ['The email has already been taken.'] } },
+      })
+
+      const wrapper = mountPage()
+      await wrapper.find('[data-testid="user-all-create-button"]').trigger('click')
+
+      await wrapper.find('[data-testid="create-user-name"]').setValue('Jane Fixit')
+      await wrapper.find('[data-testid="create-user-email"]').setValue('taken@example.com')
+      await wrapper.find('[data-testid="create-user-role"]').setValue('4')
+      await wrapper.find('[data-testid="create-user-password"]').setValue('secret123')
+      await wrapper.find('[data-testid="create-user-password-repeat"]').setValue('secret123')
+      await wrapper.find('[data-testid="create-user-form"]').trigger('submit')
+      await Promise.resolve()
+      await Promise.resolve()
+
+      expect(wrapper.find('[data-testid="create-user-modal"]').exists()).toBe(true)
+      expect(wrapper.find('[data-testid="create-user-email-error"]').text()).toBe('The email has already been taken.')
+    })
+
+    it('resets the form and clears errors when cancelled', async () => {
+      usersStore.createUser = vi.fn().mockRejectedValue({ status: 422, data: { errors: { name: ['Required'] } } })
+
+      const wrapper = mountPage()
+      await wrapper.find('[data-testid="user-all-create-button"]').trigger('click')
+      await wrapper.find('[data-testid="create-user-name"]').setValue('Jane Fixit')
+      await wrapper.find('[data-testid="create-user-form"]').trigger('submit')
+      await Promise.resolve()
+      await Promise.resolve()
+      expect(wrapper.find('[data-testid="create-user-name-error"]').exists()).toBe(true)
+
+      await wrapper.find('[data-testid="create-user-cancel"]').trigger('click')
+      expect(wrapper.find('[data-testid="create-user-modal"]').exists()).toBe(false)
+
+      await wrapper.find('[data-testid="user-all-create-button"]').trigger('click')
+      expect(wrapper.find('[data-testid="create-user-name"]').element.value).toBe('')
+      expect(wrapper.find('[data-testid="create-user-name-error"]').exists()).toBe(false)
     })
   })
 })

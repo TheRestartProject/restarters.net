@@ -11,20 +11,35 @@ import { useToastStore } from './toast.js'
  * users/me/* endpoints (email preferences, calendars, language, profile
  * info, skills, password, photo, delete-account) always operate on
  * Auth::user() - there is no id parameter on any of them (confirmed by
- * reading app/Http/Controllers/API/UserController.php directly). The
- * legacy Blade page nonetheless *shows* the Profile/Account(-self-parts)/
- * Email-preferences/Calendars tabs whenever the viewer is an Administrator
- * OR is editing their own id - meaning an Administrator who opens someone
- * else's /profile/edit/{id} sees those tabs, but saving them silently
- * edits the ADMINISTRATOR's own account, not the target's. That is a
- * pre-existing footgun in PR #868, not a feature: this client deliberately
- * does NOT reproduce it. `docs/nuxt-migration/api-gaps.md` (Phase D)
- * records the deviation. Concretely: components fed by the `me*` actions
- * below (email preferences, calendars, language, profile info, skills,
- * password, photo, delete-account) are only ever shown by ProfileTabs.vue
- * when editing one's own profile; only the two genuinely id-scoped
- * families - repair-directory-* and admin-settings - are shown while
- * editing someone else's.
+ * reading app/Http/Controllers/API/UserController.php directly). Earlier
+ * on this branch, the legacy Blade page's "show Profile/Account(-self-
+ * parts)/Email-preferences tabs whenever the viewer is an Administrator OR
+ * is editing their own id" behaviour was deliberately NOT reproduced here,
+ * since saving those tabs against `me*` while viewing someone else's page
+ * would silently edit the ADMINISTRATOR's own account instead of the
+ * target's - a pre-existing footgun in PR #868 (`docs/nuxt-migration/
+ * api-gaps.md` Phase D recorded the deviation).
+ *
+ * Full-parity gap 5 closes that footgun properly instead of just avoiding
+ * it: UserController grew genuinely id-scoped counterparts - GET/PATCH
+ * `/users/{id}/profile|skills|preferences`, PATCH `/users/{id}/password`,
+ * DELETE `/users/{id}` (admin-or-self, same validation/response shape as
+ * their `me/*` counterparts; password has no GET, matching
+ * updateMyPasswordv2 which also has none). The `user*`-prefixed
+ * state/actions below (userProfile/fetchUserProfile/updateUserProfile,
+ * userSkills/..., userEmailPreferences/..., updateUserPassword, deleteUser)
+ * are that family, kept in separate state slots from `info`/`skills`/
+ * `emailPreferences` (which always mean Auth::user(), via the unchanged
+ * `me*` actions) rather than repurposing those slots for a second meaning.
+ * ProfileTabs.vue now shows ProfileInfoTab/SkillsTab/EmailPreferencesTab/
+ * PasswordTab/DeleteAccountTab whenever the viewer is an Administrator OR
+ * is editing their own id (matching the legacy page again), and each of
+ * those components picks `me*` vs `user*` for itself based on its
+ * `isOwnProfile` prop. Calendars and Language still have no id-scoped
+ * counterpart and remain self-only, as does the standalone photo upload
+ * inside the Profile tab (ProfilePhotoTab, still `me`-only in
+ * ProfileTabs.vue) - only repair-directory-* and admin-settings were
+ * already genuinely id-scoped before this.
  */
 export const useProfileStore = defineStore('profile', {
   state: () => ({
@@ -47,6 +62,14 @@ export const useProfileStore = defineStore('profile', {
     // showing stale data.
     repairDirectory: { targetId: null, data: null, loading: false, error: null },
     adminSettings: { targetId: null, data: null, loading: false, error: null },
+
+    // gap 5's id-scoped profile/skills/preferences family - same
+    // targetId-keyed shape as repairDirectory/adminSettings above, used by
+    // ProfileInfoTab/SkillsTab/EmailPreferencesTab only when isOwnProfile
+    // is false (an Administrator editing someone else's profile).
+    userProfile: { targetId: null, data: null, loading: false, error: null },
+    userSkills: { targetId: null, data: null, loading: false, error: null },
+    userEmailPreferences: { targetId: null, data: null, loading: false, error: null },
   }),
 
   getters: {
@@ -252,6 +275,118 @@ export const useProfileStore = defineStore('profile', {
         useToastStore().error(error)
         throw error
       }
+    },
+
+    // id-scoped counterparts of fetchProfileInfo/updateProfileInfo/
+    // fetchSkills/updateSkills/fetchEmailPreferences/updateEmailPreferences/
+    // updatePassword/deleteAccount above (gap 5 - see the class doc
+    // comment). Only ever called by ProfileInfoTab/SkillsTab/
+    // EmailPreferencesTab/PasswordTab/DeleteAccountTab when their
+    // `isOwnProfile` prop is false. Unlike deleteAccount, deleteUser
+    // doesn't touch the acting Administrator's own auth state - the
+    // deleted account isn't theirs - and doesn't toast on failure (matches
+    // updateAdminSettings/updateRepairDirectoryRole's convention of
+    // leaving feedback to the caller, not deleteAccount's toast-and-
+    // rethrow).
+    async fetchUserProfile(id) {
+      const { $api } = useNuxtApp()
+      this.userProfile.targetId = id
+      this.userProfile.loading = true
+      this.userProfile.error = null
+
+      try {
+        const { data } = await $api.user.getUserProfile(id)
+        this.userProfile.data = data
+        return data
+      } catch (error) {
+        this.userProfile.error = error
+        throw error
+      } finally {
+        this.userProfile.loading = false
+      }
+    },
+
+    async updateUserProfile(id, payload) {
+      const { $api } = useNuxtApp()
+      const { data } = await $api.user.updateUserProfile(id, payload)
+
+      if (this.userProfile.targetId === id && this.userProfile.data) {
+        this.userProfile.data = { ...this.userProfile.data, ...data }
+      }
+
+      return data
+    },
+
+    async fetchUserSkills(id) {
+      const { $api } = useNuxtApp()
+      this.userSkills.targetId = id
+      this.userSkills.loading = true
+      this.userSkills.error = null
+
+      try {
+        const { data } = await $api.user.getUserSkills(id)
+        this.userSkills.data = data
+        return data
+      } catch (error) {
+        this.userSkills.error = error
+        throw error
+      } finally {
+        this.userSkills.loading = false
+      }
+    },
+
+    async updateUserSkills(id, payload) {
+      const { $api } = useNuxtApp()
+      const { data } = await $api.user.updateUserSkills(id, payload)
+
+      if (this.userSkills.targetId === id && this.userSkills.data) {
+        this.userSkills.data = { ...this.userSkills.data, selected: data.tags }
+      }
+
+      return data
+    },
+
+    async fetchUserEmailPreferences(id) {
+      const { $api } = useNuxtApp()
+      this.userEmailPreferences.targetId = id
+      this.userEmailPreferences.loading = true
+      this.userEmailPreferences.error = null
+
+      try {
+        const { data } = await $api.user.getUserEmailPreferences(id)
+        this.userEmailPreferences.data = data
+        return data
+      } catch (error) {
+        this.userEmailPreferences.error = error
+        throw error
+      } finally {
+        this.userEmailPreferences.loading = false
+      }
+    },
+
+    async updateUserEmailPreferences(id, payload) {
+      const { $api } = useNuxtApp()
+      const { data } = await $api.user.updateUserEmailPreferences(id, payload)
+
+      if (this.userEmailPreferences.targetId === id && this.userEmailPreferences.data) {
+        this.userEmailPreferences.data = data
+      }
+
+      return data
+    },
+
+    // Not caught, same convention as updatePassword above - the caller
+    // renders the 422 inline.
+    async updateUserPassword(id, payload) {
+      const { $api } = useNuxtApp()
+      const { data } = await $api.user.updateUserPassword(id, payload)
+      return data
+    },
+
+    async deleteUser(id) {
+      const { $api } = useNuxtApp()
+      const { data } = await $api.user.deleteUser(id)
+      return data
     },
 
     // GET /api/v2/users/{id}/repair-directory-options. Cached per target

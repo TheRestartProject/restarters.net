@@ -34,10 +34,11 @@ const PROFILE_RESPONSE = {
   ages: ['1990'],
 }
 
-function mountComponent() {
+function mountComponent(props = {}) {
   const i18n = createI18n({ legacy: false, locale: 'en', messages: { en: { ...en, ...clientEn } } })
 
   return mount(ProfileInfoTab, {
+    props,
     global: {
       plugins: [i18n],
       stubs: { BAlert: BAlertStub, BFormGroup: BFormGroupStub, BFormInput: BFormInputStub, BFormSelect: BFormSelectStub, BButton: BButtonStub, BForm: BFormStub },
@@ -108,5 +109,39 @@ describe('components/profile/ProfileInfoTab', () => {
     await Promise.resolve()
 
     expect(wrapper.find('[data-testid="profile-email-error"]').text()).toBe('The email has already been taken.')
+  })
+
+  describe('editing someone else\'s profile (isOwnProfile: false)', () => {
+    it('fetches via fetchUserProfile(targetId) and saves via updateUserProfile(targetId, payload), not the me/* actions', async () => {
+      profileStore.fetchUserProfile = vi.fn().mockResolvedValue(PROFILE_RESPONSE)
+      profileStore.userProfile.data = PROFILE_RESPONSE
+      profileStore.updateUserProfile = vi.fn().mockResolvedValue(PROFILE_RESPONSE)
+      profileStore.fetchProfileInfo = vi.fn()
+      profileStore.updateProfileInfo = vi.fn()
+
+      const wrapper = mountComponent({ targetId: 42, isOwnProfile: false })
+      await Promise.resolve()
+      await Promise.resolve()
+
+      expect(profileStore.fetchUserProfile).toHaveBeenCalledWith(42)
+      expect(profileStore.fetchProfileInfo).not.toHaveBeenCalled()
+      expect(wrapper.find('[data-testid="profile-name"]').element.value).toBe('Jane')
+
+      await wrapper.find('[data-testid="profile-name"]').setValue('Jane Doe')
+      await wrapper.find('[data-testid="profile-info-form"]').trigger('submit')
+      await Promise.resolve()
+      await Promise.resolve()
+
+      expect(profileStore.updateUserProfile).toHaveBeenCalledWith(42, {
+        name: 'Jane Doe',
+        email: 'jane@example.com',
+        country: 'GB',
+        townCity: 'London',
+        age: '1990',
+        gender: 'F',
+        biography: 'Fixer',
+      })
+      expect(profileStore.updateProfileInfo).not.toHaveBeenCalled()
+    })
   })
 })

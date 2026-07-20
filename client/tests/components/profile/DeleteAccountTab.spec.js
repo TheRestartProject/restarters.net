@@ -20,10 +20,11 @@ const BModalStub = {
 const BAlertStub = { template: '<div><slot /></div>' }
 const BButtonStub = { template: '<button v-bind="$attrs"><slot /></button>' }
 
-function mountComponent() {
+function mountComponent(props = {}) {
   const i18n = createI18n({ legacy: false, locale: 'en', messages: { en: { ...en, ...clientEn } } })
 
   return mount(DeleteAccountTab, {
+    props,
     global: {
       plugins: [i18n],
       stubs: { BModal: BModalStub, BAlert: BAlertStub, BButton: BButtonStub },
@@ -86,5 +87,20 @@ describe('components/profile/DeleteAccountTab', () => {
     expect(wrapper.text()).toContain('Nope')
     // The modal closes back to the initial "are you sure" prompt state.
     expect(wrapper.find('[data-testid="delete-account-modal"]').exists()).toBe(false)
+  })
+
+  describe('editing someone else\'s profile (isOwnProfile: false)', () => {
+    it('calls deleteUser(targetId) and navigates to /user/all, not deleteAccount/login', async () => {
+      profileStore.deleteUser = vi.fn().mockResolvedValue({ success: true })
+
+      const wrapper = mountComponent({ targetId: 42, isOwnProfile: false })
+      await wrapper.find('[data-testid="delete-account-button"]').trigger('click')
+      await wrapper.find('[data-testid="delete-account-confirm"]').trigger('click')
+      await Promise.resolve()
+      await Promise.resolve()
+
+      expect(profileStore.deleteUser).toHaveBeenCalledWith(42)
+      expect(navigateToMock).toHaveBeenCalledWith('/user/all')
+    })
   })
 })

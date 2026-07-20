@@ -26,12 +26,23 @@ export default class UserAPI extends BaseAPI {
   // GET /api/v2/users (UserController::listUsersv2, Administrator-only,
   // already implemented server-side - design.md §6.2 Phase D task D3, PR
   // #866's UsersPage.vue is the functional spec). params: name/email/
-  // location/country/role filters, sort/sortdir, page - all optional,
-  // passed straight through as query params. Response:
-  // {data: UserAdmin[], meta: {current_page, last_page, per_page, total,
-  // from, to}}.
+  // location/country/role filters, `permissions[]` (gap 24's permission
+  // filter - an array of permission ids, passed under that literal
+  // bracketed key so PHP parses repeated values into an array rather than
+  // last-one-wins), sort/sortdir, page - all optional, passed straight
+  // through as query params. Response: {data: UserAdmin[], meta:
+  // {current_page, last_page, per_page, total, from, to}}.
   list(params) {
     return this.$get('/api/v2/users', params)
+  }
+
+  // POST /api/v2/users (Administrator-only, full-parity gap 13). Body:
+  // {name, email, role, password} - role is the target role id, matching
+  // includes/modals/create-user.blade.php's form fields minus its
+  // client-only passwordRepeat (checked before this is ever called - see
+  // stores/users.js#createUser). 201 {data: user}.
+  create(payload) {
+    return this.$post('/api/v2/users', payload)
   }
 
   update(id, payload) {
@@ -161,5 +172,44 @@ export default class UserAPI extends BaseAPI {
 
   updateAdminSettings(id, payload) {
     return this.$patch(`/api/v2/users/${id}/admin-settings`, payload)
+  }
+
+  // gap 5's id-scoped profile/skills/preferences/password/delete family -
+  // admin-or-self counterparts of the me/* profile/skills/preferences/
+  // password/deleteAccount methods above, same request/response shape as
+  // their me/* counterpart (password has no GET, matching updatePassword
+  // above which also has none). Named with a `User` prefix (getUserProfile,
+  // not getProfile) since the unprefixed names above are already taken by
+  // the me/* family.
+  getUserProfile(id) {
+    return this.$get(`/api/v2/users/${id}/profile`)
+  }
+
+  updateUserProfile(id, payload) {
+    return this.$patch(`/api/v2/users/${id}/profile`, payload)
+  }
+
+  getUserSkills(id) {
+    return this.$get(`/api/v2/users/${id}/skills`)
+  }
+
+  updateUserSkills(id, payload) {
+    return this.$patch(`/api/v2/users/${id}/skills`, payload)
+  }
+
+  getUserEmailPreferences(id) {
+    return this.$get(`/api/v2/users/${id}/preferences`)
+  }
+
+  updateUserEmailPreferences(id, payload) {
+    return this.$patch(`/api/v2/users/${id}/preferences`, payload)
+  }
+
+  updateUserPassword(id, payload) {
+    return this.$patch(`/api/v2/users/${id}/password`, payload)
+  }
+
+  deleteUser(id) {
+    return this.$del(`/api/v2/users/${id}`)
   }
 }

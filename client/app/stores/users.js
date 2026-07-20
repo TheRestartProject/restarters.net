@@ -13,12 +13,12 @@ import { defineStore } from 'pinia'
  *    pagination - unlike stores/groups.js's client-side All Groups tab,
  *    `fetchList` is a thin pass-through: the page owns filter/sort/page
  *    state and calls it with whatever query params it wants; the store just
- *    tracks the last response + loading/error. The legacy page's
- *    "Create new user" modal (`includes/modals/create-user`, posting to the
- *    legacy web route `/user/create`) is deliberately not ported - there is
- *    no v2 API for it (confirmed by reading routes/api.php: no POST under
- *    `/users`), and building one is a separate feature, not part of this
- *    slice's brief.
+ *    tracks the last response + loading/error. `createUser` ports the
+ *    legacy page's "Create new user" modal (`includes/modals/create-user`,
+ *    which posted to the legacy web route `/user/create`) onto
+ *    POST /api/v2/users (full-parity gap 13) - it does not touch `list`
+ *    itself, the page re-fetches the current page after a successful
+ *    create, same as its role-editor modal does after an edit.
  *
  *  - /profile/[id] and /profile (design.md §6.2 Phase D task D2;
  *    resources/views/user/profile-new.blade.php is the functional spec).
@@ -86,6 +86,15 @@ export const useUsersStore = defineStore('users', {
       } finally {
         this.roles.loading = false
       }
+    },
+
+    // POST /api/v2/users (Administrator-only, gap 13's create-user modal).
+    // Field errors (422) are left for the caller to render inline, same
+    // convention as stores/profile.js#updatePassword.
+    async createUser(payload) {
+      const { $api } = useNuxtApp()
+      const { data } = await $api.user.create(payload)
+      return data
     },
 
     async fetchPublicProfile(id) {

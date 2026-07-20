@@ -297,4 +297,217 @@ class APIv2UserProfileTest extends TestCase
         $userSkillIds = UsersSkills::where('user', $user->id)->pluck('skill')->toArray();
         $this->assertEquals([$skill2->id], $userSkillIds);
     }
+
+    public function testUpdateAnotherUsersProfileRequiresAdmin(): void
+    {
+        $attacker = User::factory()->host()->create(['api_token' => 'tok1']);
+        $target = User::factory()->restarter()->create();
+        $this->actingAs($attacker);
+
+        $response = $this->patchJson("/api/v2/users/{$target->id}/profile?api_token=tok1", [
+            'name' => 'Hijacked Name',
+            'email' => $target->email,
+            'age' => $target->age,
+            'country' => 'GB',
+        ]);
+
+        $response->assertStatus(403);
+        $this->assertNotEquals('Hijacked Name', $target->fresh()->name);
+    }
+
+    public function testAdminCanUpdateAnotherUsersProfile(): void
+    {
+        $admin = User::factory()->administrator()->create(['api_token' => 'tok1']);
+        $target = User::factory()->restarter()->create();
+        $this->actingAs($admin);
+
+        $response = $this->patchJson("/api/v2/users/{$target->id}/profile?api_token=tok1", [
+            'name' => 'Admin Edited Name',
+            'email' => 'admin-edited@restarters.dev',
+            'age' => '1990',
+            'country' => 'GB',
+        ]);
+
+        $response->assertSuccessful();
+        $fresh = $target->fresh();
+        $this->assertEquals('Admin Edited Name', $fresh->name);
+        $this->assertEquals('admin-edited@restarters.dev', $fresh->email);
+    }
+
+    public function testSelfCanUpdateOwnProfileViaIdRoute(): void
+    {
+        $user = User::factory()->host()->create(['api_token' => 'tok1']);
+        $this->actingAs($user);
+
+        $response = $this->patchJson("/api/v2/users/{$user->id}/profile?api_token=tok1", [
+            'name' => 'Self Edited Via Id',
+            'email' => $user->email,
+            'age' => $user->age,
+            'country' => 'GB',
+        ]);
+
+        $response->assertSuccessful();
+        $this->assertEquals('Self Edited Via Id', $user->fresh()->name);
+    }
+
+    public function testUpdateProfileUnknownIdReturns404(): void
+    {
+        $admin = User::factory()->administrator()->create(['api_token' => 'tok1']);
+        $this->actingAs($admin);
+
+        $response = $this->patchJson('/api/v2/users/999999999/profile?api_token=tok1', [
+            'name' => 'Nobody',
+            'email' => 'nobody@example.com',
+            'age' => '1990',
+            'country' => 'GB',
+        ]);
+
+        $response->assertStatus(404);
+    }
+
+    public function testUpdateAnotherUsersSkillsRequiresAdmin(): void
+    {
+        $attacker = User::factory()->host()->create(['api_token' => 'tok1']);
+        $target = User::factory()->restarter()->create();
+        $this->actingAs($attacker);
+
+        $response = $this->patchJson("/api/v2/users/{$target->id}/skills?api_token=tok1", [
+            'tags' => [],
+        ]);
+
+        $response->assertStatus(403);
+    }
+
+    public function testAdminCanUpdateAnotherUsersSkills(): void
+    {
+        $admin = User::factory()->administrator()->create(['api_token' => 'tok1']);
+        $target = User::factory()->restarter()->create();
+        $this->actingAs($admin);
+
+        $skill = Skills::create([
+            'skill_name' => 'UT-Admin-Skill',
+            'description' => 'Planning',
+            'category' => 1,
+        ]);
+
+        $response = $this->patchJson("/api/v2/users/{$target->id}/skills?api_token=tok1", [
+            'tags' => [$skill->id],
+        ]);
+
+        $response->assertSuccessful();
+        $userSkillIds = UsersSkills::where('user', $target->id)->pluck('skill')->toArray();
+        $this->assertContains($skill->id, $userSkillIds);
+    }
+
+    public function testSkillsUnknownIdReturns404(): void
+    {
+        $admin = User::factory()->administrator()->create(['api_token' => 'tok1']);
+        $this->actingAs($admin);
+
+        $response = $this->patchJson('/api/v2/users/999999999/skills?api_token=tok1', [
+            'tags' => [],
+        ]);
+
+        $response->assertStatus(404);
+    }
+
+    public function testGetAnotherUsersProfileRequiresAdmin(): void
+    {
+        $attacker = User::factory()->host()->create(['api_token' => 'tok1']);
+        $target = User::factory()->restarter()->create();
+        $this->actingAs($attacker);
+
+        $response = $this->getJson("/api/v2/users/{$target->id}/profile?api_token=tok1");
+
+        $response->assertStatus(403);
+    }
+
+    public function testAdminCanGetAnotherUsersProfile(): void
+    {
+        $admin = User::factory()->administrator()->create(['api_token' => 'tok1']);
+        $target = User::factory()->restarter()->create([
+            'name' => 'Target Person',
+            'email' => 'target-person@restarters.dev',
+            'country_code' => 'GB',
+            'location' => 'London',
+            'age' => '1980',
+            'gender' => 'Non-binary',
+            'biography' => 'I like fixing toasters.',
+        ]);
+        $this->actingAs($admin);
+
+        $response = $this->getJson("/api/v2/users/{$target->id}/profile?api_token=tok1");
+
+        $response->assertSuccessful();
+        $this->assertEquals('Target Person', $response->json('data.name'));
+        $this->assertEquals('target-person@restarters.dev', $response->json('data.email'));
+        $this->assertEquals('GB', $response->json('data.country_code'));
+        $this->assertEquals('London', $response->json('data.location'));
+        $this->assertEquals('1980', $response->json('data.age'));
+        $this->assertEquals('Non-binary', $response->json('data.gender'));
+        $this->assertEquals('I like fixing toasters.', $response->json('data.biography'));
+        $this->assertIsArray($response->json('data.countries'));
+        $this->assertIsArray($response->json('data.ages'));
+    }
+
+    public function testSelfCanGetOwnProfileViaIdRoute(): void
+    {
+        $user = User::factory()->host()->create(['api_token' => 'tok1', 'name' => 'Self Via Id']);
+        $this->actingAs($user);
+
+        $response = $this->getJson("/api/v2/users/{$user->id}/profile?api_token=tok1");
+
+        $response->assertSuccessful();
+        $this->assertEquals('Self Via Id', $response->json('data.name'));
+    }
+
+    public function testGetProfileUnknownIdReturns404(): void
+    {
+        $admin = User::factory()->administrator()->create(['api_token' => 'tok1']);
+        $this->actingAs($admin);
+
+        $response = $this->getJson('/api/v2/users/999999999/profile?api_token=tok1');
+
+        $response->assertStatus(404);
+    }
+
+    public function testGetAnotherUsersSkillsRequiresAdmin(): void
+    {
+        $attacker = User::factory()->host()->create(['api_token' => 'tok1']);
+        $target = User::factory()->restarter()->create();
+        $this->actingAs($attacker);
+
+        $response = $this->getJson("/api/v2/users/{$target->id}/skills?api_token=tok1");
+
+        $response->assertStatus(403);
+    }
+
+    public function testAdminCanGetAnotherUsersSkills(): void
+    {
+        $admin = User::factory()->administrator()->create(['api_token' => 'tok1']);
+        $target = User::factory()->restarter()->create();
+        $this->actingAs($admin);
+
+        $skill = Skills::create([
+            'skill_name' => 'UT-Get-Admin-Skill',
+            'description' => 'Planning',
+            'category' => 1,
+        ]);
+        UsersSkills::create(['user' => $target->id, 'skill' => $skill->id]);
+
+        $response = $this->getJson("/api/v2/users/{$target->id}/skills?api_token=tok1");
+
+        $response->assertSuccessful();
+        $this->assertEquals([$skill->id], $response->json('data.selected'));
+    }
+
+    public function testGetSkillsUnknownIdReturns404(): void
+    {
+        $admin = User::factory()->administrator()->create(['api_token' => 'tok1']);
+        $this->actingAs($admin);
+
+        $response = $this->getJson('/api/v2/users/999999999/skills?api_token=tok1');
+
+        $response->assertStatus(404);
+    }
 }

@@ -218,9 +218,13 @@
       "invalid_code": "The recovery code you're using is invalid. Please request a new recovery link."
     },
     "users": {
+      "create_user": "Create new user",
+      "create_user_title": "Add new user",
       "edit_role": "Edit role",
       "edit_role_for": "Edit role: {name}",
-      "load_error": "Sorry, we couldn't load the users list."
+      "load_error": "Sorry, we couldn't load the users list.",
+      "password_mismatch": "Passwords do not match",
+      "permission": "Permission"
     },
     "cookies": {
       "banner_text": "We use cookies to help our website function, and analytical cookies to improve our website. Please click Cookie Settings to amend cookie settings or click OK to accept all.",

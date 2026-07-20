@@ -3,11 +3,29 @@ import { reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useProfileStore } from '~/stores/profile.js'
 
-// PATCH /api/v2/users/me/password. Functional spec:
+// PATCH /api/v2/users/me/password (own profile) or PATCH
+// /api/v2/users/{id}/password (gap 5 - an Administrator editing someone
+// else's, via profileStore.updateUserPassword). Functional spec:
 // resources/js/components/PasswordTab.vue +
-// resources/views/user/profile/account.blade.php. Always operates on
-// Auth::user() - see stores/profile.js's class doc comment for why this
-// tab is only ever shown while editing one's own profile.
+// resources/views/user/profile/account.blade.php. See stores/profile.js's
+// class doc comment for why the two are kept as separate store actions.
+//
+// Current Password is only collected/sent when isOwnProfile: confirmed
+// against UserController::applyPasswordUpdate - it's only required/checked
+// server-side when the acting user IS the target (an Administrator
+// resetting someone else's password doesn't know, and isn't asked for,
+// the target's current one - matching the legacy admin edit-user form).
+const props = defineProps({
+  targetId: {
+    type: Number,
+    default: null,
+  },
+  isOwnProfile: {
+    type: Boolean,
+    default: true,
+  },
+})
+
 const { t } = useI18n()
 const profileStore = useProfileStore()
 
@@ -41,11 +59,16 @@ async function save() {
   }
 
   try {
-    await profileStore.updatePassword({
-      current_password: form.currentPassword,
+    const payload = {
       new_password: form.newPassword,
       new_password_confirmation: form.newPasswordConfirmation,
-    })
+    }
+    if (props.isOwnProfile) {
+      payload.current_password = form.currentPassword
+      await profileStore.updatePassword(payload)
+    } else {
+      await profileStore.updateUserPassword(props.targetId, payload)
+    }
     form.currentPassword = ''
     form.newPassword = ''
     form.newPasswordConfirmation = ''
@@ -73,7 +96,7 @@ async function save() {
     </BAlert>
 
     <BForm data-testid="password-form" @submit.prevent="save">
-      <BFormGroup :label="`${t('auth.current_password')}:`" label-for="password-current">
+      <BFormGroup v-if="isOwnProfile" :label="`${t('auth.current_password')}:`" label-for="password-current">
         <BFormInput id="password-current" v-model="form.currentPassword" type="password" data-testid="password-current" />
         <div v-if="fieldError('current_password')" class="invalid-feedback d-block" data-testid="password-current-error">
           {{ fieldError('current_password') }}

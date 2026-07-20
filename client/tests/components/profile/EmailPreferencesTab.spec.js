@@ -21,10 +21,11 @@ const BFormCheckboxStub = {
 const BButtonStub = { template: '<button v-bind="$attrs"><slot /></button>' }
 const BFormStub = { template: '<form @submit.prevent="$emit(\'submit\', $event)"><slot /></form>' }
 
-function mountComponent() {
+function mountComponent(props = {}) {
   const i18n = createI18n({ legacy: false, locale: 'en', messages: { en: { ...en, ...clientEn } } })
 
   return mount(EmailPreferencesTab, {
+    props,
     global: {
       plugins: [i18n],
       stubs: { BAlert: BAlertStub, BFormCheckbox: BFormCheckboxStub, BButton: BButtonStub, BForm: BFormStub },
@@ -80,5 +81,30 @@ describe('components/profile/EmailPreferencesTab', () => {
     const link = wrapper.find('a.btn-preferences')
 
     expect(link.attributes('href')).toBe('https://talk.example/u/jane/preferences/emails')
+  })
+
+  describe('editing someone else\'s profile (isOwnProfile: false)', () => {
+    it('fetches via fetchUserEmailPreferences(targetId) and saves via updateUserEmailPreferences(targetId, payload), not the me/* actions', async () => {
+      profileStore.fetchUserEmailPreferences = vi.fn().mockResolvedValue({ invites: true })
+      profileStore.updateUserEmailPreferences = vi.fn().mockResolvedValue({ invites: false })
+      profileStore.fetchEmailPreferences = vi.fn()
+      profileStore.updateEmailPreferences = vi.fn()
+
+      const wrapper = mountComponent({ targetId: 42, isOwnProfile: false })
+      await Promise.resolve()
+      await Promise.resolve()
+
+      expect(profileStore.fetchUserEmailPreferences).toHaveBeenCalledWith(42)
+      expect(profileStore.fetchEmailPreferences).not.toHaveBeenCalled()
+      expect(wrapper.find('[data-testid="email-preferences-invites"]').element.checked).toBe(true)
+
+      await wrapper.find('[data-testid="email-preferences-invites"]').setValue(false)
+      await wrapper.find('[data-testid="email-preferences-form"]').trigger('submit')
+      await Promise.resolve()
+      await Promise.resolve()
+
+      expect(profileStore.updateUserEmailPreferences).toHaveBeenCalledWith(42, { invites: false })
+      expect(profileStore.updateEmailPreferences).not.toHaveBeenCalled()
+    })
   })
 })

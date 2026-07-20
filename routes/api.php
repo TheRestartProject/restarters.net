@@ -166,10 +166,28 @@ Route::prefix('v2')->middleware(\App\Http\Middleware\VerifyUserConsentApi::class
         Route::prefix('/users')->group(function() {
             Route::middleware('auth:sanctum,api')->group(function() {
                 Route::get('', [API\UserController::class, 'listUsersv2']);
+                Route::post('', [API\UserController::class, 'createUserv2']);
                 // PII-safe public profile - any logged-in user may view any
                 // profile (mirrors the legacy UserController::index, whose
                 // only gate was the route's auth middleware).
                 Route::get('/{id}', [API\UserController::class, 'getPublicProfilev2']);
+
+                // Admin id-scoped mirrors of the /users/me/* self-service endpoints below -
+                // each authorises via UserPolicy::update/delete (self-or-Administrator), so
+                // the underlying logic can never drift between the self and admin paths (see
+                // the shared private apply*()/*Data() methods on UserController).
+                // whereNumber('id') keeps these from shadowing the /users/me/*
+                // self-service group below - without it, 'me' matches {id} and
+                // every /users/me/* request is misrouted here (and 500s on the
+                // int $id type hint).
+                Route::get('/{id}/profile', [API\UserController::class, 'getUserProfilev2'])->whereNumber('id');
+                Route::patch('/{id}/profile', [API\UserController::class, 'updateUserProfilev2'])->whereNumber('id');
+                Route::patch('/{id}/password', [API\UserController::class, 'updateUserPasswordv2'])->whereNumber('id');
+                Route::get('/{id}/skills', [API\UserController::class, 'getUserSkillsv2'])->whereNumber('id');
+                Route::patch('/{id}/skills', [API\UserController::class, 'updateUserSkillsv2'])->whereNumber('id');
+                Route::get('/{id}/preferences', [API\UserController::class, 'getUserPreferencesv2'])->whereNumber('id');
+                Route::patch('/{id}/preferences', [API\UserController::class, 'updateUserPreferencesv2'])->whereNumber('id');
+                Route::delete('/{id}', [API\UserController::class, 'deleteUserv2'])->whereNumber('id');
             });
         });
 

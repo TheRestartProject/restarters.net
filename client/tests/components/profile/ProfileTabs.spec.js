@@ -9,16 +9,24 @@ import clientEn from '../../../i18n/locales/client-en.json'
 
 const stub = (testid) => ({ template: `<div data-testid="${testid}" />` })
 const idStub = (testid) => ({ props: ['targetId'], template: `<div data-testid="${testid}" :data-target-id="targetId" />` })
+// gap 5's five newly id-aware components (ProfileInfoTab/SkillsTab/
+// PasswordTab/EmailPreferencesTab/DeleteAccountTab) take both props and
+// pick /me/* vs /{id}/* themselves - capture both so tests can assert
+// they're wired with the right targetId/isOwnProfile.
+const targetAwareStub = (testid) => ({
+  props: ['targetId', 'isOwnProfile'],
+  template: `<div data-testid="${testid}" :data-target-id="targetId" :data-is-own-profile="isOwnProfile" />`,
+})
 
 const GLOBAL_STUBS = {
-  ProfileInfoTab: stub('stub-profile-info'),
-  SkillsTab: stub('stub-skills'),
+  ProfileInfoTab: targetAwareStub('stub-profile-info'),
+  SkillsTab: targetAwareStub('stub-skills'),
   ProfilePhotoTab: stub('stub-photo'),
-  PasswordTab: stub('stub-password'),
+  PasswordTab: targetAwareStub('stub-password'),
   LanguageTab: stub('stub-language'),
   AdminSettingsTab: idStub('stub-admin-settings'),
-  DeleteAccountTab: stub('stub-delete-account'),
-  EmailPreferencesTab: stub('stub-email-preferences'),
+  DeleteAccountTab: targetAwareStub('stub-delete-account'),
+  EmailPreferencesTab: targetAwareStub('stub-email-preferences'),
   CalendarsTab: stub('stub-calendars'),
   RepairDirectoryTab: idStub('stub-repair-directory'),
   NuxtLink: { props: ['to'], template: '<a :href="to"><slot /></a>' },
@@ -79,21 +87,28 @@ describe('components/profile/ProfileTabs', () => {
   })
 
   describe('an Administrator editing someone else\'s profile', () => {
-    it('shows only the Account tab, containing AdminSettingsTab scoped to targetId - no Profile/Email/Calendars/Notifications', () => {
+    it('shows Profile/Account/Email (full parity, gap 5) but not Calendars/Notifications, with the id-scoped components wired to targetId/isOwnProfile', () => {
       const wrapper = mountComponent({ targetId: 42, isOwnProfile: false, isAdmin: true })
 
-      expect(wrapper.find('[data-testid="profile-tab-nav-profile"]').exists()).toBe(false)
-      expect(wrapper.find('[data-testid="profile-tab-nav-email"]').exists()).toBe(false)
+      // Full parity with the legacy Blade page now that PATCH
+      // /users/{id}/profile|skills|preferences + DELETE /users/{id} exist -
+      // see stores/profile.js's class doc comment.
+      expect(wrapper.find('[data-testid="profile-tab-nav-profile"]').exists()).toBe(true)
+      expect(wrapper.find('[data-testid="profile-tab-nav-account"]').exists()).toBe(true)
+      expect(wrapper.find('[data-testid="profile-tab-nav-email"]').exists()).toBe(true)
+
+      // Still no id-scoped counterpart for either of these - stay self-only.
       expect(wrapper.find('[data-testid="profile-tab-nav-calendars"]').exists()).toBe(false)
       expect(wrapper.find('[data-testid="profile-tab-nav-notifications"]').exists()).toBe(false)
-      expect(wrapper.find('[data-testid="profile-tab-nav-account"]').exists()).toBe(true)
-
-      // Deliberate deviation from the legacy Blade page - see
-      // stores/profile.js's class doc comment: these three are "me"-only
-      // endpoints and must never render while editing someone else.
-      expect(wrapper.find('[data-testid="stub-password"]').exists()).toBe(false)
+      expect(wrapper.find('[data-testid="stub-photo"]').exists()).toBe(false)
       expect(wrapper.find('[data-testid="stub-language"]').exists()).toBe(false)
-      expect(wrapper.find('[data-testid="stub-delete-account"]').exists()).toBe(false)
+
+      for (const testid of ['stub-profile-info', 'stub-skills', 'stub-email-preferences', 'stub-password', 'stub-delete-account']) {
+        const stubbed = wrapper.find(`[data-testid="${testid}"]`)
+        expect(stubbed.exists()).toBe(true)
+        expect(stubbed.attributes('data-target-id')).toBe('42')
+        expect(stubbed.attributes('data-is-own-profile')).toBe('false')
+      }
 
       const adminSettings = wrapper.find('[data-testid="stub-admin-settings"]')
       expect(adminSettings.exists()).toBe(true)

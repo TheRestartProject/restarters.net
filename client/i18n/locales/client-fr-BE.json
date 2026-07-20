@@ -218,9 +218,13 @@
       "invalid_code": "Le code de récupération que vous utilisez n'est pas valide. Veuillez demander un nouveau lien de récupération."
     },
     "users": {
+      "create_user": "Créer un nouvel utilisateur",
+      "create_user_title": "Ajouter un nouvel utilisateur",
       "edit_role": "Modifier le rôle",
       "edit_role_for": "Modifier le rôle : {name}",
-      "load_error": "Désolé, nous n'avons pas pu charger la liste des utilisateurs."
+      "load_error": "Désolé, nous n'avons pas pu charger la liste des utilisateurs.",
+      "password_mismatch": "Les mots de passe ne correspondent pas",
+      "permission": "Permission"
     },
     "cookies": {
       "banner_text": "Nous utilisons des cookies pour faire fonctionner notre site web et des cookies analytiques pour l’améliorer. Cliquez sur Paramètres des cookies pour les modifier, ou sur OK pour tout accepter.",

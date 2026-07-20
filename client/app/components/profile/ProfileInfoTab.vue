@@ -1,15 +1,29 @@
 <script setup>
-import { onMounted, reactive, ref } from 'vue'
+import { computed, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useProfileStore } from '~/stores/profile.js'
 
-// GET/PATCH /api/v2/users/me/profile. Functional spec:
-// resources/js/components/ProfileInfoTab.vue +
-// resources/views/user/profile/profile.blade.php. Always operates on
-// Auth::user() - see stores/profile.js's class doc comment for why this
-// tab is only ever shown while editing one's own profile.
+// GET/PATCH /api/v2/users/me/profile (own profile) or
+// GET/PATCH /api/v2/users/{id}/profile (gap 5 - an Administrator editing
+// someone else's, via profileStore.fetchUserProfile/updateUserProfile).
+// Functional spec: resources/js/components/ProfileInfoTab.vue +
+// resources/views/user/profile/profile.blade.php. See stores/profile.js's
+// class doc comment for why the two are kept in separate state slots
+// (`info` vs `userProfile`) - `source` below reads whichever one applies.
+const props = defineProps({
+  targetId: {
+    type: Number,
+    default: null,
+  },
+  isOwnProfile: {
+    type: Boolean,
+    default: true,
+  },
+})
+
 const { t } = useI18n()
 const profileStore = useProfileStore()
+const source = computed(() => (props.isOwnProfile ? profileStore.info : profileStore.userProfile))
 
 const form = reactive({
   name: '',
@@ -41,16 +55,25 @@ function applyData(data) {
   form.biography = data.biography || ''
 }
 
-onMounted(async () => {
-  try {
-    const data = await profileStore.fetchProfileInfo()
-    applyData(data)
-  } catch {
-    // Load error is rendered by the retry state below.
-  } finally {
-    loading.value = false
-  }
-})
+// Watches (not a plain onMounted) so navigating between two different
+// users' profiles without unmounting ProfileTabs.vue (e.g. an
+// Administrator following two different /profile/edit/{id} links) re-fetches
+// - same convention as AdminSettingsTab.vue's own targetId watcher.
+watch(
+  () => [props.isOwnProfile, props.targetId],
+  async ([isOwnProfile, targetId]) => {
+    loading.value = true
+    try {
+      const data = isOwnProfile ? await profileStore.fetchProfileInfo() : await profileStore.fetchUserProfile(targetId)
+      applyData(data)
+    } catch {
+      // Load error is rendered by the retry state below.
+    } finally {
+      loading.value = false
+    }
+  },
+  { immediate: true },
+)
 
 async function save() {
   saving.value = true
@@ -58,7 +81,7 @@ async function save() {
   fieldErrors.value = {}
 
   try {
-    const data = await profileStore.updateProfileInfo({
+    const payload = {
       name: form.name,
       email: form.email,
       country: form.country,
@@ -66,7 +89,10 @@ async function save() {
       age: form.age,
       gender: form.gender,
       biography: form.biography,
-    })
+    }
+    const data = props.isOwnProfile
+      ? await profileStore.updateProfileInfo(payload)
+      : await profileStore.updateUserProfile(props.targetId, payload)
     applyData(data)
     feedback.value = t('profile.profile_updated')
     feedbackVariant.value = 'success'
@@ -91,7 +117,7 @@ async function save() {
       {{ feedback }}
     </BAlert>
 
-    <BAlert v-if="profileStore.info.error" :model-value="true" variant="danger" data-testid="profile-info-load-error">
+    <BAlert v-if="source.error" :model-value="true" variant="danger" data-testid="profile-info-load-error">
       {{ t('client.profile.load_error') }}
     </BAlert>
 
@@ -107,7 +133,7 @@ async function save() {
           <BFormGroup :label="`${t('profile.country')}:`" label-for="profile-country">
             <BFormSelect id="profile-country" v-model="form.country" required data-testid="profile-country">
               <option value="" />
-              <option v-for="c in profileStore.info.data?.countries || []" :key="c.code" :value="c.code">{{ c.name }}</option>
+              <option v-for="c in source.data?.countries || []" :key="c.code" :value="c.code">{{ c.name }}</option>
             </BFormSelect>
             <div v-if="fieldError('country')" class="invalid-feedback d-block" data-testid="profile-country-error">{{ fieldError('country') }}</div>
           </BFormGroup>
@@ -132,7 +158,7 @@ async function save() {
         <div class="col-lg-6">
           <BFormGroup :label="`${t('registration.age')}:`" label-for="profile-age">
             <BFormSelect id="profile-age" v-model="form.age" required data-testid="profile-age">
-              <option v-for="a in profileStore.info.data?.ages || []" :key="a" :value="a">{{ a }}</option>
+              <option v-for="a in source.data?.ages || []" :key="a" :value="a">{{ a }}</option>
             </BFormSelect>
             <div v-if="fieldError('age')" class="invalid-feedback d-block" data-testid="profile-age-error">{{ fieldError('age') }}</div>
           </BFormGroup>

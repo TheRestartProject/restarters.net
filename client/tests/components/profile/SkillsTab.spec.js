@@ -12,10 +12,11 @@ const BFormGroupStub = { template: '<div><slot /></div>' }
 const BButtonStub = { template: '<button v-bind="$attrs"><slot /></button>' }
 const BFormStub = { template: '<form @submit.prevent="$emit(\'submit\', $event)"><slot /></form>' }
 
-function mountComponent() {
+function mountComponent(props = {}) {
   const i18n = createI18n({ legacy: false, locale: 'en', messages: { en: { ...en, ...clientEn } } })
 
   return mount(SkillsTab, {
+    props,
     global: {
       plugins: [i18n],
       stubs: { BAlert: BAlertStub, BFormGroup: BFormGroupStub, BButton: BButtonStub, BForm: BFormStub },
@@ -76,5 +77,30 @@ describe('components/profile/SkillsTab', () => {
 
     expect(wrapper.find('[data-testid="skills-error"]').exists()).toBe(true)
     expect(wrapper.find('[data-testid="skills-form"]').exists()).toBe(false)
+  })
+
+  describe('editing someone else\'s profile (isOwnProfile: false)', () => {
+    it('fetches via fetchUserSkills(targetId) and saves via updateUserSkills(targetId, payload), not the me/* actions', async () => {
+      profileStore.fetchUserSkills = vi.fn().mockResolvedValue(SKILLS_RESPONSE)
+      profileStore.userSkills.data = SKILLS_RESPONSE
+      profileStore.updateUserSkills = vi.fn().mockResolvedValue({ tags: [10] })
+      profileStore.fetchSkills = vi.fn()
+      profileStore.updateSkills = vi.fn()
+
+      const wrapper = mountComponent({ targetId: 42, isOwnProfile: false })
+      await Promise.resolve()
+      await Promise.resolve()
+
+      expect(profileStore.fetchUserSkills).toHaveBeenCalledWith(42)
+      expect(profileStore.fetchSkills).not.toHaveBeenCalled()
+
+      await wrapper.find('[data-testid="skills-select"]').setValue(['10'])
+      await wrapper.find('[data-testid="skills-form"]').trigger('submit')
+      await Promise.resolve()
+      await Promise.resolve()
+
+      expect(profileStore.updateUserSkills).toHaveBeenCalledWith(42, { tags: [10] })
+      expect(profileStore.updateSkills).not.toHaveBeenCalled()
+    })
   })
 })

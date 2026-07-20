@@ -30,6 +30,14 @@ describe('stores/profile', () => {
         updateRepairDirectoryRole: vi.fn(),
         getAdminSettings: vi.fn(),
         updateAdminSettings: vi.fn(),
+        getUserProfile: vi.fn(),
+        updateUserProfile: vi.fn(),
+        getUserSkills: vi.fn(),
+        updateUserSkills: vi.fn(),
+        getUserEmailPreferences: vi.fn(),
+        updateUserEmailPreferences: vi.fn(),
+        updateUserPassword: vi.fn(),
+        deleteUser: vi.fn(),
       },
     }
 
@@ -385,6 +393,145 @@ describe('stores/profile', () => {
         permissions: [4],
       })
       expect(store.adminSettings.data.role).toBe(2)
+    })
+  })
+
+  describe('gap 5 id-scoped family (fetchUserProfile/updateUserProfile/fetchUserSkills/updateUserSkills/fetchUserEmailPreferences/updateUserEmailPreferences/updateUserPassword/deleteUser)', () => {
+    it('fetchUserProfile caches per target id, same as fetchAdminSettings', async () => {
+      mockApi.user.getUserProfile.mockResolvedValueOnce({
+        data: { name: 'Someone', email: 's@example.com', country_code: 'GB', location: '', age: '1990', gender: '', biography: '', countries: [], ages: [] },
+      })
+
+      const store = useProfileStore()
+      await store.fetchUserProfile(9)
+
+      expect(mockApi.user.getUserProfile).toHaveBeenCalledWith(9)
+      expect(store.userProfile.targetId).toBe(9)
+      expect(store.userProfile.data.name).toBe('Someone')
+    })
+
+    it('updateUserProfile sends the exact legacy field names and merges the response', async () => {
+      const store = useProfileStore()
+      store.userProfile.targetId = 9
+      store.userProfile.data = { name: 'Old', email: 'old@example.com', countries: [{ code: 'GB', name: 'UK' }] }
+
+      mockApi.user.updateUserProfile.mockResolvedValueOnce({
+        data: { name: 'New', email: 'new@example.com', country_code: 'GB', location: 'London', age: '1990', gender: '', biography: '' },
+      })
+
+      await store.updateUserProfile(9, {
+        name: 'New',
+        email: 'new@example.com',
+        country: 'GB',
+        townCity: 'London',
+        age: '1990',
+        gender: '',
+        biography: '',
+      })
+
+      expect(mockApi.user.updateUserProfile).toHaveBeenCalledWith(9, {
+        name: 'New',
+        email: 'new@example.com',
+        country: 'GB',
+        townCity: 'London',
+        age: '1990',
+        gender: '',
+        biography: '',
+      })
+      expect(store.userProfile.data.countries).toEqual([{ code: 'GB', name: 'UK' }])
+      expect(store.userProfile.data.name).toBe('New')
+    })
+
+    it('updateUserSkills sends {tags} and stores the returned selection', async () => {
+      const store = useProfileStore()
+      store.userSkills.targetId = 9
+      store.userSkills.data = { categories: [], selected: [1] }
+
+      mockApi.user.updateUserSkills.mockResolvedValueOnce({ data: { tags: [1, 2] } })
+
+      const data = await store.updateUserSkills(9, { tags: [1, 2] })
+
+      expect(mockApi.user.updateUserSkills).toHaveBeenCalledWith(9, { tags: [1, 2] })
+      expect(data.tags).toEqual([1, 2])
+      expect(store.userSkills.data.selected).toEqual([1, 2])
+    })
+
+    it('fetchUserEmailPreferences populates userEmailPreferences.data', async () => {
+      mockApi.user.getUserEmailPreferences.mockResolvedValueOnce({ data: { invites: true } })
+
+      const store = useProfileStore()
+      await store.fetchUserEmailPreferences(9)
+
+      expect(mockApi.user.getUserEmailPreferences).toHaveBeenCalledWith(9)
+      expect(store.userEmailPreferences.data).toEqual({ invites: true })
+    })
+
+    it('updateUserEmailPreferences sends {invites} and stores the response', async () => {
+      const store = useProfileStore()
+      store.userEmailPreferences.targetId = 9
+      store.userEmailPreferences.data = { invites: true }
+
+      mockApi.user.updateUserEmailPreferences.mockResolvedValueOnce({ data: { invites: false } })
+
+      const data = await store.updateUserEmailPreferences(9, { invites: false })
+
+      expect(mockApi.user.updateUserEmailPreferences).toHaveBeenCalledWith(9, { invites: false })
+      expect(data).toEqual({ invites: false })
+      expect(store.userEmailPreferences.data).toEqual({ invites: false })
+    })
+
+    it('updateUserPassword sends the three legacy field names and does not catch errors', async () => {
+      mockApi.user.updateUserPassword.mockResolvedValueOnce({ data: { success: true } })
+
+      const store = useProfileStore()
+      await store.updateUserPassword(9, {
+        current_password: 'old',
+        new_password: 'newpass',
+        new_password_confirmation: 'newpass',
+      })
+
+      expect(mockApi.user.updateUserPassword).toHaveBeenCalledWith(9, {
+        current_password: 'old',
+        new_password: 'newpass',
+        new_password_confirmation: 'newpass',
+      })
+    })
+
+    it('updateUserPassword rethrows a 422 for the caller to render per-field', async () => {
+      const apiError = { status: 422, data: { errors: { current_password: ['Current Password does not match!'] } } }
+      mockApi.user.updateUserPassword.mockRejectedValueOnce(apiError)
+
+      const store = useProfileStore()
+      await expect(
+        store.updateUserPassword(9, { current_password: 'wrong', new_password: 'a', new_password_confirmation: 'a' }),
+      ).rejects.toEqual(apiError)
+    })
+
+    it('deleteUser calls the API and does not touch local auth state', async () => {
+      mockApi.user.deleteUser.mockResolvedValueOnce({ data: { success: true } })
+
+      const store = useProfileStore()
+      const authStore = useAuthStore()
+      authStore.token = 'sometoken'
+      authStore.user = { id: 1 }
+
+      const data = await store.deleteUser(9)
+
+      expect(mockApi.user.deleteUser).toHaveBeenCalledWith(9)
+      expect(data).toEqual({ success: true })
+      expect(authStore.token).toBe('sometoken')
+      expect(authStore.user).toEqual({ id: 1 })
+    })
+
+    it('deleteUser rethrows without toasting (unlike deleteAccount)', async () => {
+      const apiError = { status: 500 }
+      mockApi.user.deleteUser.mockRejectedValueOnce(apiError)
+
+      const store = useProfileStore()
+      const toastStore = useToastStore()
+
+      await expect(store.deleteUser(9)).rejects.toEqual(apiError)
+      expect(toastStore.toasts).toHaveLength(0)
     })
   })
 

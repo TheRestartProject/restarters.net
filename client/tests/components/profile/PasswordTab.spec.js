@@ -17,10 +17,11 @@ const BFormInputStub = {
 const BButtonStub = { template: '<button v-bind="$attrs"><slot /></button>' }
 const BFormStub = { template: '<form @submit.prevent="$emit(\'submit\', $event)"><slot /></form>' }
 
-function mountComponent() {
+function mountComponent(props = {}) {
   const i18n = createI18n({ legacy: false, locale: 'en', messages: { en: { ...en, ...clientEn } } })
 
   return mount(PasswordTab, {
+    props,
     global: {
       plugins: [i18n],
       stubs: { BAlert: BAlertStub, BFormGroup: BFormGroupStub, BFormInput: BFormInputStub, BButton: BButtonStub, BForm: BFormStub },
@@ -100,5 +101,30 @@ describe('components/profile/PasswordTab', () => {
     await Promise.resolve()
 
     expect(wrapper.find('[data-testid="password-current-error"]').text()).toBe('Current Password does not match!')
+  })
+
+  describe('editing someone else\'s profile (isOwnProfile: false)', () => {
+    it('hides the Current Password field', () => {
+      const wrapper = mountComponent({ targetId: 42, isOwnProfile: false })
+      expect(wrapper.find('[data-testid="password-current"]').exists()).toBe(false)
+    })
+
+    it('calls updateUserPassword(targetId, payload) instead of updatePassword, omitting current_password', async () => {
+      profileStore.updateUserPassword = vi.fn().mockResolvedValue({ success: true })
+
+      const wrapper = mountComponent({ targetId: 42, isOwnProfile: false })
+      await wrapper.find('[data-testid="password-new"]').setValue('newpass1')
+      await wrapper.find('[data-testid="password-new-repeat"]').setValue('newpass1')
+      await wrapper.find('[data-testid="password-form"]').trigger('submit')
+      await Promise.resolve()
+      await Promise.resolve()
+
+      // No current_password key at all - UserController::applyPasswordUpdate
+      // only requires/checks it when the acting user IS the target.
+      expect(profileStore.updateUserPassword).toHaveBeenCalledWith(42, {
+        new_password: 'newpass1',
+        new_password_confirmation: 'newpass1',
+      })
+    })
   })
 })

@@ -3,11 +3,23 @@ import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useProfileStore } from '~/stores/profile.js'
 
-// DELETE /api/v2/users/me. Functional spec:
+// DELETE /api/v2/users/me (own profile) or DELETE /api/v2/users/{id}
+// (gap 5 - an Administrator deleting someone else's account, via
+// profileStore.deleteUser). Functional spec:
 // resources/js/components/DeleteAccountTab.vue +
-// resources/views/user/profile/account.blade.php. Always operates on
-// Auth::user() - see stores/profile.js's class doc comment for why this
-// tab is only ever shown while editing one's own profile.
+// resources/views/user/profile/account.blade.php. See stores/profile.js's
+// class doc comment for why the two are kept as separate store actions.
+const props = defineProps({
+  targetId: {
+    type: Number,
+    default: null,
+  },
+  isOwnProfile: {
+    type: Boolean,
+    default: true,
+  },
+})
+
 const { t } = useI18n()
 const profileStore = useProfileStore()
 
@@ -20,8 +32,15 @@ async function deleteAccount() {
   feedback.value = ''
 
   try {
-    await profileStore.deleteAccount()
-    await navigateTo('/login')
+    if (props.isOwnProfile) {
+      await profileStore.deleteAccount()
+      await navigateTo('/login')
+    } else {
+      // Deleting someone else's account doesn't touch the acting
+      // Administrator's own session - back to the list they came from.
+      await profileStore.deleteUser(props.targetId)
+      await navigateTo('/user/all')
+    }
   } catch (err) {
     feedback.value = err?.data?.message || t('general.error_occurred')
     deleting.value = false
