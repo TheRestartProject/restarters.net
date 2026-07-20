@@ -41,6 +41,14 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *          example="/mid_1597853610178a4b76e4d666b2a7b32ee75d8a24c706f1cbf213970.png"
  *     ),
  *     @OA\Property(
+ *          property="image_idxref",
+ *          title="image_idxref",
+ *          description="The xref id linking the image to the group - pass as {idimages} to DELETE /api/v2/groups/{id}/images/{idimages} to remove it. Null when the group has no image.",
+ *          format="int64",
+ *          nullable=true,
+ *          example=1
+ *     ),
+ *     @OA\Property(
  *          property="phone",
  *          title="phone",
  *          description="An optional phone number to contact the group.",
@@ -97,6 +105,12 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *         property="approved",
  *         title="hosts",
  *         description="Whether the group has been approved",
+ *         type="boolean",
+ *     ),
+ *     @OA\Property(
+ *         property="auto_approve",
+ *         title="auto_approve",
+ *         description="Whether events created for this group are automatically approved (true iff every network the group belongs to has auto_approve_events set). Drives which 'before you submit' copy the event form shows.",
  *         type="boolean",
  *     ),
  *     @OA\Property(
@@ -349,6 +363,11 @@ class Group extends JsonResource
             'id' => $this->idgroups,
             'name' => $this->name,
             'image' => $this->groupImage && is_object($this->groupImage) && is_object($this->groupImage->image) ? $this->groupImage->image->path : null,
+            // groupImage() is a HasOne onto Xref itself (App\Group::groupImage()), so its own
+            // idxref is exactly the id DELETE /api/v2/groups/{id}/images/{idimages} expects -
+            // mirrors the Image resource's 'idxref' field used for the same purpose on
+            // devices/events (see app/Http/Resources/Image.php).
+            'image_idxref' => $this->groupImage && is_object($this->groupImage) ? $this->groupImage->idxref : null,
             'website' => $this->website,
             'phone' => $this->phone,
             'description' => $this->free_text,
@@ -359,6 +378,10 @@ class Group extends JsonResource
             'tags' => new TagCollection($this->resource->getFilteredTagsForUser()),
             'timezone' => $this->timezone,
             'approved' => $this->approved ? true : false,
+            // getAutoApproveAttribute() (App\Group) is already in the model's $appends, but
+            // toArray() here is hand-built rather than delegating to it, so it needs pulling in
+            // explicitly. EventForm.vue needs this to pick the right "before you submit" copy.
+            'auto_approve' => (bool) $this->resource->auto_approve,
             'network_data' => $networkData,
             'full' => true,
             'email' => $this->email,

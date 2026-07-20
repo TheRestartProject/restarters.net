@@ -662,12 +662,29 @@ describe('pages/party/view/[id]', () => {
       expect(wrapper.find('[data-testid="event-share-stats-modal"]').exists()).toBe(true)
     })
 
-    it('opens the share-stats modal from the CO2-card share button, for a finished event', async () => {
-      eventsStore.current.data = baseEvent({ start: '2020-01-01T10:00:00+00:00', end: '2020-01-01T12:00:00+00:00' })
+    // StatsImpact.vue: the header dropdown's "Share event stats" (above)
+    // opens the embed-code modal (EventShareStatsModal), but the CO2 card's
+    // own "Share this" link (StatsValue.vue's `share` handler) opens the
+    // canvas-painted social-image generator (StatsShareImageModal) instead -
+    // a separate feature, previously wired to the same embed modal as the
+    // dropdown. Matches group/view/[id].vue's identical fix for its own CO2
+    // card.
+    it('opens the canvas share-image modal (not the embed modal) from the CO2 card\'s Share this link', async () => {
+      eventsStore.current.data = baseEvent({
+        start: '2020-01-01T10:00:00+00:00',
+        end: '2020-01-01T12:00:00+00:00',
+        stats: { ...baseEvent().stats, co2_total: 42 },
+      })
       const wrapper = mountPage()
 
+      expect(wrapper.find('[data-testid="stats-share-image-modal"]').exists()).toBe(false)
+      expect(wrapper.find('[data-testid="event-share-stats-modal"]').exists()).toBe(false)
+      expect(wrapper.find('[data-testid="event-view-impact-share"]').text()).toBe('Share this')
+
       await wrapper.find('[data-testid="event-view-impact-share"]').trigger('click')
-      expect(wrapper.find('[data-testid="event-share-stats-modal"]').exists()).toBe(true)
+
+      expect(wrapper.find('[data-testid="stats-share-image-modal"]').exists()).toBe(true)
+      expect(wrapper.find('[data-testid="event-share-stats-modal"]').exists()).toBe(false)
     })
   })
 

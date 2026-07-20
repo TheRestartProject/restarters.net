@@ -331,4 +331,35 @@ class APIv2GroupImagesTest extends TestCase
         $response->assertStatus(404);
         $this->assertNotNull(Xref::find($idxrefA));
     }
+
+    // --- image_idxref exposure on the group resource (gap 4: without this the client has no id
+    // to pass to DELETE /api/v2/groups/{id}/images/{idimages}, so the delete button is dead) ---
+
+    public function testGroupResourceExposesImageIdxrefAfterUpload(): void
+    {
+        $host = User::factory()->host()->create(['api_token' => 'gimg-tok-17']);
+        $idgroups = $this->createGroupAsHost($host);
+        $key = $this->seedCompletedTusUpload($this->tmpJpeg());
+        $this->postJson("/api/v2/groups/$idgroups/images?api_token=gimg-tok-17", ['upload_key' => $key])->assertSuccessful();
+
+        $idxref = Group::find($idgroups)->groupImage->idxref;
+
+        $response = $this->get("/api/v2/groups/$idgroups");
+        $response->assertSuccessful();
+
+        $this->assertEquals($idxref, $response->json('data.image_idxref'));
+        $this->assertNotEmpty($response->json('data.image'));
+    }
+
+    public function testGroupResourceImageIdxrefNullWithNoImage(): void
+    {
+        $host = User::factory()->host()->create();
+        $idgroups = $this->createGroupAsHost($host);
+
+        $response = $this->get("/api/v2/groups/$idgroups");
+        $response->assertSuccessful();
+
+        $this->assertNull($response->json('data.image_idxref'));
+        $this->assertNull($response->json('data.image'));
+    }
 }

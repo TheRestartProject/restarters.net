@@ -52,6 +52,11 @@ beforeEach(() => {
   vi.useFakeTimers()
   fakeCtx = makeFakeContext()
   getContextSpy = vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(fakeCtx)
+  // StatsShareImage.vue builds image URLs from apiBase (GET /api/v2/stats/
+  // share-image/{filename} - the CORS-enabled proxy that replaced shipping
+  // the image set as a client asset). See tests/setup.ts for the default
+  // (apiBase-less) stub this overrides.
+  vi.stubGlobal('useRuntimeConfig', () => ({ public: { apiBase: 'https://api.example.com' } }))
 
   originalImage = globalThis.Image
   class FakeImage {
@@ -103,7 +108,8 @@ describe('components/events/StatsShareImage', () => {
     // useStatsShareImage.spec.js's equivalent lookup-table assertion).
     expect(fakeCtx.drawImage).toHaveBeenCalled()
     const firstImg = fakeCtx.drawImage.mock.calls[0][0]
-    expect(firstImg.src).toContain('/images/stats/ImpactRange2Landscape-10.png')
+    expect(firstImg.src).toBe('https://api.example.com/api/v2/stats/share-image/ImpactRange2Landscape-10.png')
+    expect(firstImg.crossOrigin).toBe('anonymous')
 
     wrapper.unmount()
   })
@@ -113,7 +119,7 @@ describe('components/events/StatsShareImage', () => {
     await flushPaint()
 
     const firstImg = fakeCtx.drawImage.mock.calls[0][0]
-    expect(firstImg.src).toContain('/images/stats/ImpactRange2Square-10.png')
+    expect(firstImg.src).toBe('https://api.example.com/api/v2/stats/share-image/ImpactRange2Square-10.png')
 
     wrapper.unmount()
   })

@@ -3,7 +3,15 @@ import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { STATS_SHARE_PLATFORMS, useStatsShareImage } from '../../app/composables/useStatsShareImage.js'
 
-const statsImagesDir = join(process.cwd(), 'public/images/stats/')
+// These filenames are no longer served from the Nuxt client's own public/
+// (that would have meant shipping the entire ~224MB image set in the client
+// bundle/repo) - they're proxied from Laravel's public/images/stats/ via
+// GET /api/v2/stats/share-image/{filename} (StatsShareImageController),
+// which serves this exact directory with an allowlist check. Reading it
+// directly here (one level up from client/) still lets this test assert
+// every filename the lookup table can produce corresponds to a real file,
+// without the client needing a copy of its own.
+const statsImagesDir = join(process.cwd(), '../public/images/stats/')
 
 describe('composables/useStatsShareImage', () => {
   describe('rangeIndex/getImage - the CO2e -> background-image lookup table', () => {
@@ -53,7 +61,7 @@ describe('composables/useStatsShareImage', () => {
       expect(getImage(600, 'Instagram')).toBe('ImpactRange2Square-10.png')
     })
 
-    it('every filename getImage() can produce actually exists in public/images/stats', () => {
+    it('every filename getImage() can produce actually exists in the Laravel-side public/images/stats', () => {
       const { getImage } = useStatsShareImage()
       const seen = new Set()
       // Sample every whole-kg value across the full table range plus a
