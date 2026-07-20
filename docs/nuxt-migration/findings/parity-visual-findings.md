@@ -836,3 +836,28 @@ UNFOLLOW GROUP action. Ours renders at chrome height by comparison.
    `auto_approve` claim, which was likewise false.
 3. **Confirm the three-tab structure** (Your groups / Other groups nearby /
    All groups) exists and is panelled the same way.
+
+### 27-event-edit (desktop) — 5 diffs, NOT yet fixed
+
+Verified against `27-event-edit__{new,old}.png`. The Duplicate button added
+earlier this session is present in both, so that one is confirmed fixed.
+
+1. **The page has no tabs.** develop shows three - Details / Photos /
+   Event log - inside the panel. Ours renders the Details content bare and
+   puts Photos as a separate section BELOW the panel. Event log is absent
+   entirely (the page comment records this as no-API-endpoint-for-audit-trail;
+   that part is a genuine backend gap, but the missing TAB STRUCTURE is not).
+2. **"Event group" is plain text, not a field.** develop renders a bordered
+   input showing the group; ours renders the words "Event group: Tag Test
+   Group".
+3. **The date renders as raw ISO.** develop shows "Mon, Jul 13, 2026" with a
+   calendar icon; ours shows "2026-07-13".
+4. **The "Admin only" panel is in the wrong column.** develop puts it in the
+   right column beside the description; ours spans full width below it.
+5. **The heading link differs.** develop makes the event name in
+   "Editing <name>" the link to the event; ours adds a separate "View event"
+   link underneath.
+
+Diff 3 is the one most likely to be a real bug rather than styling - check
+whether the date input is a native `type="date"` (which would explain the ISO
+display) where develop uses a formatted picker.
