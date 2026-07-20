@@ -134,6 +134,10 @@ class AlertController extends Controller
             'ctalink' => $ctalink
         ])->id;
 
+        // Invalidate the 7200s listAlertsv2 cache so a new alert appears immediately
+        // (create previously never forgot the key, hiding new alerts for up to 2h).
+        \Cache::forget('alerts');
+
         return [
           'id' => $id
         ];
@@ -222,7 +226,9 @@ class AlertController extends Controller
             'ctalink' => $ctalink
         ]);
 
-        \Cache::clear('alerts');
+        // Cache::clear() ignores its argument and flushes the ENTIRE cache store;
+        // forget only the alerts key.
+        \Cache::forget('alerts');
 
         return [
             'id' => $id
