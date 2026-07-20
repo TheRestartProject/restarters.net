@@ -245,6 +245,21 @@ export const useProfileStore = defineStore('profile', {
     // filename and pushes it onto the session store immediately, so the
     // navbar avatar and this tab's preview update without waiting for a
     // fresh GET /api/v2/session.
+    // Multipart upload, matching develop's profile form. Shares the same
+    // endpoint and the same session-avatar refresh as uploadPhoto().
+    async uploadPhotoFile(file) {
+      const { $api } = useNuxtApp()
+      const { data } = await $api.user.updatePhotoFile(file)
+
+      const sessionStore = useSessionStore()
+      if (sessionStore.user && data?.path) {
+        const runtimeConfig = useRuntimeConfig()
+        sessionStore.user.avatar_url = `${runtimeConfig.public.apiBase}/uploads/thumbnail_${data.path}`
+      }
+
+      return data
+    },
+
     async uploadPhoto(uploadKey) {
       const { $api } = useNuxtApp()
       const { data } = await $api.user.updatePhoto(uploadKey)

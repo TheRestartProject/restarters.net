@@ -1797,35 +1797,68 @@ class UserController extends Controller
         // there is no possibility of uploading a photo on behalf of another user.
         $user = Auth::user();
 
-        $validated = $request->validate([
-            'upload_key' => 'required|string',
-        ]);
+        // Two accepted shapes, because the legacy form and this client upload
+        // differently and both must work:
+        //  - multipart `photo`, as user/profile/profile.blade.php:138-145 posts
+        //    (<input type="file"> + submit), and
+        //  - `upload_key`, a completed tus upload, which every other image in
+        //    the Nuxt client uses (TusImageUpload.vue).
+        // Everything downstream - size cap, mime whitelist, FixometerFile - is
+        // shared, so the two paths cannot drift in what they accept.
+        $isMultipart = $request->hasFile('photo');
 
-        $cache = Tus::buildCache();
-        $meta = $cache->get($validated['upload_key']);
+        $cache = null;
+        $uploadKey = null;
 
-        $filePath = $meta['file_path'] ?? null;
-
-        if (! $meta || ! $filePath || ! is_file($filePath)) {
-            throw ValidationException::withMessages([
-                'upload_key' => [__('profile.picture_error')],
+        if ($isMultipart) {
+            $request->validate([
+                'photo' => 'required|file',
             ]);
+
+            $filePath = $request->file('photo')->getRealPath();
+
+            if (! $filePath || ! is_file($filePath)) {
+                throw ValidationException::withMessages([
+                    'photo' => [__('profile.picture_error')],
+                ]);
+            }
+        } else {
+            $validated = $request->validate([
+                'upload_key' => 'required|string',
+            ]);
+
+            $uploadKey = $validated['upload_key'];
+            $cache = Tus::buildCache();
+            $meta = $cache->get($uploadKey);
+
+            $filePath = $meta['file_path'] ?? null;
+
+            if (! $meta || ! $filePath || ! is_file($filePath)) {
+                throw ValidationException::withMessages([
+                    'upload_key' => [__('profile.picture_error')],
+                ]);
+            }
+
+            // Confirm the tus upload actually finished (offset === size), not just started.
+            if (($meta['offset'] ?? null) !== ($meta['size'] ?? null)) {
+                throw ValidationException::withMessages([
+                    'upload_key' => [__('profile.picture_error')],
+                ]);
+            }
         }
 
-        // Confirm the tus upload actually finished (offset === size), not just started.
-        if (($meta['offset'] ?? null) !== ($meta['size'] ?? null)) {
-            throw ValidationException::withMessages([
-                'upload_key' => [__('profile.picture_error')],
-            ]);
-        }
+        // Which field an error is reported against depends on how it arrived.
+        $errorField = $isMultipart ? 'photo' : 'upload_key';
 
         // Max 2MB, matching the previous multipart contract.
         if (filesize($filePath) > 2 * 1024 * 1024) {
-            $cache->delete($validated['upload_key']);
-            @unlink($filePath);
+            if ($cache) {
+                $cache->delete($uploadKey);
+                @unlink($filePath);
+            }
 
             throw ValidationException::withMessages([
-                'upload_key' => [__('profile.picture_error')],
+                $errorField => [__('profile.picture_error')],
             ]);
         }
 
@@ -1834,11 +1867,13 @@ class UserController extends Controller
         $mime = @finfo_file(finfo_open(FILEINFO_MIME_TYPE), $filePath);
 
         if (! in_array($mime, ['image/jpeg', 'image/png', 'image/gif'], true)) {
-            $cache->delete($validated['upload_key']);
-            @unlink($filePath);
+            if ($cache) {
+                $cache->delete($uploadKey);
+                @unlink($filePath);
+            }
 
             throw ValidationException::withMessages([
-                'upload_key' => [__('profile.picture_error')],
+                $errorField => [__('profile.picture_error')],
             ]);
         }
 
@@ -1847,12 +1882,16 @@ class UserController extends Controller
 
         // Whether it succeeded or not, the tus temp file has served its purpose - remove it
         // and its cache entry so it isn't left behind (and can't be replayed against /photo).
-        $cache->delete($validated['upload_key']);
-        @unlink($filePath);
+        // A multipart upload has no cache entry, and PHP discards its own temp
+        // file at end of request, so there is nothing to clean up there.
+        if ($cache) {
+            $cache->delete($uploadKey);
+            @unlink($filePath);
+        }
 
         if (! $filename) {
             throw ValidationException::withMessages([
-                'upload_key' => [__('profile.picture_error')],
+                $errorField => [__('profile.picture_error')],
             ]);
         }
 
