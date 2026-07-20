@@ -440,11 +440,17 @@ defineExpose({ submit })
              its DOM - verified by inspecting its render output) - the native
              fallback input below carries the test hook and the error text
              beneath is still shown either way. -->
+        <!-- EventDatePicker.vue:7 displays
+             `{weekday:'short', day:'numeric', month:'short', year:'numeric'}`
+             i.e. "Mon, Jul 13, 2026". This showed the raw ISO "2026-07-13",
+             because `format` drove BOTH the display and - via
+             `value-type="format"` - the bound value. Splitting them keeps the
+             payload's YYYY-MM-DD while showing develop's friendly format. -->
         <DatePicker
           v-model:value="form.eventDate"
           type="date"
-          value-type="format"
-          format="YYYY-MM-DD"
+          value-type="YYYY-MM-DD"
+          format="ddd, MMM D, YYYY"
           input-class="form-control d-none d-lg-block"
           :placeholder="t('events.no_date_selected')"
         />
