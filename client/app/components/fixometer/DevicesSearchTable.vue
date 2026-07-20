@@ -227,6 +227,36 @@ function statusLabel(device) {
 function formatDate(value) {
   return value ? moment(value).format('DD/MM/YYYY') : ''
 }
+
+// Gap fix (mobile parity, 05-fixometer mobile screenshot): legacy's mobile
+// Repair Records UI (FixometerPage.vue's `d-block d-md-none` block) is a
+// different pattern from desktop's tabs, not just a narrower version of it -
+// two independent CollapsibleSections titled "Powered"/"Unpowered", both
+// collapsed by default, no explainer text, no visible table until expanded.
+// A prior version showed the desktop tabs+description+populated-table
+// unconditionally at every width - it never diverged for mobile at all,
+// which is exactly what the screenshot caught (Bootstrap 4 collapse
+// behaviour on develop vs. no such divergence being built here).
+//
+// legacy mounts TWO fully independent FixometerRecordsTable instances (own
+// props, own :total.sync) inside those sections, so both can be expanded
+// with live data simultaneously. This component only tracks one powered/
+// unpowered result set at a time (the same one the desktop tabs drive) -
+// reusing that rather than duplicating the search/pagination/sort/details
+// state is an accepted simplification (this file already drops other
+// legacy widget-level duplication, see the date-picker note above):
+// expanding a mobile section sets `filters.powered` to match and replaces
+// whichever section was previously open, instead of both being
+// independently live.
+const mobileSection = ref(null) // null | 'powered' | 'unpowered'
+const mobileSectionExpanded = computed(() => mobileSection.value !== null)
+
+function toggleMobileSection(section) {
+  mobileSection.value = mobileSection.value === section ? null : section
+  if (mobileSection.value) {
+    filters.powered = mobileSection.value === 'powered'
+  }
+}
 </script>
 
 <template>
@@ -236,13 +266,12 @@ function formatDate(value) {
          a wide right column, both inside one teal-bordered container. Single
          column on narrow viewports. -->
     <div class="device-search-layout">
-      <!-- Gap fix (MEDIUM): legacy's filter rail (FixometerFilters.vue) is
-           desktop-only - mobile gets an entirely separate, filter-less pair
-           of CollapsibleSections (FixometerPage.vue's `d-block d-md-none`
-           block). This keeps one unified layout (see this component's own
-           top-of-file doc comment) but hides the rail below md to match,
-           rather than mounting a second filter-less table. -->
-      <div class="device-search-layout__filters d-none d-md-block">
+      <!-- FixometerFilters.vue (legacy) has no responsive hiding of its own -
+           it's visible at every width, ABOVE the mobile Powered/Unpowered
+           accordion pair below (see mobileSection's own doc comment). A
+           prior version wrongly hid this whole rail below md, assuming it
+           was desktop-only. -->
+      <div class="device-search-layout__filters">
         <div class="device-search-section mb-3" data-testid="device-search-item-info">
       <button
         type="button"
@@ -357,32 +386,67 @@ function formatDate(value) {
       </div>
 
       <div class="device-search-layout__results">
-        <div class="device-search-tabs mb-3" role="group" data-testid="device-search-powered-toggle">
+        <!-- Desktop: Powered/Unpowered tabs + explainer text (legacy's
+             b-tabs, wrapping both the nav strip and the shared results body
+             below in one teal-bordered box). -->
+        <div class="d-none d-md-block">
+          <div class="device-search-tabs mb-3" role="group" data-testid="device-search-powered-toggle">
+            <button
+              type="button"
+              class="device-search-tabs__tab"
+              :class="{ 'device-search-tabs__tab--active': filters.powered }"
+              data-testid="device-search-powered-true"
+              @click="filters.powered = true"
+            >
+              {{ poweredLabel }}
+            </button>
+            <button
+              type="button"
+              class="device-search-tabs__tab"
+              :class="{ 'device-search-tabs__tab--active': !filters.powered }"
+              data-testid="device-search-powered-false"
+              @click="filters.powered = false"
+            >
+              {{ unpoweredLabel }}
+            </button>
+          </div>
+
+          <p class="text-brand small" data-testid="device-search-powered-description">
+            <!-- eslint-disable-next-line vue/no-v-html -->
+            <span v-html="filters.powered ? t('devices.description_powered') : t('devices.description_unpowered')" />
+          </p>
+        </div>
+
+        <!-- Mobile: two independent collapsed accordion headers (legacy's
+             `d-block d-md-none` CollapsibleSection pair) - no tabs, no
+             explainer text, collapsed by default; expanding one reveals the
+             shared results body below (mobileSection's own doc comment). -->
+        <div class="d-block d-md-none device-search-mobile-sections mb-3">
           <button
             type="button"
-            class="device-search-tabs__tab"
-            :class="{ 'device-search-tabs__tab--active': filters.powered }"
-            data-testid="device-search-powered-true"
-            @click="filters.powered = true"
+            class="device-search-mobile-section__header"
+            data-testid="device-search-mobile-powered-toggle"
+            :aria-expanded="mobileSection === 'powered'"
+            @click="toggleMobileSection('powered')"
           >
-            {{ poweredLabel }}
+            <span>{{ t('devices.title_powered') }}</span>
+            <span aria-hidden="true">{{ mobileSection === 'powered' ? '−' : '+' }}</span>
           </button>
           <button
             type="button"
-            class="device-search-tabs__tab"
-            :class="{ 'device-search-tabs__tab--active': !filters.powered }"
-            data-testid="device-search-powered-false"
-            @click="filters.powered = false"
+            class="device-search-mobile-section__header"
+            data-testid="device-search-mobile-unpowered-toggle"
+            :aria-expanded="mobileSection === 'unpowered'"
+            @click="toggleMobileSection('unpowered')"
           >
-            {{ unpoweredLabel }}
+            <span>{{ t('devices.title_unpowered') }}</span>
+            <span aria-hidden="true">{{ mobileSection === 'unpowered' ? '−' : '+' }}</span>
           </button>
         </div>
 
-        <p class="text-brand small" data-testid="device-search-powered-description">
-          <!-- eslint-disable-next-line vue/no-v-html -->
-          <span v-html="filters.powered ? t('devices.description_powered') : t('devices.description_unpowered')" />
-        </p>
-
+        <!-- Shared results body: always shown on desktop (d-md-block), only
+             shown on mobile once a section above is expanded. -->
+        <div :class="['d-md-block', { 'd-none': !mobileSectionExpanded }]" data-testid="device-search-results-body">
     <div v-if="loading" data-testid="device-search-loading">
       <div class="placeholder-glow">
         <span class="placeholder col-12" style="height: 8rem" />
@@ -512,6 +576,7 @@ function formatDate(value) {
         data-testid="device-search-pagination"
       />
     </template>
+        </div>
       </div>
     </div>
   </div>
@@ -537,13 +602,38 @@ function formatDate(value) {
   }
 }
 
-// legacy's b-tabs (.ourtabs.ourtabs-brand): one teal border + offset shadow
-// wrapping both the nav-tab strip and its tab-content (table) below it.
+// legacy's b-tabs (.ourtabs.ourtabs-brand) is itself `d-none d-md-block` -
+// the teal border + offset shadow wrapping the nav-tab strip and its
+// tab-content (table) only exists on desktop. Below md, legacy's mobile
+// Powered/Unpowered accordion (mobileSection's own doc comment) sits
+// unboxed, flush with the filter accordion above it - so this border/
+// shadow/padding is desktop-only too, not a permanent property of the
+// results column.
 .device-search-layout__results {
   min-width: 0;
-  padding: 1rem;
-  border: 1px solid #0394a6;
-  box-shadow: 5px 5px 0 0 #0394a6;
+
+  @media (min-width: 768px) {
+    padding: 1rem;
+    border: 1px solid #0394a6;
+    box-shadow: 5px 5px 0 0 #0394a6;
+  }
+}
+
+// Mobile Powered/Unpowered accordion headers - legacy's CollapsibleSection
+// with no `border-shadow` prop set: plain text, no box, a hairline divider
+// (not the teal-boxed look the filter accordion above uses).
+.device-search-mobile-section__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0.75rem 0;
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid #dee2e6;
+  text-align: left;
+  font-weight: 700;
+  color: #222;
 }
 
 // In the two-column layout the filter rail is narrow, so its fields (a

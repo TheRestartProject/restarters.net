@@ -436,4 +436,81 @@ describe('components/fixometer/DevicesSearchTable', () => {
       expect(wrapper.find('[data-testid="device-search-details-1"]').exists()).toBe(false)
     })
   })
+
+  // Gap fix (mobile parity, 05-fixometer mobile screenshot): legacy's
+  // mobile Repair Records UI (FixometerPage.vue's `d-block d-md-none`
+  // block) is a collapsed Powered/Unpowered accordion, not the desktop
+  // tabs+description+populated-table shown unconditionally at every width -
+  // a prior version never diverged for mobile at all.
+  describe('mobile Powered/Unpowered accordion (parity with legacy mobile)', () => {
+    it('renders the filter rail without a desktop-only class - legacy shows it at every width', () => {
+      const wrapper = mountComponent()
+
+      expect(wrapper.find('.device-search-layout__filters').classes()).not.toContain('d-none')
+    })
+
+    it('starts with both mobile sections collapsed and the shared results body hidden', async () => {
+      const wrapper = mountComponent()
+      await flushPromises()
+
+      const poweredToggle = wrapper.find('[data-testid="device-search-mobile-powered-toggle"]')
+      const unpoweredToggle = wrapper.find('[data-testid="device-search-mobile-unpowered-toggle"]')
+      expect(poweredToggle.attributes('aria-expanded')).toBe('false')
+      expect(unpoweredToggle.attributes('aria-expanded')).toBe('false')
+      expect(wrapper.find('[data-testid="device-search-results-body"]').classes()).toContain('d-none')
+    })
+
+    it('expanding the mobile Powered section reveals the results body (powered is already the default tab)', async () => {
+      const wrapper = mountComponent()
+      await flushPromises()
+
+      await wrapper.find('[data-testid="device-search-mobile-powered-toggle"]').trigger('click')
+      await flushPromises()
+
+      expect(wrapper.find('[data-testid="device-search-mobile-powered-toggle"]').attributes('aria-expanded')).toBe('true')
+      expect(wrapper.find('[data-testid="device-search-results-body"]').classes()).not.toContain('d-none')
+    })
+
+    it('switching from Unpowered back to Powered re-runs the search for powered items', async () => {
+      const wrapper = mountComponent()
+      await flushPromises()
+      await wrapper.find('[data-testid="device-search-mobile-unpowered-toggle"]').trigger('click')
+      await flushPromises()
+      mockApi.device.search.mockClear()
+
+      await wrapper.find('[data-testid="device-search-mobile-powered-toggle"]').trigger('click')
+      await flushPromises()
+
+      expect(wrapper.find('[data-testid="device-search-mobile-powered-toggle"]').attributes('aria-expanded')).toBe('true')
+      expect(mockApi.device.search).toHaveBeenCalledWith(expect.objectContaining({ powered: true }))
+    })
+
+    it('expanding Unpowered switches the shared search to unpowered and collapses Powered', async () => {
+      const wrapper = mountComponent()
+      await flushPromises()
+      await wrapper.find('[data-testid="device-search-mobile-powered-toggle"]').trigger('click')
+      await flushPromises()
+      mockApi.device.search.mockClear()
+
+      await wrapper.find('[data-testid="device-search-mobile-unpowered-toggle"]').trigger('click')
+      await flushPromises()
+
+      expect(wrapper.find('[data-testid="device-search-mobile-powered-toggle"]').attributes('aria-expanded')).toBe('false')
+      expect(wrapper.find('[data-testid="device-search-mobile-unpowered-toggle"]').attributes('aria-expanded')).toBe('true')
+      expect(mockApi.device.search).toHaveBeenCalledWith(expect.objectContaining({ powered: false }))
+    })
+
+    it('re-clicking an expanded mobile section collapses it and hides the results body again', async () => {
+      const wrapper = mountComponent()
+      await flushPromises()
+      await wrapper.find('[data-testid="device-search-mobile-powered-toggle"]').trigger('click')
+      await flushPromises()
+
+      await wrapper.find('[data-testid="device-search-mobile-powered-toggle"]').trigger('click')
+      await flushPromises()
+
+      expect(wrapper.find('[data-testid="device-search-mobile-powered-toggle"]').attributes('aria-expanded')).toBe('false')
+      expect(wrapper.find('[data-testid="device-search-results-body"]').classes()).toContain('d-none')
+    })
+  })
 })
