@@ -36,8 +36,8 @@ class RoleController extends Controller
      */
     public function listRolesv2(): JsonResponse
     {
-        if (!Fixometer::hasRole(Auth::user(), 'Administrator')) {
-            return response()->json(['message' => 'Forbidden'], 403);
+        if ($resp = $this->requireAdministrator()) {
+            return $resp;
         }
 
         $rows = (new Role)->findAll();
@@ -76,8 +76,8 @@ class RoleController extends Controller
      */
     public function getRolev2($id): JsonResponse
     {
-        if (!Fixometer::hasRole(Auth::user(), 'Administrator')) {
-            return response()->json(['message' => 'Forbidden'], 403);
+        if ($resp = $this->requireAdministrator()) {
+            return $resp;
         }
 
         $role = $this->findRoleOr404($id);
@@ -125,8 +125,8 @@ class RoleController extends Controller
      */
     public function listPermissionsv2(): JsonResponse
     {
-        if (!Fixometer::hasRole(Auth::user(), 'Administrator')) {
-            return response()->json(['message' => 'Forbidden'], 403);
+        if ($resp = $this->requireAdministrator()) {
+            return $resp;
         }
 
         $rows = DB::select('SELECT idpermissions AS id, permission AS name FROM permissions ORDER BY idpermissions ASC');
@@ -173,8 +173,8 @@ class RoleController extends Controller
      */
     public function updateRolePermissionsv2(Request $request, $id): JsonResponse
     {
-        if (!Fixometer::hasRole(Auth::user(), 'Administrator')) {
-            return response()->json(['message' => 'Forbidden'], 403);
+        if ($resp = $this->requireAdministrator()) {
+            return $resp;
         }
 
         $role = $this->findRoleOr404($id);

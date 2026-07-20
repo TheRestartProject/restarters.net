@@ -2,16 +2,36 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\Fixometer;
 use Auth;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Validation\ValidatesRequests;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller as BaseController;
 use Party;
 
 class Controller extends BaseController
 {
     use AuthorizesRequests, ValidatesRequests;
+
+    /**
+     * Guard an Administrator-only action. Returns a 403 JSON response when the
+     * current user is not an Administrator, or null when they are - so callers
+     * do `if ($resp = $this->requireAdministrator()) { return $resp; }`.
+     *
+     * Extracted from ~17 byte-identical inline checks across the admin CRUD
+     * controllers (2026-07 API audit - a copy that gets missed silently
+     * exposes a mutation).
+     */
+    protected function requireAdministrator(): ?JsonResponse
+    {
+        if (!Fixometer::hasRole(Auth::user(), 'Administrator')) {
+            return response()->json(['message' => 'Forbidden'], 403);
+        }
+
+        return null;
+    }
 
     /**
      * Resolve the authenticated user, accepting a session login, a Sanctum

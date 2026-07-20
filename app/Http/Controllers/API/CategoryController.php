@@ -98,8 +98,8 @@ class CategoryController extends Controller
      */
     public function updateCategoryv2(Request $request, $id)
     {
-        if (!Fixometer::hasRole(Auth::user(), 'Administrator')) {
-            return response()->json(['message' => 'Forbidden'], 403);
+        if ($resp = $this->requireAdministrator()) {
+            return $resp;
         }
 
         $category = Category::findOrFail($id);

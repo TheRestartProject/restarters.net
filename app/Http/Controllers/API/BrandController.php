@@ -99,8 +99,8 @@ class BrandController extends Controller
      */
     public function createBrandv2(Request $request): JsonResponse
     {
-        if (!Fixometer::hasRole(Auth::user(), 'Administrator')) {
-            return response()->json(['message' => 'Forbidden'], 403);
+        if ($resp = $this->requireAdministrator()) {
+            return $resp;
         }
 
         $validated = $request->validate([
@@ -143,8 +143,8 @@ class BrandController extends Controller
      */
     public function updateBrandv2(Request $request, $id)
     {
-        if (!Fixometer::hasRole(Auth::user(), 'Administrator')) {
-            return response()->json(['message' => 'Forbidden'], 403);
+        if ($resp = $this->requireAdministrator()) {
+            return $resp;
         }
 
         $brand = Brands::findOrFail($id);
@@ -175,8 +175,8 @@ class BrandController extends Controller
      */
     public function deleteBrandv2($id)
     {
-        if (!Fixometer::hasRole(Auth::user(), 'Administrator')) {
-            return response()->json(['message' => 'Forbidden'], 403);
+        if ($resp = $this->requireAdministrator()) {
+            return $resp;
         }
 
         $brand = Brands::findOrFail($id);

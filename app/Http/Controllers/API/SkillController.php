@@ -89,8 +89,8 @@ class SkillController extends Controller
      */
     public function createSkillv2(Request $request): JsonResponse
     {
-        if (!Fixometer::hasRole(Auth::user(), 'Administrator')) {
-            return response()->json(['message' => 'Forbidden'], 403);
+        if ($resp = $this->requireAdministrator()) {
+            return $resp;
         }
 
         $validated = $request->validate($this->validationRules());
@@ -131,8 +131,8 @@ class SkillController extends Controller
      */
     public function updateSkillv2(Request $request, $id)
     {
-        if (!Fixometer::hasRole(Auth::user(), 'Administrator')) {
-            return response()->json(['message' => 'Forbidden'], 403);
+        if ($resp = $this->requireAdministrator()) {
+            return $resp;
         }
 
         $skill = Skills::findOrFail($id);
@@ -161,8 +161,8 @@ class SkillController extends Controller
      */
     public function deleteSkillv2($id)
     {
-        if (!Fixometer::hasRole(Auth::user(), 'Administrator')) {
-            return response()->json(['message' => 'Forbidden'], 403);
+        if ($resp = $this->requireAdministrator()) {
+            return $resp;
         }
 
         $skill = Skills::findOrFail($id);

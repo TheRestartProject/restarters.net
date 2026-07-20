@@ -45,8 +45,8 @@ class PreviewDeployController extends Controller
      */
     public function index(): JsonResponse
     {
-        if (! Fixometer::hasRole(Auth::user(), 'Administrator')) {
-            return response()->json(['message' => 'Forbidden'], 403);
+        if ($resp = $this->requireAdministrator()) {
+            return $resp;
         }
 
         $token = config('services.github.deploy_pat');
@@ -106,8 +106,8 @@ class PreviewDeployController extends Controller
      */
     public function deploy(Request $request): JsonResponse
     {
-        if (! Fixometer::hasRole(Auth::user(), 'Administrator')) {
-            return response()->json(['message' => 'Forbidden'], 403);
+        if ($resp = $this->requireAdministrator()) {
+            return $resp;
         }
 
         $validated = $request->validate(['branch' => 'required|string']);

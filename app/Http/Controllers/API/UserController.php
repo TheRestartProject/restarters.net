@@ -1996,8 +1996,8 @@ class UserController extends Controller
      */
     public function listUsersv2(Request $request): JsonResponse
     {
-        if (!Fixometer::hasRole(Auth::user(), 'Administrator')) {
-            return response()->json(['message' => 'Forbidden'], 403);
+        if ($resp = $this->requireAdministrator()) {
+            return $resp;
         }
 
         $query = User::query()

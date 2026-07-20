@@ -88,8 +88,8 @@ class GroupTagController extends Controller
      */
     public function createGroupTagv2(Request $request): JsonResponse
     {
-        if (!Fixometer::hasRole(Auth::user(), 'Administrator')) {
-            return response()->json(['message' => 'Forbidden'], 403);
+        if ($resp = $this->requireAdministrator()) {
+            return $resp;
         }
 
         $validated = $request->validate($this->validationRules());
@@ -133,8 +133,8 @@ class GroupTagController extends Controller
      */
     public function updateGroupTagv2(Request $request, $id)
     {
-        if (!Fixometer::hasRole(Auth::user(), 'Administrator')) {
-            return response()->json(['message' => 'Forbidden'], 403);
+        if ($resp = $this->requireAdministrator()) {
+            return $resp;
         }
 
         $tag = $this->findGlobalOrFail($id);
@@ -166,8 +166,8 @@ class GroupTagController extends Controller
      */
     public function deleteGroupTagv2($id)
     {
-        if (!Fixometer::hasRole(Auth::user(), 'Administrator')) {
-            return response()->json(['message' => 'Forbidden'], 403);
+        if ($resp = $this->requireAdministrator()) {
+            return $resp;
         }
 
         $tag = $this->findGlobalOrFail($id);
