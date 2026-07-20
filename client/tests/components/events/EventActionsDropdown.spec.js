@@ -38,7 +38,11 @@ describe('components/events/EventActionsDropdown', () => {
     const wrapper = mountComponent()
     const dropdown = wrapper.find('[data-testid="event-actions-dropdown"]')
     expect(dropdown.exists()).toBe(true)
-    expect(dropdown.text()).toContain('Event actions')
+    // Uppercased, matching EventActions.vue:3's
+    // `:text="__('events.event_actions').toUpperCase()"` - the translation
+    // string itself is sentence case ('Event actions') in both systems, so
+    // asserting the raw string here passed while the rendered label was wrong.
+    expect(dropdown.text()).toContain('EVENT ACTIONS')
   })
 
   describe('editor menu (canedit=true)', () => {

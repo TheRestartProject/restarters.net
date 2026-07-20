@@ -70,11 +70,15 @@ const { t } = useI18n()
 </script>
 
 <template>
+  <!-- EventActions.vue:3 - `:text="__('events.event_actions').toUpperCase()"`,
+       no `no-caret`, `class="deepnowrap"`. The caret is not decoration we can
+       drop: _buttons.scss carries develop's
+       `.dropdown-toggle[aria-expanded='true']::after { transform: rotate(180deg) }`
+       open/close animation, which `no-caret` silently made dead code here. -->
   <BDropdown
     variant="primary"
-    :text="t('events.event_actions')"
-    no-caret
-    class="text-nowrap"
+    :text="t('events.event_actions').toUpperCase()"
+    class="deepnowrap"
     data-testid="event-actions-dropdown"
   >
     <template v-if="canedit">

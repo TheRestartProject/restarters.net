@@ -44,11 +44,12 @@ const { t } = useI18n()
 </script>
 
 <template>
+  <!-- GroupActions.vue:4 - no `no-caret`, `class="deepnowrap"`. NB unlike
+       EventActions.vue this label is NOT uppercased in develop. -->
   <BDropdown
     variant="primary"
     :text="t('groups.group_actions')"
-    no-caret
-    class="text-nowrap"
+    class="deepnowrap"
     data-testid="group-actions-dropdown"
   >
     <template v-if="canedit">

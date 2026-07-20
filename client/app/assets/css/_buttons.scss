@@ -246,6 +246,15 @@
   transition: 0.7s;
 }
 
+// _global.scss:511. Deliberately targets the inner `button` rather than the
+// wrapper: BDropdown renders <div class="dropdown"><button …>, so Bootstrap's
+// `text-nowrap` on the component sets white-space on the div, where it has no
+// effect on the button's own text. The event/group action toggles need this -
+// "Event actions" wraps to two lines in a narrow header column without it.
+.deepnowrap button {
+  white-space: nowrap !important;
+}
+
 .btn-group {
   &__duo {
     .btn {
