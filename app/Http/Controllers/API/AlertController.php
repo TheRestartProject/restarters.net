@@ -59,11 +59,11 @@ class AlertController extends Controller
      *      operationId="createAlert",
      *      tags={"Alerts"},
      *      summary="Create Alert",
-     *      description="Creates an alert.",
+     *      description="Creates an alert. Administrator only. Note: getUser() throws AuthenticationException (HTTP 401) for both an unauthenticated caller and an authenticated non-Administrator, so this operation never returns 403 - unlike updateAlertv2, which does distinguish the two.",
      *      @OA\Parameter(
      *          name="api_token",
-     *          description="A valid user API token",
-     *          required=true,
+     *          description="A valid user API token, if not authenticating via a session cookie or a Sanctum bearer token (see getUser(), which tries all three).",
+     *          required=false,
      *          in="query",
      *          @OA\Schema(
      *              type="string",
@@ -71,35 +71,10 @@ class AlertController extends Controller
      *          )
      *      ),
      *     @OA\RequestBody(
+     *         required=true,
      *         @OA\MediaType(
      *             mediaType="multipart/form-data",
-     *             @OA\Schema(
-     *                required={"title","html","start","end"},
-     *                @OA\Property(
-     *                   property="title",
-     *                   ref="#/components/schemas/Alert/properties/title",
-     *                ),
-     *                @OA\Property(
-     *                   property="html",
-     *                   ref="#/components/schemas/Alert/properties/html",
-     *                ),
-     *                @OA\Property(
-     *                   property="start",
-     *                   ref="#/components/schemas/Alert/properties/start",
-     *                ),
-     *                @OA\Property(
-     *                   property="end",
-     *                   ref="#/components/schemas/Alert/properties/end",
-     *                ),
-     *                @OA\Property(
-     *                   property="ctatitle",
-     *                   ref="#/components/schemas/Alert/properties/ctalink",
-     *                ),
-     *                @OA\Property(
-     *                   property="ctalink",
-     *                   ref="#/components/schemas/Alert/properties/ctalink",
-     *                ),
-     *             )
+     *             @OA\Schema(ref="#/components/schemas/AlertInput")
      *         )
      *    ),
      *    @OA\Response(
@@ -112,7 +87,9 @@ class AlertController extends Controller
      *              ref="#/components/schemas/Alert/properties/id"
      *            )
      *        ),
-     *     )
+     *     ),
+     *     @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *     @OA\Response(response=422, ref="#/components/responses/ValidationError")
      *  )
      */
     public function addAlertv2(Request $request)
@@ -149,11 +126,17 @@ class AlertController extends Controller
      *      operationId="updateAlert",
      *      tags={"Alerts"},
      *      summary="Edit Alert",
-     *      description="Edits an alert.",
+     *      description="Edits an alert. Administrator only.",
+     *      @OA\Parameter(
+     *          name="id",
+     *          in="path",
+     *          required=true,
+     *          @OA\Schema(type="integer")
+     *      ),
      *      @OA\Parameter(
      *          name="api_token",
-     *          description="A valid user API token",
-     *          required=true,
+     *          description="A valid user API token, if not authenticating via a session cookie or a Sanctum bearer token (see getUser(), which tries all three).",
+     *          required=false,
      *          in="query",
      *          @OA\Schema(
      *              type="string",
@@ -161,35 +144,10 @@ class AlertController extends Controller
      *          )
      *      ),
      *     @OA\RequestBody(
+     *         required=true,
      *         @OA\MediaType(
      *             mediaType="multipart/form-data",
-     *             @OA\Schema(
-     *                required={"title","html","start","end"},
-     *                @OA\Property(
-     *                   property="title",
-     *                   ref="#/components/schemas/Alert/properties/title",
-     *                ),
-     *                @OA\Property(
-     *                   property="html",
-     *                   ref="#/components/schemas/Alert/properties/html",
-     *                ),
-     *                @OA\Property(
-     *                   property="start",
-     *                   ref="#/components/schemas/Alert/properties/start",
-     *                ),
-     *                @OA\Property(
-     *                   property="end",
-     *                   ref="#/components/schemas/Alert/properties/end",
-     *                ),
-     *                @OA\Property(
-     *                   property="ctatitle",
-     *                   ref="#/components/schemas/Alert/properties/ctalink",
-     *                ),
-     *                @OA\Property(
-     *                   property="ctalink",
-     *                   ref="#/components/schemas/Alert/properties/ctalink",
-     *                ),
-     *             )
+     *             @OA\Schema(ref="#/components/schemas/AlertInput")
      *         )
      *    ),
      *    @OA\Response(
@@ -202,7 +160,11 @@ class AlertController extends Controller
      *              ref="#/components/schemas/Alert/properties/id"
      *            )
      *        ),
-     *     )
+     *     ),
+     *     @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *     @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *     @OA\Response(response=404, ref="#/components/responses/NotFound"),
+     *     @OA\Response(response=422, ref="#/components/responses/ValidationError")
      *  )
      */
     public function updateAlertv2(Request $request, $id)

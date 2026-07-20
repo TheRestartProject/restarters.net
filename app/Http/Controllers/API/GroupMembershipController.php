@@ -33,6 +33,7 @@ class GroupMembershipController extends Controller
      *      operationId="joinGroupv2",
      *      tags={"Groups"},
      *      summary="Join a group as the current user",
+     *      description="403 is also returned when the authenticated user has not yet given the required data consents (see GET /api/v2/session).",
      *      security={{"apiToken":{}}},
      *      @OA\Parameter(name="id", required=true, in="path", @OA\Schema(type="integer")),
      *      @OA\Response(
@@ -43,9 +44,9 @@ class GroupMembershipController extends Controller
      *              @OA\Property(property="already_member", type="boolean")
      *          ))
      *      ),
-     *      @OA\Response(response=401, description="Unauthenticated"),
-     *      @OA\Response(response=403, description="Data consent required"),
-     *      @OA\Response(response=404, description="Group not found")
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound")
      * )
      */
     public function joinv2(Request $request, $id): JsonResponse
@@ -98,7 +99,7 @@ class GroupMembershipController extends Controller
      *      operationId="leaveGroupv2",
      *      tags={"Groups"},
      *      summary="Leave a group as the current user",
-     *      description="Idempotent: leaving a group you are not a member of still returns success.",
+     *      description="Idempotent: leaving a group you are not a member of still returns success. 403 is also returned when the authenticated user has not yet given the required data consents (see GET /api/v2/session).",
      *      security={{"apiToken":{}}},
      *      @OA\Parameter(name="id", required=true, in="path", @OA\Schema(type="integer")),
      *      @OA\Response(
@@ -108,8 +109,8 @@ class GroupMembershipController extends Controller
      *              @OA\Property(property="left", type="boolean")
      *          ))
      *      ),
-     *      @OA\Response(response=401, description="Unauthenticated"),
-     *      @OA\Response(response=403, description="Data consent required")
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=403, ref="#/components/responses/Forbidden")
      * )
      */
     public function leavev2(Request $request, $id): JsonResponse
@@ -148,7 +149,7 @@ class GroupMembershipController extends Controller
      *              @OA\Property(property="image_url", type="string", nullable=true)
      *          )))
      *      ),
-     *      @OA\Response(response=401, description="Unauthenticated")
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated")
      * )
      */
     public function nearbyv2(Request $request): JsonResponse
@@ -170,7 +171,7 @@ class GroupMembershipController extends Controller
      *      operationId="inviteToGroupv2",
      *      tags={"Groups"},
      *      summary="Invite people to a group by email",
-     *      description="Requires administrator, network-coordinator-for-group, or host-of-group permission. Mirrors GroupController@postSendInvite.",
+     *      description="Requires administrator, network-coordinator-for-group, or host-of-group permission. Mirrors GroupController@postSendInvite. 403 is also returned when the authenticated user has not yet given the required data consents (see GET /api/v2/session).",
      *      security={{"apiToken":{}}},
      *      @OA\Parameter(name="id", required=true, in="path", @OA\Schema(type="integer")),
      *      @OA\RequestBody(
@@ -189,10 +190,10 @@ class GroupMembershipController extends Controller
      *              @OA\Property(property="invalid", type="array", @OA\Items(type="string"))
      *          ))
      *      ),
-     *      @OA\Response(response=401, description="Unauthenticated"),
-     *      @OA\Response(response=403, description="Not permitted to invite for this group, or data consent required"),
-     *      @OA\Response(response=404, description="Group not found"),
-     *      @OA\Response(response=422, description="Validation failure")
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound"),
+     *      @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
      */
     public function invitesv2(Request $request, $id): JsonResponse
@@ -288,7 +289,7 @@ class GroupMembershipController extends Controller
      *      operationId="archiveGroupv2",
      *      tags={"Groups"},
      *      summary="Archive a group",
-     *      description="Sets archived_at; does not delete the group or its history. Requires administrator or network-coordinator-for-group permission (mirrors the Group resource's can_perform_archive flag).",
+     *      description="Sets archived_at; does not delete the group or its history. Requires administrator or network-coordinator-for-group permission (mirrors the Group resource's can_perform_archive flag). Also requires the group to have no event with a device (Group::canDelete()), and returns 403 when the authenticated user has not yet given the required data consents (see GET /api/v2/session).",
      *      security={{"apiToken":{}}},
      *      @OA\Parameter(name="id", required=true, in="path", @OA\Schema(type="integer")),
      *      @OA\Response(
@@ -298,9 +299,9 @@ class GroupMembershipController extends Controller
      *              @OA\Property(property="archived", type="boolean")
      *          ))
      *      ),
-     *      @OA\Response(response=401, description="Unauthenticated"),
-     *      @OA\Response(response=403, description="Not permitted to archive this group, or data consent required"),
-     *      @OA\Response(response=404, description="Group not found")
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound")
      * )
      */
     public function archivev2(Request $request, $id): JsonResponse
@@ -354,7 +355,7 @@ class GroupMembershipController extends Controller
      *              ))
      *          ))
      *      ),
-     *      @OA\Response(response=404, description="Group not found")
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound")
      * )
      */
     public function statsv2(Request $request, $id): JsonResponse
@@ -453,7 +454,7 @@ class GroupMembershipController extends Controller
      *      operationId="uploadGroupImagev2",
      *      tags={"Groups"},
      *      summary="Attach a completed tus upload as the group's image",
-     *      description="Mirrors UserController::updateMyPhotov2 - upload the file to /api/tus first, then attach it here by upload_key.",
+     *      description="Mirrors UserController::updateMyPhotov2 - upload the file to /api/tus first, then attach it here by upload_key. Requires administrator, network-coordinator-for-group, or host-of-group permission; 403 is also returned when the authenticated user has not yet given the required data consents (see GET /api/v2/session). 422 covers a missing/expired/oversized (>2MB) upload_key or a non jpeg/png/gif upload.",
      *      security={{"apiToken":{}}},
      *      @OA\Parameter(name="id", required=true, in="path", @OA\Schema(type="integer")),
      *      @OA\RequestBody(
@@ -467,10 +468,10 @@ class GroupMembershipController extends Controller
      *              @OA\Property(property="image_url", type="string")
      *          ))
      *      ),
-     *      @OA\Response(response=401, description="Unauthenticated"),
-     *      @OA\Response(response=403, description="Not permitted to edit this group, or data consent required"),
-     *      @OA\Response(response=404, description="Group not found"),
-     *      @OA\Response(response=422, description="Missing/expired/oversized/non-image upload")
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound"),
+     *      @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
      */
     public function uploadImagev2(Request $request, $id): JsonResponse
@@ -549,6 +550,7 @@ class GroupMembershipController extends Controller
      *      operationId="deleteGroupImagev2",
      *      tags={"Groups"},
      *      summary="Detach an image from a group",
+     *      description="Requires administrator, network-coordinator-for-group, or host-of-group permission; 403 is also returned when the authenticated user has not yet given the required data consents (see GET /api/v2/session). 404 covers both an unknown group id and an idimages that doesn't reference an image on this group.",
      *      security={{"apiToken":{}}},
      *      @OA\Parameter(name="id", required=true, in="path", @OA\Schema(type="integer")),
      *      @OA\Parameter(name="idimages", description="The xref id linking the image to the group", required=true, in="path", @OA\Schema(type="integer")),
@@ -559,9 +561,9 @@ class GroupMembershipController extends Controller
      *              @OA\Property(property="deleted", type="boolean")
      *          ))
      *      ),
-     *      @OA\Response(response=401, description="Unauthenticated"),
-     *      @OA\Response(response=403, description="Not permitted to edit this group, or data consent required"),
-     *      @OA\Response(response=404, description="Group or image not found")
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound")
      * )
      */
     public function deleteImagev2(Request $request, $id, $idimages): JsonResponse

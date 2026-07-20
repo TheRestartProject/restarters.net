@@ -282,10 +282,7 @@ class EventController extends Controller
      *              )
      *          )
      *       ),
-     *      @OA\Response(
-     *          response=404,
-     *          description="Event not found",
-     *      ),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound"),
      *     )
      */
 
@@ -388,7 +385,7 @@ class EventController extends Controller
      *              ))
      *          ))
      *      ),
-     *      @OA\Response(response=404, description="Event not found")
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound")
      * )
      */
     public function attendeesv2(Request $request, $idevents): JsonResponse
@@ -460,7 +457,7 @@ class EventController extends Controller
      *          description="Successful operation",
      *          @OA\JsonContent(@OA\Property(property="data", type="array", @OA\Items(ref="#/components/schemas/Device")))
      *      ),
-     *      @OA\Response(response=404, description="Event not found")
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound")
      * )
      */
     public function devicesv2(Request $request, $idevents): JsonResponse
@@ -484,28 +481,20 @@ class EventController extends Controller
      *      operationId="getEventsModeratev2",
      *      tags={"Events"},
      *      summary="Get Events for Moderation",
-     *      description="Only available for Administrators and Network Coordinators.",
-     *      @OA\Parameter(
-     *          name="api_token",
-     *          description="A valid user API token",
-     *          required=true,
-     *          in="query",
-     *          @OA\Schema(
-     *              type="string",
-     *              example="1234"
-     *          )
-     *      ),
+     *      description="Events requiring moderation across the networks the caller can moderate: Administrators see every network, Network Coordinators see their own networks. Returns an empty list for an authenticated user who is neither.",
+     *      security={{"apiToken":{}}},
      *      @OA\Response(
      *          response=200,
      *          description="Successful operation",
      *          @OA\JsonContent(
      *             type="array",
-     *             description="An array of groups",
+     *             description="An array of events",
      *             @OA\Items(
      *                 ref="#/components/schemas/Event"
      *             )
      *          )
      *       ),
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
      *     )
      */
     public function moderateEventsv2(Request $request)
@@ -544,22 +533,13 @@ class EventController extends Controller
      *      operationId="createEvent",
      *      tags={"Events"},
      *      summary="Create Event",
-     *      description="Creates an event.",
-     *      @OA\Parameter(
-     *          name="api_token",
-     *          description="A valid user API token",
-     *          required=true,
-     *          in="query",
-     *          @OA\Schema(
-     *              type="string",
-     *              example="1234"
-     *          )
-     *      ),
+     *      description="Creates an event. `location` is required unless `online` is true.",
+     *      security={{"apiToken":{}}},
      *     @OA\RequestBody(
      *         @OA\MediaType(
      *             mediaType="multipart/form-data",
      *             @OA\Schema(
-     *                required={"start","end","title","description","location","lat","lng"},
+     *                required={"groupid","start","end","title","description"},
      *                @OA\Property(
      *                   property="groupid",
      *                   title="id",
@@ -612,12 +592,17 @@ class EventController extends Controller
      *        description="Successful operation",
      *        @OA\JsonContent(
      *            @OA\Property(
-     *              property="data",
-     *              title="data",
-     *              ref="#/components/schemas/Event"
+     *              property="id",
+     *              type="integer",
+     *              description="Unique identifier of the newly-created event",
+     *              example=1
      *            )
      *        ),
-     *     )
+     *     ),
+     *     @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *     @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *     @OA\Response(response=404, ref="#/components/responses/NotFound"),
+     *     @OA\Response(response=422, ref="#/components/responses/ValidationError")
      *  )
      */
     public function createEventv2(Request $request): JsonResponse
@@ -725,22 +710,14 @@ class EventController extends Controller
      *      operationId="editEvent",
      *      tags={"Events"},
      *      summary="Edit Event",
-     *      description="Edits an event.  The event of a group cannot be changed after creation.",
-     *      @OA\Parameter(
-     *          name="api_token",
-     *          description="A valid user API token",
-     *          required=true,
-     *          in="query",
-     *          @OA\Schema(
-     *              type="string",
-     *              example="1234"
-     *          )
-     *      ),
+     *      description="Edits an event.  The event of a group cannot be changed after creation. `location` is required unless `online` is true.",
+     *      security={{"apiToken":{}}},
+     *      @OA\Parameter(name="id", description="Event id", required=true, in="path", @OA\Schema(type="integer")),
      *     @OA\RequestBody(
      *         @OA\MediaType(
      *             mediaType="multipart/form-data",
      *             @OA\Schema(
-     *                required={"start","end","title","description","location","lat","lng"},
+     *                required={"start","end","title","description"},
      *                @OA\Property(
      *                   property="start",
      *                   ref="#/components/schemas/Event/properties/start",
@@ -774,6 +751,11 @@ class EventController extends Controller
      *                   ref="#/components/schemas/Event/properties/link",
      *                ),
      *                @OA\Property(
+     *                   description="Network-defined JSON data",
+     *                   property="network_data",
+     *                   @OA\Schema()
+     *                ),
+     *                @OA\Property(
      *                   property="participants",
      *                   description="New value for the participants headcount counter (replaces POST /party/update-quantity). Host/NC/admin gated, same as the rest of this endpoint.",
      *                   type="integer",
@@ -793,16 +775,17 @@ class EventController extends Controller
      *        description="Successful operation",
      *        @OA\JsonContent(
      *            @OA\Property(
-     *              property="data",
-     *              title="data",
-     *              ref="#/components/schemas/Event"
+     *              property="id",
+     *              type="integer",
+     *              description="The event's id",
+     *              example=1
      *            )
      *        ),
      *     ),
-     *     @OA\Response(response=401, description="Unauthenticated"),
-     *     @OA\Response(response=403, description="Not permitted to edit this event, or data consent required"),
-     *     @OA\Response(response=404, description="Event not found"),
-     *     @OA\Response(response=422, description="Validation failure")
+     *     @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *     @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *     @OA\Response(response=404, ref="#/components/responses/NotFound"),
+     *     @OA\Response(response=422, ref="#/components/responses/ValidationError")
      *  )
      */
     public function updateEventv2(Request $request, $idEvents): JsonResponse

@@ -43,13 +43,14 @@ class GroupTagController extends Controller
      *      operationId="getGroupTagv2",
      *      tags={"GroupTags"},
      *      summary="Get a global group tag",
+     *      description="Network-scoped tags are not visible here (404); fetch them via /api/v2/networks/{id}/tags.",
      *      @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
      *      @OA\Response(
      *          response=200,
      *          description="Successful operation",
      *          @OA\JsonContent(@OA\Property(property="data", ref="#/components/schemas/Tag"))
      *      ),
-     *      @OA\Response(response=404, description="Group tag not found (or is network-scoped)")
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound")
      * )
      */
     public function getGroupTagv2($id)
@@ -80,9 +81,9 @@ class GroupTagController extends Controller
      *          description="Group tag created",
      *          @OA\JsonContent(@OA\Property(property="data", ref="#/components/schemas/Tag"))
      *      ),
-     *      @OA\Response(response=401, description="Unauthenticated"),
-     *      @OA\Response(response=403, description="Forbidden"),
-     *      @OA\Response(response=422, description="Validation failed")
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *      @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
      */
     public function createGroupTagv2(Request $request): JsonResponse
@@ -124,10 +125,10 @@ class GroupTagController extends Controller
      *          description="Group tag updated",
      *          @OA\JsonContent(@OA\Property(property="data", ref="#/components/schemas/Tag"))
      *      ),
-     *      @OA\Response(response=401, description="Unauthenticated"),
-     *      @OA\Response(response=403, description="Forbidden"),
-     *      @OA\Response(response=404, description="Group tag not found (or is network-scoped)"),
-     *      @OA\Response(response=422, description="Validation failed")
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound"),
+     *      @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
      */
     public function updateGroupTagv2(Request $request, $id)
@@ -158,9 +159,9 @@ class GroupTagController extends Controller
      *      security={{"apiToken":{}}},
      *      @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
      *      @OA\Response(response=204, description="Group tag deleted"),
-     *      @OA\Response(response=401, description="Unauthenticated"),
-     *      @OA\Response(response=403, description="Forbidden"),
-     *      @OA\Response(response=404, description="Group tag not found (or is network-scoped)")
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound")
      * )
      */
     public function deleteGroupTagv2($id)

@@ -21,7 +21,7 @@ class SessionController extends Controller
      *      operationId="getSessionv2",
      *      tags={"Session"},
      *      summary="Client bootstrap: current user, config and flags",
-     *      security={{"apiToken":{}}},
+     *      description="Callable anonymously (guest bootstrap) - the route carries no auth middleware, so 'user' is simply null when there is no valid token.",
      *      @OA\Response(
      *          response=200,
      *          description="Session context",
@@ -95,8 +95,8 @@ class SessionController extends Controller
      *              )
      *          )
      *      ),
-     *      @OA\Response(response=401, description="Unauthenticated"),
-     *      @OA\Response(response=422, description="Unknown locale")
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
      */
     public function patchSessionv2(Request $request): JsonResponse

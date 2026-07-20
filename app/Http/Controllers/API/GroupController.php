@@ -267,6 +267,7 @@ class GroupController extends Controller
      *             )
      *          )
      *       ),
+     *      @OA\Response(response=422, ref="#/components/responses/ValidationError"),
      *     )
      */
 
@@ -377,6 +378,7 @@ class GroupController extends Controller
      *              )
      *          )
      *       ),
+     *      @OA\Response(response=422, ref="#/components/responses/ValidationError"),
      *     )
      */
 
@@ -478,7 +480,7 @@ class GroupController extends Controller
      *      operationId="getGroup",
      *      tags={"Groups"},
      *      summary="Get Group",
-     *      description="Returns information about a group.",
+     *      description="Returns information about a group. Not behind auth - if a user is authenticated (via session or bearer token) the response also includes a permissions block of UI flags for that user; anonymous requests get all-false flags.",
      *      @OA\Parameter(
      *          name="id",
      *          description="Group id",
@@ -495,14 +497,25 @@ class GroupController extends Controller
      *              @OA\Property(
      *                property="data",
      *                title="data",
-     *                ref="#/components/schemas/Group"
+     *                allOf={
+     *                    @OA\Schema(ref="#/components/schemas/Group"),
+     *                    @OA\Schema(
+     *                        @OA\Property(
+     *                            property="permissions",
+     *                            type="object",
+     *                            description="UI show/hide flags for the requesting user against this group. Advisory only - the mutating endpoints enforce their own authorization independently.",
+     *                            @OA\Property(property="can_edit", type="boolean"),
+     *                            @OA\Property(property="can_demote", type="boolean"),
+     *                            @OA\Property(property="can_see_delete", type="boolean"),
+     *                            @OA\Property(property="can_perform_delete", type="boolean"),
+     *                            @OA\Property(property="can_perform_archive", type="boolean")
+     *                        )
+     *                    )
+     *                }
      *              )
      *          )
      *       ),
-     *      @OA\Response(
-     *          response=404,
-     *          description="Group not found",
-     *      ),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound"),
      *     )
      */
     public static function getGroupv2(Request $request, $idgroups) {
@@ -617,10 +630,7 @@ class GroupController extends Controller
      *              )
      *          )
      *       ),
-     *      @OA\Response(
-     *          response=404,
-     *          description="Group not found",
-     *      ),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound"),
      *     )
      */
 
@@ -661,6 +671,15 @@ class GroupController extends Controller
      *              type="integer"
      *          )
      *      ),
+     *      @OA\Parameter(
+     *          name="exclude_event",
+     *          description="Event id. When present, excludes users already confirmed as a volunteer at that event.",
+     *          required=false,
+     *          in="query",
+     *          @OA\Schema(
+     *              type="integer"
+     *          )
+     *      ),
      *      @OA\Response(
      *          response=200,
      *          description="Successful operation",
@@ -676,10 +695,7 @@ class GroupController extends Controller
      *              )
      *          )
      *       ),
-     *      @OA\Response(
-     *          response=404,
-     *          description="Group not found",
-     *      ),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound"),
      *     )
      */
 
@@ -709,7 +725,8 @@ class GroupController extends Controller
      *      operationId="deleteVolunteerForGroupv2",
      *      tags={"Groups","Volunteers"},
      *      summary="Delete Group Volunteer",
-     *      description="Removes a volunteer from a group",
+     *      description="Removes a volunteer from a group. Requires administrator, network-coordinator-for-group, or host-of-group permission - an authenticated user lacking that permission still gets 401 (not 403), since this check is implemented via AuthenticationException.",
+     *      security={{"apiToken":{}}},
      *      @OA\Parameter(
      *          name="id",
      *          description="Group id",
@@ -732,10 +749,8 @@ class GroupController extends Controller
      *          response=200,
      *          description="Successful operation",
      *       ),
-     *      @OA\Response(
-     *          response=404,
-     *          description="Group not found",
-     *      ),
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound"),
      *     )
      */
 
@@ -764,7 +779,8 @@ class GroupController extends Controller
      *      operationId="patchVolunteerForGroupv2",
      *      tags={"Groups","Volunteers"},
      *      summary="Modify Group Volunteer",
-     *      description="Modify a volunteer's status on a group",
+     *      description="Modify a volunteer's host/restarter role on a group. Requires administrator, network-coordinator-for-group, or host-of-group permission - an authenticated user lacking that permission still gets 401 (not 403), since this check is implemented via AuthenticationException.",
+     *      security={{"apiToken":{}}},
      *      @OA\Parameter(
      *          name="id",
      *          description="Group id",
@@ -775,22 +791,30 @@ class GroupController extends Controller
      *          )
      *      ),
      *      @OA\Parameter(
-     *          name="host",
-     *          description="Host",
+     *          name="iduser",
+     *          description="User id",
      *          required=true,
      *          in="path",
      *          @OA\Schema(
-     *              type="boolean"
+     *              type="integer"
+     *          )
+     *      ),
+     *      @OA\RequestBody(
+     *          @OA\JsonContent(
+     *              @OA\Property(
+     *                  property="host",
+     *                  description="Promote the volunteer to host (true) or demote to restarter (false). Defaults to false when omitted.",
+     *                  type="boolean",
+     *                  default=false
+     *              )
      *          )
      *      ),
      *      @OA\Response(
      *          response=200,
      *          description="Successful operation",
      *       ),
-     *      @OA\Response(
-     *          response=404,
-     *          description="Group not found",
-     *      ),
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound"),
      *     )
      */
 
@@ -850,17 +874,8 @@ class GroupController extends Controller
      *      operationId="getGroupsModeratev2",
      *      tags={"Groups"},
      *      summary="Get Groups for Moderation",
-     *      description="Only available for Administrators and Network Coordinators. ",
-     *      @OA\Parameter(
-     *          name="api_token",
-     *          description="A valid user API token",
-     *          required=true,
-     *          in="query",
-     *          @OA\Schema(
-     *              type="string",
-     *              example="1234"
-     *          )
-     *      ),
+     *      description="Unapproved groups visible to the authenticated user: Administrators see all, Network Coordinators see groups in networks they coordinate. Other authenticated users get an empty array (no error).",
+     *      security={{"apiToken":{}}},
      *      @OA\Response(
      *          response=200,
      *          description="Successful operation",
@@ -872,6 +887,7 @@ class GroupController extends Controller
      *             )
      *          )
      *       ),
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
      *     )
      */
     public function moderateGroupsv2(Request $request): JsonResponse {
@@ -886,17 +902,8 @@ class GroupController extends Controller
      *      operationId="createGroup",
      *      tags={"Groups"},
      *      summary="Create Group",
-     *      description="Creates a group.",
-     *      @OA\Parameter(
-     *          name="api_token",
-     *          description="A valid user API token",
-     *          required=true,
-     *          in="query",
-     *          @OA\Schema(
-     *              type="string",
-     *              example="1234"
-     *          )
-     *      ),
+     *      description="Creates a group and adds the authenticated user as its host (converting them to a host if not already one). Notifies admins with the admin-moderate-group preference for approval.",
+     *      security={{"apiToken":{}}},
      *     @OA\RequestBody(
      *         @OA\MediaType(
      *             mediaType="multipart/form-data",
@@ -947,13 +954,11 @@ class GroupController extends Controller
      *        response=200,
      *        description="Successful operation",
      *        @OA\JsonContent(
-     *            @OA\Property(
-     *              property="data",
-     *              title="data",
-     *              ref="#/components/schemas/Group"
-     *            )
-     *        ),
-     *     )
+     *            @OA\Property(property="id", type="integer", description="Id of the newly-created group", example=1)
+     *        )
+     *     ),
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=422, ref="#/components/responses/ValidationError"),
      *  )
      */
     public function createGroupv2(Request $request): JsonResponse {
@@ -1028,22 +1033,21 @@ class GroupController extends Controller
      *      operationId="editGroup",
      *      tags={"Groups"},
      *      summary="Edit Group",
-     *      description="Edit a group.",
+     *      description="Edit a group. Requires administrator, network-coordinator-for-group, or host-of-group permission. `area`, `postcode` and `archived_at` are only persisted for an administrator or a network coordinator of the group's network(s); a host's submitted values for those fields are silently ignored.",
+     *      security={{"apiToken":{}}},
      *      @OA\Parameter(
-     *          name="api_token",
-     *          description="A valid user API token",
+     *          name="id",
+     *          description="Group id",
      *          required=true,
-     *          in="query",
+     *          in="path",
      *          @OA\Schema(
-     *              type="string",
-     *              example="1234"
+     *              type="integer"
      *          )
      *      ),
      *     @OA\RequestBody(
      *         @OA\MediaType(
      *             mediaType="multipart/form-data",
      *             @OA\Schema(
-     *                required={"name","location","description"},
      *                @OA\Property(
      *                   property="name",
      *                   ref="#/components/schemas/Group/properties/name",
@@ -1085,8 +1089,39 @@ class GroupController extends Controller
      *                @OA\Property(
      *                   property="archived_at",
      *                   title="archived_at",
-     *                   description="If present, this group has been archived and is no longer active.",
+     *                   description="If present, this group has been archived and is no longer active. Administrator/network-coordinator only.",
      *                   format="date-time",
+     *                ),
+     *                @OA\Property(
+     *                   property="area",
+     *                   description="Administrator/network-coordinator only.",
+     *                   type="string",
+     *                   nullable=true
+     *                ),
+     *                @OA\Property(
+     *                   property="postcode",
+     *                   description="Administrator/network-coordinator only.",
+     *                   type="string",
+     *                   nullable=true
+     *                ),
+     *                @OA\Property(
+     *                   property="networks",
+     *                   description="JSON-encoded array of network ids to associate with the group (replaces the existing set). Administrator only.",
+     *                   type="string",
+     *                   example="[1,2]"
+     *                ),
+     *                @OA\Property(
+     *                   property="tags",
+     *                   description="JSON-encoded array of tag ids to associate with the group (replaces the existing set). Administrators may use any tag (global or any network's); network coordinators may only submit tags belonging to networks they coordinate that the group is also a member of - existing tags outside that scope are preserved automatically.",
+     *                   type="string",
+     *                   example="[3,4]"
+     *                ),
+     *                @OA\Property(
+     *                   property="moderate",
+     *                   description="Set to ""approve"" to approve a pending group. Administrator or network-coordinator-for-group only; ignored otherwise.",
+     *                   type="string",
+     *                   enum={"approve"},
+     *                   nullable=true
      *                )
      *            )
      *         )
@@ -1095,13 +1130,13 @@ class GroupController extends Controller
      *        response=200,
      *        description="Successful operation",
      *        @OA\JsonContent(
-     *            @OA\Property(
-     *              property="data",
-     *              title="data",
-     *              ref="#/components/schemas/Group"
-     *            )
-     *        ),
-     *     )
+     *            @OA\Property(property="id", type="integer", description="Id of the edited group", example=1)
+     *        )
+     *     ),
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound"),
+     *      @OA\Response(response=422, ref="#/components/responses/ValidationError"),
      *  )
      */
     public function updateGroupv2(Request $request, $idGroup): JsonResponse {

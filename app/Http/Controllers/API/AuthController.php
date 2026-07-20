@@ -76,7 +76,8 @@ class AuthController extends Controller
      *              )
      *          )
      *      ),
-     *      @OA\Response(response=422, description="Invalid credentials or honeypot tripped")
+     *      @OA\Response(response=422, ref="#/components/responses/ValidationError"),
+     *      @OA\Response(response=429, ref="#/components/responses/TooManyRequests")
      * )
      */
     public function loginv2(Request $request): JsonResponse
@@ -125,7 +126,7 @@ class AuthController extends Controller
      *          description="Logged out",
      *          @OA\JsonContent(@OA\Property(property="message", type="string"))
      *      ),
-     *      @OA\Response(response=401, description="Unauthenticated")
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated")
      * )
      */
     public function logoutv2(Request $request): JsonResponse
@@ -190,7 +191,8 @@ class AuthController extends Controller
      *              )
      *          )
      *      ),
-     *      @OA\Response(response=422, description="Validation failure")
+     *      @OA\Response(response=422, ref="#/components/responses/ValidationError"),
+     *      @OA\Response(response=429, ref="#/components/responses/TooManyRequests")
      * )
      */
     public function registerv2(Request $request): JsonResponse
@@ -299,7 +301,8 @@ class AuthController extends Controller
      *          description="Recovery email sent",
      *          @OA\JsonContent(@OA\Property(property="message", type="string"))
      *      ),
-     *      @OA\Response(response=422, description="Unknown email or validation failure")
+     *      @OA\Response(response=422, ref="#/components/responses/ValidationError"),
+     *      @OA\Response(response=429, ref="#/components/responses/TooManyRequests")
      * )
      */
     public function forgotPasswordv2(Request $request): JsonResponse
@@ -351,7 +354,8 @@ class AuthController extends Controller
      *          description="Password updated",
      *          @OA\JsonContent(@OA\Property(property="message", type="string"))
      *      ),
-     *      @OA\Response(response=422, description="Invalid/expired token or validation failure")
+     *      @OA\Response(response=422, ref="#/components/responses/ValidationError"),
+     *      @OA\Response(response=429, ref="#/components/responses/TooManyRequests")
      * )
      */
     public function resetPasswordv2(Request $request): JsonResponse
@@ -401,7 +405,8 @@ class AuthController extends Controller
      *                  @OA\Property(property="email", type="string", nullable=true)
      *              )
      *          )
-     *      )
+     *      ),
+     *      @OA\Response(response=429, ref="#/components/responses/TooManyRequests")
      * )
      */
     public function recoveryInfov2(string $token): JsonResponse
@@ -433,7 +438,7 @@ class AuthController extends Controller
      *              )
      *          )
      *      ),
-     *      @OA\Response(response=422, description="Validation failure")
+     *      @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
      */
     public function emailAvailablev2(Request $request): JsonResponse
@@ -477,9 +482,10 @@ class AuthController extends Controller
      *              )
      *          )
      *      ),
-     *      @OA\Response(response=401, description="Unauthenticated"),
-     *      @OA\Response(response=404, description="Unknown code/hash"),
-     *      @OA\Response(response=422, description="Validation failure")
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=403, description="Data consent required"),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound"),
+     *      @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
      */
     public function claimInvitev2(Request $request): JsonResponse
@@ -517,7 +523,7 @@ class AuthController extends Controller
      *              )
      *          )
      *      ),
-     *      @OA\Response(response=401, description="Unauthenticated")
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated")
      * )
      */
     public function ssoTicketv2(Request $request): JsonResponse
@@ -563,8 +569,8 @@ class AuthController extends Controller
      *              )
      *          )
      *      ),
-     *      @OA\Response(response=401, description="Unauthenticated"),
-     *      @OA\Response(response=422, description="Validation failure")
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
      */
     public function consentv2(Request $request): JsonResponse

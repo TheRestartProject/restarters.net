@@ -48,9 +48,9 @@ class EventAttendanceController extends Controller
      *              @OA\Property(property="prompt_follow_group", type="boolean", description="True when the user isn't a member of the hosting group - replaces the legacy prompt-follow-group flash")
      *          ))
      *      ),
-     *      @OA\Response(response=401, description="Unauthenticated"),
-     *      @OA\Response(response=403, description="Data consent required"),
-     *      @OA\Response(response=404, description="Event not found")
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound")
      * )
      */
     public function rsvpv2(Request $request, $idevents): JsonResponse
@@ -125,8 +125,8 @@ class EventAttendanceController extends Controller
      *              @OA\Property(property="left", type="boolean")
      *          ))
      *      ),
-     *      @OA\Response(response=401, description="Unauthenticated"),
-     *      @OA\Response(response=403, description="Data consent required")
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=403, ref="#/components/responses/Forbidden")
      * )
      */
     public function cancelRsvpv2(Request $request, $idevents): JsonResponse
@@ -158,10 +158,10 @@ class EventAttendanceController extends Controller
      *              @OA\Property(property="host", type="boolean")
      *          ))
      *      ),
-     *      @OA\Response(response=401, description="Unauthenticated"),
-     *      @OA\Response(response=403, description="Not permitted to edit this event, or data consent required"),
-     *      @OA\Response(response=404, description="Event or user not found"),
-     *      @OA\Response(response=422, description="Validation failure")
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound"),
+     *      @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
      */
     public function patchVolunteerv2(Request $request, $idevents, $iduser): JsonResponse
@@ -197,8 +197,9 @@ class EventAttendanceController extends Controller
      *      @OA\Response(response=200, description="Requests sent",
      *          @OA\JsonContent(@OA\Property(property="data", type="object",
      *              @OA\Property(property="requested", type="integer")))),
-     *      @OA\Response(response=403, description="Not permitted"),
-     *      @OA\Response(response=404, description="Event not found"),
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound"),
      * )
      *
      * Port of PartyController::getContributions (the old "Request review" modal
@@ -246,9 +247,9 @@ class EventAttendanceController extends Controller
      *              @OA\Property(property="deleted", type="boolean")
      *          ))
      *      ),
-     *      @OA\Response(response=401, description="Unauthenticated"),
-     *      @OA\Response(response=403, description="Not permitted to edit this event, or data consent required"),
-     *      @OA\Response(response=404, description="Event not found")
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound")
      * )
      */
     public function deleteVolunteerv2(Request $request, $idevents, $idevents_users): JsonResponse
@@ -296,10 +297,10 @@ class EventAttendanceController extends Controller
      *              @OA\Property(property="invalid", type="array", @OA\Items(type="string"))
      *          ))
      *      ),
-     *      @OA\Response(response=401, description="Unauthenticated"),
-     *      @OA\Response(response=403, description="Not permitted to invite for this event, or data consent required"),
-     *      @OA\Response(response=404, description="Event not found"),
-     *      @OA\Response(response=422, description="Validation failure")
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound"),
+     *      @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
      */
     public function invitesv2(Request $request, $idevents): JsonResponse
@@ -414,10 +415,10 @@ class EventAttendanceController extends Controller
      *              @OA\Property(property="image_url", type="string")
      *          ))
      *      ),
-     *      @OA\Response(response=401, description="Unauthenticated"),
-     *      @OA\Response(response=403, description="Not an attendee of this event, or data consent required"),
-     *      @OA\Response(response=404, description="Event not found"),
-     *      @OA\Response(response=422, description="Missing/expired/oversized/non-image upload")
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound"),
+     *      @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
      */
     public function uploadImagev2(Request $request, $idevents): JsonResponse
@@ -475,9 +476,9 @@ class EventAttendanceController extends Controller
      *              @OA\Property(property="deleted", type="boolean")
      *          ))
      *      ),
-     *      @OA\Response(response=401, description="Unauthenticated"),
-     *      @OA\Response(response=403, description="Not an attendee of this event, or data consent required"),
-     *      @OA\Response(response=404, description="Event or image not found")
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound")
      * )
      */
     public function deleteImagev2(Request $request, $idevents, $idimages): JsonResponse
@@ -579,9 +580,9 @@ class EventAttendanceController extends Controller
      *              @OA\Property(property="deleted", type="boolean")
      *          ))
      *      ),
-     *      @OA\Response(response=401, description="Unauthenticated"),
-     *      @OA\Response(response=403, description="Not permitted to delete this event, or data consent required"),
-     *      @OA\Response(response=404, description="Event not found")
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound")
      * )
      */
     public function deleteEventv2(Request $request, $idevents): JsonResponse

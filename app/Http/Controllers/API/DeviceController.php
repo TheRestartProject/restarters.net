@@ -30,7 +30,7 @@ class DeviceController extends Controller {
      *      operationId="getDevice",
      *      tags={"Devices"},
      *      summary="Get Device",
-     *      description="Returns information about a device.",
+     *      description="Returns information about a device. Public - no authentication required.",
      *      @OA\Parameter(
      *          name="id",
      *          description="Device id",
@@ -51,10 +51,7 @@ class DeviceController extends Controller {
      *              )
      *          )
      *       ),
-     *      @OA\Response(
-     *          response=404,
-     *          description="Device not found",
-     *      ),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound"),
      *     )
      */
 
@@ -71,17 +68,8 @@ class DeviceController extends Controller {
      *      operationId="createDevice",
      *      tags={"Devices"},
      *      summary="Create Device",
-     *      description="Creates a device.",
-     *      @OA\Parameter(
-     *          name="api_token",
-     *          description="A valid user API token",
-     *          required=true,
-     *          in="query",
-     *          @OA\Schema(
-     *              type="string",
-     *              example="1234"
-     *          )
-     *      ),
+     *      description="Creates a device against an event. Requires edit-events-devices permission (typically the event's host) on the target event (`eventid`). 404 if that event does not exist.",
+     *      security={{"apiToken":{}}},
      *     @OA\RequestBody(
      *         @OA\MediaType(
      *             mediaType="multipart/form-data",
@@ -147,15 +135,38 @@ class DeviceController extends Controller {
      *    ),
      *    @OA\Response(
      *        response=200,
-     *        description="Successful operation",
+     *        description="Successful operation. Returns the device and the owning event's stats, to save the client another API call to update its store.",
      *        @OA\JsonContent(
-     *            @OA\Property(
-     *              property="data",
-     *              title="data",
-     *              ref="#/components/schemas/Device"
+     *            @OA\Property(property="id", type="integer", description="The id of the created device"),
+     *            @OA\Property(property="device", ref="#/components/schemas/Device"),
+     *            @OA\Property(property="stats", type="object", description="Party::getEventStats() for the device's event - the same shape as the stats block on GET /api/v2/events/{id}.",
+     *                @OA\Property(property="co2_powered", type="number"),
+     *                @OA\Property(property="co2_unpowered", type="number"),
+     *                @OA\Property(property="co2_total", type="number"),
+     *                @OA\Property(property="waste_powered", type="number"),
+     *                @OA\Property(property="waste_unpowered", type="number"),
+     *                @OA\Property(property="waste_total", type="number"),
+     *                @OA\Property(property="fixed_devices", type="number"),
+     *                @OA\Property(property="fixed_powered", type="number"),
+     *                @OA\Property(property="fixed_unpowered", type="number"),
+     *                @OA\Property(property="repairable_devices", type="number"),
+     *                @OA\Property(property="dead_devices", type="number"),
+     *                @OA\Property(property="unknown_repair_status", type="number"),
+     *                @OA\Property(property="devices_powered", type="number"),
+     *                @OA\Property(property="devices_unpowered", type="number"),
+     *                @OA\Property(property="no_weight_powered", type="number"),
+     *                @OA\Property(property="no_weight_unpowered", type="number"),
+     *                @OA\Property(property="participants", type="number"),
+     *                @OA\Property(property="volunteers", type="number"),
+     *                @OA\Property(property="hours_volunteered", type="number"),
+     *                @OA\Property(property="invited", type="number")
      *            )
      *        ),
-     *     )
+     *     ),
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound"),
+     *      @OA\Response(response=422, ref="#/components/responses/ValidationError")
      *  )
      */
     public function createDevicev2(Request $request)
@@ -260,15 +271,15 @@ class DeviceController extends Controller {
      *      operationId="editDevice",
      *      tags={"Devices"},
      *      summary="Edit Device",
-     *      description="Edits a device.",
+     *      description="Edits a device. Requires edit-events-devices permission on both the target event (`eventid` in the body) and the device's current owning event - an IDOR guard against a host of one event reassigning/overwriting a device that belongs to another event.",
+     *      security={{"apiToken":{}}},
      *      @OA\Parameter(
-     *          name="api_token",
-     *          description="A valid user API token",
+     *          name="id",
+     *          description="Device id",
      *          required=true,
-     *          in="query",
+     *          in="path",
      *          @OA\Schema(
-     *              type="string",
-     *              example="1234"
+     *              type="integer"
      *          )
      *      ),
      *     @OA\RequestBody(
@@ -336,15 +347,38 @@ class DeviceController extends Controller {
      *    ),
      *    @OA\Response(
      *        response=200,
-     *        description="Successful operation",
+     *        description="Successful operation. Returns the device and the owning event's stats, to save the client another API call to update its store.",
      *        @OA\JsonContent(
-     *            @OA\Property(
-     *              property="data",
-     *              title="data",
-     *              ref="#/components/schemas/Device"
+     *            @OA\Property(property="id", type="integer", description="The id of the updated device"),
+     *            @OA\Property(property="device", ref="#/components/schemas/Device"),
+     *            @OA\Property(property="stats", type="object", description="Party::getEventStats() for the device's event - the same shape as the stats block on GET /api/v2/events/{id}.",
+     *                @OA\Property(property="co2_powered", type="number"),
+     *                @OA\Property(property="co2_unpowered", type="number"),
+     *                @OA\Property(property="co2_total", type="number"),
+     *                @OA\Property(property="waste_powered", type="number"),
+     *                @OA\Property(property="waste_unpowered", type="number"),
+     *                @OA\Property(property="waste_total", type="number"),
+     *                @OA\Property(property="fixed_devices", type="number"),
+     *                @OA\Property(property="fixed_powered", type="number"),
+     *                @OA\Property(property="fixed_unpowered", type="number"),
+     *                @OA\Property(property="repairable_devices", type="number"),
+     *                @OA\Property(property="dead_devices", type="number"),
+     *                @OA\Property(property="unknown_repair_status", type="number"),
+     *                @OA\Property(property="devices_powered", type="number"),
+     *                @OA\Property(property="devices_unpowered", type="number"),
+     *                @OA\Property(property="no_weight_powered", type="number"),
+     *                @OA\Property(property="no_weight_unpowered", type="number"),
+     *                @OA\Property(property="participants", type="number"),
+     *                @OA\Property(property="volunteers", type="number"),
+     *                @OA\Property(property="hours_volunteered", type="number"),
+     *                @OA\Property(property="invited", type="number")
      *            )
      *        ),
-     *     )
+     *     ),
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound"),
+     *      @OA\Response(response=422, ref="#/components/responses/ValidationError")
      *  )
      */
     public function updateDevicev2(Request $request, $iddevices): JsonResponse
@@ -433,7 +467,8 @@ class DeviceController extends Controller {
      *      operationId="deleteDevice",
      *      tags={"Devices"},
      *      summary="Delete Device",
-     *      description="Deletes a device.",
+     *      description="Deletes a device. Requires edit-events-devices permission on the device's owning event.",
+     *      security={{"apiToken":{}}},
      *      @OA\Parameter(
      *          name="id",
      *          description="Device id",
@@ -445,12 +480,36 @@ class DeviceController extends Controller {
      *      ),
      *      @OA\Response(
      *          response=200,
-     *          description="Successful operation",
+     *          description="Successful operation. Returns the owning event's stats, to save the client another API call to update its store.",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="id", type="integer", description="The id of the deleted device"),
+     *              @OA\Property(property="stats", type="object", description="Party::getEventStats() for the device's (now former) event - the same shape as the stats block on GET /api/v2/events/{id}.",
+     *                  @OA\Property(property="co2_powered", type="number"),
+     *                  @OA\Property(property="co2_unpowered", type="number"),
+     *                  @OA\Property(property="co2_total", type="number"),
+     *                  @OA\Property(property="waste_powered", type="number"),
+     *                  @OA\Property(property="waste_unpowered", type="number"),
+     *                  @OA\Property(property="waste_total", type="number"),
+     *                  @OA\Property(property="fixed_devices", type="number"),
+     *                  @OA\Property(property="fixed_powered", type="number"),
+     *                  @OA\Property(property="fixed_unpowered", type="number"),
+     *                  @OA\Property(property="repairable_devices", type="number"),
+     *                  @OA\Property(property="dead_devices", type="number"),
+     *                  @OA\Property(property="unknown_repair_status", type="number"),
+     *                  @OA\Property(property="devices_powered", type="number"),
+     *                  @OA\Property(property="devices_unpowered", type="number"),
+     *                  @OA\Property(property="no_weight_powered", type="number"),
+     *                  @OA\Property(property="no_weight_unpowered", type="number"),
+     *                  @OA\Property(property="participants", type="number"),
+     *                  @OA\Property(property="volunteers", type="number"),
+     *                  @OA\Property(property="hours_volunteered", type="number"),
+     *                  @OA\Property(property="invited", type="number")
+     *              )
+     *          )
      *       ),
-     *      @OA\Response(
-     *          response=404,
-     *          description="Device not found",
-     *      ),
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound"),
      *     )
      */
 
@@ -651,10 +710,10 @@ class DeviceController extends Controller {
      *              @OA\Property(property="image_url", type="string")
      *          ))
      *      ),
-     *      @OA\Response(response=401, description="Unauthenticated"),
-     *      @OA\Response(response=403, description="Not permitted to edit this device, or data consent required"),
-     *      @OA\Response(response=404, description="Device not found"),
-     *      @OA\Response(response=422, description="Missing/expired/oversized/non-image upload")
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound"),
+     *      @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
      */
     public function uploadImagev2(Request $request, $iddevices): JsonResponse
@@ -709,9 +768,9 @@ class DeviceController extends Controller {
      *              @OA\Property(property="deleted", type="boolean")
      *          ))
      *      ),
-     *      @OA\Response(response=401, description="Unauthenticated"),
-     *      @OA\Response(response=403, description="Not permitted to edit this device, or data consent required"),
-     *      @OA\Response(response=404, description="Device or image not found")
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound")
      * )
      */
     public function deleteImagev2(Request $request, $iddevices, $idimages): JsonResponse

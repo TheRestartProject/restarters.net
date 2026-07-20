@@ -170,7 +170,7 @@ class UserController extends Controller
      *              )
      *          )
      *      ),
-     *      @OA\Response(response=401, description="Unauthenticated")
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated")
      * )
      */
     public function getMyEmailPreferencesv2(): JsonResponse
@@ -245,8 +245,9 @@ class UserController extends Controller
      *              )
      *          )
      *      ),
-     *      @OA\Response(response=401, description="Unauthenticated"),
-     *      @OA\Response(response=422, description="Validation error")
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=403, description="Data consent required"),
+     *      @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
      */
     public function updateMyEmailPreferencesv2(Request $request): JsonResponse
@@ -326,7 +327,7 @@ class UserController extends Controller
      *              @OA\Property(property="onboarding", type="boolean")
      *          ))
      *      ),
-     *      @OA\Response(response=401, description="Unauthenticated"),
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
      *      @OA\Response(response=403, description="Data consent required")
      * )
      */
@@ -361,7 +362,7 @@ class UserController extends Controller
      *              @OA\Property(property="image_url", type="string", nullable=true)
      *          )))
      *      ),
-     *      @OA\Response(response=401, description="Unauthenticated")
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated")
      * )
      */
     public function getMyGroupsv2(): JsonResponse
@@ -567,7 +568,7 @@ class UserController extends Controller
      *              )
      *          )
      *      ),
-     *      @OA\Response(response=401, description="Unauthenticated")
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated")
      * )
      */
     public function getMyCalendarsv2(): JsonResponse
@@ -645,8 +646,8 @@ class UserController extends Controller
      *              )
      *          )
      *      ),
-     *      @OA\Response(response=401, description="Unauthenticated"),
-     *      @OA\Response(response=404, description="User not found")
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound")
      * )
      */
     public function getRepairDirOptionsv2(int $id): JsonResponse
@@ -691,10 +692,10 @@ class UserController extends Controller
      *              @OA\Property(property="role", type="integer")
      *          ))
      *      ),
-     *      @OA\Response(response=401, description="Unauthenticated"),
-     *      @OA\Response(response=403, description="Forbidden"),
-     *      @OA\Response(response=404, description="User not found"),
-     *      @OA\Response(response=422, description="Validation error")
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound"),
+     *      @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
      */
     public function updateRepairDirRolev2(Request $request, int $id): JsonResponse
@@ -743,7 +744,7 @@ class UserController extends Controller
      *              )
      *          )
      *      ),
-     *      @OA\Response(response=401, description="Unauthenticated")
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated")
      * )
      */
     public function getMyLanguagev2(): JsonResponse
@@ -767,14 +768,34 @@ class UserController extends Controller
     /**
      * @OA\Get(
      *      path="/api/v2/users/me/notifications",
-     *      operationId="getMyNotifications",
+     *      operationId="getMyNotificationsv2",
      *      tags={"Users"},
      *      summary="List the authenticated user's in-app notifications",
      *      description="Paginated list of the user's Restarters (in-app) notifications, replacing the old /profile/notifications page.",
      *      security={{"apiToken":{}}},
      *      @OA\Parameter(name="page", in="query", required=false, @OA\Schema(type="integer")),
-     *      @OA\Response(response=200, description="Notifications"),
-     *      @OA\Response(response=401, description="Unauthenticated"),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Notifications",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="data", type="array", @OA\Items(
+     *                  @OA\Property(property="id", type="string"),
+     *                  @OA\Property(property="type", type="string", description="The notification's class basename, e.g. NewGroupMember"),
+     *                  @OA\Property(property="title", type="string", nullable=true),
+     *                  @OA\Property(property="name", type="string", nullable=true),
+     *                  @OA\Property(property="url", type="string", nullable=true),
+     *                  @OA\Property(property="read", type="boolean"),
+     *                  @OA\Property(property="created_at", type="string", format="date-time", nullable=true)
+     *              )),
+     *              @OA\Property(property="meta", type="object",
+     *                  @OA\Property(property="current_page", type="integer"),
+     *                  @OA\Property(property="last_page", type="integer"),
+     *                  @OA\Property(property="total", type="integer"),
+     *                  @OA\Property(property="unread", type="integer")
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated")
      * )
      */
     public function getMyNotificationsv2(Request $request): JsonResponse
@@ -808,7 +829,7 @@ class UserController extends Controller
     /**
      * @OA\Post(
      *      path="/api/v2/users/me/notifications/read",
-     *      operationId="markMyNotificationsRead",
+     *      operationId="markMyNotificationsReadv2",
      *      tags={"Users"},
      *      summary="Mark the user's notifications as read",
      *      description="Marks a single notification (by id) or all of them as read.",
@@ -816,8 +837,17 @@ class UserController extends Controller
      *      @OA\RequestBody(required=false, @OA\JsonContent(
      *          @OA\Property(property="id", type="string", description="Notification id; omit to mark all as read"),
      *      )),
-     *      @OA\Response(response=200, description="Marked read"),
-     *      @OA\Response(response=401, description="Unauthenticated"),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Marked read",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="data", type="object",
+     *                  @OA\Property(property="unread", type="integer")
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=403, description="Data consent required")
      * )
      */
     public function markMyNotificationsReadv2(Request $request): JsonResponse
@@ -852,9 +882,9 @@ class UserController extends Controller
      *              @OA\Property(property="language", type="string")
      *          ))
      *      ),
-     *      @OA\Response(response=401, description="Unauthenticated"),
-     *      @OA\Response(response=403, description="Forbidden (e.g. data consent outstanding)"),
-     *      @OA\Response(response=422, description="Validation error")
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=403, description="Data consent required"),
+     *      @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
      */
     public function updateMyLanguagev2(Request $request): JsonResponse
@@ -929,7 +959,7 @@ class UserController extends Controller
      *              )
      *          )
      *      ),
-     *      @OA\Response(response=401, description="Unauthenticated")
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated")
      * )
      */
     public function getMyProfilev2(): JsonResponse
@@ -1038,8 +1068,9 @@ class UserController extends Controller
      *              )
      *          )
      *      ),
-     *      @OA\Response(response=401, description="Unauthenticated"),
-     *      @OA\Response(response=422, description="Validation error")
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=403, description="Data consent required"),
+     *      @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
      */
     public function updateMyProfilev2(Request $request, Geocoder $geocoder): JsonResponse
@@ -1179,7 +1210,7 @@ class UserController extends Controller
      *              )
      *          )
      *      ),
-     *      @OA\Response(response=401, description="Unauthenticated")
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated")
      * )
      */
     public function getMySkillsv2(): JsonResponse
@@ -1289,8 +1320,9 @@ class UserController extends Controller
      *              )
      *          )
      *      ),
-     *      @OA\Response(response=401, description="Unauthenticated"),
-     *      @OA\Response(response=422, description="Validation error")
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=403, description="Data consent required"),
+     *      @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
      */
     public function updateMySkillsv2(Request $request): JsonResponse
@@ -1397,8 +1429,9 @@ class UserController extends Controller
      *              )
      *          )
      *      ),
-     *      @OA\Response(response=401, description="Unauthenticated"),
-     *      @OA\Response(response=422, description="Validation error")
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=403, description="Data consent required"),
+     *      @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
      */
     public function updateMyPasswordv2(Request $request): JsonResponse
@@ -1546,9 +1579,9 @@ class UserController extends Controller
      *              )
      *          )
      *      ),
-     *      @OA\Response(response=401, description="Unauthenticated"),
-     *      @OA\Response(response=403, description="Forbidden"),
-     *      @OA\Response(response=404, description="User not found")
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound")
      * )
      */
     public function getAdminSettingsv2(int $id): JsonResponse
@@ -1625,10 +1658,10 @@ class UserController extends Controller
      *              )
      *          )
      *      ),
-     *      @OA\Response(response=401, description="Unauthenticated"),
-     *      @OA\Response(response=403, description="Forbidden"),
-     *      @OA\Response(response=404, description="User not found"),
-     *      @OA\Response(response=422, description="Validation error")
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound"),
+     *      @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
      */
     public function updateAdminSettingsv2(Request $request, int $id): JsonResponse
@@ -1716,8 +1749,9 @@ class UserController extends Controller
      *              )
      *          )
      *      ),
-     *      @OA\Response(response=401, description="Unauthenticated"),
-     *      @OA\Response(response=422, description="Validation error")
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=403, description="Data consent required"),
+     *      @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
      */
     public function updateMyPhotov2(Request $request): JsonResponse
@@ -1808,7 +1842,8 @@ class UserController extends Controller
      *              )
      *          )
      *      ),
-     *      @OA\Response(response=401, description="Unauthenticated")
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=403, description="Data consent required")
      * )
      */
     public function deleteMyAccountv2(Request $request): JsonResponse
@@ -1955,8 +1990,8 @@ class UserController extends Controller
      *              @OA\Property(property="meta", type="object")
      *          )
      *      ),
-     *      @OA\Response(response=401, description="Unauthenticated"),
-     *      @OA\Response(response=403, description="Forbidden")
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=403, ref="#/components/responses/Forbidden")
      * )
      */
     public function listUsersv2(Request $request): JsonResponse
@@ -2073,8 +2108,8 @@ class UserController extends Controller
      *              )
      *          )
      *      ),
-     *      @OA\Response(response=401, description="Unauthenticated"),
-     *      @OA\Response(response=404, description="User not found")
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound")
      * )
      *
      * PII-safe public profile behind pages/profile/[id].vue and /profile

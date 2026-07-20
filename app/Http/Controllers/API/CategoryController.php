@@ -52,7 +52,7 @@ class CategoryController extends Controller
      *          description="Successful operation",
      *          @OA\JsonContent(@OA\Property(property="data", ref="#/components/schemas/Category"))
      *      ),
-     *      @OA\Response(response=404, description="Category not found")
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound")
      * )
      */
     public function getCategoryv2($id)
@@ -90,10 +90,10 @@ class CategoryController extends Controller
      *          description="Category updated",
      *          @OA\JsonContent(@OA\Property(property="data", ref="#/components/schemas/Category"))
      *      ),
-     *      @OA\Response(response=401, description="Unauthenticated"),
-     *      @OA\Response(response=403, description="Forbidden"),
-     *      @OA\Response(response=404, description="Category not found"),
-     *      @OA\Response(response=422, description="Validation failed")
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound"),
+     *      @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
      */
     public function updateCategoryv2(Request $request, $id)

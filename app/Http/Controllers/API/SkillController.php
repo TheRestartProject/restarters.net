@@ -50,7 +50,7 @@ class SkillController extends Controller
      *          description="Successful operation",
      *          @OA\JsonContent(@OA\Property(property="data", ref="#/components/schemas/Skill"))
      *      ),
-     *      @OA\Response(response=404, description="Skill not found")
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound")
      * )
      */
     public function getSkillv2($id)
@@ -82,9 +82,9 @@ class SkillController extends Controller
      *          description="Skill created",
      *          @OA\JsonContent(@OA\Property(property="data", ref="#/components/schemas/Skill"))
      *      ),
-     *      @OA\Response(response=401, description="Unauthenticated"),
-     *      @OA\Response(response=403, description="Forbidden"),
-     *      @OA\Response(response=422, description="Validation failed")
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *      @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
      */
     public function createSkillv2(Request $request): JsonResponse
@@ -123,10 +123,10 @@ class SkillController extends Controller
      *          description="Skill updated",
      *          @OA\JsonContent(@OA\Property(property="data", ref="#/components/schemas/Skill"))
      *      ),
-     *      @OA\Response(response=401, description="Unauthenticated"),
-     *      @OA\Response(response=403, description="Forbidden"),
-     *      @OA\Response(response=404, description="Skill not found"),
-     *      @OA\Response(response=422, description="Validation failed")
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound"),
+     *      @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
      */
     public function updateSkillv2(Request $request, $id)
@@ -154,9 +154,9 @@ class SkillController extends Controller
      *      security={{"apiToken":{}}},
      *      @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
      *      @OA\Response(response=204, description="Skill deleted"),
-     *      @OA\Response(response=401, description="Unauthenticated"),
-     *      @OA\Response(response=403, description="Forbidden"),
-     *      @OA\Response(response=404, description="Skill not found")
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound")
      * )
      */
     public function deleteSkillv2($id)

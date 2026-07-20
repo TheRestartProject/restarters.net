@@ -60,7 +60,7 @@ class BrandController extends Controller
      *              @OA\Property(property="data", ref="#/components/schemas/Brand")
      *          )
      *      ),
-     *      @OA\Response(response=404, description="Brand not found")
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound")
      * )
      */
     public function getBrandv2($id)
@@ -92,9 +92,9 @@ class BrandController extends Controller
      *              @OA\Property(property="data", ref="#/components/schemas/Brand")
      *          )
      *      ),
-     *      @OA\Response(response=401, description="Unauthenticated"),
-     *      @OA\Response(response=403, description="Forbidden"),
-     *      @OA\Response(response=422, description="Validation failed")
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *      @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
      */
     public function createBrandv2(Request $request): JsonResponse
@@ -135,10 +135,10 @@ class BrandController extends Controller
      *              @OA\Property(property="data", ref="#/components/schemas/Brand")
      *          )
      *      ),
-     *      @OA\Response(response=401, description="Unauthenticated"),
-     *      @OA\Response(response=403, description="Forbidden"),
-     *      @OA\Response(response=404, description="Brand not found"),
-     *      @OA\Response(response=422, description="Validation failed")
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound"),
+     *      @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
      */
     public function updateBrandv2(Request $request, $id)
@@ -168,9 +168,9 @@ class BrandController extends Controller
      *      security={{"apiToken":{}}},
      *      @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
      *      @OA\Response(response=204, description="Brand deleted"),
-     *      @OA\Response(response=401, description="Unauthenticated"),
-     *      @OA\Response(response=403, description="Forbidden"),
-     *      @OA\Response(response=404, description="Brand not found")
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound")
      * )
      */
     public function deleteBrandv2($id)

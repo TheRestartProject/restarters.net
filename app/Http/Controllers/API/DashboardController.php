@@ -65,7 +65,7 @@ class DashboardController extends Controller
      *              )
      *          )
      *      ),
-     *      @OA\Response(response=401, description="Unauthenticated")
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated")
      * )
      */
     public function indexv2(Request $request): JsonResponse

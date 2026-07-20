@@ -82,10 +82,6 @@ class NetworkController extends Controller
      *              )
      *          )
      *       ),
-     *      @OA\Response(
-     *          response=404,
-     *          description="Network not found",
-     *      ),
      *     )
      */
 
@@ -122,10 +118,7 @@ class NetworkController extends Controller
      *              )
      *          )
      *       ),
-     *      @OA\Response(
-     *          response=404,
-     *          description="Event not found",
-     *      ),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound"),
      *     )
      */
 
@@ -238,10 +231,7 @@ class NetworkController extends Controller
      *              )
      *          )
      *       ),
-     *      @OA\Response(
-     *          response=404,
-     *          description="Network not found",
-     *      ),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound"),
      *     )
      */
 
@@ -377,10 +367,7 @@ class NetworkController extends Controller
      *              )
      *          )
      *       ),
-     *      @OA\Response(
-     *          response=404,
-     *          description="Network not found",
-     *      ),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound"),
      *     )
      */
 
@@ -463,10 +450,7 @@ class NetworkController extends Controller
      *              )
      *          )
      *       ),
-     *      @OA\Response(
-     *          response=404,
-     *          description="Network not found",
-     *      ),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound"),
      *     )
      */
     public function getNetworkTagsv2(Request $request, $id)
@@ -519,16 +503,19 @@ class NetworkController extends Controller
      *              @OA\Property(property="fixed_unpowered", type="integer", example=13),
      *              @OA\Property(property="repairable_devices", type="integer", example=520),
      *              @OA\Property(property="dead_devices", type="integer", example=178),
+     *              @OA\Property(property="unknown_repair_status", type="integer", example=22),
+     *              @OA\Property(property="devices_powered", type="integer", example=610),
+     *              @OA\Property(property="devices_unpowered", type="integer", example=90),
+     *              @OA\Property(property="no_weight_powered", type="integer", example=4),
+     *              @OA\Property(property="no_weight_unpowered", type="integer", example=1),
      *              @OA\Property(property="participants", type="integer", example=880),
      *              @OA\Property(property="volunteers", type="integer", example=556),
      *              @OA\Property(property="hours_volunteered", type="integer", example=3152),
+     *              @OA\Property(property="invited", type="integer", example=940),
      *              @OA\Property(property="parties", type="integer", example=161)
      *          )
      *       ),
-     *      @OA\Response(
-     *          response=404,
-     *          description="Network not found",
-     *      ),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound"),
      *     )
      */
     public function getNetworkStatsv2(Request $request, $id): JsonResponse
@@ -588,22 +575,10 @@ class NetworkController extends Controller
      *              )
      *          )
      *       ),
-     *      @OA\Response(
-     *          response=401,
-     *          description="Unauthenticated",
-     *      ),
-     *      @OA\Response(
-     *          response=403,
-     *          description="Forbidden - User is not a coordinator for this network",
-     *      ),
-     *      @OA\Response(
-     *          response=404,
-     *          description="Network not found",
-     *      ),
-     *      @OA\Response(
-     *          response=422,
-     *          description="Validation error - tag name already exists in this network",
-     *      ),
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound"),
+     *      @OA\Response(response=422, ref="#/components/responses/ValidationError"),
      *     )
      */
     public function createNetworkTagv2(Request $request, $id)
@@ -683,23 +658,17 @@ class NetworkController extends Controller
      *      @OA\Response(
      *          response=200,
      *          description="Tag updated successfully",
+     *          @OA\JsonContent(
+     *              @OA\Property(
+     *                property="data",
+     *                ref="#/components/schemas/Tag"
+     *              )
+     *          )
      *       ),
-     *      @OA\Response(
-     *          response=401,
-     *          description="Unauthenticated",
-     *      ),
-     *      @OA\Response(
-     *          response=403,
-     *          description="Forbidden - User is not a coordinator for this network",
-     *      ),
-     *      @OA\Response(
-     *          response=404,
-     *          description="Network or tag not found",
-     *      ),
-     *      @OA\Response(
-     *          response=422,
-     *          description="Validation error or duplicate tag name",
-     *      ),
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound"),
+     *      @OA\Response(response=422, ref="#/components/responses/ValidationError"),
      *     )
      */
     public function updateNetworkTagv2(Request $request, $id, $tagId)
@@ -777,19 +746,13 @@ class NetworkController extends Controller
      *      @OA\Response(
      *          response=200,
      *          description="Tag deleted successfully",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="message", type="string", example="Tag deleted successfully")
+     *          )
      *       ),
-     *      @OA\Response(
-     *          response=401,
-     *          description="Unauthenticated",
-     *      ),
-     *      @OA\Response(
-     *          response=403,
-     *          description="Forbidden - User is not a coordinator for this network or tag is global",
-     *      ),
-     *      @OA\Response(
-     *          response=404,
-     *          description="Network or tag not found",
-     *      ),
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound"),
      *     )
      */
     public function deleteNetworkTagv2(Request $request, $id, $tagId)
@@ -834,13 +797,16 @@ class NetworkController extends Controller
      *          required=true,
      *          @OA\JsonContent(
      *              required={"groups"},
-     *              @OA\Property(property="groups", type="array", @OA\Items(type="integer")),
+     *              @OA\Property(property="groups", type="array", minItems=1, @OA\Items(type="integer"), description="Group ids to add to the network. Unknown ids are silently skipped."),
      *          )
      *      ),
      *      @OA\Response(response=200, description="Groups associated",
      *          @OA\JsonContent(@OA\Property(property="data", type="object",
-     *              @OA\Property(property="associated", type="integer")))),
-     *      @OA\Response(response=403, description="Forbidden"),
+     *              @OA\Property(property="associated", type="integer", description="Number of groups actually found and associated")))),
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound"),
+     *      @OA\Response(response=422, ref="#/components/responses/ValidationError"),
      * )
      *
      * Port of NetworkController::associateGroup (the old session+CSRF web form).
@@ -897,8 +863,10 @@ class NetworkController extends Controller
      *          @OA\JsonContent(@OA\Property(property="data", type="object",
      *              @OA\Property(property="logo", type="string")))
      *      ),
-     *      @OA\Response(response=403, description="Forbidden"),
-     *      @OA\Response(response=422, description="Upload invalid or uploads disabled"),
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound"),
+     *      @OA\Response(response=422, ref="#/components/responses/ValidationError"),
      * )
      *
      * Port of NetworkController::update's network_logo handling: stores the

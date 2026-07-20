@@ -30,8 +30,8 @@ class RoleController extends Controller
      *              @OA\Property(property="data", type="array", @OA\Items(ref="#/components/schemas/RoleAdmin"))
      *          )
      *      ),
-     *      @OA\Response(response=401, description="Unauthenticated"),
-     *      @OA\Response(response=403, description="Forbidden")
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=403, ref="#/components/responses/Forbidden")
      * )
      */
     public function listRolesv2(): JsonResponse
@@ -69,9 +69,9 @@ class RoleController extends Controller
      *          description="Successful operation",
      *          @OA\JsonContent(@OA\Property(property="data", ref="#/components/schemas/RoleAdmin"))
      *      ),
-     *      @OA\Response(response=401, description="Unauthenticated"),
-     *      @OA\Response(response=403, description="Forbidden"),
-     *      @OA\Response(response=404, description="Role not found")
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound")
      * )
      */
     public function getRolev2($id): JsonResponse
@@ -119,8 +119,8 @@ class RoleController extends Controller
      *              @OA\Property(property="data", type="array", @OA\Items(ref="#/components/schemas/Permission"))
      *          )
      *      ),
-     *      @OA\Response(response=401, description="Unauthenticated"),
-     *      @OA\Response(response=403, description="Forbidden")
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=403, ref="#/components/responses/Forbidden")
      * )
      */
     public function listPermissionsv2(): JsonResponse
@@ -144,9 +144,9 @@ class RoleController extends Controller
      *      operationId="updateRolePermissionsv2",
      *      tags={"Roles"},
      *      summary="Replace the permissions granted to a role",
-     *      description="Administrator only. Sends the full set of permission IDs; the server replaces the role's grants atomically.",
+     *      description="Administrator only. `permissions` is the FULL desired set of permission IDs for this role, not a delta: the server deletes all existing grants for the role and re-inserts exactly the given IDs inside a DB transaction (Role::edit()), so any grant omitted from the array is revoked. `permissions` must be present but may be an empty array, which revokes every permission from the role. Every ID must reference an existing row in the permissions table (`exists:permissions,idpermissions`) or the whole request is rejected with 422 - no partial updates. `id` is the role's idroles primary key. Returns the same shape as GET /api/v2/roles/{id} on success.",
      *      security={{"apiToken":{}}},
-     *      @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *      @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer"), description="Role primary key (idroles)"),
      *      @OA\RequestBody(
      *          required=true,
      *          @OA\JsonContent(
@@ -154,6 +154,7 @@ class RoleController extends Controller
      *              @OA\Property(
      *                  property="permissions",
      *                  type="array",
+     *                  description="Full replacement set of permission IDs to grant this role. Must reference existing permissions; an empty array revokes all permissions.",
      *                  @OA\Items(type="integer"),
      *                  example={4, 6}
      *              )
@@ -164,10 +165,10 @@ class RoleController extends Controller
      *          description="Permissions replaced",
      *          @OA\JsonContent(@OA\Property(property="data", ref="#/components/schemas/RoleAdmin"))
      *      ),
-     *      @OA\Response(response=401, description="Unauthenticated"),
-     *      @OA\Response(response=403, description="Forbidden"),
-     *      @OA\Response(response=404, description="Role not found"),
-     *      @OA\Response(response=422, description="Validation failed")
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound"),
+     *      @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
      */
     public function updateRolePermissionsv2(Request $request, $id): JsonResponse

@@ -39,7 +39,8 @@ class PreviewDeployController extends Controller
      *              @OA\Property(property="error", type="string", nullable=true)
      *          ))
      *      ),
-     *      @OA\Response(response=403, description="Forbidden")
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=403, ref="#/components/responses/Forbidden")
      * )
      */
     public function index(): JsonResponse
@@ -96,9 +97,11 @@ class PreviewDeployController extends Controller
      *      @OA\Response(response=200, description="Deploy triggered",
      *          @OA\JsonContent(@OA\Property(property="data", type="object",
      *              @OA\Property(property="message", type="string")))),
-     *      @OA\Response(response=403, description="Forbidden"),
-     *      @OA\Response(response=422, description="Validation failure"),
-     *      @OA\Response(response=502, description="GitHub API error")
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *      @OA\Response(response=422, ref="#/components/responses/ValidationError"),
+     *      @OA\Response(response=502, description="GITHUB_DEPLOY_PAT is not configured, or the GitHub API call failed",
+     *          @OA\JsonContent(@OA\Property(property="message", type="string")))
      * )
      */
     public function deploy(Request $request): JsonResponse
