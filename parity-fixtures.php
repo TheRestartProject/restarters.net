@@ -53,12 +53,30 @@ $host->number_of_logins = 5;
 $host->save();
 $out[] = 'host='.$host->id;
 
-// --- network -----------------------------------------------------------
+// --- networks ----------------------------------------------------------
+// BOTH systems run CheckForRepairNetwork on every request. It maps the request
+// host to a Network by shortname, and its default branch is
+// Network::where('shortname','like','restarters') - with no match it THROWS
+// ("Could not determine repair network from domain"), 500ing every page. The
+// testing-environment fallback that invents a network does not apply to the
+// dev/legacy instances. So a 'restarters' network is not optional here: without
+// it the legacy parity instance is completely down and no capture can run.
+$default = Network::where('shortname', 'restarters')->first();
+if (!$default) {
+    $default = new Network;
+    $default->name = 'Restarters';
+    $default->shortname = 'restarters';
+    $default->default_language = 'en';
+    $default->save();
+}
+$out[] = 'defaultNetwork='.$default->id;
+
 $network = Network::where('name', 'Test London network')->first();
 if (!$network) {
     $network = new Network;
     $network->name = 'Test London network';
     $network->shortname = 'test-london';
+    $network->default_language = 'en';
     $network->save();
 }
 $out[] = 'network='.$network->id;
