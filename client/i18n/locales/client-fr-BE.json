@@ -201,7 +201,8 @@
       "no_groups": "Ce réseau n'a pas encore de groupes.",
       "not_found": "Ce réseau est introuvable.",
       "stats_unavailable": "Les statistiques ne sont pas disponibles pour ce réseau pour le moment.",
-      "tags_load_error": "Désolé, nous n'avons pas pu charger les tags de ce réseau."
+      "tags_load_error": "Désolé, nous n'avons pas pu charger les tags de ce réseau.",
+      "editing": "Modification de {name}"
     },
     "notifications": {
       "discourse_aria": "Notifications Talk",

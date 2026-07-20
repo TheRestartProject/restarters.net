@@ -269,7 +269,7 @@ function sortCaretClass(key) {
           </th>
           <th v-if="showJoin || approve">
             <span class="visually-hidden">
-              {{ approve ? t('networks.group_requires_moderation') : t('groups.join_group_button') }}
+              {{ approve ? t('networks.moderation.group_requires_moderation') : t('groups.join_group_button') }}
             </span>
           </th>
         </tr>
@@ -342,7 +342,7 @@ function sortCaretClass(key) {
           </td>
           <td v-if="approve" class="cell-warning p-2">
             <NuxtLink :to="`/group/edit/${row.id}`" :data-testid="`groups-table-moderate-${row.id}`">
-              {{ t('networks.group_requires_moderation') }}
+              {{ t('networks.moderation.group_requires_moderation') }}
             </NuxtLink>
           </td>
           <td v-else-if="showJoin">

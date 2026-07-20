@@ -58,6 +58,9 @@ const EXPECTED_GATES = {
   '/login': 'guest',
   '/networks': 'auth',
   '/networks/{id}': 'auth',
+  // networks/edit.blade.php sits behind develop's auth+role middleware; the
+  // page itself also gates on Administrator-or-coordinator-of-this-network.
+  '/networks/{id}/edit': 'auth',
   '/notifications': 'auth',
   '/party': 'auth',
   '/party/all': 'auth',

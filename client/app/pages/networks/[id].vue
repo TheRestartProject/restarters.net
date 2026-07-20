@@ -10,7 +10,6 @@ import AssociateGroupsModal from '~/components/networks/AssociateGroupsModal.vue
 import NetworkGroupsModerationTable from '~/components/networks/NetworkGroupsModerationTable.vue'
 import NetworkEventsModerationTable from '~/components/networks/NetworkEventsModerationTable.vue'
 import NetworkTagsManager from '~/components/networks/NetworkTagsManager.vue'
-import TusImageUpload from '~/components/forms/TusImageUpload.vue'
 
 // /networks/{id} - resources/views/networks/show.blade.php +
 // resources/js/components/NetworkPage.vue (design.md §6.2 Phase E task E1).
@@ -41,8 +40,9 @@ import TusImageUpload from '~/components/forms/TusImageUpload.vue'
 // GroupsTable/GroupEventScrollTable here, not a bare name list. Section
 // ORDER also matches legacy exactly (gap #6): Header -> Impact -> About ->
 // Coordinators -> Groups-requiring-moderation -> Events-requiring-moderation
-// -> Groups -> Tags -> (Network logo management, appended at the very end -
-// see the section's own comment for why).
+// -> Groups -> Tags. Logo management is NOT here: develop puts it on
+// networks/{id}/edit (networks/edit.blade.php), which now exists as
+// pages/networks/[id]/edit.vue.
 definePageMeta({ auth: true })
 
 const { t } = useI18n()
@@ -64,16 +64,6 @@ useHead({ title: computed(() => network.value?.name || t('networks.general.netwo
 
 const showDescriptionModal = ref(false)
 const showAssociateModal = ref(false)
-const logoError = ref('')
-
-async function onLogoUploaded({ uploadKey }) {
-  logoError.value = ''
-  try {
-    await networksStore.uploadLogo(id.value, uploadKey)
-  } catch {
-    logoError.value = t('client.networks.logo_upload_error')
-  }
-}
 
 const truncatedDescription = computed(() => {
   const description = network.value?.description
@@ -270,27 +260,6 @@ function retry() {
         <NetworkTagsManager :network-id="id" />
       </section>
 
-      <!-- Network logo management: legacy has no such section on the show
-           page at all (logo upload is a separate, primitive /networks/
-           {id}/edit page - a single <input type=file> + full-page-reload
-           form, resources/views/networks/edit.blade.php). Kept inline here
-           instead (parity-v2/networks.md gap #8), using the same TUS
-           upload infrastructure every other image upload on the Nuxt app
-           already uses, rather than porting a strictly worse primitive
-           file-input page - but appended at the very end, after Tags, so
-           it doesn't disturb the legacy section order above (gap #6). -->
-      <section v-if="canManage" class="mb-4" data-testid="network-logo-manage">
-        <h2>{{ t('client.networks.logo_heading') }}</h2>
-        <TusImageUpload
-          :current-image-url="network.logo || ''"
-          data-testid="network-logo-upload"
-          @uploaded="onLogoUploaded"
-          @upload-error="logoError = $event"
-        />
-        <BAlert v-if="logoError" :model-value="true" variant="danger" class="mt-2" data-testid="network-logo-error">
-          {{ logoError }}
-        </BAlert>
-      </section>
 
       <BModal :model-value="showDescriptionModal" :title="network.name" size="lg" ok-only data-testid="network-description-modal" @hide="showDescriptionModal = false">
         <!-- eslint-disable-next-line vue/no-v-html -->

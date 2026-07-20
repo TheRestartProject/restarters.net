@@ -2,6 +2,8 @@
 
 return [
   'edit' => [
+    'label_logo' => 'Logo du réseau',
+    'button_save' => 'Sauver les changements',
     'add_new_field' => 'Ajouter un nouveau champ',
     'new_field_name' => 'Nouveau nom de champ',
     'add_field' => 'Ajouter le champ',
