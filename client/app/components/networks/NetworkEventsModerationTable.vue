@@ -8,7 +8,7 @@ import { useModerationStore } from '~/stores/moderation.js'
 // renders <EventsRequiringModeration :networks="[id]" /> - a full
 // GroupEventScrollTable (date / title+group / invited+volunteer counts /
 // an edit-approve-duplicate-delete actions dropdown) - not the plain
-// title-only <ul> the shared components/moderation/ModerationQueue.vue
+// title-only <ul> the (now deleted) shared ModerationQueue.vue
 // renders on /party and /group/map.
 //
 // GroupEventScrollTable.vue's markup is tightly coupled to the legacy Vuex
@@ -21,9 +21,11 @@ import { useModerationStore } from '~/stores/moderation.js'
 // support (date, title, group, confirmed volunteers) plus a link to the
 // event, rather than faking the missing figure or the actions menu.
 const props = defineProps({
+  // Optional, matching develop's EventsRequiringModeration - which takes no
+  // network filter at all on events/index.blade.php:55. null = no filtering.
   networkId: {
     type: Number,
-    required: true,
+    default: null,
   },
 })
 
@@ -33,11 +35,12 @@ const moderationStore = useModerationStore()
 // Client-side network scoping (events aren't tagged with networks directly -
 // they're scoped via their group's networks), same approach as
 // ModerationQueue.vue.
-const events = computed(() =>
-  moderationStore.events.data.filter(
+const events = computed(() => {
+  if (props.networkId == null) return moderationStore.events.data
+  return moderationStore.events.data.filter(
     (e) => Array.isArray(e.group?.networks) && e.group.networks.some((n) => n.id === props.networkId)
   )
-)
+})
 
 function dateLabel(iso) {
   return new Date(iso).toLocaleDateString(locale.value, { day: 'numeric', month: 'short', year: 'numeric' })
@@ -53,7 +56,8 @@ onMounted(() => {
     <div v-if="!events.length" class="text-muted" data-testid="network-events-moderation-empty">
       {{ t('networks.show.none') }}
     </div>
-    <table v-else class="table network-moderation-table">
+    <div v-else class="table-responsive table-section">
+      <table class="table network-moderation-table">
       <thead>
         <tr>
           <th>{{ t('groups.export.events.date') }}</th>
@@ -85,7 +89,8 @@ onMounted(() => {
           </td>
         </tr>
       </tbody>
-    </table>
+      </table>
+    </div>
   </div>
 </template>
 

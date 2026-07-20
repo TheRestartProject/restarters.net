@@ -178,7 +178,7 @@ describe('pages/group/all', () => {
 
       const wrapper = mountPage()
 
-      expect(wrapper.find('[data-testid="moderation-queue-groups"]').exists()).toBe(false)
+      expect(wrapper.find('[data-testid="network-groups-moderation-table"]').exists()).toBe(false)
       expect(wrapper.find('[data-testid="group-row-tags-1"]').exists()).toBe(false)
     })
 
@@ -190,7 +190,7 @@ describe('pages/group/all', () => {
 
       const wrapper = mountPage()
 
-      expect(wrapper.find('[data-testid="moderation-queue-groups"]').exists()).toBe(true)
+      expect(wrapper.find('[data-testid="network-groups-moderation-table"]').exists()).toBe(true)
       expect(wrapper.find('[data-testid="group-row-tags-1"]').text()).toContain('Scotland')
     })
 
@@ -206,7 +206,7 @@ describe('pages/group/all', () => {
       const wrapper = mountPage()
       const html = wrapper.html()
 
-      expect(html.indexOf('moderation-queue-groups')).toBeLessThan(html.indexOf('group-create-link'))
+      expect(html.indexOf('network-groups-moderation-table')).toBeLessThan(html.indexOf('group-create-link'))
     })
   })
 })

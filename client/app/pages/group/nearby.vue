@@ -7,7 +7,7 @@ import { useProfileStore } from '~/stores/profile.js'
 import { useAuth } from '~/composables/useAuth.js'
 import GroupsTabsNav from '~/components/groups/GroupsTabsNav.vue'
 import GroupsTable from '~/components/groups/GroupsTable.vue'
-import ModerationQueue from '~/components/moderation/ModerationQueue.vue'
+import GroupsRequiringModeration from '~/components/networks/NetworkGroupsModerationTable.vue'
 
 // /group/nearby - resources/views/group/index.blade.php (tab="nearby") +
 // resources/js/components/GroupsPage.vue's "Other groups nearby" tab is the
@@ -76,7 +76,10 @@ onMounted(() => {
     <!-- Legacy's group.index.blade.php renders GroupsRequiringModeration
          BEFORE GroupsPage (whose own template opens with this h1) - not
          after it. See all.vue's matching comment. -->
-    <ModerationQueue v-if="showModeration" type="groups" />
+    <!-- group/index.blade.php:53 - the full GroupsTable(approve), not
+         the plain name-only list. These three pages are tabs of develop\'s
+         single /group page, which renders it once above the tabs. -->
+    <GroupsRequiringModeration v-if="showModeration"  />
 
     <h1 class="d-flex justify-content-between align-items-start">
       <span class="d-flex align-items-center">

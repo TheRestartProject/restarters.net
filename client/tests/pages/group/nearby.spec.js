@@ -148,7 +148,7 @@ describe('pages/group/nearby', () => {
 
     const wrapper = mountPage()
 
-    expect(wrapper.find('[data-testid="moderation-queue-groups"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="network-groups-moderation-table"]').exists()).toBe(true)
   })
 
   // Legacy shows GroupsRequiringModeration on every /group tab, unscoped by
@@ -167,7 +167,7 @@ describe('pages/group/nearby', () => {
     const wrapper = mountPage()
 
     expect(wrapper.find('[data-testid="group-nearby-no-location"]').exists()).toBe(true)
-    expect(wrapper.find('[data-testid="moderation-queue-groups"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="network-groups-moderation-table"]').exists()).toBe(true)
   })
 
   // Legacy's group.index.blade.php renders GroupsRequiringModeration
@@ -182,7 +182,7 @@ describe('pages/group/nearby', () => {
     const wrapper = mountPage()
     const html = wrapper.html()
 
-    expect(html.indexOf('moderation-queue-groups')).toBeLessThan(html.indexOf('group-create-link'))
+    expect(html.indexOf('network-groups-moderation-table')).toBeLessThan(html.indexOf('group-create-link'))
   })
 
   // gap #1/#2: legacy's shared tab bar only ever has three tabs (no "Map"),

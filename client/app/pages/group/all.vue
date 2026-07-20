@@ -5,7 +5,7 @@ import { useGroupsStore } from '~/stores/groups.js'
 import { useAuth } from '~/composables/useAuth.js'
 import GroupsTabsNav from '~/components/groups/GroupsTabsNav.vue'
 import GroupsTable from '~/components/groups/GroupsTable.vue'
-import ModerationQueue from '~/components/moderation/ModerationQueue.vue'
+import GroupsRequiringModeration from '~/components/networks/NetworkGroupsModerationTable.vue'
 
 // /group/all - resources/views/group/index.blade.php (tab="all") +
 // resources/js/components/GroupsPage.vue's "All Groups" tab /
@@ -98,7 +98,10 @@ onMounted(() => {
          groups-lists.md gap #2 says "above the h1/tabs"; this had drifted
          to below the h1 - a mobile-only screenshot pass is what surfaced
          it, since desktop's wider layout made the reordering easy to miss). -->
-    <ModerationQueue v-if="showModeration" type="groups" />
+    <!-- group/index.blade.php:53 - the full GroupsTable(approve), not
+         the plain name-only list. These three pages are tabs of develop\'s
+         single /group page, which renders it once above the tabs. -->
+    <GroupsRequiringModeration v-if="showModeration"  />
 
     <h1 class="d-flex justify-content-between align-items-start">
       <span class="d-flex align-items-center">

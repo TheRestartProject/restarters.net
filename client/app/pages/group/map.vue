@@ -6,7 +6,7 @@ import { useAuth } from '~/composables/useAuth.js'
 import GroupsTabsNav from '~/components/groups/GroupsTabsNav.vue'
 import GroupsTable from '~/components/groups/GroupsTable.vue'
 import GroupMap from '~/components/groups/GroupMap.vue'
-import ModerationQueue from '~/components/moderation/ModerationQueue.vue'
+import GroupsRequiringModeration from '~/components/networks/NetworkGroupsModerationTable.vue'
 
 // /group/map - resources/js/components/GroupMapAndList.vue (map+list shell)
 // + GroupMap.vue (the Leaflet map itself) are the functional spec. Unlike
@@ -113,7 +113,10 @@ onMounted(() => {
       </NuxtLink>
     </h1>
 
-    <ModerationQueue v-if="showModeration" type="groups" />
+    <!-- group/index.blade.php:53 - the full GroupsTable(approve), not
+         the plain name-only list. These three pages are tabs of develop\'s
+         single /group page, which renders it once above the tabs. -->
+    <GroupsRequiringModeration v-if="showModeration"  />
 
     <GroupsTabsNav active="map" />
 

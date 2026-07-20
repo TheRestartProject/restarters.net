@@ -10,7 +10,7 @@ import { useClipboard } from '~/composables/useClipboard.js'
 import EventsList from '~/components/events/EventsList.vue'
 import EventFilters from '~/components/events/EventFilters.vue'
 import EventCollapsibleSection from '~/components/events/EventCollapsibleSection.vue'
-import ModerationQueue from '~/components/moderation/ModerationQueue.vue'
+import EventsRequiringModeration from '~/components/networks/NetworkEventsModerationTable.vue'
 import AlertsBanner from '~/components/alerts/AlertsBanner.vue'
 import {
   eventIsFinished,
@@ -203,7 +203,10 @@ onMounted(load)
       </NuxtLink>
     </div>
 
-    <ModerationQueue v-if="showModeration" type="events" class="mb-3" />
+    <!-- events/index.blade.php:55 renders <EventsRequiringModeration/>, the
+         full events table, not the plain name-only list. Same substitution
+         already corrected on /group and the network page. -->
+    <EventsRequiringModeration v-if="showModeration" class="mb-3" />
 
     <!-- Gap 20: AlertsBanner sits after the moderation queue, matching
          GroupEvents.vue's slot order (h1/add-event row + moderation queue

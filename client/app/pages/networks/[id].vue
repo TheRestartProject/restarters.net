@@ -35,7 +35,8 @@ import NetworkTagsManager from '~/components/networks/NetworkTagsManager.vue'
 // Groups/Events "requiring moderation" sections use the network-specific
 // NetworkGroupsModerationTable / NetworkEventsModerationTable components
 // (parity-v2/networks.md gap #2 + #11), NOT the shared components/
-// moderation/ModerationQueue.vue used by /party and /group/map - legacy's
+// moderation/ModerationQueue.vue (since deleted - it rendered a plain
+// name-only list develop never had anywhere) - legacy's
 // GroupsRequiringModeration/EventsRequiringModeration render the FULL
 // GroupsTable/GroupEventScrollTable here, not a bare name list. Section
 // ORDER also matches legacy exactly (gap #6): Header -> Impact -> About ->
@@ -225,7 +226,7 @@ function retry() {
 
       <!-- Groups/events awaiting moderation, for Administrators and this
            network's coordinators - the network-specific rich tables (gap
-           #2/#11), not the shared components/moderation/ModerationQueue.vue
+           #2/#11), not a plain name-only list
            bare-link list used elsewhere. Always-visible heading + "None"
            fallback, matching legacy NetworkPage.vue exactly. -->
       <template v-if="canManage">
