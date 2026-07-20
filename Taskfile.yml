@@ -356,7 +356,15 @@ tasks:
       # capture.spec.js reads to build the detail-page URLs. Must run every
       # time: migrate:fresh renumbers ids, and a stale id silently renders as
       # a 404 on both systems, which then compares as a false match.
-      - docker exec restarters bash -c "php artisan tinker parity-fixtures.php < /dev/null"
+      # NB `php artisan tinker <file>` exits 1 here even when the script runs
+      # perfectly (psysh quirk - a trivial echo script exits 1 too), so its
+      # exit code carries no information. Assert on the script's own end
+      # marker instead. `< /dev/null` is required or tinker waits on stdin
+      # forever.
+      - |
+        docker exec restarters bash -c "php artisan tinker parity-fixtures.php < /dev/null" 2>&1 \
+          | grep -q 'FIXTURES .* END' \
+          || { echo 'parity-fixtures.php did not complete - detail-page ids unavailable'; exit 1; }
       - |
         docker exec restarters bash -c "grep -q '^AUTH_RATE_LIMIT' /var/www/.env && sed -i 's/^AUTH_RATE_LIMIT=.*/AUTH_RATE_LIMIT=1000/' /var/www/.env || echo 'AUTH_RATE_LIMIT=1000' >> /var/www/.env; php artisan config:clear"
       - docker exec restarters_playwright bash -c "npx playwright install chromium"
