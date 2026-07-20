@@ -26,7 +26,12 @@ class Controller extends BaseController
      */
     protected function requireAdministrator(): ?JsonResponse
     {
-        if (!Fixometer::hasRole(Auth::user(), 'Administrator')) {
+        // getUser(), not Auth::user(): the latter is null when the caller
+        // authenticates with ?api_token= (the legacy api guard), so an
+        // Administrator using a token was told Forbidden. getUser() is this
+        // class's own resolver for exactly that - session, then sanctum, then
+        // the api guard.
+        if (!Fixometer::hasRole($this->getUser(), 'Administrator')) {
             return response()->json(['message' => 'Forbidden'], 403);
         }
 

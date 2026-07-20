@@ -523,6 +523,77 @@ class EventController extends Controller
      *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
      *     )
      */
+    /**
+     * @OA\Get(
+     *      path="/api/v2/events/{id}/audits",
+     *      operationId="getEventAuditsv2",
+     *      tags={"Events"},
+     *      summary="Audit trail for an event",
+     *      description="Backs the edit page's Event log tab. Administrator only, matching the legacy edit view's `$audits && hasRole(Administrator)` gate. Strings are rendered server-side from the event-audits lang files so the placeholder substitution stays in one place; each entry's `heading` and `changes` are HTML.",
+     *      security={{"apiToken":{}}},
+     *      @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Audit entries, newest first",
+     *          @OA\JsonContent(@OA\Property(property="data", type="array", @OA\Items(
+     *              @OA\Property(property="id", type="integer"),
+     *              @OA\Property(property="event", type="string", example="updated"),
+     *              @OA\Property(property="heading", type="string"),
+     *              @OA\Property(property="changes", type="array", @OA\Items(type="string"))
+     *          )))
+     *      ),
+     *      @OA\Response(response=403, description="Not an administrator"),
+     *      @OA\Response(response=404, description="No such event")
+     * )
+     */
+    public function auditsv2($id): JsonResponse
+    {
+        if ($resp = $this->requireAdministrator()) {
+            return $resp;
+        }
+
+        $event = Party::find($id);
+
+        if (! $event) {
+            return response()->json(['error' => 'No such event'], 404);
+        }
+
+        // Rendered server-side, as the legacy view does
+        // (partials/log-accordion.blade.php's
+        // `@lang($type.'.'.$audit->event.'.metadata', $audit->getMetadata())`).
+        // Resolving them client-side would mean reimplementing the placeholder
+        // substitution and keeping two copies of the key layout in step.
+        $audits = $event->audits()->with('user')->orderBy('created_at', 'desc')->get();
+
+        return response()->json([
+            'data' => $audits->map(function ($audit) {
+                $changes = [];
+
+                foreach ($audit->getModified() as $attribute => $modified) {
+                    $key = 'event-audits.'.$audit->event.'.modified.'.$attribute;
+                    $line = __($key, $modified);
+
+                    // An attribute with no lang entry returns the key itself -
+                    // skip it rather than showing a raw key to the user, which
+                    // is exactly the failure the /party moderation header had.
+                    if ($line !== $key) {
+                        $changes[] = $line;
+                    }
+                }
+
+                $headingKey = 'event-audits.'.$audit->event.'.metadata';
+                $heading = __($headingKey, $audit->getMetadata());
+
+                return [
+                    'id' => $audit->id,
+                    'event' => $audit->event,
+                    'heading' => $heading === $headingKey ? null : $heading,
+                    'changes' => $changes,
+                ];
+            })->values()->all(),
+        ]);
+    }
+
     public function moderateEventsv2(Request $request)
     {
         // Get the user that the API has been authenticated as.

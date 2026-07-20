@@ -145,6 +145,9 @@ Route::prefix('v2')->middleware(\App\Http\Middleware\VerifyUserConsentApi::class
 
         Route::prefix('/events')->group(function() {
             Route::get('{id}/attendees', [API\EventController::class, 'attendeesv2']);
+            // Audit trail for the edit page's Event log tab - Administrator
+            // only, matching edit.blade.php's `$audits && hasRole(Administrator)`.
+            Route::get('{id}/audits', [API\EventController::class, 'auditsv2']);
             Route::get('{id}/devices', [API\EventController::class, 'devicesv2']);
             Route::get('{id}', [API\EventController::class, 'getEventv2']);
             Route::post('', [API\EventController::class, 'createEventv2']);
