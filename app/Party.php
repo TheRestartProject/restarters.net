@@ -654,6 +654,22 @@ class Party extends Model implements Auditable
         ])->exists();
     }
 
+    // Set by callers that batch-load images to avoid N+1 (see FixometerFile::findImagesForMany).
+    public ?array $preloadedImages = null;
+
+    // Mirrors Device::getImages() - event photos are a gallery (multiple per event), same
+    // xref-backed images table the upload/delete endpoints already use.
+    public function getImages()
+    {
+        if ($this->preloadedImages !== null) {
+            return $this->preloadedImages;
+        }
+
+        $File = new \FixometerFile;
+
+        return $File->findImages(env('TBL_EVENTS'), $this->idevents);
+    }
+
     /**
      * [owner description]
      * Party Owner/Creator.

@@ -44,13 +44,21 @@ import GroupNetworkData from '../groups/GroupNetworkData.vue'
 // `v-if="canApprove"` b-card - note this is gated on the *page-level*
 // canApprove prop, which legacy sets independent of create-vs-edit, unlike
 // the moderation `canApprove` computed below which is edit-only) is ported
-// via GroupNetworkData, visible whenever `isAdmin` is true. It contains the
-// network_data field editor plus the timezone override input - legacy's
-// events form has no *visible* per-event timezone control at all (only
-// GroupAddEdit.vue's group-level one), so exposing it unconditionally (as
-// this component previously did, findings/parity-v2/events.md #5) was a
-// parity bug; keeping it, admin-gated, preserves the useful override
-// capability without putting it in front of every host by default.
+// via GroupNetworkData, visible whenever `isAdmin` is true, and contains
+// only the network_data field editor. Legacy's events form has no
+// *visible* per-event timezone control at all (only GroupAddEdit.vue's
+// group-level one) - EventAddEdit.vue's `this.timezone` is never assigned,
+// so it submits `timezone: undefined` (dropped by JSON.stringify), and the
+// event simply inherits the group's timezone via Party::getTimezoneAttribute
+// falling back to `$this->theGroup->timezone`. An earlier version of this
+// form exposed an editable timezone override here (findings/parity-v2/
+// events.md #5 flagged the unconditional version as a bug, then a later
+// pass admin-gated it instead of removing it - also wrong, per the
+// standing parity-with-develop instruction). `form.timezone` itself is
+// kept - auto-populated from the selected group below and still sent in
+// the payload - so the event's stored timezone matches what legacy's
+// server-side fallback resolves to; only the *visible, editable* control is
+// gone.
 const props = defineProps({
   eventId: {
     type: Number,
@@ -135,10 +143,6 @@ const networkData = ref({ ...(props.initialEvent?.network_data || {}) })
 const approved = ref(!!props.initialEvent?.approved)
 const eventGroupName = computed(() => props.initialEvent?.group?.name || '')
 
-const timezones = ref([])
-const timezoneValid = computed(() => !form.timezone || !timezones.value.length || timezones.value.includes(form.timezone))
-const timezoneTouched = ref(false)
-
 const groupOptionsSorted = computed(() => [...props.groups].sort((a, b) => a.name.localeCompare(b.name)))
 
 const selectedGroupDetail = computed(() => groupsStore.details[form.idgroups] || null)
@@ -167,19 +171,7 @@ function mapServerErrors(errors) {
   return mapped
 }
 
-onMounted(async () => {
-  const { $api } = useNuxtApp()
-
-  if ($api?.config) {
-    try {
-      const zones = await $api.config.timezones()
-      timezones.value = (zones || []).map((z) => z.name)
-    } catch {
-      // Non-critical: the field still works as free text without the
-      // client-side validity check.
-    }
-  }
-
+onMounted(() => {
   // "If only one group, default to that" (EventAddEdit.vue's created()).
   if (creating.value && !form.idgroups && groupOptionsSorted.value.length === 1) {
     form.idgroups = groupOptionsSorted.value[0].id
@@ -189,11 +181,12 @@ onMounted(async () => {
 // Fetches the selected group's full record (for its timezone default and
 // the "use group location" shortcut - .event-address's useGroup() in
 // VenueAddress.vue) whenever the selection changes, including the initial
-// mount. Only *applies* the group's timezone as a default when: this is a
-// live user-driven change (oldId !== undefined - false on the immediate
-// initial call), or the timezone field is still empty (a fresh create with
-// no prior value) - never silently overwriting a value that arrived via
-// edit/duplicate prefill or that the user already typed themselves.
+// mount. There's no visible timezone control for the user to have typed
+// into (see the class doc comment), so the only thing worth protecting is
+// an edit/duplicate prefill that already arrived with a value: apply the
+// group's timezone on a live user-driven change (oldId !== undefined -
+// false on the immediate initial call), or whenever the field is still
+// empty.
 watch(
   () => form.idgroups,
   async (id, oldId) => {
@@ -202,16 +195,12 @@ watch(
     const detail = await groupsStore.fetchDetails(id)
     const isUserChange = oldId !== undefined
 
-    if (detail?.timezone && !timezoneTouched.value && (isUserChange || !form.timezone)) {
+    if (detail?.timezone && (isUserChange || !form.timezone)) {
       form.timezone = detail.timezone
     }
   },
   { immediate: true }
 )
-
-function onTimezoneInput() {
-  timezoneTouched.value = true
-}
 
 function useGroupLocation() {
   if (groupLocationText.value) {
@@ -284,9 +273,6 @@ function validate() {
   }
   if (form.link && !/^https?:\/\/.+/i.test(form.link)) {
     errors.link = [t('client.events.link_invalid')]
-  }
-  if (!timezoneValid.value) {
-    errors.timezone = [t('partials.validate_timezone')]
   }
 
   return errors
@@ -531,23 +517,6 @@ defineExpose({ submit })
         </BCardHeader>
         <BCardBody>
           <GroupNetworkData v-model="networkData" />
-
-          <BFormGroup class="mt-2" :label="`${t('groups.timezone')}:`" label-for="event-form-timezone">
-            <input
-              id="event-form-timezone"
-              v-model="form.timezone"
-              type="text"
-              list="event-form-timezones"
-              class="form-control"
-              :class="{ 'is-invalid': !timezoneValid }"
-              data-testid="event-form-timezone"
-              @input="onTimezoneInput"
-            >
-            <datalist id="event-form-timezones">
-              <option v-for="zone in timezones" :key="zone" :value="zone" />
-            </datalist>
-            <small class="form-text text-muted">{{ t('groups.timezone_placeholder') }}</small>
-          </BFormGroup>
         </BCardBody>
       </BCard>
 

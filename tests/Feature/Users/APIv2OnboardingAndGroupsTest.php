@@ -56,8 +56,13 @@ class APIv2OnboardingAndGroupsTest extends TestCase
         $this->assertEquals(5, $user->fresh()->number_of_logins);
     }
 
-    public function testOnboardingFlagOnSessionReflectsCompletion(): void
+    public function testOnboardingFlagOnSessionStaysFalseRegardlessOfCompletion(): void
     {
+        // Parity with develop: the onboarding modal is dead code there (its gating
+        // $onboarding view variable is never assigned), so the session flag is always
+        // false - completing onboarding doesn't change it. The endpoint itself stays
+        // functional (see testOnboardingCompleteBumpsNumberOfLoginsFromOneToTwo above),
+        // it just no longer drives any client-visible flag.
         $user = User::factory()->restarter()->create([
             'api_token' => 'onboard-tok-3',
             'number_of_logins' => 1,
@@ -65,7 +70,7 @@ class APIv2OnboardingAndGroupsTest extends TestCase
         $this->actingAs($user);
 
         $before = $this->get('/api/v2/session?api_token=onboard-tok-3');
-        $this->assertTrue($before->json('data.flags.onboarding'));
+        $this->assertFalse($before->json('data.flags.onboarding'));
 
         $this->post('/api/v2/users/me/onboarding-complete?api_token=onboard-tok-3')->assertSuccessful();
 

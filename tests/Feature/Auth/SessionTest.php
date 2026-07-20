@@ -46,8 +46,10 @@ class SessionTest extends TestCase
         $this->assertEquals('fr', $response->json('data.user.language'));
         $this->assertTrue($response->json('data.user.consent.given'));
         $this->assertEquals('Session Test Network', $response->json('data.user.networks.0.name'));
-        // Factory users have number_of_logins=1, so onboarding is on.
-        $this->assertTrue($response->json('data.flags.onboarding'));
+        // Parity with develop: the onboarding modal is dead code there (its gating
+        // $onboarding view variable is never assigned), so we never surface it either,
+        // regardless of number_of_logins.
+        $this->assertFalse($response->json('data.flags.onboarding'));
     }
 
     public function testPatchLocalePersists(): void

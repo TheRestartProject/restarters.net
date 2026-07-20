@@ -10,8 +10,8 @@ import clientEn from '../../../i18n/locales/client-en.json'
 
 // RichTextEditor/LocationPicker/vue-datepicker-next's DatePicker are unit
 // tested (or vendored) on their own - stub them here to plain inputs so
-// EventForm's own logic (payload shape, validation, group/timezone
-// defaulting, 422 rendering) is what's under test, same convention as
+// EventForm's own logic (payload shape, validation, group timezone
+// inheritance, 422 rendering) is what's under test, same convention as
 // tests/components/groups/GroupForm.spec.js.
 const RichTextEditorStub = {
   props: ['modelValue', 'hasError', 'testid'],
@@ -107,11 +107,6 @@ describe('components/events/EventForm', () => {
 
   beforeEach(() => {
     setActivePinia(createPinia())
-    vi.stubGlobal('useNuxtApp', () => ({
-      $api: {
-        config: { timezones: vi.fn().mockResolvedValue([{ name: 'Europe/London' }]) },
-      },
-    }))
     groupsStore = useGroupsStore()
     groupsStore.fetchDetails = vi.fn().mockResolvedValue(null)
   })
@@ -130,7 +125,11 @@ describe('components/events/EventForm', () => {
       const store = useEventsStore()
       store.createEvent = vi.fn()
 
-      const wrapper = mountForm({ groups: [{ id: 9, name: 'Acme Restarters' }] })
+      // Two groups, not one - a single-group list now auto-selects
+      // synchronously on mount (onMounted has no more awaited timezone
+      // fetch to delay it past this synchronous submit), which would
+      // leave the group field validly populated and defeat this case.
+      const wrapper = mountForm({ groups: [{ id: 9, name: 'Acme Restarters' }, { id: 10, name: 'Other Group' }] })
       await wrapper.find('[data-testid="event-form"]').trigger('submit')
 
       expect(wrapper.find('[data-testid="event-form-venue-error"]').exists()).toBe(true)
@@ -236,24 +235,32 @@ describe('components/events/EventForm', () => {
       expect(wrapper.find('[data-testid="event-form-group"]').element.value).toBe('9')
     })
 
-    it('defaults the timezone from the selected group and lets it be overridden (admin only - see the admin-only card test below)', async () => {
+    it('inherits the timezone from the selected group (no visible per-event control, matching develop) and re-inherits on a later group change', async () => {
       groupsStore.fetchDetails = vi.fn().mockResolvedValue({ timezone: 'Europe/Paris', location: { location: 'Paris HQ' } })
 
-      const wrapper = mountForm({ isAdmin: true, groups: [{ id: 9, name: 'Acme Restarters' }, { id: 10, name: 'Other Group' }] })
+      const store = useEventsStore()
+      store.createEvent = vi.fn().mockResolvedValue(42)
+
+      const wrapper = mountForm({ groups: [{ id: 9, name: 'Acme Restarters' }, { id: 10, name: 'Other Group' }] })
       await wrapper.find('[data-testid="event-form-group"]').setValue('9')
       await wrapper.vm.$nextTick()
       await wrapper.vm.$nextTick()
 
-      expect(wrapper.find('[data-testid="event-form-timezone"]').element.value).toBe('Europe/Paris')
+      await fillRequiredFields(wrapper, { group: false })
+      await wrapper.find('[data-testid="event-form"]').trigger('submit')
+      await wrapper.vm.$nextTick()
+      expect(store.createEvent.mock.calls[0][0].timezone).toBe('Europe/Paris')
 
-      // A manual edit is never clobbered by a later group change.
-      await wrapper.find('[data-testid="event-form-timezone"]').setValue('Europe/London')
-      groupsStore.fetchDetails = vi.fn().mockResolvedValue({ timezone: 'Europe/Paris', location: null })
+      // A later group change re-inherits the new group's timezone - there's
+      // no per-event override to protect (develop has none either).
+      groupsStore.fetchDetails = vi.fn().mockResolvedValue({ timezone: 'Europe/London', location: null })
       await wrapper.find('[data-testid="event-form-group"]').setValue('10')
       await wrapper.vm.$nextTick()
       await wrapper.vm.$nextTick()
 
-      expect(wrapper.find('[data-testid="event-form-timezone"]').element.value).toBe('Europe/London')
+      await wrapper.find('[data-testid="event-form"]').trigger('submit')
+      await wrapper.vm.$nextTick()
+      expect(store.createEvent.mock.calls[1][0].timezone).toBe('Europe/London')
     })
 
     it('shows a "use group location" shortcut that fills the location field, hidden when online', async () => {
@@ -281,19 +288,22 @@ describe('components/events/EventForm', () => {
       expect(wrapper.find('[data-testid="event-approve"]').exists()).toBe(false)
     })
 
-    it('shows the admin-only card (network_data editor + timezone override) for an admin, even while creating', () => {
+    it('shows the admin-only card (network_data editor) for an admin, even while creating', () => {
       const wrapper = mountForm({ groups: [{ id: 9, name: 'Acme Restarters' }], isAdmin: true })
 
       expect(wrapper.find('[data-testid="event-form-admin"]').exists()).toBe(true)
-      expect(wrapper.find('[data-testid="event-form-timezone"]').exists()).toBe(true)
       expect(wrapper.findComponent(GroupNetworkDataStub).exists()).toBe(true)
     })
 
-    it('hides the admin-only card and the timezone override for a non-admin', () => {
+    it('hides the admin-only card for a non-admin', () => {
       const wrapper = mountForm({ groups: [{ id: 9, name: 'Acme Restarters' }], isAdmin: false })
 
       expect(wrapper.find('[data-testid="event-form-admin"]').exists()).toBe(false)
-      expect(wrapper.find('[data-testid="event-form-timezone"]').exists()).toBe(false)
+    })
+
+    it('never renders a per-event timezone control, for an admin or otherwise (develop has none)', () => {
+      expect(mountForm({ groups: [{ id: 9, name: 'Acme Restarters' }], isAdmin: true }).find('[data-testid="event-form-timezone"]').exists()).toBe(false)
+      expect(mountForm({ groups: [{ id: 9, name: 'Acme Restarters' }], isAdmin: false }).find('[data-testid="event-form-timezone"]').exists()).toBe(false)
     })
 
     it('submits network_data edited via the admin-only card', async () => {

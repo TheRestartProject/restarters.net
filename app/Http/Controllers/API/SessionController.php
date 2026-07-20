@@ -137,7 +137,16 @@ class SessionController extends Controller
                 ] : null,
             ],
             'flags' => [
-                'onboarding' => $user ? $user->number_of_logins < 2 : false,
+                // Parity with develop: the legacy Blade layout gates the onboarding
+                // modal on a $onboarding view variable that is never assigned by any
+                // controller there, so the modal (and its /onboarding-complete route)
+                // is dead code on develop and no user ever sees it. We match that by
+                // always returning false here. The client component
+                // (DashboardOnboardingModal.vue) and the completion endpoint
+                // (POST /api/v2/users/me/onboarding-complete) are left in place but
+                // dormant; to deliberately revive the feature, replace this literal
+                // with real gating logic (e.g. $user->number_of_logins < 2).
+                'onboarding' => false,
             ],
         ];
     }

@@ -235,6 +235,23 @@ use Illuminate\Support\Facades\Auth;
  *          nullable=true
  *     ),
  *     @OA\Property(
+ *         property="images",
+ *         title="images",
+ *         description="Any photos uploaded for this event",
+ *         type="array",
+ *         @OA\Items(
+ *           ref="#/components/schemas/Image"
+ *         )
+ *     ),
+ *     @OA\Property(
+ *          property="discourse_thread",
+ *          title="discourse_thread",
+ *          description="The id of this event's linked Discourse discussion thread. Combine with the session config's discourse_url as {discourse_url}/t/{discourse_thread} to link to the thread. Only present when the authenticated user is a confirmed attendee (EventsUsers.status==='1', same check as 'attending') - unlike Group.discourse_group this is not public. Null when there is no linked thread, the caller is unauthenticated, or the caller isn't a confirmed attendee.",
+ *          format="string",
+ *          nullable=true,
+ *          example="4821"
+ *     ),
+ *     @OA\Property(
  *          property="full",
  *          title="full",
  *          description="Indicates that this is a full result, not summary group information.",
@@ -276,12 +293,19 @@ class Party extends JsonResource
             'approved' => $this->approved ? true : false,
             'network_data' => $networkData,
             'full' => true,
+            'images' => \App\Http\Resources\Image::collection($this->resource->getImages()),
         ];
 
         // Mirrors expandEvent()'s Auth::user() && $event->isBeingAttendedBy(...) check (strict
         // status==='1'). Optional-auth chain matches Volunteer resource / API\EventController::getUser().
         $currentUser = Auth::user() ?? auth('sanctum')->user() ?? auth('api')->user();
-        $ret['attending'] = $this->when($currentUser !== null, fn () => $this->resource->isBeingAttendedBy($currentUser->id));
+        $isAttending = $currentUser !== null && $this->resource->isBeingAttendedBy($currentUser->id);
+        $ret['attending'] = $this->when($currentUser !== null, fn () => $isAttending);
+
+        // events/view.blade.php: $discourseThread = ($is_attending && $event->discourse_thread) ?
+        // ... : null - gated the same way as 'attending' above, unlike Group.discourse_group which
+        // is unconditionally public.
+        $ret['discourse_thread'] = ($isAttending && $this->discourse_thread) ? $this->discourse_thread : null;
 
         if ($this->link) {
             // Don't return this unless present - the OpenAPI schema doesn't allow null values.

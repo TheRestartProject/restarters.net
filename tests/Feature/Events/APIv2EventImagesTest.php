@@ -325,4 +325,40 @@ class APIv2EventImagesTest extends TestCase
         $response->assertStatus(404);
         $this->assertNotNull(Xref::find($idxrefA));
     }
+
+    // --- images field on the event resource (gap 1: develop's event page shows an uploaded-photos
+    // gallery; without this the view page has no way to render one) ---
+
+    public function testEventResourceImagesEmptyArrayWithNoPhotos(): void
+    {
+        $host = User::factory()->host()->create();
+        [, $idevents] = $this->createEventAsHost($host);
+
+        $response = $this->get("/api/v2/events/$idevents");
+        $response->assertSuccessful();
+
+        $this->assertEquals([], $response->json('data.images'));
+    }
+
+    public function testEventResourceReflectsUploadedPhotos(): void
+    {
+        $host = User::factory()->host()->create(['api_token' => 'eimg-tok-17']);
+        [, $idevents] = $this->createEventAsHost($host);
+
+        $firstKey = $this->seedCompletedTusUpload($this->tmpJpeg());
+        $this->postJson("/api/v2/events/$idevents/images?api_token=eimg-tok-17", ['upload_key' => $firstKey])->assertSuccessful();
+        $secondKey = $this->seedCompletedTusUpload($this->tmpJpeg());
+        $this->postJson("/api/v2/events/$idevents/images?api_token=eimg-tok-17", ['upload_key' => $secondKey])->assertSuccessful();
+
+        $response = $this->get("/api/v2/events/$idevents");
+        $response->assertSuccessful();
+
+        $images = $response->json('data.images');
+        $this->assertCount(2, $images);
+        foreach ($images as $image) {
+            $this->assertArrayHasKey('id', $image);
+            $this->assertArrayHasKey('idxref', $image);
+            $this->assertNotEmpty($image['path']);
+        }
+    }
 }

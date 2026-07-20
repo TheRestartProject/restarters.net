@@ -35,11 +35,6 @@ const BFormSelectStub = {
   template:
     '<select :value="modelValue" @change="$emit(\'update:modelValue\', $event.target.value)" v-bind="$attrs"><slot /></select>',
 }
-const BModalStub = {
-  props: ['modelValue', 'title'],
-  emits: ['hide'],
-  template: '<div v-if="modelValue" :data-title="title" v-bind="$attrs"><slot /></div>',
-}
 
 function mountPage() {
   const i18n = createI18n({ legacy: false, locale: 'en', messages })
@@ -47,7 +42,7 @@ function mountPage() {
   return mount(PreviewDeployPage, {
     global: {
       plugins: [i18n],
-      stubs: { BAlert: BAlertStub, BButton: BButtonStub, BFormSelect: BFormSelectStub, BModal: BModalStub },
+      stubs: { BAlert: BAlertStub, BButton: BButtonStub, BFormSelect: BFormSelectStub },
     },
   })
 }
@@ -122,50 +117,42 @@ describe('pages/admin/preview-deploy', () => {
     expect(groups[0].label).toBe('Main branches')
     expect(groups[1]).toEqual({
       label: 'Open pull requests',
-      options: [{ value: 'feature-x', text: '#42 — Add feature (feature-x, @bob)' }],
+      options: [{ value: 'feature-x', text: '#42 Add feature (feature-x)' }],
     })
     expect(wrapper.findComponent(BFormSelectStub).props('modelValue')).toBe('feature-x')
   })
 
-  it('clicking Deploy opens a confirmation dialog instead of deploying immediately', async () => {
+  // Gap 23: legacy's Deploy button is gated by a blocking window.confirm(),
+  // not a BModal - matched here.
+  it('clicking Deploy asks for confirmation with the legacy message before deploying', async () => {
     const { deploy } = stubApi({ prs: [] })
+    const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(true)
     const wrapper = mountPage()
     await flushPromises()
 
-    expect(wrapper.find('[data-testid="preview-deploy-confirm-modal"]').exists()).toBe(false)
     await wrapper.find('[data-testid="preview-deploy-submit"]').trigger('click')
+    await flushPromises()
 
-    expect(wrapper.find('[data-testid="preview-deploy-confirm-modal"]').exists()).toBe(true)
-    expect(wrapper.text()).toContain(
+    expect(confirmSpy).toHaveBeenCalledWith(
       'This will redeploy restarters.dev with the selected branch and restore the overnight database. Continue?'
     )
-    expect(deploy).not.toHaveBeenCalled()
-  })
-
-  it('only deploys once the confirmation dialog is confirmed', async () => {
-    const { deploy } = stubApi({ prs: [] })
-    const wrapper = mountPage()
-    await flushPromises()
-
-    await wrapper.find('[data-testid="preview-deploy-submit"]').trigger('click')
-    await wrapper.find('[data-testid="preview-deploy-confirm-ok"]').trigger('click')
-    await flushPromises()
-
     expect(deploy).toHaveBeenCalledWith('develop')
-    expect(wrapper.find('[data-testid="preview-deploy-confirm-modal"]').exists()).toBe(false)
     expect(wrapper.find('[data-testid="preview-deploy-feedback"]').exists()).toBe(true)
+
+    confirmSpy.mockRestore()
   })
 
-  it('cancelling the confirmation dialog does not deploy', async () => {
+  it('does not deploy when the confirmation is dismissed', async () => {
     const { deploy } = stubApi({ prs: [] })
+    const confirmSpy = vi.spyOn(window, 'confirm').mockReturnValue(false)
     const wrapper = mountPage()
     await flushPromises()
 
     await wrapper.find('[data-testid="preview-deploy-submit"]').trigger('click')
-    await wrapper.find('[data-testid="preview-deploy-confirm-cancel"]').trigger('click')
 
     expect(deploy).not.toHaveBeenCalled()
-    expect(wrapper.find('[data-testid="preview-deploy-confirm-modal"]').exists()).toBe(false)
+
+    confirmSpy.mockRestore()
   })
 
   it('links to the GitHub Actions workflow run list', async () => {

@@ -4,7 +4,6 @@ import { useI18n } from 'vue-i18n'
 import { useAuth } from '~/composables/useAuth.js'
 import { useUsersStore } from '~/stores/users.js'
 import { useAdminRefdataStore } from '~/stores/adminRefdata.js'
-import AdminSettingsTab from '~/components/profile/AdminSettingsTab.vue'
 
 // /user/all - resources/views/user/all.blade.php +
 // resources/js/components/UsersPage.vue (design.md §6.2 Phase D task D3,
@@ -17,25 +16,18 @@ import AdminSettingsTab from '~/components/profile/AdminSettingsTab.vue'
 // its filter/sort/page state to query params and re-fetches, it does not
 // slice anything client-side.
 //
-// The "Edit role" button per row opens AdminSettingsTab.vue (already built
-// for D1's /profile/edit/[[id]] Account tab) in a modal, exactly the "role
-// editor modal -> PATCH /users/{id}/admin-settings" the task brief asks
-// for - reusing it rather than re-implementing the role/groups/preferences/
-// permissions form a second time. The "Create new user" button/modal (gap
-// 13) ports `includes/modals/create-user.blade.php` onto POST /api/v2/users
+// The "Create new user" button/modal (gap 13) ports
+// `includes/modals/create-user.blade.php` onto POST /api/v2/users
 // (stores/users.js#createUser) - see submitCreate() below. The Permission
 // filter (gap 24) reuses the same permissions catalogue as
 // AdminSettingsTab's checkbox matrix (useAdminRefdataStore, already fetched
 // for /role's RolesPage) rather than duplicating a fetch in this store.
 //
-// parity-v2/admin-and-static.md gap 8 (distinct numbering from the gaps
-// referenced just above, which are from an earlier findings pass): legacy's
-// user list has no per-row quick-role-edit action, only the Name link to a
-// full /user/edit/{id} page. KEPT here rather than removed - the Name link
-// already reaches the same role editor (ProfileTabs.vue's AdminSettingsTab,
-// shown to admins on /profile/edit/{id}), so this button is a redundant
-// but non-regressive shortcut, not a capability legacy lacks. Flagged for a
-// product-owner call per that gap's own suggested resolution.
+// parity-v2/admin-and-static.md gap 8: legacy's user list has no per-row
+// quick-role-edit action, only the Name link to a full /user/edit/{id}
+// page - that link reaches the same role editor (ProfileTabs.vue's
+// AdminSettingsTab, shown to admins on /profile/edit/{id}). No per-row
+// button here either, matching legacy.
 definePageMeta({ auth: true, role: 'Administrator' })
 
 const { t, tm } = useI18n()
@@ -54,9 +46,6 @@ const filters = reactive({ name: '', email: '', location: '', country: '', role:
 const appliedFilters = reactive({ name: '', email: '', location: '', country: '', role: '', permissions: [] })
 const sortBy = ref('')
 const sortDesc = ref(false)
-
-const editingUserId = ref(null)
-const editingUserName = ref('')
 
 // Gap 6: legacy's filter <aside> is a Bootstrap collapse, hidden by default
 // below the md breakpoint and toggled by a "Reveal filters" button (with an
@@ -157,22 +146,6 @@ function humanise(iso) {
   }
 }
 
-function openRoleModal(row) {
-  editingUserId.value = row.id
-  editingUserName.value = row.name
-}
-
-function closeRoleModal() {
-  editingUserId.value = null
-  editingUserName.value = ''
-  // Refresh whatever page we're on - the row's role/name may have changed.
-  fetch(usersStore.list.meta.current_page)
-}
-
-const roleModalTitle = computed(() =>
-  editingUserName.value ? t('client.users.edit_role_for', { name: editingUserName.value }) : ''
-)
-
 function retry() {
   fetch()
 }
@@ -195,9 +168,8 @@ function openCreateModal() {
   showCreateModal.value = true
 }
 
-// Just resets/hides - unlike closeRoleModal, nothing can have been saved by
-// the time this runs (AdminSettingsTab has its own in-modal save button;
-// this form's submit button IS the save, handled by submitCreate below), so
+// Just resets/hides - nothing can have been saved by the time this runs
+// (this form's submit button IS the save, handled by submitCreate below), so
 // dismissing without submitting needs no re-fetch.
 function closeCreateModal() {
   showCreateModal.value = false
@@ -229,7 +201,7 @@ async function submitCreate() {
       password: createForm.password,
     })
     closeCreateModal()
-    // Refresh whatever page we're on, same convention as closeRoleModal.
+    // Refresh whatever page we're on - a new row may now belong on it.
     fetch(usersStore.list.meta.current_page)
   } catch (err) {
     if (err?.status === 422) {
@@ -382,12 +354,11 @@ onMounted(() => {
                     </button>
                     <template v-else>{{ t(column.labelKey) }}</template>
                   </th>
-                  <th />
                 </tr>
               </thead>
               <tbody>
                 <tr v-if="!usersStore.list.data.length" data-testid="users-table-empty">
-                  <td :colspan="columns.length + 1">{{ t('users.empty') }}</td>
+                  <td :colspan="columns.length">{{ t('users.empty') }}</td>
                 </tr>
                 <tr v-for="row in usersStore.list.data" :key="row.id" :data-testid="`users-row-${row.id}`">
                   <td>
@@ -412,16 +383,6 @@ onMounted(() => {
                   <td>{{ row.groups_count }}</td>
                   <td :title="row.created_at">{{ humanise(row.created_at) }}</td>
                   <td :title="row.last_login_at">{{ humanise(row.last_login_at) }}</td>
-                  <td>
-                    <button
-                      type="button"
-                      class="btn btn-sm btn-outline-primary"
-                      :data-testid="`users-row-edit-role-${row.id}`"
-                      @click="openRoleModal(row)"
-                    >
-                      {{ t('client.users.edit_role') }}
-                    </button>
-                  </td>
                 </tr>
               </tbody>
             </table>
@@ -449,21 +410,6 @@ onMounted(() => {
         </template>
       </div>
     </div>
-
-    <BModal
-      :model-value="editingUserId !== null"
-      :title="roleModalTitle"
-      no-footer
-      data-testid="users-role-modal"
-      @hide="closeRoleModal"
-    >
-      <AdminSettingsTab v-if="editingUserId !== null" :target-id="editingUserId" />
-      <div class="d-flex justify-content-end mt-3">
-        <BButton variant="outline-secondary" data-testid="users-role-modal-close" @click="closeRoleModal">
-          {{ t('partials.cancel') }}
-        </BButton>
-      </div>
-    </BModal>
 
     <BModal
       :model-value="showCreateModal"

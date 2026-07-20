@@ -7,11 +7,9 @@ import { useI18n } from 'vue-i18n'
 // admin, who holds a bearer token, not a web session). Drives
 // GET/POST /api/v2/admin/preview-deploys (API\PreviewDeployController).
 //
-// Gap 23: the confirmation is a BModal with separate Cancel/Deploy buttons
-// rather than legacy's blocking window.confirm() - kept as an intentional
-// modernization (consistent styling with the rest of the SPA's confirm
-// flows, and testable in Playwright, unlike a native dialog); the message
-// text itself (admin.preview_deploy_confirm) matches legacy verbatim.
+// Gap 23: legacy's Deploy button was a blocking window.confirm() (see
+// resources/views/admin/preview-deploy.blade.php's onclick) - matched here
+// rather than a BModal, with the same message text (admin.preview_deploy_confirm).
 definePageMeta({ auth: true, role: 'Administrator' })
 // Gap 14: legacy's <title>/H1 read "Deploy Preview Branch" / "Deploy Preview
 // Branch to restarters.dev".
@@ -29,16 +27,10 @@ const selectedBranch = ref('')
 const deploying = ref(false)
 const feedback = ref('')
 const feedbackVariant = ref('success')
-const showConfirm = ref(false)
 
 // Blade's admin/preview-deploy.blade.php always offered a "Main branches"
 // optgroup (develop/master) ahead of any open-PR branches, so the select is
 // never empty/disabled when there are zero open PRs.
-//
-// Gap 24: legacy's PR option text is a plain "#N Title (branch)"; this adds
-// an em-dash and "@author" - kept as an intentional improvement (knowing
-// who opened a PR is useful when picking one to deploy) rather than
-// reverting to strictly match legacy's format.
 const options = computed(() => {
   const groups = [
     {
@@ -52,7 +44,8 @@ const options = computed(() => {
   if (prs.value.length) {
     groups.push({
       label: t('admin.open_pull_requests'),
-      options: prs.value.map((p) => ({ value: p.branch, text: `#${p.number} — ${p.title} (${p.branch}, @${p.author})` })),
+      // Matches legacy's plain "#N Title (branch)" option text.
+      options: prs.value.map((p) => ({ value: p.branch, text: `#${p.number} ${p.title} (${p.branch})` })),
     })
   }
   return groups
@@ -73,18 +66,18 @@ async function load() {
   }
 }
 
-function openConfirm() {
+// Matches legacy's blocking window.confirm() gate before the form submit.
+function confirmAndDeploy() {
   if (!selectedBranch.value) {
     return
   }
-  showConfirm.value = true
+  if (!window.confirm(t('admin.preview_deploy_confirm'))) {
+    return
+  }
+  deploy()
 }
 
 async function deploy() {
-  showConfirm.value = false
-  if (!selectedBranch.value) {
-    return
-  }
   deploying.value = true
   feedback.value = ''
   try {
@@ -137,29 +130,11 @@ onMounted(load)
           variant="primary"
           :disabled="deploying || !selectedBranch"
           data-testid="preview-deploy-submit"
-          @click="openConfirm"
+          @click="confirmAndDeploy"
         >
           {{ deploying ? 'Deploying…' : 'Deploy' }}
         </BButton>
       </div>
-
-      <BModal
-        :model-value="showConfirm"
-        :title="t('partials.are_you_sure')"
-        no-footer
-        data-testid="preview-deploy-confirm-modal"
-        @hide="showConfirm = false"
-      >
-        <p>{{ t('admin.preview_deploy_confirm') }}</p>
-        <div class="d-flex justify-content-end gap-2">
-          <BButton variant="outline-secondary" data-testid="preview-deploy-confirm-cancel" @click="showConfirm = false">
-            {{ t('partials.cancel') }}
-          </BButton>
-          <BButton variant="primary" data-testid="preview-deploy-confirm-ok" @click="deploy">
-            Deploy
-          </BButton>
-        </div>
-      </BModal>
     </template>
 
     <hr class="mt-4">

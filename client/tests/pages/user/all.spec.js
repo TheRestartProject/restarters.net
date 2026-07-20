@@ -17,10 +17,6 @@ const BModalStub = {
   emits: ['hide'],
   template: '<div v-if="modelValue" :data-title="title"><slot /></div>',
 }
-const AdminSettingsTabStub = {
-  props: ['targetId'],
-  template: '<div data-testid="stub-admin-settings" :data-target-id="targetId" />',
-}
 // Same shape as components/profile/ProfileInfoTab.spec.js's BForm*
 // stubs - real elements so v-model/setValue work in tests. `emits` must be
 // declared explicitly here (unlike those other spec files, which never
@@ -62,7 +58,6 @@ const GLOBAL_STUBS = {
   BFormInput: BFormInputStub,
   BFormSelect: BFormSelectStub,
   BPagination: BPaginationStub,
-  AdminSettingsTab: AdminSettingsTabStub,
 }
 
 const ROW = {
@@ -327,38 +322,6 @@ describe('pages/user/all', () => {
       const wrapper = mountPage()
 
       expect(wrapper.find('[data-testid="users-pagination"]').exists()).toBe(false)
-    })
-  })
-
-  describe('role editor modal', () => {
-    beforeEach(() => {
-      usersStore.list.data = [ROW]
-    })
-
-    it('is closed by default', () => {
-      const wrapper = mountPage()
-      expect(wrapper.find('[data-testid="users-role-modal"]').exists()).toBe(false)
-    })
-
-    it('opens with AdminSettingsTab scoped to the clicked row on "Edit role"', async () => {
-      const wrapper = mountPage()
-
-      await wrapper.find('[data-testid="users-row-edit-role-7"]').trigger('click')
-
-      const modal = wrapper.find('[data-testid="users-role-modal"]')
-      expect(modal.exists()).toBe(true)
-      expect(wrapper.find('[data-testid="stub-admin-settings"]').attributes('data-target-id')).toBe('7')
-    })
-
-    it('closes and re-fetches the current page when dismissed', async () => {
-      const wrapper = mountPage()
-      await wrapper.find('[data-testid="users-row-edit-role-7"]').trigger('click')
-      usersStore.fetchList.mockClear()
-
-      await wrapper.find('[data-testid="users-role-modal-close"]').trigger('click')
-
-      expect(wrapper.find('[data-testid="users-role-modal"]').exists()).toBe(false)
-      expect(usersStore.fetchList).toHaveBeenCalledTimes(1)
     })
   })
 
