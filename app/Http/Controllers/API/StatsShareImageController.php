@@ -3,8 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
-use Symfony\Component\HttpFoundation\BinaryFileResponse;
-use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Http\Response;
 
 class StatsShareImageController extends Controller
 {
@@ -65,7 +64,13 @@ class StatsShareImageController extends Controller
             abort(404);
         }
 
-        return new BinaryFileResponse($path, 200, [
+        // A plain in-memory Response rather than Laravel's file()/
+        // BinaryFileResponse helper: these images are at most a few hundred
+        // KB (nowhere near worth streaming), and BinaryFileResponse writes
+        // its body straight to the output buffer on send() rather than
+        // exposing it via getContent() - which makes it awkward to assert
+        // against in tests and gains nothing at this size.
+        return response(file_get_contents($path), 200, [
             'Content-Type' => 'image/png',
             // Every request for a given filename returns byte-identical
             // content (the images are static, checked-in assets) - cache

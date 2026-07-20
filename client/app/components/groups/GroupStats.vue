@@ -148,7 +148,7 @@ const notCounting = computed(() => {
                 data-testid="group-stats-share"
                 @click="emit('share-stats')"
               >
-                {{ t('client.groups.share_this') }}
+                {{ t('partials.share_this') }}
               </button>
             </div>
           </div>

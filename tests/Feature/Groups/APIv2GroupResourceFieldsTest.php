@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Groups;
 
+use App\Network;
 use App\User;
 use Auth;
 use Illuminate\Support\Str;
@@ -80,6 +81,48 @@ class APIv2GroupResourceFieldsTest extends TestCase
         $response->assertSuccessful();
 
         $this->assertFalse($response->json('data.is_member'));
+    }
+
+    public function testAutoApproveFalseWithNoNetwork(): void
+    {
+        // getAutoApproveAttribute() (App\Group) returns false for a group with no networks at
+        // all - matches develop's "no networks = not auto-approved" behaviour.
+        $host = User::factory()->host()->create();
+        $idgroups = $this->createGroupAsHost($host);
+
+        $response = $this->get("/api/v2/groups/$idgroups");
+        $response->assertSuccessful();
+
+        $this->assertFalse($response->json('data.auto_approve'));
+    }
+
+    public function testAutoApproveTrueWhenEveryNetworkAutoApproves(): void
+    {
+        $host = User::factory()->host()->create();
+        $idgroups = $this->createGroupAsHost($host);
+
+        $network = Network::factory()->create(['auto_approve_events' => true]);
+        \App\Group::find($idgroups)->networks()->attach($network->id);
+
+        $response = $this->get("/api/v2/groups/$idgroups");
+        $response->assertSuccessful();
+
+        $this->assertTrue($response->json('data.auto_approve'));
+    }
+
+    public function testAutoApproveFalseWhenAnyNetworkDoesNotAutoApprove(): void
+    {
+        $host = User::factory()->host()->create();
+        $idgroups = $this->createGroupAsHost($host);
+
+        $autoApproving = Network::factory()->create(['auto_approve_events' => true]);
+        $notAutoApproving = Network::factory()->create(['auto_approve_events' => false]);
+        \App\Group::find($idgroups)->networks()->attach([$autoApproving->id, $notAutoApproving->id]);
+
+        $response = $this->get("/api/v2/groups/$idgroups");
+        $response->assertSuccessful();
+
+        $this->assertFalse($response->json('data.auto_approve'));
     }
 
     public function testDiscourseGroupNullWhenNotLinked(): void
