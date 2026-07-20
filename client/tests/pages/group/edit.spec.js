@@ -37,23 +37,11 @@ const BASE_GROUP = {
   },
 }
 
-// archive_group/archive_group_confirm are being restored to lang/en/groups.php
-// (see docs/nuxt-migration/findings/parity-audit-findings.md) but the
-// generated client/i18n/locales/en.json is regenerated centrally via
-// `php artisan translations:export-client`, so they're supplied inline here
-// rather than by editing the checked-in locale file.
-const GROUPS_OVERRIDES = {
-  groups: {
-    archive_group: 'Archive group',
-    archive_group_confirm: 'Please confirm that you want to archive {name}.',
-  },
-}
-
 function mountPage() {
   const i18n = createI18n({
     legacy: false,
     locale: 'en',
-    messages: { en: { ...en, ...clientEn, groups: { ...en.groups, ...GROUPS_OVERRIDES.groups } } },
+    messages: { en: { ...en, ...clientEn } },
   })
 
   return mount(GroupEditPage, {
@@ -75,7 +63,6 @@ describe('pages/group/edit/[id]', () => {
 
     groupsStore = useGroupsStore()
     groupsStore.fetchCurrent = vi.fn().mockResolvedValue(BASE_GROUP)
-    groupsStore.deleteGroup = vi.fn().mockResolvedValue({ archived: true })
 
     sessionStore = useSessionStore()
     sessionStore.user = { role: 4 }
@@ -151,40 +138,16 @@ describe('pages/group/edit/[id]', () => {
     expect(wrapper.find('[data-testid="group-edit-tabs"]').text()).toContain('Group details')
   })
 
-  describe('archive', () => {
-    it('hides the control entirely when can_perform_archive is false', () => {
-      groupsStore.current.data = BASE_GROUP
-      const wrapper = mountPage()
-      expect(wrapper.find('[data-testid="group-edit-archive"]').exists()).toBe(false)
-    })
-
-    it('shows the archive control for a NetworkCoordinator when can_perform_archive is true', () => {
-      groupsStore.current.data = {
-        ...BASE_GROUP,
-        permissions: { ...BASE_GROUP.permissions, can_perform_archive: true },
-      }
-      sessionStore.user = { role: 4 } // NetworkCoordinator, not Administrator
-      const wrapper = mountPage()
-      expect(wrapper.find('[data-testid="group-edit-archive"]').exists()).toBe(true)
-    })
-
-    it('shows the archive_group label and archive_group_confirm copy, and calls deleteGroup (archive semantics) then redirects', async () => {
-      groupsStore.current.data = {
-        ...BASE_GROUP,
-        name: 'Fixers United',
-        permissions: { ...BASE_GROUP.permissions, can_perform_archive: true },
-      }
-      const wrapper = mountPage()
-
-      const button = wrapper.find('[data-testid="group-edit-archive"]')
-      expect(button.text()).toBe('Archive group')
-
-      await button.trigger('click')
-      expect(wrapper.find('[data-testid="group-edit-archive-confirm"]').exists()).toBe(true)
-      expect(wrapper.text()).toContain('Please confirm that you want to archive Fixers United.')
-
-      await wrapper.find('[data-testid="group-edit-archive-confirm"]').trigger('click')
-      expect(groupsStore.deleteGroup).toHaveBeenCalledWith(5)
-    })
+  // Matches legacy GroupAddEdit.vue exactly: no archive control on this
+  // page, regardless of can_perform_archive - archiving is only reachable
+  // from the group VIEW page's Group Actions dropdown (see
+  // tests/pages/group/view.spec.js's archive coverage).
+  it('never shows an archive control here, even when can_perform_archive is true', () => {
+    groupsStore.current.data = {
+      ...BASE_GROUP,
+      permissions: { ...BASE_GROUP.permissions, can_perform_archive: true },
+    }
+    const wrapper = mountPage()
+    expect(wrapper.find('[data-testid="group-edit-archive"]').exists()).toBe(false)
   })
 })

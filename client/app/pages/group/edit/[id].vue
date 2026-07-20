@@ -12,22 +12,13 @@ import GroupForm from '~/components/groups/GroupForm.vue'
 // image picker sits after Description/before Location in both create and
 // edit flows, rather than as a separate widget above the whole form).
 //
-// Archive (permission-gated on can_perform_archive - Administrator or
-// NetworkCoordinator-of-the-group, per
-// App\Http\Controllers\API\GroupController::groupPermissionsFor) stays on
-// this page below the form. This calls DELETE /api/v2/groups/{id} ->
-// GroupMembershipController::archivev2, which only ever sets archived_at
-// (reversible) - legacy's separate, Administrator-only hard-delete action
-// has no surviving API endpoint (routes/api.php has no hard-delete route),
-// so it is not reproduced here; see docs/nuxt-migration/findings/
-// parity-audit-findings.md "/group/edit/{id} - missing-content".
-//
-// findings/parity-v2/group-forms.md #11: legacy GroupAddEdit.vue has no
-// archive control at all - archiving is only reachable from the group VIEW
-// page's "Group Actions" dropdown (GroupActions.vue). Kept here as a
-// deliberate UX improvement rather than reverted, per that finding's own
-// suggested fix ("if kept, note it as an intentional UX improvement rather
-// than parity").
+// No archive control on this page: legacy GroupAddEdit.vue has none either
+// (findings/parity-v2/group-forms.md #11) - archiving is only reachable
+// from the group VIEW page's "Group Actions" dropdown (GroupActions.vue,
+// wired up in group/view/[id].vue). An earlier version of this page added
+// one here anyway as a "deliberate UX improvement"; removed per the
+// standing parity-with-develop instruction - additions develop lacks are a
+// work item, not a decision to keep.
 //
 // The legacy page's admin-only "Group log" audit tab
 // (App\Helpers\Fixometer::hasRole($user,'Administrator') &&
@@ -51,7 +42,6 @@ const id = computed(() => Number(route.params.id))
 const group = computed(() => groupsStore.current.data)
 const permissions = computed(() => group.value?.permissions || {})
 const canEdit = computed(() => !!permissions.value.can_edit)
-const canPerformArchive = computed(() => !!permissions.value.can_perform_archive)
 
 // Role ints per app/Role.php: Root(1) has every role, Administrator(2) is
 // the only other role that can change a group's network affiliation
@@ -59,8 +49,6 @@ const canPerformArchive = computed(() => !!permissions.value.can_perform_archive
 const isAdmin = computed(() => sessionStore.user?.role === 1 || sessionStore.user?.role === 2)
 
 const updatedMessage = ref('')
-const confirmingArchive = ref(false)
-const archiving = ref(false)
 
 useHead({ title: computed(() => (group.value ? `${t('groups.editing')} ${group.value.name}` : t('groups.editing'))) })
 
@@ -77,30 +65,6 @@ function retry() {
 function onUpdated() {
   updatedMessage.value = t('groups.edit_group_save_changes')
   load()
-}
-
-function askArchive() {
-  confirmingArchive.value = true
-}
-
-function cancelArchive() {
-  confirmingArchive.value = false
-}
-
-async function confirmArchive() {
-  confirmingArchive.value = false
-  archiving.value = true
-
-  try {
-    // groupsStore.deleteGroup archives (see the store's own comment) -
-    // kept under that name because it's shared with group/view/[id].vue.
-    await groupsStore.deleteGroup(id.value)
-    await navigateTo(`/group/view/${id.value}`)
-  } catch {
-    // Store already toasted the error.
-  } finally {
-    archiving.value = false
-  }
 }
 </script>
 
@@ -152,24 +116,6 @@ async function confirmArchive() {
             :is-admin="isAdmin"
             @updated="onUpdated"
           />
-
-          <div v-if="canPerformArchive" class="mt-4 pt-3 border-top">
-            <template v-if="confirmingArchive">
-              <span class="me-2">{{ t('groups.archive_group_confirm', { name: group.name }) }}</span>
-              <BButton variant="danger" :disabled="archiving" data-testid="group-edit-archive-confirm" @click="confirmArchive">
-                {{ t('partials.yes') }}
-              </BButton>
-              <BButton variant="link" @click="cancelArchive">{{ t('partials.cancel') }}</BButton>
-            </template>
-            <BButton
-              v-else
-              variant="outline-danger"
-              data-testid="group-edit-archive"
-              @click="askArchive"
-            >
-              {{ t('groups.archive_group') }}
-            </BButton>
-          </div>
         </div>
       </div>
     </div>
