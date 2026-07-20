@@ -101,8 +101,13 @@ label.form-check-label {
   // findings/parity-v2 screenshot diff on /group/create. Restoring the
   // pairing here fixes every readonly .form-control site-wide, not just
   // that one field.
+  // `:read-only` is scoped to input/textarea deliberately. It matches any
+  // element that is not user-editable, which includes EVERY <select> - so an
+  // unscoped `&:read-only` greyed out every .form-control select on the site
+  // (Country, Year of birth, the Skills listbox) as though disabled, where
+  // develop renders them white. Caught by comparing 31-profile-edit.
   &:disabled,
-  &:read-only {
+  &:is(input, textarea):read-only {
     background-color: $input-disabled-bg;
     opacity: 1;
   }
