@@ -11,15 +11,16 @@ import { useModerationStore } from '~/stores/moderation.js'
 // title-only <ul> the (now deleted) shared ModerationQueue.vue
 // renders on /party and /group/map.
 //
-// GroupEventScrollTable.vue's markup is tightly coupled to the legacy Vuex
-// events store (invited.allinvitedcount, a dedicated actions dropdown
-// component) that has no Nuxt/API v2 equivalent, and rebuilding it is out
-// of scope for this pass (it lives under resources/js, and the
-// invited-count figure isn't present anywhere in GET /api/v2/moderate/
-// events' App\Http\Resources\Party payload at all - see
-// docs/nuxt-migration/api-gaps.md). This renders the columns the API DOES
-// support (date, title, group, confirmed volunteers) plus a link to the
-// event, rather than faking the missing figure or the actions menu.
+// Hand-rolled rather than reproducing GroupEventScrollTable.vue, whose markup
+// is coupled to the legacy Vuex store and a dedicated actions-dropdown
+// component. The columns match develop's: date, title+group, volunteers
+// INVITED, confirmed volunteers, plus a link to the event.
+//
+// The invited count used to be missing here, on the grounds that it "isn't
+// present anywhere in GET /api/v2/moderate/events' payload at all". It wasn't
+// - so it was added (Party resource's `invited`, via whenCounted, with the
+// endpoint calling loadCount so it costs one query). A missing figure was
+// being treated as a fact about the API rather than something to fix.
 const props = defineProps({
   // Optional, matching develop's EventsRequiringModeration - which takes no
   // network filter at all on events/index.blade.php:55. null = no filtering.
@@ -62,6 +63,7 @@ onMounted(() => {
         <tr>
           <th>{{ t('groups.export.events.date') }}</th>
           <th>{{ t('groups.export.events.event') }}</th>
+          <th>{{ t('groups.volunteers_invited') }}</th>
           <th>{{ t('groups.export.events.volunteers') }}</th>
           <th />
         </tr>
@@ -77,6 +79,7 @@ onMounted(() => {
               <NuxtLink :to="`/group/view/${event.group.id}`">{{ event.group.name }}</NuxtLink>
             </div>
           </td>
+          <td>{{ event.invited ?? 0 }}</td>
           <td>{{ event.stats?.volunteers ?? 0 }}</td>
           <td>
             <NuxtLink

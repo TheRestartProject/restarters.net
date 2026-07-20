@@ -294,6 +294,14 @@ class Party extends JsonResource
             'network_data' => $networkData,
             'full' => true,
             'images' => \App\Http\Resources\Image::collection($this->resource->getImages()),
+            // develop's GroupEventScrollTable shows an invited-volunteer count
+            // (PartyController.php:76's allinvitedcount), which the moderation
+            // queue needs. whenCounted, NOT a direct ->count(): this resource is
+            // used by list endpoints, and counting per row there would be an
+            // N+1. Endpoints that want it call loadCount('allInvited') - one
+            // query for the whole collection - and it is simply absent
+            // elsewhere, exactly as before.
+            'invited' => $this->whenCounted('allInvited'),
         ];
 
         // Mirrors expandEvent()'s Auth::user() && $event->isBeingAttendedBy(...) check (strict

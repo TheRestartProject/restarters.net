@@ -548,7 +548,14 @@ class EventController extends Controller
             return strtotime($a->event_start_utc) - strtotime($b->event_start_utc);
         });
 
-        $ret = \App\Http\Resources\Party::collection(collect($events));
+        // One query for every event's invited count, rather than one per event
+        // (see the Party resource's `invited` field).
+        // Eloquent's collection, not the base one - loadCount only exists on
+        // the former, and collect() returns the latter.
+        $collection = new \Illuminate\Database\Eloquent\Collection($events);
+        $collection->loadCount('allInvited');
+
+        $ret = \App\Http\Resources\Party::collection($collection);
 
         return response()->json($ret);
     }

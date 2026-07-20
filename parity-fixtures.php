@@ -149,6 +149,28 @@ if (!EventsUsers::where('event', $event->idevents)->where('user', $jane->id)->ex
     $eu->save();
 }
 
+// An UNAPPROVED event, so the groups/events-requiring-moderation queues have
+// something to render. Without one they capture empty on every page that
+// shows them (/group, /group/all, /group/nearby, /group/map, /party and the
+// network page), which is indistinguishable in a screenshot from the queue
+// being broken or absent - and that is exactly the false-match the harness is
+// meant to prevent.
+$pending = Party::where('group', $group->idgroups)->where('approved', false)->first();
+if (!$pending) {
+    $pending = new Party;
+    $pending->group = $group->idgroups;
+    $pending->venue = 'Pending Review Venue';
+    $pending->location = 'London';
+    $pending->latitude = 51.5074;
+    $pending->longitude = -0.1278;
+    $pending->free_text = 'An event awaiting moderation, for the parity capture.';
+    $pending->event_start_utc = now()->addDays(14)->setTime(10, 0)->toDateTimeString();
+    $pending->event_end_utc = now()->addDays(14)->setTime(13, 0)->toDateTimeString();
+    $pending->approved = false;
+    $pending->save();
+}
+$out[] = 'pendingEvent='.$pending->idevents;
+
 $out[] = 'events='.Party::where('group', $group->idgroups)->count();
 
 // Publish the ids for the capture harness. Every migrate:fresh renumbers
