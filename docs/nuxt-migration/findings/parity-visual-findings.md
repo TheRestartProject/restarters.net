@@ -861,3 +861,21 @@ earlier this session is present in both, so that one is confirmed fixed.
 Diff 3 is the one most likely to be a real bug rather than styling - check
 whether the date input is a native `type="date"` (which would explain the ISO
 display) where develop uses a formatted picker.
+
+### 31-profile-edit — compared, 1 diff
+
+Verified against the 02:00 capture (which postdates the _list-group.scss port,
+so the amber active tab is confirmed landed). Sidebar, the "Your profile"
+panel's left/right field split, and Skills + Change-my-photo as two
+side-by-side panels all match develop.
+
+**Remaining diff - the photo panel's upload affordance.** develop renders a
+"Profile picture:" label, a native file input ("Choose File / No file
+chosen") and a CHANGE MY PHOTO submit button. Ours renders a drag-and-drop
+zone ("Drop your files here / Drop files here or browse files") with NO submit
+button, so the upload presumably fires on drop rather than on an explicit
+click. That is a different interaction model, not just different styling.
+
+Minor, unconfirmed: our Skills listbox has a grey ground where develop's is
+white - worth checking it hasn't picked up the disabled/readonly background
+rule added to _forms.scss earlier in the migration.
