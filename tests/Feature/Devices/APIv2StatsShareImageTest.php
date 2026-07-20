@@ -67,7 +67,7 @@ class APIv2StatsShareImageTest extends TestCase
      */
     public function testPathTraversalAttemptsAreRejected(string $filename): void
     {
-        $response = $this->getJson('/api/v2/stats/share-image/' . $filename);
+        $response = $this->getJson('/api/v2/stats/share-image/'.$filename);
         $response->assertStatus(404);
     }
 
@@ -86,5 +86,4 @@ class APIv2StatsShareImageTest extends TestCase
             'empty' => [''],
         ];
     }
-
 }

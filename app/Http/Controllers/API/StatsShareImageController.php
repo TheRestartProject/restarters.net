@@ -58,9 +58,9 @@ class StatsShareImageController extends Controller
         // file 404s here too. Belt-and-braces on top of the allowlist above:
         // confirm the fully-resolved path still sits inside $baseDir before
         // serving anything from it.
-        $path = realpath($baseDir . DIRECTORY_SEPARATOR . $filename);
+        $path = realpath($baseDir.DIRECTORY_SEPARATOR.$filename);
 
-        if ($path === false || strncmp($path, $baseDir . DIRECTORY_SEPARATOR, strlen($baseDir) + 1) !== 0) {
+        if ($path === false || strncmp($path, $baseDir.DIRECTORY_SEPARATOR, strlen($baseDir) + 1) !== 0) {
             abort(404);
         }
 
