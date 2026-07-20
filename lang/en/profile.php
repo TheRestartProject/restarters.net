@@ -6,6 +6,7 @@ return [
   'biography' => 'Biography',
   'no_bio' => ':name has not yet entered a biography.',
   'edit_user' => 'Edit user',
+  'profile_picture' => 'Profile picture',
   'change_photo' => 'Change my photo',
   'skills_updated' => 'Skills updated!',
   'notifications' => 'Notifications',

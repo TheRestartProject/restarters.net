@@ -1107,6 +1107,7 @@
         "biography": "Biographie",
         "no_bio": "{name} n'a pas encore enregistré de biographie",
         "edit_user": "Editer utilisateur",
+        "profile_picture": "Photo de profil",
         "change_photo": "Changer ma photo",
         "language_panel_title": "Paramètres de langue",
         "language_updated": "Préférence de langue mise à jour",

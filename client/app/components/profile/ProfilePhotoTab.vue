@@ -55,6 +55,16 @@ function onUploadError(message) {
       {{ feedback }}
     </BAlert>
 
-    <TusImageUpload :current-image-url="photoUrl" @uploaded="onUploaded" @upload-error="onUploadError" />
+    <!-- profile.blade.php:145 labels the field "Profile picture:". The
+         control itself differs and deliberately stays as-is for now: develop
+         uses a plain multipart <input type="file"> plus a CHANGE MY PHOTO
+         submit, whereas this is the shared TusImageUpload (resumable tus)
+         used for every other image in the client - and develop itself uses a
+         dropzone for group images, so the pattern is not foreign to it.
+         Swapping transport would mean a different endpoint contract, so it is
+         recorded in findings/parity-visual-findings.md rather than changed
+         blind. -->
+    <label class="form-label fw-bold" for="profile-photo-upload">{{ t('profile.profile_picture') }}:</label>
+    <TusImageUpload id="profile-photo-upload" :current-image-url="photoUrl" @uploaded="onUploaded" @upload-error="onUploadError" />
   </div>
 </template>
