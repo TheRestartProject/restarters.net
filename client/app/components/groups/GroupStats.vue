@@ -105,7 +105,7 @@ const notCounting = computed(() => {
       <div class="group-stats__row">
         <section v-if="groupStats" class="group-stats__col" data-testid="group-stats-facts">
           <h2>{{ t('groups.group_facts') }}</h2>
-          <div class="stat-cards">
+          <div class="stat-cards stat-cards--facts">
             <div
               v-for="card in achievements"
               :key="card.testid"
@@ -131,7 +131,7 @@ const notCounting = computed(() => {
               <div v-html="t('groups.impact_calculation')" />
             </BPopover>
           </h2>
-          <div class="stat-cards">
+          <div class="stat-cards stat-cards--impact">
             <div class="stat-card" data-testid="group-stats-waste">
               <img :src="'/images/trash.svg'" alt="" class="stat-card__icon">
               <div class="stat-card__count">{{ kg(groupStats.waste_total) }}</div>
@@ -175,15 +175,45 @@ const notCounting = computed(() => {
 }
 
 .stat-cards {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
   gap: 1rem;
+}
+
+// GroupStatsFacts.vue's mobile layout (findings: parity-shots/mobile/
+// 09-group-view): the primary "events" card spans the full row, with
+// participants/hours-volunteered sharing a 2-column row below it; all
+// three become equal columns in a single row from md (768px) up.
+.stat-cards--facts {
+  grid-template-columns: 1fr 1fr;
+
+  .stat-card--primary {
+    grid-column: 1 / -1;
+  }
+
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(3, 1fr);
+
+    .stat-card--primary {
+      grid-column: auto;
+    }
+  }
+}
+
+// StatsImpact.vue's mobile layout: waste/CO2 cards stack full-width, one
+// per row, only becoming a 1fr:2fr (not equal) side-by-side pair from md up.
+.stat-cards--impact {
+  grid-template-columns: 1fr;
+
+  @media (min-width: 768px) {
+    grid-template-columns: 1fr 2fr;
+  }
 }
 
 // Neo-brutalist stat card (shared StatsValue.vue look; same as the fixometer
 // ImpactStats card): white box, near-black border + offset shadow, teal value.
+// Sizing comes from the parent .stat-cards--facts/--impact grid tracks
+// (not a flex-item property) - see those rules above.
 .stat-card {
-  flex: 1 1 0;
   min-width: 90px;
   padding: 1rem 0.5rem;
   text-align: center;

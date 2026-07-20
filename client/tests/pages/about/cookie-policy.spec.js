@@ -40,6 +40,22 @@ describe('pages/about/cookie-policy', () => {
     expect(wrapper.find('[data-testid="cookie-policy-table"]').attributes('style')).toContain('border: 1px solid gray')
   })
 
+  // Mobile parity capture (390x844): develop has an <h2> "How does
+  // restarters.net use cookies?" between the "Managing cookies" paragraph
+  // and the strictly-necessary/analytical/marketing bullet list - verified
+  // verbatim against origin/develop's cookie-policy.blade.php. Was already
+  // present in this page's markup/committed HEAD; pinned here so a future
+  // regression shows up in vitest rather than only in a rendered screenshot.
+  it('shows "How does restarters.net use cookies?" between "Managing cookies" and the cookie-type bullets', () => {
+    const wrapper = mountPage()
+    const headings = wrapper.findAll('h2, h3').map((h) => h.text())
+
+    const managingIndex = headings.indexOf('Managing cookies')
+    const howIndex = headings.indexOf('How does restarters.net use cookies?')
+    expect(managingIndex).toBeGreaterThanOrEqual(0)
+    expect(howIndex).toBe(managingIndex + 1)
+  })
+
   // Rendered-screenshot review gap 5: a "The cookies we use" heading sits
   // directly above "Cookies set by us (first party)".
   it('shows "The cookies we use" heading directly above the cookie table section', () => {
