@@ -184,13 +184,24 @@ describe('pages/networks/[id]', () => {
       setLoggedInUser({ id: 1, role_name: 'Administrator', networks: [] })
     })
 
-    it('renders the network name, stats and groups table', async () => {
+    it('renders the network name and stats', async () => {
       const wrapper = mountPage()
       await flushPromises()
 
       expect(wrapper.find('[data-testid="network-show-name"]').text()).toBe('Test London')
       expect(wrapper.find('[data-testid="stub-network-stats"]').attributes('data-groups-count')).toBe('1')
-      expect(wrapper.find('[data-testid="stub-groups-table"]').attributes('data-row-count')).toBe('1')
+    })
+
+    // NetworkPage.vue:80-86 - a count sentence and a link to the groups list
+    // filtered to this network, NOT an inline groups table. The table this
+    // used to assert was a divergence from develop.
+    it('renders a group-count sentence linking to the filtered groups list', async () => {
+      const wrapper = mountPage()
+      await flushPromises()
+
+      expect(wrapper.find('[data-testid="network-show-groups-info"]').text()).toContain('Test London')
+      expect(wrapper.find('[data-testid="network-show-groups-link"]').attributes('href')).toBe('/group/all?network=1')
+      expect(wrapper.find('[data-testid="stub-groups-table"]').exists()).toBe(false)
     })
 
     it('does not render the coordinators section when the network has none', async () => {
@@ -284,15 +295,13 @@ describe('pages/networks/[id]', () => {
       expect(modal.attributes('data-candidate-count')).toBe('2')
     })
 
-    it('re-fetches groups filtered by tag when the tag filter changes', async () => {
+    // The per-tag group filter belonged to the inline groups browser, which
+    // develop's network page does not have; it went with it.
+    it('does not render a tag filter over the groups', async () => {
       const wrapper = mountPage()
       await flushPromises()
-      networksStore.fetchGroups.mockClear()
 
-      await wrapper.find('[data-testid="network-show-tag-filter"]').setValue('1')
-      await flushPromises()
-
-      expect(networksStore.fetchGroups).toHaveBeenCalledWith(1, { group_tag: 1 })
+      expect(wrapper.find('[data-testid="network-show-tag-filter"]').exists()).toBe(false)
     })
 
     it('shows a not-found state for a 404', async () => {

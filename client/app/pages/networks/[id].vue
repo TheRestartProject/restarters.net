@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAuth } from '~/composables/useAuth.js'
 import { useSessionStore } from '~/stores/session.js'
@@ -11,7 +11,6 @@ import NetworkGroupsModerationTable from '~/components/networks/NetworkGroupsMod
 import NetworkEventsModerationTable from '~/components/networks/NetworkEventsModerationTable.vue'
 import NetworkTagsManager from '~/components/networks/NetworkTagsManager.vue'
 import TusImageUpload from '~/components/forms/TusImageUpload.vue'
-import GroupsTable from '~/components/groups/GroupsTable.vue'
 
 // /networks/{id} - resources/views/networks/show.blade.php +
 // resources/js/components/NetworkPage.vue (design.md §6.2 Phase E task E1).
@@ -63,7 +62,6 @@ const network = computed(() => networksStore.current.data)
 
 useHead({ title: computed(() => network.value?.name || t('networks.general.networks')) })
 
-const selectedTagFilter = ref('')
 const showDescriptionModal = ref(false)
 const showAssociateModal = ref(false)
 const logoError = ref('')
@@ -118,11 +116,10 @@ const candidateGroups = computed(() => {
 })
 
 function loadGroups() {
-  const params = selectedTagFilter.value ? { group_tag: selectedTagFilter.value } : {}
+  const params = {}
   networksStore.fetchGroups(id.value, params)
 }
 
-watch(selectedTagFilter, loadGroups)
 
 function loadNetwork() {
   networksStore.fetchCurrent(id.value)
@@ -249,40 +246,23 @@ function retry() {
         </section>
       </template>
 
-      <!-- Legacy's "Groups" section is just a count sentence + a "View
-           groups" link out to /group/network/{id} - it never lists groups
-           inline. That destination has no Nuxt equivalent (see the header
-           dropdown's comment above), so the richer inline GroupsTable +
-           tag filter already built here is kept as a deliberate,
-           functionally-superior divergence rather than regressed to a
-           link with nowhere useful to go (parity-v2/networks.md gap #3 -
-           flagged for explicit sign-off there). -->
-      <section class="mb-4">
-        <div class="d-flex justify-content-between align-items-center mb-2">
-          <h2 class="mb-0">{{ t('networks.general.groups') }}</h2>
-          <select
-            v-if="networksStore.tags.data.length"
-            v-model="selectedTagFilter"
-            class="form-select w-auto"
-            data-testid="network-show-tag-filter"
-          >
-            <option value="">{{ t('networks.tags.title') }}</option>
-            <option v-for="tag in networksStore.tags.data" :key="tag.id" :value="tag.id">{{ tag.name }}</option>
-          </select>
+      <!-- NetworkPage.vue:80-86 - a count sentence and a link out to the
+           groups list filtered to this network. This used to render the full
+           inline groups browser (search, country/network filters, sortable
+           table), justified in a comment as a "functionally-superior
+           divergence flagged for explicit sign-off". It was neither signed off
+           nor parity, and the stated blocker - that develop's
+           /group/network/{id} has no Nuxt equivalent - is handled by pointing
+           at /group/all with a network query param, which GroupsTableFilters
+           now seeds from. -->
+      <section class="groups-section mb-4">
+        <h2>{{ t('networks.general.groups') }}</h2>
+        <div class="groups-info border p-3" data-testid="network-show-groups-info">
+          {{ t('networks.show.groups_count', { count: groupRows.length, name: network.name }, groupRows.length) }}
+          <NuxtLink :to="`/group/all?network=${network.id}`" data-testid="network-show-groups-link">
+            {{ t('networks.show.view_groups_link') }}
+          </NuxtLink>
         </div>
-
-        <div v-if="networksStore.groups.loading" data-testid="network-show-groups-loading">
-          <div class="placeholder-glow">
-            <span class="placeholder col-12" style="height: 4rem" />
-          </div>
-        </div>
-        <BAlert v-else-if="networksStore.groups.error" :model-value="true" variant="danger" data-testid="network-show-groups-error">
-          {{ t('client.networks.groups_load_error') }}
-        </BAlert>
-        <div v-else-if="!groupRows.length" class="text-muted" data-testid="network-show-groups-empty">
-          {{ t('client.networks.no_groups') }}
-        </div>
-        <GroupsTable v-else :groups="groupRows" :show-join="false" :show-filters="true" />
       </section>
 
       <section v-if="canManage" class="mb-4" data-testid="tags-management">

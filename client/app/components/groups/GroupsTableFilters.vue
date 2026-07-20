@@ -39,7 +39,22 @@ const emit = defineEmits(['update:filters'])
 const { t } = useI18n()
 
 const expanded = ref(false)
-const filters = reactive({ name: '', tags: '', location: '', country: '', network: '' })
+
+// Seeded from ?network= so a link can land here pre-filtered. develop's
+// network page links to /group/network/{id} - a dedicated route this client
+// doesn't have - and the absence of any query-param handling here is why that
+// link was previously considered unreproducible, and the whole groups browser
+// embedded into the network page instead. Expanded by default when a filter
+// arrives this way, so the applied filter is visible rather than hidden behind
+// the collapsed panel.
+const route = useRoute()
+const initialNetwork = route.query.network ? String(route.query.network) : ''
+
+const filters = reactive({ name: '', tags: '', location: '', country: '', network: initialNetwork })
+
+if (initialNetwork) {
+  expanded.value = true
+}
 
 watch(
   filters,
