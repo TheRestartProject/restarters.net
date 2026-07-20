@@ -232,7 +232,14 @@ async function dismissOnboardingModal(page) {
 // side degrades to "0" instead. That difference is an environment artifact,
 // not a design regression.
 async function settle(page) {
-  await page.waitForLoadState('networkidle').catch(() => {})
+  // Bounded deliberately. Unqualified, waitForLoadState uses the default
+  // navigation timeout, so ONE page whose network never goes idle (a hanging
+  // map tile, a stalled poll) burns minutes and then takes the whole suite
+  // down with it via the per-test timeout - which is exactly what happened:
+  // a single stall on 09-group-view cost every later desktop page its
+  // capture, and the pages simply appeared "not captured" with no obvious
+  // cause. 8s is well past a healthy page here (most settle in under 2s).
+  await page.waitForLoadState('networkidle', { timeout: 8000 }).catch(() => {})
   // Let async widgets/stat counters paint.
   await page.waitForTimeout(1200)
   await dismissOnboardingModal(page)

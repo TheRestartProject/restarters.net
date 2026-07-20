@@ -9,8 +9,14 @@
 const config = {
   testDir: 'client/parity',
   outputDir: '/tmp/test-results/parity-output',
-  // Live pages + full-page screenshots at two viewports are slow.
-  timeout: 300 * 1000,
+  // Live pages + full-page screenshots at two viewports are slow. This is a
+  // whole-suite-of-pages budget, not a single-page one: each `logged-in pages`
+  // test walks ~28 URLs in one go, and the legacy side additionally blocks
+  // ~5s per page on a Discourse cURL timeout when that container is down. At
+  // 300s this silently truncated the desktop run partway through the page
+  // list, so pages late in the list were never captured and looked simply
+  // absent rather than failed.
+  timeout: 1800 * 1000,
   retries: 0,
   // Serial: never hammer the live site, and keep capture order deterministic.
   workers: 1,
