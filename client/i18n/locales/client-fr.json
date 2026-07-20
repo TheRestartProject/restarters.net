@@ -231,7 +231,6 @@
       "invalid_code": "Le code de récupération que vous utilisez n'est pas valide. Veuillez demander un nouveau lien de récupération."
     },
     "users": {
-      "click_to_copy": "Cliquer/appuyer pour copier",
       "create_user": "Créer un nouvel utilisateur",
       "create_user_title": "Ajouter un nouvel utilisateur",
       "edit_role": "Modifier le rôle",

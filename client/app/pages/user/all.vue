@@ -2,7 +2,6 @@
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAuth } from '~/composables/useAuth.js'
-import { useClipboard } from '~/composables/useClipboard.js'
 import { useUsersStore } from '~/stores/users.js'
 import { useAdminRefdataStore } from '~/stores/adminRefdata.js'
 import AdminSettingsTab from '~/components/profile/AdminSettingsTab.vue'
@@ -43,7 +42,6 @@ const { t, tm } = useI18n()
 useHead({ title: t('users.title') })
 
 const { hasRole } = useAuth()
-const { copy } = useClipboard()
 const usersStore = useUsersStore()
 const adminRefdataStore = useAdminRefdataStore()
 
@@ -157,20 +155,6 @@ function humanise(iso) {
   } catch {
     return iso
   }
-}
-
-// Gap 9: legacy truncates the email cell to 15 chars (Str::limit) and wraps
-// it in a hover popover offering "Click/press to copy" - reused here as a
-// native title tooltip (shows the full address on hover) plus a click
-// handler through the shared useClipboard composable, rather than building
-// a bespoke Bootstrap popover for a single cell.
-function truncateEmail(email) {
-  if (!email) return ''
-  return email.length > 15 ? `${email.slice(0, 15)}...` : email
-}
-
-function copyEmail(email) {
-  copy(email)
 }
 
 function openRoleModal(row) {
@@ -411,19 +395,9 @@ onMounted(() => {
                       {{ row.name }}
                     </NuxtLink>
                   </td>
-                  <td>
-                    <span
-                      class="hover-pointer"
-                      role="button"
-                      tabindex="0"
-                      :title="`${row.email} - ${t('client.users.click_to_copy')}`"
-                      :data-testid="`users-row-email-${row.id}`"
-                      @click="copyEmail(row.email)"
-                      @keydown.enter="copyEmail(row.email)"
-                    >{{ truncateEmail(row.email) }}</span>
-                  </td>
+                  <td>{{ row.email }}</td>
                   <td>{{ t(row.role_name) }}</td>
-                  <td>{{ row.location || t('users.location_na') }}</td>
+                  <td>{{ row.location }}</td>
                   <td>{{ row.country_name }}</td>
                   <!-- parity-v2/admin-and-static.md gap 10: legacy wraps this
                        count in a hover popover listing the member's actual
@@ -566,10 +540,6 @@ onMounted(() => {
   border: 0;
   padding: 0;
   font-weight: bold;
-  cursor: pointer;
-}
-
-.hover-pointer {
   cursor: pointer;
 }
 </style>

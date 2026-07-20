@@ -44,23 +44,14 @@ describe('pages/brands', () => {
     expect(table.props('displayKey')).toBe('brand_name')
     expect(table.props('formFields')).toEqual([{ key: 'brand_name', label: 'Brand name', type: 'text', required: true, maxLength: 255 }])
     expect(table.props('testidPrefix')).toBe('brands')
-    // allowCreate isn't passed explicitly - like the legacy BrandsPage.vue,
-    // this page relies on AdminCrudTable's own default (true), covered by
-    // that component's own generic suite.
+    // allowCreate/allowDelete aren't passed explicitly - like the live
+    // BrandsPage.vue (07e6abd7cc^, this branch's pre-Phase-F baseline - not
+    // develop's older Blade, which never got a delete UI), this page relies
+    // on AdminCrudTable's own defaults (both true), covered by that
+    // component's own generic suite.
   })
 
-  // Gap 2: legacy's brand list/edit templates expose no delete UI at all
-  // (DELETE /brands/{id} exists server-side but nothing links to it) - so
-  // unlike its skills/tags siblings, this page turns delete off entirely.
-  it('disables delete (brand deletion has no UI in the legacy app)', () => {
-    const wrapper = mountPage()
-    const table = wrapper.findComponent(AdminCrudTableStub)
-
-    expect(table.props('allowDelete')).toBe(false)
-    expect(table.props('deleteItem')).toBeUndefined()
-  })
-
-  it('wires items and the create/update actions to the adminRefdata store', () => {
+  it('wires items and the four CRUD actions to the adminRefdata store', () => {
     adminStore.brands.data = [{ id: 1, brand_name: 'Sony' }]
 
     const wrapper = mountPage()
@@ -70,6 +61,14 @@ describe('pages/brands', () => {
     expect(table.props('fetchItems')).toBe(adminStore.fetchBrands)
     expect(table.props('createItem')).toBe(adminStore.createBrand)
     expect(table.props('updateItem')).toBe(adminStore.updateBrand)
+    expect(table.props('deleteItem')).toBe(adminStore.deleteBrand)
+  })
+
+  it('formats the duplicate-name confirm-delete message with the brand name', () => {
+    const wrapper = mountPage()
+    const table = wrapper.findComponent(AdminCrudTableStub)
+
+    expect(table.props('labels').formatConfirmDelete({ brand_name: 'Sony' })).toBe('Are you sure you want to delete the brand "Sony"?')
   })
 
   it('reads ?editId= from the route as a number', () => {

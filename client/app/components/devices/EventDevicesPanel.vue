@@ -77,7 +77,7 @@ function onAdded() {
       <h2 class="mb-0 d-flex align-items-center">
         <!-- Gap 23: EventDevices.vue pairs the heading with a TV icon
              (desktop only - `d-none d-md-block` on the b-img itself). -->
-        <img src="/images/tv.svg" alt="" class="devices-title-icon d-none d-md-block me-2">
+        <img :src="'/images/tv.svg'" alt="" class="devices-title-icon d-none d-md-block me-2">
         {{ t('devices.title_items_at_event') }}
         <span class="fw-normal">({{ devices.length }})</span>
       </h2>

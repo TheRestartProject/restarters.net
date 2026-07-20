@@ -8,7 +8,7 @@ import en from '../../i18n/locales/en.json'
 import clientEn from '../../i18n/locales/client-en.json'
 
 const AdminCrudTableStub = {
-  props: ['items', 'displayKey', 'tableFields', 'formFields', 'labels', 'testidPrefix', 'allowCreate', 'allowDelete', 'editTwoColumn', 'editId', 'fetchItems', 'createItem', 'updateItem', 'deleteItem'],
+  props: ['items', 'displayKey', 'tableFields', 'formFields', 'labels', 'testidPrefix', 'allowCreate', 'allowDelete', 'editId', 'fetchItems', 'createItem', 'updateItem', 'deleteItem'],
   template: '<div data-testid="stub-admin-crud-table" />',
 }
 
@@ -34,16 +34,15 @@ const NuxtLinkStub = { props: ['to'], template: '<a :href="to"><slot /></a>' }
 
 // lang/en/admin.php's co2_footprint gained a real Unicode subscript in
 // place of raw "<sub>2</sub>" markup (the table header/form label render it
-// as plain text, so the old value showed the literal tags on screen), and
-// not_applicable is new alongside this Nuxt work (gap 21), but
+// as plain text, so the old value showed the literal tags on screen) but
 // client/i18n/locales/en.json is a generated, checked-in artifact this
 // change intentionally leaves untouched (php artisan translations:export-client)
-// - overlay the changed/new keys here so the spec doesn't depend on regenerating it.
+// - overlay the changed key here so the spec doesn't depend on regenerating it.
 const messages = {
   en: {
     ...en,
     ...clientEn,
-    admin: { ...en.admin, co2_footprint: 'CO₂ Footprint (kg)', not_applicable: 'N/A' },
+    admin: { ...en.admin, co2_footprint: 'CO₂ Footprint (kg)' },
   },
 }
 
@@ -107,46 +106,34 @@ describe('pages/category', () => {
     expect(adminStore.fetchClusters).toHaveBeenCalledTimes(1)
   })
 
-  it('reads cluster_name directly off each row, falling back to N/A when empty (gap 21)', () => {
+  // live CategoriesPage.vue (07e6abd7cc^) is the baseline (not develop's
+  // older Blade, nor develop's dead CategoriesTable.vue - neither is
+  // mounted by anything on this branch): blank cluster cell when empty (no
+  // "N/A" fallback), "Category name" as the column label (not "Name"), and
+  // footprint_reliability sortable: true.
+  it('reads cluster_name directly off each row, translating it but with no N/A fallback', () => {
     const wrapper = mountPage()
     const table = wrapper.findComponent(AdminCrudTableStub)
     const clusterColumn = table.props('tableFields').find((f) => f.key === 'cluster_name')
 
     expect(clusterColumn).toBeDefined()
-    expect(clusterColumn.formatter('Computers and Home Office')).toBe('Computers and Home Office')
-    expect(clusterColumn.formatter(null)).toBe('N/A')
-    expect(clusterColumn.formatter('')).toBe('N/A')
+    expect(clusterColumn.formatter(null)).toBeNull()
+    expect(clusterColumn.formatter('')).toBe('')
   })
 
-  // Gap 20: CategoriesTable.vue hardcodes its rendered column header to the
-  // literal English "Name", ignoring admin.category_name (which stays the
-  // create/edit form field's label, unaffected by this gap).
-  it('labels the name table column "Name", distinct from the form field\'s "Category name"', () => {
+  it('labels the name table column "Category name", matching the form field', () => {
     const wrapper = mountPage()
     const table = wrapper.findComponent(AdminCrudTableStub)
 
-    expect(table.props('tableFields').find((f) => f.key === 'name').label).toBe('Name')
+    expect(table.props('tableFields').find((f) => f.key === 'name').label).toBe('Category name')
     expect(table.props('formFields').find((f) => f.key === 'name').label).toBe('Category name')
   })
 
-  // Gap 19: legacy's CategoriesTable.vue explicitly sets sortable: false on
-  // this column (it holds pre-rendered badge HTML, not a sortable value).
-  it('marks the reliability column non-sortable', () => {
+  it('marks the reliability column sortable', () => {
     const wrapper = mountPage()
     const table = wrapper.findComponent(AdminCrudTableStub)
 
-    expect(table.props('tableFields').find((f) => f.key === 'footprint_reliability').sortable).toBe(false)
-  })
-
-  // Gap 12: category/edit.blade.php groups Name/Weight/CO2/Reliability/
-  // Cluster in one Bootstrap column beside Description in another.
-  it('opts into AdminCrudTable\'s two-column edit layout, with description in the right column', () => {
-    const wrapper = mountPage()
-    const table = wrapper.findComponent(AdminCrudTableStub)
-
-    expect(table.props('editTwoColumn')).toBe(true)
-    expect(table.props('formFields').find((f) => f.key === 'description_short').column).toBe('right')
-    expect(table.props('formFields').find((f) => f.key === 'name').column).toBeUndefined()
+    expect(table.props('tableFields').find((f) => f.key === 'footprint_reliability').sortable).toBe(true)
   })
 
   it("the cluster select field's options update once fetchClusters resolves", async () => {

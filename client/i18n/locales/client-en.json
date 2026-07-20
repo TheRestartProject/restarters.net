@@ -231,7 +231,6 @@
       "invalid_code": "The recovery code you're using is invalid. Please request a new recovery link."
     },
     "users": {
-      "click_to_copy": "Click/press to copy",
       "create_user": "Create new user",
       "create_user_title": "Add new user",
       "edit_role": "Edit role",

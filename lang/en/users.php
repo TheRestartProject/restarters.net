@@ -7,7 +7,6 @@ return [
     'role' => 'Role',
     'role_any' => 'Choose role',
     'location' => 'Location',
-    'location_na' => 'N/A',
     'country' => 'Country',
     'groups' => 'Groups',
     'joined' => 'Joined',

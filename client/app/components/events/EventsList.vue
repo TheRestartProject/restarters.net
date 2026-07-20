@@ -69,7 +69,7 @@ const { t } = useI18n()
             <!-- Gap 1: date_long column header - GroupEventScrollTable.vue's
                  head(date_long) shows a clock icon rather than text. -->
             <th scope="col">
-              <img src="/images/clock.svg" alt="" class="col-icon-sm">
+              <img :src="'/images/clock.svg'" alt="" class="col-icon-sm">
             </th>
             <th scope="col" />
             <template v-if="!past">

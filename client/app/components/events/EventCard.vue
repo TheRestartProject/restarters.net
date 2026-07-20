@@ -129,7 +129,7 @@ async function onToggleAttendance() {
       <div>{{ date }}</div>
       <div>{{ start }} <span class="d-none d-md-inline">- {{ end }}</span></div>
       <div class="text-muted">
-        <img src="/images/clock.svg" alt="" class="datelong-icon">
+        <img :src="'/images/clock.svg'" alt="" class="datelong-icon">
         {{ timezone }}
       </div>
     </td>
