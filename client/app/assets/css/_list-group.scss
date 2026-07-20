@@ -1,0 +1,43 @@
+// _list-group.scss - the profile/preferences sidebar nav.
+//
+// Bootstrap's own list-group is imported (_bootstrap.scss), but develop's
+// overrides on top of it were never ported, so `.list-group-item.active`
+// fell back to Bootstrap 5's themed $primary - a TEAL block with white text
+// where develop shows an AMBER one with brand-coloured text. Affects the
+// sidebar on every profile page, not just notifications.
+.list-group {
+  margin-bottom: 20px;
+
+  .list-group-item {
+    font-size: 20px;
+    color: $brand;
+    border: 1px solid #d9d9d9;
+    border-top: 0;
+    border-radius: 0;
+    margin: 0;
+
+    &:hover {
+      text-decoration: underline;
+      background-color: #fff;
+    }
+
+    &:focus,
+    &:active {
+      text-decoration: none;
+      outline: 2px solid #222;
+      background-color: #fff;
+    }
+
+    &:first-child {
+      border-top: 1px solid #d9d9d9;
+    }
+
+    &.active {
+      color: $brand;
+      outline: 2px solid #222;
+      background-color: $brand-orange;
+      border-color: $brand-orange;
+      border-radius: 2px;
+    }
+  }
+}

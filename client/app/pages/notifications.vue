@@ -147,8 +147,11 @@ async function markOne(id) {
         <div class="edit-panel">
           <div class="d-flex justify-content-between align-items-center mb-3">
             <h3 class="mb-0">{{ t('notifications.notifications') }}</h3>
+            <!-- notifications.blade.php:48 renders this unconditionally; ours
+                 hid it whenever nothing was unread, so the action vanished
+                 exactly when a user might go looking to confirm it had
+                 worked. -->
             <BButton
-              v-if="list.unread > 0"
               variant="outline-primary"
               data-testid="notifications-mark-all"
               @click="markAll"
