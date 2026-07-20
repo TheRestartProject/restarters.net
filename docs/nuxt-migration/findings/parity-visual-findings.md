@@ -785,3 +785,26 @@ Page height was used to triage which pages to look at, and it produced two
 false leads (see the retraction above). The network page, by contrast, has a
 height ratio of 1.31 and is genuinely divergent. **Look at every pair.** The
 ratio is at best a hint about ordering, never evidence either way.
+
+### 29-network-view — resolution
+
+Diffs 1, 2 and 4 are fixed together by making the moderation queue render
+`GroupsTable` in develop's `approve` mode, which is all develop's
+`GroupsRequiringModeration` ever did. The hand-rolled table had cost us the
+panel, the icon+sort column headers and the amber cell in one go - a good
+illustration that "we built our own equivalent" is where parity quietly goes,
+not the obviously-missing features. Diff 3 (the Groups section) is fixed
+separately.
+
+**Diff 5 is not a diff - it is a bigger gap.** develop puts network-logo
+upload on `networks/{id}/edit` (`Route::resource('networks', ...)->only([
+'index','show','edit','update'])`, `resources/views/networks/edit.blade.php:30`).
+This client has **no network edit page at all** - only `pages/networks/index.vue`
+and `pages/networks/[id].vue` - and the logo dropzone was bolted onto the view
+page as a substitute. Deleting it from the view page without building the edit
+page would remove the only way to set a network logo, so it stays until that
+page exists.
+
+**Outstanding: build `/networks/[id]/edit`** (name, description, website,
+logo, and whatever else `NetworkController@edit`/`@update` accepts). Until
+then the view page carries a control develop does not have there.
