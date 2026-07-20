@@ -61,10 +61,16 @@ onMounted(() => {
       <table class="table network-moderation-table">
       <thead>
         <tr>
-          <th>{{ t('groups.export.events.date') }}</th>
-          <th>{{ t('groups.export.events.event') }}</th>
-          <th>{{ t('groups.volunteers_invited') }}</th>
-          <th>{{ t('groups.export.events.volunteers') }}</th>
+          <!-- GroupEventScrollTable.vue:38-70 uses ICON headers, not text.
+               These were text, and the three groups.export.events.* keys they
+               used never resolved: develop stores them FLAT with literal dots
+               ('export.events.date'), so vue-i18n read them as a nested path
+               and rendered the raw key string in the header row. Icons remove
+               the broken lookups and match develop at the same time. -->
+          <th><img src="/images/clock.svg" alt="" class="moderation-th-icon" :title="t('groups.export_event_list')"></th>
+          <th />
+          <th><img src="/images/mail_ico.svg" alt="" class="moderation-th-icon" :title="t('groups.volunteers_invited')"></th>
+          <th><img src="/images/participants.svg" alt="" class="moderation-th-icon" :title="t('groups.volunteers_confirmed')"></th>
           <th />
         </tr>
       </thead>
@@ -100,5 +106,13 @@ onMounted(() => {
 <style scoped lang="scss">
 .network-moderation-flag {
   white-space: nowrap;
+}
+</style>
+
+<style scoped>
+/* GroupEventScrollTable's `.icon` header images. */
+.moderation-th-icon {
+  width: 24px;
+  height: 24px;
 }
 </style>

@@ -544,6 +544,13 @@ class EventController extends Controller
             $events = array_merge($events, $network->eventsRequiringModeration());
         }
 
+        // Dedupe by id: an event whose group belongs to more than one network
+        // is returned once per network by the loop above, so it appeared
+        // twice in the moderation queue. Observed against the parity fixtures,
+        // where the queue rendered the same pending event twice while develop
+        // showed it once.
+        $events = collect($events)->unique('idevents')->values()->all();
+
         usort($events, function ($a, $b) {
             return strtotime($a->event_start_utc) - strtotime($b->event_start_utc);
         });

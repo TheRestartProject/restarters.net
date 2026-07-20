@@ -57,9 +57,14 @@ const { t } = useI18n()
       </div>
     </div>
 
-    <p v-else-if="!events.length" data-testid="events-list-empty">
-      {{ emptyMessage }}
-    </p>
+    <!-- Rendered as HTML: several of these strings carry markup in the lang
+         files - events.no_location is
+         "<b>You do not currently have a town/city set. You can set one in
+         <a href=\"/profile/edit\">your profile</a>.</b>" - and interpolating
+         it printed the tags as literal text on /party. The strings come from
+         our own lang files, not from user input. -->
+    <!-- eslint-disable-next-line vue/no-v-html -->
+    <p v-else-if="!events.length" data-testid="events-list-empty" v-html="emptyMessage" />
 
     <div v-else class="table-responsive">
       <table class="table align-middle" data-testid="events-list-items">

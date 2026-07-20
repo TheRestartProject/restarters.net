@@ -30,6 +30,7 @@ return [
   'area' => 'Area',
   'groups_approval_text' => 'Group submissions need to be approved by an administrator',
   'group_tag' => 'Tag',
+  'volunteers_confirmed' => 'Volunteers confirmed',
   'volunteers_invited' => 'Volunteers invited',
   'group_tags' => 'Group tags',
   'approve_group' => 'Approve group',
