@@ -67,4 +67,6 @@ return [
   'tooltip_notes' => '<p>Add any additional detail here, for example:</p><ul><li>Did you encounter anything that made the repair more difficult?</li><li>Was the actual problem different to what the owner thought?</li></ul>',
   'tooltip_type_powered' => 'What type of item is this? (e.g. \'Blender\' or \'Drone\' or \'Drill\')',
   'tooltip_type_unpowered' => 'Add as much information about the type of item here as you can (e.g. \'Sofa\' or \'Denim jeans\')',
+  'brand_if_known' => 'Brand (if known)',
+  'model_if_known' => 'Model (if known)',
 ];

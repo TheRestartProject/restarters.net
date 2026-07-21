@@ -389,6 +389,7 @@ defineExpose({ submit })
             v-model="form.brand"
             type="text"
             class="form-control"
+            :placeholder="t('devices.brand_if_known')"
             list="device-form-brand-list"
             :disabled="readonly"
             data-testid="device-form-brand"
@@ -411,6 +412,7 @@ defineExpose({ submit })
             v-model="form.model"
             type="text"
             class="form-control"
+            :placeholder="t('devices.model_if_known')"
             :disabled="readonly"
             data-testid="device-form-model"
           >

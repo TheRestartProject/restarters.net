@@ -124,6 +124,21 @@ describe('components/devices/DeviceForm', () => {
       .toBe(en.devices.tooltip_type_unpowered)
   })
 
+  // DeviceBrand.vue/DeviceModel.vue prompt with "Brand (if known)" /
+  // "Model (if known)". That "(if known)" is the only thing telling anyone
+  // the fields are optional, so dropping it loses information rather than
+  // just styling. Kept as a placeholder ALONGSIDE the real <label>, not
+  // instead of it - develop has placeholder-only, which leaves the field
+  // unnamed once anything is typed into it.
+  it('prompts that brand and model are optional', () => {
+    const wrapper = mountForm()
+
+    expect(wrapper.find('[data-testid="device-form-brand"]').attributes('placeholder'))
+      .toBe(en.devices.brand_if_known)
+    expect(wrapper.find('[data-testid="device-form-model"]').attributes('placeholder'))
+      .toBe(en.devices.model_if_known)
+  })
+
   it('requires a category before submitting', async () => {
     store.addDevice = vi.fn()
     const wrapper = mountForm()

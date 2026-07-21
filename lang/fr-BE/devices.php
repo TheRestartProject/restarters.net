@@ -67,4 +67,6 @@ return [
   'tooltip_notes' => '<p>Ajoutez autant de détails que possible ici, par exemple:</p><ul><li>Avez-vous rencontré un obstacle ayant rendu votre réparation plus difficile?</li><li>Est-ce que le problème s\'est avéré différent de ce que le propriétaire pensait?</li></ul>',
   'tooltip_type_powered' => 'Quel type d\'appareil est-ce? (ex: "blender", "drone")',
   'tooltip_type_unpowered' => 'Ajoutez autant d\'informations que possible sur le type d\'appareil (ex: "divan" "Jeans Denim")',
+  'brand_if_known' => 'Marque (si connue)',
+  'model_if_known' => 'Modèle (si connu)',
 ];

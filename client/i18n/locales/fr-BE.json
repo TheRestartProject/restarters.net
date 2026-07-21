@@ -667,7 +667,9 @@
         "tooltip_problem": "<p>N'hésitez pas à donner autant de détails que possible à propos du problème rencontré et ce qui a été fait pour le réparer. Par exemple:</p><ul><li>Comment s'est-il cassé?</li><li>Quelle partie était cassée?</li><li>Quelles étapes ont été suivies pour le réparer et cela a-t-il fonctionné?</li></ul><p><a href='https://talk.restarters.net/t/fixometer-how-to-log-repair-data-from-your-event/1028#heading--comments' target='_blank' rel='noopener nofollower'>Plus d'informations</a></p>",
         "tooltip_notes": "<p>Ajoutez autant de détails que possible ici, par exemple:</p><ul><li>Avez-vous rencontré un obstacle ayant rendu votre réparation plus difficile?</li><li>Est-ce que le problème s'est avéré différent de ce que le propriétaire pensait?</li></ul>",
         "tooltip_type_powered": "Quel type d'appareil est-ce? (ex: \"blender\", \"drone\")",
-        "tooltip_type_unpowered": "Ajoutez autant d'informations que possible sur le type d'appareil (ex: \"divan\" \"Jeans Denim\")"
+        "tooltip_type_unpowered": "Ajoutez autant d'informations que possible sur le type d'appareil (ex: \"divan\" \"Jeans Denim\")",
+        "brand_if_known": "Marque (si connue)",
+        "model_if_known": "Modèle (si connu)"
     },
     "discourse": {
         "number_of_comments": "Nombre de commentaires",
