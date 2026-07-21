@@ -117,7 +117,7 @@ async function markOne(id) {
     </div>
 
     <div class="row justify-content-center">
-      <div class="col-lg-4">
+      <div class="col-lg-4 offset-lg-sidebar">
         <div class="list-group" data-testid="notifications-sidebar">
           <NuxtLink to="/profile/edit" class="list-group-item list-group-item-action" data-testid="notifications-sidebar-profile">
             {{ t('profile.profile') }}
@@ -144,7 +144,7 @@ async function markOne(id) {
       </div>
 
       <div class="col-lg-8">
-        <div class="edit-panel">
+        <div class="edit-panel notifications-page">
           <div class="d-flex justify-content-between align-items-center mb-3">
             <h3 class="mb-0">{{ t('notifications.notifications') }}</h3>
             <!-- notifications.blade.php:48 renders this unconditionally; ours
