@@ -51,9 +51,17 @@ class GroupController extends Controller
 
         $groupAudits = self::getGroupAudits($dateFrom);
 
+        // Batched, not one Group::find() per audit row - same fix as
+        // UserGroupsController::changes. A caller asking for all changes (no
+        // dateFrom) otherwise pays one query per audit, which grows with the
+        // whole history rather than with the result set.
+        $groups = Group::whereIn('idgroups', $groupAudits->pluck('auditable_id')->unique()->all())
+            ->get()
+            ->keyBy('idgroups');
+
         $groupChanges = [];
         foreach ($groupAudits as $groupAudit) {
-            $group = Group::find($groupAudit->auditable_id);
+            $group = $groups->get($groupAudit->auditable_id);
             if (! is_null($group) && $group->changesShouldPushToZapier()) {
                 $groupChanges[] = self::mapDetailsAndAuditToChange($group, $groupAudit);
             }

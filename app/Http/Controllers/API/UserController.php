@@ -49,9 +49,16 @@ class UserController extends Controller
 
         $userAudits = self::getUserAudits($dateFrom);
 
+        // Batched, not one User::find() per audit row - same fix as
+        // GroupController::getGroupChanges and UserGroupsController::changes.
+        $users = User::withTrashed()
+            ->whereIn('id', $userAudits->pluck('auditable_id')->unique()->all())
+            ->get()
+            ->keyBy('id');
+
         $userChanges = [];
         foreach ($userAudits as $userAudit) {
-            $user = User::withTrashed()->find($userAudit->auditable_id);
+            $user = $users->get($userAudit->auditable_id);
             if (! is_null($user) && $user->changesShouldPushToZapier()) {
                 $userChanges[] = self::mapUserAndAuditToUserChange($user, $userAudit);
             }
