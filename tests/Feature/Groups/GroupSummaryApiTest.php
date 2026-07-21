@@ -95,7 +95,7 @@ class GroupSummaryApiTest extends TestCase
             'event_end_utc' => Carbon::now()->addDays(3)->addHours(2)->toIso8601String(),
             'approved' => true,
         ]);
-        \Cache::forget('future_events');
+        \Cache::forget('future_approved_events');
 
         $response = $this->get('/api/v2/groups/summary?ids=' . $a->idgroups . ',' . $b->idgroups
             . '&includeNextEvent=true&includeCounts=true&archived=true');

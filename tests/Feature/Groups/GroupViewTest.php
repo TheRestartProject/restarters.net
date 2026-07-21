@@ -225,7 +225,7 @@ class GroupViewTest extends TestCase
         ]);
 
         // The upcoming events are cached globally, not per group.
-        Cache::forget('future_events');
+        Cache::forget('future_approved_events');
 
         $response = $this->get('/api/v2/groups/summary?includeNextEvent=true');
         $response->assertSuccessful();
@@ -234,6 +234,67 @@ class GroupViewTest extends TestCase
         $this->assertNotNull($group, "Group (id=$id) not found in API response");
         $this->assertNotNull($group['next_event'], 'Group should have a next_event');
         $this->assertEquals($soonest->idevents, $group['next_event']['id'], 'next_event should be the soonest upcoming event, not the furthest away');
+    }
+
+    public function testNextEventIgnoresUnapprovedEvents(): void
+    {
+        $this->loginAsTestUser(Role::ADMINISTRATOR);
+
+        // The group page only ever counts approved events as the "next" one
+        // (Group::getNextUpcomingEvent), but the summary API used to take any
+        // future event - so an unapproved event showed on the public map as the
+        // group's next event while the group's own page ignored it.
+        $id = $this->createGroup('Group With An Unapproved Event');
+
+        $soon = Carbon::parse('1pm tomorrow');
+        $later = Carbon::parse('1pm +3 months');
+
+        Party::factory()->create([
+            'group' => $id,
+            'approved' => false,
+            'event_start_utc' => $soon->toIso8601String(),
+            'event_end_utc' => $soon->copy()->addHours(2)->toIso8601String(),
+        ]);
+        $approved = Party::factory()->create([
+            'group' => $id,
+            'approved' => true,
+            'event_start_utc' => $later->toIso8601String(),
+            'event_end_utc' => $later->copy()->addHours(2)->toIso8601String(),
+        ]);
+
+        Cache::forget('future_approved_events');
+
+        $response = $this->get('/api/v2/groups/summary?includeNextEvent=true');
+        $response->assertSuccessful();
+
+        $group = collect($response->json('data'))->firstWhere('id', $id);
+        $this->assertNotNull($group, "Group (id=$id) not found in API response");
+        $this->assertNotNull($group['next_event'], 'Group should have a next_event');
+        $this->assertEquals($approved->idevents, $group['next_event']['id'], 'next_event should skip the unapproved event and use the approved one');
+    }
+
+    public function testNextEventIsNullWhenTheOnlyUpcomingEventIsUnapproved(): void
+    {
+        $this->loginAsTestUser(Role::ADMINISTRATOR);
+
+        $id = $this->createGroup('Group With Only An Unapproved Event');
+
+        $soon = Carbon::parse('1pm tomorrow');
+        Party::factory()->create([
+            'group' => $id,
+            'approved' => false,
+            'event_start_utc' => $soon->toIso8601String(),
+            'event_end_utc' => $soon->copy()->addHours(2)->toIso8601String(),
+        ]);
+
+        Cache::forget('future_approved_events');
+
+        $response = $this->get('/api/v2/groups/summary?includeNextEvent=true');
+        $response->assertSuccessful();
+
+        $group = collect($response->json('data'))->firstWhere('id', $id);
+        $this->assertNotNull($group, "Group (id=$id) not found in API response");
+        $this->assertNull($group['next_event'], 'An unapproved event must not be advertised as the next event');
     }
 
     public function testFutureScopeReturnsSoonestFirst(): void
