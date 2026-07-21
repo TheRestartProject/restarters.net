@@ -45,6 +45,9 @@ const { t, locale } = useI18n()
 
 const activeTab = ref('upcoming')
 const sortDesc = ref(false)
+// GroupEventScrollTable.vue is a b-table with every column sortable. Only the
+// date/title header sorted here, so the stats columns were decorative.
+const sortKey = ref('start')
 const showCalendarModal = ref(false)
 
 const upcoming = computed(() =>
@@ -59,13 +62,34 @@ const past = computed(() =>
     .sort((a, b) => new Date(b.start) - new Date(a.start))
 )
 
+// How each sortable column reads its value. Stats live under event.stats, so
+// a missing figure sorts as -1 rather than 0 - "not recorded" and "zero" are
+// different things and should not interleave.
+const SORT_VALUES = {
+  start: (e) => new Date(e.start).getTime(),
+  location: (e) => String(e.location || '').toLowerCase(),
+  participants: (e) => e.stats?.participants ?? -1,
+  volunteers: (e) => e.stats?.volunteers ?? -1,
+  waste: (e) => e.stats?.waste_total ?? -1,
+  co2: (e) => e.stats?.co2_total ?? -1,
+  fixed: (e) => e.stats?.fixed_devices ?? -1,
+  repairable: (e) => e.stats?.repairable_devices ?? -1,
+  dead: (e) => e.stats?.dead_devices ?? -1,
+  invited: (e) => e.invited ?? -1,
+}
+
 const rows = computed(() => {
   const base = activeTab.value === 'upcoming' ? upcoming.value : past.value
+  const read = SORT_VALUES[sortKey.value] ?? SORT_VALUES.start
   const sorted = [...base]
+
   sorted.sort((a, b) => {
-    const cmp = new Date(a.start) - new Date(b.start)
+    const av = read(a)
+    const bv = read(b)
+    const cmp = typeof av === 'string' ? av.localeCompare(bv) : av - bv
     return sortDesc.value ? -cmp : cmp
   })
+
   return sorted
 })
 
@@ -145,11 +169,18 @@ function noDevices(event) {
 
 // Only one sortable column here (the date/title header), so the key is
 // fixed. aria-sort on the <th>; the hint on the control.
-const sortAria = () => sortAriaValue('start', 'start', sortDesc.value)
-const sortHint = () => t(sortHintKey('start', 'start', sortDesc.value))
+const sortAria = (key = 'start') => sortAriaValue(key, sortKey.value, sortDesc.value)
+const sortHint = (key = 'start') => t(sortHintKey(key, sortKey.value, sortDesc.value))
 
-function toggleSort() {
-  sortDesc.value = !sortDesc.value
+// First click sorts ascending on a new column; clicking the active one flips
+// it, matching b-table.
+function toggleSort(key = 'start') {
+  if (sortKey.value === key) {
+    sortDesc.value = !sortDesc.value
+  } else {
+    sortKey.value = key
+    sortDesc.value = false
+  }
 }
 
 function dateLabel(iso) {
@@ -249,12 +280,22 @@ function copyCalendarUrl() {
         <table v-else class="table" data-testid="group-events-table-upcoming">
           <thead>
             <tr>
-              <th scope="col" class="sortable" role="button" :aria-sort="sortAria()" @click="toggleSort">
+              <th scope="col" class="sortable" role="button" :aria-sort="sortAria()" @click="toggleSort('start')">
                 <span>{{ t('client.groups.column_event') }}</span>
                 <span class="sort-indicator" aria-hidden="true">{{ sortDesc ? '▼' : '▲' }}</span>
                 <span class="visually-hidden">{{ sortHint() }}</span>
               </th>
-              <th scope="col">{{ t('client.groups.column_location') }}</th>
+              <th
+                scope="col"
+                class="sortable"
+                role="button"
+                :aria-sort="sortAria('location')"
+                @click="toggleSort('location')"
+              >
+                <span>{{ t('client.groups.column_location') }}</span>
+                <span class="sort-indicator" aria-hidden="true">{{ sortKey === 'location' && sortDesc ? '▼' : '▲' }}</span>
+                <span class="visually-hidden">{{ sortHint('location') }}</span>
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -278,20 +319,34 @@ function copyCalendarUrl() {
         <table v-else class="table" data-testid="group-events-table-past">
           <thead>
             <tr>
-              <th scope="col" class="sortable" role="button" :aria-sort="sortAria()" @click="toggleSort">
+              <th scope="col" class="sortable" role="button" :aria-sort="sortAria()" @click="toggleSort('start')">
                 <span>{{ t('client.groups.column_event') }}</span>
                 <span class="sort-indicator" aria-hidden="true">{{ sortDesc ? '▼' : '▲' }}</span>
                 <span class="visually-hidden">{{ sortHint() }}</span>
               </th>
-              <th scope="col">{{ t('client.groups.column_location') }}</th>
+              <th
+                scope="col"
+                class="sortable"
+                role="button"
+                :aria-sort="sortAria('location')"
+                @click="toggleSort('location')"
+              >
+                <span>{{ t('client.groups.column_location') }}</span>
+                <span class="sort-indicator" aria-hidden="true">{{ sortKey === 'location' && sortDesc ? '▼' : '▲' }}</span>
+                <span class="visually-hidden">{{ sortHint('location') }}</span>
+              </th>
               <th
                 v-for="column in statColumns"
                 :key="column.key"
                 scope="col"
-                class="stat-col"
+                class="stat-col sortable"
+                role="button"
+                :aria-sort="sortAria(column.key)"
                 :data-testid="`group-events-col-${column.key}`"
+                @click="toggleSort(column.key)"
               >
                 <img :src="column.icon" :alt="column.label" :title="column.label" width="24" height="24">
+                <span class="visually-hidden">{{ sortHint(column.key) }}</span>
               </th>
             </tr>
           </thead>

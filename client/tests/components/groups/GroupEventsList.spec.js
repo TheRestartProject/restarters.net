@@ -169,6 +169,60 @@ describe('components/groups/GroupEventsList', () => {
     expect(rowsAfter[0].attributes('data-testid')).toBe('group-event-4')
   })
 
+  // GroupEventScrollTable.vue is a b-table with every column sortable. Only
+  // the date header sorted here, so the stats columns were decorative.
+  describe('sorting by stats column', () => {
+    const PAST = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
+    const withStats = (id, participants) => ({
+      id,
+      title: `E${id}`,
+      start: PAST,
+      end: PAST,
+      location: 'X',
+      stats: { participants, volunteers: 0, waste_total: 0, co2_total: 0, fixed_devices: 0, repairable_devices: 0, dead_devices: 0 },
+    })
+
+    async function pastTable(events) {
+      const wrapper = mountComponent({ events })
+      await wrapper.find('[data-testid="group-events-tab-past"]').trigger('click')
+      return wrapper
+    }
+
+    it('sorts ascending on first click of a stats column, and flips on the second', async () => {
+      const wrapper = await pastTable([withStats(1, 9), withStats(2, 3)])
+      const order = () => wrapper.findAll('[data-testid="group-events-table-past"] tbody tr')
+        .map((r) => r.attributes('data-testid'))
+
+      await wrapper.find('[data-testid="group-events-col-participants"]').trigger('click')
+      expect(order()).toEqual(['group-event-2', 'group-event-1'])
+
+      await wrapper.find('[data-testid="group-events-col-participants"]').trigger('click')
+      expect(order()).toEqual(['group-event-1', 'group-event-2'])
+    })
+
+    it('marks only the active column via aria-sort', async () => {
+      const wrapper = await pastTable([withStats(1, 9), withStats(2, 3)])
+
+      await wrapper.find('[data-testid="group-events-col-waste"]').trigger('click')
+
+      expect(wrapper.find('[data-testid="group-events-col-waste"]').attributes('aria-sort')).toBe('ascending')
+      expect(wrapper.find('[data-testid="group-events-col-participants"]').attributes('aria-sort')).toBe('none')
+    })
+
+    it('sorts an event with no stats apart from one recording zero', async () => {
+      // "not recorded" and "zero" are different things; -1 keeps them from
+      // interleaving.
+      const noStats = { id: 3, title: 'E3', start: PAST, end: PAST, location: 'X' }
+      const wrapper = await pastTable([withStats(1, 0), noStats])
+
+      await wrapper.find('[data-testid="group-events-col-participants"]').trigger('click')
+
+      const order = wrapper.findAll('[data-testid="group-events-table-past"] tbody tr')
+        .map((r) => r.attributes('data-testid'))
+      expect(order).toEqual(['group-event-3', 'group-event-1'])
+    })
+  })
+
   it('shows Add new event and Export event list only when canedit is true (gap 2, 5)', () => {
     const editor = mountComponent({ events: EVENTS, canedit: true })
     expect(editor.find('[data-testid="group-events-add"]').attributes('href')).toBe('/party/create/5')
