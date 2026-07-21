@@ -155,9 +155,70 @@ describe('GroupMap options', () => {
   })
 })
 
-// Neil's PR feedback: as well as centring the map on your town, put that town in
-// the "Search for a place..." box - a visual hint that the map has already been
-// searched for you.
+// A user who has set only their country gets a box around that country's groups.
+// Framing the 5 nearest groups to the middle of a country would be useless - the
+// centre of France is not near anyone in particular - so that only happens for a
+// user who has coordinates of their own.
+describe('GroupMap country-level framing', () => {
+  const groups = [
+    { id: 1, location: { lat: 51.5, lng: -0.1 } },
+    { id: 2, location: { lat: 53.4, lng: -2.2 } },
+    { id: 3, location: { lat: 55.9, lng: -3.2 } },
+  ]
+  const COUNTRY = [[50.0, -5.0], [56.0, 1.0]]
+
+  test('fits the country box as given when the user has no coordinates of their own', () => {
+    const wrapper = mountMap(COUNTRY, groups)
+    const map = fakeMap()
+    wrapper.vm.mapObject = map
+    wrapper.vm.$refs.map = { mapObject: map }
+    wrapper.vm.zoomedToGroups = false
+
+    wrapper.vm.zoomToGroups()
+
+    expect(map.fitBounds).toHaveBeenCalledTimes(1)
+    expect(wrapper.vm.hasUserPoint).toBe(false)
+    // The whole country box, not a tight box round a few groups near its middle.
+    const bounds = map.fitBounds.mock.calls[0][0]
+    expect(L.latLngBounds(bounds).contains([50.0, -5.0])).toBe(true)
+    expect(L.latLngBounds(bounds).contains([56.0, 1.0])).toBe(true)
+  })
+
+  test('frames the groups nearest the user when they do have coordinates', () => {
+    const wrapper = mountMap(COUNTRY, groups, { yourLat: 51.5, yourLng: -0.1 })
+    const map = fakeMap()
+    wrapper.vm.mapObject = map
+    wrapper.vm.$refs.map = { mapObject: map }
+    wrapper.vm.zoomedToGroups = false
+
+    expect(wrapper.vm.hasUserPoint).toBe(true)
+
+    wrapper.vm.zoomToGroups()
+
+    const bounds = map.fitBounds.mock.calls[0][0]
+    // Centred on the user's own point, not the middle of the country box.
+    expect(bounds.contains([51.5, -0.1])).toBe(true)
+  })
+
+  // Country with no groups in it: the page can't build a box, so we still get the
+  // inverted world box and fall back to showing everything.
+  test('falls back to framing all groups when the country has none', () => {
+    const wrapper = mountMap(WORLD, groups)
+    const map = fakeMap()
+    wrapper.vm.mapObject = map
+    wrapper.vm.$refs.map = { mapObject: map }
+    wrapper.vm.zoomedToGroups = false
+
+    wrapper.vm.zoomToGroups()
+
+    const bounds = map.fitBounds.mock.calls[0][0]
+    expect(bounds.contains([51.5, -0.1])).toBe(true)
+    expect(bounds.contains([55.9, -3.2])).toBe(true)
+  })
+})
+
+// The map is centred on the user's town, and that town also goes in the "Search
+// for a place..." box, as a hint that the map has already been searched for them.
 describe('GroupMap place search preload', () => {
   test('preloads the search box with the area the map was centred on', () => {
     const wrapper = mountMap(WORLD, [], { yourArea: 'Ulverston' })

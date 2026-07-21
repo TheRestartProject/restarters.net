@@ -66,6 +66,16 @@ export default {
       type: String,
       required: false,
       default: '',
+    },
+    yourLat: {
+      type: Number,
+      required: false,
+      default: null,
+    },
+    yourLng: {
+      type: Number,
+      required: false,
+      default: null,
     }
   },
   data() {
@@ -120,6 +130,12 @@ export default {
         return false
       }
       return +b[0][0] <= +b[1][0]
+    },
+    hasUserPoint() {
+      // A location of the user's own, as opposed to a box round their country.
+      // Only this justifies zooming in to the groups nearest them.
+      return this.yourLat !== null && this.yourLng !== null &&
+          !isNaN(+this.yourLat) && !isNaN(+this.yourLng)
     },
   },
   created() {
@@ -304,10 +320,19 @@ export default {
         const lngOf = (g) => +(g.location && g.location.lng != null ? g.location.lng : g.lng)
 
         let framed
-        if (this.hasLocation) {
-          // The user has a location, so the map is already centred on their area.
-          // Frame the 5 groups closest to the centre.
-          const center = this.mapObject.getCenter()
+        if (!this.hasUserPoint && this.hasLocation) {
+          // A box round the user's country: show the country as we were given it.
+          // Zooming to the groups nearest its centre would land somewhere
+          // arbitrary in the middle of the country, near nobody in particular.
+          this.bounds = this.initialBounds
+          this.mapObject.fitBounds(this.initialBounds)
+          return
+        }
+
+        if (this.hasUserPoint) {
+          // Frame the 5 groups closest to the user themselves.  Using the centre
+          // of the bounding box instead would drift away from where they are.
+          const center = new L.LatLng(+this.yourLat, +this.yourLng)
           framed = this.allGroups
               .map((group) => {
                 const distance = Math.sqrt((latOf(group) - center.lat) ** 2 + (lngOf(group) - center.lng) ** 2)

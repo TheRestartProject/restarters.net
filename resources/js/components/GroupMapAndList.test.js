@@ -39,6 +39,8 @@ const groupMapStub = {
     network: { type: Number, default: null },
     yourGroups: { type: Array, default: () => [] },
     yourArea: { type: String, default: '' },
+    yourLat: { type: Number, default: null },
+    yourLng: { type: Number, default: null },
     hover: { type: Number, default: null },
   },
   template: '<div class="stub-groupmap" />',
@@ -108,6 +110,15 @@ test('forwards yourArea to the map so the search box can be preloaded', async ()
   expect(wrapper.findComponent(groupMapStub).props('yourArea')).toBe('Ulverston')
 })
 
+// The map only zooms to the groups nearest the user if it knows where they are.
+test('forwards the user\'s own coordinates to the map', async () => {
+  const wrapper = await makeWrapper({ yourLat: 54.19, yourLng: -3.09 })
+
+  const map = wrapper.findComponent(groupMapStub)
+  expect(map.props('yourLat')).toBe(54.19)
+  expect(map.props('yourLng')).toBe(-3.09)
+})
+
 describe('effectiveGroupIds', () => {
   test('falls back to the full (network-filtered) list before the map has reported', async () => {
     const wrapper = await makeWrapper({ network: 5 })
@@ -131,8 +142,8 @@ describe('effectiveGroupIds', () => {
   })
 })
 
-// Neil's PR feedback: pin hover flows back up from the map and down into the
-// table, so the matching row highlights.
+// Pin hover flows back up from the map and down into the table, so the matching
+// row highlights.
 test('map update:hover lands in the table hover prop', async () => {
   const wrapper = await makeWrapper()
   wrapper.findComponent({ name: 'GroupMap' }).vm.$emit('update:hover', 42)

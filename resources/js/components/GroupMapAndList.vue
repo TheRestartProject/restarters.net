@@ -15,6 +15,8 @@
           :network="network"
           :your-groups="yourGroups"
           :your-area="yourArea"
+          :your-lat="yourLat"
+          :your-lng="yourLng"
           :hover="hover"
           @update:hover="hover = $event"
           @groups="groupsChanged($event)"
@@ -74,6 +76,16 @@ export default {
       type: String,
       required: false,
       default: '',
+    },
+    yourLat: {
+      type: Number,
+      required: false,
+      default: null,
+    },
+    yourLng: {
+      type: Number,
+      required: false,
+      default: null,
     },
     showFilters: {
       type: Boolean,

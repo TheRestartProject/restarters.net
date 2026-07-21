@@ -42,6 +42,8 @@ const groupMapStub = {
     initialBounds: { type: Array },
     yourGroups: { type: Array, default: () => [] },
     yourArea: { type: String, default: '' },
+    yourLat: { type: Number, default: null },
+    yourLng: { type: Number, default: null },
     network: { type: Number, default: null },
     showFilters: { type: Boolean, default: false },
     canManageTags: { type: Boolean, default: false },
@@ -135,6 +137,15 @@ test('forwards yourArea to the map list so the place search is preloaded', async
   await flushTabs(wrapper)
 
   expect(wrapper.findComponent(groupMapStub).props('yourArea')).toBe('Ulverston')
+})
+
+test('forwards the user\'s own coordinates to the map list', async () => {
+  const wrapper = makeWrapper({ tab: 'other', nearbyGroups: WORLD_BOUNDS, yourLat: 54.19, yourLng: -3.09 })
+  await flushTabs(wrapper)
+
+  const map = wrapper.findComponent(groupMapStub)
+  expect(map.props('yourLat')).toBe(54.19)
+  expect(map.props('yourLng')).toBe(-3.09)
 })
 
 test('passes the networks list for the network filter on the plain groups page', async () => {

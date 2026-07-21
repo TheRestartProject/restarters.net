@@ -83,6 +83,19 @@ class GroupController extends Controller
             // We pass a high limit to the groups nearby; there is a distance limit which will normally kick in first.
             $nearby_groups = $user->groupsNearby(1000);
 
+            if (empty($nearby_groups) && $user->country_code) {
+                // groupsNearby() needs coordinates, which a user who has only set their country doesn't have.  We
+                // can still open the map on something better than the whole world by framing the groups in their
+                // country.  If there aren't any then we leave the bounding box alone, which the map reads as "no
+                // location" and falls back to showing every group.
+                $nearby_groups = Group::whereNull('archived_at')
+                    ->where('approved', true)
+                    ->where('country_code', $user->country_code)
+                    ->whereNotNull('latitude')
+                    ->whereNotNull('longitude')
+                    ->get();
+            }
+
             // Now find the lat/lng bounding box which contains these groups.
             foreach ($nearby_groups as $group) {
                 if ($group->latitude < $min_lat) {

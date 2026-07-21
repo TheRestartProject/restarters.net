@@ -53,6 +53,8 @@
               :initial-bounds="nearbyGroups"
               :your-groups="yourGroups"
               :your-area="yourArea"
+              :your-lat="yourLat"
+              :your-lng="yourLng"
               :network="network"
               show-filters
               :can-manage-tags="showTags"
@@ -98,6 +100,16 @@ export default {
     },
     yourArea: {
       type: String,
+      required: false,
+      default: null
+    },
+    yourLat: {
+      type: Number,
+      required: false,
+      default: null
+    },
+    yourLng: {
+      type: Number,
       required: false,
       default: null
     },

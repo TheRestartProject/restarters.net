@@ -197,6 +197,66 @@ class GroupViewTest extends TestCase
         $this->assertNotNull($group2['next_event'], 'Group Beta should have a next_event');
     }
 
+    public function testGroupsPageFramesTheCountryForAUserWithNoTown(): void
+    {
+        // A user who has only set their country has no coordinates, so
+        // groupsNearby() can't help - the map used to open on the whole world.
+        // Frame the groups in their country instead.
+        $this->loginAsTestUser(Role::ADMINISTRATOR);
+        $id = $this->createGroup('Group In Country', 'https://therestartproject.org', 'London');
+
+        $group = Group::find($id);
+        $group->country_code = 'GB';
+        $group->latitude = 54.19;
+        $group->longitude = -3.09;
+        $group->approved = true;
+        $group->save();
+
+        $user = \App\User::factory()->restarter()->create([
+            'country_code' => 'GB',
+            'location' => null,
+            'latitude' => null,
+            'longitude' => null,
+        ]);
+        $this->actingAs($user);
+
+        $props = $this->getVueProperties($this->get('/group/other'));
+        $bounds = json_decode($props[1][':nearby-groups'], true);
+
+        // [[min_lat, min_lng], [max_lat, max_lng]] - a real box, not the inverted
+        // world box [[90,180],[-90,-180]] that means "no location".
+        $this->assertLessThanOrEqual($bounds[1][0], $bounds[0][0], 'Should be a real bounding box, not the inverted world box');
+        $this->assertEqualsWithDelta(54.19, $bounds[0][0], 0.001);
+        $this->assertEqualsWithDelta(-3.09, $bounds[0][1], 0.001);
+    }
+
+    public function testGroupsPageFallsBackToTheWorldWhenTheCountryHasNoGroups(): void
+    {
+        $this->loginAsTestUser(Role::ADMINISTRATOR);
+        $id = $this->createGroup('Group Somewhere Else');
+
+        $group = Group::find($id);
+        $group->country_code = 'GB';
+        $group->latitude = 54.19;
+        $group->longitude = -3.09;
+        $group->save();
+
+        // Country with no groups in it: nothing to frame, so we fall back to the
+        // inverted world box, which the map reads as "show me everything".
+        $user = \App\User::factory()->restarter()->create([
+            'country_code' => 'NZ',
+            'location' => null,
+            'latitude' => null,
+            'longitude' => null,
+        ]);
+        $this->actingAs($user);
+
+        $props = $this->getVueProperties($this->get('/group/other'));
+        $bounds = json_decode($props[1][':nearby-groups'], true);
+
+        $this->assertEquals([[90, 180], [-90, -180]], $bounds);
+    }
+
     public function testNextEventIsTheSoonestNotTheFurthestAway(): void
     {
         $this->loginAsTestUser(Role::ADMINISTRATOR);

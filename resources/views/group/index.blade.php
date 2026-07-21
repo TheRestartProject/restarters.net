@@ -62,6 +62,8 @@
           :your-groups="{{ json_encode($your_groups, JSON_INVALID_UTF8_IGNORE) }}"
           :nearby-groups="{{ json_encode($nearby_groups, JSON_INVALID_UTF8_IGNORE) }}"
           your-area="{{ $your_area }}"
+          :your-lat="{{ $your_lat !== null ? $your_lat : 'null' }}"
+          :your-lng="{{ $your_lng !== null ? $your_lng : 'null' }}"
           :can-create="{{ $can_create ? 'true' : 'false' }}"
           tab="{{ $tab }}"
           :network="{{ $network ? $network : 'null' }}"
