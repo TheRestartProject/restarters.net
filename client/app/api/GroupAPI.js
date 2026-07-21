@@ -96,11 +96,18 @@ export default class GroupAPI extends BaseAPI {
     return this.$post(`/api/v2/groups/${id}/invites`, payload)
   }
 
-  // DELETE /api/v2/groups/{id} (api-contracts-phase-b.md B2, not yet
-  // implemented server-side) - archive semantics, gated client-side on the
-  // can_perform_delete permission flag (#892).
+  // DELETE /api/v2/groups/{id} - archive semantics (sets archived_at, and is
+  // reversible). Gated client-side on can_perform_archive.
   del(id) {
     return this.$del(`/api/v2/groups/${id}`)
+  }
+
+  // DELETE /api/v2/groups/{id}/permanent - the hard delete, removing the group
+  // and its events for good. Administrator only, and only when the group has
+  // no event with a device; the endpoint enforces both independently of the
+  // can_see_delete/can_perform_delete flags the UI gates on.
+  deletePermanently(id) {
+    return this.$del(`/api/v2/groups/${id}/permanent`)
   }
 
   // DELETE /api/v2/groups/{id}/volunteers/{iduser} - already implemented

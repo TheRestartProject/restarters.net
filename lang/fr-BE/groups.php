@@ -178,4 +178,6 @@ Apprenez à utiliser ce groupe ici : :help.',
   'repairable_items' => 'Appareils réparables',
   'end_of_life_items' => 'Appareils en fin de vie',
   'now_unfollowed' => 'Vous ne suivez maintenant plus <a href=":link">:name</a>!',
+  'delete_group' => 'Supprimer Repair Café',
+  'delete_group_confirm' => 'Veuillez confirmer que vous voulez supprimer :name',
 ];

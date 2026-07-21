@@ -363,10 +363,8 @@ export const useGroupsStore = defineStore('groups', {
       return data
     },
 
-    // DELETE /api/v2/groups/{id} (api-contracts-phase-b.md B2, not yet
-    // implemented server-side; archive semantics). Only ever called when
-    // permissions.can_perform_delete is true (#892 - enforced server-side
-    // too).
+    // DELETE /api/v2/groups/{id} - archive semantics. Only ever called when
+    // permissions.can_perform_archive is true (enforced server-side too).
     async deleteGroup(id) {
       const { $api } = useNuxtApp()
 
@@ -375,6 +373,29 @@ export const useGroupsStore = defineStore('groups', {
         if (this.current.data && this.current.data.id === id) {
           this.current.data = { ...this.current.data, archived_at: new Date().toISOString() }
         }
+        return data
+      } catch (error) {
+        useToastStore().error(error)
+        throw error
+      }
+    },
+
+    // DELETE /api/v2/groups/{id}/permanent - the hard delete GroupActions.vue
+    // offers Administrators, removing the group and its events for good
+    // rather than archiving. Drops the group from local state, since unlike
+    // archive there is nothing left to view.
+    async deleteGroupPermanently(id) {
+      const { $api } = useNuxtApp()
+
+      try {
+        const { data } = await $api.group.deletePermanently(id)
+
+        this.mine.data = this.mine.data.filter((g) => g.id !== id)
+        this.memberIds = this.memberIds.filter((mid) => mid !== id)
+        if (this.current.data && this.current.data.id === id) {
+          this.current.data = null
+        }
+
         return data
       } catch (error) {
         useToastStore().error(error)

@@ -178,4 +178,6 @@ Learn how to use this group here: :help.',
   'repairable_items' => 'Repairable items',
   'end_of_life_items' => 'End-of-life items',
   'now_unfollowed' => 'You have now unfollowed <a href=":link">:name</a>.',
+  'delete_group' => 'Delete group',
+  'delete_group_confirm' => 'Please confirm that you want to delete :name.',
 ];

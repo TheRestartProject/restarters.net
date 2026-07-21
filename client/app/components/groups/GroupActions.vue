@@ -36,9 +36,21 @@ defineProps({
     type: Boolean,
     default: false,
   },
+  // Administrator-only permanent delete, distinct from archive. GroupActions.vue
+  // shows the item to anyone who can see it and greys it out when the group
+  // can't actually be deleted (it has an event with a device), rather than
+  // hiding it - so an admin learns the option exists and why it's unavailable.
+  canSeeDelete: {
+    type: Boolean,
+    default: false,
+  },
+  canPerformDelete: {
+    type: Boolean,
+    default: false,
+  },
 })
 
-const emit = defineEmits(['invite', 'share-stats', 'join', 'leave', 'archive'])
+const emit = defineEmits(['invite', 'share-stats', 'join', 'leave', 'archive', 'delete'])
 
 const { t } = useI18n()
 </script>
@@ -81,6 +93,14 @@ const { t } = useI18n()
         @click="emit('archive')"
       >
         {{ t('groups.archive_group') }}
+      </BDropdownItem>
+      <BDropdownItem
+        v-if="canSeeDelete"
+        :disabled="!canPerformDelete"
+        data-testid="group-actions-delete"
+        @click="canPerformDelete && emit('delete')"
+      >
+        {{ t('groups.delete_group') }}
       </BDropdownItem>
     </template>
     <template v-else>

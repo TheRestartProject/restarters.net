@@ -141,6 +141,7 @@ Route::prefix('v2')->middleware(\App\Http\Middleware\VerifyUserConsentApi::class
                 Route::delete('{id}/members/me', [API\GroupMembershipController::class, 'leavev2']);
                 Route::post('{id}/invites', [API\GroupMembershipController::class, 'invitesv2']);
                 Route::delete('{id}', [API\GroupMembershipController::class, 'archivev2']);
+                Route::delete('{id}/permanent', [API\GroupMembershipController::class, 'deletePermanentlyv2']);
                 Route::post('{id}/images', [API\GroupMembershipController::class, 'uploadImagev2']);
                 Route::delete('{id}/images/{idimages}', [API\GroupMembershipController::class, 'deleteImagev2']);
             });

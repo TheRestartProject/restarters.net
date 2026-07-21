@@ -248,6 +248,94 @@ class APIv2GroupMembershipTest extends TestCase
         $this->assertNull(Group::find($idgroups)->archived_at);
     }
 
+    // --- permanent delete (DELETE /groups/{id}/permanent) ---
+    //
+    // Distinct from archive: GroupActions.vue offers both, and only an
+    // Administrator sees this one (can_see_delete). GroupController::delete
+    // is the pre-cutover equivalent.
+
+    public function testPermanentDeleteRequiresAuthentication(): void
+    {
+        $host = User::factory()->host()->create();
+        $idgroups = $this->createGroupAsHost($host);
+
+        $response = $this->deleteJson("/api/v2/groups/$idgroups/permanent");
+
+        $response->assertStatus(401);
+        $this->assertNotNull(Group::find($idgroups));
+    }
+
+    public function testPermanentDeleteDeniedForHost(): void
+    {
+        $host = User::factory()->host()->create(['api_token' => 'perm-tok-1']);
+        $idgroups = $this->createGroupAsHost($host);
+
+        $response = $this->delete("/api/v2/groups/$idgroups/permanent?api_token=perm-tok-1");
+
+        $response->assertStatus(403);
+        $this->assertNotNull(Group::find($idgroups));
+    }
+
+    public function testPermanentDeleteDeniedForNetworkCoordinator(): void
+    {
+        // A coordinator may archive but not permanently delete - the two
+        // actions have deliberately different gates.
+        $host = User::factory()->host()->create();
+        $idgroups = $this->createGroupAsHost($host);
+
+        $network = Network::factory()->create(['shortname' => 'permnetwork'.Str::random(6)]);
+        $network->addGroup(Group::find($idgroups));
+
+        $coordinator = User::factory()->networkCoordinator()->create(['api_token' => 'perm-tok-2']);
+        $network->addCoordinator($coordinator);
+        $this->app['auth']->forgetGuards();
+        $this->actingAs($coordinator);
+
+        $response = $this->delete("/api/v2/groups/$idgroups/permanent?api_token=perm-tok-2");
+
+        $response->assertStatus(403);
+        $this->assertNotNull(Group::find($idgroups));
+    }
+
+    public function testAdministratorCanPermanentlyDeleteGroupAndItsEvents(): void
+    {
+        $host = User::factory()->host()->create();
+        $idgroups = $this->createGroupAsHost($host);
+        $event = Party::factory()->create(['group' => $idgroups]);
+
+        $admin = User::factory()->administrator()->create(['api_token' => 'perm-tok-3']);
+        $this->app['auth']->forgetGuards();
+        $this->actingAs($admin);
+
+        $response = $this->delete("/api/v2/groups/$idgroups/permanent?api_token=perm-tok-3");
+
+        $response->assertSuccessful();
+        $this->assertEquals(['deleted' => true], $response->json('data'));
+        $this->assertNull(Group::find($idgroups));
+        $this->assertNull(Party::withTrashed()->find($event->idevents));
+    }
+
+    public function testPermanentDeleteBlockedWhenGroupHasADevice(): void
+    {
+        // Same Group::canDelete() protection archive has: nothing with
+        // recorded repair data is destroyed.
+        $host = User::factory()->host()->create();
+        $idgroups = $this->createGroupAsHost($host);
+
+        $event = Party::factory()->create(['group' => $idgroups]);
+        Device::factory()->fixed()->create(['event' => $event->idevents]);
+
+        $admin = User::factory()->administrator()->create(['api_token' => 'perm-tok-4']);
+        $this->app['auth']->forgetGuards();
+        $this->actingAs($admin);
+
+        $response = $this->delete("/api/v2/groups/$idgroups/permanent?api_token=perm-tok-4");
+
+        $response->assertStatus(403);
+        $this->assertNotNull(Group::find($idgroups));
+        $this->assertNotNull(Party::withTrashed()->find($event->idevents));
+    }
+
     public function testNetworkCoordinatorForGroupCanArchiveGroup(): void
     {
         $host = User::factory()->host()->create();

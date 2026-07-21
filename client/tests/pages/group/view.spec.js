@@ -314,6 +314,83 @@ describe('pages/group/view/[id]', () => {
     })
   })
 
+  // GroupActions.vue offers Administrators a permanent delete alongside
+  // archive: the item is visible whenever can_see_delete, but greyed out when
+  // the group can't actually go (an event of its has a device).
+  describe('permanent delete', () => {
+    const ADMIN_GROUP = (overrides = {}) => ({
+      ...BASE_GROUP,
+      // can_edit too: GroupActions only renders the destructive items in its
+      // editor branch, same as the archive item beside it.
+      permissions: {
+        ...BASE_GROUP.permissions,
+        can_edit: true,
+        can_see_delete: true,
+        can_perform_delete: true,
+        ...overrides,
+      },
+    })
+
+    it('is hidden from users without can_see_delete', () => {
+      groupsStore.current.data = BASE_GROUP
+      const wrapper = mountPage()
+
+      expect(wrapper.find('[data-testid="group-actions-delete"]').exists()).toBe(false)
+    })
+
+    it('is shown but disabled when the group cannot be deleted', () => {
+      groupsStore.current.data = ADMIN_GROUP({ can_perform_delete: false })
+      const wrapper = mountPage()
+
+      const item = wrapper.find('[data-testid="group-actions-delete"]')
+      expect(item.exists()).toBe(true)
+      // Rendered as a class, not an attribute - the item is an <a>, which
+      // cannot be disabled. The click handler is what actually withholds the
+      // action, so assert that too rather than trusting the styling.
+      expect(item.classes()).toContain('disabled')
+    })
+
+    it('does nothing when the disabled delete item is clicked', async () => {
+      groupsStore.current.data = ADMIN_GROUP({ can_perform_delete: false })
+      groupsStore.deleteGroupPermanently = vi.fn().mockResolvedValue()
+
+      const wrapper = mountPage()
+      await wrapper.find('[data-testid="group-actions-delete"]').trigger('click')
+
+      expect(wrapper.find('[data-testid="group-view-delete-confirm"]').exists()).toBe(false)
+      expect(groupsStore.deleteGroupPermanently).not.toHaveBeenCalled()
+    })
+
+    it('confirms before deleting, then calls the store and navigates away', async () => {
+      groupsStore.current.data = ADMIN_GROUP()
+      groupsStore.deleteGroupPermanently = vi.fn().mockResolvedValue()
+
+      const wrapper = mountPage()
+      await wrapper.find('[data-testid="group-actions-delete"]').trigger('click')
+
+      // Nothing happens until confirmed.
+      expect(groupsStore.deleteGroupPermanently).not.toHaveBeenCalled()
+
+      await wrapper.find('[data-testid="group-view-delete-confirm"]').trigger('click')
+      await flushPromises()
+
+      expect(groupsStore.deleteGroupPermanently).toHaveBeenCalledWith(5)
+    })
+
+    it('does not archive when deleting', async () => {
+      groupsStore.current.data = ADMIN_GROUP()
+      groupsStore.deleteGroupPermanently = vi.fn().mockResolvedValue()
+      groupsStore.deleteGroup = vi.fn().mockResolvedValue()
+
+      const wrapper = mountPage()
+      await wrapper.find('[data-testid="group-actions-delete"]').trigger('click')
+      await wrapper.find('[data-testid="group-view-delete-confirm"]').trigger('click')
+      await flushPromises()
+
+      expect(groupsStore.deleteGroup).not.toHaveBeenCalled()
+    })
+  })
+
   it('opens the invite modal from the GROUP ACTIONS invite item', async () => {
     groupsStore.current.data = { ...BASE_GROUP, permissions: { ...BASE_GROUP.permissions, can_edit: true } }
     const wrapper = mountPage()

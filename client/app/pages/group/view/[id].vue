@@ -35,16 +35,14 @@ const group = computed(() => groupsStore.current.data)
 const permissions = computed(() => group.value?.permissions || {})
 const canedit = computed(() => !!permissions.value.can_edit)
 const candemote = computed(() => !!permissions.value.can_demote)
-// The "delete" control actually archives (DELETE /api/v2/groups/{id} ->
-// archivev2, reversible); relabelled to "Archive" and gated on
-// can_perform_archive (Administrator OR NetworkCoordinator-of-group), matching
-// group/edit/[id].vue and legacy GroupActions.vue. There genuinely is no
-// hard-delete route wired up server-side (routes/api.php's groups DELETE
-// always hits GroupMembershipController::archivev2) even though the
-// can_see_delete/can_perform_delete permission flags exist in the API
-// response - so unlike develop's disabled "Delete group" item, there's
-// nothing for a "Delete group" menu item to call.
+// Two separate destructive actions, as in GroupActions.vue. "Archive"
+// (DELETE /api/v2/groups/{id}) sets archived_at and is reversible, open to
+// Administrators and the group's NetworkCoordinator. "Delete group"
+// (DELETE /api/v2/groups/{id}/permanent) removes the group and its events for
+// good, Administrator only, and only when no event has a device.
 const canPerformArchive = computed(() => !!permissions.value.can_perform_archive)
+const canSeeDelete = computed(() => !!permissions.value.can_see_delete)
+const canPerformDelete = computed(() => !!permissions.value.can_perform_delete)
 const isMember = computed(() => groupsStore.isMember(id.value))
 // GroupEvents.vue's showCalendar: Auth::check() && (isVolunteer OR
 // Administrator) - approximated here with the flags already on hand.
@@ -138,6 +136,31 @@ async function confirmArchive() {
     // Store already toasted the error.
   } finally {
     archiving.value = false
+  }
+}
+
+const confirmingDelete = ref(false)
+const deleting = ref(false)
+
+function askDelete() {
+  confirmingDelete.value = true
+}
+
+function cancelDelete() {
+  confirmingDelete.value = false
+}
+
+async function confirmDelete() {
+  confirmingDelete.value = false
+  deleting.value = true
+
+  try {
+    await groupsStore.deleteGroupPermanently(id.value)
+    await navigateTo('/group')
+  } catch {
+    // Store already toasted the error.
+  } finally {
+    deleting.value = false
   }
 }
 
@@ -262,15 +285,33 @@ onMounted(() => {
               :canedit="canedit"
               :is-member="isMember"
               :can-perform-archive="canPerformArchive"
+              :can-see-delete="canSeeDelete"
+              :can-perform-delete="canPerformDelete"
               :archived="!!group.archived_at"
               @invite="showInvite = true"
               @share-stats="showShareStats = true"
               @join="onJoin"
               @leave="onLeave"
               @archive="askArchive"
+              @delete="askDelete"
             />
           </div>
         </div>
+
+        <template v-if="canSeeDelete && confirmingDelete">
+          <div class="w-100 d-flex align-items-center gap-2 mt-2">
+            <span class="small">{{ t('groups.delete_group_confirm', { name: group.name }) }}</span>
+            <BButton
+              variant="danger"
+              :disabled="deleting"
+              data-testid="group-view-delete-confirm"
+              @click="confirmDelete"
+            >
+              {{ t('partials.yes') }}
+            </BButton>
+            <BButton variant="link" @click="cancelDelete">{{ t('partials.cancel') }}</BButton>
+          </div>
+        </template>
 
         <template v-if="canPerformArchive && confirmingArchive">
           <div class="w-100 d-flex align-items-center gap-2 mt-2">

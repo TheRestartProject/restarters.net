@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Device;
+use App\EventsUsers;
 use App\Events\UserFollowedGroup;
 use App\Group;
 use App\Helpers\Fixometer;
@@ -11,6 +12,7 @@ use App\Http\Controllers\Controller;
 use App\Invite;
 use App\Notifications\JoinGroup;
 use App\Notifications\NewGroupMember;
+use App\Party;
 use App\Role;
 use App\User;
 use App\UserGroups;
@@ -328,6 +330,64 @@ class GroupMembershipController extends Controller
         $group->update(['archived_at' => now()]);
 
         return response()->json(['data' => ['archived' => true]]);
+    }
+
+    /**
+     * @OA\Delete(
+     *      path="/api/v2/groups/{id}/permanent",
+     *      operationId="deleteGroupPermanentlyv2",
+     *      tags={"Groups"},
+     *      summary="Permanently delete a group and its events",
+     *      description="Administrator only, and only for a group with no event that has a device (Group::canDelete). This is the hard delete - DELETE /api/v2/groups/{id} archives instead, which is reversible and available to coordinators too.",
+     *      security={{"apiToken":{}}},
+     *      @OA\Parameter(name="id", description="Group id", required=true, in="path", @OA\Schema(type="integer")),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Deleted",
+     *          @OA\JsonContent(@OA\Property(property="data", type="object",
+     *              @OA\Property(property="deleted", type="boolean")
+     *          ))
+     *      ),
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound")
+     * )
+     */
+    public function deletePermanentlyv2(Request $request, $id): JsonResponse
+    {
+        $user = $request->user();
+        $group = Group::findOrFail($id);
+
+        // Administrator only - stricter than archive, which coordinators may
+        // also do. Matches can_see_delete in GroupController::groupPermissionsFor
+        // and the Auth::user()->hasRole('Administrator') gate on the web
+        // GroupController::delete this replaces.
+        if (! Fixometer::hasRole($user, 'Administrator')) {
+            abort(403);
+        }
+
+        if (! $group->canDelete()) {
+            abort(403);
+        }
+
+        // The group's events go too, including soft-deleted and future ones.
+        // canDelete() has already established none of them has a device, so
+        // nothing with recorded repair data is destroyed here. events_users
+        // rows are not cascaded in the DB, so they need removing first or the
+        // event delete hits a constraint violation - force, not soft, for the
+        // same reason.
+        $events = Party::withTrashed()->where('events.group', $group->idgroups)->get();
+
+        foreach ($events as $event) {
+            EventsUsers::where('event', $event->idevents)->get()
+                ->each(fn ($eventUser) => $eventUser->forceDelete());
+
+            $event->forceDelete();
+        }
+
+        $group->delete();
+
+        return response()->json(['data' => ['deleted' => true]]);
     }
 
     /**
