@@ -67,7 +67,6 @@
           :can-create="{{ $can_create ? 'true' : 'false' }}"
           tab="{{ $tab }}"
           :network="{{ $network ? $network : 'null' }}"
-          :networks="{{ json_encode($networks, JSON_INVALID_UTF8_IGNORE) }}"
           :all-group-tags="{{ json_encode($all_group_tags, JSON_INVALID_UTF8_IGNORE) }}"
           :show-tags="{{ $show_tags ? 'true' : 'false' }}"
         />

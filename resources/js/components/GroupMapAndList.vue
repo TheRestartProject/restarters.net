@@ -19,16 +19,16 @@
           :your-lng="yourLng"
           :hover="hover"
           @update:hover="hover = $event"
+          @update:centre="centre = $event"
           @groups="groupsChanged($event)"
       />
       <GroupsTable
           :groupids="effectiveGroupIds"
           class="mt-3"
           count
-          :your-groups="yourGroups"
           :hover.sync="hover"
+          :centre="centre"
           :search="showFilters"
-          :networks="networks"
           :all-group-tags="availableTags"
           :show-tags="canManageTags"
       />
@@ -102,11 +102,6 @@ export default {
       required: false,
       default: () => [],
     },
-    networks: {
-      type: Array,
-      required: false,
-      default: null,
-    },
   },
   data() {
     return {
@@ -114,6 +109,8 @@ export default {
       // null = the map hasn't told us what's in view yet; an empty array is a
       // real answer (nothing in view) and must not fall back to all groups.
       groupidsInBounds: null,
+      // Where the map is centred, which orders the list by what's nearest.
+      centre: null,
       mapready: false,
       bounds: null,
       hover: null,

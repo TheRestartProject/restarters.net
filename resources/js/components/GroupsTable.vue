@@ -5,12 +5,7 @@
       <GroupsTableFilters
           v-if="search"
           :name.sync="searchName"
-          :location.sync="searchLocation"
-          :network.sync="searchNetwork"
-          :country.sync="searchCountry"
           :tags.sync="searchTags"
-          :networks="networks"
-          :groups="groups"
           :all-group-tags="allGroupTags"
           :show-tags="showTags"
       />
@@ -26,11 +21,7 @@
           v-if="searchShow"
           class="pl-1 pr-1 pt-2 pb-2"
           :name.sync="searchName"
-          :location.sync="searchLocation"
-          :network.sync="searchNetwork"
-          :country.sync="searchCountry"
-          :networks="networks"
-          :groups="groups"
+          :tags.sync="searchTags"
           :all-group-tags="allGroupTags"
           :show-tags="showTags"
       />
@@ -74,12 +65,6 @@
           <span class="small text-muted">{{ data.item.location.country }}</span>
         </div>
       </template>
-      <template slot="head(hosts)">
-        <b-img :src="imageUrl('/icons/user_ico.svg')" class="mt-3 iconsmall" />
-      </template>
-      <template slot="head(restarters)">
-        <b-img :src="imageUrl('/icons/volunteer_ico-thick.svg')" class="mt-3 icon" />
-      </template>
       <template slot="head(next_event)">
         <b-img :src="imageUrl('/icons/events_ico.svg')" class="mt-3 icon" />
       </template>
@@ -97,26 +82,9 @@
         <span />
       </template>
       <template slot="cell(following)" slot-scope="data">
-        <div v-if="approve" class="cell-warning d-flex justify-content-around p-2">
+        <div class="cell-warning d-flex justify-content-around p-2">
           <a :href="'/group/edit/' + data.item.id">{{ __('groups.group_requires_moderation') }}</a>
         </div>
-        <b-btn variant="primary" class="text-nowrap mr-2" v-else-if="!yourGroup(data.item.id)" :to="'/group/join/' + data.item.id">
-          <span class="d-block d-md-none">
-            {{ __('groups.join_group_button_mobile') }}
-          </span>
-          <span class="d-none d-md-block">
-            {{ __('groups.join_group_button') }}
-          </span>
-        </b-btn>
-        <b-btn variant="primary" class="text-nowrap mr-2" v-else @click="leaveGroup(data.item.id)">
-          <span class="d-block d-md-none">
-            {{ __('groups.leave_group_button_mobile') }}
-          </span>
-          <span class="d-none d-md-block">
-            {{ __('groups.leave_group_button') }}
-          </span>
-        </b-btn>
-        <ConfirmModal :key="'leavegroupmodal-' + data.item.id" :ref="'confirmLeave-' + data.item.id" @confirm="leaveConfirmed(data.item.id)" :message="__('groups.leave_group_confirm')" />
       </template>
     </b-table>
     <infinite-loading @infinite="loadMore">
@@ -130,18 +98,24 @@ import { DATE_FORMAT, DEFAULT_PROFILE } from '../constants'
 import images from '../mixins/images'
 import moment from 'moment'
 import GroupsTableFilters from './GroupsTableFilters.vue'
-import ConfirmModal from './ConfirmModal.vue'
 import GroupArchivedBadge from "./GroupArchivedBadge.vue";
 import InfiniteLoading from 'vue-infinite-loading'
 
 
 export default {
-  components: {GroupArchivedBadge, ConfirmModal, GroupsTableFilters, InfiniteLoading},
+  components: {GroupArchivedBadge, GroupsTableFilters, InfiniteLoading},
   mixins: [images],
   props: {
     groupids: {
       type: Array,
       required: true
+    },
+    // Where the map is centred, so the list can be ordered by what's nearest to
+    // the middle of what the user is looking at.  Null away from the map.
+    centre: {
+      type: Object,
+      required: false,
+      default: null
     },
     // Group id whose row should be highlighted (set when its map pin is hovered).
     hover: {
@@ -164,11 +138,6 @@ export default {
       required: false,
       default: null
     },
-    yourGroups: {
-      type: Array,
-      required: false,
-      default: () => [],
-    },
     approve: {
       type: Boolean,
       required: false,
@@ -178,11 +147,6 @@ export default {
       type: Boolean,
       required: false,
       default: false
-    },
-    networks: {
-      type: Array,
-      required: false,
-      default: null
     },
     allGroupTags: {
       type: Array,
@@ -198,25 +162,28 @@ export default {
   data () {
     return {
       searchName: null,
-      searchLocation: null,
-      searchNetwork: null,
-      searchCountry: null,
       searchTags: null,
       searchShow: false,
-      fields: [
-        { key: 'group_image', label: 'Group Image', tdClass: 'image'},
-        { key: 'group_name', label: 'Group Name', sortable: true },
-        { key: 'location', label: 'Location', tdClass: "hidecell", thClass: "hidecell" },
-        { key: 'hosts', label: 'Hosts', sortable: true, tdClass: "hidecell text-center", thClass: "hidecell text-center pl-3" },
-        { key: 'restarters', label: 'Restarters', sortable: true, tdClass: "hidecell text-center", thClass: "hidecell text-center pl-3" },
-        { key: 'next_event', label: 'Next Event', sortable: true, tdClass: "hidecell event", thClass: "hidecell" },
-        { key: 'following' , label: 'Follow' }
-      ],
-      show: 3,
-      left: []
+      show: 3
     }
   },
   computed: {
+    fields() {
+      const fields = [
+        { key: 'group_image', label: 'Group Image', tdClass: 'image'},
+        { key: 'group_name', label: 'Group Name', sortable: true },
+        { key: 'location', label: 'Location', tdClass: "hidecell", thClass: "hidecell" },
+        { key: 'next_event', label: 'Next Event', sortable: true, tdClass: "hidecell event", thClass: "hidecell" },
+      ]
+
+      if (this.approve) {
+        // Moderation reuses this table, and its rows need a way through to the
+        // group that is waiting to be approved.
+        fields.push({ key: 'following', label: 'Moderate' })
+      }
+
+      return fields
+    },
     defaultProfile() {
       return DEFAULT_PROFILE
     },
@@ -234,20 +201,6 @@ export default {
         items = items.filter(g => g.name && g.name.toLowerCase().includes(name))
       }
 
-      if (this.searchLocation) {
-        const loc = this.searchLocation.toLowerCase()
-        items = items.filter(g => g.location && g.location.location && g.location.location.toLowerCase().includes(loc))
-      }
-
-      if (this.searchCountry) {
-        items = items.filter(g => g.location && g.location.country === this.searchCountry.country)
-      }
-
-      if (this.searchNetwork) {
-        // Groups may hold networks as summary objects ([{id}]) or as plain ids.
-        items = items.filter(g => (g.networks || []).some(n => (n && n.id !== undefined ? n.id : n) === this.searchNetwork))
-      }
-
       if (this.searchTags && this.searchTags.length) {
         const tagIds = this.searchTags.map(t => t.id)
         items = items.filter(g => {
@@ -259,9 +212,21 @@ export default {
       return items
     },
     itemsToShow() {
-      // Sort before slicing so the first page is the alphabetically-first
-      // groups, not whatever happened to be first in the store.
+      // Sort before slicing, so the first page is the first groups in order
+      // rather than whichever ones happened to load first.
       const items = [...this.filteredItems].sort((a, b) => {
+        if (this.centre) {
+          // Nearest the middle of the map first: someone looking at a map wants
+          // what's in front of them, and alphabetical order says nothing about
+          // where a group is.  Groups we can't place go last.
+          const da = this.distanceFromCentre(a)
+          const db = this.distanceFromCentre(b)
+
+          if (da !== db) {
+            return da - db
+          }
+        }
+
         return a.name.localeCompare(b.name)
       })
 
@@ -289,6 +254,18 @@ export default {
     }
   },
   methods: {
+    distanceFromCentre(group) {
+      // Only ever compared with each other, so the flat-earth approximation is
+      // fine and avoids the cost of a great-circle calculation per row.
+      const lat = group.location && group.location.lat != null ? group.location.lat : group.lat
+      const lng = group.location && group.location.lng != null ? group.location.lng : group.lng
+
+      if (lat == null || lng == null || isNaN(+lat) || isNaN(+lng)) {
+        return Number.MAX_VALUE
+      }
+
+      return Math.sqrt((+lat - this.centre.lat) ** 2 + (+lng - this.centre.lng) ** 2)
+    },
     eventStart(event) {
       // next_event is an object ({start}) from the v2 APIs but a plain date
       // string in the moderation store (newToOld).
@@ -327,14 +304,6 @@ export default {
         } else {
           return new moment(this.eventStart(aRow.next_event)).unix() - new moment(this.eventStart(bRow.next_event)).unix()
         }
-      } else if (key === 'hosts' || key === 'restarters') {
-        if (parseInt(a) < parseInt(b)) {
-          return -1
-        } else if (parseInt(a) > parseInt(b)) {
-          return 1
-        } else {
-          return 0
-        }
       } else {
         return String(a).localeCompare(String(b), compareLocale, compareOptions)
       }
@@ -347,27 +316,12 @@ export default {
         $state.complete()
       }
     },
-    leaveGroup(idgroups) {
-      this.$refs['confirmLeave-' + idgroups].show()
-    },
-    async leaveConfirmed(idgroups) {
-      await this.$store.dispatch('groups/unfollow', {
-        idgroups: idgroups
-      })
-
-      this.left.push(idgroups)
-    },
     distance(dist ) {
       if (dist < 5) {
         return Math.round(dist * 10) / 10
       } else {
         return Math.round(dist)
       }
-    },
-    yourGroup(id) {
-      // `left` tracks groups unfollowed in this session, so the button flips
-      // without waiting for fresh server data.
-      return this.yourGroups.includes(id) && !this.left.includes(id)
     },
     toggleFilters() {
       this.searchShow = !this.searchShow

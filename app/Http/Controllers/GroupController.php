@@ -58,7 +58,6 @@ class GroupController extends Controller
         } else {
             $all_group_tags = collect([]);
         }
-        $networks = Network::all();
 
         // Look for groups we have joined, not just been invited to.  We have to explicitly test on deleted_at because
         // the normal filtering out of soft deletes won't happen for joins.
@@ -121,7 +120,6 @@ class GroupController extends Controller
             'your_lng' => $user->longitude,
             'tab' => (!$tab || $tab === 'mine') ? 'mine' : 'other',
             'network' => $network,
-            'networks' => $networks,
             'all_group_tags' => $all_group_tags,
         ]);
     }

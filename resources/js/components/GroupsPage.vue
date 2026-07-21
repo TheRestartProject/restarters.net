@@ -31,8 +31,6 @@
                 class="mt-3"
                 :tab="currentTab"
                 :your-area="yourArea"
-                :your-groups="yourGroups"
-                :networks="networks"
                 :all-group-tags="allGroupTags"
                 :show-tags="showTags"
             />
@@ -59,7 +57,6 @@
               show-filters
               :can-manage-tags="showTags"
               :available-tags="allGroupTags"
-              :networks="network ? null : networks"
           />
         </div>
         <div v-else class="mt-2 mb-2 text-center">
@@ -122,10 +119,6 @@ export default {
       type: Boolean,
       required: false,
       default: false
-    },
-    networks: {
-      type: Array,
-      required: true
     },
     allGroupTags: {
       type: Array,

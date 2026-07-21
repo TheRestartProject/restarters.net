@@ -55,19 +55,32 @@ function mountTable(groups = [group], props = {}) {
   })
 }
 
-describe('GroupsTable column headers', () => {
-  // The hosts/restarters columns should show icons in the header, like the
-  // location and next-event columns do. Regression: the header-slot names did
-  // not match the field keys, so b-table fell back to the text labels
-  // "Hosts" / "Restarters".
-  test('renders the hosts column header as the user icon, not text', () => {
-    const thead = mountTable().find('thead').html()
-    expect(thead).toContain('user_ico')
+describe('GroupsTable columns', () => {
+  // A row says what the group is and where: logo, name, tags, location and when
+  // they next meet. Volunteer headcounts don't help anyone choose a group.
+  test('shows no host or restarter counts', () => {
+    const keys = mountTable().vm.fields.map(f => f.key)
+
+    expect(keys).not.toContain('hosts')
+    expect(keys).not.toContain('restarters')
+    expect(keys).toEqual(['group_image', 'group_name', 'location', 'next_event'])
   })
 
-  test('renders the restarters column header as the volunteer icon, not text', () => {
-    const thead = mountTable().find('thead').html()
-    expect(thead).toContain('volunteer_ico-thick')
+  // Following a group is a decision to make on the group's own page, having
+  // read about it - not something to click down a list.
+  test('offers no follow or leave button', () => {
+    const html = mountTable([group], { yourGroups: [] }).html()
+
+    expect(html).not.toContain('groups.join_group_button')
+    expect(html).not.toContain('groups.leave_group_button')
+  })
+
+  // Moderation reuses this table, and its rows do need an action.
+  test('keeps the moderation link when approving', () => {
+    const wrapper = mountTable([group], { approve: true })
+
+    expect(wrapper.vm.fields.map(f => f.key)).toContain('following')
+    expect(wrapper.html()).toContain('groups.group_requires_moderation')
   })
 })
 
@@ -130,25 +143,42 @@ describe('GroupsTable sorting', () => {
   })
 })
 
-describe('GroupsTable network filter', () => {
-  test('filters by the selected network (summary shape: networks = [{id}])', async () => {
-    const groups = [
-      { ...group, id: 1, name: 'In network', networks: [{ id: 2, name: 'N2' }] },
-      { ...group, id: 2, name: 'Other network', networks: [{ id: 3, name: 'N3' }] },
-    ]
-    const wrapper = mountTable(groups)
-    await wrapper.setData({ searchNetwork: 2 })
-    expect(wrapper.vm.filteredItems.map(g => g.name)).toEqual(['In network'])
+describe('GroupsTable distance sort', () => {
+  // Someone looking at a map wants the groups they can see, nearest first.
+  // Alphabetical order tells them nothing about where anything is.
+  const far = { ...group, id: 1, name: 'Alpha', location: { lat: 55.9, lng: -3.2 } }
+  const near = { ...group, id: 2, name: 'Zulu', location: { lat: 51.5, lng: -0.1 } }
+  // Named so that neither expected distance order matches alphabetical order,
+  // or the test would pass without any distance sorting at all.
+  const middle = { ...group, id: 3, name: 'Aaa', location: { lat: 53.4, lng: -2.2 } }
+
+  test('orders by distance from the centre of the map, closest first', () => {
+    const wrapper = mountTable([far, near, middle], { centre: { lat: 51.5, lng: -0.1 } })
+
+    expect(wrapper.vm.itemsToShow.map(g => g.name)).toEqual(['Zulu', 'Aaa', 'Alpha'])
   })
 
-  test('filters by the selected network (old shape: networks = [id])', async () => {
-    const groups = [
-      { ...group, id: 1, name: 'In network', networks: [2] },
-      { ...group, id: 2, name: 'Other network', networks: [3] },
-    ]
-    const wrapper = mountTable(groups)
-    await wrapper.setData({ searchNetwork: 2 })
-    expect(wrapper.vm.filteredItems.map(g => g.name)).toEqual(['In network'])
+  test('re-orders when the map moves', async () => {
+    const wrapper = mountTable([far, near, middle], { centre: { lat: 51.5, lng: -0.1 } })
+
+    await wrapper.setProps({ centre: { lat: 55.9, lng: -3.2 } })
+
+    expect(wrapper.vm.itemsToShow.map(g => g.name)).toEqual(['Alpha', 'Aaa', 'Zulu'])
+  })
+
+  // The table is used away from the map too, where there is no centre to
+  // measure from.
+  test('falls back to alphabetical when there is no map centre', () => {
+    const wrapper = mountTable([far, near, middle])
+
+    expect(wrapper.vm.itemsToShow.map(g => g.name)).toEqual(['Aaa', 'Alpha', 'Zulu'])
+  })
+
+  test('sorts groups with no coordinates to the end', () => {
+    const nowhere = { ...group, id: 4, name: 'Bravo', location: { lat: null, lng: null } }
+    const wrapper = mountTable([nowhere, near], { centre: { lat: 51.5, lng: -0.1 } })
+
+    expect(wrapper.vm.itemsToShow.map(g => g.name)).toEqual(['Zulu', 'Bravo'])
   })
 })
 
@@ -176,28 +206,6 @@ describe('GroupsTable mobile filter toggle', () => {
 
     await wrapper.find('.clickme').trigger('click')
     expect(wrapper.vm.searchShow).toBe(false)
-  })
-})
-
-describe('GroupsTable follow/unfollow button', () => {
-  test('shows Unfollow for groups in yourGroups and Follow for others', () => {
-    const groups = [
-      { ...group, id: 1, name: 'Mine' },
-      { ...group, id: 2, name: 'Not mine' },
-    ]
-    const wrapper = mountTable(groups, { yourGroups: [1] })
-    const rows = wrapper.findAll('tbody tr')
-    expect(rows.at(0).text()).toContain('groups.leave_group_button')
-    expect(rows.at(0).text()).not.toContain('groups.join_group_button')
-    expect(rows.at(1).text()).toContain('groups.join_group_button')
-  })
-
-  test('flips the button to Follow after unfollowing', async () => {
-    const wrapper = mountTable([group], { yourGroups: [1] })
-    expect(wrapper.find('tbody tr').text()).toContain('groups.leave_group_button')
-    await wrapper.vm.leaveConfirmed(1)
-    await wrapper.vm.$nextTick()
-    expect(wrapper.find('tbody tr').text()).toContain('groups.join_group_button')
   })
 })
 

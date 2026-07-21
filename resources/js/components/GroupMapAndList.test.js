@@ -51,10 +51,9 @@ const groupsTableStub = {
   props: {
     groupids: { type: Array },
     search: { type: Boolean, default: false },
-    networks: { type: Array, default: null },
     allGroupTags: { type: Array, default: null },
     showTags: { type: Boolean, default: false },
-    yourGroups: { type: Array, default: () => [] },
+    centre: { type: Object, default: null },
   },
   template: '<div class="stub-table" />',
 }
@@ -83,12 +82,10 @@ async function makeWrapper(props = {}) {
 }
 
 test('forwards network and filter context to the map and the table', async () => {
-  const networks = [{ id: 5, name: 'N5' }]
   const tags = [{ id: 1, tag_name: 'Foo' }]
   const wrapper = await makeWrapper({
     network: 5,
     showFilters: true,
-    networks,
     availableTags: tags,
     canManageTags: true,
   })
@@ -97,7 +94,6 @@ test('forwards network and filter context to the map and the table', async () =>
 
   const table = wrapper.findComponent(groupsTableStub)
   expect(table.props('search')).toBe(true)
-  expect(table.props('networks')).toEqual(networks)
   expect(table.props('allGroupTags')).toEqual(tags)
   expect(table.props('showTags')).toBe(true)
 })
@@ -117,6 +113,17 @@ test('forwards the user\'s own coordinates to the map', async () => {
   const map = wrapper.findComponent(groupMapStub)
   expect(map.props('yourLat')).toBe(54.19)
   expect(map.props('yourLng')).toBe(-3.09)
+})
+
+// The list is ordered by distance from the middle of the map, so it has to know
+// where that is, and follow it as the map moves.
+test('passes the map centre through to the table', async () => {
+  const wrapper = await makeWrapper()
+
+  wrapper.findComponent({ name: 'GroupMap' }).vm.$emit('update:centre', { lat: 54.19, lng: -3.09 })
+  await wrapper.vm.$nextTick()
+
+  expect(wrapper.findComponent(groupsTableStub).props('centre')).toEqual({ lat: 54.19, lng: -3.09 })
 })
 
 describe('effectiveGroupIds', () => {
