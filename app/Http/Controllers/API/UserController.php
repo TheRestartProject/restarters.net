@@ -2165,11 +2165,12 @@ class UserController extends Controller
             return response()->json(['message' => 'User not found'], 404);
         }
 
-        // Same xref/thumbnail derivation SessionController::userPayload() and
-        // the legacy profile view (User::getProfile) use, so the avatar here
-        // matches what the navbar already shows for the same person.
+        // Full size, NOT the thumbnail: profile-new.blade.php renders
+        // `/uploads/{path}` in a col-3 header block. The navbar avatar is a
+        // separate, genuinely thumbnail-sized use (SessionController::
+        // userPayload), so the two should not share a derivation.
         $profile = User::getProfile($user->id);
-        $avatarUrl = ($profile && $profile->path) ? url('/uploads/thumbnail_'.$profile->path) : null;
+        $avatarUrl = ($profile && $profile->path) ? url('/uploads/'.$profile->path) : null;
 
         // Mirrors the legacy profile-new.blade.php's
         // $user->existsOnDiscourse() / getTalkProfileUrl() pairing: null/false
