@@ -14,6 +14,7 @@
           :bounds.sync="bounds"
           :network="network"
           :your-groups="yourGroups"
+          :your-area="yourArea"
           :hover="hover"
           @update:hover="hover = $event"
           @groups="groupsChanged($event)"
@@ -68,6 +69,11 @@ export default {
       type: Array,
       required: false,
       default: () => [],
+    },
+    yourArea: {
+      type: String,
+      required: false,
+      default: '',
     },
     showFilters: {
       type: Boolean,

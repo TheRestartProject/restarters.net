@@ -41,6 +41,7 @@ const groupMapStub = {
   props: {
     initialBounds: { type: Array },
     yourGroups: { type: Array, default: () => [] },
+    yourArea: { type: String, default: '' },
     network: { type: Number, default: null },
     showFilters: { type: Boolean, default: false },
     canManageTags: { type: Boolean, default: false },
@@ -127,6 +128,13 @@ test('forwards network + filter context to the map list on a network view', asyn
   // On a network view the list is already scoped, so the network dropdown is
   // pointless — don't offer it.
   expect(map.props('networks')).toBeNull()
+})
+
+test('forwards yourArea to the map list so the place search is preloaded', async () => {
+  const wrapper = makeWrapper({ tab: 'other', nearbyGroups: WORLD_BOUNDS, yourArea: 'Ulverston' })
+  await flushTabs(wrapper)
+
+  expect(wrapper.findComponent(groupMapStub).props('yourArea')).toBe('Ulverston')
 })
 
 test('passes the networks list for the network filter on the plain groups page', async () => {

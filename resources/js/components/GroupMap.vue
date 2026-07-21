@@ -61,12 +61,18 @@ export default {
       type: Number,
       required: false,
       default: null,
+    },
+    yourArea: {
+      type: String,
+      required: false,
+      default: '',
     }
   },
   data() {
     return {
       moved: false,
       mapObject: null,
+      geocoder: null,
       zoom: this.minZoom,
       destroyed: false,
       mapIdle: 0,
@@ -183,7 +189,7 @@ export default {
 
       if (this.mapObject) {
         try {
-          new Geocoder({
+          this.geocoder = new Geocoder({
             placeholder: this.__('groups.search_place'),
             errorMessage: this.__('groups.search_nothing_found'),
             defaultMarkGeocode: false,
@@ -213,6 +219,8 @@ export default {
                 }
               })
               .addTo(this.mapObject)
+
+          this.presetSearch()
         } catch (e) {
           // This is usually caused by leaflet.
           console.log('Ignore leaflet exception', e)
@@ -220,6 +228,14 @@ export default {
       }
 
       this.idle()
+    },
+    presetSearch() {
+      // We've already centred the map on the user's area, so show that area in
+      // the search box too - a hint that the map has been searched for them,
+      // rather than an empty box that looks like nothing has happened.
+      if (this.geocoder && this.yourArea) {
+        this.geocoder.setQuery(this.yourArea)
+      }
     },
     idle() {
       this.mapObject = this.$refs.map.mapObject

@@ -38,6 +38,7 @@ const groupMapStub = {
     initialBounds: { type: Array },
     network: { type: Number, default: null },
     yourGroups: { type: Array, default: () => [] },
+    yourArea: { type: String, default: '' },
     hover: { type: Number, default: null },
   },
   template: '<div class="stub-groupmap" />',
@@ -97,6 +98,14 @@ test('forwards network and filter context to the map and the table', async () =>
   expect(table.props('networks')).toEqual(networks)
   expect(table.props('allGroupTags')).toEqual(tags)
   expect(table.props('showTags')).toBe(true)
+})
+
+// The search box is preloaded with the user's area, so the town has to survive
+// the whole way down from the page to the map.
+test('forwards yourArea to the map so the search box can be preloaded', async () => {
+  const wrapper = await makeWrapper({ yourArea: 'Ulverston' })
+
+  expect(wrapper.findComponent(groupMapStub).props('yourArea')).toBe('Ulverston')
 })
 
 describe('effectiveGroupIds', () => {

@@ -52,6 +52,7 @@
           <GroupMapAndList
               :initial-bounds="nearbyGroups"
               :your-groups="yourGroups"
+              :your-area="yourArea"
               :network="network"
               show-filters
               :can-manage-tags="showTags"

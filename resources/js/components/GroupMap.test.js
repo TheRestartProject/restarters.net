@@ -42,11 +42,11 @@ function fakeMap(size = { x: 688, y: 400 }) {
   }
 }
 
-function mountMap(initialBounds, groups) {
+function mountMap(initialBounds, groups, props = {}) {
   return shallowMount(GroupMap, {
     localVue,
     store: makeStore(groups),
-    propsData: { initialBounds },
+    propsData: { initialBounds, ...props },
   })
 }
 
@@ -152,6 +152,38 @@ describe('GroupMap options', () => {
 
   test('does not set gestureHandling (the plugin is not installed)', () => {
     expect('gestureHandling' in mountMap(WORLD, []).vm.mapOptions).toBe(false)
+  })
+})
+
+// Neil's PR feedback: as well as centring the map on your town, put that town in
+// the "Search for a place..." box - a visual hint that the map has already been
+// searched for you.
+describe('GroupMap place search preload', () => {
+  test('preloads the search box with the area the map was centred on', () => {
+    const wrapper = mountMap(WORLD, [], { yourArea: 'Ulverston' })
+    const geocoder = { setQuery: jest.fn() }
+    wrapper.vm.geocoder = geocoder
+
+    wrapper.vm.presetSearch()
+
+    expect(geocoder.setQuery).toHaveBeenCalledWith('Ulverston')
+  })
+
+  test('leaves the box empty when the user has no area set', () => {
+    const wrapper = mountMap(WORLD, [], { yourArea: '' })
+    const geocoder = { setQuery: jest.fn() }
+    wrapper.vm.geocoder = geocoder
+
+    wrapper.vm.presetSearch()
+
+    expect(geocoder.setQuery).not.toHaveBeenCalled()
+  })
+
+  // The search box is built inside the Leaflet control, so there's nothing to
+  // preload until the map is ready.
+  test('does nothing when the geocoder control has not been created yet', () => {
+    const wrapper = mountMap(WORLD, [], { yourArea: 'Ulverston' })
+    expect(() => wrapper.vm.presetSearch()).not.toThrow()
   })
 })
 
