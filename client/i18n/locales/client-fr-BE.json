@@ -258,6 +258,11 @@
       "more_information": "Plus d’informations",
       "sort_ascending": "(Cliquez pour trier par ordre croissant)",
       "sort_descending": "(Cliquez pour trier par ordre décroissant)"
+    },
+    "onboarding": {
+      "slide1_alt": "Deux Restarters tentant une réparation",
+      "slide2_alt": "Un·e bénévole aidant un membre du public avec son téléphone",
+      "slide3_alt": "Un·e Restarter réparant un appareil lors d’un de nos événements"
     }
   }
 }

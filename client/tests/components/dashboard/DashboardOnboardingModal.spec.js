@@ -28,6 +28,19 @@ function mountComponent(props = {}) {
 }
 
 describe('components/dashboard/DashboardOnboardingModal', () => {
+  // app.blade.php describes each onboarding image; alt="" would declare
+  // these content images decorative and tell a screen reader nothing.
+  it('describes each slide image, and changes the description with the slide', async () => {
+    const wrapper = mountComponent({ show: true })
+
+    const alt = () => wrapper.find('img.rounded-circle').attributes('alt')
+    expect(alt()).toBe(clientEn.client.onboarding.slide1_alt)
+    expect(alt()).not.toBe('')
+
+    await wrapper.find('[data-testid="onboarding-next"]').trigger('click')
+    expect(alt()).toBe(clientEn.client.onboarding.slide2_alt)
+  })
+
   it('does not render when show is false', () => {
     const wrapper = mountComponent({ show: false })
     expect(wrapper.find('[data-testid="modal-stub"]').exists()).toBe(false)

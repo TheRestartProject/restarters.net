@@ -258,6 +258,11 @@
       "more_information": "More information",
       "sort_ascending": "(Click to sort ascending)",
       "sort_descending": "(Click to sort descending)"
+    },
+    "onboarding": {
+      "slide1_alt": "Two Restarters attempting a fix",
+      "slide2_alt": "A volunteer helping a member of the public with their phone",
+      "slide3_alt": "A Restarter fixing a device at one of our events"
     }
   }
 }

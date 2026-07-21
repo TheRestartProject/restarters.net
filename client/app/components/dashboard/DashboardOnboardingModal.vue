@@ -13,19 +13,27 @@ const emit = defineEmits(['dismiss'])
 
 const { t } = useI18n()
 
+// Each slide carries its own alt text. These are content images in an
+// onboarding slideshow, not decoration: app.blade.php describes all three
+// ("Two Restarters attempting a fix" etc), and rendering alt="" instead
+// declares them decorative, so a screen reader user is told nothing at all.
+// develop hardcodes the English; translated here.
 const slides = [
   {
     image: '/images/onboarding/onboarding-1.webp',
+    alt: 'client.onboarding.slide1_alt',
     heading: 'onboarding.slide1_heading',
     content: 'onboarding.slide1_content',
   },
   {
     image: '/images/onboarding/onboarding-2.webp',
+    alt: 'client.onboarding.slide2_alt',
     heading: 'onboarding.slide2_heading',
     content: 'onboarding.slide2_content',
   },
   {
     image: '/images/onboarding/onboarding-3.webp',
+    alt: 'client.onboarding.slide3_alt',
     heading: 'onboarding.slide3_heading',
     content: 'onboarding.slide3_content',
   },
@@ -68,7 +76,12 @@ function dismiss() {
     />
 
     <article :data-testid="`onboarding-slide-${current}`">
-      <img :src="slides[current].image" class="rounded-circle img-fluid" width="250" alt="">
+      <img
+        :src="slides[current].image"
+        class="rounded-circle img-fluid"
+        width="250"
+        :alt="t(slides[current].alt)"
+      >
       <h1>{{ t(slides[current].heading) }}</h1>
       <!-- eslint-disable-next-line vue/no-v-html -->
       <div v-html="t(slides[current].content)" />
