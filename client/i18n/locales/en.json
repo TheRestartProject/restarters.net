@@ -244,7 +244,7 @@
         "find_out_more": "Find out more",
         "add_to_calendar": "Add to calendar",
         "copy_button_label": "Copy your calendar link",
-        "see_all_calendars": "See all your calendars"
+        "see_all_calendars": "See all my calendars"
     },
     "cantcreate": {
         "heading": "Adding events",
@@ -608,7 +608,7 @@
         "huge_impact": "Repairers around the world are having a huge impact!",
         "huge_impact_2": "Search your repair data below, and get a flavour of the impact of repair as well as the barriers we face when repairing.  You can help us understand what else this data tells us and what changes we should campaign for over at the <a href=\"https://talk.restarters.net/c/right-to-repair/repair-data/25\">repair data discussion</a> in our forum.",
         "add_data_button": "Add Data",
-        "add_data_description": "Choose one of your groups and an event to add your repair data to.",
+        "add_data_description": "Adding repair data helps show the impact of repair.",
         "add_data_no_groups": "You need to follow a group before you can add data.",
         "add_data_no_events": "This group doesn't have any events yet.",
         "search_text": "Browse or search our global database of repairs.",
@@ -899,11 +899,11 @@
         "delete_error": "Could not delete group tag."
     },
     "groups": {
-        "search_location_placeholder": "Search by location",
-        "search_country_placeholder": "Filter by country",
-        "search_tags_placeholder": "Filter by tags",
-        "show_filters": "Show filters",
-        "hide_filters": "Hide filters",
+        "search_location_placeholder": "Search location...",
+        "search_country_placeholder": "Country...",
+        "search_tags_placeholder": "Tag",
+        "show_filters": "Show Filters",
+        "hide_filters": "Hide Filters",
         "message_example_text": "<add a custom message here if required>",
         "group_admin_only": "Admin only",
         "group": "Group",
@@ -956,7 +956,7 @@
         "invite_volunteers": "Invite volunteers",
         "about": "About",
         "read_more": "Read more",
-        "read_less": "Read less",
+        "read_less": "<img class=\"icon\" src=\"/images/minus-icon.svg\" style=\"width: 20px;\" />&nbsp;READ LESS",
         "volunteers": "Volunteers",
         "invite_to_group": "Invite to group",
         "participants": "participants",
@@ -1002,7 +1002,7 @@
         "no_groups_nearest_with_location": "<p>There are no groups within 50 km of your location. You can <a href=\"/group/all\">see all groups here</a>. Or why not start your own? <a href=\"https://talk.restarters.net/t/how-to-run-a-repair-event-the-restart-party-kit/324\">Learn what running your own repair event involves.</a></p>",
         "group_count": "There is <b>{count} group</b>.|There are <b>{count} groups</b>.",
         "group_count_map": "There is <b>{count} group</b>.  Zoom out to see more.|There are <b>{count} groups</b>.  Zoom out to see more.",
-        "search_name_placeholder": "Search by name",
+        "search_name_placeholder": "Search name...",
         "leave_group_button": "Unfollow group",
         "leave_group_button_mobile": "Unfollow",
         "leave_group_confirm": "Please confirm that you want to unfollow this group.",

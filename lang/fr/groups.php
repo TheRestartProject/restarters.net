@@ -1,10 +1,10 @@
 <?php
 
 return [
-  'search_location_placeholder' => 'Rechercher par localisation',
-  'search_country_placeholder' => 'Filtrer par pays',
-  'search_tags_placeholder' => 'Filtrer par tag',
-  'show_filters' => 'Afficher les filtres',
+  'search_location_placeholder' => 'Rechercher localisation...',
+  'search_country_placeholder' => 'Pays',
+  'search_tags_placeholder' => 'Tag',
+  'show_filters' => 'Montrer les filtres',
   'hide_filters' => 'Cacher les filtres',
   'group' => 'Repair Café',
   'groups' => 'Repair Cafés',
@@ -59,7 +59,7 @@ return [
   'upcoming_none_planned' => 'Aucun prévu',
   'about' => 'A propos',
   'read_more' => 'Lire plus',
-  'read_less' => 'Lire moins',
+  'read_less' => '<img class="icon" src="/images/minus-icon.svg" style="width: 20px;" /> LIRE MOINS',
   'device_breakdown' => 'Panne de l\'appareil',
   'host' => 'Organisateur',
   'invite_to_group' => 'Inviter au Repair Café',
@@ -115,7 +115,7 @@ return [
   'no_groups_nearest_no_location' => '<b><p>Vous n\'avez  pas défini de village/ville. Vous pouvez en ajouter un.e dans <a href="/profile/edit">votre profil</a>.</p><p>Vous pouvez aussi <a href="/group/all">voir tous les Repair Cafés</a>.</p></b>',
   'no_groups_nearest_with_location' => '<b><p>Il n\'y a apparemment pas encore de Repair Cafés listé proche de chez vous.</p><p>Voulez-vous créer ou ajouter un Repair Café?  Regardez comment faire dans <a href="https://talk.restarters.net/t/how-to-power-up-community-repair-with-restarters-net/1228/2">nos ressources</a>.</p></b>',
   'no_unpowered_stats' => 'Pour l\'instant, ces statistiques sont seulement affichées pour les appareils électriques. Nous espérons pouvoir inclure les appareils non-électriques sous peu.',
-  'search_name_placeholder' => 'Rechercher par nom',
+  'search_name_placeholder' => 'Rechercher nom...',
   'all' => 'Tous',
   'nearby' => 'Proche',
   'no_other_events' => 'Il n\'y a actuellement aucun autre événement à venir',

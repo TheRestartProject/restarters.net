@@ -24,7 +24,7 @@ return [
   'huge_impact' => 'Repairers around the world are having a huge impact!',
   'huge_impact_2' => 'Search your repair data below, and get a flavour of the impact of repair as well as the barriers we face when repairing.  You can help us understand what else this data tells us and what changes we should campaign for over at the <a href="https://talk.restarters.net/c/right-to-repair/repair-data/25">repair data discussion</a> in our forum.',
   'add_data_button' => 'Add Data',
-  'add_data_description' => 'Choose one of your groups and an event to add your repair data to.',
+  'add_data_description' => 'Adding repair data helps show the impact of repair.',
   'add_data_no_groups' => 'You need to follow a group before you can add data.',
   'add_data_no_events' => 'This group doesn\'t have any events yet.',
   'search_text' => 'Browse or search our global database of repairs.',

@@ -381,7 +381,12 @@ onMounted(() => {
                 data-testid="group-view-description-toggle"
                 @click="showFullDescription = !showFullDescription"
               >
-                {{ showFullDescription ? t('groups.read_less') : t('groups.read_more') }}
+                <!-- groups.read_less carries markup (a minus icon before the
+                     label), exactly as events.read_less does on the event page.
+                     Rendered as text it showed the tag source instead of the
+                     icon, so this matches how the event page already does it. -->
+                <!-- eslint-disable-next-line vue/no-v-html -->
+                <span v-html="showFullDescription ? t('groups.read_less') : t('groups.read_more')" />
               </button>
             </template>
             <p v-else class="text-muted" data-testid="group-view-description-empty">

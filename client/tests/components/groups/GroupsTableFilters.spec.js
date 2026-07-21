@@ -80,7 +80,9 @@ describe('components/groups/GroupsTableFilters', () => {
     const wrapper = mountComponent({ showTags: true })
     const options = wrapper.find('[data-testid="groups-table-filter-tags"]').findAll('option')
 
-    expect(options.map((o) => o.text())).toEqual(['Filter by tags', 'Electronics'])
+    // Placeholder text read from the locale file rather than duplicated here,
+    // so a copy change in lang/ doesn't need a matching edit in this spec.
+    expect(options.map((o) => o.text())).toEqual([en.groups.search_tags_placeholder, 'Electronics'])
   })
 
   // Country options are derived from the (unfiltered) `groups` prop, same
@@ -96,7 +98,7 @@ describe('components/groups/GroupsTableFilters', () => {
     })
     const options = wrapper.find('[data-testid="groups-table-filter-country"]').findAll('option')
 
-    expect(options.map((o) => o.text())).toEqual(['Filter by country', 'France', 'UK'])
+    expect(options.map((o) => o.text())).toEqual([en.groups.search_country_placeholder, 'France', 'UK'])
   })
 
   it('emits update:filters with the current criteria as the fields change', async () => {

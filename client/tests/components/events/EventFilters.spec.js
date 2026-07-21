@@ -42,7 +42,7 @@ describe('components/events/EventFilters', () => {
       const select = wrapper.find('[data-testid="event-filters-country"]')
       expect(select.exists()).toBe(true)
       expect(select.findAll('option').map((o) => o.text())).toEqual([
-        'Filter by country',
+        en.groups.search_country_placeholder,
         'France',
         'UK',
       ])

@@ -208,7 +208,7 @@ describe('pages/party/index (mine)', () => {
       await wrapper.find('[data-testid="party-other-tab-all"]').trigger('click')
 
       const options = wrapper.find('[data-testid="event-filters-country"]').findAll('option').map((o) => o.text())
-      expect(options).toEqual(['Filter by country', 'France', 'UK'])
+      expect(options).toEqual([en.groups.search_country_placeholder, 'France', 'UK'])
     })
 
     it('narrows the list by title text', async () => {

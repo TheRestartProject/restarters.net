@@ -260,7 +260,7 @@
         "find_out_more": "En savoir plus",
         "add_to_calendar": "Ajouter à mon calendrier",
         "copy_button_label": "Copier le lien de votre calendrier",
-        "see_all_calendars": "Voir tous vos calendriers"
+        "see_all_calendars": "Voir tous mes calendriers"
     },
     "cantcreate": {
         "heading": "Ajouter des événements",
@@ -374,7 +374,7 @@
         "huge_impact": "Les réparateurs du monde entier ont un immense impact !",
         "huge_impact_2": "Recherchez vos données de réparation ci-dessous et faites-vous une idée de l'impact de la réparation ainsi que des obstacles auxquels nous sommes confrontés lorsque nous réparons.  Vous pouvez nous aider à comprendre ce que ces données nous apprennent d'autre et quels changements nous devrions préconiser dans la <a href=\"https://talk.restarters.net/c/right-to-repair/repair-data/25\">discussion sur les données de réparation</a> de notre forum.",
         "add_data_button": "Ajouter des données",
-        "add_data_description": "Choisissez un de vos groupes et un événement pour y ajouter vos données de réparation.",
+        "add_data_description": "Ajouter des données de réparation aide à démontrer l'impact de la réparation",
         "add_data_no_groups": "Vous devez suivre un groupe avant de pouvoir ajouter des données.",
         "add_data_no_events": "Ce groupe n'a pas encore d'événement.",
         "search_text": "Parcourez  notre base de données de réparation",
@@ -660,10 +660,10 @@
         "delete_error": "Impossible de supprimer le code du Repair Café."
     },
     "groups": {
-        "search_location_placeholder": "Rechercher par localisation",
-        "search_country_placeholder": "Filtrer par pays",
-        "search_tags_placeholder": "Filtrer par tag",
-        "show_filters": "Afficher les filtres",
+        "search_location_placeholder": "Rechercher localisation...",
+        "search_country_placeholder": "Pays",
+        "search_tags_placeholder": "Tag",
+        "show_filters": "Montrer les filtres",
         "hide_filters": "Cacher les filtres",
         "group": "Repair Café",
         "groups": "Repair Cafés",
@@ -718,7 +718,7 @@
         "upcoming_none_planned": "Aucun prévu",
         "about": "A propos",
         "read_more": "Lire plus",
-        "read_less": "Lire moins",
+        "read_less": "<img class=\"icon\" src=\"/images/minus-icon.svg\" style=\"width: 20px;\" /> LIRE MOINS",
         "device_breakdown": "Panne de l'appareil",
         "host": "Organisateur",
         "invite_to_group": "Inviter au Repair Café",
@@ -774,7 +774,7 @@
         "no_groups_nearest_no_location": "<b><p>Vous n'avez  pas défini de village/ville. Vous pouvez en ajouter un.e dans <a href=\"/profile/edit\">votre profil</a>.</p><p>Vous pouvez aussi <a href=\"/group/all\">voir tous les Repair Cafés</a>.</p></b>",
         "no_groups_nearest_with_location": "<b><p>Il n'y a apparemment pas encore de Repair Cafés listé proche de chez vous.</p><p>Voulez-vous créer ou ajouter un Repair Café?  Regardez comment faire dans <a href=\"https://talk.restarters.net/t/how-to-power-up-community-repair-with-restarters-net/1228/2\">nos ressources</a>.</p></b>",
         "no_unpowered_stats": "Pour l'instant, ces statistiques sont seulement affichées pour les appareils électriques. Nous espérons pouvoir inclure les appareils non-électriques sous peu.",
-        "search_name_placeholder": "Rechercher par nom",
+        "search_name_placeholder": "Rechercher nom...",
         "all": "Tous",
         "nearby": "Proche",
         "no_other_events": "Il n'y a actuellement aucun autre événement à venir",
