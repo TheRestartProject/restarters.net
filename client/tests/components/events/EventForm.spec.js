@@ -39,6 +39,19 @@ vi.mock('vue-datepicker-next', () => ({
   },
 }))
 
+// EventForm pulls in EventVenueMap.vue for the venue preview, which uses
+// @vue-leaflet/vue-leaflet - that package dynamic-import()s Leaflet's marker
+// PNGs to patch L.Icon.Default, which needs a bundler rather than Node's
+// module loader. Mock the package rather than mount it, same approach
+// tests/pages/party/view.spec.js and GroupMap.spec.js take.
+const { LMapStub, LTileLayerStub, LMarkerStub } = vi.hoisted(() => ({
+  LMapStub: { name: 'LMap', props: ['zoom', 'center', 'options', 'useGlobalLeaflet'], template: '<div class="stub-lmap"><slot /></div>' },
+  LTileLayerStub: { name: 'LTileLayer', props: ['url', 'attribution'], template: '<div class="stub-ltilelayer" />' },
+  LMarkerStub: { name: 'LMarker', props: ['latLng', 'icon', 'interactive'], template: '<div class="stub-lmarker" />' },
+}))
+
+vi.mock('@vue-leaflet/vue-leaflet', () => ({ LMap: LMapStub, LTileLayer: LTileLayerStub, LMarker: LMarkerStub }))
+
 const BFormStub = {
   emits: ['submit'],
   template: '<form @submit.prevent="$emit(\'submit\', $event)"><slot /></form>',
