@@ -257,7 +257,9 @@
     "common": {
       "more_information": "More information",
       "sort_ascending": "(Click to sort ascending)",
-      "sort_descending": "(Click to sort descending)"
+      "sort_descending": "(Click to sort descending)",
+      "expand": "Expand",
+      "collapse": "Collapse"
     },
     "onboarding": {
       "slide1_alt": "Two Restarters attempting a fix",

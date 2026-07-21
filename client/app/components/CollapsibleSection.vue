@@ -1,5 +1,6 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, useId } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 // Mobile-collapsible section (legacy resources/js/components/CollapsibleSection.vue):
 // on desktop the content is always shown; on mobile the heading carries a "+"/"−"
@@ -10,7 +11,14 @@ const props = defineProps({
   collapsedOnMobile: { type: Boolean, default: false },
 })
 
+const { t } = useI18n()
+
 const expanded = ref(!props.collapsedOnMobile)
+
+// Ties the control to the region it controls, so aria-controls has something
+// to point at. useId() rather than a hand-rolled counter: a counter declared
+// in <script setup> is per-instance and would hand every section the same id.
+const bodyId = useId()
 
 function toggle() {
   expanded.value = !expanded.value
@@ -29,15 +37,27 @@ function toggle() {
       <div class="flex-grow-1">
         <slot name="title" />
       </div>
-      <!-- Mobile-only expand/collapse affordance; desktop keeps the body open. -->
-      <span
+      <!-- Mobile-only expand/collapse affordance; desktop keeps the body open.
+           A real <button>: this was a <span>, which cannot be tabbed to or
+           activated from the keyboard, and on which aria-expanded is ignored
+           because a span has no role that supports it. The glyph is the whole
+           visible content, so the control also needs a name of its own -
+           otherwise it announces as "+".
+           @click.stop because the header row toggles too (tap anywhere on
+           mobile); without it the button's click would bubble and toggle
+           twice, i.e. do nothing. -->
+      <button
+        type="button"
         class="collapsible-section__toggle d-md-none"
         :aria-expanded="expanded"
+        :aria-controls="bodyId"
+        :aria-label="expanded ? t('client.common.collapse') : t('client.common.expand')"
         data-testid="collapsible-toggle"
-      >{{ expanded ? '−' : '+' }}</span>
+        @click.stop="toggle"
+      >{{ expanded ? '−' : '+' }}</button>
     </div>
 
-    <div :class="{ 'd-none d-md-block': !expanded }" data-testid="collapsible-body">
+    <div :id="bodyId" :class="{ 'd-none d-md-block': !expanded }" data-testid="collapsible-body">
       <slot />
     </div>
   </div>
@@ -45,6 +65,11 @@ function toggle() {
 
 <style scoped>
 .collapsible-section__toggle {
+  background: none;
+  border: 0;
+  padding: 0;
+  color: inherit;
+  line-height: 1;
   font-size: 1.75rem;
   font-weight: bold;
   line-height: 1;
