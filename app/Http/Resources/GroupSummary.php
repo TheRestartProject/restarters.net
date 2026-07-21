@@ -142,8 +142,8 @@ class GroupSummary extends JsonResource
             // are fetching many groups.
             //
             // Only approved events count, matching Group::getNextUpcomingEvent() which the group's own page uses.
-            // Without this an event still awaiting moderation was advertised as the group's next event on the
-            // public map while the group's page ignored it.
+            // Without this an event still awaiting moderation would be advertised as the group's next event on
+            // the public map while the group's page ignored it.
             if (Cache::has('future_approved_events')) {
                 $upcoming = Cache::get('future_approved_events');
             } else {

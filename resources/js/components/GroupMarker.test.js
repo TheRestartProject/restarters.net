@@ -46,9 +46,9 @@ describe('GroupMarker icon', () => {
     expect(mountMarker({ hover: true }).vm.icon.options.iconUrl).toBe('/images/vendor/leaflet/dist/marker-icon.png')
   })
 
-  // Neil's PR feedback: pins looked mispositioned - a group in Ulverston appeared
-  // to be out in Morecambe Bay.  With no iconSize/iconAnchor, Leaflet puts the
-  // image's top-left corner on the coordinate rather than the tip of the pin.
+  // With no iconSize/iconAnchor, Leaflet puts the image's top-left corner on the
+  // coordinate rather than the tip of the pin, so the marker points somewhere
+  // other than the place it marks.
   test('anchors the tip of the pin to the coordinate, not its top-left corner', () => {
     const options = mountMarker().vm.icon.options
     expect(options.iconSize).toEqual([25, 41])
@@ -63,9 +63,9 @@ describe('GroupMarker icon', () => {
   })
 })
 
-// Neil's PR feedback: the group name took too long to appear on hover.  It was
-// the native `title` attribute, whose delay is the browser's and can't be tuned;
-// a Leaflet tooltip shows as soon as the pointer arrives.
+// The name must come from a Leaflet tooltip rather than the native `title`
+// attribute: `title` appears only after the browser's own delay, which can't be
+// tuned, whereas a tooltip shows as soon as the pointer arrives.
 describe('GroupMarker tooltip', () => {
   test('renders the name in a Leaflet tooltip rather than a native title', () => {
     const wrapper = mountMarker()
@@ -76,8 +76,8 @@ describe('GroupMarker tooltip', () => {
   })
 })
 
-// Neil's PR feedback: hovering a pin should highlight the matching list row
-// (the reverse of row-hover → red pin).
+// Hovering a pin highlights the matching list row - the reverse of the
+// row-hover → red pin direction.
 describe('GroupMarker hover emission', () => {
   test('mouseover emits update:hover with the group id, mouseout clears it', async () => {
     const wrapper = mountMarker()

@@ -28,8 +28,7 @@ function makeStore () {
   })
 }
 
-// Neil's PR feedback: the logo and name should navigate to the group, not
-// just the "Go to group" button.
+// The logo and name navigate to the group, not just the "Go to group" button.
 test('modal title logo and name link to the group page', () => {
   const wrapper = shallowMount(GroupInfoModal, {
     localVue,

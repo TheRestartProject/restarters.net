@@ -201,7 +201,7 @@ describe('GroupsTable follow/unfollow button', () => {
   })
 })
 
-// Neil's PR feedback: hovering a map pin should highlight the matching row.
+// Hovering a map pin highlights the matching row.
 describe('GroupsTable pin-hover row highlight', () => {
   test('row gets the highlight class when hover matches its id', () => {
     const wrapper = mountTable([group], { hover: 1 })
