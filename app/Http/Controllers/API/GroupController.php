@@ -1423,7 +1423,10 @@ class GroupController extends Controller
 
         $name = $request->input('name');
         $area = $request->input('area');
-        $postcode = $request->input('postcode', '');
+        // NOT NULL in the schema, and ConvertEmptyStringsToNull rewrites a
+        // submitted '' to null before this runs - so an explicitly-sent null
+        // means "clear it", which for this column is '' rather than null.
+        $postcode = $request->input('postcode') ?? '';
         $location = $request->input('location');
         $phone = $request->input('phone');
         $website = $request->input('website');

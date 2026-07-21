@@ -250,16 +250,12 @@ async function submit() {
     timezone: form.timezone || null,
   }
 
-  // Unlike its siblings above, groups.postcode is NOT NULL in the schema,
-  // and Laravel's global ConvertEmptyStringsToNull middleware turns a
-  // submitted '' into null before validateGroupParams ever sees it - its
-  // `input('postcode', '')` default only kicks in when the key is absent
-  // from the request entirely. So a blank postcode must be omitted here,
-  // not sent as '' or null, or group creation 500s with a SQL
-  // integrity-constraint error.
-  if (form.postcode) {
-    payload.postcode = form.postcode
-  }
+  // Always sent, including when blank. PATCH only writes fields the request
+  // actually carries, so omitting a blank postcode would leave the stored one
+  // untouched and make it unclearable. groups.postcode is NOT NULL and
+  // ConvertEmptyStringsToNull rewrites '' to null in transit, so the server
+  // coerces a sent null back to '' (validateGroupParams).
+  payload.postcode = form.postcode || null
 
   if (!creating.value) {
     payload.network_data = JSON.stringify(networkData.value)

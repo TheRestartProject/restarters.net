@@ -184,11 +184,12 @@ describe('components/groups/GroupForm', () => {
         phone: '01234 567890',
         description: '<p>We fix stuff</p>',
         location: 'Anytown',
-        // Deliberately absent, not null: groups.postcode is NOT NULL in the
-        // schema, and Laravel's ConvertEmptyStringsToNull middleware turns a
-        // submitted '' into null before the server's own `input('postcode',
-        // '')` default gets a chance to apply - so a blank postcode must be
-        // omitted from the payload entirely (see GroupForm.vue's submit()).
+        // Always sent, even when blank: PATCH only writes fields the request
+        // carries, so omitting it would make a postcode unclearable.
+        // groups.postcode is NOT NULL and ConvertEmptyStringsToNull rewrites
+        // '' to null in transit, so validateGroupParams coerces a sent null
+        // back to ''.
+        postcode: null,
         timezone: null,
       })
       expect(wrapper.emitted('created')).toEqual([[42]])
