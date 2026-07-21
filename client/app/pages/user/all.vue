@@ -1,5 +1,6 @@
 <script setup>
 import { computed, onMounted, reactive, ref } from 'vue'
+import { sortAriaValue, sortHintKey } from '~/composables/useSortAria.js'
 import { useI18n } from 'vue-i18n'
 import { useAuth } from '~/composables/useAuth.js'
 import { useUsersStore } from '~/stores/users.js'
@@ -46,6 +47,11 @@ const filters = reactive({ name: '', email: '', location: '', country: '', role:
 const appliedFilters = reactive({ name: '', email: '', location: '', country: '', role: '', permissions: [] })
 const sortBy = ref('')
 const sortDesc = ref(false)
+
+// aria-sort on the <th>; the hint on the control. See composables/useSortAria.js.
+const sortAria = (column) =>
+  column.sortKey ? sortAriaValue(column.sortKey, sortBy.value, sortDesc.value) : undefined
+const sortHint = (column) => t(sortHintKey(column.sortKey, sortBy.value, sortDesc.value))
 
 // Gap 6: legacy's filter <aside> is a Bootstrap collapse, hidden by default
 // below the md breakpoint and toggled by a "Reveal filters" button (with an
@@ -342,7 +348,7 @@ onMounted(() => {
             <table class="table table-striped" data-testid="users-table">
               <thead>
                 <tr>
-                  <th v-for="column in columns" :key="column.key">
+                  <th v-for="column in columns" :key="column.key" :aria-sort="sortAria(column)">
                     <button
                       v-if="column.sortKey"
                       type="button"
@@ -351,6 +357,7 @@ onMounted(() => {
                       @click="sortByColumn(column)"
                     >
                       {{ t(column.labelKey) }} {{ sortIndicator(column) }}
+                      <span class="visually-hidden">{{ sortHint(column) }}</span>
                     </button>
                     <template v-else>{{ t(column.labelKey) }}</template>
                   </th>

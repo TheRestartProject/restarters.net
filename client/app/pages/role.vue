@@ -1,5 +1,6 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
+import { sortAriaValue, sortHintKey } from '~/composables/useSortAria.js'
 import { useI18n } from 'vue-i18n'
 import { useAdminRefdataStore } from '~/stores/adminRefdata.js'
 
@@ -61,6 +62,10 @@ const editTitle = computed(() => (editingRole.value ? `${t('admin.edit-role')}: 
 // pattern as that component's own sortByColumn/sortIndicator.
 const sortKey = ref(null)
 const sortDesc = ref(false)
+
+// aria-sort on the <th>; the hint on the control. See composables/useSortAria.js.
+const sortAria = (key) => sortAriaValue(key, sortKey.value, sortDesc.value)
+const sortHint = (key) => t(sortHintKey(key, sortKey.value, sortDesc.value))
 
 const sortedRoles = computed(() => {
   if (!sortKey.value) return adminStore.roles.data
@@ -183,14 +188,16 @@ onMounted(load)
       <table class="table table-striped table-hover" data-testid="roles-table">
         <thead>
           <tr>
-            <th>
+            <th :aria-sort="sortAria('id')">
               <button type="button" class="sort-header" data-testid="roles-table-sort-id" @click="sortByColumn('id')">
                 {{ t('admin.role_id') }} {{ sortIndicator('id') }}
+                <span class="visually-hidden">{{ sortHint('id') }}</span>
               </button>
             </th>
-            <th>
+            <th :aria-sort="sortAria('name')">
               <button type="button" class="sort-header" data-testid="roles-table-sort-name" @click="sortByColumn('name')">
                 {{ t('admin.role') }} {{ sortIndicator('name') }}
+                <span class="visually-hidden">{{ sortHint('name') }}</span>
               </button>
             </th>
             <th>{{ t('admin.role_permissions') }}</th>

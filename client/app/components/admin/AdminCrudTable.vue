@@ -1,5 +1,7 @@
 <script setup>
 import { computed, onMounted, reactive, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { sortAriaValue, sortHintKey } from '../../composables/useSortAria.js'
 import AdminCrudFormField from './AdminCrudFormField.vue'
 
 // Generic reference-data CRUD table, built from PR #863's
@@ -26,6 +28,8 @@ import AdminCrudFormField from './AdminCrudFormField.vue'
 // rather than legacy's separate path route (`/brands/edit/5`) - a
 // deliberate routing simplification for the SPA, documented in
 // docs/nuxt-migration/api-gaps.md Phase D rather than silently diverging.
+const { t } = useI18n()
+
 const props = defineProps({
   items: {
     type: Array,
@@ -134,6 +138,13 @@ const displayItems = computed(() => {
   })
   return localSortDesc.value ? sorted.reverse() : sorted
 })
+
+// aria-sort belongs on the <th>; the hint on the control says what a click
+// will do next. See composables/useSortAria.js.
+const sortAria = (field) =>
+  field.sortable ? sortAriaValue(field.key, localSortKey.value, localSortDesc.value) : undefined
+
+const sortHint = (field) => t(sortHintKey(field.key, localSortKey.value, localSortDesc.value))
 
 function sortIndicator(field) {
   if (localSortKey.value !== field.key) return ''
@@ -385,7 +396,7 @@ onMounted(load)
       <table class="table table-striped table-hover" :data-testid="`${testidPrefix}-table`">
         <thead>
           <tr>
-            <th v-for="field in tableFields" :key="field.key">
+            <th v-for="field in tableFields" :key="field.key" :aria-sort="sortAria(field)">
               <button
                 v-if="field.sortable"
                 type="button"
@@ -394,6 +405,7 @@ onMounted(load)
                 @click="sortByColumn(field)"
               >
                 {{ field.label }} {{ sortIndicator(field) }}
+                <span class="visually-hidden">{{ sortHint(field) }}</span>
               </button>
               <template v-else>{{ field.label }}</template>
             </th>

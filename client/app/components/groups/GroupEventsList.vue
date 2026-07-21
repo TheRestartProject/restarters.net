@@ -1,5 +1,6 @@
 <script setup>
 import { computed, ref } from 'vue'
+import { sortAriaValue, sortHintKey } from '~/composables/useSortAria.js'
 import { useI18n } from 'vue-i18n'
 
 // GET /api/v2/groups/{id}/events (API\GroupController::getEventsForGroupv2
@@ -142,6 +143,11 @@ function noDevices(event) {
   return (s.fixed_devices ?? 0) + (s.repairable_devices ?? 0) + (s.dead_devices ?? 0) === 0
 }
 
+// Only one sortable column here (the date/title header), so the key is
+// fixed. aria-sort on the <th>; the hint on the control.
+const sortAria = () => sortAriaValue('start', 'start', sortDesc.value)
+const sortHint = () => t(sortHintKey('start', 'start', sortDesc.value))
+
 function toggleSort() {
   sortDesc.value = !sortDesc.value
 }
@@ -243,9 +249,10 @@ function copyCalendarUrl() {
         <table v-else class="table" data-testid="group-events-table-upcoming">
           <thead>
             <tr>
-              <th scope="col" class="sortable" role="button" @click="toggleSort">
+              <th scope="col" class="sortable" role="button" :aria-sort="sortAria()" @click="toggleSort">
                 <span>{{ t('client.groups.column_event') }}</span>
-                <span class="sort-indicator">{{ sortDesc ? '▼' : '▲' }}</span>
+                <span class="sort-indicator" aria-hidden="true">{{ sortDesc ? '▼' : '▲' }}</span>
+                <span class="visually-hidden">{{ sortHint() }}</span>
               </th>
               <th scope="col">{{ t('client.groups.column_location') }}</th>
             </tr>
@@ -271,9 +278,10 @@ function copyCalendarUrl() {
         <table v-else class="table" data-testid="group-events-table-past">
           <thead>
             <tr>
-              <th scope="col" class="sortable" role="button" @click="toggleSort">
+              <th scope="col" class="sortable" role="button" :aria-sort="sortAria()" @click="toggleSort">
                 <span>{{ t('client.groups.column_event') }}</span>
-                <span class="sort-indicator">{{ sortDesc ? '▼' : '▲' }}</span>
+                <span class="sort-indicator" aria-hidden="true">{{ sortDesc ? '▼' : '▲' }}</span>
+                <span class="visually-hidden">{{ sortHint() }}</span>
               </th>
               <th scope="col">{{ t('client.groups.column_location') }}</th>
               <th

@@ -1,6 +1,12 @@
 import { flushPromises, mount } from '@vue/test-utils'
+import { createI18n } from 'vue-i18n'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import AdminCrudTable from '../../../app/components/admin/AdminCrudTable.vue'
+import en from '../../../i18n/locales/en.json'
+import clientEn from '../../../i18n/locales/client-en.json'
+
+// The table announces its sortable columns, so it needs translations.
+const i18n = createI18n({ legacy: false, locale: 'en', messages: { en: { ...en, ...clientEn } } })
 
 // Generic component test (design.md §6.2 Phase D task D4 brief: "AdminCrudTable
 // generic behaviour (one thorough suite)"). Exercised against a made-up
@@ -85,7 +91,7 @@ function mountTable(props = {}, slots = {}) {
       ...props,
     },
     slots,
-    global: { stubs: GLOBAL_STUBS },
+    global: { plugins: [i18n], stubs: GLOBAL_STUBS },
   })
 }
 
