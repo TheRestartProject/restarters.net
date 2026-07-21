@@ -16,6 +16,7 @@ jest.mock('axios', () => ({
 import axios from 'axios'
 
 import groups from './groups'
+import { INDEX_API_ENTRY, INDEX_STORE_ENTRY } from '../testFixtures/groups'
 
 // store/groups.js reads locale via document.getElementById('language-current').innerText.
 // jsdom doesn't populate innerText reliably, so set the property explicitly.
@@ -202,7 +203,7 @@ describe('hydrate', () => {
 
 test('the index fetch shapes entries for the map, filters and table', async () => {
   axios.get.mockResolvedValueOnce({
-    data: { data: [{ id: 7, name: 'G', lat: 51, lng: 0, country: 'United Kingdom', network_ids: [3], tag_ids: [9], archived_at: null }] }
+    data: { data: [INDEX_API_ENTRY] }
   })
   const commits = []
 
@@ -213,7 +214,9 @@ test('the index fetch shapes entries for the map, filters and table', async () =
 
   expect(axios.get.mock.calls[0][0]).toContain('/api/v2/groups/names')
   const g = commits.find(c => c[0] === 'setList')[1].groups[0]
-  expect(g.location).toEqual({ location: null, country: 'United Kingdom', lat: 51, lng: 0 })
-  expect(g.networks).toEqual([3])
-  expect(g.group_tags_full).toEqual([{ id: 9 }])
+
+  // The whole entry, with nothing overridden: this is what ties the fixture
+  // that component tests build on to what the store really produces. If this
+  // fails, the mapping changed - update the fixture, not the assertion.
+  expect(g).toEqual(INDEX_STORE_ENTRY)
 })

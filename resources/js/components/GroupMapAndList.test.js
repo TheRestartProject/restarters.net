@@ -6,21 +6,22 @@ import { mount, createLocalVue } from '@vue/test-utils'
 import Vuex from 'vuex'
 import LangMixin from 'resources/js/mixins/lang.js'
 import GroupMapAndList from './GroupMapAndList.vue'
+import { indexGroup, hydratedGroup } from '../testFixtures/groups'
 
 const localVue = createLocalVue()
 localVue.use(Vuex)
 localVue.mixin(LangMixin)
 
+// The shape the map is actually drawn from - see testFixtures/groups.js.
 const GROUPS = [
-  { id: 1, name: 'Alpha', networks: [{ id: 5, name: 'N5' }] },
-  { id: 2, name: 'Beta', networks: [{ id: 6, name: 'N6' }] },
+  indexGroup({ id: 1, name: 'Alpha', networks: [5] }),
+  indexGroup({ id: 2, name: 'Beta', networks: [6] }),
 ]
 
-// What the names index actually sends, and what the map is drawn from: the
-// store maps network_ids straight through, so these are plain integers.
-const INDEX_GROUPS = [
-  { id: 1, name: 'Alpha', networks: [5] },
-  { id: 2, name: 'Beta', networks: [6] },
+// The summary shape, which the same components see once rows are hydrated.
+const HYDRATED_GROUPS = [
+  hydratedGroup({ id: 1, name: 'Alpha', networks: [{ id: 5 }] }),
+  hydratedGroup({ id: 2, name: 'Beta', networks: [{ id: 6 }] }),
 ]
 
 function makeStore(groups = GROUPS) {
@@ -235,14 +236,14 @@ describe('reframing waits for the typing to stop', () => {
 // map is drawn from the names index, which sends plain ids.
 describe('network scoping', () => {
   test('finds the network\'s groups when networks are plain ids', async () => {
-    const wrapper = await makeWrapper({ network: 5 }, INDEX_GROUPS)
+    const wrapper = await makeWrapper({ network: 5 }, GROUPS)
 
     expect(wrapper.vm.matchingGroupIds).toEqual([1])
     expect(wrapper.findComponent(groupMapStub).props('groupids')).toEqual([1])
   })
 
   test('still finds them when networks are objects', async () => {
-    const wrapper = await makeWrapper({ network: 5 }, GROUPS)
+    const wrapper = await makeWrapper({ network: 5 }, HYDRATED_GROUPS)
 
     expect(wrapper.vm.matchingGroupIds).toEqual([1])
   })
