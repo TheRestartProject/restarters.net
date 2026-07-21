@@ -28,7 +28,9 @@ import {
 definePageMeta({ auth: true })
 
 const { t } = useI18n()
-useHead({ title: t('events.your_events') })
+// events/index.blade.php:3-5 - the page title is "Events", not
+// "Your events" (which is the heading of one section within it).
+useHead({ title: t('general.menu_events') })
 
 const eventsStore = useEventsStore()
 const dashboardStore = useDashboardStore()
@@ -214,7 +216,7 @@ onMounted(load)
          inside GroupEvents.vue itself). -->
     <AlertsBanner />
 
-    <div v-if="eventsStore.myEvents.loading" data-testid="party-mine-loading">
+    <div v-if="eventsStore.myEvents.loading || !eventsStore.myEvents.loaded" data-testid="party-mine-loading">
       <div class="placeholder-glow mb-3">
         <span class="placeholder col-12" style="height: 6rem" />
       </div>

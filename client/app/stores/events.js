@@ -38,7 +38,12 @@ import { useToastStore } from './toast.js'
  */
 export const useEventsStore = defineStore('events', {
   state: () => ({
-    myEvents: { data: [], loading: false, error: null },
+    // `loaded` distinguishes "not fetched yet" from "fetched and empty".
+    // Without it the first paint has loading=false and data=[], so a page
+    // renders its empty state ("no events") before the request is even sent,
+    // then flips to a placeholder, then to content - a wrong answer on screen
+    // plus a layout shift. Same shape stores/fixometer.js already uses.
+    myEvents: { data: [], loading: false, loaded: false, error: null },
     current: { data: null, loading: false, error: null },
     attendees: { data: { confirmed: [], invited: [] }, loading: false, error: null },
     devices: { data: [], loading: false, error: null },
@@ -185,6 +190,7 @@ export const useEventsStore = defineStore('events', {
       try {
         const { data } = await $api.event.myEvents(params)
         this.myEvents.data = data
+        this.myEvents.loaded = true
         return data
       } catch (error) {
         this.myEvents.error = error

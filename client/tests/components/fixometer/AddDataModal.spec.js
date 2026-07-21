@@ -61,6 +61,11 @@ describe('components/fixometer/AddDataModal', () => {
     setActivePinia(createPinia())
     dashboardStore = useDashboardStore()
     eventsStore = useEventsStore()
+    // These specs seed myEvents.data directly, i.e. they simulate a COMPLETED
+    // fetch - so mark it loaded. Without this the page renders its loading
+    // placeholder, because `loaded: false` now means "not fetched yet" rather
+    // than "fetched and empty".
+    eventsStore.myEvents.loaded = true
     dashboardStore.fetch = vi.fn().mockResolvedValue({})
     eventsStore.fetchMyEvents = vi.fn().mockResolvedValue({})
   })
