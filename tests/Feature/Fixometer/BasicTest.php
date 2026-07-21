@@ -46,10 +46,11 @@ class BasicTest extends TestCase
 
         $this->assertEquals('attachment; filename=repair-data.csv', $response->headers->get('content-disposition'));
 
-        // Bit hacky, but grab the file that was created.  Can't find a way to do this in Laravel easily, though it's
-        // probably possible using mocking.
-        $filename = base_path() . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'repair-data.csv';
-        $fh = fopen($filename, 'r');
+        // Read the CSV off the response. It used to be picked up from
+        // public/repair-data.csv - the export no longer leaves a copy under
+        // the docroot, because doing so republished one caller's filtered
+        // rows to everyone.
+        $fh = fopen($response->getFile()->getPathname(), 'r');
 
         # Skip headers.
         fgetcsv($fh);

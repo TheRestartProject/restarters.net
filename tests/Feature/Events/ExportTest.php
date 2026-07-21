@@ -137,9 +137,21 @@ class ExportTest extends TestCase
         $row2 = fgetcsv($fh);
         self::assertEquals($event2->getEventName(), $row2[1]);
         self::assertEquals($group2->name, $row2[10]);
+
+        // group3 is the unapproved one. Whether its event appears is now the
+        // point of the test rather than an incidental: an Administrator or a
+        // coordinator for the network may see it, a plain Host of the other
+        // two groups may not (User::userCanSeeEvent). This block previously
+        // asserted every role saw it, which is what the export was doing
+        // wrong.
         $row2 = fgetcsv($fh);
-        self::assertEquals($event3->getEventName(), $row2[1]);
-        self::assertEquals($group3->name, $row2[10]);
+
+        if ($role === 'Host') {
+            self::assertFalse($row2, 'A host of other groups must not see an unapproved group\'s event');
+        } else {
+            self::assertEquals($event3->getEventName(), $row2[1]);
+            self::assertEquals($group3->name, $row2[10]);
+        }
 
         // Export devices.
         $response = $this->get("/export/devices");
@@ -315,6 +327,16 @@ class ExportTest extends TestCase
             'event' => $idevents,
         ]);
 
+        // Clear any copy left under the docroot by an older build before
+        // exporting, so the assertion below reflects THIS request rather
+        // than whatever is lying around. A dev checkout of this repo had 270
+        // such files, dating back months - that accumulation is what the
+        // leak looked like in practice.
+        $leaked = public_path() . '/repair-data-Test-Group-Name.csv';
+        if (file_exists($leaked)) {
+            unlink($leaked);
+        }
+
         // Export devices for this group - should not fail
         $response = $this->get("/export/devices/group/{$group->idgroups}");
         $response->assertSuccessful();
@@ -328,7 +350,7 @@ class ExportTest extends TestCase
         // public_path()/repair-data-*.csv - that WAS the bug: the export is
         // filtered per caller, so leaving it under the docroot published one
         // caller's rows at a guessable URL.
-        $this->assertFileDoesNotExist(public_path() . '/' . $expectedFilename);
+        $this->assertFileDoesNotExist($leaked);
         $fh = fopen($response->getFile()->getPathname(), 'r');
         $this->assertNotFalse($fh);
         fgetcsv($fh); // Skip header
@@ -403,9 +425,7 @@ class ExportTest extends TestCase
             $response = $this->get("/export/networks/{$network->id}/events");
             $response->assertSuccessful();
 
-            $filename = 'events.csv';
-            $this->assertFileExists($filename);
-            $fh = fopen($filename, 'r');
+            $fh = fopen($response->getFile()->getPathname(), 'r');
             $this->assertNotFalse($fh);
 
             $header = fgetcsv($fh);
