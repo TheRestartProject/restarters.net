@@ -166,42 +166,6 @@ onUnmounted(() => {
           <span>{{ t('general.menu_groups') }}</span>
         </NuxtLink>
       </li>
-      <!-- navbar.blade.php:177-183's "Other" menu. These links have no other
-           home in develop's chrome - layouts/footer.blade.php is empty - so
-           they belong here rather than in a footer. -->
-      <li class="nav-other">
-        <BDropdown
-          variant="link"
-          :text="t('general.menu_other')"
-          toggle-class="nav-other__toggle"
-          data-testid="nav-other"
-        >
-          <BDropdownItem
-            :href="t('general.help_feedback_url')"
-            target="_blank"
-            rel="noopener noreferrer"
-            data-testid="nav-help-feedback"
-          >
-            {{ t('general.menu_help_feedback') }}
-          </BDropdownItem>
-          <BDropdownItem
-            :href="t('general.faq_url')"
-            target="_blank"
-            rel="noopener noreferrer"
-            data-testid="nav-faq"
-          >
-            {{ t('general.menu_faq') }}
-          </BDropdownItem>
-          <BDropdownItem
-            :href="t('general.restartproject_url')"
-            target="_blank"
-            rel="noopener noreferrer"
-            data-testid="nav-restart-project"
-          >
-            {{ t('general.therestartproject') }}
-          </BDropdownItem>
-        </BDropdown>
-      </li>
       <li>
         <a :href="config.wiki_url || '#'" rel="noopener noreferrer" data-testid="nav-wiki" @click.prevent="goToWiki">
           <IconWiki />
