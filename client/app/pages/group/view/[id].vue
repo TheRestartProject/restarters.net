@@ -139,6 +139,17 @@ async function confirmArchive() {
   }
 }
 
+// group/view.blade.php banners an outstanding invitation, so someone who
+// browses straight to a group they've been invited to can still accept.
+// has_pending_invite is the invite hash; the accept link is a Laravel web
+// route (it establishes a session and redirects back), so it's a plain href
+// rather than a NuxtLink.
+const pendingInvite = computed(() => group.value?.has_pending_invite || null)
+
+const pendingInviteMessage = computed(() =>
+  t('groups.invitation_pending', { accept: `/group/accept-invite/${id.value}/${pendingInvite.value}` })
+)
+
 const confirmingDelete = ref(false)
 const deleting = ref(false)
 
@@ -217,6 +228,16 @@ onMounted(() => {
 
 <template>
   <div class="container py-4" data-testid="group-view-page">
+    <BAlert
+      v-if="pendingInvite"
+      :model-value="true"
+      variant="warning"
+      data-testid="group-view-pending-invite"
+    >
+      <!-- eslint-disable-next-line vue/no-v-html -->
+      <span v-html="pendingInviteMessage" />
+    </BAlert>
+
     <BAlert
       v-if="haveLeft"
       :model-value="true"

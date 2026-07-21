@@ -317,6 +317,26 @@ describe('pages/group/view/[id]', () => {
   // GroupActions.vue offers Administrators a permanent delete alongside
   // archive: the item is visible whenever can_see_delete, but greyed out when
   // the group can't actually go (an event of its has a device).
+  // group/view.blade.php banners an outstanding invitation, so a user who
+  // navigates straight to the group can accept without hunting for the email.
+  describe('pending invite banner', () => {
+    it('is absent when there is no invite', () => {
+      groupsStore.current.data = BASE_GROUP
+      const wrapper = mountPage()
+
+      expect(wrapper.find('[data-testid="group-view-pending-invite"]').exists()).toBe(false)
+    })
+
+    it('links to the accept route with the invite hash', () => {
+      groupsStore.current.data = { ...BASE_GROUP, has_pending_invite: 'abc123hash' }
+      const wrapper = mountPage()
+
+      const banner = wrapper.find('[data-testid="group-view-pending-invite"]')
+      expect(banner.exists()).toBe(true)
+      expect(banner.html()).toContain('/group/accept-invite/5/abc123hash')
+    })
+  })
+
   describe('permanent delete', () => {
     const ADMIN_GROUP = (overrides = {}) => ({
       ...BASE_GROUP,

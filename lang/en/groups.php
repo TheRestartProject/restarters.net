@@ -180,4 +180,5 @@ Learn how to use this group here: :help.',
   'now_unfollowed' => 'You have now unfollowed <a href=":link">:name</a>.',
   'delete_group' => 'Delete group',
   'delete_group_confirm' => 'Please confirm that you want to delete :name.',
+  'invitation_pending' => 'You have an invitation to this group.  Please click <a href=":accept">here</a> if you would like to join.',
 ];

@@ -291,6 +291,14 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *          example="https://app.restarters.net/group/invite/abc123"
  *     ),
  *     @OA\Property(
+ *          property="has_pending_invite",
+ *          title="has_pending_invite",
+ *          description="The caller's outstanding invitation hash for this group, or null when there is none or the caller is anonymous. Use it to build /group/accept-invite/{group}/{hash}.",
+ *          format="string",
+ *          nullable=true,
+ *          example="a1b2c3d4"
+ *     ),
+ *     @OA\Property(
  *          property="is_member",
  *          title="is_member",
  *          description="Whether the currently authenticated user is a confirmed member of this group. null when there is no authenticated user.",
@@ -401,6 +409,21 @@ class Group extends JsonResource
             ?? auth('sanctum')->user()
             ?? auth('api')->user();
         $ret['is_member'] = $user ? $this->resource->isVolunteer($user->id) : null;
+
+        // group/view.blade.php shows a banner when the caller has an
+        // outstanding invitation to this group, so someone who navigates here
+        // directly - rather than through the emailed link - can still accept.
+        // The value is the users_groups.status column, which doubles as the
+        // invite hash in /group/accept-invite/{group}/{hash}; a joined member
+        // has status '1'. Only ever the caller's own invite, and absent
+        // entirely when there isn't one.
+        $ret['has_pending_invite'] = $user
+            ? (\App\UserGroups::where('group', $this->idgroups)
+                ->where('user', $user->id)
+                ->where('status', '<>', '1')
+                ->whereNotNull('status')
+                ->value('status') ?: null)
+            : null;
 
         // Get next approved event for group
         $nextevent = \App\Group::find($this->idgroups)->getNextUpcomingEvent();
