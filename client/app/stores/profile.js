@@ -470,9 +470,8 @@ export const useProfileStore = defineStore('profile', {
       return data
     },
 
-    // Best-effort - see the state doc comment. Swallows failure (including
-    // the 404 this endpoint returns today, since it doesn't exist yet)
-    // rather than blocking the page: the heading falls back to a generic
+    // Best-effort - see the state doc comment. Swallows failure rather than
+    // blocking the page: the heading falls back to a generic
     // "Editing user #{id}".
     async fetchTargetUser(id) {
       const { $api } = useNuxtApp()

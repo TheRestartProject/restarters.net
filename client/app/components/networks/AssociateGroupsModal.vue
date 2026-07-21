@@ -8,12 +8,8 @@ import { useNetworksStore } from '../../stores/networks.js'
 // + NetworkController@associateGroup - a multi-select of groups not
 // currently in the network, submitted as one batch.
 //
-// POST /api/v2/networks/{id}/groups does not exist server-side yet (only
-// the web route networks.associate-group does, a session+CSRF form POST
-// with a redirect response - unusable from the SPA). This is built against
-// the documented-but-not-implemented v2 shape and will surface a clean
-// error until the endpoint lands - see docs/nuxt-migration/api-gaps.md
-// Phase E and stores/networks.js#associateGroups.
+// POST /api/v2/networks/{id}/groups (NetworkController::associateGroupsv2),
+// Administrator or coordinator-of-network only.
 const props = defineProps({
   show: {
     type: Boolean,

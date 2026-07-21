@@ -146,10 +146,8 @@ export const useNetworksStore = defineStore('networks', {
       this.tags.data = this.tags.data.filter((tag) => tag.id !== tagId)
     },
 
-    // See api/NetworkAPI.js#associateGroups - the endpoint this calls does
-    // not exist server-side yet (docs/nuxt-migration/api-gaps.md Phase E).
-    // On success, re-fetches the network's groups so the just-added rows
-    // appear without a full page reload.
+    // POST /api/v2/networks/{id}/groups. On success, re-fetches the
+    // network's groups so the just-added rows appear without a page reload.
     async associateGroups(id, groupIds) {
       const { $api } = useNuxtApp()
       const result = await $api.network.associateGroups(id, groupIds)

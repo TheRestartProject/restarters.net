@@ -111,7 +111,9 @@
       "start_required": "Please choose a start time.",
       "title_required": "Please enter a name for your event.",
       "view_event": "View event",
-      "view_load_error": "Sorry, we couldn't load this event."
+      "view_load_error": "Sorry, we couldn't load this event.",
+      "image_delete_error": "Sorry, we couldn't remove that photo. Please try again.",
+      "remove_photo": "Remove photo"
     },
     "fixometer": {
       "load_error": "Sorry, we couldn't load the Fixometer stats. Please try again.",

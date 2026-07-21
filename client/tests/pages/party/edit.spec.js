@@ -230,4 +230,57 @@ describe('pages/party/edit/[id]', () => {
     })
   })
 
+
+  // events/edit.blade.php lists the event's existing photos with a "Remove
+  // file" link on each. The API has supported deletion all along
+  // (DELETE /api/v2/events/{id}/images/{idimages}); nothing called it.
+  describe('existing photos', () => {
+    const WITH_IMAGES = { ...BASE_EVENT, images: [{ idimages: 11, path: 'a.jpg' }, { idimages: 12, path: 'b.jpg' }] }
+
+    it('renders each existing photo with a remove control', async () => {
+      eventsStore.fetchEvent = vi.fn().mockResolvedValue(WITH_IMAGES)
+      eventsStore.current.data = WITH_IMAGES
+
+      const wrapper = mountPage()
+      await flushPromises()
+
+      expect(wrapper.findAll('[data-testid="event-edit-photo"]')).toHaveLength(2)
+      expect(wrapper.find('[data-testid="event-edit-photo-remove-11"]').exists()).toBe(true)
+    })
+
+    it('deletes the photo it was clicked on', async () => {
+      eventsStore.fetchEvent = vi.fn().mockResolvedValue(WITH_IMAGES)
+      eventsStore.current.data = WITH_IMAGES
+      eventsStore.deleteEventImage = vi.fn().mockResolvedValue({})
+
+      const wrapper = mountPage()
+      await flushPromises()
+
+      await wrapper.find('[data-testid="event-edit-photo-remove-12"]').trigger('click')
+      await flushPromises()
+
+      expect(eventsStore.deleteEventImage).toHaveBeenCalledWith(5, 12)
+    })
+
+    it('shows an error when deletion fails', async () => {
+      eventsStore.fetchEvent = vi.fn().mockResolvedValue(WITH_IMAGES)
+      eventsStore.current.data = WITH_IMAGES
+      eventsStore.deleteEventImage = vi.fn().mockRejectedValue(new Error('nope'))
+
+      const wrapper = mountPage()
+      await flushPromises()
+
+      await wrapper.find('[data-testid="event-edit-photo-remove-11"]').trigger('click')
+      await flushPromises()
+
+      expect(wrapper.find('[data-testid="event-edit-image-error"]').exists()).toBe(true)
+    })
+
+    it('shows no photo grid when the event has none', async () => {
+      const wrapper = mountPage()
+      await flushPromises()
+
+      expect(wrapper.find('[data-testid="event-edit-photo"]').exists()).toBe(false)
+    })
+  })
 })

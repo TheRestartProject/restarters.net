@@ -475,14 +475,30 @@ describe('stores/events', () => {
   })
 
   describe('uploadEventImage', () => {
-    it('returns the response data on success', async () => {
+    it('returns the response data on success, and refetches so the photo appears', async () => {
       mockApi.event.uploadImage.mockResolvedValueOnce({ data: { image_url: '/uploads/mid_x.png' } })
+      mockApi.event.get.mockResolvedValueOnce({ data: { id: 5, images: [{ idimages: 1, path: 'x.png' }] } })
 
       const store = useEventsStore()
       const data = await store.uploadEventImage(5, 'key123')
 
       expect(mockApi.event.uploadImage).toHaveBeenCalledWith(5, 'key123')
       expect(data).toEqual({ image_url: '/uploads/mid_x.png' })
+      // The edit page renders the grid from current.data.images, so the
+      // upload has to be followed by a refetch or the new photo never shows.
+      expect(mockApi.event.get).toHaveBeenCalledWith(5)
+      expect(store.current.data.images).toHaveLength(1)
+    })
+
+    it('deleteEventImage removes the photo and refetches', async () => {
+      mockApi.event.deleteImage = vi.fn().mockResolvedValue({ data: { deleted: true } })
+      mockApi.event.get.mockResolvedValueOnce({ data: { id: 5, images: [] } })
+
+      const store = useEventsStore()
+      await store.deleteEventImage(5, 12)
+
+      expect(mockApi.event.deleteImage).toHaveBeenCalledWith(5, 12)
+      expect(store.current.data.images).toEqual([])
     })
 
     it('rethrows on failure (caller shows its own error message)', async () => {

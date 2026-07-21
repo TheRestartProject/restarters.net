@@ -111,7 +111,9 @@
       "start_required": "Veuillez choisir une heure de début.",
       "title_required": "Veuillez saisir un nom pour votre événement.",
       "view_event": "Voir l'événement",
-      "view_load_error": "Désolé, nous n'avons pas pu charger cet événement."
+      "view_load_error": "Désolé, nous n'avons pas pu charger cet événement.",
+      "image_delete_error": "Désolé, nous n'avons pas pu supprimer cette photo. Veuillez réessayer.",
+      "remove_photo": "Supprimer la photo"
     },
     "fixometer": {
       "load_error": "Désolé, nous n'avons pas pu charger les statistiques du Fixometer. Veuillez réessayer.",

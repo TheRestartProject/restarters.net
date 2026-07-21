@@ -46,9 +46,9 @@ const accessGranted = computed(() => isOwnProfile.value || isAdmin.value || repa
 
 const viewProfileUrl = computed(() => (isOwnProfile.value ? '/profile' : `/profile/${targetId.value}`))
 
-// Best-effort "Editing <name>" subheading for the admin-on-someone-else
-// case - see stores/profile.js's targetUser doc comment (GET
-// /api/v2/users/{id} doesn't exist yet, design.md §6.2 Phase D task D2).
+// "Editing <name>" subheading for the admin-on-someone-else case, from
+// GET /api/v2/users/{id} - see stores/profile.js's targetUser doc comment.
+// Still best-effort: the heading falls back to the id if the fetch fails.
 const heading = computed(() => {
   if (isOwnProfile.value || targetId.value === null) {
     return null

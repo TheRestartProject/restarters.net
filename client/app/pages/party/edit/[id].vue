@@ -6,12 +6,12 @@ import { useAuth } from '~/composables/useAuth.js'
 import { useEventPermissions } from '~/composables/useEventPermissions.js'
 import EventForm from '~/components/events/EventForm.vue'
 import TusImageUpload from '~/components/forms/TusImageUpload.vue'
+import { useUploadedImageUrl } from '~/composables/useUploadedImageUrl.js'
 
 // /party/edit/[id] - resources/views/events/edit.blade.php +
 // EventAddEdit.vue (design.md §6.2 section 4 C4 task brief). Adds, over the
-// create page: the "photos" tab (TusImageUpload, C1f - write-only, since no
-// endpoint lists an event's existing photos, api-gaps.md Phase C item 3)
-// and the moderation approve select (EventForm.vue, gated on
+// create page: the "photos" tab (existing photos with a remove control, plus
+// TusImageUpload) and the moderation approve select (EventForm.vue, gated on
 // data-testid=event-approve).
 //
 // The legacy page's admin-only "Event log" audit tab
@@ -27,6 +27,7 @@ const eventsStore = useEventsStore()
 
 const id = computed(() => Number(route.params.id))
 const event = computed(() => eventsStore.current.data)
+const { uploadedImageUrl } = useUploadedImageUrl()
 
 // No permissions object on the v2 Event resource (unlike Group's) - approximate
 // canedit via useEventPermissions: Administrator (and Root) always qualify;
@@ -123,6 +124,24 @@ async function onImageUploaded({ uploadKey }) {
 
 function onImageUploadError(message) {
   imageError.value = message
+}
+
+// events/edit.blade.php gives each photo a "Remove file" link. Same shape as
+// DevicePhotos.vue's removeImage.
+const deletingImageId = ref(null)
+
+async function removeImage(image) {
+  deletingImageId.value = image.idimages
+  imageError.value = ''
+  imageMessage.value = ''
+
+  try {
+    await eventsStore.deleteEventImage(id.value, image.idimages)
+  } catch {
+    imageError.value = t('client.events.image_delete_error')
+  } finally {
+    deletingImageId.value = null
+  }
 }
 </script>
 
@@ -248,6 +267,27 @@ function onImageUploadError(message) {
       </div>
 
       <div v-show="activeTab === 'photos'" class="pt-3" data-testid="event-edit-pane-photos">
+        <div v-if="event?.images?.length" class="d-flex flex-wrap gap-2 mb-3">
+          <div
+            v-for="image in event.images"
+            :key="image.idimages"
+            class="position-relative"
+            data-testid="event-edit-photo"
+          >
+            <img :src="uploadedImageUrl(image.path)" width="100" height="100" style="object-fit: cover" alt="">
+            <button
+              type="button"
+              class="btn btn-sm btn-light position-absolute top-0 end-0 p-1 lh-1"
+              :disabled="deletingImageId === image.idimages"
+              :aria-label="t('client.events.remove_photo')"
+              :data-testid="`event-edit-photo-remove-${image.idimages}`"
+              @click="removeImage(image)"
+            >
+              &times;
+            </button>
+          </div>
+        </div>
+
         <TusImageUpload @uploaded="onImageUploaded" @upload-error="onImageUploadError" />
         <div v-if="imageMessage" class="text-success" data-testid="event-edit-image-success">{{ imageMessage }}</div>
         <div v-if="imageError" class="text-danger" data-testid="event-edit-image-error">{{ imageError }}</div>

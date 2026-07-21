@@ -18,10 +18,9 @@ import { useUploadedImageUrl } from '~/composables/useUploadedImageUrl.js'
 // only gated element, and that's a client-side judgment call mirroring the
 // legacy Blade's own: `$user->id == Auth::id() || hasRole(Administrator)`.
 //
-// GET /api/v2/users/{id} doesn't exist yet - see stores/users.js and
-// docs/nuxt-migration/api-gaps.md Phase D for the documented shape this is
-// built against. fetchPublicProfile surfaces the failure as a real
-// not-found (404) or generic error state, rather than swallowing it.
+// Reads GET /api/v2/users/{id} (UserController::getPublicProfilev2).
+// fetchPublicProfile surfaces a failure as a real not-found (404) or generic
+// error state, rather than swallowing it.
 const props = defineProps({
   userId: {
     type: Number,

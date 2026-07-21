@@ -298,15 +298,31 @@ export const useEventsStore = defineStore('events', {
       }
     },
 
-    // POST /api/v2/events/{id}/images (C1f/C4). Write-only from the
-    // client's point of view: no endpoint lists an event's existing photos
-    // (docs/nuxt-migration/api-gaps.md Phase C item 3), so there's no local
-    // state to update on success - the caller (party/edit/[id].vue) just
-    // shows a confirmation/error.
+    // POST /api/v2/events/{id}/images. The Event resource carries `images`,
+    // so `current` is refreshed to pick the new photo up - the edit page
+    // renders them from there.
     async uploadEventImage(id, uploadKey) {
       const { $api } = useNuxtApp()
       const { data } = await $api.event.uploadImage(id, uploadKey)
+      await this.fetchEvent(id)
       return data
+    },
+
+    // DELETE /api/v2/events/{id}/images/{idimages} - events/edit.blade.php
+    // gives every photo a "Remove file" link. Same shape as
+    // stores/devices.js#deleteDeviceImage: refetch on success so the removed
+    // photo disappears, toast and rethrow on failure.
+    async deleteEventImage(id, idimages) {
+      const { $api } = useNuxtApp()
+
+      try {
+        const { data } = await $api.event.deleteImage(id, idimages)
+        await this.fetchEvent(id)
+        return data
+      } catch (error) {
+        useToastStore().error(error)
+        throw error
+      }
     },
   },
 })
