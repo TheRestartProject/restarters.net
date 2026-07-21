@@ -67,8 +67,35 @@ describe('components/dashboard/DashboardOnboardingModal', () => {
     expect(wrapper.find('[data-testid="onboarding-slide-1"]').exists()).toBe(true)
   })
 
-  it('emits dismiss when the close button is clicked', async () => {
+  // Parity gap #19: legacy's modal-prev is a slick arrow - slick's
+  // `slick-disabled` class fully removes it (display: none) on the first
+  // slide rather than just disabling it.
+  it('hides the previous button entirely on the first slide, not just disables it', () => {
     const wrapper = mountComponent({ show: true })
+
+    expect(wrapper.find('[data-testid="onboarding-previous"]').exists()).toBe(false)
+  })
+
+  // Parity gap #19: legacy's close (X) only gains `.close--visible` once the
+  // slick carousel reports the last slide (beforeChange, nextSlide === 2) -
+  // it's not shown throughout.
+  it('shows the close button only on the last slide', async () => {
+    const wrapper = mountComponent({ show: true })
+
+    expect(wrapper.find('[data-testid="onboarding-close"]').exists()).toBe(false)
+
+    await wrapper.find('[data-testid="onboarding-next"]').trigger('click')
+    expect(wrapper.find('[data-testid="onboarding-close"]').exists()).toBe(false)
+
+    await wrapper.find('[data-testid="onboarding-next"]').trigger('click')
+    expect(wrapper.find('[data-testid="onboarding-close"]').exists()).toBe(true)
+  })
+
+  it('emits dismiss when the close button is clicked on the last slide', async () => {
+    const wrapper = mountComponent({ show: true })
+
+    await wrapper.find('[data-testid="onboarding-next"]').trigger('click')
+    await wrapper.find('[data-testid="onboarding-next"]').trigger('click')
 
     await wrapper.find('[data-testid="onboarding-close"]').trigger('click')
 

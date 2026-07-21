@@ -92,8 +92,18 @@ const colspan = computed(() => {
     </div>
 
     <BButton v-if="canedit" variant="primary" class="mb-3" :data-testid="addTestId" @click="emit('toggle-add')">
+      <img :src="'/images/add-icon.svg'" alt="" class="add-device-icon">
       {{ powered ? t('partials.add_device_powered') : t('partials.add_device_unpowered') }}
     </BButton>
     <DeviceForm v-if="adding" :event-id="eventId" :powered="powered" @saved="emit('saved')" @cancel="emit('toggle-add')" />
   </div>
 </template>
+
+<style scoped>
+/* Gap fix (dropped-behaviour finding): EventDevices.vue's own
+   `b-img class="icon mb-1"` sizing for the add-device button icon. */
+.add-device-icon {
+  width: 20px;
+  margin-bottom: 3px;
+}
+</style>

@@ -180,6 +180,14 @@ describe('pages/dashboard', () => {
 
     expect(wrapper.find('[data-testid="onboarding-modal"]').exists()).toBe(true)
 
+    // Legacy only reveals the X close button once the carousel reaches its
+    // last slide (see DashboardOnboardingModal.vue) - advance through the
+    // other slides first, matching that behaviour, rather than expecting it
+    // to be present from the first slide.
+    expect(wrapper.find('[data-testid="onboarding-close"]').exists()).toBe(false)
+    await wrapper.find('[data-testid="onboarding-next"]').trigger('click')
+    await wrapper.find('[data-testid="onboarding-next"]').trigger('click')
+
     await wrapper.find('[data-testid="onboarding-close"]').trigger('click')
 
     expect(sessionStore.dismissOnboarding).toHaveBeenCalledTimes(1)

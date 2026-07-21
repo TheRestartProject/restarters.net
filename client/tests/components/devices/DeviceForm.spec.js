@@ -63,9 +63,11 @@ function seedMeta(store) {
 
 function mountForm(props = {}) {
   // devices.title_repair/unknown_item_type/unknown_brand (gaps 7 and 13)
-  // aren't in the checked-in i18n/locales fixtures yet (they're
-  // regenerated from lang/en/devices.php by `translations:export-client`,
-  // which this task deliberately doesn't run) - overlay them here instead.
+  // and devices.repair_outcome (control-substitution finding: the repair
+  // status multiselect's placeholder) aren't in the checked-in
+  // i18n/locales fixtures yet (they're regenerated from lang/en/devices.php
+  // by `translations:export-client`, which this task deliberately doesn't
+  // run) - overlay them here instead.
   const i18n = createI18n({
     legacy: false,
     locale: 'en',
@@ -78,6 +80,7 @@ function mountForm(props = {}) {
           title_repair: 'REPAIR',
           unknown_item_type: "You're creating a new item type. Are you sure an existing item type is not suitable?",
           unknown_brand: "You're creating a new brand. Are you sure an existing brand is not suitable?",
+          repair_outcome: 'Repair outcome?',
         },
       },
     },
@@ -90,6 +93,16 @@ function mountForm(props = {}) {
       stubs: GLOBAL_STUBS,
     },
   })
+}
+
+// Category/status/next-steps/spare-parts/barrier are custom multiselect-
+// style panels now (control-substitution finding), not native <select>s -
+// click the control to open it, then mousedown the option (same pattern as
+// TagMultiselect.spec.js's own single-select test: mousedown, not click, so
+// the option's handler runs before any blur-close).
+async function chooseOption(wrapper, testid, value) {
+  await wrapper.find(`[data-testid="${testid}"]`).trigger('click')
+  await wrapper.find(`[data-testid="${testid}-option-${value}"]`).trigger('mousedown')
 }
 
 describe('components/devices/DeviceForm', () => {
@@ -154,13 +167,13 @@ describe('components/devices/DeviceForm', () => {
     const wrapper = mountForm()
 
     await wrapper.find('[data-testid="device-form-item-type"]').setValue('Toaster')
-    await wrapper.find('[data-testid="device-form-category"]').setValue('10')
+    await chooseOption(wrapper, 'device-form-category', '10')
     await wrapper.find('[data-testid="device-form-brand"]').setValue('Acme')
     await wrapper.find('[data-testid="device-form-model"]').setValue('9000')
     await wrapper.find('[data-testid="device-form-age"]').setValue('2')
     await wrapper.find('[data-testid="device-form-problem"]').setValue('Would not toast')
     await wrapper.find('[data-testid="device-form-notes"]').setValue('Needed a new element')
-    await wrapper.find('[data-testid="device-form-status"]').setValue('Fixed')
+    await chooseOption(wrapper, 'device-form-status', 'Fixed')
     await wrapper.find('[data-testid="device-form"]').trigger('submit')
     await wrapper.vm.$nextTick()
 
@@ -184,7 +197,7 @@ describe('components/devices/DeviceForm', () => {
     store.addDevice = vi.fn().mockResolvedValue({ device: { id: 1 } })
     const wrapper = mountForm()
 
-    await wrapper.find('[data-testid="device-form-category"]').setValue('10')
+    await chooseOption(wrapper, 'device-form-category', '10')
     await wrapper.find('[data-testid="device-form-quantity"]').setValue('3')
     await wrapper.find('[data-testid="device-form"]').trigger('submit')
     await wrapper.vm.$nextTick()
@@ -196,7 +209,7 @@ describe('components/devices/DeviceForm', () => {
     store.addDevice = vi.fn().mockResolvedValue({ device: { id: 42 } })
     const wrapper = mountForm()
 
-    await wrapper.find('[data-testid="device-form-category"]').setValue('10')
+    await chooseOption(wrapper, 'device-form-category', '10')
     await wrapper.find('[data-testid="device-form"]').trigger('submit')
     await wrapper.vm.$nextTick()
 
@@ -207,7 +220,7 @@ describe('components/devices/DeviceForm', () => {
     store.addDevice = vi.fn().mockRejectedValue({ status: 500 })
     const wrapper = mountForm()
 
-    await wrapper.find('[data-testid="device-form-category"]').setValue('10')
+    await chooseOption(wrapper, 'device-form-category', '10')
     await wrapper.find('[data-testid="device-form"]').trigger('submit')
     await wrapper.vm.$nextTick()
 
@@ -224,7 +237,7 @@ describe('components/devices/DeviceForm', () => {
   describe('conditional repair-status fields', () => {
     it('shows next steps + spare parts for Repairable, hides barrier', async () => {
       const wrapper = mountForm()
-      await wrapper.find('[data-testid="device-form-status"]').setValue('Repairable')
+      await chooseOption(wrapper, 'device-form-status', 'Repairable')
 
       expect(wrapper.find('[data-testid="device-form-next-steps"]').exists()).toBe(true)
       expect(wrapper.find('[data-testid="device-form-spare-parts"]').exists()).toBe(true)
@@ -233,7 +246,7 @@ describe('components/devices/DeviceForm', () => {
 
     it('shows only spare parts for Fixed', async () => {
       const wrapper = mountForm()
-      await wrapper.find('[data-testid="device-form-status"]').setValue('Fixed')
+      await chooseOption(wrapper, 'device-form-status', 'Fixed')
 
       expect(wrapper.find('[data-testid="device-form-next-steps"]').exists()).toBe(false)
       expect(wrapper.find('[data-testid="device-form-spare-parts"]').exists()).toBe(true)
@@ -242,7 +255,7 @@ describe('components/devices/DeviceForm', () => {
 
     it('shows only barrier for End of life', async () => {
       const wrapper = mountForm()
-      await wrapper.find('[data-testid="device-form-status"]').setValue('End of life')
+      await chooseOption(wrapper, 'device-form-status', 'End of life')
 
       expect(wrapper.find('[data-testid="device-form-next-steps"]').exists()).toBe(false)
       expect(wrapper.find('[data-testid="device-form-spare-parts"]').exists()).toBe(false)
@@ -253,16 +266,16 @@ describe('components/devices/DeviceForm', () => {
   describe('weight field visibility (EventDevice.vue: showWeight)', () => {
     it('is always shown for unpowered devices', async () => {
       const wrapper = mountForm({ powered: false })
-      await wrapper.find('[data-testid="device-form-category"]').setValue('20')
+      await chooseOption(wrapper, 'device-form-category', '20')
       expect(wrapper.find('[data-testid="device-form-weight"]').exists()).toBe(true)
     })
 
     it('is hidden for powered devices unless the misc category (46) is chosen', async () => {
       const wrapper = mountForm({ powered: true })
-      await wrapper.find('[data-testid="device-form-category"]').setValue('10')
+      await chooseOption(wrapper, 'device-form-category', '10')
       expect(wrapper.find('[data-testid="device-form-weight"]').exists()).toBe(false)
 
-      await wrapper.find('[data-testid="device-form-category"]').setValue('46')
+      await chooseOption(wrapper, 'device-form-category', '46')
       expect(wrapper.find('[data-testid="device-form-weight"]').exists()).toBe(true)
     })
   })
@@ -272,7 +285,7 @@ describe('components/devices/DeviceForm', () => {
       const wrapper = mountForm({ powered: true })
       await wrapper.find('[data-testid="device-form-item-type"]').setValue('Toaster')
 
-      expect(wrapper.find('[data-testid="device-form-category"]').element.value).toBe('10')
+      expect(wrapper.find('[data-testid="device-form-category"]').attributes('data-value')).toBe('10')
     })
 
     it('does not overwrite an existing category when editing', async () => {
@@ -286,7 +299,7 @@ describe('components/devices/DeviceForm', () => {
       // The category select stays on the device's original category (20),
       // not the "Toaster" suggestion (10), because editing.value is true
       // and form.category was already non-empty.
-      expect(wrapper.find('[data-testid="device-form-category"]').element.value).toBe('20')
+      expect(wrapper.find('[data-testid="device-form-category"]').attributes('data-value')).toBe('20')
     })
   })
 
@@ -315,7 +328,7 @@ describe('components/devices/DeviceForm', () => {
       const wrapper = mountForm({ device: editDevice() })
 
       expect(wrapper.find('[data-testid="device-form-item-type"]').element.value).toBe('Kettle')
-      expect(wrapper.find('[data-testid="device-form-category"]').element.value).toBe('10')
+      expect(wrapper.find('[data-testid="device-form-category"]').attributes('data-value')).toBe('10')
       expect(wrapper.find('[data-testid="device-form-brand"]').element.value).toBe('Acme')
       expect(wrapper.find('[data-testid="device-form-model"]').element.value).toBe('K1')
     })
@@ -398,6 +411,82 @@ describe('components/devices/DeviceForm', () => {
 
       expect(wrapper.find('[data-testid="device-form-item-type-warning"]').exists()).toBe(false)
       expect(wrapper.find('[data-testid="device-form-brand-warning"]').exists()).toBe(false)
+    })
+  })
+
+  // Gap fix (control-substitution finding): DeviceCategorySelect.vue/
+  // DeviceRepairStatus.vue/DeviceType.vue/DeviceBrand.vue's vue-multiselect/
+  // vue-typeahead-bootstrap controls, ported as bespoke panels (not native
+  // <select>/<datalist>) - see DeviceForm.vue's own doc comment.
+  describe('multiselect-style category/status panels and item-type/brand suggestions', () => {
+    it('category is closed by default and opens a grouped panel on click', async () => {
+      const wrapper = mountForm()
+
+      expect(wrapper.find('[data-testid="device-form-category-option-10"]').exists()).toBe(false)
+
+      await wrapper.find('[data-testid="device-form-category"]').trigger('click')
+
+      // Grouped under the cluster header text, not a flat list - the group
+      // heading renders as its own (unclickable) option.
+      const panel = wrapper.find('.multiselect__content-wrapper')
+      expect(panel.text()).toContain('Kitchen')
+      expect(wrapper.find('[data-testid="device-form-category-option-10"]').exists()).toBe(true)
+    })
+
+    it('choosing a category option closes the panel and updates the selected label', async () => {
+      const wrapper = mountForm()
+
+      await chooseOption(wrapper, 'device-form-category', '10')
+
+      expect(wrapper.find('[data-testid="device-form-category-option-10"]').exists()).toBe(false)
+      expect(wrapper.find('[data-testid="device-form-category"]').text()).toBe('Toaster')
+    })
+
+    it('opening the category panel yourself clears the auto-suggestion highlight (DeviceCategorySelect.vue: @open)', async () => {
+      const wrapper = mountForm({ powered: true })
+      await wrapper.find('[data-testid="device-form-item-type"]').setValue('Toaster')
+      expect(wrapper.find('.suggested').exists()).toBe(true)
+
+      await wrapper.find('[data-testid="device-form-category"]').trigger('click')
+      expect(wrapper.find('.suggested').exists()).toBe(false)
+    })
+
+    it('repair status opens a flat options panel and closes it once chosen', async () => {
+      const wrapper = mountForm()
+
+      await wrapper.find('[data-testid="device-form-status"]').trigger('click')
+      expect(wrapper.find('[data-testid="device-form-status-option-Repairable"]').exists()).toBe(true)
+
+      await wrapper.find('[data-testid="device-form-status-option-Repairable"]').trigger('mousedown')
+      expect(wrapper.find('[data-testid="device-form-status"]').text()).toBe('Repairable')
+      expect(wrapper.find('[data-testid="device-form-status-option-Repairable"]').exists()).toBe(false)
+    })
+
+    it('item type shows a filtered suggestion list as you type, and clicking one fills the field', async () => {
+      const wrapper = mountForm({ powered: true })
+
+      await wrapper.find('[data-testid="device-form-item-type"]').trigger('focus')
+      await wrapper.find('[data-testid="device-form-item-type"]').setValue('Blen')
+
+      expect(wrapper.find('[data-testid="device-form-item-type-option-Blender"]').exists()).toBe(true)
+
+      await wrapper.find('[data-testid="device-form-item-type-option-Blender"]').trigger('mousedown')
+
+      expect(wrapper.find('[data-testid="device-form-item-type"]').element.value).toBe('Blender')
+      expect(wrapper.find('[data-testid="device-form-item-type-option-Blender"]').exists()).toBe(false)
+    })
+
+    it('brand shows a filtered suggestion list as you type, and clicking one fills the field', async () => {
+      const wrapper = mountForm()
+
+      await wrapper.find('[data-testid="device-form-brand"]').trigger('focus')
+      await wrapper.find('[data-testid="device-form-brand"]').setValue('Ac')
+
+      expect(wrapper.find('[data-testid="device-form-brand-option-Acme"]').exists()).toBe(true)
+
+      await wrapper.find('[data-testid="device-form-brand-option-Acme"]').trigger('mousedown')
+
+      expect(wrapper.find('[data-testid="device-form-brand"]').element.value).toBe('Acme')
     })
   })
 

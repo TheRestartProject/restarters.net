@@ -203,7 +203,7 @@ function retry() {
             v-for="coordinator in network.coordinators"
             :key="coordinator.id"
             :to="`/profile/${coordinator.id}`"
-            class="d-flex align-items-center gap-2 p-2 pe-3 text-decoration-none coordinator-card"
+            class="d-flex align-items-center p-2 pe-3 text-decoration-none coordinator-card"
             :data-testid="`network-coordinator-${coordinator.id}`"
           >
             <img
@@ -211,9 +211,9 @@ function retry() {
               alt=""
               width="40"
               height="40"
-              class="rounded-circle"
+              class="rounded-circle coordinator-avatar"
             >
-            <span>{{ coordinator.name }}</span>
+            <span class="coordinator-name">{{ coordinator.name }}</span>
           </NuxtLink>
         </div>
       </section>
@@ -253,10 +253,17 @@ function retry() {
         </div>
       </section>
 
-      <section v-if="canManage" class="mb-4" data-testid="tags-management">
-        <h2>{{ t('networks.tags.title') }}</h2>
-        <NetworkTagsManager :network-id="id" />
-      </section>
+      <!-- NetworkPage.vue wraps the tags-management section in a
+           <div class="row"><div class="col-lg-6">, constraining it to half
+           the container width at >=992px (desktop). -->
+      <div class="row">
+        <div class="col-lg-6">
+          <section v-if="canManage" class="mb-4" data-testid="tags-management">
+            <h2>{{ t('networks.tags.title') }}</h2>
+            <NetworkTagsManager :network-id="id" />
+          </section>
+        </div>
+      </div>
 
 
       <BModal :model-value="showDescriptionModal" :title="network.name" size="lg" ok-only data-testid="network-description-modal" @hide="showDescriptionModal = false">
@@ -278,9 +285,11 @@ function retry() {
 <style scoped lang="scss">
 // Coordinator pill cards (parity-v2/networks.md gap #7): matches legacy
 // NetworkPage.vue's .coordinator-card exactly - 2px solid black border,
-// pill radius, hover border-color/box-shadow - rather than bare Bootstrap
-// utility classes with no hover affordance.
+// pill radius, hover border-color/box-shadow, 0.75rem internal gap, cover-
+// fit avatar and bold nowrap name - rather than bare Bootstrap utility
+// classes with no hover affordance.
 .coordinator-card {
+  gap: 0.75rem;
   border: 2px solid #000;
   border-radius: 50px;
   background: #fff;
@@ -292,5 +301,14 @@ function retry() {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
     text-decoration: none;
   }
+}
+
+.coordinator-avatar {
+  object-fit: cover;
+}
+
+.coordinator-name {
+  font-weight: 500;
+  white-space: nowrap;
 }
 </style>

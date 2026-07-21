@@ -2,6 +2,7 @@
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import CollapsibleSection from '~/components/CollapsibleSection.vue'
+import TagMultiselect from '~/components/forms/TagMultiselect.vue'
 
 // Legacy DashboardAddData.vue: a group -> event picker that jumps to the
 // chosen event's view (/party/view/{id}) where the user adds repair data.
@@ -70,18 +71,30 @@ const addUrl = computed(() => (selectedEventId.value ? `/party/view/${selectedEv
       <template #title>
         <div class="d-flex align-items-center">
           <h2 class="mb-0">{{ t('dashboard.add_data_heading') }}</h2>
-          <img src="/images/fixometer-doodle.svg" alt="" class="ms-4 d-none d-md-block add-data__doodle">
+          <img src="/images/fixometer-doodle.svg" alt="" class="ms-4 d-none d-md-block">
         </div>
       </template>
 
       <div class="content-divider">
         <p>{{ t('dashboard.see_your_impact') }}:</p>
         <div class="row g-2 align-items-end">
-          <div class="col-md-5">
-            <BFormSelect v-model="selectedGroupId" :options="groupOptions" data-testid="add-data-group" />
+          <div class="col-md-5" data-testid="add-data-group">
+            <TagMultiselect
+              v-model="selectedGroupId"
+              :multiple="false"
+              :options="groupOptions"
+              track-by="value"
+              label-by="text"
+            />
           </div>
-          <div class="col-md-5">
-            <BFormSelect v-model="selectedEventId" :options="eventOptions" data-testid="add-data-event" />
+          <div class="col-md-5" data-testid="add-data-event">
+            <TagMultiselect
+              v-model="selectedEventId"
+              :multiple="false"
+              :options="eventOptions"
+              track-by="value"
+              label-by="text"
+            />
           </div>
           <div class="col-md-2 d-flex justify-content-md-end">
             <NuxtLink v-if="addUrl" :to="addUrl" class="btn btn-primary" data-testid="add-data-add">
@@ -106,7 +119,6 @@ const addUrl = computed(() => (selectedEventId.value ? `/party/view/${selectedEv
   padding: 30px;
 }
 
-.add-data__doodle {
-  height: 2.5rem;
-}
+/* fixometer-doodle.svg is left unstyled (develop's DashboardAddData.vue
+   never sizes it either) - it renders at its native 95x76. */
 </style>

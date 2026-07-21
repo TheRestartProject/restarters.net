@@ -110,8 +110,13 @@ function close() {
     </div>
 
     <template v-else-if="!groupOptions.length">
+      <!-- Gap fix (MEDIUM): develop's own AddDataModal.vue reuses
+           groups.follow_group_first ('Repair data is added to community
+           repair events. Please first follow a group and then choose an
+           event in order to add repair data.') here, not a shorter
+           invented string. -->
       <BAlert :model-value="true" variant="warning" data-testid="add-data-no-groups">
-        {{ t('devices.add_data_no_groups') }}
+        {{ t('groups.follow_group_first') }}
       </BAlert>
       <NuxtLink to="/group" class="btn btn-primary" data-testid="add-data-see-groups">
         {{ t('dashboard.see_all_groups') }}
@@ -119,12 +124,18 @@ function close() {
     </template>
 
     <template v-else>
-      <label class="form-label mt-2" for="add-data-group">{{ `${t('devices.group')}:` }}</label>
+      <!-- Gap fix (MEDIUM): develop's field label is
+           devices.add_data_group ('Please select a group'), not the bare
+           devices.group. -->
+      <label class="form-label mt-2" for="add-data-group">{{ `${t('devices.add_data_group')}:` }}</label>
       <BFormSelect id="add-data-group" v-model="selectedGroupId" :options="groupOptions" data-testid="add-data-group" />
 
       <template v-if="!groupEvents.length">
+        <!-- Gap fix (MEDIUM): develop reuses groups.create_event_first
+             ('Please first create an event in order to add repair data.'),
+             not a shorter invented string. -->
         <BAlert :model-value="true" variant="warning" class="mt-2" data-testid="add-data-no-events">
-          {{ t('devices.add_data_no_events') }}
+          {{ t('groups.create_event_first') }}
         </BAlert>
         <NuxtLink :to="`/party/create/${selectedGroupId}`" class="btn btn-primary" data-testid="add-data-create-event">
           {{ t('events.create_event') }}
@@ -132,16 +143,23 @@ function close() {
       </template>
 
       <template v-else>
-        <label class="form-label mt-2" for="add-data-event">{{ `${t('events.event')}:` }}</label>
+        <!-- Gap fix (MEDIUM): develop's field label is
+             devices.add_data_event ('Please select an event'), not the bare
+             events.event. -->
+        <label class="form-label mt-2" for="add-data-event">{{ `${t('devices.add_data_event')}:` }}</label>
         <BFormSelect id="add-data-event" v-model="selectedEventId" :options="eventOptions" data-testid="add-data-event" />
 
+        <!-- Gap fix (MEDIUM): develop's final action button reads
+             devices.add_data_action_button ('Go to event'), not
+             devices.add_data_button ('Add Data') - that key is reserved for
+             the button that opens this modal. -->
         <NuxtLink
           v-if="selectedEventId"
           :to="`/party/view/${selectedEventId}#devices-section`"
           class="btn btn-primary mt-3"
           data-testid="add-data-go"
         >
-          {{ t('devices.add_data_button') }}
+          {{ t('devices.add_data_action_button') }}
         </NuxtLink>
       </template>
     </template>

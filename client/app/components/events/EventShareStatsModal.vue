@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 // Gap 3: "Share event stats" is completely absent from the Nuxt event page
@@ -66,6 +66,12 @@ const headlineEmbed = computed(
 const co2Url = computed(() => `${runtimeConfig.public.apiBase}/outbound/info/party/${props.eventId}/leaf`)
 const co2Embed = computed(() => `<iframe src="${co2Url.value}" frameborder="0" width="700" height="370"></iframe>`)
 
+// event-share-stats.blade.php's #accordionEvent: both cards start collapsed
+// (`.collapse` with no `.show`), expanding only on a header click - this was
+// rendering as two always-open, always-live-iframe blocks instead.
+const headlineOpen = ref(false)
+const co2Open = ref(false)
+
 function close() {
   emit('close')
 }
@@ -82,50 +88,130 @@ function close() {
   >
     <p>{{ t('events.share_stats_message', { date: eventDate, event_name: eventName, number_devices: fixedDevices }) }}</p>
 
-    <h3 class="h6">{{ t('events.headline_stats_dropdown') }}</h3>
-    <div class="mb-2">
-      <label for="event-share-stats-headline-embed" class="fw-bold small">{{ t('events.embed_code_header') }}:</label>
-      <input
-        id="event-share-stats-headline-embed"
-        type="text"
-        readonly
-        class="form-control"
-        data-testid="event-share-stats-headline-embed"
-        :value="headlineEmbed"
-        @focus="$event.target.select()"
-      >
-    </div>
-    <p class="small text-muted">{{ t('events.headline_stats_message') }}</p>
-    <iframe
-      :src="headlineUrl"
-      frameborder="0"
-      width="100%"
-      height="370"
-      class="form-control mb-4"
-      data-testid="event-share-stats-headline-preview"
-    />
+    <!-- event-share-stats.blade.php's #accordionEvent: two collapsed-by-
+         default cards, matching StatsShareImageModal's sibling GroupShareStatsModal
+         convention of a plain header-button toggle rather than a full
+         accordion widget. -->
+    <div class="accordion-share">
+      <div class="accordion-share__item">
+        <button
+          type="button"
+          class="accordion-share__header"
+          :aria-expanded="headlineOpen"
+          data-testid="event-share-stats-headline-toggle"
+          @click="headlineOpen = !headlineOpen"
+        >
+          {{ t('events.headline_stats_dropdown') }}
+          <svg
+            class="accordion-share__caret"
+            :class="{ 'accordion-share__caret--open': headlineOpen }"
+            width="10"
+            height="6"
+            viewBox="0 0 10 6"
+            aria-hidden="true"
+          ><path d="M5,6l-5,-6l10,0l-5,6Z" fill="#0394a6" /></svg>
+        </button>
+        <div v-show="headlineOpen" class="accordion-share__body" data-testid="event-share-stats-headline-body">
+          <div class="mb-2">
+            <label for="event-share-stats-headline-embed" class="fw-bold small">{{ t('events.embed_code_header') }}:</label>
+            <input
+              id="event-share-stats-headline-embed"
+              type="text"
+              readonly
+              class="form-control"
+              data-testid="event-share-stats-headline-embed"
+              :value="headlineEmbed"
+              @focus="$event.target.select()"
+            >
+          </div>
+          <p class="small text-muted">{{ t('events.headline_stats_message') }}</p>
+          <iframe
+            :src="headlineUrl"
+            frameborder="0"
+            width="100%"
+            height="370"
+            class="form-control"
+            data-testid="event-share-stats-headline-preview"
+          />
+        </div>
+      </div>
 
-    <h3 class="h6">{{ t('events.co2_equivalence_visualisation_dropdown') }}</h3>
-    <p class="small text-muted">{{ t('events.infographic_message') }}</p>
-    <div class="mb-2">
-      <label for="event-share-stats-co2-embed" class="fw-bold small">{{ t('events.embed_code_header') }}:</label>
-      <input
-        id="event-share-stats-co2-embed"
-        type="text"
-        readonly
-        class="form-control"
-        data-testid="event-share-stats-co2-embed"
-        :value="co2Embed"
-        @focus="$event.target.select()"
-      >
+      <div class="accordion-share__item">
+        <button
+          type="button"
+          class="accordion-share__header"
+          :aria-expanded="co2Open"
+          data-testid="event-share-stats-co2-toggle"
+          @click="co2Open = !co2Open"
+        >
+          {{ t('events.co2_equivalence_visualisation_dropdown') }}
+          <svg
+            class="accordion-share__caret"
+            :class="{ 'accordion-share__caret--open': co2Open }"
+            width="10"
+            height="6"
+            viewBox="0 0 10 6"
+            aria-hidden="true"
+          ><path d="M5,6l-5,-6l10,0l-5,6Z" fill="#0394a6" /></svg>
+        </button>
+        <div v-show="co2Open" class="accordion-share__body" data-testid="event-share-stats-co2-body">
+          <p class="small text-muted">{{ t('events.infographic_message') }}</p>
+          <div class="mb-2">
+            <label for="event-share-stats-co2-embed" class="fw-bold small">{{ t('events.embed_code_header') }}:</label>
+            <input
+              id="event-share-stats-co2-embed"
+              type="text"
+              readonly
+              class="form-control"
+              data-testid="event-share-stats-co2-embed"
+              :value="co2Embed"
+              @focus="$event.target.select()"
+            >
+          </div>
+          <iframe
+            :src="co2Url"
+            frameborder="0"
+            width="100%"
+            height="370"
+            class="form-control"
+            data-testid="event-share-stats-co2-preview"
+          />
+        </div>
+      </div>
     </div>
-    <iframe
-      :src="co2Url"
-      frameborder="0"
-      width="100%"
-      height="370"
-      class="form-control"
-      data-testid="event-share-stats-co2-preview"
-    />
   </BModal>
 </template>
+
+<style scoped>
+/* event-share-stats.blade.php's #accordionEvent .card: a plain bordered,
+   button-toggled section, collapsed by default. */
+.accordion-share__item {
+  border: 1px solid #dee2e6;
+  border-radius: 0.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.accordion-share__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  border: 0;
+  background: none;
+  padding: 0.75rem 1rem;
+  font-weight: bold;
+  text-align: left;
+}
+
+.accordion-share__caret {
+  transition: transform 0.2s ease;
+}
+
+.accordion-share__caret--open {
+  transform: rotate(180deg);
+}
+
+.accordion-share__body {
+  padding: 0 1rem 1rem;
+}
+</style>

@@ -67,30 +67,52 @@ function dismiss() {
     data-testid="onboarding-modal"
     @hide="dismiss"
   >
-    <button
-      type="button"
-      class="btn-close float-end"
-      :aria-label="t('onboarding.finishing_action')"
-      data-testid="onboarding-close"
-      @click="dismiss"
-    />
+    <!-- Legacy source: resources/views/layouts/app.blade.php's #onboarding
+         modal + resources/js/app.js's onboarding() (a slick carousel) +
+         resources/sass/_onboarding.scss. The legacy close (X) only gets its
+         `.close--visible` class once the slick carousel's `beforeChange`
+         reports nextSlide === 2 (the last of 3 slides) - reproduced here as
+         a v-if gated on the last slide, not shown throughout. Likewise
+         legacy's modal-prev is a slick arrow: slick's `slick-disabled` class
+         (`display: none !important`) removes it entirely on the first
+         slide, not merely :disabled. -->
+    <div class="onboarding">
+      <button
+        v-if="current === slides.length - 1"
+        type="button"
+        class="btn-close float-end"
+        :aria-label="t('onboarding.finishing_action')"
+        data-testid="onboarding-close"
+        @click="dismiss"
+      />
 
-    <article :data-testid="`onboarding-slide-${current}`">
-      <img
-        :src="slides[current].image"
-        class="rounded-circle img-fluid"
-        width="250"
-        :alt="t(slides[current].alt)"
-      >
-      <h1>{{ t(slides[current].heading) }}</h1>
-      <!-- eslint-disable-next-line vue/no-v-html -->
-      <div v-html="t(slides[current].content)" />
-    </article>
+      <article :data-testid="`onboarding-slide-${current}`">
+        <img
+          :src="slides[current].image"
+          class="rounded-circle img-fluid onboarding__image"
+          width="250"
+          :alt="t(slides[current].alt)"
+        >
+        <h1>{{ t(slides[current].heading) }}</h1>
+        <!-- eslint-disable-next-line vue/no-v-html -->
+        <div class="onboarding__body" v-html="t(slides[current].content)" />
+      </article>
 
-    <div class="d-flex justify-content-between mt-3">
+      <!-- Slide-position indicator, standing in for slick's auto-generated
+           `dots: true` pager. -->
+      <ul class="onboarding__dots" data-testid="onboarding-dots">
+        <li
+          v-for="(slide, index) in slides"
+          :key="index"
+          class="onboarding__dot"
+          :class="{ 'onboarding__dot--active': index === current }"
+        />
+      </ul>
+
       <BButton
+        v-if="current > 0"
         variant="link"
-        :disabled="current === 0"
+        class="onboarding__nav onboarding__nav--prev"
         data-testid="onboarding-previous"
         @click="previous"
       >
@@ -100,14 +122,106 @@ function dismiss() {
       <BButton
         v-if="current < slides.length - 1"
         variant="link"
+        class="onboarding__nav onboarding__nav--next"
         data-testid="onboarding-next"
         @click="next"
       >
         {{ t('onboarding.next') }}
       </BButton>
-      <BButton v-else variant="primary" data-testid="onboarding-finish" @click="dismiss">
+      <BButton
+        v-else
+        variant="primary"
+        class="onboarding__nav onboarding__nav--finish"
+        data-testid="onboarding-finish"
+        @click="dismiss"
+      >
         {{ t('onboarding.finishing_action') }}
       </BButton>
     </div>
   </BModal>
 </template>
+
+<style scoped>
+/* Ported from resources/sass/_onboarding.scss (a scoped rebuild - the modal
+   markup here isn't legacy's raw #onboarding/.modal-slideshow, so the
+   selectors target this component's own classes rather than
+   .modal/.modal-dialog/.modal-content). */
+.onboarding {
+  position: relative;
+  padding-bottom: 56px;
+}
+
+.onboarding article {
+  padding-bottom: 10px;
+}
+
+.onboarding h1 {
+  font-weight: normal;
+  font-size: 26px;
+  line-height: 1;
+  margin: 0 0 15px;
+  text-align: center;
+}
+
+.onboarding__image {
+  display: block;
+  margin: 0 auto 25px;
+  max-width: 180px;
+}
+
+@media (min-width: 992px) {
+  .onboarding__image {
+    max-width: 100%;
+  }
+}
+
+/* v-html content (slideN_content, lang/en/onboarding.php) renders raw <p>/
+   <ul> markup that bypasses the compiler, so it needs :deep() to be reached
+   by scoped styles. */
+.onboarding__body :deep(p) {
+  font-size: 15px;
+  line-height: 1.3;
+  text-align: center;
+}
+
+.onboarding__body :deep(ul) {
+  font-size: 15px;
+  text-align: center;
+  list-style-type: square;
+  list-style-position: inside;
+}
+
+.onboarding__dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.onboarding__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #d8d8d8;
+}
+
+.onboarding__dot--active {
+  background-color: #222;
+}
+
+.onboarding__nav {
+  position: absolute;
+  bottom: 0;
+}
+
+.onboarding__nav--prev {
+  left: 0;
+}
+
+.onboarding__nav--next,
+.onboarding__nav--finish {
+  right: 0;
+}
+</style>

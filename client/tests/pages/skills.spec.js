@@ -54,17 +54,14 @@ describe('pages/skills', () => {
     expect(descriptionField.nullIfEmpty).toBe(true)
   })
 
-  // live SkillsPage.vue (07e6abd7cc^) is the baseline (not develop's Blade):
-  // 3 table columns (skill_name/category/description), category formatted
-  // through the same hardcoded category labels as the form select.
-  it("lists skill_name/category/description columns, category formatted through the same category labels", () => {
+  // develop's real skills/index.blade.php thead has just two columns -
+  // "Skill name" and "Description" - no Category column (Category is
+  // edit-form-only there, per skills/edit.blade.php's `#category` select).
+  it('lists only skill_name/description columns, no Category column', () => {
     const wrapper = mountPage()
     const table = wrapper.findComponent(AdminCrudTableStub)
-    const categoryColumn = table.props('tableFields').find((f) => f.key === 'category')
 
-    expect(table.props('tableFields').map((f) => f.key)).toEqual(['skill_name', 'category', 'description'])
-    expect(categoryColumn.formatter(2)).toBe('Technical skills')
-    expect(categoryColumn.formatter(null)).toBe('')
+    expect(table.props('tableFields').map((f) => f.key)).toEqual(['skill_name', 'description'])
   })
 
   it('wires items and CRUD actions to the adminRefdata store', () => {

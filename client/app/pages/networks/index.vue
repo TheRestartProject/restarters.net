@@ -86,15 +86,13 @@ function retry() {
     </BAlert>
 
     <template v-else>
-      <!-- develop's networks/index.blade.php wraps each list in a
-           <section class="table-section"> - table-section itself carries
-           no border/shadow (resources/sass/_table.scss: padding: 20px 0
-           only), but the rendered page shows each list in the site's
-           brand "content panel" box (white fill, thin black border, hard
-           offset drop-shadow) - the same look already ported here as the
-           global .panel class (app/assets/css/_panels.scss, used on
-           login/dashboard). Reusing that rather than inventing new CSS. -->
-      <section class="mb-4 panel" data-testid="your-networks-section">
+      <!-- develop's networks/index.blade.php wraps each list in a plain
+           <section class="table-section"> - resources/sass/_table.scss's
+           .table-section rule is just `padding: 20px 0` (plus @extend
+           .clear), no border/background/shadow. Not the site's .panel
+           "content panel" card (that class is never used on this page in
+           develop). -->
+      <section class="mb-4" data-testid="your-networks-section">
         <h2>{{ t('networks.index.your_networks') }}</h2>
         <p>{{ t('networks.index.your_networks_explainer') }}</p>
 
@@ -132,7 +130,7 @@ function retry() {
         </div>
       </section>
 
-      <section v-if="showAllNetworks" class="panel" data-testid="all-networks-section">
+      <section v-if="showAllNetworks" data-testid="all-networks-section">
         <h2>{{ t('networks.index.all_networks') }}</h2>
         <p>{{ t('networks.index.all_networks_explainer') }}</p>
 

@@ -82,10 +82,12 @@ describe('components/groups/GroupsTable', () => {
     useGroupsStore().fetchTags = vi.fn().mockResolvedValue([])
   })
 
-  it('shows an empty-state row when there are no groups', () => {
+  // develop's b-table renders no tbody content at all for zero matches (no
+  // show-empty/empty-text prop) - not an invented "no results" row/message.
+  it('renders no rows when there are no groups', () => {
     const wrapper = mountComponent({ groups: [] })
 
-    expect(wrapper.find('[data-testid="groups-table-empty"]').exists()).toBe(true)
+    expect(wrapper.findAll('tbody tr')).toHaveLength(0)
   })
 
   it('renders one row per group, linked to its view page', () => {
@@ -164,6 +166,17 @@ describe('components/groups/GroupsTable', () => {
 
     expect(wrapper.find('[data-testid="group-row-archived-10"]').exists()).toBe(false)
     expect(wrapper.find('[data-testid="group-row-archived-11"]').exists()).toBe(true)
+  })
+
+  // GroupArchivedBadge.vue (legacy): the badge carries a title tooltip with
+  // the archive date (groups.archived_group_title, ':date').
+  it('carries an archive-date tooltip on the archived badge', () => {
+    const wrapper = mountComponent({
+      groups: [{ id: 11, name: 'Old', archivedAt: '2024-01-01T00:00:00Z' }],
+    })
+
+    const expected = en.groups.archived_group_title.replace('{date}', '2024-01-01T00:00:00Z')
+    expect(wrapper.find('[data-testid="group-row-archived-11"]').attributes('title')).toBe(expected)
   })
 
   // /group/map's row<->marker hover linking (GroupMap.vue) - Neil's PR
@@ -251,8 +264,9 @@ describe('components/groups/GroupsTable', () => {
       expect(wrapper.find('[data-testid="groups-table-filter-tags"]').exists()).toBe(false)
     })
 
-    // gap #6/#11: the tag filter is a dropdown gated on showTags (matching
-    // legacy's Administrator/NetworkCoordinator-only tag search), not the
+    // gap #6/#11: the tag filter is a multi-select gated on showTags
+    // (matching legacy's Administrator/NetworkCoordinator-only tag search,
+    // and legacy's vue-multiselect :multiple="true" on this field), not the
     // free-text search every other field uses.
     it('filters rows by tag, when showTags is set', async () => {
       useGroupsStore().tags.data = [
@@ -262,10 +276,31 @@ describe('components/groups/GroupsTable', () => {
 
       const wrapper = mountComponent({ groups: filterableRows, showFilters: true, showTags: true })
       await wrapper.find('[data-testid="groups-table-filters-toggle"]').trigger('click')
-      await wrapper.find('[data-testid="groups-table-filter-tags"]').setValue('6')
+      await wrapper.find('[data-testid="groups-table-filter-tags-search"]').trigger('focus')
+      await wrapper.find('[data-testid="groups-table-filter-tags-option-6"]').trigger('mousedown')
 
       expect(wrapper.find('[data-testid="group-row-2"]').exists()).toBe(true)
       expect(wrapper.find('[data-testid="group-row-1"]').exists()).toBe(false)
+    })
+
+    // Multiple tags selected match any row with at least one of them in
+    // common (legacy's filteredGroups: "Tag in common?" -
+    // tagsInCommon.length > 0), not only rows matching every selected tag.
+    it('matches rows with any of several selected tags in common', async () => {
+      useGroupsStore().tags.data = [
+        { id: 5, name: 'electronics' },
+        { id: 6, name: 'textiles' },
+      ]
+
+      const wrapper = mountComponent({ groups: filterableRows, showFilters: true, showTags: true })
+      await wrapper.find('[data-testid="groups-table-filters-toggle"]').trigger('click')
+      await wrapper.find('[data-testid="groups-table-filter-tags-search"]').trigger('focus')
+      await wrapper.find('[data-testid="groups-table-filter-tags-option-5"]').trigger('mousedown')
+      await wrapper.find('[data-testid="groups-table-filter-tags-search"]').trigger('focus')
+      await wrapper.find('[data-testid="groups-table-filter-tags-option-6"]').trigger('mousedown')
+
+      expect(wrapper.find('[data-testid="group-row-1"]').exists()).toBe(true)
+      expect(wrapper.find('[data-testid="group-row-2"]').exists()).toBe(true)
     })
   })
 

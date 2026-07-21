@@ -90,4 +90,14 @@ describe('components/devices/EventDeviceTable', () => {
     const wrapper = mountTable({ canedit: false })
     expect(wrapper.find('[data-testid="add-powered-device-desktop"]').exists()).toBe(false)
   })
+
+  // Gap fix (dropped-behaviour finding): EventDevices.vue's add-device
+  // buttons lead with `b-img :src="imageUrl('/images/add-icon.svg')"`.
+  it('shows the add-icon image before the label, for both powered and unpowered', () => {
+    const powered = mountTable({ canedit: true, powered: true })
+    const unpowered = mountTable({ canedit: true, powered: false })
+
+    expect(powered.find('[data-testid="add-powered-device-desktop"] img').attributes('src')).toBe('/images/add-icon.svg')
+    expect(unpowered.find('[data-testid="add-unpowered-device-desktop"] img').attributes('src')).toBe('/images/add-icon.svg')
+  })
 })

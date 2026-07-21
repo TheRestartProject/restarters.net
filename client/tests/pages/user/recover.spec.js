@@ -66,9 +66,14 @@ describe('pages/user/recover', () => {
     expect(wrapper.find('[data-testid="recover-success"]').exists()).toBe(false)
   })
 
-  it('shows a success message and hides the form once the reset email is sent', async () => {
+  // Gap fix: legacy forgot-password.blade.php always re-renders the same
+  // form alongside its flash message (App\Http\Controllers\UserController
+  // ::recover returns the same view either way) - it was previously hidden
+  // here via `v-if="!sent"`, which had no legacy equivalent and blocked
+  // retrying with a different address.
+  it('shows the server\'s success message and keeps the form visible so the user can try again', async () => {
     const authStore = useAuthStore()
-    authStore.forgotPassword = vi.fn().mockResolvedValue({})
+    authStore.forgotPassword = vi.fn().mockResolvedValue({ message: 'We have e-mailed your password reset link!' })
 
     const wrapper = mountRecover()
     await wrapper.find('[data-testid="recover-email"]').setValue('jane@bloggs.net')
@@ -76,8 +81,8 @@ describe('pages/user/recover', () => {
     await flushPromises()
 
     expect(authStore.forgotPassword).toHaveBeenCalledWith({ email: 'jane@bloggs.net' })
-    expect(wrapper.find('[data-testid="recover-success"]').exists()).toBe(true)
-    expect(wrapper.find('[data-testid="recover-form"]').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="recover-success"]').text()).toBe('We have e-mailed your password reset link!')
+    expect(wrapper.find('[data-testid="recover-form"]').exists()).toBe(true)
   })
 
   it('shows the server error message when the request fails', async () => {
@@ -89,5 +94,26 @@ describe('pages/user/recover', () => {
     await flushPromises()
 
     expect(wrapper.find('[data-testid="recover-error"]').text()).toBe('Something went wrong.')
+  })
+
+  // Gap fix: AuthController::forgotPasswordv2 (passwords.user - "We can't
+  // find a user with that e-mail address.") surfaces a "no such account"
+  // failure as a 422 validation error on the `email` field, not the
+  // generic top-level `message` - that specific reason must reach the
+  // user, not a generic "something went wrong".
+  it('shows the specific email-not-found reason from errors.email, not the generic top-level message', async () => {
+    const authStore = useAuthStore()
+    authStore.forgotPassword = vi.fn().mockRejectedValue({
+      data: {
+        message: 'The given data was invalid.',
+        errors: { email: ["We can't find a user with that e-mail address."] },
+      },
+    })
+
+    const wrapper = mountRecover()
+    await wrapper.find('[data-testid="recover-form"]').trigger('submit')
+    await flushPromises()
+
+    expect(wrapper.find('[data-testid="recover-error"]').text()).toBe("We can't find a user with that e-mail address.")
   })
 })

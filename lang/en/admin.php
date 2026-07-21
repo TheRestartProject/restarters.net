@@ -48,7 +48,6 @@ return [
   'role_permissions' => 'Permissions',
   'edit-role' => 'Edit role',
   'save-role' => 'Save role',
-  'role_permissions_help' => 'Tick the permissions this role should have. The role itself cannot be renamed.',
   'role_update_success' => 'Role permissions updated.',
   'role_update_error' => 'Could not update role permissions.',
   'main_branches' => 'Main branches',

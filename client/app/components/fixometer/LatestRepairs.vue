@@ -107,8 +107,9 @@ const groupImageUrl = computed(() => uploadedImageUrl(props.latestData?.group?.i
   padding: 1rem;
   background-color: #4aaebc;
   color: #222;
+  // $shadow (assets/css/_variables.scss) is 5px.
   border: 1px solid #222;
-  box-shadow: 4px 4px 0 #222;
+  box-shadow: 5px 5px 0 #222;
   display: flex;
   flex-direction: column;
   justify-content: center;

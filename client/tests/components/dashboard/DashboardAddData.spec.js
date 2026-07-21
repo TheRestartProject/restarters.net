@@ -6,19 +6,27 @@ import en from '../../../i18n/locales/en.json'
 import clientEn from '../../../i18n/locales/client-en.json'
 
 const NuxtLinkStub = { props: ['to'], template: '<a :href="to"><slot /></a>' }
-const BFormSelectStub = {
-  props: ['modelValue', 'options'],
-  emits: ['update:modelValue'],
-  template: '<select><option v-for="o in options" :key="o.value" :value="o.value">{{ o.text }}</option></select>',
-}
 
 function mountComponent(props = {}) {
   const i18n = createI18n({ legacy: false, locale: 'en', messages: { en: { ...en, ...clientEn } } })
 
   return mount(DashboardAddData, {
     props,
-    global: { plugins: [i18n], stubs: { NuxtLink: NuxtLinkStub, BFormSelect: BFormSelectStub } },
+    global: { plugins: [i18n], stubs: { NuxtLink: NuxtLinkStub } },
   })
+}
+
+// The group/event pickers are TagMultiselect.vue instances (finding #13 -
+// develop uses vue-multiselect here, not a native <select>), each wrapped in
+// a `[data-testid="add-data-group"]`/`[data-testid="add-data-event"]`
+// container so the two pickers' internal (identically-named) testids don't
+// collide. Open a picker by focusing its search input, then read the
+// `.multiselect__option` labels.
+function optionLabels(wrapper, testid) {
+  return wrapper
+    .find(`[data-testid="${testid}"]`)
+    .findAll('.multiselect__option')
+    .map((o) => o.text())
 }
 
 const GROUPS = [
@@ -47,18 +55,18 @@ describe('components/dashboard/DashboardAddData', () => {
     expect(wrapper.find('[data-testid="dashboard-add-data"]').exists()).toBe(false)
   })
 
-  it('offers only groups that have events, newest event first, and links Add to that event', () => {
+  it('offers only groups that have events, newest event first, and links Add to that event', async () => {
     const wrapper = mountComponent({ groups: GROUPS, events: EVENTS })
 
     expect(wrapper.find('[data-testid="dashboard-add-data"]').exists()).toBe(true)
 
     // Only groups 1 + 2 have events (group 3 excluded), sorted A-Z.
-    const groupOpts = wrapper.find('[data-testid="add-data-group"]').findAll('option')
-    expect(groupOpts.map((o) => o.text())).toEqual(['Alpha Fixers', 'Zeta Repairs'])
+    await wrapper.find('[data-testid="add-data-group"] input').trigger('focus')
+    expect(optionLabels(wrapper, 'add-data-group')).toEqual(['Alpha Fixers', 'Zeta Repairs'])
 
     // Default group's events, newest first.
-    const eventOpts = wrapper.find('[data-testid="add-data-event"]').findAll('option')
-    expect(eventOpts.map((o) => o.text())).toEqual(['Alpha Event New', 'Alpha Event Old'])
+    await wrapper.find('[data-testid="add-data-event"] input').trigger('focus')
+    expect(optionLabels(wrapper, 'add-data-event')).toEqual(['Alpha Event New', 'Alpha Event Old'])
 
     // Add link targets the selected (newest) event's view page.
     expect(wrapper.find('[data-testid="add-data-add"]').attributes('href')).toBe('/party/view/11')

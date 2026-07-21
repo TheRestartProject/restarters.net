@@ -1,9 +1,22 @@
 import { mount } from '@vue/test-utils'
 import { createI18n } from 'vue-i18n'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import EventFilters from '../../../app/components/events/EventFilters.vue'
 import en from '../../../i18n/locales/en.json'
 import clientEn from '../../../i18n/locales/client-en.json'
+
+// vue-datepicker-next's default export minifies to an internal component
+// name rather than "DatePicker", so global.stubs (which matches by resolved
+// component name) can't target it - mock the module itself instead, same
+// convention as tests/components/events/EventForm.spec.js.
+vi.mock('vue-datepicker-next', () => ({
+  default: {
+    props: ['value', 'placeholder'],
+    emits: ['update:value'],
+    template:
+      '<input data-testid="event-filters-date-stub" :value="value" :placeholder="placeholder" @input="$emit(\'update:value\', $event.target.value)" />',
+  },
+}))
 
 function mountComponent(props = {}) {
   const i18n = createI18n({ legacy: false, locale: 'en', messages: { en: { ...en, ...clientEn } } })
@@ -35,21 +48,29 @@ describe('components/events/EventFilters', () => {
     expect(wrapper.find('[data-testid="event-filters-end"]').exists()).toBe(false)
   })
 
+  // GroupEventsScrollTableFilters.vue's country control is a single-select
+  // vue-multiselect, not a native <select> - components/forms/TagMultiselect.vue
+  // is this project's stand-in (vue-multiselect is Vue 2 only).
   describe('gap 18: country + date-range filters', () => {
-    it('renders a country dropdown built from countryOptions and emits update:country on change', async () => {
+    it('renders a country picker built from countryOptions and emits update:country on selection', async () => {
       const wrapper = mountComponent({ search: '', country: '', countryOptions: ['France', 'UK'] })
 
-      const select = wrapper.find('[data-testid="event-filters-country"]')
-      expect(select.exists()).toBe(true)
-      expect(select.findAll('option').map((o) => o.text())).toEqual([
-        en.groups.search_country_placeholder,
-        'France',
-        'UK',
-      ])
+      const picker = wrapper.findComponent('[data-testid="event-filters-country"]')
+      expect(picker.exists()).toBe(true)
+      expect(picker.props('options')).toEqual(['France', 'UK'])
 
-      await select.setValue('UK')
+      await picker.vm.$emit('update:modelValue', 'UK')
 
       expect(wrapper.emitted('update:country')).toEqual([['UK']])
+    })
+
+    it('emits update:country with an empty string when the selection is cleared', async () => {
+      const wrapper = mountComponent({ search: '', country: 'UK', countryOptions: ['France', 'UK'] })
+
+      const picker = wrapper.findComponent('[data-testid="event-filters-country"]')
+      await picker.vm.$emit('update:modelValue', null)
+
+      expect(wrapper.emitted('update:country')).toEqual([['']])
     })
 
     it('renders start/end date inputs when dateRange is set and emits update:start/update:end', async () => {

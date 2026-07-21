@@ -28,6 +28,7 @@ const BModalStub = {
   emits: ['hide'],
   template: '<div v-if="modelValue" :data-modal-title="title"><slot /></div>',
 }
+const NuxtLinkStub = { props: ['to'], template: '<a :href="to"><slot /></a>' }
 
 const GLOBAL_STUBS = {
   BAlert: BAlertStub,
@@ -36,6 +37,7 @@ const GLOBAL_STUBS = {
   BFormGroup: BFormGroupStub,
   BFormSelect: BFormSelectStub,
   BModal: BModalStub,
+  NuxtLink: NuxtLinkStub,
 }
 
 const TABLE_FIELDS = [
@@ -238,8 +240,14 @@ describe('components/admin/AdminCrudTable', () => {
     })
   })
 
-  describe('edit modal', () => {
-    it('opens pre-filled when the display-key link is clicked', async () => {
+  describe('edit view', () => {
+    // develop's edit views are dedicated pages (category|skills|brands
+    // edit.blade.php: breadcrumb + h2 + `.edit-panel.edit-panel__device`),
+    // not a modal - this replaced a plain BModal that dropped all of that
+    // page chrome. The "-edit-modal" testid is kept for the inner form
+    // wrapper for e2e/admin.test.js backward-compatibility even though it's
+    // no longer a BModal.
+    it('opens pre-filled when the display-key link is clicked, replacing the list with the edit view', async () => {
       const wrapper = mountTable()
       await flushPromises()
 
@@ -247,6 +255,69 @@ describe('components/admin/AdminCrudTable', () => {
 
       const modal = wrapper.find('[data-testid="widgets-edit-modal"]')
       expect(modal.exists()).toBe(true)
+      expect(wrapper.find('[data-testid="widgets-edit-name"]').element.value).toBe('Widget One')
+      // The list (title/add-button/table) is gone while editing, matching
+      // develop's edit view being a separate page.
+      expect(wrapper.find('[data-testid="widgets-table"]').exists()).toBe(false)
+      expect(wrapper.find('[data-testid="widgets-add-button"]').exists()).toBe(false)
+    })
+
+    it('shows a breadcrumb (FIXOMETER > list title > edit title) and the h2 edit title', async () => {
+      const wrapper = mountTable()
+      await flushPromises()
+
+      await wrapper.find('[data-testid="widgets-edit-link-1"]').trigger('click')
+
+      const breadcrumb = wrapper.find('[data-testid="widgets-edit-breadcrumb"]')
+      expect(breadcrumb.exists()).toBe(true)
+      expect(breadcrumb.text()).toContain('FIXOMETER')
+      expect(breadcrumb.text()).toContain('Widgets') // labels.title
+      expect(breadcrumb.text()).toContain('Edit widget') // labels.editTitle
+      expect(breadcrumb.find('a[href="/dashboard"]').exists()).toBe(true)
+
+      expect(wrapper.find('h2').text()).toBe('Edit widget')
+    })
+
+    it('wraps the form in the edit-panel/edit-panel__device classes', async () => {
+      const wrapper = mountTable()
+      await flushPromises()
+
+      await wrapper.find('[data-testid="widgets-edit-link-1"]').trigger('click')
+
+      expect(wrapper.find('.edit-panel.edit-panel__device').exists()).toBe(true)
+    })
+
+    it('renders an optional labels.editDescription paragraph under the h2, when supplied', async () => {
+      const wrapper = mountTable({ labels: { ...LABELS, editDescription: 'Some help text.' } })
+      await flushPromises()
+
+      await wrapper.find('[data-testid="widgets-edit-link-1"]').trigger('click')
+
+      expect(wrapper.find('.edit-panel p').text()).toBe('Some help text.')
+    })
+
+    it('renders no description paragraph when labels.editDescription is not supplied', async () => {
+      const wrapper = mountTable()
+      await flushPromises()
+
+      await wrapper.find('[data-testid="widgets-edit-link-1"]').trigger('click')
+
+      // Only the h2 and the form itself live in .edit-panel - no stray <p>.
+      expect(wrapper.find('.edit-panel > p').exists()).toBe(false)
+    })
+
+    it('closing via the breadcrumb list crumb returns to the list, clearing the form', async () => {
+      const wrapper = mountTable()
+      await flushPromises()
+
+      await wrapper.find('[data-testid="widgets-edit-link-1"]').trigger('click')
+      await wrapper.find('[data-testid="widgets-edit-breadcrumb-list"]').trigger('click')
+
+      expect(wrapper.find('[data-testid="widgets-edit-modal"]').exists()).toBe(false)
+      expect(wrapper.find('[data-testid="widgets-table"]').exists()).toBe(true)
+
+      // Re-opening the same row shows its own values again, not stale state.
+      await wrapper.find('[data-testid="widgets-edit-link-1"]').trigger('click')
       expect(wrapper.find('[data-testid="widgets-edit-name"]').element.value).toBe('Widget One')
     })
 
@@ -263,6 +334,7 @@ describe('components/admin/AdminCrudTable', () => {
       expect(updateItem).toHaveBeenCalledWith(1, { name: 'Widget One (edited)', kind: 1, notes: 'Some notes', weight: 2.5 })
       expect(wrapper.find('[data-testid="widgets-feedback"]').text()).toBe('Widget updated!')
       expect(wrapper.find('[data-testid="widgets-edit-modal"]').exists()).toBe(false)
+      expect(wrapper.find('[data-testid="widgets-table"]').exists()).toBe(true) // back to the list
     })
 
     it('renders a generic error message when updateItem rejects without field errors', async () => {

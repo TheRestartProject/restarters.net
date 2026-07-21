@@ -25,8 +25,6 @@ return [
   'huge_impact_2' => 'Recherchez vos données de réparation ci-dessous et faites-vous une idée de l\'impact de la réparation ainsi que des obstacles auxquels nous sommes confrontés lorsque nous réparons.  Vous pouvez nous aider à comprendre ce que ces données nous apprennent d\'autre et quels changements nous devrions préconiser dans la <a href="https://talk.restarters.net/c/right-to-repair/repair-data/25">discussion sur les données de réparation</a> de notre forum.',
   'add_data_button' => 'Ajouter des données',
   'add_data_description' => 'Ajouter des données de réparation aide à démontrer l\'impact de la réparation',
-  'add_data_no_groups' => 'Vous devez suivre un groupe avant de pouvoir ajouter des données.',
-  'add_data_no_events' => 'Ce groupe n\'a pas encore d\'événement.',
   'search_text' => 'Parcourez  notre base de données de réparation',
   'table_intro' => 'Cliquez sur la ligne pour plus de détails.  Cliquez sur l\'en-tête d\'une colonne pour trier par cette colonne - cliquez à nouveau pour inverser l\'ordre de tri.',
   'repair_records' => 'Données de réparation',
@@ -69,4 +67,11 @@ return [
   'tooltip_type_unpowered' => 'Ajoutez autant d\'informations que possible sur le type d\'appareil (ex: "divan" "Jeans Denim")',
   'brand_if_known' => 'Marque (si connue)',
   'model_if_known' => 'Modèle (si connu)',
+
+  // Already exist on develop's lang/fr/devices.php with these exact
+  // values.
+  'repair_outcome' => 'Résultat de la réparation?',
+  'add_data_group' => 'Veuillez sélectionner un Repair Café',
+  'add_data_event' => 'Veuillez sélectionner un événement',
+  'add_data_action_button' => 'Participer à l\'événément',
 ];

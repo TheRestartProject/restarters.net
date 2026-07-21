@@ -156,4 +156,12 @@ return [
   'manual_invite_placeholder' => 'Type email and press Enter or Tab',
   'youre_going' => 'You\'re going!',
   'you_have_joined' => 'You have joined <a class="plain-link" href=":url">:name</a>',
+
+  // Already exist on develop's lang/en/events.php with these exact values -
+  // ported here rather than reworded, since this branch's copy of the file
+  // predates them.
+  'request_review' => 'Request review',
+  'search_title_placeholder' => 'Search title...',
+  'search_start_placeholder' => 'From...',
+  'search_end_placeholder' => 'To...',
 ];

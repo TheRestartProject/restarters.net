@@ -88,11 +88,17 @@ h2 {
 }
 
 .talk-doodle {
-  height: 40px;
+  width: 70px;
+  height: 54.5px;
 }
 
 .talk-topics {
   margin-bottom: 0.5rem;
+  /* develop's DiscourseDiscussion.vue: ::v-deep table { border-collapse:
+     separate; border-spacing: 0 9px; } - gives each DashboardTalkTopic row
+     visible gaps for its own border/box-shadow hover effect. */
+  border-collapse: separate;
+  border-spacing: 0 9px;
 }
 
 .talk-topics__icon {

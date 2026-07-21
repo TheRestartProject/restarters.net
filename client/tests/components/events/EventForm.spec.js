@@ -103,12 +103,19 @@ function mountForm(props = {}) {
   })
 }
 
+// EventGroup.vue's group picker is components/forms/TagMultiselect.vue now
+// (develop uses vue-multiselect) - set its value through the component
+// rather than through a native <select> API.
+function setGroupField(wrapper, value) {
+  return wrapper.findComponent('[data-testid="event-form-group"]').vm.$emit('update:modelValue', value)
+}
+
 async function fillRequiredFields(wrapper, { group = true } = {}) {
   await wrapper.find('[data-testid="event-form-venue"]').setValue('Repair Café')
   await wrapper.find('[data-testid="event-form-description"]').setValue('<p>Bring your broken things</p>')
   await wrapper.find('[data-testid="location-picker-input"]').setValue('Town Hall')
   if (group) {
-    await wrapper.find('[data-testid="event-form-group"]').setValue('9')
+    await setGroupField(wrapper, 9)
   }
   await wrapper.find('[data-testid="event-form-date-stub"]').setValue('2026-08-20')
   await wrapper.find('[data-testid="event-form-start"]').setValue('10:00')
@@ -150,6 +157,11 @@ describe('components/events/EventForm', () => {
       expect(wrapper.find('[data-testid="event-form-group-error"]').exists()).toBe(true)
       expect(wrapper.find('[data-testid="event-form-date-error"]').exists()).toBe(true)
       expect(store.createEvent).not.toHaveBeenCalled()
+
+      // EventGroup.vue's hasError styling (a red border, ported via
+      // EventForm.vue's own scoped style over the shared .multiselect
+      // rules) is driven by this class.
+      expect(wrapper.findComponent('[data-testid="event-form-group"]').classes()).toContain('hasError')
     })
 
     it('submits the exact payload field names createEventv2 expects and emits created', async () => {
@@ -186,7 +198,7 @@ describe('components/events/EventForm', () => {
       await wrapper.find('[data-testid="event-form-venue"]').setValue('Online Repair Café')
       await wrapper.find('[data-testid="event-form-description"]').setValue('<p>Bring your broken things</p>')
       await wrapper.find('[data-testid="event-form-online"] input').setValue(true)
-      await wrapper.find('[data-testid="event-form-group"]').setValue('9')
+      await setGroupField(wrapper, 9)
       await wrapper.find('[data-testid="event-form-date-stub"]').setValue('2026-08-20')
       await wrapper.find('[data-testid="event-form-start"]').setValue('10:00')
       await wrapper.find('[data-testid="event-form-end"]').setValue('12:00')
@@ -245,7 +257,7 @@ describe('components/events/EventForm', () => {
       await wrapper.vm.$nextTick()
       await wrapper.vm.$nextTick()
 
-      expect(wrapper.find('[data-testid="event-form-group"]').element.value).toBe('9')
+      expect(wrapper.findComponent('[data-testid="event-form-group"]').props('modelValue')).toBe(9)
     })
 
     it('inherits the timezone from the selected group (no visible per-event control, matching develop) and re-inherits on a later group change', async () => {
@@ -255,7 +267,7 @@ describe('components/events/EventForm', () => {
       store.createEvent = vi.fn().mockResolvedValue(42)
 
       const wrapper = mountForm({ groups: [{ id: 9, name: 'Acme Restarters' }, { id: 10, name: 'Other Group' }] })
-      await wrapper.find('[data-testid="event-form-group"]').setValue('9')
+      await setGroupField(wrapper, 9)
       await wrapper.vm.$nextTick()
       await wrapper.vm.$nextTick()
 
@@ -267,7 +279,7 @@ describe('components/events/EventForm', () => {
       // A later group change re-inherits the new group's timezone - there's
       // no per-event override to protect (develop has none either).
       groupsStore.fetchDetails = vi.fn().mockResolvedValue({ timezone: 'Europe/London', location: null })
-      await wrapper.find('[data-testid="event-form-group"]').setValue('10')
+      await setGroupField(wrapper, 10)
       await wrapper.vm.$nextTick()
       await wrapper.vm.$nextTick()
 
@@ -294,7 +306,7 @@ describe('components/events/EventForm', () => {
 
       expect(notice()).toBe('Once confirmed by a coordinator, your event will be made public.')
 
-      await wrapper.find('[data-testid="event-form-group"]').setValue('9')
+      await setGroupField(wrapper, 9)
       await wrapper.vm.$nextTick()
       await wrapper.vm.$nextTick()
 
@@ -309,7 +321,7 @@ describe('components/events/EventForm', () => {
       })
 
       const wrapper = mountForm({ groups: [{ id: 9, name: 'Acme Restarters' }] })
-      await wrapper.find('[data-testid="event-form-group"]').setValue('9')
+      await setGroupField(wrapper, 9)
       await wrapper.vm.$nextTick()
       await wrapper.vm.$nextTick()
 
@@ -416,13 +428,29 @@ describe('components/events/EventForm', () => {
       expect(wrapper.find('[data-testid="event-form-venue-map"]').exists()).toBe(false)
     })
 
-    it('keeps the group select, disabled, while editing', () => {
+    // LocationPicker.vue's lat/lng are exposed as v-model props for exactly
+    // this - see its own class doc comment - wired up so picking an
+    // autocomplete suggestion shows the map preview live, not just from
+    // pre-existing initialEvent coordinates.
+    it('shows the venue map live once LocationPicker emits coordinates for a new address', async () => {
       const wrapper = mountForm({ eventId: 5, initialEvent: EVENT })
 
-      const select = wrapper.find('[data-testid="event-form-group"]')
-      expect(select.exists()).toBe(true)
-      expect(select.attributes('disabled')).toBeDefined()
-      expect(select.text()).toContain('Acme Restarters')
+      expect(wrapper.find('[data-testid="event-form-venue-map"]').exists()).toBe(false)
+
+      const picker = wrapper.findComponent(LocationPickerStub)
+      await picker.vm.$emit('update:lat', 51.5)
+      await picker.vm.$emit('update:lng', -0.12)
+
+      expect(wrapper.find('[data-testid="event-form-venue-map"]').exists()).toBe(true)
+    })
+
+    it('keeps the group picker, disabled, while editing', () => {
+      const wrapper = mountForm({ eventId: 5, initialEvent: EVENT })
+
+      const picker = wrapper.findComponent('[data-testid="event-form-group"]')
+      expect(picker.exists()).toBe(true)
+      expect(picker.props('disabled')).toBe(true)
+      expect(picker.text()).toContain('Acme Restarters')
     })
 
     it('shows the admin-only card for an admin while editing too, prefilled with the event\'s network_data', () => {
@@ -513,6 +541,17 @@ describe('components/events/EventForm', () => {
       const wrapper = mountForm({ eventId: 5, initialEvent: unapproved, isAdmin: false })
       expect(wrapper.find('[data-testid="event-approve"]').exists()).toBe(false)
     })
+
+    // EventAddEdit.vue:76 - the cog SVG immediately before the "Approve
+    // Event:" label, dropped from an earlier version of this form.
+    it('shows the cog icon before the Approve Event label', () => {
+      const unapproved = { ...EVENT, approved: false }
+      const wrapper = mountForm({ eventId: 5, initialEvent: unapproved, isAdmin: true })
+
+      const approveGroup = wrapper.find('.event-form-approve')
+      expect(approveGroup.find('svg').exists()).toBe(true)
+      expect(approveGroup.text()).toContain('Approve Event')
+    })
   })
 
   describe('duplicate mode (create mode with a prefill source)', () => {
@@ -531,7 +570,7 @@ describe('components/events/EventForm', () => {
       network_data: {},
     }
 
-    it('prefills every field except the date, and keeps the group select editable', () => {
+    it('prefills every field except the date, and keeps the group picker editable', () => {
       const wrapper = mountForm({
         initialEvent: SOURCE_EVENT,
         isDuplicate: true,
@@ -541,8 +580,11 @@ describe('components/events/EventForm', () => {
       expect(wrapper.find('[data-testid="event-form-venue"]').element.value).toBe('Repair Café')
       expect(wrapper.find('[data-testid="event-form-start"]').element.value).toBe('10:00')
       expect(wrapper.find('[data-testid="event-form-date-stub"]').element.value).toBe('')
-      expect(wrapper.find('[data-testid="event-form-group"]').exists()).toBe(true)
-      expect(wrapper.find('[data-testid="event-form-group"]').element.value).toBe('9')
+
+      const picker = wrapper.findComponent('[data-testid="event-form-group"]')
+      expect(picker.exists()).toBe(true)
+      expect(picker.props('disabled')).toBe(false)
+      expect(picker.props('modelValue')).toBe(9)
     })
 
     it('submits as a create (groupid, no moderate) once the date is filled in, round-tripping the source event\'s network_data', async () => {

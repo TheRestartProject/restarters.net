@@ -17,8 +17,12 @@ class MockQuill {
     this.handlers = {}
     lastInstance = this
     this.clipboard = {
+      matchers: [],
       dangerouslyPasteHTML: (html) => {
         this.root.innerHTML = html
+      },
+      addMatcher: (selector, matcher) => {
+        this.clipboard.matchers.push([selector, matcher])
       },
     }
   }
@@ -92,5 +96,84 @@ describe('components/forms/RichTextEditor', () => {
     const wrapper = await mountEditor({ modelValue: '' })
     lastInstance.emitChange('<p><br></p>')
     expect(wrapper.emitted('update:modelValue')[0]).toEqual([''])
+  })
+
+  // legacy's quill-paste-smart clipboard allowlist (allowed.tags/attributes,
+  // substituteBlockElements, magicPasteLinks) has no Quill-2 build, so the
+  // same allowlist is reproduced with Quill 2's own clipboard.addMatcher
+  // hooks instead - registered once per mount.
+  describe('paste sanitization (develop\'s quill-paste-smart allowlist)', () => {
+    function matcherFor(selector) {
+      const found = lastInstance.clipboard.matchers.find(([s]) => s === selector)
+      return found?.[1]
+    }
+
+    it('registers a matcher for every element, for h1-h3, and for text nodes', async () => {
+      await mountEditor()
+      expect(matcherFor(Node.ELEMENT_NODE)).toBeTypeOf('function')
+      expect(matcherFor('h1, h2, h3')).toBeTypeOf('function')
+      expect(matcherFor(Node.TEXT_NODE)).toBeTypeOf('function')
+    })
+
+    it('strips colour/background/font/size/align/direction from pasted formatting, outside develop\'s allowed.attributes', async () => {
+      await mountEditor()
+      const sanitize = matcherFor(Node.ELEMENT_NODE)
+      const delta = {
+        ops: [
+          { insert: 'styled', attributes: { color: 'red', bold: true, background: 'yellow', font: 'serif', size: 'large', align: 'center', direction: 'rtl' } },
+        ],
+      }
+
+      const result = sanitize(document.createElement('span'), delta)
+
+      expect(result.ops[0].attributes).toEqual({ bold: true })
+    })
+
+    it('drops the attributes key entirely once nothing allowed is left', async () => {
+      await mountEditor()
+      const sanitize = matcherFor(Node.ELEMENT_NODE)
+      const delta = { ops: [{ insert: 'x', attributes: { color: 'red' } }] }
+
+      const result = sanitize(document.createElement('span'), delta)
+
+      expect(result.ops[0].attributes).toBeUndefined()
+    })
+
+    it('downgrades pasted h1-h3 headings to plain paragraphs, outside develop\'s h4-h6-only allowed.tags', async () => {
+      await mountEditor()
+      const downgrade = matcherFor('h1, h2, h3')
+      const delta = { ops: [{ insert: 'Big heading', attributes: { header: 1 } }] }
+
+      const result = downgrade(document.createElement('h1'), delta)
+
+      expect(result.ops[0].attributes).toBeUndefined()
+    })
+
+    it('auto-links a bare URL pasted as plain text (magicPasteLinks)', async () => {
+      await mountEditor()
+      const magicLinks = matcherFor(Node.TEXT_NODE)
+      const textNode = document.createTextNode('see https://example.com/page for details')
+      const delta = { ops: [{ insert: 'see https://example.com/page for details' }] }
+
+      const result = magicLinks(textNode, delta)
+
+      const linkOp = result.ops.find((op) => op.attributes?.link)
+      expect(linkOp).toEqual({ insert: 'https://example.com/page', attributes: { link: 'https://example.com/page' } })
+    })
+
+    it('does not re-linkify text already inside an anchor', async () => {
+      await mountEditor()
+      const magicLinks = matcherFor(Node.TEXT_NODE)
+      const anchor = document.createElement('a')
+      anchor.href = 'https://example.com'
+      const textNode = document.createTextNode('https://example.com')
+      anchor.appendChild(textNode)
+      const delta = { ops: [{ insert: 'https://example.com' }] }
+
+      const result = magicLinks(textNode, delta)
+
+      expect(result).toBe(delta)
+      expect(result.ops[0].attributes).toBeUndefined()
+    })
   })
 })

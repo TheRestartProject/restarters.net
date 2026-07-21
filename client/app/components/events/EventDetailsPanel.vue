@@ -5,6 +5,7 @@ import { useEventComputed } from '~/composables/useEventComputed.js'
 import { useCalendarLinks } from '~/composables/useCalendarLinks.js'
 import { useSessionStore } from '~/stores/session.js'
 import EventVenueMap from './EventVenueMap.vue'
+import EventCollapsibleSection from './EventCollapsibleSection.vue'
 
 // Gap 9: develop's EventDetails.vue renders a bordered, icon-led row list
 // (date [+ add-to-calendar dropdown], time, talk-thread, hosts, link,
@@ -48,8 +49,16 @@ const discourseThread = computed(() => {
 </script>
 
 <template>
-  <div data-testid="event-details-panel">
-    <h2>{{ t('events.event_details') }}</h2>
+  <!-- EventDetails.vue:1 - plain <CollapsibleSection> with neither `collapsed`
+       nor `hide-title` set, i.e. both default to false: the title shows on
+       mobile AND desktop, and the section starts expanded on mobile (still
+       with the +/- toggle) rather than collapsed. Our EventCollapsibleSection
+       defaults `collapsed` to true (EventDescription.vue's `collapsed
+       hide-title` case), so that has to be overridden explicitly here. -->
+  <EventCollapsibleSection :collapsed="false" data-testid="event-details-panel">
+    <template #title>
+      <h2 class="mb-0">{{ t('events.event_details') }}</h2>
+    </template>
 
     <div class="detail-row detail-row--thick d-flex justify-content-between flex-wrap pt-1 pb-1">
       <div class="d-flex">
@@ -115,7 +124,7 @@ const discourseThread = computed(() => {
       :lng="event.lng"
       class="mt-2"
     />
-  </div>
+  </EventCollapsibleSection>
 </template>
 
 <style scoped>

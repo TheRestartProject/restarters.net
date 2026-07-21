@@ -23,10 +23,12 @@ const props = defineProps({
 const { t } = useI18n()
 const profileStore = useProfileStore()
 
-const showModal = ref(false)
 const deleting = ref(false)
 const feedback = ref('')
 
+// develop's form (resources/views/user/profile/account.blade.php) submits
+// the soft-delete request directly on button click, with no "are you
+// sure?" confirmation step - matched verbatim rather than adding one.
 async function deleteAccount() {
   deleting.value = true
   feedback.value = ''
@@ -44,7 +46,6 @@ async function deleteAccount() {
   } catch (err) {
     feedback.value = err?.data?.message || t('general.error_occurred')
     deleting.value = false
-    showModal.value = false
   }
 }
 </script>
@@ -59,21 +60,11 @@ async function deleteAccount() {
       <div class="row">
         <div class="col-md-8 d-flex flex-column align-content-center">{{ t('auth.delete_account_text') }}</div>
         <div class="col-md-4 d-flex flex-column align-content-center">
-          <BButton variant="danger" :disabled="deleting" data-testid="delete-account-button" @click="showModal = true">
+          <BButton variant="danger" :disabled="deleting" data-testid="delete-account-button" @click="deleteAccount">
             {{ t('auth.delete_account') }}
           </BButton>
         </div>
       </div>
     </div>
-
-    <BModal :model-value="showModal" :title="t('partials.are_you_sure')" no-footer data-testid="delete-account-modal" @hide="showModal = false">
-      <p>{{ t('auth.delete_account_text') }}</p>
-      <div class="d-flex justify-content-end gap-2">
-        <BButton variant="outline-secondary" @click="showModal = false">{{ t('partials.cancel') }}</BButton>
-        <BButton variant="danger" :disabled="deleting" data-testid="delete-account-confirm" @click="deleteAccount">
-          {{ t('auth.delete_account') }}
-        </BButton>
-      </div>
-    </BModal>
   </div>
 </template>

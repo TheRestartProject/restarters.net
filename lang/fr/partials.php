@@ -58,4 +58,10 @@ return [
   'share_modal_planting_around' => "planter environ",
   'share_modal_hectares' => "hectare d’arbres.*|hectares d’arbres.*",
   'impact_estimates' => 'Les chiffres relatifs à l\'impact sont des estimations basées sur les données saisies par les groupes dans Restarters.net.',
+
+  // Already exist on develop's lang/fr/partials.php with these exact
+  // values.
+  'please_choose' => 'Veuillez choisir...',
+  'please_confirm' => 'Veuillez confirmer que vous souhaitez continuer.',
+  'confirm' => 'Confirmer',
 ];

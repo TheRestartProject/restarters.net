@@ -155,6 +155,37 @@ describe('components/fixometer/DevicesSearchTable', () => {
     expect(mockApi.device.search).toHaveBeenLastCalledWith(expect.objectContaining({ item_type: 'Bicycle' }))
   })
 
+  // Gap fix: DeviceCategorySelect.vue's v-b-popover.html.left tooltip
+  // (devices.tooltip_category), same key/pattern DeviceForm.vue's category
+  // field already ports via FieldInfoPopover.
+  it('shows a category tooltip with the legacy tooltip_category copy', async () => {
+    const wrapper = mountComponent()
+    await flushPromises()
+
+    const popover = wrapper.findComponent({ name: 'FieldInfoPopover' })
+    expect(popover.exists()).toBe(true)
+    expect(popover.props('content')).toBe(en.devices.tooltip_category)
+  })
+
+  // Gap fix: DeviceBrand.vue's vue-typeahead-bootstrap suggestions, ported
+  // as a <datalist> the same way DeviceForm.vue's own brand field is.
+  it('suggests known brands via a datalist sourced from the brands store', async () => {
+    mockApi.device.brands.mockResolvedValue({
+      data: [
+        { id: 1, brand_name: 'Bosch' },
+        { id: 2, brand_name: 'Dyson' },
+      ],
+    })
+
+    const wrapper = mountComponent()
+    await flushPromises()
+
+    const input = wrapper.find('[data-testid="device-search-brand"]')
+    expect(input.attributes('list')).toBe('device-search-brand-list')
+    const options = wrapper.find('#device-search-brand-list').findAll('option')
+    expect(options.map((o) => o.attributes('value'))).toEqual(['Bosch', 'Dyson'])
+  })
+
   it('maps the status filter to the numeric Device::REPAIR_STATUS_* code, not the resource string', async () => {
     const wrapper = mountComponent()
     await flushPromises()
@@ -434,6 +465,44 @@ describe('components/fixometer/DevicesSearchTable', () => {
 
       expect(mockApi.device.search).not.toHaveBeenCalled()
       expect(wrapper.find('[data-testid="device-search-details-1"]').exists()).toBe(false)
+    })
+  })
+
+  // Gap fix: legacy's b-tabs is `ourtabs ourtabs-brand` (assets/css/
+  // _tabs.scss's already-ported nav-tabs chrome, same pattern
+  // devices/EventDevicesPanel.vue's desktop tab strip uses) - Bootstrap
+  // nav/nav-tabs/nav-link markup, not a bespoke pill button-group.
+  describe('desktop Powered/Unpowered tabs (ourtabs pattern)', () => {
+    it('renders the toggle as nav-tabs, with the active tab carrying the nav-link active class', async () => {
+      const wrapper = mountComponent()
+      await flushPromises()
+
+      const poweredTab = wrapper.find('[data-testid="device-search-powered-true"]')
+      const unpoweredTab = wrapper.find('[data-testid="device-search-powered-false"]')
+      expect(poweredTab.classes()).toEqual(expect.arrayContaining(['nav-link', 'active']))
+      expect(unpoweredTab.classes()).toContain('nav-link')
+      expect(unpoweredTab.classes()).not.toContain('active')
+
+      await unpoweredTab.trigger('click')
+      expect(wrapper.find('[data-testid="device-search-powered-false"]').classes()).toContain('active')
+      expect(wrapper.find('[data-testid="device-search-powered-true"]').classes()).not.toContain('active')
+    })
+  })
+
+  // Gap fix: FixometerFilters.vue expands/collapses with an SVG icon image
+  // (add-icon-brand.svg/minus-icon-brand.svg), not a text +/− glyph.
+  describe('filter section expand/collapse icons', () => {
+    it('swaps the item-info toggle between add-icon-brand.svg and minus-icon-brand.svg', async () => {
+      const wrapper = mountComponent()
+      await flushPromises()
+
+      const toggle = wrapper.find('[data-testid="device-search-item-info-toggle"]')
+      expect(toggle.find('img').attributes('src')).toBe('/images/add-icon-brand.svg')
+
+      await toggle.trigger('click')
+      expect(wrapper.find('[data-testid="device-search-item-info-toggle"] img').attributes('src')).toBe(
+        '/images/minus-icon-brand.svg'
+      )
     })
   })
 

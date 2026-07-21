@@ -147,14 +147,21 @@ function remove(value) {
   margin-bottom: 0.5rem;
 }
 
+// Matches develop's global .multiselect__tag styling (resources/sass/
+// _global.scss's ".multiselect .multiselect__tags .multiselect__tag") -
+// brand-orange fill, black border, hard drop shadow, square corners -
+// rather than an invented teal/white rounded badge.
 .group-multiselect__chip {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  background-color: #0394a6;
-  color: #fff;
+  background-color: #ffbe5f;
+  color: #222;
   font-weight: normal;
   padding: 0.35rem 0.5rem;
+  border: 2px solid #000;
+  border-radius: 0;
+  box-shadow: 2px 2px 0 0 #222;
 }
 
 .group-multiselect__chip-remove {

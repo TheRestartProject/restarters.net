@@ -25,8 +25,6 @@ return [
   'huge_impact_2' => 'Search your repair data below, and get a flavour of the impact of repair as well as the barriers we face when repairing.  You can help us understand what else this data tells us and what changes we should campaign for over at the <a href="https://talk.restarters.net/c/right-to-repair/repair-data/25">repair data discussion</a> in our forum.',
   'add_data_button' => 'Add Data',
   'add_data_description' => 'Adding repair data helps show the impact of repair.',
-  'add_data_no_groups' => 'You need to follow a group before you can add data.',
-  'add_data_no_events' => 'This group doesn\'t have any events yet.',
   'search_text' => 'Browse or search our global database of repairs.',
   'table_intro' => 'Press the ‘i’ icons for details.  Click a column head to sort by that column - click again to reverse sort order.',
   'repair_records' => 'Repair Records',
@@ -69,4 +67,12 @@ return [
   'tooltip_type_unpowered' => 'Add as much information about the type of item here as you can (e.g. \'Sofa\' or \'Denim jeans\')',
   'brand_if_known' => 'Brand (if known)',
   'model_if_known' => 'Model (if known)',
+
+  // Already exist on develop's lang/en/devices.php with these exact
+  // values - ported here rather than reworded, since this branch's copy of
+  // the file predates them.
+  'repair_outcome' => 'Repair outcome?',
+  'add_data_group' => 'Please select a group',
+  'add_data_event' => 'Please select an event',
+  'add_data_action_button' => 'Go to event',
 ];

@@ -4,10 +4,11 @@ import { useI18n } from 'vue-i18n'
 import AdminCrudTable from '~/components/admin/AdminCrudTable.vue'
 import { useAdminRefdataStore } from '~/stores/adminRefdata.js'
 
-// /skills - resources/views/skills/index.blade.php +
-// resources/js/components/SkillsPage.vue (design.md §6.2 Phase D task D4,
-// PR #863's AdminCrudPage.vue prop contract is the functional spec).
-// Administrator-only, same shape as pages/brands.vue.
+// /skills - resources/views/skills/index.blade.php, a plain server-rendered
+// table (no Vue component on develop's side at all - design.md §6.2 Phase D
+// task D4, PR #863's AdminCrudPage.vue prop contract is the functional spec
+// for the generic AdminCrudTable.vue this page is built on). Administrator-
+// only, same shape as pages/brands.vue.
 //
 // The category dropdown (1 = Organising, 2 = Technical) has no dedicated
 // list endpoint - App\Helpers\Fixometer::skillCategories() is a hardcoded
@@ -56,15 +57,18 @@ const categoryOptions = computed(() => [
   { value: 1, text: t('Organising skills - please select at least one if you’d like to host events') },
   { value: 2, text: t('Technical skills') },
 ])
-const categoryLookup = computed(() => Object.fromEntries(categoryOptions.value.map((o) => [o.value, o.text])))
 
-// live SkillsPage.vue (07e6abd7cc^) is the baseline: 3 columns (skill_name/
-// category/description) and a plain "Description" label - develop's Blade
-// (2 columns, "Description (optional)") is the wrong target for this branch,
-// which had already migrated this page to its own Vue2 shape pre-Phase-F.
+// develop's real skills/index.blade.php thead has just two columns -
+// "Skill name" and "Description" (`<th>Skill name</th><th>Description</th>`),
+// no Category column: Category is an edit-form-only field there
+// (skills/edit.blade.php's `#category` select), never shown in the list.
+// "SkillsPage.vue" (a 3-column shape with Category in the table) never
+// existed on develop; it was this branch's own pre-Phase-F scaffolding
+// (commit 07e6abd7cc^, immediately before this branch's own Phase F commit
+// deleted the legacy Blade+Vue2 frontend), so citing it as "live"/"the
+// baseline" had it backwards.
 const tableFields = computed(() => [
   { key: 'skill_name', label: t('admin.skill-name'), sortable: true },
-  { key: 'category', label: t('admin.category'), sortable: true, formatter: (value) => (value != null ? categoryLookup.value[value] || value : '') },
   { key: 'description', label: t('admin.description'), sortable: false },
 ])
 

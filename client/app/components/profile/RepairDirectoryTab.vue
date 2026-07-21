@@ -75,7 +75,20 @@ async function save() {
     </BAlert>
 
     <BForm v-else @submit.prevent="save">
-      <BFormGroup :label="t('profile.repair_dir_role')" label-for="repair-dir-select">
+      <!-- develop centers this field in a `row justify-content-center` with
+           the label and select each taking half the row at lg+
+           (resources/views/user/profile/repair-directory.blade.php) -
+           BFormGroup's label-cols-lg/content-cols-lg reproduce the two
+           col-lg-6 columns; the centering itself is applied to the row
+           BFormGroup renders internally via the scoped :deep() below,
+           since BFormGroup has no prop for extra row classes. -->
+      <BFormGroup
+        class="repair-dir-role-group"
+        :label="t('profile.repair_dir_role')"
+        label-for="repair-dir-select"
+        label-cols-lg="6"
+        content-cols-lg="6"
+      >
         <BFormSelect id="repair-dir-select" v-model="selected" :disabled="loading" data-testid="repair-dir-select">
           <option v-for="opt in options" :key="opt.value" :value="opt.value" :disabled="opt.disabled">
             {{ t(opt.key) }}
@@ -85,7 +98,7 @@ async function save() {
 
       <div class="button-group row">
         <div class="offset-9 col-sm-3 d-flex align-items-center justify-content-end">
-          <BButton type="submit" variant="primary" :disabled="saving || loading || selected === current" data-testid="repair-dir-save">
+          <BButton type="submit" variant="primary" class="btn-save" :disabled="saving || loading || selected === current" data-testid="repair-dir-save">
             {{ t('auth.save_user') }}
           </BButton>
         </div>
@@ -93,3 +106,9 @@ async function save() {
     </BForm>
   </div>
 </template>
+
+<style scoped>
+.repair-dir-role-group :deep(.row) {
+  justify-content: center;
+}
+</style>

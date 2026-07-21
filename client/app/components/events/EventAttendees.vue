@@ -212,10 +212,14 @@ async function confirmRemove() {
                 <div class="d-flex align-items-center">
                   <img :src="profileImage(attendee)" alt="" width="40" height="40" class="rounded-circle me-2 attendee-avatar">
                   <div>
-                    <NuxtLink v-if="attendee.user" :to="`/profile/${attendee.user}`" class="fw-bold">
+                    <NuxtLink
+                      v-if="attendee.user"
+                      :to="`/profile/${attendee.user}`"
+                      :class="{ 'fw-bold': attendee.role === EVENT_ROLE_HOST }"
+                    >
                       {{ displayName(attendee) }}
                     </NuxtLink>
-                    <span v-else class="fw-bold">{{ displayName(attendee) }}</span>
+                    <span v-else :class="{ 'fw-bold': attendee.role === EVENT_ROLE_HOST }">{{ displayName(attendee) }}</span>
                     <span
                       v-if="attendee.role === EVENT_ROLE_HOST"
                       class="host-label ms-1"
@@ -275,7 +279,7 @@ async function confirmRemove() {
                 class="d-flex align-items-center py-2 border-bottom"
                 :data-testid="`event-attendee-${attendee.id}`"
               >
-                <img :src="profileImage(attendee)" alt="" width="40" height="40" class="rounded-circle me-2">
+                <img :src="profileImage(attendee)" alt="" width="40" height="40" class="rounded-circle me-2 attendee-avatar">
                 <span>{{ displayName(attendee) }}</span>
               </li>
             </ul>
@@ -350,11 +354,11 @@ async function confirmRemove() {
 }
 
 /* Gap 22: plain uppercase "Host" text instead of a badge, matching
-   EventAttendee.vue's .host. */
+   EventAttendee.vue's .host ($brand-light, no explicit font-size - it's
+   full body size, bolded only via the shared host-only wrapper above). */
 .host-label {
   text-transform: uppercase;
-  color: var(--bs-primary, #0394a6);
-  font-size: 0.75rem;
+  color: #4aaebc;
   font-weight: bold;
 }
 

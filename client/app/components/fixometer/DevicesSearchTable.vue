@@ -8,6 +8,9 @@ import { deviceStatusKey, deviceStatusVariant } from '../../composables/useDevic
 import FixometerSortHeader from './FixometerSortHeader.vue'
 import { sortAriaValue } from '../../composables/useSortAria.js'
 import DeviceForm from '../devices/DeviceForm.vue'
+import FieldInfoPopover from '../forms/FieldInfoPopover.vue'
+import DatePicker from 'vue-datepicker-next'
+import 'vue-datepicker-next/index.css'
 
 // Paginated/filterable device search table for /device/search
 // (api-contracts-phase-c.md C6a; design.md §6.2 C6 task brief). The legacy
@@ -140,6 +143,10 @@ function onRowClosed(id) {
 }
 
 const clusters = computed(() => devicesStore.clusters)
+// DeviceBrand.vue's `brands` prop (DeviceForm.vue's own brand field ports
+// this the same way) - a <datalist> of known brand names to suggest while
+// typing, in place of legacy's vue-typeahead-bootstrap dropdown.
+const brands = computed(() => devicesStore.brands.data)
 // Only offer categories that match the selected powered/unpowered toggle -
 // DeviceCategorySelect.vue's :powered prop does the same filtering
 // server-props-side in the legacy app.
@@ -284,14 +291,21 @@ function toggleMobileSection(section) {
         @click="itemInfoExpanded = !itemInfoExpanded"
       >
         <span class="device-search-section__title">{{ t('devices.item_and_repair_info') }}</span>
-        <span class="device-search-section__toggle" aria-hidden="true">{{ itemInfoExpanded ? '−' : '+' }}</span>
+        <img
+          class="device-search-section__toggle"
+          :src="itemInfoExpanded ? '/images/minus-icon-brand.svg' : '/images/add-icon-brand.svg'"
+          :alt="itemInfoExpanded ? 'Collapse' : 'Expand'"
+        >
       </button>
       <fieldset v-show="itemInfoExpanded" class="device-search-section__body" data-testid="device-search-filters">
         <legend class="visually-hidden">{{ t('devices.item_and_repair_info') }}</legend>
 
         <div class="row g-3">
           <div class="col-sm-6 col-md-4">
-            <label class="form-label" for="device-search-category">{{ t('devices.category') }}</label>
+            <label class="form-label" for="device-search-category">
+              {{ t('devices.category') }}
+              <FieldInfoPopover :content="t('devices.tooltip_category')" />
+            </label>
             <select id="device-search-category" v-model.number="filters.category" class="form-select" data-testid="device-search-category">
               <option :value="null">{{ t('client.devices.any_category') }}</option>
               <optgroup v-for="cluster in filteredClusters" :key="cluster.id" :label="t(cluster.name)">
@@ -328,7 +342,17 @@ function toggleMobileSection(section) {
 
           <div v-if="filters.powered" class="col-sm-6 col-md-4">
             <label class="form-label" for="device-search-brand">{{ t('devices.brand') }}</label>
-            <input id="device-search-brand" v-model="filters.brand" type="text" class="form-control" data-testid="device-search-brand">
+            <input
+              id="device-search-brand"
+              v-model="filters.brand"
+              type="text"
+              class="form-control"
+              list="device-search-brand-list"
+              data-testid="device-search-brand"
+            >
+            <datalist id="device-search-brand-list">
+              <option v-for="b in brands" :key="b.id" :value="b.brand_name" />
+            </datalist>
           </div>
 
           <div class="col-sm-6 col-md-4">
@@ -357,7 +381,11 @@ function toggleMobileSection(section) {
         @click="eventInfoExpanded = !eventInfoExpanded"
       >
         <span class="device-search-section__title">{{ t('devices.event_info') }}</span>
-        <span class="device-search-section__toggle" aria-hidden="true">{{ eventInfoExpanded ? '−' : '+' }}</span>
+        <img
+          class="device-search-section__toggle"
+          :src="eventInfoExpanded ? '/images/minus-icon-brand.svg' : '/images/add-icon-brand.svg'"
+          :alt="eventInfoExpanded ? 'Collapse' : 'Expand'"
+        >
       </button>
       <fieldset v-show="eventInfoExpanded" class="device-search-section__body">
         <legend class="visually-hidden">{{ t('devices.event_info') }}</legend>
@@ -368,89 +396,130 @@ function toggleMobileSection(section) {
             <input id="device-search-group" v-model="filters.group" type="text" class="form-control" data-testid="device-search-group">
           </div>
 
-          <!-- Gap fix (MEDIUM, accepted simplification): legacy uses
-               b-form-datepicker (a styled calendar-button widget); this
-               migration deliberately drops vue-multiselect-family widgets
-               throughout (design.md §2 - see also EventFilters.vue's
-               identical from/to date pair), so a plain native
-               <input type="date"> stands in here too rather than a
-               one-off themed picker for just this table. -->
-          <div class="col-sm-6 col-md-4">
+          <!-- Gap fix (MEDIUM): FixometerFilters.vue's b-form-datepicker
+               (Bootstrap-5-less equivalent: vue-datepicker-next, design.md
+               §2/api-gaps.md C4 - already used this way by EventForm.vue's
+               event-date field), themed with the brand-orange .datepicker
+               accent (FixometerFilters.vue's scoped style). A prior version
+               used a bare native <input type="date"> instead. Its rendered
+               <input> doesn't take a data-testid (api-gaps.md C4 again), so
+               the native fallback below - shown on narrow viewports, same
+               dual pattern as EventForm.vue/legacy's own EventDatePicker.vue -
+               keeps the stable test hook and remains the only one of the pair
+               actually wired to data-testid. -->
+          <div class="col-sm-6 col-md-4 device-search-datepicker">
             <label class="form-label" for="device-search-from-date">{{ t('devices.from_date') }}</label>
-            <input id="device-search-from-date" v-model="filters.from_date" type="date" class="form-control" data-testid="device-search-from-date">
+            <DatePicker
+              v-model:value="filters.from_date"
+              type="date"
+              value-type="YYYY-MM-DD"
+              format="DD/MM/YYYY"
+              input-class="form-control d-none d-md-block"
+            />
+            <input
+              id="device-search-from-date"
+              v-model="filters.from_date"
+              type="date"
+              class="form-control d-block d-md-none"
+              data-testid="device-search-from-date"
+            >
           </div>
 
-          <div class="col-sm-6 col-md-4">
+          <div class="col-sm-6 col-md-4 device-search-datepicker">
             <label class="form-label" for="device-search-to-date">{{ t('devices.to_date') }}</label>
-            <input id="device-search-to-date" v-model="filters.to_date" type="date" class="form-control" data-testid="device-search-to-date">
+            <DatePicker
+              v-model:value="filters.to_date"
+              type="date"
+              value-type="YYYY-MM-DD"
+              format="DD/MM/YYYY"
+              input-class="form-control d-none d-md-block"
+            />
+            <input
+              id="device-search-to-date"
+              v-model="filters.to_date"
+              type="date"
+              class="form-control d-block d-md-none"
+              data-testid="device-search-to-date"
+            >
           </div>
         </div>
       </fieldset>
     </div>
       </div>
 
-      <div class="device-search-layout__results">
+      <div class="device-search-layout__results ourtabs ourtabs-brand">
         <!-- Desktop: Powered/Unpowered tabs + explainer text (legacy's
              b-tabs, wrapping both the nav strip and the shared results body
-             below in one teal-bordered box). -->
-        <div class="d-none d-md-block">
-          <div class="device-search-tabs mb-3" role="group" data-testid="device-search-powered-toggle">
+             below in one teal-bordered box). Reuses the already-ported
+             .ourtabs.ourtabs-brand nav-tabs chrome (assets/css/_tabs.scss,
+             same pattern as devices/EventDevicesPanel.vue's desktop tab
+             strip) rather than a bespoke pill button-group - the nav sits
+             directly under .ourtabs (its `.nav-tabs { border-bottom: none }`
+             rule) with the rest of the panel in one `> div:not(.nav)` sibling
+             (its `padding: 0 1rem 1rem` rule), matching that CSS's shape. -->
+        <ul class="nav nav-tabs d-none d-md-flex mb-3" role="group" data-testid="device-search-powered-toggle">
+          <li class="nav-item">
             <button
               type="button"
-              class="device-search-tabs__tab"
-              :class="{ 'device-search-tabs__tab--active': filters.powered }"
+              class="nav-link"
+              :class="{ active: filters.powered }"
               data-testid="device-search-powered-true"
               @click="filters.powered = true"
             >
               {{ poweredLabel }}
             </button>
+          </li>
+          <li class="nav-item">
             <button
               type="button"
-              class="device-search-tabs__tab"
-              :class="{ 'device-search-tabs__tab--active': !filters.powered }"
+              class="nav-link"
+              :class="{ active: !filters.powered }"
               data-testid="device-search-powered-false"
               @click="filters.powered = false"
             >
               {{ unpoweredLabel }}
             </button>
+          </li>
+        </ul>
+
+        <div class="device-search-layout__content">
+          <div class="d-none d-md-block">
+            <p class="text-brand small" data-testid="device-search-powered-description">
+              <!-- eslint-disable-next-line vue/no-v-html -->
+              <span v-html="filters.powered ? t('devices.description_powered') : t('devices.description_unpowered')" />
+            </p>
           </div>
 
-          <p class="text-brand small" data-testid="device-search-powered-description">
-            <!-- eslint-disable-next-line vue/no-v-html -->
-            <span v-html="filters.powered ? t('devices.description_powered') : t('devices.description_unpowered')" />
-          </p>
-        </div>
+          <!-- Mobile: two independent collapsed accordion headers (legacy's
+               `d-block d-md-none` CollapsibleSection pair) - no tabs, no
+               explainer text, collapsed by default; expanding one reveals the
+               shared results body below (mobileSection's own doc comment). -->
+          <div class="d-block d-md-none device-search-mobile-sections mb-3">
+            <button
+              type="button"
+              class="device-search-mobile-section__header"
+              data-testid="device-search-mobile-powered-toggle"
+              :aria-expanded="mobileSection === 'powered'"
+              @click="toggleMobileSection('powered')"
+            >
+              <span>{{ t('devices.title_powered') }}</span>
+              <span aria-hidden="true">{{ mobileSection === 'powered' ? '−' : '+' }}</span>
+            </button>
+            <button
+              type="button"
+              class="device-search-mobile-section__header"
+              data-testid="device-search-mobile-unpowered-toggle"
+              :aria-expanded="mobileSection === 'unpowered'"
+              @click="toggleMobileSection('unpowered')"
+            >
+              <span>{{ t('devices.title_unpowered') }}</span>
+              <span aria-hidden="true">{{ mobileSection === 'unpowered' ? '−' : '+' }}</span>
+            </button>
+          </div>
 
-        <!-- Mobile: two independent collapsed accordion headers (legacy's
-             `d-block d-md-none` CollapsibleSection pair) - no tabs, no
-             explainer text, collapsed by default; expanding one reveals the
-             shared results body below (mobileSection's own doc comment). -->
-        <div class="d-block d-md-none device-search-mobile-sections mb-3">
-          <button
-            type="button"
-            class="device-search-mobile-section__header"
-            data-testid="device-search-mobile-powered-toggle"
-            :aria-expanded="mobileSection === 'powered'"
-            @click="toggleMobileSection('powered')"
-          >
-            <span>{{ t('devices.title_powered') }}</span>
-            <span aria-hidden="true">{{ mobileSection === 'powered' ? '−' : '+' }}</span>
-          </button>
-          <button
-            type="button"
-            class="device-search-mobile-section__header"
-            data-testid="device-search-mobile-unpowered-toggle"
-            :aria-expanded="mobileSection === 'unpowered'"
-            @click="toggleMobileSection('unpowered')"
-          >
-            <span>{{ t('devices.title_unpowered') }}</span>
-            <span aria-hidden="true">{{ mobileSection === 'unpowered' ? '−' : '+' }}</span>
-          </button>
-        </div>
-
-        <!-- Shared results body: always shown on desktop (d-md-block), only
-             shown on mobile once a section above is expanded. -->
-        <div :class="['d-md-block', { 'd-none': !mobileSectionExpanded }]" data-testid="device-search-results-body">
+          <!-- Shared results body: always shown on desktop (d-md-block), only
+               shown on mobile once a section above is expanded. -->
+          <div :class="['d-md-block', { 'd-none': !mobileSectionExpanded }]" data-testid="device-search-results-body">
     <div v-if="loading" data-testid="device-search-loading">
       <div class="placeholder-glow">
         <span class="placeholder col-12" style="height: 8rem" />
@@ -581,6 +650,7 @@ function toggleMobileSection(section) {
       />
     </template>
         </div>
+        </div>
       </div>
     </div>
   </div>
@@ -612,14 +682,39 @@ function toggleMobileSection(section) {
 // Powered/Unpowered accordion (mobileSection's own doc comment) sits
 // unboxed, flush with the filter accordion above it - so this border/
 // shadow/padding is desktop-only too, not a permanent property of the
-// results column.
+// results column. The border/shadow/padding themselves now come from the
+// .ourtabs.ourtabs-brand classes on this element (assets/css/_tabs.scss) -
+// reusing the same chrome devices/EventDevicesPanel.vue's desktop tab strip
+// uses - rather than one-off rules; .ourtabs applies unconditionally, so
+// it's switched off below md here to keep that desktop-only behaviour.
 .device-search-layout__results {
   min-width: 0;
 
-  @media (min-width: 768px) {
-    padding: 1rem;
-    border: 1px solid #0394a6;
-    box-shadow: 5px 5px 0 0 #0394a6;
+  // !important: .ourtabs.ourtabs-brand's own border rule (_tabs.scss) is
+  // !important, so switching it off below md needs to match.
+  @media (max-width: 767.98px) {
+    background-color: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+  }
+
+  // Gap in the ported _tabs.scss (assets/css/_tabs.scss): develop's
+  // .ourtabs.ourtabs-brand .nav-link.active also gets a 5px teal top border
+  // (_events.scss:397-399) - the ported version carries the teal side/bottom
+  // border override but not this one. Added locally rather than editing the
+  // shared file (also used by EventDevicesPanel.vue, out of scope here).
+  :deep(.nav-link.active) {
+    border-top: 5px solid #0394a6;
+  }
+}
+
+// .ourtabs's own `> div:not(.nav) { padding: 0 1rem 1rem }` rule (_tabs.scss)
+// supplies this content's side/bottom padding at every width - cancelled
+// below md, alongside the border/shadow above, to match the mobile
+// accordion's unboxed, flush presentation.
+.device-search-layout__content {
+  @media (max-width: 767.98px) {
+    padding: 0 !important;
   }
 }
 
@@ -653,40 +748,13 @@ function toggleMobileSection(section) {
   }
 }
 
-// Powered/Unpowered toggle - legacy FixometerPage.vue's b-tabs: both tabs sit
-// in a brand-teal bordered strip, white-backed, the active one picked out in
-// teal (rather than the earlier btn-primary/btn-outline pair, which the theme
-// rendered as a jarring solid-black inactive block).
-.device-search-tabs {
-  display: inline-flex;
-  border: 1px solid #0394a6;
-}
-
-.device-search-tabs__tab {
-  background: #fff;
-  border: 0;
-  border-right: 1px solid #0394a6;
-  padding: 0.5rem 1.25rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  color: #6c757d;
-
-  &:last-child {
-    border-right: 0;
-  }
-
-  &--active {
-    color: #0394a6;
-    box-shadow: inset 0 -3px 0 0 #0394a6;
-  }
-}
-
 // FixometerFilters.vue's collapsible section chrome (border/shadow in the
 // lighter brand teal, uppercase clickable header) - kept scoped, same
-// reasoning as ImpactStats.vue's stat-card grid.
+// reasoning as ImpactStats.vue's stat-card grid. $shadow (assets/css/
+// _variables.scss) is 5px.
 .device-search-section {
   border: 1px solid #4aaebc;
-  box-shadow: 4px 4px 0 0 #4aaebc;
+  box-shadow: 5px 5px 0 0 #4aaebc;
 }
 
 .device-search-section__header {
@@ -700,12 +768,11 @@ function toggleMobileSection(section) {
   text-align: left;
 }
 
-// Legacy used a "+"/"−" expand glyph (not a chevron) on these filter bars.
+// FixometerFilters.vue expands/collapses with an SVG icon image
+// (add-icon-brand.svg/minus-icon-brand.svg), not a text +/− glyph - sized to
+// match its .icon class.
 .device-search-section__toggle {
-  font-size: 1.5rem;
-  font-weight: bold;
-  line-height: 1;
-  color: #0394a6;
+  width: 30px;
 }
 
 .device-search-section__title {
@@ -718,6 +785,30 @@ function toggleMobileSection(section) {
   border: 0;
   padding: 0.75rem;
   margin: 0;
+}
+
+// FixometerFilters.vue's `.datepicker` accent - the calendar-button widget
+// there is themed brand-orange ($brand-orange #ffbe5f); vue-datepicker-next
+// has no equivalent button, so the same accent goes on its input border/
+// icon and the popup calendar's selected-day highlight instead.
+.device-search-datepicker {
+  :deep(.mx-datepicker) {
+    width: 100%;
+  }
+
+  :deep(.mx-input:hover),
+  :deep(.mx-input:focus) {
+    border-color: #ffbe5f;
+  }
+
+  :deep(.mx-icon-calendar) {
+    color: #ffbe5f;
+  }
+
+  :deep(.mx-calendar-content .cell.active) {
+    background-color: #ffbe5f;
+    color: #222;
+  }
 }
 
 // Per-row edit/info toggle - legacy's single edit_ico_green.svg (admin) or
@@ -747,6 +838,19 @@ function toggleMobileSection(section) {
 
 .device-search-details > td {
   background: #f5f7fa;
+}
+
+// FixometerRecordsTable.vue's .badge - a fixed-width block, not Bootstrap
+// 5's default rounded pill. BBadge's root element receives this component's
+// scope attribute (Vue scopes a directly-used child's root node), so a plain
+// selector reaches it without :deep().
+.badge {
+  width: 90px;
+  padding: 0;
+  border-radius: 0;
+  font-size: small;
+  line-height: 2;
+  text-transform: uppercase;
 }
 
 // Gap fix (LOW): FixometerRecordsTable.vue clamps the Assessment cell to 3

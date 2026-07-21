@@ -425,7 +425,7 @@ function closeAddVolunteer() {
 
           <div class="eh-right d-flex justify-content-between align-items-start flex-wrap gap-2">
             <div v-if="event.group" class="d-flex align-items-center mb-1">
-              <img :src="groupImage" alt="" width="32" height="32" class="rounded-circle me-2 group-avatar">
+              <img :src="groupImage" alt="" width="50" height="50" class="me-2 group-avatar">
               <span>
                 {{ t('events.organised_by', { group: '' }) }}
                 <NuxtLink :to="`/group/view/${event.group.id}`" class="fw-bold" data-testid="event-view-group">

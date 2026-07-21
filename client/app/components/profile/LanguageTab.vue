@@ -69,7 +69,12 @@ async function save() {
 
       <div class="d-flex justify-content-end">
         <BButton type="submit" variant="primary" :disabled="saving || loading || selected === current" data-testid="language-save">
-          {{ t('partials.save') }}
+          <!-- develop hardcodes a plain, untranslated "Save" literal here
+               (resources/views/user/profile/account.blade.php's language
+               form button - no @lang() call, unlike every other button on
+               that page) - matched verbatim rather than reusing
+               partials.save, which is an unrelated "Save item" string. -->
+          Save
         </BButton>
       </div>
     </BForm>

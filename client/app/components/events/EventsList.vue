@@ -79,18 +79,18 @@ const { t } = useI18n()
             <th scope="col" />
             <template v-if="!past">
               <th scope="col" class="text-center">
-                <img src="/images/mail_ico.svg" alt="" class="col-icon" :title="t('events.invited')">
+                <img src="/images/mail_ico.svg" alt="" class="col-icon" :title="t('groups.volunteers_invited')">
               </th>
               <th scope="col" class="text-center">
-                <img src="/images/participants.svg" alt="" class="col-icon" :title="t('groups.volunteers')">
+                <img src="/images/participants.svg" alt="" class="col-icon" :title="t('groups.volunteers_confirmed')">
               </th>
             </template>
             <template v-else>
               <th scope="col" class="text-center">
-                <img src="/images/participants.svg" alt="" class="col-icon" :title="t('groups.participants')">
+                <img src="/images/participants.svg" alt="" class="col-icon" :title="t('groups.participants_attended')">
               </th>
               <th scope="col" class="text-center">
-                <img src="/icons/volunteer_ico.svg" alt="" class="col-icon" :title="t('groups.volunteers')">
+                <img src="/icons/volunteer_ico.svg" alt="" class="col-icon" :title="t('groups.volunteers_attended')">
               </th>
               <th scope="col" class="text-center">
                 <img src="/images/trash.svg" alt="" class="col-icon" :title="t('events.stat-7')">
@@ -99,13 +99,13 @@ const { t } = useI18n()
                 <img src="/images/cloud-empty.svg" alt="" class="col-icon" :title="t('events.stat-6')">
               </th>
               <th scope="col" class="text-center">
-                <img src="/images/fixed.svg" alt="" class="col-icon" :title="t('partials.fixed')">
+                <img src="/images/fixed.svg" alt="" class="col-icon" :title="t('groups.fixed_items')">
               </th>
               <th scope="col" class="text-center">
-                <img src="/images/repairable_ico.svg" alt="" class="col-icon" :title="t('partials.repairable')">
+                <img src="/images/repairable_ico.svg" alt="" class="col-icon" :title="t('groups.repairable_items')">
               </th>
               <th scope="col" class="text-center">
-                <img src="/images/dead_ico.svg" alt="" class="col-icon" :title="t('partials.end_of_life')">
+                <img src="/images/dead_ico.svg" alt="" class="col-icon" :title="t('groups.end_of_life_items')">
               </th>
             </template>
             <th scope="col" />

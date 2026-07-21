@@ -205,7 +205,6 @@
         "role_permissions": "Permissions",
         "edit-role": "Modifier le rôle",
         "save-role": "Enregistrer le rôle",
-        "role_permissions_help": "Cochez les permissions à accorder à ce rôle. Le nom du rôle ne peut pas être modifié.",
         "role_update_success": "Permissions du rôle mises à jour.",
         "role_update_error": "Impossible de mettre à jour les permissions du rôle.",
         "main_branches": "Branches principales",
@@ -294,7 +293,6 @@
         "see_all_groups_near_you": "Voir tous les Repair Cafés proches de chez vous.",
         "see_all_groups": "Voir tous les Repair Cafés",
         "sidebar_intro_1": "Nous sommes une large communauté d'organisateurs d'événements locaux de réparation et nous oeuvrons pour notre droit à la réparation. Restarters.net est notre référentiel gratuit et open source.",
-        "getting_the_most_intro": "Restarters.net est une plateforme gratuite, open source, pour une  communauté collective de personnes organisant des événements locaux de réparation et œuvrant pour le droit à la réparation.",
         "getting_the_most": "C'est parti !",
         "getting_the_most_bullet1": "<strong>Réparer</strong>: <a href=\"https://restarters.net/group\" target=\"_blank\" rel=\"noopener\">Suivez votre Repair Café le plus proche </a> et perfectionnez ou partagez vos compétences sur notre <a href=\"https://wiki.restarters.net/\" target=\"_blank\"> wiki de la réparation </a>.",
         "getting_the_most_bullet2": "<strong>Organiser</strong>: <a href=\"https://talk.restarters.net/session/sso?return_path=https://talk.restarters.net/t/how-to-run-a-repair-event-the-restart-party-kit/324/\" target=\"_blank\">Apprenez comment organiser un événement</a> and/or <a href=\"https://talk.restarters.net/c/community-repair/5\" target=\"_blank\">Demandez de l'aide à la communauté sur Talk</a>.",
@@ -375,8 +373,6 @@
         "huge_impact_2": "Recherchez vos données de réparation ci-dessous et faites-vous une idée de l'impact de la réparation ainsi que des obstacles auxquels nous sommes confrontés lorsque nous réparons.  Vous pouvez nous aider à comprendre ce que ces données nous apprennent d'autre et quels changements nous devrions préconiser dans la <a href=\"https://talk.restarters.net/c/right-to-repair/repair-data/25\">discussion sur les données de réparation</a> de notre forum.",
         "add_data_button": "Ajouter des données",
         "add_data_description": "Ajouter des données de réparation aide à démontrer l'impact de la réparation",
-        "add_data_no_groups": "Vous devez suivre un groupe avant de pouvoir ajouter des données.",
-        "add_data_no_events": "Ce groupe n'a pas encore d'événement.",
         "search_text": "Parcourez  notre base de données de réparation",
         "table_intro": "Cliquez sur la ligne pour plus de détails.  Cliquez sur l'en-tête d'une colonne pour trier par cette colonne - cliquez à nouveau pour inverser l'ordre de tri.",
         "repair_records": "Données de réparation",
@@ -418,7 +414,11 @@
         "tooltip_type_powered": "Quel type d'appareil est-ce? (ex: \"blender\", \"drone\")",
         "tooltip_type_unpowered": "Ajoutez autant d'informations que possible sur le type d'appareil (ex: \"divan\" \"Jeans Denim\")",
         "brand_if_known": "Marque (si connue)",
-        "model_if_known": "Modèle (si connu)"
+        "model_if_known": "Modèle (si connu)",
+        "repair_outcome": "Résultat de la réparation?",
+        "add_data_group": "Veuillez sélectionner un Repair Café",
+        "add_data_event": "Veuillez sélectionner un événement",
+        "add_data_action_button": "Participer à l'événément"
     },
     "discourse": {
         "number_of_comments": "Nombre de commentaires",
@@ -595,7 +595,11 @@
         "select_members_placeholder": "Sélectionner les membres à inviter",
         "manual_invite_placeholder": "Tapez un e-mail et appuyez sur Entrée ou Tab",
         "youre_going": "Vous participez!",
-        "you_have_joined": "Vous avez rejoint <a class=\"plain-link\" href=\"{url}\">{name}</a>"
+        "you_have_joined": "Vous avez rejoint <a class=\"plain-link\" href=\"{url}\">{name}</a>",
+        "request_review": "Retours de bénévoles",
+        "search_title_placeholder": "Recherche un titre...",
+        "search_start_placeholder": "À...",
+        "search_end_placeholder": "De..."
     },
     "general": {
         "profile": "Votre profil",
@@ -842,7 +846,9 @@
         "delete_group": "Supprimer Repair Café",
         "delete_group_confirm": "Veuillez confirmer que vous voulez supprimer {name}",
         "invitation_pending": "Vous avez une invitation à rejoindre ce Repair Café. Cliquez <a href=\"{accept}\">ici</a> si vous voulez le rejoindre.",
-        "you_have_joined": "Vous avez rejoint <a class=\"plain-link\" href=\"{url}\">{name}</a>"
+        "you_have_joined": "Vous avez rejoint <a class=\"plain-link\" href=\"{url}\">{name}</a>",
+        "create_event_first": "Veuillez d'abord créer un événement afin d'ajouter des données de réparation.",
+        "follow_group_first": "Les données de réparation sont ajoutées aux événements de réparation de la communauté. Veuillez d'abord suivre un Repair Café, puis choisir un événement afin d'ajouter des données de réparation."
     },
     "landing": {
         "title": "Bienvenue chez Restarters !",
@@ -1126,7 +1132,10 @@
         "share_modal_seedlings": "plant d’arbre pendant 10 ans.*|plants d’arbres pour 10 ans.*",
         "share_modal_planting_around": "planter environ",
         "share_modal_hectares": "hectare d’arbres.*|hectares d’arbres.*",
-        "impact_estimates": "Les chiffres relatifs à l'impact sont des estimations basées sur les données saisies par les groupes dans Restarters.net."
+        "impact_estimates": "Les chiffres relatifs à l'impact sont des estimations basées sur les données saisies par les groupes dans Restarters.net.",
+        "please_choose": "Veuillez choisir...",
+        "please_confirm": "Veuillez confirmer que vous souhaitez continuer.",
+        "confirm": "Confirmer"
     },
     "passwords": {
         "reset": "Votre mot de passe a été réinitialisé!",

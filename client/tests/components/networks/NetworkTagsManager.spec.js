@@ -79,6 +79,23 @@ describe('components/networks/NetworkTagsManager', () => {
     expect(wrapper.find('[data-testid="network-tag-description-1"]').exists()).toBe(false)
   })
 
+  // NetworkPage.vue's edit/delete buttons use plain monochrome
+  // pencil.svg/trash.svg (18px/20px), not the coloured edit_ico_green.svg/
+  // delete_ico_red.svg icon set (rendered-diff finding #88).
+  it('uses develop\'s plain monochrome pencil/trash icons for edit and delete', () => {
+    store.tags.data = [{ id: 1, name: 'Scotland', description: null, groups_count: 0 }]
+
+    const wrapper = mountComponent()
+
+    const editIcon = wrapper.get('[data-testid="network-tag-edit-1"] img')
+    expect(editIcon.attributes('src')).toBe('/images/pencil.svg')
+    expect(editIcon.attributes('width')).toBe('18')
+
+    const deleteIcon = wrapper.get('[data-testid="network-tag-delete-1"] img')
+    expect(deleteIcon.attributes('src')).toBe('/images/trash.svg')
+    expect(deleteIcon.attributes('width')).toBe('20')
+  })
+
   it('always shows the inline create form (not a modal-behind-a-button)', async () => {
     store.tags.data = []
     store.createTag = vi.fn().mockResolvedValue({ id: 2, name: 'New Tag', description: null, groups_count: 0 })

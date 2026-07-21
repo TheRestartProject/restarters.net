@@ -102,16 +102,32 @@ describe('pages/role', () => {
     expect(wrapper.find('[data-testid="role-permission-6"]').element.checked).toBe(false)
   })
 
-  // live RolesPage.vue (07e6abd7cc^) is the baseline: id/name are sortable,
-  // but permissions_list is explicitly `sortable: false` (a display-only
-  // comma-joined string) - develop's dead RolesTable.vue (not mounted by
-  // anything on this branch) sorted all three, which was the wrong target.
+  // role/edit.blade.php: a disabled, name-prefilled `#inputName` text field
+  // above the permissions checkboxes, and this literal placeholder
+  // paragraph (no lang key used for it in develop).
+  it('shows the role name in a disabled field and the literal placeholder copy', async () => {
+    const wrapper = mountPage()
+    await flushPromises()
+
+    await wrapper.find('[data-testid="roles-edit-link-3"]').trigger('click')
+
+    const nameField = wrapper.find('[data-testid="roles-edit-name"]')
+    expect(nameField.element.value).toBe('Host')
+    expect(nameField.element.disabled).toBe(true)
+    expect(wrapper.text()).toContain('Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec sed odio dui.')
+  })
+
+  // develop's real, mounted RolesTable.vue (resources/js/components/
+  // RolesTable.vue, registered as `roles-table` and rendered by
+  // role/all.blade.php - "RolesPage.vue" never existed on develop; it was
+  // this branch's own pre-Phase-F scaffolding) marks all three b-table
+  // fields sortable: true, including permissions_list.
   describe('sorting', () => {
-    it('has no sort control for the permissions column', async () => {
+    it('has a sort control for the permissions column too', async () => {
       const wrapper = mountPage()
       await flushPromises()
 
-      expect(wrapper.find('[data-testid="roles-table-sort-permissions_list"]').exists()).toBe(false)
+      expect(wrapper.find('[data-testid="roles-table-sort-permissions_list"]').exists()).toBe(true)
     })
 
     it('sorts ascending on first click of a sortable column', async () => {
@@ -144,6 +160,16 @@ describe('pages/role', () => {
 
       const rows = wrapper.findAll('tbody tr')
       expect(rows[0].attributes('data-testid')).toBe('roles-row-4') // descending: 4 before 3
+    })
+
+    it('sorts on the permissions column too', async () => {
+      const wrapper = mountPage()
+      await flushPromises()
+
+      await wrapper.find('[data-testid="roles-table-sort-permissions_list"]').trigger('click')
+
+      const rows = wrapper.findAll('tbody tr')
+      expect(rows[0].attributes('data-testid')).toBe('roles-row-4') // '' < 'Create Party'
     })
   })
 

@@ -182,4 +182,8 @@ Apprenez à utiliser ce groupe ici : :help.',
   'delete_group_confirm' => 'Veuillez confirmer que vous voulez supprimer :name',
   'invitation_pending' => 'Vous avez une invitation à rejoindre ce Repair Café. Cliquez <a href=":accept">ici</a> si vous voulez le rejoindre.',
   'you_have_joined' => 'Vous avez rejoint <a class="plain-link" href=":url">:name</a>',
+
+  // Already exist on develop's lang/fr/groups.php with these exact values.
+  'create_event_first' => 'Veuillez d\'abord créer un événement afin d\'ajouter des données de réparation.',
+  'follow_group_first' => 'Les données de réparation sont ajoutées aux événements de réparation de la communauté. Veuillez d\'abord suivre un Repair Café, puis choisir un événement afin d\'ajouter des données de réparation.',
 ];

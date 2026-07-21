@@ -182,4 +182,10 @@ Learn how to use this group here: :help.',
   'delete_group_confirm' => 'Please confirm that you want to delete :name.',
   'invitation_pending' => 'You have an invitation to this group.  Please click <a href=":accept">here</a> if you would like to join.',
   'you_have_joined' => 'You have joined <a class="plain-link" href=":url">:name</a>',
+
+  // Already exist on develop's lang/en/groups.php with these exact values -
+  // ported here rather than reworded, since this branch's copy of the file
+  // predates them.
+  'create_event_first' => 'Please first create an event in order to add repair data.',
+  'follow_group_first' => 'Repair data is added to community repair events. Please first follow a group and then choose an event in order to add repair data.',
 ];

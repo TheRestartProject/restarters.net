@@ -93,7 +93,10 @@ function formatWeight(value) {
 .stat-value {
   font-size: 1.5rem;
   font-weight: bold;
-  color: var(--bs-primary, #0394a6);
+  // $brand-light from app/assets/css/_variables.scss, hardcoded here as
+  // other components already do in scoped styles (no global variable
+  // import wired up for component <style> blocks).
+  color: #4aaebc;
 }
 
 .stat-label {

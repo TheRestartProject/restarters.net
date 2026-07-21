@@ -2,6 +2,7 @@
 import { computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useModerationStore } from '~/stores/moderation.js'
+import { eventDateLabel, eventStartLocal, eventEndLocal } from '~/composables/useEventComputed.js'
 
 // Events-awaiting-moderation table for /networks/{id}'s "Events to moderate"
 // section (parity-v2/networks.md gap #2 + #11). Legacy NetworkPage.vue
@@ -28,7 +29,7 @@ const props = defineProps({
   },
 })
 
-const { t, locale } = useI18n()
+const { t } = useI18n()
 const moderationStore = useModerationStore()
 
 // Client-side network scoping (events aren't tagged with networks directly -
@@ -40,10 +41,6 @@ const events = computed(() => {
     (e) => Array.isArray(e.group?.networks) && e.group.networks.some((n) => n.id === props.networkId)
   )
 })
-
-function dateLabel(iso) {
-  return new Date(iso).toLocaleDateString(locale.value, { day: 'numeric', month: 'short', year: 'numeric' })
-}
 
 onMounted(() => {
   moderationStore.fetchEvents().catch(() => {})
@@ -64,8 +61,14 @@ onMounted(() => {
                used never resolved: develop stores them FLAT with literal dots
                ('export.events.date'), so vue-i18n read them as a nested path
                and rendered the raw key string in the header row. Icons remove
-               the broken lookups and match develop at the same time. -->
-          <th><img src="/images/clock.svg" alt="" class="moderation-th-icon" :title="t('groups.export_event_list')"></th>
+               the broken lookups and match develop at the same time. head
+               (date_long) carries no title in develop (unlike the invited/
+               volunteers headers, which do) - matched here by leaving the
+               clock icon title-less. `:src` (not a static `src=`) so
+               Vite's SFC asset-url transform doesn't inline this small
+               public-dir svg as a data URI, matching EventCard.vue's
+               `:src="'/images/clock.svg'"`. -->
+          <th><img :src="'/images/clock.svg'" alt="" class="moderation-th-icon"></th>
           <th />
           <th><img src="/images/mail_ico.svg" alt="" class="moderation-th-icon" :title="t('groups.volunteers_invited')"></th>
           <th><img src="/images/participants.svg" alt="" class="moderation-th-icon" :title="t('groups.volunteers_confirmed')"></th>
@@ -74,7 +77,17 @@ onMounted(() => {
       </thead>
       <tbody>
         <tr v-for="event in events" :key="event.id" :data-testid="`network-events-moderation-row-${event.id}`">
-          <td>{{ dateLabel(event.start) }}</td>
+          <!-- GroupEventsScrollTableDateLong.vue: date, start-end time (end
+               hidden below md) and a clock-icon timezone line - same shape
+               EventCard.vue's datelong column already ports. -->
+          <td class="text-start small">
+            <div>{{ eventDateLabel(event) }}</div>
+            <div>{{ eventStartLocal(event) }} <span class="d-none d-md-inline">- {{ eventEndLocal(event) }}</span></div>
+            <div class="text-muted">
+              <img :src="'/images/clock.svg'" alt="" class="datelong-icon">
+              {{ event.timezone }}
+            </div>
+          </td>
           <td>
             <NuxtLink :to="`/party/view/${event.id}`" :data-testid="`network-events-moderation-link-${event.id}`">
               {{ event.title }}
@@ -112,5 +125,11 @@ onMounted(() => {
 .moderation-th-icon {
   width: 24px;
   height: 24px;
+}
+
+/* GroupEventsScrollTableDateLong.vue's `.icon` clock/timezone image. */
+.datelong-icon {
+  width: 10px;
+  margin-bottom: 2px;
 }
 </style>

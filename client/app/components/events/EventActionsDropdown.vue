@@ -99,7 +99,7 @@ const { t } = useI18n()
       </BDropdownItem>
       <template v-if="finished">
         <BDropdownItem data-testid="event-actions-request-review" @click="emit('request-review')">
-          {{ t('client.events.request_review') }}
+          {{ t('events.request_review') }}
         </BDropdownItem>
         <BDropdownItem data-testid="event-actions-share-stats" @click="emit('share-stats')">
           {{ t('events.share_event_stats') }}

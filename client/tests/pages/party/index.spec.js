@@ -207,8 +207,11 @@ describe('pages/party/index (mine)', () => {
       const wrapper = mountPage()
       await wrapper.find('[data-testid="party-other-tab-all"]').trigger('click')
 
-      const options = wrapper.find('[data-testid="event-filters-country"]').findAll('option').map((o) => o.text())
-      expect(options).toEqual([en.groups.search_country_placeholder, 'France', 'UK'])
+      // The country filter is a TagMultiselect now, matching develop's
+      // vue-multiselect control in GroupEventsScrollTableFilters.vue, so the
+      // options are a prop rather than <option> elements.
+      const picker = wrapper.findComponent('[data-testid="event-filters-country"]')
+      expect(picker.props('options')).toEqual(['France', 'UK'])
     })
 
     it('narrows the list by title text', async () => {
@@ -227,7 +230,7 @@ describe('pages/party/index (mine)', () => {
       await wrapper.find('[data-testid="party-other-tab-all"]').trigger('click')
 
       const panel = wrapper.find('[data-testid="party-other-panel-all"]')
-      await panel.find('[data-testid="event-filters-country"]').setValue('France')
+      await panel.findComponent('[data-testid="event-filters-country"]').vm.$emit('update:modelValue', 'France')
 
       expect(panel.find('[data-testid="event-card-10"]').exists()).toBe(false)
       expect(panel.find('[data-testid="event-card-11"]').exists()).toBe(true)

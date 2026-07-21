@@ -84,7 +84,7 @@ function onInput(event) {
       <img src="/images/add-icon.svg" alt="+" width="16" height="16">
     </button>
   </div>
-  <div v-else class="h3 mb-0" :data-testid="testid">{{ current }}</div>
+  <div v-else class="attendance-count-readonly" :data-testid="testid">{{ current }}</div>
 </template>
 
 <style scoped>
@@ -110,5 +110,14 @@ function onInput(event) {
 .attendance-count-input::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
+}
+
+/* EventAttendanceCount.vue's shared `.attendance-count` class - the
+   read-only div uses the same teal/bold/23px treatment as the editable
+   input, not a plain Bootstrap heading class. */
+.attendance-count-readonly {
+  color: #4aaebc;
+  font-weight: bold;
+  font-size: 23px;
 }
 </style>

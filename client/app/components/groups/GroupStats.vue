@@ -51,6 +51,12 @@ function kg(value) {
   return `${Math.round(value ?? 0).toLocaleString()} kg`
 }
 
+// StatsValue.vue's printableCount(): roundedCount.toLocaleString() - every
+// stat-card count gets thousand separators, not just the kg() figures.
+function printableCount(value) {
+  return Math.round(value ?? 0).toLocaleString()
+}
+
 // StatsImpact.vue's notincluded(): the "not counting X/Y/Z devices" caveat,
 // built from dead/repairable/no-weight counts and joined with "and" when
 // more than one applies. events.to_be_recycled/to_be_repaired/no_weight are
@@ -114,7 +120,7 @@ const notCounting = computed(() => {
               :data-testid="card.testid"
             >
               <img :src="`/images/${card.icon}.svg`" alt="" class="stat-card__icon">
-              <div class="stat-card__count">{{ card.count }}</div>
+              <div class="stat-card__count">{{ printableCount(card.count) }}</div>
               <div class="stat-card__label">{{ card.label }}</div>
             </div>
           </div>
@@ -152,7 +158,9 @@ const notCounting = computed(() => {
               </button>
             </div>
           </div>
-          <p v-if="notCounting" class="small text-muted mt-2" data-testid="group-stats-not-counting">
+          <!-- StatsImpact.vue's .impact-notincluded-content: brand-teal
+               ($brand-light/#4aaebc), not Bootstrap's generic muted grey. -->
+          <p v-if="notCounting" class="small not-counting mt-2" data-testid="group-stats-not-counting">
             {{ notCounting }}
           </p>
         </section>
@@ -246,10 +254,13 @@ const notCounting = computed(() => {
   height: 40px;
 }
 
+// StatsValue.vue's .impact-stat-count-secondary: $brand-light (#4aaebc), NOT
+// $brand/#0394a6 - that darker teal is reserved for the primary-variant
+// cards (background #4aaebc, white text - see .stat-card--primary above).
 .stat-card__count {
   font-size: 1.75rem;
   font-weight: bold;
-  color: var(--bs-primary, #0394a6);
+  color: #4aaebc;
   line-height: 1;
 }
 
@@ -265,5 +276,10 @@ const notCounting = computed(() => {
   padding: 0;
   margin-left: 0.35rem;
   vertical-align: middle;
+}
+
+// StatsImpact.vue's .impact-notincluded-content: $brand-light (#4aaebc).
+.not-counting {
+  color: #4aaebc;
 }
 </style>

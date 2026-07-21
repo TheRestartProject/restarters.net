@@ -29,6 +29,13 @@ const props = defineProps({
     type: Number,
     required: true,
   },
+  // EventDetails.vue:74 shows the venue map at zoom 16; VenueAddress.vue:31
+  // (the create/edit form's own preview) uses zoom 11 instead - callers pass
+  // their own value, defaulting to the (more common) view-page zoom.
+  zoom: {
+    type: Number,
+    default: 16,
+  },
 })
 
 const center = computed(() => [props.lat, props.lng])
@@ -58,7 +65,7 @@ const icon = L.icon({
 <template>
   <div class="event-venue-map" data-testid="event-venue-map">
     <LMap
-      :zoom="16"
+      :zoom="zoom"
       :center="center"
       :options="mapOptions"
       use-global-leaflet

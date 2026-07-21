@@ -101,7 +101,7 @@
       "invite_success_apart_from": "Invites sent - apart from these ({emails}), who have already joined the event, have already been sent an invite, or have not opted in to receive emails.",
       "link_invalid": "Please enter a valid website address.",
       "load_error": "Sorry, we couldn't load your events.",
-      "moderate_approve_help": "This will mark the event as having been moderated and will send all hosts an email confirming.",
+      "moderate_approve_help": "This will mark the post as having been moderated and will send all hosts an email confirming",
       "no_devices": "No items recorded yet.",
       "no_search_results": "No events match your search.",
       "now_following_group": "You are now following this group.",
@@ -135,10 +135,10 @@
       "recovery_logout_prefix": "If you continue to get an error, you could try",
       "recovery_logout_suffix": "and logging back in again.",
       "report_instructions": "You can report the issue by emailing <a href=\"mailto:community&#64;therestartproject.org\">community&#64;therestartproject.org</a>, or by posting in the <a href=\"https://talk.restarters.net/c/restarters-dev\" target=\"_blank\" rel=\"noopener\">restarters-dev Discourse forum</a>.",
-      "report_intro": "Please let us know that you encountered this issue and we'll look into it as soon as possible.",
+      "report_intro": "Please let us know that you encountered this issue and we will look into it ASAP.",
       "text": "You don't have permission to view this page.",
       "thanks": "Thanks!",
-      "title": "Access denied"
+      "title": "Sorry, but you do not have the permissions to perform that action."
     },
     "groups": {
       "all_tab": "All groups",

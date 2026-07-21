@@ -106,26 +106,31 @@ describe('pages/category', () => {
     expect(adminStore.fetchClusters).toHaveBeenCalledTimes(1)
   })
 
-  // live CategoriesPage.vue (07e6abd7cc^) is the baseline (not develop's
-  // older Blade, nor develop's dead CategoriesTable.vue - neither is
-  // mounted by anything on this branch): blank cluster cell when empty (no
-  // "N/A" fallback), "Category name" as the column label (not "Name"), and
-  // footprint_reliability sortable: true.
-  it('reads cluster_name directly off each row, translating it but with no N/A fallback', () => {
+  // develop's real, mounted CategoriesTable.vue (resources/js/components/
+  // CategoriesTable.vue, registered as `categories-table` and rendered by
+  // category/index.blade.php - "CategoriesPage.vue"/"AdminCrudPage.vue"
+  // never existed on develop; they were this branch's own pre-Phase-F
+  // scaffolding) falls back to the literal, untranslated string 'N/A' for a
+  // blank cluster cell: `data.item.cluster_name ? __(data.item.cluster_name) : 'N/A'`.
+  it('reads cluster_name directly off each row, translating it, with an "N/A" fallback when blank', () => {
     const wrapper = mountPage()
     const table = wrapper.findComponent(AdminCrudTableStub)
     const clusterColumn = table.props('tableFields').find((f) => f.key === 'cluster_name')
 
     expect(clusterColumn).toBeDefined()
-    expect(clusterColumn.formatter(null)).toBeNull()
-    expect(clusterColumn.formatter('')).toBe('')
+    expect(clusterColumn.formatter(null)).toBe('N/A')
+    expect(clusterColumn.formatter('')).toBe('N/A')
   })
 
-  it('labels the name table column "Category name", matching the form field', () => {
+  // CategoriesTable.vue's b-table field is `{ key: 'name', label: 'Name', ... }`
+  // - a plain literal, not translated. The edit form field keeps the
+  // separate admin.category_name key (category/edit.blade.php's `@lang('admin.category_name')`
+  // label), so only the table column changes.
+  it('labels the name table column "Name" (a literal, not admin.category_name), leaving the form field as "Category name"', () => {
     const wrapper = mountPage()
     const table = wrapper.findComponent(AdminCrudTableStub)
 
-    expect(table.props('tableFields').find((f) => f.key === 'name').label).toBe('Category name')
+    expect(table.props('tableFields').find((f) => f.key === 'name').label).toBe('Name')
     expect(table.props('formFields').find((f) => f.key === 'name').label).toBe('Category name')
   })
 

@@ -84,7 +84,7 @@ onMounted(() => {
     <h1 class="d-flex justify-content-between align-items-start">
       <span class="d-flex align-items-center">
         {{ t('groups.groups') }}
-        <img src="/images/group_doodle_ico.svg" alt="" class="ms-3" style="height: 76px">
+        <img src="/images/group_doodle_ico.svg" alt="" class="ms-4" style="height: 76px">
       </span>
       <NuxtLink to="/group/create" class="btn btn-primary" data-testid="group-create-link">
         <span class="d-block d-lg-none">{{ t('groups.create_groups_mobile2') }}</span>

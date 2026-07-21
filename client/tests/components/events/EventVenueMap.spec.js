@@ -50,4 +50,16 @@ describe('components/events/EventVenueMap', () => {
     expect(marker.props('latLng')).toEqual([51.5, -0.1])
     expect(marker.props('interactive')).toBe(false)
   })
+
+  // EventDetails.vue:74 (view page) is zoom 16; VenueAddress.vue:31 (the
+  // create/edit form's preview, wired up via EventForm.vue) is zoom 11.
+  it('defaults to zoom 16, matching EventDetails.vue', () => {
+    const wrapper = mountMap()
+    expect(wrapper.findComponent(LMapStub).props('zoom')).toBe(16)
+  })
+
+  it('accepts a zoom override, for EventForm.vue\'s zoom-11 preview', () => {
+    const wrapper = mountMap({ zoom: 11 })
+    expect(wrapper.findComponent(LMapStub).props('zoom')).toBe(11)
+  })
 })

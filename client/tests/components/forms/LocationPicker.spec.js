@@ -37,6 +37,16 @@ describe('components/forms/LocationPicker', () => {
     expect(wrapper.find('[data-testid="location-picker-error"]').exists()).toBe(true)
   })
 
+  // develop's GroupAddEdit.vue ::v-deep(.hasError) rule is a plain red
+  // border - not Bootstrap's .is-invalid, which adds a warning-triangle
+  // background image and extra padding-right.
+  it('marks the input with a plain red-border error class, not Bootstrap is-invalid', () => {
+    const wrapper = mountPicker({ location: 'Nowhereville', hasError: true })
+    const input = wrapper.find('[data-testid="location-picker-input"]')
+    expect(input.classes()).toContain('location-picker__input--error')
+    expect(input.classes()).not.toContain('is-invalid')
+  })
+
   it('fetches and shows suggestions after typing 3+ characters, and selecting one emits location/lat/lng/postcode', async () => {
     const autocomplete = vi.fn().mockResolvedValue({
       predictions: [{ place_id: 'abc', description: '10 Downing St, London' }],

@@ -91,4 +91,14 @@ describe('components/groups/GroupStats', () => {
 
     expect(wrapper.find('[data-testid="group-stats-not-counting"]').exists()).toBe(false)
   })
+
+  // StatsValue.vue's printableCount(): stat-card counts get thousand
+  // separators (finding 52).
+  it('formats group-facts stat-card counts with thousand separators', () => {
+    const wrapper = mountComponent({
+      stats: { group_stats: { ...STATS.group_stats, participants: 12345 } },
+    })
+
+    expect(wrapper.find('[data-testid="group-stats-participants"]').text()).toContain('12,345')
+  })
 })

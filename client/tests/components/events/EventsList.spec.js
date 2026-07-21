@@ -76,4 +76,27 @@ describe('components/events/EventsList', () => {
     expect(wrapper.find('[data-testid="event-card-hosting-1"]').exists()).toBe(true)
     expect(wrapper.find('[data-testid="event-card-hosting-2"]').exists()).toBe(false)
   })
+
+  // GroupEventScrollTable.vue's head(invited)/head(volunteers) icon titles -
+  // distinct keys per column, not both reusing groups.volunteers.
+  it('titles the invited/volunteers column icons with the long-form develop keys, not both groups.volunteers', () => {
+    const wrapper = mountComponent({ events: EVENTS, past: false })
+    const icons = wrapper.findAll('thead img')
+
+    expect(icons[1].attributes('title')).toBe(en.groups.volunteers_invited)
+    expect(icons[2].attributes('title')).toBe(en.groups.volunteers_confirmed)
+  })
+
+  // GroupEventScrollTable.vue's head(participants_count)/head(volunteers_count)/
+  // head(fixed_devices)/head(repairable_devices)/head(dead_devices) icon titles.
+  it('titles the past-bucket column icons with the long-form develop keys', () => {
+    const wrapper = mountComponent({ events: EVENTS, past: true })
+    const icons = wrapper.findAll('thead img')
+
+    expect(icons[1].attributes('title')).toBe(en.groups.participants_attended)
+    expect(icons[2].attributes('title')).toBe(en.groups.volunteers_attended)
+    expect(icons[5].attributes('title')).toBe(en.groups.fixed_items)
+    expect(icons[6].attributes('title')).toBe(en.groups.repairable_items)
+    expect(icons[7].attributes('title')).toBe(en.groups.end_of_life_items)
+  })
 })

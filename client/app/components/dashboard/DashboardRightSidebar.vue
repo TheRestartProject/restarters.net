@@ -6,10 +6,13 @@ import CollapsibleSection from '~/components/CollapsibleSection.vue'
 // legacy version had a couple of display classes that contradicted their
 // parent's (a mobile-only span nested inside a desktop-only block, and vice
 // versa): getting_the_most_intro was never actually reachable on any
-// breakpoint (verified against the live legacy dashboard), so that key is
-// gone. sidebar_intro_1 is what real users saw - above the photo on desktop,
-// inside the orange panel on mobile (the photo/intro box is desktop-only) -
-// replicated here the same way rather than showing it twice on desktop.
+// breakpoint (verified against the live legacy dashboard: its wrapping <p>
+// is d-none d-md-block while the v-html span inside is d-inline d-md-none -
+// desktop-only containing mobile-only, so it never renders anywhere), so
+// that key is gone. sidebar_intro_1 is what real users saw - above the photo
+// on desktop, inside the orange panel on mobile (the photo/intro box is
+// desktop-only) - replicated here the same way rather than showing it twice
+// on desktop.
 const { t } = useI18n()
 </script>
 
@@ -34,11 +37,9 @@ const { t } = useI18n()
         </template>
 
         <div class="getting-started__content">
-          <!-- DashboardRightSidebar.vue's intro paragraph, above the bullets.
-               It sits before the mobile-only sidebar_intro_1 repeat and shows
-               at every width - we rendered the bullets with no lead-in. -->
-          <p>{{ t('dashboard.getting_the_most_intro') }}</p>
-
+          <!-- getting_the_most_intro is dropped entirely: develop's own
+               markup makes it unreachable at any breakpoint (see the header
+               comment above) - not shown here either. -->
           <p class="d-block d-md-none">{{ t('dashboard.sidebar_intro_1') }}</p>
 
           <ul class="list-unstyled getting-started__list">
@@ -88,8 +89,8 @@ const { t } = useI18n()
 }
 
 .hand-doodle {
-  width: 56px;
-  height: 69px;
+  width: 70px;
+  height: 86px;
   flex-shrink: 0;
 }
 </style>

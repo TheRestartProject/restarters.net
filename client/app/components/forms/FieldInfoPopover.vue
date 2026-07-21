@@ -2,7 +2,8 @@
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-// Info "i" button that reveals a field's help text on hover/focus/click.
+// Info "i" button that reveals a field's help text on click (develop's
+// v-b-popover.html.left - click-triggered, popover to the left of the icon).
 // The device form carries one of these on five of its fields (item type,
 // category, model, problem, notes) - DeviceCategorySelect.vue,
 // DeviceType.vue, DeviceModel.vue, DeviceProblem.vue and DeviceNotes.vue
@@ -41,9 +42,9 @@ const button = ref(null)
       :aria-label="t('client.common.more_information')"
       data-testid="field-info-toggle"
     >
-      <img :src="`/icons/info_ico_${variant === 'brand' ? 'green' : 'black'}.svg`" alt="" width="18" height="18">
+      <img :src="`/icons/info_ico_${variant === 'brand' ? 'green' : 'black'}.svg`" alt="">
     </button>
-    <BPopover :target="button" triggers="hover focus click" html data-testid="field-info-popover">
+    <BPopover :target="button" placement="left" click html data-testid="field-info-popover">
       <!-- eslint-disable-next-line vue/no-v-html -->
       <div v-html="content" />
     </BPopover>

@@ -38,6 +38,12 @@ function pc(cluster, count) {
   const total = (cluster.fixed ?? 0) + (cluster.repairable ?? 0) + (cluster.dead ?? 0)
   return total ? Math.round((10000 * count) / total) / 100 : 0
 }
+
+// StatsValue.vue's printableCount(): every cluster-panel count gets
+// thousand separators.
+function printableCount(value) {
+  return Math.round(value ?? 0).toLocaleString()
+}
 </script>
 
 <template>
@@ -54,17 +60,17 @@ function pc(cluster, count) {
             <template v-if="clusterStats[cluster.id]">
               <div class="cluster-panel__item">
                 <img :src="'/images/fixed.svg'" alt="" class="cluster-panel__icon">
-                <div class="cluster-panel__count">{{ clusterStats[cluster.id].fixed ?? 0 }}</div>
+                <div class="cluster-panel__count">{{ printableCount(clusterStats[cluster.id].fixed) }}</div>
                 <div class="small">{{ pc(clusterStats[cluster.id], clusterStats[cluster.id].fixed ?? 0) }}%</div>
               </div>
               <div class="cluster-panel__item">
                 <img :src="'/images/repairable.svg'" alt="" class="cluster-panel__icon">
-                <div class="cluster-panel__count">{{ clusterStats[cluster.id].repairable ?? 0 }}</div>
+                <div class="cluster-panel__count">{{ printableCount(clusterStats[cluster.id].repairable) }}</div>
                 <div class="small">{{ pc(clusterStats[cluster.id], clusterStats[cluster.id].repairable ?? 0) }}%</div>
               </div>
               <div class="cluster-panel__item">
                 <img :src="'/images/dead.svg'" alt="" class="cluster-panel__icon">
-                <div class="cluster-panel__count">{{ clusterStats[cluster.id].dead ?? 0 }}</div>
+                <div class="cluster-panel__count">{{ printableCount(clusterStats[cluster.id].dead) }}</div>
                 <div class="small">{{ pc(clusterStats[cluster.id], clusterStats[cluster.id].dead ?? 0) }}%</div>
               </div>
               <!-- GroupDevicesBreakdownCluster.vue's .divider: a teal rule
@@ -73,17 +79,17 @@ function pc(cluster, count) {
               <div class="cluster-panel__divider d-none d-md-block" :data-testid="`group-stats-cluster-${cluster.id}-divider`" />
               <div class="cluster-panel__item">
                 <img :src="'/images/most-seen_ico.svg'" alt="" class="cluster-panel__icon">
-                <div class="cluster-panel__count">{{ clusterStats[cluster.id].most_seen?.count ?? 0 }}</div>
+                <div class="cluster-panel__count">{{ printableCount(clusterStats[cluster.id].most_seen?.count) }}</div>
                 <div class="small">{{ translateName(clusterStats[cluster.id].most_seen?.name) }}</div>
               </div>
               <div class="cluster-panel__item">
                 <img :src="'/images/most-repaired_ico.svg'" alt="" class="cluster-panel__icon">
-                <div class="cluster-panel__count">{{ clusterStats[cluster.id].most_repaired?.count ?? 0 }}</div>
+                <div class="cluster-panel__count">{{ printableCount(clusterStats[cluster.id].most_repaired?.count) }}</div>
                 <div class="small">{{ translateName(clusterStats[cluster.id].most_repaired?.name) }}</div>
               </div>
               <div class="cluster-panel__item">
                 <img :src="'/images/least-repaired_ico.svg'" alt="" class="cluster-panel__icon">
-                <div class="cluster-panel__count">{{ clusterStats[cluster.id].least_repaired?.count ?? 0 }}</div>
+                <div class="cluster-panel__count">{{ printableCount(clusterStats[cluster.id].least_repaired?.count) }}</div>
                 <div class="small">{{ translateName(clusterStats[cluster.id].least_repaired?.name) }}</div>
               </div>
             </template>
@@ -106,32 +112,32 @@ function pc(cluster, count) {
           <template v-if="clusterStats[cluster.id]">
             <div class="cluster-panel__item">
               <img :src="'/images/fixed.svg'" alt="" class="cluster-panel__icon">
-              <div class="cluster-panel__count">{{ clusterStats[cluster.id].fixed ?? 0 }}</div>
+              <div class="cluster-panel__count">{{ printableCount(clusterStats[cluster.id].fixed) }}</div>
               <div class="small">{{ pc(clusterStats[cluster.id], clusterStats[cluster.id].fixed ?? 0) }}%</div>
             </div>
             <div class="cluster-panel__item">
               <img :src="'/images/repairable.svg'" alt="" class="cluster-panel__icon">
-              <div class="cluster-panel__count">{{ clusterStats[cluster.id].repairable ?? 0 }}</div>
+              <div class="cluster-panel__count">{{ printableCount(clusterStats[cluster.id].repairable) }}</div>
               <div class="small">{{ pc(clusterStats[cluster.id], clusterStats[cluster.id].repairable ?? 0) }}%</div>
             </div>
             <div class="cluster-panel__item">
               <img :src="'/images/dead.svg'" alt="" class="cluster-panel__icon">
-              <div class="cluster-panel__count">{{ clusterStats[cluster.id].dead ?? 0 }}</div>
+              <div class="cluster-panel__count">{{ printableCount(clusterStats[cluster.id].dead) }}</div>
               <div class="small">{{ pc(clusterStats[cluster.id], clusterStats[cluster.id].dead ?? 0) }}%</div>
             </div>
             <div class="cluster-panel__item">
               <img :src="'/images/most-seen_ico.svg'" alt="" class="cluster-panel__icon">
-              <div class="cluster-panel__count">{{ clusterStats[cluster.id].most_seen?.count ?? 0 }}</div>
+              <div class="cluster-panel__count">{{ printableCount(clusterStats[cluster.id].most_seen?.count) }}</div>
               <div class="small">{{ translateName(clusterStats[cluster.id].most_seen?.name) }}</div>
             </div>
             <div class="cluster-panel__item">
               <img :src="'/images/most-repaired_ico.svg'" alt="" class="cluster-panel__icon">
-              <div class="cluster-panel__count">{{ clusterStats[cluster.id].most_repaired?.count ?? 0 }}</div>
+              <div class="cluster-panel__count">{{ printableCount(clusterStats[cluster.id].most_repaired?.count) }}</div>
               <div class="small">{{ translateName(clusterStats[cluster.id].most_repaired?.name) }}</div>
             </div>
             <div class="cluster-panel__item">
               <img :src="'/images/least-repaired_ico.svg'" alt="" class="cluster-panel__icon">
-              <div class="cluster-panel__count">{{ clusterStats[cluster.id].least_repaired?.count ?? 0 }}</div>
+              <div class="cluster-panel__count">{{ printableCount(clusterStats[cluster.id].least_repaired?.count) }}</div>
               <div class="small">{{ translateName(clusterStats[cluster.id].least_repaired?.name) }}</div>
             </div>
           </template>
@@ -139,7 +145,10 @@ function pc(cluster, count) {
       </GroupCollapsibleSection>
     </div>
 
-    <p class="small text-muted mt-3">{{ t('groups.no_unpowered_stats') }}</p>
+    <!-- GroupDevicesBreakdown.vue's caveat is `.text-brand` ($brand/#0394a6,
+         our global text-brand utility), not Bootstrap's generic
+         `.text-muted` grey. -->
+    <p class="small text-brand mt-3">{{ t('groups.no_unpowered_stats') }}</p>
   </section>
 </template>
 
@@ -219,10 +228,13 @@ function pc(cluster, count) {
   height: 32px;
 }
 
+// GroupDevicesBreakdownCluster.vue's StatsValue instances all use the
+// default (secondary) variant: .impact-stat-count-secondary is $brand-light
+// (#4aaebc), NOT $brand/#0394a6.
 .cluster-panel__count {
   font-weight: bold;
   font-size: 1.25rem;
-  color: var(--bs-primary, #0394a6);
+  color: #4aaebc;
 }
 
 .cluster-mobile-title {

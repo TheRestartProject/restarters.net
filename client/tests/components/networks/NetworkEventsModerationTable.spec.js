@@ -86,4 +86,46 @@ describe('components/networks/NetworkEventsModerationTable', () => {
     expect(flag.attributes('href')).toBe('/party/edit/7')
     expect(flag.text()).toBe('Event requires moderation')
   })
+
+  // GroupEventsScrollTableDateLong.vue's date cell: full date, start-end
+  // time and a clock-icon timezone line - not a bare formatted date
+  // (rendered-diff finding #89).
+  it('renders the event start/end time and timezone alongside the date', async () => {
+    store.fetchEvents = vi.fn(async () => {
+      store.events.data = [
+        {
+          id: 7,
+          title: 'Repair Café',
+          start: '2026-08-01T10:00:00Z',
+          end: '2026-08-01T14:00:00Z',
+          timezone: 'Europe/London',
+          group: { id: 3, name: 'Camden Restarters', networks: [{ id: 1 }] },
+          stats: { volunteers: 6 },
+        },
+      ]
+    })
+
+    const wrapper = mountComponent()
+    await flushPromises()
+
+    const row = wrapper.get('[data-testid="network-events-moderation-row-7"]')
+    expect(row.text()).toContain('Europe/London')
+    expect(row.find('img.datelong-icon').exists()).toBe(true)
+  })
+
+  // develop's head(date_long) template carries no title/tooltip on the
+  // clock icon, unlike the invited/volunteers headers (rendered-diff
+  // finding #90).
+  it('does not put a tooltip on the date column\'s clock-icon header', async () => {
+    store.fetchEvents = vi.fn(async () => {
+      store.events.data = [{ id: 7, title: 'Repair Café', start: '2026-08-01T10:00:00Z', group: { id: 3, name: 'Camden Restarters', networks: [{ id: 1 }] } }]
+    })
+
+    const wrapper = mountComponent()
+    await flushPromises()
+
+    const headerIcons = wrapper.findAll('th img')
+    const clockHeaderIcon = headerIcons.find((img) => img.attributes('src') === '/images/clock.svg')
+    expect(clockHeaderIcon.attributes('title')).toBeUndefined()
+  })
 })

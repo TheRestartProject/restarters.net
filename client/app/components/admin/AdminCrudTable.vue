@@ -23,11 +23,12 @@ import AdminCrudFormField from './AdminCrudFormField.vue'
 // renders whatever `items` array it's handed and re-calls `fetchItems`/
 // `createItem`/`updateItem`/`deleteItem` as the user interacts.
 //
-// `editId` reproduces the legacy "pre-open the edit modal" bookmark
-// behaviour, but as a query param on the same page (`/brands?editId=5`)
-// rather than legacy's separate path route (`/brands/edit/5`) - a
-// deliberate routing simplification for the SPA, documented in
-// docs/nuxt-migration/api-gaps.md Phase D rather than silently diverging.
+// `editId` reproduces the legacy "deep link straight to the edit view"
+// bookmark behaviour, but as a query param on the same page
+// (`/brands?editId=5`) rather than legacy's separate path route
+// (`/brands/edit/5`) - a deliberate routing simplification for the SPA,
+// documented in docs/nuxt-migration/api-gaps.md Phase D rather than
+// silently diverging.
 const { t } = useI18n()
 
 const props = defineProps({
@@ -208,6 +209,17 @@ function resetEditForm() {
   editFieldErrors.value = {}
 }
 
+// develop's edit views are dedicated pages (category|skills|brands
+// edit.blade.php), not a modal - reached from the list's row link and left
+// via the breadcrumb's list crumb or Cancel, both of which just go back to
+// the list. Here that's "stop showing the edit panel", not a real
+// navigation (see editId's own doc comment on why this stays a query-param
+// toggle on one SPA route rather than a second route).
+function closeEdit() {
+  showEdit.value = false
+  resetEditForm()
+}
+
 function trimForm(form) {
   const out = {}
   props.formFields.forEach((field) => {
@@ -267,7 +279,11 @@ async function submitEdit() {
     await props.updateItem(id, trimForm(editForm))
     feedback.value = props.labels.updateSuccess
     feedbackVariant.value = 'success'
-    showEdit.value = false
+    // No BModal @hide handler to fall back on any more (the edit view is a
+    // plain v-if section, not a modal) - reset explicitly on success, same
+    // as the Cancel button and breadcrumb's list crumb both already do via
+    // closeEdit().
+    closeEdit()
   } catch (err) {
     editError.value = applyApiError(err, editFieldErrors, props.labels.updateError)
   } finally {
@@ -362,83 +378,153 @@ onMounted(load)
       {{ feedback }}
     </BAlert>
 
-    <div class="d-flex align-items-center mb-3">
-      <h1 class="mb-0 me-auto">{{ labels.title }}</h1>
-      <BButton
-        v-if="allowCreate"
-        variant="primary"
-        :data-testid="`${testidPrefix}-add-button`"
-        @click="openCreateModal"
-      >
-        {{ labels.createButton }}
-      </BButton>
-    </div>
-
-    <div v-if="listLoading" :data-testid="`${testidPrefix}-loading`">
-      <div class="placeholder-glow">
-        <span class="placeholder col-12" style="height: 6rem" />
+    <template v-if="!showEdit">
+      <div class="d-flex align-items-center mb-3">
+        <h1 class="mb-0 me-auto">{{ labels.title }}</h1>
+        <BButton
+          v-if="allowCreate"
+          variant="primary"
+          :data-testid="`${testidPrefix}-add-button`"
+          @click="openCreateModal"
+        >
+          {{ labels.createButton }}
+        </BButton>
       </div>
-    </div>
 
-    <BAlert v-else-if="listError" :model-value="true" variant="danger" :data-testid="`${testidPrefix}-load-error`">
-      <p>{{ labels.loadError }}</p>
-      <BButton variant="danger" :data-testid="`${testidPrefix}-retry`" @click="retry">
-        {{ labels.retry }}
-      </BButton>
-    </BAlert>
+      <div v-if="listLoading" :data-testid="`${testidPrefix}-loading`">
+        <div class="placeholder-glow">
+          <span class="placeholder col-12" style="height: 6rem" />
+        </div>
+      </div>
 
-    <!-- CategoriesTable.vue:2 / RolesTable.vue:2 / brands|skills|tags
-         index.blade: `class="table-responsive table-section"`.
-         `.table-section` is _tables.scss's white/20px-padding/1px-border/
-         6px-shadow panel - already ported here, just never applied, so
-         every admin table rendered flat on the page background. -->
-    <div v-else class="table-responsive table-section">
-      <table class="table table-striped table-hover" :data-testid="`${testidPrefix}-table`">
-        <thead>
-          <tr>
-            <th v-for="field in tableFields" :key="field.key" :aria-sort="sortAria(field)">
-              <button
-                v-if="field.sortable"
-                type="button"
-                class="sort-header"
-                :data-testid="`${testidPrefix}-table-sort-${field.key}`"
-                @click="sortByColumn(field)"
+      <BAlert v-else-if="listError" :model-value="true" variant="danger" :data-testid="`${testidPrefix}-load-error`">
+        <p>{{ labels.loadError }}</p>
+        <BButton variant="danger" :data-testid="`${testidPrefix}-retry`" @click="retry">
+          {{ labels.retry }}
+        </BButton>
+      </BAlert>
+
+      <!-- CategoriesTable.vue:2 / RolesTable.vue:2 / brands|skills|tags
+           index.blade: `class="table-responsive table-section"`.
+           `.table-section` is _tables.scss's white/20px-padding/1px-border/
+           6px-shadow panel - already ported here, just never applied, so
+           every admin table rendered flat on the page background. -->
+      <div v-else class="table-responsive table-section">
+        <table class="table table-striped table-hover" :data-testid="`${testidPrefix}-table`">
+          <thead>
+            <tr>
+              <th v-for="field in tableFields" :key="field.key" :aria-sort="sortAria(field)">
+                <button
+                  v-if="field.sortable"
+                  type="button"
+                  class="sort-header"
+                  :data-testid="`${testidPrefix}-table-sort-${field.key}`"
+                  @click="sortByColumn(field)"
+                >
+                  {{ field.label }} {{ sortIndicator(field) }}
+                  <span class="visually-hidden">{{ sortHint(field) }}</span>
+                </button>
+                <template v-else>{{ field.label }}</template>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-if="!displayItems.length" :data-testid="`${testidPrefix}-table-empty`">
+              <td :colspan="tableFields.length">{{ labels.emptyText }}</td>
+            </tr>
+            <tr v-for="item in displayItems" :key="item[primaryKey]" :data-testid="`${testidPrefix}-row-${item[primaryKey]}`">
+              <td v-for="field in tableFields" :key="field.key">
+                <a
+                  v-if="field.key === displayKey"
+                  href="#"
+                  :data-testid="`${testidPrefix}-edit-link-${item[primaryKey]}`"
+                  @click.prevent="openEditModal(item)"
+                >
+                  {{ cellValue(item, field) }}
+                </a>
+                <!-- Optional per-column custom rendering: a caller can provide
+                     #cell-<field.key>="{ item, value }" to render a column's
+                     cell itself (e.g. category.vue's coloured reliability
+                     badge). Falls back to the plain formatted value when no
+                     such slot is filled, so every page that doesn't opt in
+                     (brands/skills/tags/role) renders exactly as before. -->
+                <slot v-else :name="`cell-${field.key}`" :item="item" :value="cellValue(item, field)">
+                  {{ cellValue(item, field) }}
+                </slot>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </template>
+
+    <!-- category|skills|brands edit.blade.php: a breadcrumb (FIXOMETER >
+         list title > edit title) and a `.edit-panel.edit-panel__device`
+         panel with an h2 + optional description paragraph around the form,
+         reached by navigating to a dedicated /xxx/edit/{id} page - not the
+         plain BModal this replaced, which dropped all of that page chrome.
+         Kept on the same SPA route (editId toggles this in place of the
+         list) rather than a real second route - see editId's own doc
+         comment above. -->
+    <template v-else>
+      <nav aria-label="breadcrumb" :data-testid="`${testidPrefix}-edit-breadcrumb`">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><NuxtLink to="/dashboard">FIXOMETER</NuxtLink></li>
+          <li class="breadcrumb-item">
+            <a href="#" :data-testid="`${testidPrefix}-edit-breadcrumb-list`" @click.prevent="closeEdit">{{ labels.title }}</a>
+          </li>
+          <li class="breadcrumb-item active" aria-current="page">{{ labels.editTitle }}</li>
+        </ol>
+      </nav>
+
+      <div class="edit-panel edit-panel__device">
+        <h2>{{ labels.editTitle }}</h2>
+        <p v-if="labels.editDescription">{{ labels.editDescription }}</p>
+
+        <!-- data-testid stays "-edit-modal" (not "-edit-panel"): it's no
+             longer a BModal, but this is the id e2e/admin.test.js already
+             asserts visible/hidden around, and a plain v-if section still
+             satisfies both. -->
+        <div :data-testid="`${testidPrefix}-edit-modal`">
+          <BForm :data-testid="`${testidPrefix}-edit-form`" @submit.prevent="submitEdit">
+            <AdminCrudFormField
+              v-for="field in formFields"
+              :key="`edit-${field.key}`"
+              :field="field"
+              :model-value="editForm[field.key]"
+              :error="fieldError(editFieldErrors, field.key)"
+              :testid="`${testidPrefix}-edit-${field.key}`"
+              @update:model-value="editForm[field.key] = $event"
+            />
+            <p v-if="editError && !Object.keys(editFieldErrors).length" class="text-danger" :data-testid="`${testidPrefix}-edit-error`">
+              {{ editError }}
+            </p>
+            <div class="d-flex justify-content-end gap-2 mt-3">
+              <!-- develop puts Delete on the EDIT page (tags/edit.blade.php:55),
+                   not on every table row. Kept as a button with a confirm step
+                   rather than develop's `<a href="/tags/delete/{id}">`: that is a
+                   GET request that deletes, which is CSRF-able and can fire from a
+                   prefetch or a crawler. Copying the placement is parity; copying
+                   a destructive GET is importing a vulnerability, the same line
+                   already drawn over updateQuantity's IDOR. -->
+              <BButton
+                v-if="allowDelete && editingItem"
+                variant="outline-danger"
+                class="me-auto"
+                :data-testid="`${testidPrefix}-delete-${editingItem[primaryKey]}`"
+                @click="confirmDelete(editingItem)"
               >
-                {{ field.label }} {{ sortIndicator(field) }}
-                <span class="visually-hidden">{{ sortHint(field) }}</span>
-              </button>
-              <template v-else>{{ field.label }}</template>
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-if="!displayItems.length" :data-testid="`${testidPrefix}-table-empty`">
-            <td :colspan="tableFields.length">{{ labels.emptyText }}</td>
-          </tr>
-          <tr v-for="item in displayItems" :key="item[primaryKey]" :data-testid="`${testidPrefix}-row-${item[primaryKey]}`">
-            <td v-for="field in tableFields" :key="field.key">
-              <a
-                v-if="field.key === displayKey"
-                href="#"
-                :data-testid="`${testidPrefix}-edit-link-${item[primaryKey]}`"
-                @click.prevent="openEditModal(item)"
-              >
-                {{ cellValue(item, field) }}
-              </a>
-              <!-- Optional per-column custom rendering: a caller can provide
-                   #cell-<field.key>="{ item, value }" to render a column's
-                   cell itself (e.g. category.vue's coloured reliability
-                   badge). Falls back to the plain formatted value when no
-                   such slot is filled, so every page that doesn't opt in
-                   (brands/skills/tags/role) renders exactly as before. -->
-              <slot v-else :name="`cell-${field.key}`" :item="item" :value="cellValue(item, field)">
-                {{ cellValue(item, field) }}
-              </slot>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+                {{ labels.deleteButton }}
+              </BButton>
+              <BButton variant="outline-secondary" @click="closeEdit">{{ labels.cancel }}</BButton>
+              <BButton type="submit" variant="primary" :disabled="!editValid || saving" :data-testid="`${testidPrefix}-edit-submit`">
+                {{ labels.saveButton }}
+              </BButton>
+            </div>
+          </BForm>
+        </div>
+      </div>
+    </template>
 
     <BModal
       :model-value="showCreate"
@@ -464,51 +550,6 @@ onMounted(load)
           <BButton variant="outline-secondary" @click="showCreate = false">{{ labels.cancel }}</BButton>
           <BButton type="submit" variant="primary" :disabled="!createValid || saving" :data-testid="`${testidPrefix}-create-submit`">
             {{ labels.createButton }}
-          </BButton>
-        </div>
-      </BForm>
-    </BModal>
-
-    <BModal
-      :model-value="showEdit"
-      :title="labels.editTitle"
-      no-footer
-      :data-testid="`${testidPrefix}-edit-modal`"
-      @hide="showEdit = false; resetEditForm()"
-    >
-      <BForm :data-testid="`${testidPrefix}-edit-form`" @submit.prevent="submitEdit">
-        <AdminCrudFormField
-          v-for="field in formFields"
-          :key="`edit-${field.key}`"
-          :field="field"
-          :model-value="editForm[field.key]"
-          :error="fieldError(editFieldErrors, field.key)"
-          :testid="`${testidPrefix}-edit-${field.key}`"
-          @update:model-value="editForm[field.key] = $event"
-        />
-        <p v-if="editError && !Object.keys(editFieldErrors).length" class="text-danger" :data-testid="`${testidPrefix}-edit-error`">
-          {{ editError }}
-        </p>
-        <div class="d-flex justify-content-end gap-2 mt-3">
-          <!-- develop puts Delete on the EDIT page (tags/edit.blade.php:55),
-               not on every table row. Kept as a button with a confirm step
-               rather than develop's `<a href="/tags/delete/{id}">`: that is a
-               GET request that deletes, which is CSRF-able and can fire from a
-               prefetch or a crawler. Copying the placement is parity; copying
-               a destructive GET is importing a vulnerability, the same line
-               already drawn over updateQuantity's IDOR. -->
-          <BButton
-            v-if="allowDelete && editingItem"
-            variant="outline-danger"
-            class="me-auto"
-            :data-testid="`${testidPrefix}-delete-${editingItem[primaryKey]}`"
-            @click="confirmDelete(editingItem)"
-          >
-            {{ labels.deleteButton }}
-          </BButton>
-          <BButton variant="outline-secondary" @click="showEdit = false">{{ labels.cancel }}</BButton>
-          <BButton type="submit" variant="primary" :disabled="!editValid || saving" :data-testid="`${testidPrefix}-edit-submit`">
-            {{ labels.saveButton }}
           </BButton>
         </div>
       </BForm>

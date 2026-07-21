@@ -467,7 +467,10 @@ defineExpose({ submit })
           <BFormGroup v-if="canModerate && !approved" :label="`${t('groups.approve_group')}:`" label-for="group-form-moderate" class="mt-2">
             <select id="group-form-moderate" v-model="form.moderate" class="form-select" data-testid="group-form-moderate">
               <option value="" />
-              <option value="approve">{{ t('client.groups.approve_option') }}</option>
+              <!-- Hardcoded, untranslated - matches develop's GroupAddEdit.vue
+                   <option value="approve">Approve</option> verbatim (no lang
+                   key exists for it there either). -->
+              <option value="approve">Approve</option>
             </select>
           </BFormGroup>
 

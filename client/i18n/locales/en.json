@@ -190,7 +190,6 @@
         "role_permissions": "Permissions",
         "edit-role": "Edit role",
         "save-role": "Save role",
-        "role_permissions_help": "Tick the permissions this role should have. The role itself cannot be renamed.",
         "role_update_success": "Role permissions updated.",
         "role_update_error": "Could not update role permissions.",
         "main_branches": "Main branches",
@@ -528,7 +527,6 @@
         "see_all_groups": "See all groups",
         "no_groups_intro": "There are community <a href=\"/group/all\">groups all over the world</a>. You're welcome to follow any group to get notified when they organise events.",
         "sidebar_intro_1": "We are a global community of people who run local repair events and campaign for our Right to Repair. Restarters.net is our free, open source toolkit.",
-        "getting_the_most_intro": "Restarters.net is a free, open source platform for a global community of people making local repair events happen and campaigning for our Right to Repair.",
         "getting_the_most": "Getting started",
         "getting_the_most_bullet1": "<strong>Get fixing</strong>: <a href=\"https://restarters.net/group\" target=\"_blank\" rel=\"noopener\">follow your nearest community repair group</a> and brush up or share your skills with our <a href=\"https://wiki.restarters.net/\" target=\"_blank\">repair wiki</a>.",
         "getting_the_most_bullet2": "<strong>Get organising</strong>: <a href=\"https://talk.restarters.net/session/sso?return_path=https://talk.restarters.net/t/how-to-run-a-repair-event-the-restart-party-kit/324/\" target=\"_blank\">learn how to run a repair event</a> and/or <a href=\"https://talk.restarters.net/c/community-repair/5\" target=\"_blank\">ask the community for help on Talk</a>.",
@@ -609,8 +607,6 @@
         "huge_impact_2": "Search your repair data below, and get a flavour of the impact of repair as well as the barriers we face when repairing.  You can help us understand what else this data tells us and what changes we should campaign for over at the <a href=\"https://talk.restarters.net/c/right-to-repair/repair-data/25\">repair data discussion</a> in our forum.",
         "add_data_button": "Add Data",
         "add_data_description": "Adding repair data helps show the impact of repair.",
-        "add_data_no_groups": "You need to follow a group before you can add data.",
-        "add_data_no_events": "This group doesn't have any events yet.",
         "search_text": "Browse or search our global database of repairs.",
         "table_intro": "Press the ‘i’ icons for details.  Click a column head to sort by that column - click again to reverse sort order.",
         "repair_records": "Repair Records",
@@ -652,7 +648,11 @@
         "tooltip_type_powered": "What type of item is this? (e.g. 'Blender' or 'Drone' or 'Drill')",
         "tooltip_type_unpowered": "Add as much information about the type of item here as you can (e.g. 'Sofa' or 'Denim jeans')",
         "brand_if_known": "Brand (if known)",
-        "model_if_known": "Model (if known)"
+        "model_if_known": "Model (if known)",
+        "repair_outcome": "Repair outcome?",
+        "add_data_group": "Please select a group",
+        "add_data_event": "Please select an event",
+        "add_data_action_button": "Go to event"
     },
     "discourse": {
         "number_of_comments": "Number of comments",
@@ -832,7 +832,11 @@
         "select_members_placeholder": "Select members to invite",
         "manual_invite_placeholder": "Type email and press Enter or Tab",
         "youre_going": "You're going!",
-        "you_have_joined": "You have joined <a class=\"plain-link\" href=\"{url}\">{name}</a>"
+        "you_have_joined": "You have joined <a class=\"plain-link\" href=\"{url}\">{name}</a>",
+        "request_review": "Request review",
+        "search_title_placeholder": "Search title...",
+        "search_start_placeholder": "From...",
+        "search_end_placeholder": "To..."
     },
     "general": {
         "general": "General",
@@ -1078,7 +1082,9 @@
         "delete_group": "Delete group",
         "delete_group_confirm": "Please confirm that you want to delete {name}.",
         "invitation_pending": "You have an invitation to this group.  Please click <a href=\"{accept}\">here</a> if you would like to join.",
-        "you_have_joined": "You have joined <a class=\"plain-link\" href=\"{url}\">{name}</a>"
+        "you_have_joined": "You have joined <a class=\"plain-link\" href=\"{url}\">{name}</a>",
+        "create_event_first": "Please first create an event in order to add repair data.",
+        "follow_group_first": "Repair data is added to community repair events. Please first follow a group and then choose an event in order to add repair data."
     },
     "landing": {
         "title": "Welcome to Restarters!",
@@ -1354,7 +1360,10 @@
         "share_modal_seedlings": "tree seedling for 10 years.*|tree seedlings for 10 years.*",
         "share_modal_planting_around": "planting around",
         "share_modal_hectares": "hectare of trees.*|hectares of trees.*",
-        "impact_estimates": "Impact figures are estimates based on data entered by groups into Restarters.net."
+        "impact_estimates": "Impact figures are estimates based on data entered by groups into Restarters.net.",
+        "please_choose": "Please choose...",
+        "please_confirm": "Please confirm that you wish to proceed.",
+        "confirm": "Confirm"
     },
     "passwords": {
         "sent": "We have e-mailed your password reset link!",

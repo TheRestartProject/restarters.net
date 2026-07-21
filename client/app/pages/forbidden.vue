@@ -55,9 +55,10 @@ async function logoutAndReturn() {
     <h1>{{ t('client.forbidden.title') }}</h1>
     <img class="rounded img-fluid" src="/images/broken-toaster.png" :alt="t('client.forbidden.image_alt')">
 
-    <p>{{ t('client.forbidden.text') }}</p>
-
-    <p>{{ t('client.forbidden.report_intro') }}</p>
+    <!-- resources/views/user/forbidden.blade.php: no separate intro
+         paragraph before this - it's the page's only h2, right after the
+         image, and there's nothing else between them. -->
+    <h2>{{ t('client.forbidden.report_intro') }}</h2>
     <!-- eslint-disable-next-line vue/no-v-html — fixed lang string with embedded links -->
     <p data-testid="forbidden-report" v-html="t('client.forbidden.report_instructions')" />
 

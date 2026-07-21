@@ -58,7 +58,7 @@ describe('components/CollapsibleSection', () => {
   it('is expanded by default (body visible on all breakpoints)', () => {
     const w = mountSection()
     expect(w.find('[data-testid="collapsible-body"]').classes()).not.toContain('d-none')
-    expect(w.find('[data-testid="collapsible-toggle"]').text()).toBe('−')
+    expect(w.find('[data-testid="collapsible-toggle"] img').attributes('src')).toBe('/images/minus-icon.svg')
   })
 
   it('toggles the body to mobile-collapsed (d-none d-md-block) and back', async () => {
@@ -68,7 +68,7 @@ describe('components/CollapsibleSection', () => {
     let body = w.find('[data-testid="collapsible-body"]')
     expect(body.classes()).toContain('d-none')
     expect(body.classes()).toContain('d-md-block') // still shown on desktop
-    expect(w.find('[data-testid="collapsible-toggle"]').text()).toBe('+')
+    expect(w.find('[data-testid="collapsible-toggle"] img').attributes('src')).toBe('/images/add-icon.svg')
 
     await w.find('[data-testid="collapsible-header"]').trigger('click')
     body = w.find('[data-testid="collapsible-body"]')
@@ -80,6 +80,6 @@ describe('components/CollapsibleSection', () => {
     const body = w.find('[data-testid="collapsible-body"]')
     expect(body.classes()).toContain('d-none')
     expect(body.classes()).toContain('d-md-block')
-    expect(w.find('[data-testid="collapsible-toggle"]').text()).toBe('+')
+    expect(w.find('[data-testid="collapsible-toggle"] img').attributes('src')).toBe('/images/add-icon.svg')
   })
 })

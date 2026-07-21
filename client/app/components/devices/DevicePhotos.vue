@@ -64,7 +64,27 @@ function onUploadError(message) {
   uploadError.value = message || t('client.devices.image_upload_error')
 }
 
-async function removeImage(image) {
+// Gap fix (dropped-behaviour finding): DeviceImage.vue gates its remove
+// button behind a bare `<ConfirmModal @confirm="remove" ref="confirm"/>`
+// (no title/message passed, so it falls back to ConfirmModal's own
+// defaults, `partials.are_you_sure`/`partials.please_confirm`) rather than
+// deleting on click. `confirmingImage` holds the image pending confirmation
+// (null when the modal is closed).
+const confirmingImage = ref(null)
+
+function askRemoveImage(image) {
+  confirmingImage.value = image
+}
+
+function cancelRemoveImage() {
+  confirmingImage.value = null
+}
+
+async function confirmRemoveImage() {
+  const image = confirmingImage.value
+  confirmingImage.value = null
+  if (!image) return
+
   deletingIdxref.value = image.idxref
   uploadError.value = ''
 
@@ -76,6 +96,20 @@ async function removeImage(image) {
     deletingIdxref.value = null
   }
 }
+
+// Gap fix (dropped-behaviour finding): DeviceImage.vue's thumbnail opens
+// DeviceImageModal (full-size, same '/uploads/' + path src as the
+// thumbnail - there's no separate thumbnail-sized asset for device photos)
+// on click - mirrors EventImagesGallery.vue's own zoom/BModal pattern.
+const zoomedImage = ref(null)
+
+function zoom(image) {
+  zoomedImage.value = image
+}
+
+function closeZoom() {
+  zoomedImage.value = null
+}
 </script>
 
 <template>
@@ -84,7 +118,16 @@ async function removeImage(image) {
 
     <div class="d-flex flex-wrap gap-2 mb-2">
       <div v-for="image in images" :key="image.idxref" class="position-relative" data-testid="device-photo">
-        <img :src="uploadedImageUrl(image.path)" width="100" height="100" style="object-fit: cover" alt="">
+        <img
+          :src="uploadedImageUrl(image.path)"
+          width="100"
+          height="100"
+          style="object-fit: cover; cursor: pointer"
+          alt=""
+          role="button"
+          data-testid="device-photo-thumb"
+          @click="zoom(image)"
+        >
         <button
           v-if="!readonly"
           type="button"
@@ -92,7 +135,7 @@ async function removeImage(image) {
           :disabled="deletingIdxref === image.idxref || uploading"
           :aria-label="t('client.devices.remove_photo')"
           :data-testid="`device-photo-remove-${image.idxref}`"
-          @click="removeImage(image)"
+          @click="askRemoveImage(image)"
         >
           &times;
         </button>
@@ -104,5 +147,36 @@ async function removeImage(image) {
     <BAlert v-if="uploadError" :model-value="true" variant="danger" data-testid="device-photos-error">
       {{ uploadError }}
     </BAlert>
+
+    <BModal
+      :model-value="!!confirmingImage"
+      :title="t('partials.are_you_sure')"
+      no-footer
+      data-testid="device-photo-delete-modal"
+      @hide="cancelRemoveImage"
+    >
+      <p>{{ t('partials.please_confirm') }}</p>
+      <div class="d-flex justify-content-end gap-2">
+        <BButton variant="white" data-testid="device-photo-delete-cancel" @click="cancelRemoveImage">
+          {{ t('partials.cancel') }}
+        </BButton>
+        <BButton variant="primary" data-testid="device-photo-delete-confirm" @click="confirmRemoveImage">
+          {{ t('partials.confirm') }}
+        </BButton>
+      </div>
+    </BModal>
+
+    <BModal
+      :model-value="!!zoomedImage"
+      data-testid="device-photo-zoom-modal"
+      @hide="closeZoom"
+    >
+      <img v-if="zoomedImage" :src="uploadedImageUrl(zoomedImage.path)" alt="" class="w-100">
+      <template #footer>
+        <BButton variant="primary" data-testid="device-photo-zoom-close" @click="closeZoom">
+          {{ t('partials.close') }}
+        </BButton>
+      </template>
+    </BModal>
   </div>
 </template>

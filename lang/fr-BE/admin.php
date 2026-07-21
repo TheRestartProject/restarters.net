@@ -49,7 +49,6 @@ return [
   'role_permissions' => 'Permissions',
   'edit-role' => 'Modifier le rôle',
   'save-role' => 'Enregistrer le rôle',
-  'role_permissions_help' => 'Cochez les permissions à accorder à ce rôle. Le nom du rôle ne peut pas être modifié.',
   'role_update_success' => 'Permissions du rôle mises à jour.',
   'role_update_error' => 'Impossible de mettre à jour les permissions du rôle.',
   'main_branches' => 'Branches principales',

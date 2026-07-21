@@ -189,7 +189,7 @@ function onLngInput(event) {
           v-model="inputValue"
           type="text"
           class="form-control"
-          :class="{ 'is-invalid': hasError }"
+          :class="{ 'location-picker__input--error': hasError }"
           :placeholder="placeholder || t('groups.groups_location_placeholder')"
           autocomplete="off"
           data-testid="location-picker-input"
@@ -272,5 +272,16 @@ function onLngInput(event) {
   max-height: 250px;
   overflow-y: auto;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* develop's GroupAddEdit.vue ::v-deep(.hasError) rule: a plain red border,
+   not Bootstrap's .is-invalid (which adds a warning-triangle background
+   image and padding-right). $brand-danger from
+   app/assets/css/_variables.scss, hardcoded here per the pattern in
+   DashboardAddData.vue (no global variable import wired up for component
+   <style> blocks). */
+.location-picker__input--error {
+  border: 2px solid #dc3545;
+  margin: 0;
 }
 </style>

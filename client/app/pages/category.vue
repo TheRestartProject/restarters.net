@@ -5,8 +5,11 @@ import AdminCrudTable from '~/components/admin/AdminCrudTable.vue'
 import { useAdminRefdataStore } from '~/stores/adminRefdata.js'
 
 // /category - resources/views/category/index.blade.php +
-// resources/js/components/CategoriesPage.vue (design.md §6.2 Phase D task
-// D4, PR #863's AdminCrudPage.vue prop contract is the functional spec).
+// resources/js/components/CategoriesTable.vue, develop's real, mounted
+// component (registered as `categories-table` in resources/js/app.js -
+// design.md §6.2 Phase D task D4, PR #863's AdminCrudPage.vue prop contract
+// is the functional spec for the generic AdminCrudTable.vue this page is
+// built on).
 //
 // Unlike its siblings (brands/skills/tags), CategoryController::index is a
 // PUBLIC list view - any authenticated user can see the categories table;
@@ -15,7 +18,7 @@ import { useAdminRefdataStore } from '~/stores/adminRefdata.js'
 // mutation - design.md §4.4). So this page is gated on `auth: true` alone,
 // not `role: 'Administrator'` - matching the legacy controller exactly. The
 // edit link/modal stays visible to every viewer, same as legacy
-// CategoriesPage.vue (which never hid it either); a non-Administrator who
+// CategoriesTable.vue (which never hid it either); a non-Administrator who
 // submits an edit gets the same 403 rendered inline as any other API
 // error, not a client-side pre-emptive block.
 //
@@ -76,23 +79,29 @@ const RELIABILITY_COLORS = {
 const RELIABILITY_FALLBACK_COLOR = RELIABILITY_COLORS[6]
 const reliabilityColor = (level) => RELIABILITY_COLORS[level] || RELIABILITY_FALLBACK_COLOR
 
-// live CategoriesPage.vue (07e6abd7cc^) is the baseline for all of the
-// below, not develop's older Blade/CategoriesTable.vue (which isn't mounted
-// by anything and was a parity-doc false lead): "Category name" as the
-// column header (not "Name"), a blank cluster cell rather than an "N/A"
-// fallback, and footprint_reliability sortable (its formatter returns a
-// plain badge colour + text pair, not markup CategoriesPage.vue itself
-// treats specially).
+// develop's real, mounted counterpart for /category is
+// resources/js/components/CategoriesTable.vue (registered as
+// `categories-table` in resources/js/app.js and rendered directly by
+// resources/views/category/index.blade.php) - "CategoriesPage.vue"/
+// "AdminCrudPage.vue" never existed on develop at all; they were this
+// branch's OWN pre-Phase-F scaffolding (commit 07e6abd7cc^, the commit
+// immediately before this branch's own Phase F commit deleted the legacy
+// Blade+Vue2 frontend), so citing them as "the baseline" was citing our own
+// unreviewed work as if it were develop. CategoriesTable.vue's b-table
+// fields give: "Name" as the column header (not "Category name" - the form
+// field below keeps that key, matching category/edit.blade.php's label),
+// and an "N/A" fallback for a blank cluster cell (not blank).
 const tableFields = computed(() => [
-  { key: 'name', label: t('admin.category_name'), sortable: true },
+  { key: 'name', label: 'Name', sortable: true },
   {
     key: 'cluster_name',
     label: t('admin.category_cluster'),
     sortable: true,
     // cluster_name is the same raw, top-level-i18n-keyed DB string as
     // clusterOptions above - translate it here too rather than rendering
-    // it as-is.
-    formatter: (value) => (value ? t(value) : value),
+    // it as-is. 'N/A' (untranslated literal, matching CategoriesTable.vue's
+    // own `: 'N/A'` fallback verbatim) when there's no cluster.
+    formatter: (value) => (value ? t(value) : 'N/A'),
   },
   { key: 'weight', label: t('admin.weight'), sortable: true },
   { key: 'footprint', label: t('admin.co2_footprint'), sortable: true },

@@ -4,11 +4,11 @@ import { sortAriaValue, sortHintKey } from '~/composables/useSortAria.js'
 import { useI18n } from 'vue-i18n'
 import { useAdminRefdataStore } from '~/stores/adminRefdata.js'
 
-// /role - resources/views/role/all.blade.php +
-// resources/js/components/RolesPage.vue (design.md §6.2 Phase D task D4).
-// Administrator-only (RoleController::index and every /api/v2/roles* /
-// /api/v2/permissions endpoint alike - API\RoleController - all 403/redirect
-// non-admins).
+// /role - resources/views/role/all.blade.php + develop's real, mounted
+// resources/js/components/RolesTable.vue (registered as `roles-table` in
+// resources/js/app.js - design.md §6.2 Phase D task D4). Administrator-only
+// (RoleController::index and every /api/v2/roles* / /api/v2/permissions
+// endpoint alike - API\RoleController - all 403/redirect non-admins).
 //
 // Deliberately NOT built on AdminCrudTable.vue, unlike its four siblings:
 // roles cannot be created, renamed or deleted (RoleController exposes no
@@ -20,8 +20,8 @@ import { useAdminRefdataStore } from '~/stores/adminRefdata.js'
 // single-record formFields contract would need a bespoke field `type`
 // (multi-select-against-a-different-list-with-a-different-payload-key)
 // that no other reference-data resource needs, so this page reimplements
-// the legacy RolesPage.vue's table+matrix directly instead - a design
-// decision, not a missing generic capability.
+// RolesTable.vue's table+matrix directly instead - a design decision, not a
+// missing generic capability.
 definePageMeta({ auth: true, role: 'Administrator' })
 
 const { t } = useI18n()
@@ -56,12 +56,18 @@ const feedbackVariant = ref('success')
 // here has no way to know the stored name is "Restarter".
 const editTitle = computed(() => (editingRole.value ? `${t('admin.edit-role')}: ${editingRole.value.name}` : t('admin.edit-role')))
 
-// live RolesPage.vue (07e6abd7cc^) marks id/name sortable but
-// permissions_list explicitly `sortable: false` (it's a display-only
-// comma-joined string, not develop's dead RolesTable.vue, which sorted all
-// three) - reimplemented locally (this page isn't built on AdminCrudTable.vue,
-// see the doc comment above), same sort-ascending-then-toggle-descending
-// pattern as that component's own sortByColumn/sortIndicator.
+// develop's real, mounted counterpart for /role is
+// resources/js/components/RolesTable.vue (registered as `roles-table` in
+// resources/js/app.js and rendered directly by role/all.blade.php) - all
+// three b-table fields (id/role/permissions_list) are `sortable: true`
+// there. "RolesPage.vue" never existed on develop; it was this branch's own
+// pre-Phase-F scaffolding (commit 07e6abd7cc^, immediately before this
+// branch's own Phase F commit deleted the legacy Blade+Vue2 frontend), so
+// citing it as "live"/"the baseline" and calling RolesTable.vue "dead code"
+// had it backwards - reimplemented locally (this page isn't built on
+// AdminCrudTable.vue, see the doc comment above), same
+// sort-ascending-then-toggle-descending pattern as that component's own
+// sortByColumn/sortIndicator.
 const sortKey = ref(null)
 const sortDesc = ref(false)
 
@@ -202,7 +208,12 @@ onMounted(load)
                 <span class="visually-hidden">{{ sortHint('name') }}</span>
               </button>
             </th>
-            <th>{{ t('admin.role_permissions') }}</th>
+            <th :aria-sort="sortAria('permissions_list')">
+              <button type="button" class="sort-header" data-testid="roles-table-sort-permissions_list" @click="sortByColumn('permissions_list')">
+                {{ t('admin.role_permissions') }} {{ sortIndicator('permissions_list') }}
+                <span class="visually-hidden">{{ sortHint('permissions_list') }}</span>
+              </button>
+            </th>
           </tr>
         </thead>
         <tbody>
@@ -220,7 +231,16 @@ onMounted(load)
     <BModal :model-value="showEdit" :title="editTitle" no-footer data-testid="roles-edit-modal" @hide="closeEditModal">
       <p v-if="editError" class="text-danger" data-testid="roles-edit-error">{{ editError }}</p>
       <div v-if="editingRole">
-        <p>{{ t('admin.role_permissions_help') }}</p>
+        <!-- role/edit.blade.php: a disabled, name-prefilled text field
+             above the permissions checkboxes ("Name:" / #inputName,
+             disabled, value={{ $role_name }}), and this literal
+             placeholder paragraph - no lang key is used on this page in
+             develop. -->
+        <div class="mb-3">
+          <label for="role-edit-name" class="form-label">Name:</label>
+          <input id="role-edit-name" type="text" class="form-control" :value="editingRole.name" disabled data-testid="roles-edit-name">
+        </div>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec sed odio dui.</p>
         <div data-testid="roles-edit-permissions">
           <div v-for="permission in adminStore.permissions.data" :key="permission.id" class="form-check">
             <input

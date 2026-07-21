@@ -29,14 +29,21 @@ describe('components/groups/GroupsTableFilters', () => {
     groupsStore.fetchTags = vi.fn().mockResolvedValue([])
   })
 
-  // gap #4: name (text) / tag (select) / location (text) / country (select)
-  // / network (select), in that order - matching legacy's
-  // GroupsTableFilters.vue field order exactly.
+  // gap #4: name (text) / tag (multi-select) / location (text) / country
+  // (select) / network (select), in that order - matching legacy's
+  // GroupsTableFilters.vue field order exactly. Matched on the field
+  // wrapper's own data-testid (rather than "input, select") so this holds
+  // regardless of which control a given field uses - the tag field is a
+  // GroupMultiSelect (a <div>, not an <input>/<select>) since legacy allows
+  // multiple tag selection.
   it('renders the fields in legacy order: name, tag, location, country, network', () => {
     const wrapper = mountComponent({ showTags: true })
 
-    const fields = wrapper.findAll('[data-testid="groups-table-filters-fields"] input, [data-testid="groups-table-filters-fields"] select')
-    const testids = fields.map((el) => el.attributes('data-testid'))
+    const testids = wrapper
+      .find('[data-testid="groups-table-filters-fields"]')
+      .findAll('[data-testid]')
+      .map((el) => el.attributes('data-testid'))
+      .filter((id) => /^groups-table-filter-(name|tags|location|country|network)$/.test(id))
 
     expect(testids).toEqual([
       'groups-table-filter-name',
@@ -74,15 +81,13 @@ describe('components/groups/GroupsTableFilters', () => {
     expect(options.map((o) => o.text())).toEqual(['Network', 'UK Network', 'US Network'])
   })
 
-  it('populates the tag dropdown from the groups store, when shown', () => {
+  it('offers tag options from the groups store as selectable chips, when shown', async () => {
     groupsStore.tags.data = [{ id: 5, name: 'Electronics' }]
 
     const wrapper = mountComponent({ showTags: true })
-    const options = wrapper.find('[data-testid="groups-table-filter-tags"]').findAll('option')
+    await wrapper.find('[data-testid="groups-table-filter-tags-search"]').trigger('focus')
 
-    // Placeholder text read from the locale file rather than duplicated here,
-    // so a copy change in lang/ doesn't need a matching edit in this spec.
-    expect(options.map((o) => o.text())).toEqual([en.groups.search_tags_placeholder, 'Electronics'])
+    expect(wrapper.find('[data-testid="groups-table-filter-tags-option-5"]').text()).toBe('Electronics')
   })
 
   // Country options are derived from the (unfiltered) `groups` prop, same
@@ -111,5 +116,23 @@ describe('components/groups/GroupsTableFilters', () => {
     const emitted = wrapper.emitted('update:filters').at(-1)[0]
     expect(emitted.name).toBe('Fixers')
     expect(emitted.network).toBe(1)
+  })
+
+  // Restores legacy's vue-multiselect :multiple="true" on this field -
+  // filters.tags is an array of selected tag ids, not a single value.
+  it('emits filters.tags as an array of ids, supporting more than one tag', async () => {
+    groupsStore.tags.data = [
+      { id: 5, name: 'Electronics' },
+      { id: 6, name: 'Textiles' },
+    ]
+
+    const wrapper = mountComponent({ showTags: true })
+    await wrapper.find('[data-testid="groups-table-filter-tags-search"]').trigger('focus')
+    await wrapper.find('[data-testid="groups-table-filter-tags-option-5"]').trigger('mousedown')
+    await wrapper.find('[data-testid="groups-table-filter-tags-search"]').trigger('focus')
+    await wrapper.find('[data-testid="groups-table-filter-tags-option-6"]').trigger('mousedown')
+
+    const emitted = wrapper.emitted('update:filters').at(-1)[0]
+    expect(emitted.tags).toEqual([5, 6])
   })
 })

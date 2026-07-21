@@ -72,4 +72,25 @@ describe('components/groups/GroupDevicesBreakdown', () => {
     const wrapper = mountComponent({ clusterStats: CLUSTER_STATS })
     expect(wrapper.find('[data-testid="group-stats-cluster-1-divider"]').exists()).toBe(true)
   })
+
+  // StatsValue.vue's printableCount(): cluster-panel counts get thousand
+  // separators (finding 52).
+  it('formats cluster-panel counts with thousand separators', () => {
+    const wrapper = mountComponent({
+      clusterStats: {
+        1: {
+          fixed: 1234,
+          repairable: 0,
+          dead: 0,
+          most_seen: { name: 'Laptop', count: 2345 },
+          most_repaired: { name: 'Laptop', count: 0 },
+          least_repaired: { name: 'Mouse', count: 0 },
+        },
+      },
+    })
+
+    const panel = wrapper.find('[data-testid="group-stats-cluster-1"]')
+    expect(panel.text()).toContain('1,234')
+    expect(panel.text()).toContain('2,345')
+  })
 })

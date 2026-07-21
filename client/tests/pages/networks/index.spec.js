@@ -155,18 +155,19 @@ describe('pages/networks/index', () => {
     expect(wrapper.get('[data-testid="your-networks-empty"]').text()).toBe('You are not a coordinator of any networks.')
   })
 
-  // develop wraps each list section in the site's brand content-panel box
-  // (white fill, thin black border, hard offset drop-shadow) - Nuxt
-  // previously rendered both sections flat with no border/shadow at all
-  // (parity-v2 rendered-diff finding #1).
-  it('wraps "Your networks" and "All networks" in the .panel box treatment', async () => {
+  // develop's networks/index.blade.php wraps each list in a plain
+  // <section class="table-section"> - .table-section is just
+  // `padding: 20px 0`, no border/background/shadow, and the page never
+  // uses the site's .panel content-panel card at all (rendered-diff
+  // finding #87 fixed this back from an invented .panel wrap).
+  it('does not wrap "Your networks" and "All networks" in the .panel box treatment', async () => {
     setLoggedInUser({ id: 1, role_name: 'Administrator', networks: [] })
 
     const wrapper = mountPage()
     await flushPromises()
 
-    expect(wrapper.get('[data-testid="your-networks-section"]').classes()).toContain('panel')
-    expect(wrapper.get('[data-testid="all-networks-section"]').classes()).toContain('panel')
+    expect(wrapper.get('[data-testid="your-networks-section"]').classes()).not.toContain('panel')
+    expect(wrapper.get('[data-testid="all-networks-section"]').classes()).not.toContain('panel')
   })
 
   it('shows "All networks" for Administrators but not plain NetworkCoordinators', async () => {

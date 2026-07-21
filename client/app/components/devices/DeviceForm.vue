@@ -16,13 +16,12 @@ import FieldInfoPopover from '../forms/FieldInfoPopover.vue'
 // createDevicev2 and updateDevicev2 read $request->input(...) directly, so
 // extra/renamed keys are silently ignored, not rejected.
 //
-// Deliberate simplifications vs the legacy form (same design decision
-// EventForm.vue/GroupForm.vue already made - "vue-multiselect isn't
-// installed for this migration", design.md §2): every legacy
-// vue-multiselect/vue-typeahead-bootstrap field (item type, category,
-// brand, repair status, next steps, spare parts, barrier) becomes a plain
-// native <select>/<input list=datalist> here - natively keyboard-operable,
-// no extra dependency.
+// vue-multiselect/vue-typeahead-bootstrap are Vue 2 only, so every legacy
+// field built on them (item type, category, brand, repair status, next
+// steps, spare parts, barrier) is ported here as a bespoke control that
+// reproduces their markup/class names instead - components/forms/
+// TagMultiselect.vue's own doc comment set this precedent first. See the
+// `openDropdown` block below for the shared open/select/blur plumbing.
 //
 // Delete is NOT shown by default: DeviceRow.vue (the summary row this form
 // replaces while editing) owns its own delete icon + confirm, matching
@@ -220,6 +219,112 @@ function sparePartsLabel(value) {
   return SPARE_PARTS_LABELS[value] || value
 }
 
+// Gap fix (control-substitution finding): develop drives item type/category/
+// brand/repair status/next steps/spare parts/barrier with vue-multiselect
+// (select-type fields) and vue-typeahead-bootstrap (item type/brand) -
+// clickable custom panels, not the browser's own <select>/<datalist> chrome.
+// components/forms/TagMultiselect.vue already established this project's
+// answer for the same Vue-2-only-library problem (see its own doc comment):
+// reproduce vue-multiselect's markup/class names
+// (.multiselect/.multiselect__tags/.multiselect__content-wrapper/
+// .multiselect__option, styled globally in assets/css/_multiselect.scss)
+// on plain elements rather than adding a dependency. `openDropdown` tracks
+// which single field's panel is open at a time (mousedown.prevent on each
+// option, same as TagMultiselect, so choosing an option never fires the
+// control's blur first).
+const openDropdown = ref(null)
+
+function toggleDropdownFor(key) {
+  if (props.readonly) return
+  const opening = openDropdown.value !== key
+  openDropdown.value = opening ? key : null
+  // DeviceCategorySelect.vue's `@open="suggested = false"`: opening the
+  // category panel yourself cancels the auto-suggestion highlight.
+  if (opening && key === 'category') categorySuggested.value = false
+}
+
+function closeDropdown(key) {
+  if (openDropdown.value === key) openDropdown.value = null
+}
+
+function onFieldBlur(key, event) {
+  // Losing focus to our own panel (an option's mousedown is prevented, so
+  // this only fires for a genuine focus move elsewhere) closes it.
+  if (event.currentTarget.contains(event.relatedTarget)) return
+  closeDropdown(key)
+}
+
+const categorySelectedLabel = computed(() => {
+  if (form.category === miscCategoryId.value) return t('partials.category_none')
+  for (const cluster of clusters.value) {
+    const match = categoryOptionsForCluster(cluster).find((c) => c.idcategories === form.category)
+    if (match) return t(match.name)
+  }
+  return ''
+})
+
+function selectCategory(value) {
+  form.category = value
+  openDropdown.value = null
+}
+
+const statusOptions = computed(() => [
+  { value: STATUS_FIXED, label: t('partials.fixed') },
+  { value: STATUS_REPAIRABLE, label: t('partials.repairable') },
+  { value: STATUS_END_OF_LIFE, label: t('partials.end_of_life') },
+])
+const statusSelectedLabel = computed(() => statusOptions.value.find((o) => o.value === form.repairStatus)?.label || '')
+function selectStatus(value) {
+  form.repairStatus = value
+  openDropdown.value = null
+}
+
+const nextStepsOptions = computed(() => (options.value.next_steps || []).map((n) => ({ value: n, label: t(nextStepLabel(n)) })))
+const nextStepsSelectedLabel = computed(() => nextStepsOptions.value.find((o) => o.value === form.nextSteps)?.label || '')
+function selectNextSteps(value) {
+  form.nextSteps = value
+  openDropdown.value = null
+}
+
+const sparePartsOptions = computed(() => (options.value.spare_parts || []).map((p) => ({ value: p, label: t(sparePartsLabel(p)) })))
+const sparePartsSelectedLabel = computed(() => sparePartsOptions.value.find((o) => o.value === form.spareParts)?.label || '')
+function selectSpareParts(value) {
+  form.spareParts = value
+  openDropdown.value = null
+}
+
+const barrierOptions = computed(() => (options.value.barriers || []).map((b) => ({ value: b.name, label: t(b.name) })))
+const barrierSelectedLabel = computed(() => barrierOptions.value.find((o) => o.value === form.barrier)?.label || '')
+function selectBarrier(value) {
+  form.barrier = value
+  openDropdown.value = null
+}
+
+// Item type/brand: a real <input> (so typed text is directly editable, as
+// in vue-typeahead-bootstrap) plus a custom-styled suggestion panel below it
+// instead of the browser's own <datalist> popup. maxMatches 5 matches
+// DeviceType.vue/DeviceBrand.vue's own `:maxMatches="5"`.
+const itemTypeMatches = computed(() => {
+  const term = form.itemType.trim().toLowerCase()
+  const list = term ? itemTypeSuggestions.value.filter((s) => s.toLowerCase().includes(term)) : itemTypeSuggestions.value
+  return list.slice(0, 5)
+})
+function selectItemType(value) {
+  form.itemType = value
+  openDropdown.value = null
+}
+
+const brandNames = computed(() => brands.value.map((b) => b.brand_name))
+const brandMatches = computed(() => {
+  const term = form.brand.trim().toLowerCase()
+  const list = term ? brandNames.value.filter((s) => s.toLowerCase().includes(term)) : brandNames.value
+  return list.slice(0, 5)
+})
+function selectBrand(value) {
+  form.brand = value
+  openDropdown.value = null
+}
+
 const submitting = ref(false)
 const missingCategory = ref(false)
 const generalError = ref('')
@@ -340,18 +445,36 @@ defineExpose({ submit })
             {{ t('devices.item_type') }}:
             <FieldInfoPopover :content="itemTypeTooltip" :variant="infoIconVariant" />
           </template>
-          <input
-            id="device-form-item-type"
-            v-model="form.itemType"
-            type="text"
-            class="form-control"
-            list="device-form-item-type-list"
-            :disabled="readonly"
-            data-testid="device-form-item-type"
-          >
-          <datalist id="device-form-item-type-list">
-            <option v-for="s in itemTypeSuggestions" :key="s" :value="s" />
-          </datalist>
+          <div class="position-relative typeahead-field">
+            <input
+              id="device-form-item-type"
+              v-model="form.itemType"
+              type="text"
+              class="form-control form-control-lg"
+              autocomplete="off"
+              :disabled="readonly"
+              data-testid="device-form-item-type"
+              @focus="openDropdown = 'itemType'"
+              @blur="onFieldBlur('itemType', $event)"
+            >
+            <div
+              v-if="openDropdown === 'itemType' && itemTypeMatches.length"
+              class="multiselect__content-wrapper"
+              data-testid="device-form-item-type-suggestions"
+            >
+              <ul class="multiselect__content">
+                <li
+                  v-for="s in itemTypeMatches"
+                  :key="s"
+                  class="multiselect__option"
+                  :data-testid="`device-form-item-type-option-${s}`"
+                  @mousedown.prevent="selectItemType(s)"
+                >
+                  {{ s }}
+                </li>
+              </ul>
+            </div>
+          </div>
           <small v-if="itemTypeUnknown" class="form-text text-warning d-block" data-testid="device-form-item-type-warning">
             {{ t('devices.unknown_item_type') }}
           </small>
@@ -362,41 +485,94 @@ defineExpose({ submit })
             {{ t('devices.category') }}:
             <FieldInfoPopover :content="t('devices.tooltip_category')" :variant="infoIconVariant" />
           </template>
-          <select
-            id="device-form-category"
-            v-model.number="form.category"
-            class="form-select"
-            :class="{ 'is-invalid': missingCategory, 'border-warning': categorySuggested }"
-            :disabled="readonly"
-            data-testid="device-form-category"
-          >
-            <option :value="null" />
-            <optgroup v-for="cluster in clusters" :key="cluster.id" :label="t(cluster.name)">
-              <option v-for="c in categoryOptionsForCluster(cluster)" :key="c.idcategories" :value="c.idcategories">
-                {{ t(c.name) }}
-              </option>
-            </optgroup>
-            <option :value="miscCategoryId">{{ t('partials.category_none') }}</option>
-          </select>
+          <div class="device-category" :class="{ suggested: categorySuggested, 'border-thick': missingCategory }">
+            <div
+              id="device-form-category"
+              class="multiselect"
+              :class="{ 'multiselect--active': openDropdown === 'category', 'multiselect--disabled': readonly }"
+            >
+              <div
+                class="multiselect__tags"
+                tabindex="0"
+                :disabled="readonly"
+                data-testid="device-form-category"
+                :data-value="form.category === null ? '' : String(form.category)"
+                @click="toggleDropdownFor('category')"
+                @keydown.esc="closeDropdown('category')"
+                @keydown.enter.prevent="toggleDropdownFor('category')"
+                @blur="onFieldBlur('category', $event)"
+              >
+                {{ categorySelectedLabel || t('devices.category') }}
+              </div>
+              <div v-if="openDropdown === 'category'" class="multiselect__content-wrapper">
+                <ul class="multiselect__content">
+                  <template v-for="cluster in clusters" :key="cluster.id">
+                    <li
+                      v-if="categoryOptionsForCluster(cluster).length"
+                      class="multiselect__option multiselect__option--group multiselect__option--disabled"
+                    >
+                      {{ t(cluster.name) }}
+                    </li>
+                    <li
+                      v-for="c in categoryOptionsForCluster(cluster)"
+                      :key="c.idcategories"
+                      class="multiselect__option"
+                      :class="{ 'multiselect__option--selected': form.category === c.idcategories }"
+                      :data-testid="`device-form-category-option-${c.idcategories}`"
+                      @mousedown.prevent="selectCategory(c.idcategories)"
+                    >
+                      {{ t(c.name) }}
+                    </li>
+                  </template>
+                  <li
+                    class="multiselect__option"
+                    :class="{ 'multiselect__option--selected': form.category === miscCategoryId }"
+                    :data-testid="`device-form-category-option-${miscCategoryId}`"
+                    @mousedown.prevent="selectCategory(miscCategoryId)"
+                  >
+                    {{ t('partials.category_none') }}
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
           <div v-if="missingCategory" class="invalid-feedback d-block" data-testid="device-form-category-error">
             {{ t('events.form_error') }}
           </div>
         </BFormGroup>
 
         <BFormGroup :label="`${t('devices.brand')}:`" label-for="device-form-brand">
-          <input
-            id="device-form-brand"
-            v-model="form.brand"
-            type="text"
-            class="form-control"
-            :placeholder="t('devices.brand_if_known')"
-            list="device-form-brand-list"
-            :disabled="readonly"
-            data-testid="device-form-brand"
-          >
-          <datalist id="device-form-brand-list">
-            <option v-for="b in brands" :key="b.id" :value="b.brand_name" />
-          </datalist>
+          <div class="position-relative typeahead-field">
+            <input
+              id="device-form-brand"
+              v-model="form.brand"
+              type="text"
+              class="form-control form-control-lg"
+              autocomplete="off"
+              :placeholder="t('devices.brand_if_known')"
+              :disabled="readonly"
+              data-testid="device-form-brand"
+              @focus="openDropdown = 'brand'"
+              @blur="onFieldBlur('brand', $event)"
+            >
+            <div
+              v-if="openDropdown === 'brand' && brandMatches.length"
+              class="multiselect__content-wrapper"
+              data-testid="device-form-brand-suggestions"
+            >
+              <ul class="multiselect__content">
+                <li
+                  v-for="b in brandMatches"
+                  :key="b"
+                  class="multiselect__option"
+                  :data-testid="`device-form-brand-option-${b}`"
+                  @mousedown.prevent="selectBrand(b)"
+                >
+                  {{ b }}
+                </li>
+              </ul>
+            </div>
+          </div>
           <small v-if="brandUnknown" class="form-text text-warning d-block" data-testid="device-form-brand-warning">
             {{ t('devices.unknown_brand') }}
           </small>
@@ -457,57 +633,147 @@ defineExpose({ submit })
         <h3>{{ t('devices.title_repair') }}</h3>
 
         <BFormGroup :label="`${t('devices.repair_status')}:`" label-for="device-form-status">
-          <select
+          <div
             id="device-form-status"
-            v-model="form.repairStatus"
-            class="form-select"
-            :disabled="readonly"
-            data-testid="device-form-status"
+            class="multiselect"
+            :class="{ 'multiselect--active': openDropdown === 'status', 'multiselect--disabled': readonly }"
           >
-            <option value="" />
-            <option :value="STATUS_FIXED">{{ t('partials.fixed') }}</option>
-            <option :value="STATUS_REPAIRABLE">{{ t('partials.repairable') }}</option>
-            <option :value="STATUS_END_OF_LIFE">{{ t('partials.end_of_life') }}</option>
-          </select>
+            <div
+              class="multiselect__tags"
+              tabindex="0"
+              :disabled="readonly"
+              data-testid="device-form-status"
+              :data-value="form.repairStatus"
+              @click="toggleDropdownFor('status')"
+              @keydown.esc="closeDropdown('status')"
+              @keydown.enter.prevent="toggleDropdownFor('status')"
+              @blur="onFieldBlur('status', $event)"
+            >
+              {{ statusSelectedLabel || t('devices.repair_outcome') }}
+            </div>
+            <div v-if="openDropdown === 'status'" class="multiselect__content-wrapper">
+              <ul class="multiselect__content">
+                <li
+                  v-for="o in statusOptions"
+                  :key="o.value"
+                  class="multiselect__option"
+                  :class="{ 'multiselect__option--selected': form.repairStatus === o.value }"
+                  :data-testid="`device-form-status-option-${o.value}`"
+                  @mousedown.prevent="selectStatus(o.value)"
+                >
+                  {{ o.label }}
+                </li>
+              </ul>
+            </div>
+          </div>
         </BFormGroup>
 
         <BFormGroup v-if="showNextSteps" :label="`${t('devices.repair_details')}:`" label-for="device-form-next-steps">
-          <select
+          <div
             id="device-form-next-steps"
-            v-model="form.nextSteps"
-            class="form-select"
-            :disabled="readonly"
-            data-testid="device-form-next-steps"
+            class="multiselect"
+            :class="{ 'multiselect--active': openDropdown === 'nextSteps', 'multiselect--disabled': readonly }"
           >
-            <option value="" />
-            <option v-for="n in options.next_steps" :key="n" :value="n">{{ t(nextStepLabel(n)) }}</option>
-          </select>
+            <div
+              class="multiselect__tags"
+              tabindex="0"
+              :disabled="readonly"
+              data-testid="device-form-next-steps"
+              :data-value="form.nextSteps"
+              @click="toggleDropdownFor('nextSteps')"
+              @keydown.esc="closeDropdown('nextSteps')"
+              @keydown.enter.prevent="toggleDropdownFor('nextSteps')"
+              @blur="onFieldBlur('nextSteps', $event)"
+            >
+              {{ nextStepsSelectedLabel || t('devices.repair_details') }}
+            </div>
+            <div v-if="openDropdown === 'nextSteps'" class="multiselect__content-wrapper">
+              <ul class="multiselect__content">
+                <li
+                  v-for="o in nextStepsOptions"
+                  :key="o.value"
+                  class="multiselect__option"
+                  :class="{ 'multiselect__option--selected': form.nextSteps === o.value }"
+                  :data-testid="`device-form-next-steps-option-${o.value}`"
+                  @mousedown.prevent="selectNextSteps(o.value)"
+                >
+                  {{ o.label }}
+                </li>
+              </ul>
+            </div>
+          </div>
         </BFormGroup>
 
         <BFormGroup v-if="showSpareParts" :label="`${t('devices.spare_parts')}:`" label-for="device-form-spare-parts">
-          <select
+          <div
             id="device-form-spare-parts"
-            v-model="form.spareParts"
-            class="form-select"
-            :disabled="readonly"
-            data-testid="device-form-spare-parts"
+            class="multiselect"
+            :class="{ 'multiselect--active': openDropdown === 'spareParts', 'multiselect--disabled': readonly }"
           >
-            <option value="" />
-            <option v-for="p in options.spare_parts" :key="p" :value="p">{{ t(sparePartsLabel(p)) }}</option>
-          </select>
+            <div
+              class="multiselect__tags"
+              tabindex="0"
+              :disabled="readonly"
+              data-testid="device-form-spare-parts"
+              :data-value="form.spareParts"
+              @click="toggleDropdownFor('spareParts')"
+              @keydown.esc="closeDropdown('spareParts')"
+              @keydown.enter.prevent="toggleDropdownFor('spareParts')"
+              @blur="onFieldBlur('spareParts', $event)"
+            >
+              {{ sparePartsSelectedLabel || t('devices.spare_parts') }}
+            </div>
+            <div v-if="openDropdown === 'spareParts'" class="multiselect__content-wrapper">
+              <ul class="multiselect__content">
+                <li
+                  v-for="o in sparePartsOptions"
+                  :key="o.value"
+                  class="multiselect__option"
+                  :class="{ 'multiselect__option--selected': form.spareParts === o.value }"
+                  :data-testid="`device-form-spare-parts-option-${o.value}`"
+                  @mousedown.prevent="selectSpareParts(o.value)"
+                >
+                  {{ o.label }}
+                </li>
+              </ul>
+            </div>
+          </div>
         </BFormGroup>
 
         <BFormGroup v-if="showBarrier" :label="`${t('partials.choose_barriers')}:`" label-for="device-form-barrier">
-          <select
+          <div
             id="device-form-barrier"
-            v-model="form.barrier"
-            class="form-select"
-            :disabled="readonly"
-            data-testid="device-form-barrier"
+            class="multiselect"
+            :class="{ 'multiselect--active': openDropdown === 'barrier', 'multiselect--disabled': readonly }"
           >
-            <option value="" />
-            <option v-for="b in options.barriers" :key="b.id" :value="b.name">{{ t(b.name) }}</option>
-          </select>
+            <div
+              class="multiselect__tags"
+              tabindex="0"
+              :disabled="readonly"
+              data-testid="device-form-barrier"
+              :data-value="form.barrier"
+              @click="toggleDropdownFor('barrier')"
+              @keydown.esc="closeDropdown('barrier')"
+              @keydown.enter.prevent="toggleDropdownFor('barrier')"
+              @blur="onFieldBlur('barrier', $event)"
+            >
+              {{ barrierSelectedLabel || t('partials.choose_barriers') }}
+            </div>
+            <div v-if="openDropdown === 'barrier'" class="multiselect__content-wrapper">
+              <ul class="multiselect__content">
+                <li
+                  v-for="o in barrierOptions"
+                  :key="o.value"
+                  class="multiselect__option"
+                  :class="{ 'multiselect__option--selected': form.barrier === o.value }"
+                  :data-testid="`device-form-barrier-option-${o.value}`"
+                  @mousedown.prevent="selectBarrier(o.value)"
+                >
+                  {{ o.label }}
+                </li>
+              </ul>
+            </div>
+          </div>
         </BFormGroup>
       </div>
 
@@ -604,5 +870,30 @@ defineExpose({ submit })
   font-size: 1.1rem;
   font-weight: bold;
   margin-bottom: 1rem;
+}
+
+/* Gap fix (control-substitution finding): reproduces
+   DeviceCategorySelect.vue's own <style> block verbatim - a wide,
+   non-scrolling grouped panel instead of the ~column-width default. */
+.device-category .multiselect__content-wrapper {
+  width: 360px !important;
+}
+
+/* Gap fix (invented-styling finding): EventDevice.vue's
+   `::v-deep .suggested .multiselect` rule verbatim - a thick near-black
+   border on the auto-suggested category, not Bootstrap's $warning orange. */
+.suggested .multiselect {
+  border: 3px solid #222 !important;
+  width: calc(100% - 6px) !important;
+}
+
+/* EventDevice.vue's `.border-thick` (its own missing-category indicator -
+   the category control turns this red border on validation failure). */
+.border-thick {
+  border: 3px solid red;
+}
+
+.multiselect__tags {
+  cursor: pointer;
 }
 </style>

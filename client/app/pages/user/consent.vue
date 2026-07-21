@@ -256,17 +256,26 @@ async function submit() {
 
               <div class="row">
                 <div class="col-lg-6">
-                  <BFormGroup :label="`${t('general.your_name')}:`" label-for="consent-name">
+                  <BFormGroup label-for="consent-name">
+                    <!-- resources/sass/_registration.scss's `label sup { color:
+                         #FF0000; font-size: 16px; }` - required-field marker,
+                         verbatim from register-new.blade.php's
+                         `<label>...:<sup>*</sup></label>` (present on this
+                         disabled field too - the Auth::check() branch keeps
+                         the same label markup). -->
+                    <template #label>{{ t('general.your_name') }}:<sup>*</sup></template>
                     <BFormInput id="consent-name" :model-value="sessionStore.user?.name" disabled data-testid="consent-name" />
                   </BFormGroup>
                 </div>
                 <div class="col-lg-6">
-                  <BFormGroup :label="`${t('auth.email_address')}:`" label-for="consent-email">
+                  <BFormGroup label-for="consent-email">
+                    <template #label>{{ t('auth.email_address') }}:<sup>*</sup></template>
                     <BFormInput id="consent-email" :model-value="sessionStore.user?.email" disabled data-testid="consent-email" />
                   </BFormGroup>
                 </div>
                 <div class="col-lg-6">
-                  <BFormGroup :label="`${t('registration.age')}:`" label-for="consent-age" :description="t('registration.age_help')">
+                  <BFormGroup label-for="consent-age" :description="t('registration.age_help')">
+                    <template #label>{{ t('registration.age') }}:<sup>*</sup></template>
                     <BFormSelect id="consent-age" v-model="form.age" required data-testid="consent-age">
                       <option value="">&nbsp;</option>
                       <option v-for="y in ageOptions" :key="y" :value="String(y)">{{ y }}</option>
@@ -277,7 +286,8 @@ async function submit() {
                   </BFormGroup>
                 </div>
                 <div class="col-lg-6">
-                  <BFormGroup :label="`${t('registration.country')}:`" label-for="consent-country" :description="t('registration.country_help')">
+                  <BFormGroup label-for="consent-country" :description="t('registration.country_help')">
+                    <template #label>{{ t('registration.country') }}:<sup>*</sup></template>
                     <BFormSelect id="consent-country" v-model="form.country" required data-testid="consent-country">
                       <option value="">&nbsp;</option>
                       <option v-for="c in countries" :key="c.code" :value="c.code">{{ c.name }}</option>
@@ -393,9 +403,9 @@ async function submit() {
 </template>
 
 <style scoped>
-/* Step-scoped layout only - the .panel/.btn-checkbox chrome itself comes
-   from the global brand styles (_panels.scss/_buttons.scss), same as
-   register.vue. */
+/* Step-scoped layout - the .panel chrome itself comes from the global brand
+   styles (_panels.scss). The skill-toggle .btn-checkbox override below is
+   NOT covered by that global stylesheet, though - see its own comment. */
 .registration-wizard {
   max-width: 760px;
 }
@@ -414,5 +424,66 @@ async function submit() {
 
 .registration-step h3 {
   padding-right: 100px;
+}
+
+/* Required-field marker: resources/sass/_registration.scss's
+   `label sup { color: #FF0000; font-size: 16px; top: auto; left: auto; }`
+   (top/left reset cancel the reboot default superscript raise/offset so
+   the * sits right after the label text, not floated up and over). */
+label sup {
+  color: #ff0000;
+  font-size: 16px;
+  top: auto;
+  left: auto;
+}
+
+/* Skill toggle buttons (step 1): resources/sass/_buttons.scss's
+   label.btn.btn-checkbox - flat light-gray, no border/shadow, sentence-case
+   - not the global _buttons.scss .btn-checkbox { @extend .btn-primary },
+   which is the bordered/shadowed/uppercase/black-when-checked look used
+   everywhere else .btn-checkbox appears. That global rule was ported from
+   the widget CSS bundle (resources/global/css/app.scss)
+   header_plain.blade.php now loads; register-new.blade.php (which this
+   Auth::check() consent flow is also part of - see the top-of-file doc
+   comment) originally loaded resources/sass/app.scss instead (git show
+   07e6abd7cc^, the commit before Phase F deleted both the Blade view and
+   that stylesheet) - restore its rule here, scoped to this page, same as
+   register.vue's own copy of this override, rather than touching the
+   shared global stylesheet other .btn-checkbox consumers (e.g.
+   SkillsTab.vue) still rely on.
+   !important on the properties that need to beat @extend .btn-primary's own
+   !important background-color, matching the legacy rule's own !importants. */
+.btn-checkbox {
+  width: 100%;
+  font-size: 16px;
+  padding: 16px;
+  padding-bottom: 13px;
+  margin-bottom: 15px;
+  background-color: #e4e4e4 !important;
+  background-image: none !important;
+  border: none !important;
+  border-bottom: 3px solid #b6b6b6 !important;
+  color: #000;
+  border-radius: 0;
+  text-transform: none !important;
+  letter-spacing: normal;
+  font-weight: 400 !important;
+  box-shadow: none !important;
+}
+
+input[type='checkbox']:focus + .btn-checkbox {
+  background-color: #e4e4e4;
+  padding: 16px;
+  color: #000;
+  border-radius: 0;
+}
+
+input[type='checkbox']:checked + .btn-checkbox {
+  background-color: #ffbe5f !important;
+  padding: 16px;
+  border: 0 !important;
+  color: #222 !important;
+  font-size: 16px;
+  border-radius: 0;
 }
 </style>

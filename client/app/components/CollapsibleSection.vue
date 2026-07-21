@@ -54,7 +54,10 @@ function toggle() {
         :aria-label="expanded ? t('client.common.collapse') : t('client.common.expand')"
         data-testid="collapsible-toggle"
         @click.stop="toggle"
-      >{{ expanded ? '−' : '+' }}</button>
+      >
+        <img v-if="expanded" :src="'/images/minus-icon.svg'" alt="" class="icon">
+        <img v-else :src="'/images/add-icon.svg'" alt="" class="icon">
+      </button>
     </div>
 
     <div :id="bodyId" :class="{ 'd-none d-md-block': !expanded }" data-testid="collapsible-body">
@@ -68,13 +71,12 @@ function toggle() {
   background: none;
   border: 0;
   padding: 0;
-  color: inherit;
-  line-height: 1;
-  font-size: 1.75rem;
-  font-weight: bold;
-  line-height: 1;
-  cursor: pointer;
   padding-left: 0.5rem;
+  cursor: pointer;
+}
+
+.collapsible-section__toggle .icon {
+  width: 30px;
 }
 
 @media (max-width: 767.98px) {

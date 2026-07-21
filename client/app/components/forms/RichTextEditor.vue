@@ -20,9 +20,14 @@ import 'quill/dist/quill.snow.css'
 // quill@2.0.3 installed here) - registered below the same way legacy
 // registered the Quill-1 build, `htmlEditButton: {}` in modules (it
 // self-injects its own toolbar button; no separate `toolbar` array entry
-// needed, same as legacy's config). quill-paste-smart genuinely has no
-// Quill-2 build - paste is handled by Quill 2's own (safer) default
-// clipboard matcher instead.
+// needed, same as legacy's config).
+//
+// Paste sanitization: legacy registers quill-paste-smart with an explicit
+// allowlist (allowed.tags/attributes, substituteBlockElements,
+// magicPasteLinks - see below). quill-paste-smart itself has no Quill-2
+// build, and adding a replacement package is outside this component's
+// scope, so the same allowlist is reproduced with Quill 2's own
+// `clipboard.addMatcher` hooks below instead of pulling in a dependency.
 const props = defineProps({
   modelValue: {
     type: String,
@@ -49,6 +54,82 @@ function normalize(html) {
   return html ? html.replace('<p><br></p>', '') : html
 }
 
+// legacy's quill-paste-smart allowed.tags is ['a','b','strong','u','s','i',
+// 'p','br','ul','ol','li','span','h4','h5','h6'] - everything else that
+// Quill 2's own default clipboard matcher would otherwise carry across
+// (colour, background, font, size, alignment, text direction) is outside
+// that list and gets dropped here.
+const DISALLOWED_PASTE_FORMATS = ['align', 'background', 'color', 'direction', 'font', 'size']
+
+function stripAttributes(delta, names) {
+  delta.ops.forEach((op) => {
+    if (!op.attributes) return
+    const kept = Object.fromEntries(Object.entries(op.attributes).filter(([key]) => !names.includes(key)))
+    if (Object.keys(kept).length === 0) {
+      delete op.attributes
+    } else {
+      op.attributes = kept
+    }
+  })
+  return delta
+}
+
+// Node.ELEMENT_NODE matches every element the paste converts, mirroring
+// allowed.attributes (href/rel/target/class survive - Quill's own Link blot
+// always stamps rel="noopener noreferrer" target="_blank" on every link it
+// creates, so those need no extra handling here).
+function sanitizePastedFormats(_node, delta) {
+  return stripAttributes(delta, DISALLOWED_PASTE_FORMATS)
+}
+
+// allowed.tags stops at h4/h5/h6 (matching the toolbar's header options),
+// so h1-h3 aren't on the allowlist. substituteBlockElements downgrades an
+// unlisted block tag to a plain paragraph rather than dropping it - closest
+// equivalent here is stripping the header format so the text survives as
+// an ordinary paragraph.
+function downgradePastedHeadings(_node, delta) {
+  return stripAttributes(delta, ['header'])
+}
+
+// magicPasteLinks: auto-link bare URLs typed/pasted as plain text (a link
+// already carries the `link` attribute via Quill's own <a> handling, so
+// this only ever adds formatting Quill's default clipboard wouldn't).
+const BARE_URL_PATTERN = /(https?:\/\/\S+|www\.\S+)/gi
+
+function magicPasteLinks(node, delta) {
+  if (node.parentElement?.closest('a')) return delta
+
+  delta.ops = delta.ops.reduce((ops, op) => {
+    if (typeof op.insert !== 'string' || op.attributes?.link) {
+      ops.push(op)
+      return ops
+    }
+
+    BARE_URL_PATTERN.lastIndex = 0
+    let lastIndex = 0
+    let match
+    while ((match = BARE_URL_PATTERN.exec(op.insert))) {
+      if (match.index > lastIndex) {
+        ops.push({ insert: op.insert.slice(lastIndex, match.index), attributes: op.attributes })
+      }
+      // Trailing punctuation (sentence-ending '.', ')', etc.) isn't part of
+      // the URL.
+      const url = match[0].replace(/[.,;:!?)]+$/, '')
+      const trailing = match[0].slice(url.length)
+      const href = url.startsWith('www.') ? `https://${url}` : url
+      ops.push({ insert: url, attributes: { ...op.attributes, link: href } })
+      if (trailing) ops.push({ insert: trailing, attributes: op.attributes })
+      lastIndex = match.index + match[0].length
+    }
+    if (lastIndex < op.insert.length) {
+      ops.push({ insert: op.insert.slice(lastIndex), attributes: op.attributes })
+    }
+    return ops
+  }, [])
+
+  return delta
+}
+
 onMounted(async () => {
   const [{ default: Quill }, { default: htmlEditButton }] = await Promise.all([
     import('quill'),
@@ -69,6 +150,10 @@ onMounted(async () => {
       htmlEditButton: {},
     },
   })
+
+  quill.clipboard.addMatcher(Node.ELEMENT_NODE, sanitizePastedFormats)
+  quill.clipboard.addMatcher('h1, h2, h3', downgradePastedHeadings)
+  quill.clipboard.addMatcher(Node.TEXT_NODE, magicPasteLinks)
 
   if (props.modelValue) {
     quill.clipboard.dangerouslyPasteHTML(props.modelValue)
@@ -110,8 +195,29 @@ onBeforeUnmount(() => {
 
 <style scoped lang="scss">
 .rich-text-editor {
+  // develop's fixed, scrolling 300px box (not a flexible min-height).
+  :deep(.ql-editor),
+  :deep(.ql-container) {
+    min-height: 300px !important;
+    max-height: 300px !important;
+    height: 300px !important;
+  }
+
+  // develop's in-editor heading sizes for the toolbar's H4/H5/H6 options -
+  // otherwise typed/pasted headings all render at the browser's default h4/
+  // h5/h6 sizes (or whatever the snow theme's own defaults are).
   :deep(.ql-editor) {
-    min-height: 200px;
+    h4 {
+      font-size: 1.5rem;
+    }
+
+    h5 {
+      font-size: 1.25rem;
+    }
+
+    h6 {
+      font-size: 1rem;
+    }
   }
 
   &.has-error {

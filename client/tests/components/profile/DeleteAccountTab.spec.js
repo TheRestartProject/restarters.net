@@ -7,16 +7,6 @@ import { useProfileStore } from '../../../app/stores/profile.js'
 import en from '../../../i18n/locales/en.json'
 import clientEn from '../../../i18n/locales/client-en.json'
 
-// Note: BModal's own data-testid="stub-modal" gets overridden by the real
-// component's `data-testid="delete-account-modal"` attribute (Vue's
-// fallthrough-attrs merge: the parent's binding on a component tag wins
-// over the stub's own static template attribute of the same name) - so
-// the modal is found by that testid, not the stub's.
-const BModalStub = {
-  props: ['modelValue'],
-  emits: ['hide'],
-  template: '<div v-if="modelValue" data-testid="stub-modal"><slot /></div>',
-}
 const BAlertStub = { template: '<div><slot /></div>' }
 const BButtonStub = { template: '<button v-bind="$attrs"><slot /></button>' }
 
@@ -27,7 +17,7 @@ function mountComponent(props = {}) {
     props,
     global: {
       plugins: [i18n],
-      stubs: { BModal: BModalStub, BAlert: BAlertStub, BButton: BButtonStub },
+      stubs: { BAlert: BAlertStub, BButton: BButtonStub },
     },
   })
 }
@@ -43,11 +33,6 @@ describe('components/profile/DeleteAccountTab', () => {
     profileStore = useProfileStore()
   })
 
-  it('does not show the confirmation modal until the delete button is clicked', () => {
-    const wrapper = mountComponent()
-    expect(wrapper.find('[data-testid="delete-account-modal"]').exists()).toBe(false)
-  })
-
   // findings/parity-v2/profile-notifs-auth.md gap 8 was diffed against
   // origin/develop's older, since-superseded Blade (which happens to leave
   // this tab unwrapped) rather than this branch's own pre-Phase-F Vue
@@ -59,25 +44,14 @@ describe('components/profile/DeleteAccountTab', () => {
     expect(wrapper.find('[data-testid="delete-account-tab"]').classes()).toContain('edit-panel')
   })
 
-  it('opens the confirmation modal on delete-account-button click', async () => {
-    const wrapper = mountComponent()
-    await wrapper.find('[data-testid="delete-account-button"]').trigger('click')
-    expect(wrapper.find('[data-testid="delete-account-modal"]').exists()).toBe(true)
-  })
-
-  it('does not call the store until the modal is confirmed', async () => {
-    profileStore.deleteAccount = vi.fn()
-    const wrapper = mountComponent()
-    await wrapper.find('[data-testid="delete-account-button"]').trigger('click')
-    expect(profileStore.deleteAccount).not.toHaveBeenCalled()
-  })
-
-  it('calls deleteAccount and navigates to /login on confirm', async () => {
+  // develop's form (resources/views/user/profile/account.blade.php) submits
+  // the soft-delete request straight from the button click - no "are you
+  // sure?" confirmation step - matched verbatim rather than adding one.
+  it('calls deleteAccount and navigates to /login on delete-account-button click, with no confirmation step', async () => {
     profileStore.deleteAccount = vi.fn().mockResolvedValue({ success: true })
 
     const wrapper = mountComponent()
     await wrapper.find('[data-testid="delete-account-button"]').trigger('click')
-    await wrapper.find('[data-testid="delete-account-confirm"]').trigger('click')
     await Promise.resolve()
     await Promise.resolve()
 
@@ -90,14 +64,11 @@ describe('components/profile/DeleteAccountTab', () => {
 
     const wrapper = mountComponent()
     await wrapper.find('[data-testid="delete-account-button"]').trigger('click')
-    await wrapper.find('[data-testid="delete-account-confirm"]').trigger('click')
     await Promise.resolve()
     await Promise.resolve()
 
     expect(navigateToMock).not.toHaveBeenCalled()
     expect(wrapper.text()).toContain('Nope')
-    // The modal closes back to the initial "are you sure" prompt state.
-    expect(wrapper.find('[data-testid="delete-account-modal"]').exists()).toBe(false)
   })
 
   describe('editing someone else\'s profile (isOwnProfile: false)', () => {
@@ -106,7 +77,6 @@ describe('components/profile/DeleteAccountTab', () => {
 
       const wrapper = mountComponent({ targetId: 42, isOwnProfile: false })
       await wrapper.find('[data-testid="delete-account-button"]').trigger('click')
-      await wrapper.find('[data-testid="delete-account-confirm"]').trigger('click')
       await Promise.resolve()
       await Promise.resolve()
 

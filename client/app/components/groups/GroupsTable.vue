@@ -84,24 +84,31 @@ function imageSrc(row) {
 const sortKey = ref('name')
 const sortDesc = ref(false)
 
-const filters = ref({ name: '', location: '', country: '', tags: '', network: '' })
+const filters = ref({ name: '', location: '', country: '', tags: [], network: '' })
 
 function matchesFilters(row) {
   const f = filters.value
   const has = (haystack, needle) =>
     !needle || String(haystack || '').toLowerCase().includes(needle.toLowerCase())
 
-  // Tag/network dropdowns filter by id (row.tagIds/row.networkIds - the
-  // names-index's tag_ids/network_ids, available immediately rather than
-  // waiting on per-row hydration - see pages/group/all.vue's `rows`
-  // computed), not by matching display text.
+  // Network dropdown filters by id (row.networkIds - the names-index's
+  // network_ids, available immediately rather than waiting on per-row
+  // hydration - see pages/group/all.vue's `rows` computed), not by matching
+  // display text.
   const matchesId = (ids, needle) => !needle || (Array.isArray(ids) && ids.map(String).includes(String(needle)))
+
+  // Tag filter is multi-select (legacy's vue-multiselect :multiple="true" -
+  // GroupsTableFilters.vue), so `needle` is an array of tag ids; a row
+  // matches if it has any tag in common (legacy's filteredGroups: "Tag in
+  // common?" - tagsInCommon.length > 0), not all of them.
+  const matchesTags = (ids, needles) =>
+    !needles?.length || (Array.isArray(ids) && needles.some((n) => ids.map(String).includes(String(n))))
 
   return (
     has(row.name, f.name) &&
     has(row.location?.location, f.location) &&
     has(row.location?.country, f.country) &&
-    matchesId(row.tagIds, f.tags) &&
+    matchesTags(row.tagIds, f.tags) &&
     matchesId(row.networkIds, f.network)
   )
 }
@@ -215,21 +222,14 @@ function sortCaretClass(key) {
               </span>
             </button>
           </th>
-          <th v-if="optionalColumns.location" :aria-sort="sortAria('location')">
-            <button
-              type="button"
-              class="sort-header"
-              :aria-label="t('client.groups.column_location')"
-              data-testid="groups-table-sort-location"
-              @click="sortBy('location')"
-            >
-              <span class="visually-hidden">{{ sortHint('location') }}</span>
-              <img src="/icons/map_marker_ico.svg" alt="" class="col-icon">
-              <span class="sort-carets" :class="sortCaretClass('location')" aria-hidden="true">
-                <span class="sort-caret sort-caret--up" />
-                <span class="sort-caret sort-caret--down" />
-              </span>
-            </button>
+          <!-- Location is not a sortable b-table field in develop (fields:
+               [{ key: 'location', label: 'Location', tdClass: "hidecell",
+               thClass: "hidecell" }] has no `sortable: true`, unlike
+               group_name/hosts/restarters/next_event) - plain header, no
+               sort button/caret/aria-sort. -->
+          <th v-if="optionalColumns.location">
+            <span class="visually-hidden">{{ t('client.groups.column_location') }}</span>
+            <img src="/icons/map_marker_ico.svg" alt="" class="col-icon">
           </th>
           <th v-if="optionalColumns.hosts" :aria-sort="sortAria('hosts')">
             <button
@@ -287,11 +287,6 @@ function sortCaretClass(key) {
         </tr>
       </thead>
       <tbody>
-        <tr v-if="!sortedGroups.length" data-testid="groups-table-empty">
-          <td :colspan="7">
-            {{ t('client.groups.no_results') }}
-          </td>
-        </tr>
         <tr
           v-for="row in sortedGroups"
           :key="row.id"
@@ -320,6 +315,7 @@ function sortCaretClass(key) {
                 v-if="row.archivedAt"
                 variant="secondary"
                 pill
+                :title="t('groups.archived_group_title', { date: row.archivedAt })"
                 :data-testid="`group-row-archived-${row.id}`"
               >
                 {{ t('groups.archived_group') }}

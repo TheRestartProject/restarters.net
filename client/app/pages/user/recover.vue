@@ -17,16 +17,27 @@ const email = ref('')
 const submitting = ref(false)
 const generalError = ref('')
 const sent = ref(false)
+const successMessage = ref('')
 
 async function submit() {
   generalError.value = ''
   submitting.value = true
 
   try {
-    await authStore.forgotPassword({ email: email.value })
+    // UserController::recover's 'success' branch is __('passwords.sent')
+    // ("We have e-mailed your password reset link!") - AuthController::
+    // forgotPasswordv2 (the v2 equivalent this hits) echoes that same
+    // string back as `message`, so render the server's actual response
+    // rather than a fixed client-side string.
+    const data = await authStore.forgotPassword({ email: email.value })
+    successMessage.value = data?.message || t('client.recover.sent')
     sent.value = true
   } catch (err) {
-    generalError.value = err?.data?.message || t('general.error_occurred')
+    // UserController::recover's 'danger' branch when no account matches is
+    // __('passwords.user') ("We can't find a user with that e-mail
+    // address.") - forgotPasswordv2 surfaces that as a 422 validation error
+    // on the `email` field (errors.email), not a generic top-level message.
+    generalError.value = err?.data?.errors?.email?.[0] || err?.data?.message || t('general.error_occurred')
   } finally {
     submitting.value = false
   }
@@ -41,13 +52,17 @@ async function submit() {
         <p>{{ t('auth.forgotten_pw_text') }}</p>
 
         <BAlert v-if="sent" :model-value="true" variant="success" data-testid="recover-success">
-          {{ t('client.recover.sent') }}
+          {{ successMessage }}
         </BAlert>
         <BAlert v-if="generalError" :model-value="true" variant="danger" data-testid="recover-error">
           {{ generalError }}
         </BAlert>
 
-        <BForm v-if="!sent" data-testid="recover-form" @submit.prevent="submit">
+        <!-- forgot-password.blade.php's form is unconditionally present
+             regardless of $response - it re-renders on the same page as
+             the flash message above, so the user can immediately retry
+             with a different address. Not hidden once `sent`. -->
+        <BForm data-testid="recover-form" @submit.prevent="submit">
           <BFormGroup :label="`${t('auth.email_address')}:`" label-for="email">
             <BFormInput id="email" v-model="email" type="email" required data-testid="recover-email" />
           </BFormGroup>

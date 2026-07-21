@@ -3,6 +3,7 @@ import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useGroupsStore } from '~/stores/groups.js'
 import { useNetworksStore } from '~/stores/networks.js'
+import GroupMultiSelect from './GroupMultiSelect.vue'
 
 // Filter bar for GroupsTable (port of the legacy resources/js/components/
 // GroupsTableFilters.vue). Name/tag/location/country/network filters,
@@ -11,11 +12,14 @@ import { useNetworksStore } from '~/stores/networks.js'
 // so the table can filter its rows client-side. Field order matches
 // legacy exactly: name, tag, location, country, network.
 //
-// Country/Network/Tag are native <select>s rather than legacy's
-// vue-multiselect, matching the plain-control idiom already used for
-// filters elsewhere in this client (EventFilters.vue's country <select>,
-// DevicesSearchTable.vue's status/category <select>s) - single-select even
-// for tags, where legacy allows multiple.
+// Country/Network are native <select>s rather than legacy's vue-multiselect,
+// matching the plain-control idiom already used for filters elsewhere in
+// this client (EventFilters.vue's country <select>, DevicesSearchTable.vue's
+// status/category <select>s) - both are single-select in legacy too
+// (:multiple="false"). Tag is the one field legacy's multiselect allows
+// multiple selections on (:multiple="true"), so it uses GroupMultiSelect.vue
+// (chip/dropdown control, findings/parity-v2/group-forms.md #6) bound to an
+// array instead.
 const props = defineProps({
   // Full (unfiltered) row list, used only to derive the Country options -
   // same source legacy's GroupsTableFilters.vue computes them from
@@ -50,7 +54,7 @@ const expanded = ref(false)
 const route = useRoute()
 const initialNetwork = route.query.network ? String(route.query.network) : ''
 
-const filters = reactive({ name: '', tags: '', location: '', country: '', network: initialNetwork })
+const filters = reactive({ name: '', tags: [], location: '', country: '', network: initialNetwork })
 
 if (initialNetwork) {
   expanded.value = true
@@ -76,7 +80,9 @@ const networkOptions = computed(() => networksStore.list.data)
 // networks' tags, everyone else gets []) - same source GroupForm.vue's
 // tag multiselect uses. Only fetched when the dropdown is actually shown.
 const groupsStore = useGroupsStore()
-const tagOptions = computed(() => groupsStore.tags.data)
+const tagOptions = computed(() =>
+  groupsStore.tags.data.map((tag) => ({ value: tag.id, text: tag.tag_name ?? tag.name })),
+)
 
 onMounted(() => {
   networksStore.fetchList().catch(() => {})
@@ -128,10 +134,12 @@ const countryOptions = computed(() => {
         >
       </div>
       <div v-if="showTags" class="col-12 col-md">
-        <select v-model="filters.tags" class="form-select" data-testid="groups-table-filter-tags">
-          <option value="">{{ t('groups.search_tags_placeholder') }}</option>
-          <option v-for="tag in tagOptions" :key="tag.id" :value="tag.id">{{ tag.tag_name ?? tag.name }}</option>
-        </select>
+        <GroupMultiSelect
+          v-model="filters.tags"
+          :options="tagOptions"
+          testid="groups-table-filter-tags"
+          :placeholder="t('groups.search_tags_placeholder')"
+        />
       </div>
       <div class="col-12 col-md">
         <input

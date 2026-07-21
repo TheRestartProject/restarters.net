@@ -125,8 +125,10 @@ describe('pages/group/map', () => {
       const wrapper = mountPage()
       await wrapper.findComponent(GroupMapStub).vm.$emit('update:groupIdsInBounds', [])
 
+      // develop's b-table renders no tbody content at all for zero matches -
+      // not an invented "no results" row (GroupsTable.vue parity finding #4).
       expect(wrapper.findAll('tbody tr[data-testid^="group-row-"]')).toHaveLength(0)
-      expect(wrapper.find('[data-testid="groups-table-empty"]').exists()).toBe(true)
+      expect(wrapper.findAll('tbody tr')).toHaveLength(0)
     })
 
     it('shows only the reported ids when the map narrows the view', async () => {

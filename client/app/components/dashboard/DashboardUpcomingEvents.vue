@@ -68,43 +68,51 @@ function timeLabel(iso) {
     </div>
 
     <ul v-if="sortedEvents.length" class="list-unstyled" data-testid="upcoming-events-list">
+      <!-- develop's DashboardEvent.vue: the WHOLE row is a single
+           `<div @click="goto" class="clickme">` navigating to
+           /party/view/{id} - not just the title. Reproduced here as one
+           NuxtLink wrapping the date box, title, timestamp and avatar. -->
       <li
         v-for="event in sortedEvents"
         :key="event.id"
-        class="d-flex align-items-center py-2 border-bottom"
+        class="border-bottom"
         :data-testid="`upcoming-event-${event.id}`"
       >
-        <div class="datebox text-center fw-bold me-2">
-          <div class="day">{{ dayOfMonth(event.start) }}</div>
-          <div class="month">{{ month(event.start) }}</div>
-        </div>
-
-        <div class="flex-grow-1">
-          <NuxtLink :to="`/party/view/${event.id}`" :data-testid="`upcoming-event-link-${event.id}`">
-            {{ event.title }}
-          </NuxtLink>
-          <BBadge
-            v-if="event.online"
-            variant="primary"
-            pill
-            class="ms-1 nounderline"
-            :data-testid="`upcoming-event-online-${event.id}`"
-          >
-            {{ t('events.online') }}
-          </BBadge>
-          <div class="small">
-            {{ dateLabel(event.start) }} {{ timeLabel(event.start) }}
-            <span v-if="event.end" class="d-none d-md-inline">- {{ timeLabel(event.end) }}</span>
-          </div>
-        </div>
-
-        <img
-          :src="event.group.image_url || '/images/placeholder-avatar.webp'"
-          alt=""
-          width="48"
-          height="48"
-          class="group-avatar ms-2"
+        <NuxtLink
+          :to="`/party/view/${event.id}`"
+          class="event-row d-flex align-items-center py-2"
+          :data-testid="`upcoming-event-link-${event.id}`"
         >
+          <div class="datebox text-center fw-bold me-2">
+            <div class="day">{{ dayOfMonth(event.start) }}</div>
+            <div class="month">{{ month(event.start) }}</div>
+          </div>
+
+          <div class="flex-grow-1">
+            <span>{{ event.title }}</span>
+            <BBadge
+              v-if="event.online"
+              variant="primary"
+              pill
+              class="ms-1 nounderline"
+              :data-testid="`upcoming-event-online-${event.id}`"
+            >
+              {{ t('events.online') }}
+            </BBadge>
+            <div class="small">
+              {{ dateLabel(event.start) }} {{ timeLabel(event.start) }}
+              <span v-if="event.end" class="d-none d-md-inline">- {{ timeLabel(event.end) }}</span>
+            </div>
+          </div>
+
+          <img
+            :src="event.group.image_url || '/images/placeholder-avatar.webp'"
+            alt=""
+            width="48"
+            height="48"
+            class="group-avatar ms-2"
+          >
+        </NuxtLink>
       </li>
     </ul>
 
@@ -137,5 +145,27 @@ h3 {
 
 .nounderline {
   text-decoration: none !important;
+}
+
+/* Bootstrap's .border-bottom utility is $enable-important-utilities (its
+   default #dee2e6 grey wins over a plain override) - develop's
+   DashboardEvent.vue divides rows with a solid `<hr />` styled
+   `border-top: 1px solid black`. */
+.border-bottom {
+  border-bottom-color: #000 !important;
+}
+
+/* The whole row is now the click target (see the template comment) -
+   develop's version is a plain, unstyled div (no link colours/underline at
+   all), so neutralise the anchor's default styling to match. */
+.event-row {
+  color: inherit;
+  text-decoration: none;
+
+  &:hover,
+  &:focus {
+    color: inherit;
+    text-decoration: none;
+  }
 }
 </style>

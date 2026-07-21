@@ -23,10 +23,12 @@ const BFormSelectStub = {
 }
 
 function mountComponent(props = {}) {
-  // devices.add_data_description/add_data_no_groups/add_data_no_events (gap 1)
-  // aren't in the checked-in i18n/locales fixtures yet (regenerated from
-  // lang/en/devices.php by `translations:export-client`, which this task
-  // deliberately doesn't run) - overlay them here, same as DeviceForm.spec.js.
+  // devices.add_data_group/add_data_event/add_data_action_button and
+  // groups.follow_group_first/create_event_first (gap fix - develop's own
+  // AddDataModal.vue lang keys) aren't in the checked-in i18n/locales
+  // fixtures yet (regenerated from lang/en/*.php by
+  // `translations:export-client`, which this task deliberately doesn't
+  // run) - overlay develop's exact values here, same as DeviceForm.spec.js.
   const i18n = createI18n({
     legacy: false,
     locale: 'en',
@@ -36,9 +38,15 @@ function mountComponent(props = {}) {
         ...clientEn,
         devices: {
           ...en.devices,
-          add_data_description: 'Choose one of your groups and an event to add your repair data to.',
-          add_data_no_groups: "You need to follow a group before you can add data.",
-          add_data_no_events: "This group doesn't have any events yet.",
+          add_data_group: 'Please select a group',
+          add_data_event: 'Please select an event',
+          add_data_action_button: 'Go to event',
+        },
+        groups: {
+          ...en.groups,
+          follow_group_first:
+            'Repair data is added to community repair events. Please first follow a group and then choose an event in order to add repair data.',
+          create_event_first: 'Please first create an event in order to add repair data.',
         },
       },
     },

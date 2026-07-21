@@ -60,11 +60,17 @@ function dismiss(id) {
 
 <template>
   <div v-if="visibleAlerts.length" data-testid="alerts-banner">
+    <!-- Legacy AlertBanner.vue binds `:variant="alert.variant"` then
+         immediately repeats a static `variant="secondary"` on the same
+         b-alert tag - a Vue 2 duplicate-attribute bug where the later
+         (static) one always wins, so every alert renders grey regardless
+         of its real variant. Reproduced verbatim: `variant` is always
+         'secondary' here too, not `alert.variant || 'secondary'`. -->
     <BAlert
       v-for="alert in visibleAlerts"
       :key="alert.id"
       :model-value="true"
-      :variant="alert.variant || 'secondary'"
+      variant="secondary"
       dismissible
       class="mb-2"
       :data-testid="`alert-banner-${alert.id}`"

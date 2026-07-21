@@ -152,14 +152,19 @@ async function performDelete() {
               <strong>{{ tag.name }}</strong>
               <span class="text-muted ms-2">({{ tag.groups_count }} {{ t('networks.stats.groups', { count: tag.groups_count }, tag.groups_count) }})</span>
             </div>
+            <!-- NetworkPage.vue's plain monochrome pencil/trash icons
+                 (18px/20px, no colour fill), not a coloured icon set - `:src`
+                 (not a static `src=`) so Vite's SFC asset-url transform
+                 doesn't inline these small public-dir svgs as data URIs,
+                 matching EventCard.vue's `:src="'/images/clock.svg'"`. -->
             <div class="d-flex align-items-center">
               <BButton variant="link" size="sm" class="p-0 me-2" :data-testid="`network-tag-edit-${tag.id}`" @click="openEdit(tag)">
                 <span class="visually-hidden">{{ t('networks.tags.edit') }}</span>
-                <img src="/icons/edit_ico_green.svg" alt="" width="18" height="18">
+                <img :src="'/images/pencil.svg'" alt="" width="18" height="18">
               </BButton>
               <BButton variant="link" size="sm" class="p-0" :data-testid="`network-tag-delete-${tag.id}`" @click="confirmDelete(tag)">
                 <span class="visually-hidden">{{ t('networks.tags.delete') }}</span>
-                <img src="/icons/delete_ico_red.svg" alt="" width="20" height="20">
+                <img :src="'/images/trash.svg'" alt="" width="20" height="20">
               </BButton>
             </div>
           </div>
@@ -236,7 +241,10 @@ async function performDelete() {
 </template>
 
 <style scoped lang="scss">
+// $brand-grey from app/assets/css/_variables.scss, hardcoded here as other
+// components already do in scoped styles (no global variable import wired
+// up for component <style> blocks).
 .tag-item {
-  background: #f8f9fa;
+  background: #f5f7fa;
 }
 </style>

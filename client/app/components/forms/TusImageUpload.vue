@@ -34,7 +34,7 @@ const props = defineProps({
   },
 })
 
-const emit = defineEmits(['uploaded', 'upload-error'])
+const emit = defineEmits(['uploaded', 'upload-error', 'remove'])
 
 const { t } = useI18n()
 
@@ -147,6 +147,28 @@ function onFileInputChange(event) {
 function onDrop(event) {
   addCompactFile(event.dataTransfer && event.dataTransfer.files && event.dataTransfer.files[0])
 }
+
+// Legacy GroupImage.vue's deleteMe(): clears the just-picked file
+// (dropzone.removeAllFiles() + currentimage = null there) and only ever
+// shows once a file has actually been picked - v-if="currentimage" there,
+// v-if="localPreviewUrl" here. Emits so the caller (GroupForm.vue) can
+// reset its own state back to the placeholder image.
+function removeCompactFile(event) {
+  event.stopPropagation()
+
+  if (localPreviewUrl.value) {
+    URL.revokeObjectURL(localPreviewUrl.value)
+    localPreviewUrl.value = null
+  }
+
+  uppy?.getFiles().forEach((file) => uppy.removeFile(file.id))
+
+  if (fileInputEl.value) {
+    fileInputEl.value.value = ''
+  }
+
+  emit('remove')
+}
 </script>
 
 <template>
@@ -168,6 +190,16 @@ function onDrop(event) {
         data-testid="tus-image-upload-preview"
       >
       <span v-if="uploading" class="spinner-border spinner-border-sm tus-image-upload__thumb-spinner" role="status" aria-hidden="true" />
+      <button
+        v-if="localPreviewUrl"
+        type="button"
+        class="tus-image-upload__remove"
+        :aria-label="t('partials.remove')"
+        data-testid="tus-image-upload-remove"
+        @click="removeCompactFile"
+      >
+        <img src="/icons/cross_ico.svg" alt="">
+      </button>
     </div>
     <input
       ref="fileInputEl"
@@ -218,5 +250,26 @@ function onDrop(event) {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+}
+
+// GroupImage.vue's .deleteme: same size/position/z-index, translated from
+// its CSS-grid overlay to position:absolute since this thumb isn't a grid.
+.tus-image-upload__remove {
+  position: absolute;
+  top: 3px;
+  right: 10px;
+  z-index: 10000;
+  width: 40px;
+  min-width: 40px;
+  height: 40px;
+  min-height: 40px;
+  max-height: 40px;
+  border: 0;
+  border-radius: 20px;
+  background: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 </style>

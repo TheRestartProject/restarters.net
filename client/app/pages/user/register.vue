@@ -286,7 +286,12 @@ async function submit() {
 
               <div class="row">
                 <div class="col-lg-6">
-                  <BFormGroup :label="`${t('general.your_name')}:`" label-for="name">
+                  <BFormGroup label-for="name">
+                    <!-- resources/sass/_registration.scss's `label sup { color:
+                         #FF0000; font-size: 16px; }` - required-field marker,
+                         verbatim from register-new.blade.php's
+                         `<label>...:<sup>*</sup></label>`. -->
+                    <template #label>{{ t('general.your_name') }}:<sup>*</sup></template>
                     <BFormInput id="name" v-model="form.name" required data-testid="register-name" />
                     <div v-if="fieldError('name')" class="invalid-feedback d-block" data-testid="register-name-error">
                       {{ fieldError('name') }}
@@ -294,7 +299,8 @@ async function submit() {
                   </BFormGroup>
                 </div>
                 <div class="col-lg-6">
-                  <BFormGroup :label="`${t('auth.email_address')}:`" label-for="email">
+                  <BFormGroup label-for="email">
+                    <template #label>{{ t('auth.email_address') }}:<sup>*</sup></template>
                     <BFormInput
                       id="email"
                       v-model="form.email"
@@ -310,7 +316,8 @@ async function submit() {
                   </BFormGroup>
                 </div>
                 <div class="col-lg-6">
-                  <BFormGroup :label="`${t('registration.age')}:`" label-for="age" :description="t('registration.age_help')">
+                  <BFormGroup label-for="age" :description="t('registration.age_help')">
+                    <template #label>{{ t('registration.age') }}:<sup>*</sup></template>
                     <BFormSelect id="age" v-model="form.age" required data-testid="register-age">
                       <option value="">&nbsp;</option>
                       <option v-for="year in birthYears" :key="year" :value="year">{{ year }}</option>
@@ -321,7 +328,8 @@ async function submit() {
                   </BFormGroup>
                 </div>
                 <div class="col-lg-6">
-                  <BFormGroup :label="`${t('registration.country')}:`" label-for="country" :description="t('registration.country_help')">
+                  <BFormGroup label-for="country" :description="t('registration.country_help')">
+                    <template #label>{{ t('registration.country') }}:<sup>*</sup></template>
                     <BFormSelect id="country" v-model="form.country" required data-testid="register-country">
                       <option value="">&nbsp;</option>
                       <option v-for="c in countries" :key="c.code" :value="c.code">{{ c.name }}</option>
@@ -358,7 +366,8 @@ async function submit() {
 
               <div class="row">
                 <div class="col-lg-6">
-                  <BFormGroup :label="`${t('auth.password')}:`" label-for="password">
+                  <BFormGroup label-for="password">
+                    <template #label>{{ t('auth.password') }}:<sup>*</sup></template>
                     <BFormInput id="password" v-model="form.password" type="password" required data-testid="register-password" />
                     <div v-if="fieldError('password')" class="invalid-feedback d-block" data-testid="register-password-error">
                       {{ fieldError('password') }}
@@ -366,7 +375,8 @@ async function submit() {
                   </BFormGroup>
                 </div>
                 <div class="col-lg-6">
-                  <BFormGroup :label="`${t('auth.repeat_password')}:`" label-for="password-confirm">
+                  <BFormGroup label-for="password-confirm">
+                    <template #label>{{ t('auth.repeat_password') }}:<sup>*</sup></template>
                     <BFormInput
                       id="password-confirm"
                       v-model="form.password_confirmation"
@@ -480,6 +490,17 @@ async function submit() {
 
 .registration-step h3 {
   padding-right: 100px;
+}
+
+/* Required-field marker: resources/sass/_registration.scss's
+   `label sup { color: #FF0000; font-size: 16px; top: auto; left: auto; }`
+   (top/left reset cancel the reboot default superscript raise/offset so
+   the * sits right after the label text, not floated up and over). */
+label sup {
+  color: #ff0000;
+  font-size: 16px;
+  top: auto;
+  left: auto;
 }
 
 /* Skill toggle buttons (step 1): resources/sass/_buttons.scss's

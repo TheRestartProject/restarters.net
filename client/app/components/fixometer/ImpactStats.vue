@@ -195,8 +195,9 @@ const yearsVolunteered = computed(() => Math.round((10 * (props.impactData?.hour
   background-color: #fff;
   // Match the live site: near-black card border + offset shadow, with only
   // the value text in teal (legacy StatsValue.vue's .hasBorder uses $black).
+  // $shadow (assets/css/_variables.scss) is 5px.
   border: 1px solid #222;
-  box-shadow: 4px 4px 0 #222;
+  box-shadow: 5px 5px 0 #222;
   display: flex;
   flex-direction: column;
   align-items: center;

@@ -54,5 +54,12 @@ return [
   'share_modal_seedlings' => "tree seedling for 10 years.*|tree seedlings for 10 years.*",
   'share_modal_planting_around' => "planting around",
   'share_modal_hectares' => "hectare of trees.*|hectares of trees.*",
-  'impact_estimates' => 'Impact figures are estimates based on data entered by groups into Restarters.net.'
+  'impact_estimates' => 'Impact figures are estimates based on data entered by groups into Restarters.net.',
+
+  // Already exist on develop's lang/en/partials.php with these exact
+  // values - ported here rather than reworded, since this branch's copy of
+  // the file predates them.
+  'please_choose' => 'Please choose...',
+  'please_confirm' => 'Please confirm that you wish to proceed.',
+  'confirm' => 'Confirm',
 ];

@@ -58,7 +58,7 @@ function download() {
         <BButton
           v-for="platform in STATS_SHARE_PLATFORMS"
           :key="platform"
-          variant="outline-dark"
+          variant="primary"
           size="sm"
           :class="{ active: target === platform }"
           :disabled="painting"
@@ -87,7 +87,11 @@ function download() {
 /* StatsShareModal.vue's black/white toggle look: unselected buttons are
    white-on-black-outline, the active platform inverts to black-fill with an
    offset shadow - matches the neo-brutalist stat-card treatment used
-   elsewhere on the event/group pages. */
+   elsewhere on the event/group pages. develop only overrides
+   background-color/color (its own ::v-deep .buttons button rule), not
+   border-color, so the button keeps whatever border its Bootstrap variant
+   sets - `variant="primary"` on the BButton above renders that border as
+   $primary/brand teal, not `outline-dark`'s near-black. */
 .stats-share-buttons :deep(.btn) {
   font-size: 12px;
   color: #000;

@@ -7,6 +7,7 @@ import { useGroupsStore } from '../../stores/groups.js'
 import { eventStartLocal, eventEndLocal } from '../../composables/useEventComputed.js'
 import RichTextEditor from '../forms/RichTextEditor.vue'
 import LocationPicker from '../forms/LocationPicker.vue'
+import TagMultiselect from '../forms/TagMultiselect.vue'
 import EventVenueMap from './EventVenueMap.vue'
 import DatePicker from 'vue-datepicker-next'
 import 'vue-datepicker-next/index.css'
@@ -33,9 +34,11 @@ import GroupNetworkData from '../groups/GroupNetworkData.vue'
 // Scope cuts vs the legacy form (documented here, not in api-gaps.md -
 // these are UI simplifications, not missing endpoints, mirroring
 // GroupForm.vue's precedent):
-//  - The event-group multiselect becomes a plain <select> (vue-multiselect
-//    isn't installed for this migration - design.md §2 only lists it for
-//    the group/tag pickers already ported in B6).
+//  - The event-group picker is components/forms/TagMultiselect.vue
+//    (EventGroup.vue's vue-multiselect equivalent - see that component's own
+//    class doc comment: vue-multiselect is Vue 2 only, so this project
+//    reproduces its markup/class names on bootstrap-vue-next primitives
+//    instead), not a byte-for-byte port of vue-multiselect itself.
 //  - `duplicateFrom`'s image-upload semantics don't apply (legacy's create
 //    form is also the duplicate form and has no image tab either - the
 //    dropzone only ever lived in edit.blade.php, so TusImageUpload for
@@ -156,6 +159,22 @@ const eventGroupName = computed(() => props.initialEvent?.group?.name || '')
 
 const groupOptionsSorted = computed(() => [...props.groups].sort((a, b) => a.name.localeCompare(b.name)))
 
+// TagMultiselect's option shape ({value, text}), built from the same sorted
+// list. While editing, `groups` isn't populated at all (the page only
+// resolves it for create/duplicate - see the class doc comment), so the
+// current group is added explicitly, exactly as the old plain <select>'s
+// extra `<option>` did - otherwise the disabled control would render empty
+// instead of showing which group the event is in.
+const groupSelectOptions = computed(() => {
+  const options = groupOptionsSorted.value.map((g) => ({ value: g.id, text: g.name }))
+
+  if (!creating.value && form.idgroups && !options.some((o) => o.value === form.idgroups)) {
+    options.unshift({ value: form.idgroups, text: eventGroupName.value })
+  }
+
+  return options
+})
+
 const selectedGroupDetail = computed(() => groupsStore.details[form.idgroups] || null)
 const groupLocationText = computed(() => selectedGroupDetail.value?.location?.location || null)
 
@@ -170,22 +189,17 @@ const groupLocationText = computed(() => selectedGroupDetail.value?.location?.lo
 const autoApprove = computed(() => !!selectedGroupDetail.value?.auto_approve)
 
 // VenueAddress.vue:31-40 renders a map preview beside the address, gated on
-// `!online && lat !== null`. Ours had no preview at all. develop geocodes as
-// you type; this client leaves geocoding to the server
-// (GroupController/EventController geocode `location` themselves - see the
-// class doc comment), so coordinates are only known for an event that already
-// has them: edit, and duplicate-from-source. That covers the cases where
-// develop actually shows a map on load, and the preview is simply absent
-// while a brand-new address is still just text - which is also develop's
-// state until its own geocode returns.
-const venueLat = computed(() => {
-  const value = props.initialEvent?.lat
-  return typeof value === 'number' ? value : null
-})
-const venueLng = computed(() => {
-  const value = props.initialEvent?.lng
-  return typeof value === 'number' ? value : null
-})
+// `!online && lat !== null`, and its :lat/:lng are updated live as
+// PlacesAutocomplete resolves a selection (VenueAddress.vue's
+// `placeChanged` sets `this.lat`/`this.lng` from the chosen place, before
+// any server round-trip). LocationPicker.vue's `lat`/`lng` are exposed as
+// optional v-model props for exactly this caller (see its own class doc
+// comment) - bound below so picking a suggestion updates the preview
+// immediately, the same as develop. Seeded from initialEvent for edit/
+// duplicate-from-source, where the coordinates are already known without
+// the user touching the field at all.
+const venueLat = ref(typeof props.initialEvent?.lat === 'number' ? props.initialEvent.lat : null)
+const venueLng = ref(typeof props.initialEvent?.lng === 'number' ? props.initialEvent.lng : null)
 const showVenueMap = computed(() => !form.online && venueLat.value !== null && venueLng.value !== null)
 
 const submitting = ref(false)
@@ -419,26 +433,23 @@ defineExpose({ submit })
         </div>
       </BFormGroup>
 
-      <!-- EventAddEdit.vue:17-22 renders the SAME EventGroup control while
-           editing, just `:disabled="!creating"` - a bordered, greyed field. -->
+      <!-- EventGroup.vue renders the SAME multiselect control while editing,
+           just `:disabled="!creating"` - a bordered, greyed field. -->
       <div class="event-form-group">
         <BFormGroup :label="`${t('events.field_event_group')}:`" label-for="event-form-group">
-          <select
+          <TagMultiselect
             id="event-form-group"
-            v-model.number="form.idgroups"
-            class="form-select"
-            :class="{ 'is-invalid': fieldError('idgroups') }"
+            :model-value="form.idgroups"
+            :options="groupSelectOptions"
+            track-by="value"
+            label-by="text"
+            :multiple="false"
             :disabled="!creating"
+            :placeholder="t('partials.please_choose')"
+            :class="{ hasError: fieldError('idgroups') }"
             data-testid="event-form-group"
-          >
-            <option :value="null" />
-            <!-- While editing, `groups` isn't populated (the page only
-                 resolves it for create/duplicate), so the current group is
-                 offered explicitly - otherwise the disabled select would
-                 render blank instead of showing which group the event is in. -->
-            <option v-if="!creating && form.idgroups" :value="form.idgroups">{{ eventGroupName }}</option>
-            <option v-for="g in groupOptionsSorted" :key="g.id" :value="g.id">{{ g.name }}</option>
-          </select>
+            @update:model-value="form.idgroups = $event"
+          />
           <div v-if="fieldError('idgroups')" class="invalid-feedback d-block" data-testid="event-form-group-error">
             {{ fieldError('idgroups') }}
           </div>
@@ -524,6 +535,8 @@ defineExpose({ submit })
       <div class="event-form-address">
         <LocationPicker
           v-model:location="form.location"
+          v-model:lat="venueLat"
+          v-model:lng="venueLng"
           :show-postcode="false"
           :label="t('events.field_event_venue')"
           :placeholder="t('events.field_venue_placeholder')"
@@ -535,6 +548,7 @@ defineExpose({ submit })
           v-if="showVenueMap"
           :lat="venueLat"
           :lng="venueLng"
+          :zoom="11"
           class="mb-3"
           data-testid="event-form-venue-map"
         />
@@ -580,7 +594,37 @@ defineExpose({ submit })
       </BCard>
 
       <div v-if="!creating && canApprove && !approved" class="event-form-approve mb-3">
-        <BFormGroup :label="`${t('events.approve_event')}:`" label-for="event-form-approve">
+        <BFormGroup label-for="event-form-approve">
+          <!-- EventAddEdit.vue:76 - the same cog SVG as the admin-only card
+               header above, immediately before the "Approve Event:" label. -->
+          <template #label>
+            <svg width="18" height="18" viewBox="0 0 15 15" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd" aria-hidden="true">
+              <g fill="#0394a6">
+                <path d="M7.5 1.58a5.941 5.941 0 0 1 5.939 5.938A5.942 5.942 0 0 1 7.5 13.457a5.942 5.942 0 0 1-5.939-5.939A5.941 5.941 0 0 1 7.5 1.58zm0 3.04a2.899 2.899 0 1 1-2.898 2.899A2.9 2.9 0 0 1 7.5 4.62z" />
+                <ellipse cx="6.472" cy=".217" rx=".274" ry=".217" />
+                <ellipse cx="8.528" cy=".217" rx=".274" ry=".217" />
+                <path d="M6.472 0h2.056v1.394H6.472z" />
+                <path d="M8.802.217H6.198l-.274 1.562h3.152L8.802.217z" />
+                <ellipse cx="8.528" cy="14.783" rx=".274" ry=".217" />
+                <ellipse cx="6.472" cy="14.783" rx=".274" ry=".217" />
+                <path d="M6.472 13.606h2.056V15H6.472z" />
+                <path d="M6.198 14.783h2.604l.274-1.562H5.924l.274 1.562zM1.47 2.923c.107-.106.262-.125.347-.04.084.085.066.24-.041.347-.107.107-.262.125-.346.04-.085-.084-.067-.24.04-.347zM2.923 1.47c.107-.107.263-.125.347-.04.085.084.067.239-.04.346-.107.107-.262.125-.347.041-.085-.085-.066-.24.04-.347z" />
+                <path d="M2.923 1.47L1.47 2.923l.986.986 1.453-1.453-.986-.986z" />
+                <path d="M3.27 1.43L1.43 3.27l.91 1.299L4.569 2.34 3.27 1.43zm10.26 10.647c-.107.106-.262.125-.347.04-.084-.085-.066-.24.041-.347.107-.107.262-.125.346-.04.085.084.067.24-.04.347zm-1.453 1.453c-.107.107-.263.125-.347.04-.085-.084-.067-.239.04-.346.107-.107.262-.125.347-.041.085.085.066.24-.04.347z" />
+                <path d="M12.077 13.53l1.453-1.453-.986-.986-1.453 1.453.986.986z" />
+                <path d="M11.73 13.57l1.84-1.84-.91-1.299-2.229 2.229 1.299.91zM0 8.528c0-.151.097-.274.217-.274.119 0 .216.123.216.274 0 .151-.097.274-.216.274-.12 0-.217-.123-.217-.274zm0-2.056c0-.151.097-.274.217-.274.119 0 .216.123.216.274 0 .151-.097.274-.216.274-.12 0-.217-.123-.217-.274z" />
+                <path d="M0 6.472v2.056h1.394V6.472H0z" />
+                <path d="M.217 6.198v2.604l1.562.274V5.924l-1.562.274zM15 6.472c0 .151-.097.274-.217.274-.119 0-.216-.123-.216-.274 0-.151.097-.274.216-.274.12 0 .217.123.217.274zm0 2.056c0 .151-.097.274-.217.274-.119 0-.216-.123-.216-.274 0-.151.097-.274.216-.274.12 0 .217.123.217.274z" />
+                <path d="M15 8.528V6.472h-1.394v2.056H15z" />
+                <path d="M14.783 8.802V6.198l-1.562-.274v3.152l1.562-.274zM2.923 13.53c-.106-.107-.125-.262-.04-.347.085-.084.24-.066.347.041.107.107.125.262.04.346-.084.085-.24.067-.347-.04zM1.47 12.077c-.107-.107-.125-.263-.04-.347.084-.085.239-.067.346.04.107.107.125.262.041.347-.085.085-.24.066-.347-.04z" />
+                <path d="M1.47 12.077l1.453 1.453.986-.986-1.453-1.453-.986.986z" />
+                <path d="M1.43 11.73l1.84 1.84 1.299-.91-2.229-2.229-.91 1.299zM12.077 1.47c.106.107.125.262.04.347-.085.084-.24.066-.347-.041-.107-.107-.125-.262-.04-.346.084-.085.24-.067.347.04zm1.453 1.453c.107.107.125.263.04.347-.084.085-.239.067-.346-.04-.107-.107-.125-.262-.041-.347.085-.085.24-.066.347.04z" />
+                <path d="M13.53 2.923L12.077 1.47l-.986.986 1.453 1.453.986-.986z" />
+                <path d="M13.57 3.27l-1.84-1.84-1.299.91 2.229 2.229.91-1.299z" />
+              </g>
+            </svg>
+            {{ t('events.approve_event') }}:
+          </template>
           <select id="event-form-approve" v-model="form.moderate" class="form-select" data-testid="event-approve">
             <option value="" />
             <option value="approve">{{ t('client.groups.approve_option') }}</option>
@@ -674,6 +718,30 @@ defineExpose({ submit })
 .event-form-group {
   grid-row: 3 / 4;
   grid-column: 1 / 2;
+
+  // EventGroup.vue's own scoped style, layered on top of the shared
+  // .multiselect rules (assets/css/_multiselect.scss): a 1px black border
+  // (thinner than the 2px used elsewhere in this app), and a red border
+  // once the field has a validation error. The 3px black focus/active
+  // border doesn't need restating - .multiselect--active's two-class
+  // selector already outranks the single-class override below.
+  :deep(.multiselect) {
+    border: 1px solid #222 !important;
+  }
+
+  :deep(.multiselect__tags) {
+    border: 1px solid #222 !important;
+  }
+
+  :deep(.hasError) {
+    &.multiselect {
+      border: 1px solid #dc3545 !important;
+    }
+
+    .multiselect__tags {
+      border: 1px solid #dc3545 !important;
+    }
+  }
 }
 
 .event-form-description {

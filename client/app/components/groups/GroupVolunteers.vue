@@ -121,7 +121,15 @@ async function confirmRemove(volunteer) {
               >
             </NuxtLink>
             <div>
-              <NuxtLink :to="`/profile/${volunteer.user}`" class="fw-bold">{{ volunteer.name }}</NuxtLink>
+              <!-- develop's GroupVolunteer.vue: bold only applies when the
+                   volunteer is a host, and the name link itself is
+                   text-black (a plain name label, not a teal hyperlink). -->
+              <NuxtLink
+                :to="`/profile/${volunteer.user}`"
+                class="text-black"
+                :class="{ 'fw-bold': volunteer.host }"
+                :data-testid="`group-volunteer-name-${volunteer.user}`"
+              >{{ volunteer.name }}</NuxtLink>
               <!-- develop's GroupVolunteer.vue .host class: plain uppercase
                    brand-teal text, no pill/background. -->
               <span
@@ -236,12 +244,10 @@ async function confirmRemove(volunteer) {
 }
 
 /* develop's GroupVolunteer.vue .host: plain uppercase brand-teal text, no
-   badge/pill background. */
+   badge/pill background. $brand-light is #4aaebc - NOT $brand/#0394a6. */
 .host-label {
   text-transform: uppercase;
-  color: var(--bs-primary, #0394a6);
-  font-size: 0.8rem;
-  font-weight: bold;
+  color: #4aaebc;
 }
 
 /* develop's GroupVolunteer.vue .edit-dropdown: an icon-only, borderless

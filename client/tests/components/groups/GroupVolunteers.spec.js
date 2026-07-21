@@ -77,6 +77,22 @@ describe('components/groups/GroupVolunteers', () => {
     expect(host.classes()).toContain('host-label')
   })
 
+  // develop's GroupVolunteer.vue only bolds the name when the volunteer is
+  // a host (:class="{ 'font-weight-bold': volunteer.host }") - it is not a
+  // blanket style on every row, and the link itself is plain text-black,
+  // not a teal hyperlink.
+  it('bolds the volunteer name only for hosts, and renders it as plain text-black (not a teal link)', () => {
+    const wrapper = mountComponent({ volunteers: VOLUNTEERS })
+
+    const hostLink = wrapper.find('[data-testid="group-volunteer-name-10"]')
+    expect(hostLink.classes()).toContain('fw-bold')
+    expect(hostLink.classes()).toContain('text-black')
+
+    const nonHostLink = wrapper.find('[data-testid="group-volunteer-name-11"]')
+    expect(nonHostLink.classes()).not.toContain('fw-bold')
+    expect(nonHostLink.classes()).toContain('text-black')
+  })
+
   it('shows a pencil edit-icon dropdown (not inline buttons) for editable rows (gap 3)', () => {
     const wrapper = mountComponent({ volunteers: VOLUNTEERS, canedit: true })
 

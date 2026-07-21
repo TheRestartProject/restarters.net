@@ -39,6 +39,24 @@ const ago = computed(() => (props.topic.created_at ? moment(props.topic.created_
 </template>
 
 <style scoped lang="scss">
+// develop's DiscourseTopic.vue: .topic { border: 0; background-color: white;
+// padding: 10px; } plus a comic-card hover (border + offset box-shadow),
+// paired with DashboardWhatsHappening.vue's border-spacing on the table so
+// each row reads as its own card.
+.talk-topic {
+  background-color: #fff;
+  padding: 10px;
+  border: 0;
+
+  &:hover {
+    border: 1px solid #222;
+    box-shadow:
+      5px 5px 0 0,
+      1px 1px 0 0 inset,
+      -1px -1px 0 0 inset;
+  }
+}
+
 .talk-topic__main {
   word-break: break-word;
   color: #222;

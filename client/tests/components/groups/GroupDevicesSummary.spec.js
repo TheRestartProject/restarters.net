@@ -50,4 +50,49 @@ describe('components/groups/GroupDevicesSummary', () => {
     expect(wrapper.find('[data-testid="group-stats-devices"]').exists()).toBe(false)
     expect(wrapper.find('[data-testid="group-stats-top-device-0"]').exists()).toBe(false)
   })
+
+  // StatsValue.vue's printableCount(): stat-card counts get thousand
+  // separators (finding 52).
+  it('formats stat-card counts with thousand separators', () => {
+    const wrapper = mountComponent({
+      stats: { device_stats: { fixed: 1234, repairable: 0, dead: 0 }, top_devices: [] },
+    })
+
+    expect(wrapper.find('[data-testid="group-stats-fixed"]').text()).toContain('1,234')
+  })
+
+  // GroupDeviceRepairPodium.vue's device.counter is NOT run through
+  // StatsValue/printableCount in develop - it's a plain interpolation - so
+  // the podium count should stay unformatted (finding 52's scope is the
+  // StatsValue-backed cards, not this component).
+  it('does not add thousand separators to the podium count (matches develop)', () => {
+    const wrapper = mountComponent({
+      stats: {
+        device_stats: null,
+        top_devices: [{ name: 'Laptop', counter: 1234 }],
+      },
+    })
+
+    expect(wrapper.find('[data-testid="group-stats-top-device-0"]').text()).toContain('1234')
+    expect(wrapper.find('[data-testid="group-stats-top-device-0"]').text()).not.toContain('1,234')
+  })
+
+  // GroupDevicesMostRepaired.vue's `.d-block.d-md-none` +
+  // GroupDeviceRepairPodium.vue's `.mobile` grid: mobile gets its own flat,
+  // full-width rosette/count/name rows in natural 1st/2nd/3rd order (finding
+  // 50), distinct from the staggered desktop podium.
+  it('renders a flat mobile podium counterpart in natural 1st/2nd/3rd order', () => {
+    const wrapper = mountComponent({ stats: STATS })
+
+    const first = wrapper.find('[data-testid="group-stats-top-device-mobile-0"]')
+    expect(first.text()).toContain('5')
+    expect(first.text()).toContain('Laptop')
+    expect(first.find('img').attributes('src')).toBe('/images/rosette_1_ico.svg')
+
+    const second = wrapper.find('[data-testid="group-stats-top-device-mobile-1"]')
+    expect(second.find('img').attributes('src')).toBe('/images/rosette_2_ico.svg')
+
+    const third = wrapper.find('[data-testid="group-stats-top-device-mobile-2"]')
+    expect(third.find('img').attributes('src')).toBe('/images/rosette_3_ico.svg')
+  })
 })

@@ -165,4 +165,16 @@ async function confirmDelete() {
 .device-row-icon-btn__icon {
   width: 1.1rem;
 }
+
+/* Gap fix (invented-styling finding): EventDeviceSummary.vue's own
+   `.badge` override verbatim - a flat, uppercase, fixed-width badge rather
+   than BBadge's default rounded pill. */
+.badge {
+  width: 90px;
+  padding: 0;
+  border-radius: 0;
+  font-size: small;
+  line-height: 2;
+  text-transform: uppercase;
+}
 </style>

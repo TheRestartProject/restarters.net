@@ -98,7 +98,7 @@ async function save() {
           <a class="btn-preferences" :href="platformPreferencesUrl">{{ t('auth.set_preferences') }}</a>
         </div>
         <div class="col-sm-3 d-flex align-items-center justify-content-end">
-          <BButton type="submit" variant="primary" :disabled="saving" data-testid="email-preferences-save">
+          <BButton type="submit" variant="primary" class="btn-save" :disabled="saving" data-testid="email-preferences-save">
             {{ t('auth.save_preferences') }}
           </BButton>
         </div>

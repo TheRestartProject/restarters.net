@@ -151,10 +151,10 @@ watch(
       <div v-if="showProfileTab" v-show="activeTab === 'profile'" data-testid="profile-tab-panel-profile">
         <ProfileInfoTab :target-id="targetId" :is-own-profile="isOwnProfile" />
         <div class="row row-end">
-          <div class="col-lg-6">
+          <div class="col-lg-6 d-flex col-bottom">
             <SkillsTab :target-id="targetId" :is-own-profile="isOwnProfile" />
           </div>
-          <div class="col-lg-6">
+          <div class="col-lg-6 d-flex col-bottom">
             <!-- No id-scoped photo-upload endpoint - self-only, see the
                  class doc comment above. -->
             <ProfilePhotoTab v-if="isOwnProfile" />

@@ -145,4 +145,10 @@ return [
   'manual_invite_placeholder' => 'Tapez un e-mail et appuyez sur Entrée ou Tab',
   'youre_going' => 'Vous participez!',
   'you_have_joined' => 'Vous avez rejoint <a class="plain-link" href=":url">:name</a>',
+
+  // Already exist on develop's lang/fr/events.php with these exact values.
+  'request_review' => 'Retours de bénévoles',
+  'search_title_placeholder' => 'Recherche un titre...',
+  'search_start_placeholder' => 'À...',
+  'search_end_placeholder' => 'De...',
 ];

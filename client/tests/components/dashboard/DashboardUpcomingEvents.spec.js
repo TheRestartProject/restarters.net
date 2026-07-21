@@ -72,11 +72,43 @@ describe('components/dashboard/DashboardUpcomingEvents', () => {
       ],
     })
 
-    const titles = wrapper.findAll('[data-testid="upcoming-events-list"] a').map((a) => a.text())
-    expect(titles[0]).toBe('Sooner Event')
+    // Parity gap #6: the WHOLE row is one link (develop's DashboardEvent.vue
+    // wraps date box + title + timestamp + avatar in a single clickable
+    // target), so the anchor's text is the row's full content, not just the
+    // title.
+    const rows = wrapper.findAll('[data-testid="upcoming-events-list"] > li')
+    expect(rows).toHaveLength(2)
+    expect(rows[0].text()).toContain('Sooner Event')
+    expect(rows[1].text()).toContain('Later Event')
 
-    expect(wrapper.find('[data-testid="upcoming-event-link-11"]').attributes('href')).toBe('/party/view/11')
+    const link = wrapper.find('[data-testid="upcoming-event-link-11"]')
+    expect(link.attributes('href')).toBe('/party/view/11')
+    expect(link.text()).toContain('Sooner Event')
+
     expect(wrapper.find('[data-testid="upcoming-events-see-all"]').attributes('href')).toBe('/party')
+  })
+
+  it('wraps the whole row - date box and avatar included - in the single navigation link (parity gap #6)', () => {
+    const wrapper = mountComponent({
+      events: [
+        {
+          id: 50,
+          title: 'Whole Row Event',
+          start: '2026-08-01T10:00:00Z',
+          end: '2026-08-01T12:00:00Z',
+          online: false,
+          group: { id: 1, name: 'Group A', image_url: '/uploads/group.jpg' },
+        },
+      ],
+    })
+
+    const link = wrapper.find('[data-testid="upcoming-event-link-50"]')
+    expect(link.exists()).toBe(true)
+    expect(link.attributes('href')).toBe('/party/view/50')
+    // Only one <a> per row - date box/avatar aren't separately-linked.
+    expect(wrapper.find('[data-testid="upcoming-event-50"]').findAll('a')).toHaveLength(1)
+    expect(link.find('img').exists()).toBe(true)
+    expect(link.find('.day').exists()).toBe(true)
   })
 
   it('shows the "Online" badge only for online events (parity gap #8)', () => {

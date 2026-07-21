@@ -16,6 +16,7 @@ class MockUppy {
   constructor() {
     this.handlers = {}
     this.usedPlugins = []
+    this.files = []
     lastUppyInstance = this
   }
 
@@ -33,7 +34,19 @@ class MockUppy {
 
   destroy() {}
 
-  addFile() {}
+  addFile(file) {
+    const id = `file-${this.files.length}`
+    this.files.push({ id, ...file })
+    return id
+  }
+
+  getFiles() {
+    return this.files
+  }
+
+  removeFile(id) {
+    this.files = this.files.filter((f) => f.id !== id)
+  }
 
   emitComplete(result) {
     this.handlers.complete?.(result)
@@ -156,6 +169,52 @@ describe('components/forms/TusImageUpload', () => {
       lastUppyInstance.emitComplete({ successful: [{ tus: { uploadUrl: 'http://localhost:8001/api/tus/abc123' } }] })
       await wrapper.vm.$nextTick()
       expect(wrapper.find('.tus-image-upload__thumb-spinner').exists()).toBe(false)
+    })
+
+    // Legacy GroupImage.vue's .deleteme button - v-if="currentimage" there
+    // (only once a file has actually been picked, never for a pre-existing
+    // currentImageUrl loaded from the server).
+    describe('remove button (GroupImage.vue deleteMe() parity)', () => {
+      async function pickFile(wrapper) {
+        vi.stubGlobal('URL', { ...URL, createObjectURL: vi.fn().mockReturnValue('blob:local-preview'), revokeObjectURL: vi.fn() })
+        const file = new File(['x'], 'photo.png', { type: 'image/png' })
+        const input = wrapper.find('[data-testid="tus-image-upload-file-input"]')
+        Object.defineProperty(input.element, 'files', { value: [file], configurable: true })
+        await input.trigger('change')
+      }
+
+      it('is absent for a pre-existing image, and appears once a file is picked', async () => {
+        const wrapper = await mountUpload({ compact: true, currentImageUrl: '/uploads/mid_1.png' })
+        expect(wrapper.find('[data-testid="tus-image-upload-remove"]').exists()).toBe(false)
+
+        await pickFile(wrapper)
+
+        expect(wrapper.find('[data-testid="tus-image-upload-remove"]').exists()).toBe(true)
+      })
+
+      it('clears the preview and the uppy file, re-shows the placeholder, and emits remove', async () => {
+        const wrapper = await mountUpload({ compact: true, currentImageUrl: '/uploads/mid_1.png' })
+        await pickFile(wrapper)
+        expect(lastUppyInstance.getFiles()).toHaveLength(1)
+
+        await wrapper.find('[data-testid="tus-image-upload-remove"]').trigger('click')
+
+        expect(wrapper.find('[data-testid="tus-image-upload-remove"]').exists()).toBe(false)
+        expect(wrapper.find('[data-testid="tus-image-upload-preview"]').attributes('src')).toBe('/uploads/mid_1.png')
+        expect(lastUppyInstance.getFiles()).toHaveLength(0)
+        expect(wrapper.emitted('remove')).toBeTruthy()
+      })
+
+      it('does not reopen the file picker (the click must not bubble to the dropzone)', async () => {
+        const wrapper = await mountUpload({ compact: true })
+        await pickFile(wrapper)
+        const input = wrapper.find('[data-testid="tus-image-upload-file-input"]').element
+        const clickSpy = vi.spyOn(input, 'click')
+
+        await wrapper.find('[data-testid="tus-image-upload-remove"]').trigger('click')
+
+        expect(clickSpy).not.toHaveBeenCalled()
+      })
     })
   })
 })

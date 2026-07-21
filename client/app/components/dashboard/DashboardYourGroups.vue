@@ -59,7 +59,7 @@ const amAHost = computed(() => props.groups.some((g) => g.role === HOST_ROLE))
       <div class="d-flex justify-content-between flex-wrap align-items-center">
         <div class="d-flex align-items-center">
           <h2 class="mb-0">{{ t('dashboard.your_groups_heading') }}</h2>
-          <img src="/images/group_doodle_ico.svg" alt="" class="group-doodle ms-3">
+          <img src="/images/group_doodle_ico.svg" alt="" class="ms-3">
         </div>
         <NuxtLink
           v-if="newNearbyGroups.length"
@@ -156,12 +156,20 @@ h2 {
   }
 }
 
-.group-doodle {
-  height: 40px;
-}
+/* group_doodle_ico.svg is left unstyled (develop's DashboardYourGroups.vue
+   sizes it with a `.height` class that has no matching CSS rule anywhere in
+   develop's sass) - it renders at its native 52x76. */
 
 .group-avatar {
   border: 1px solid #222;
+}
+
+/* Bootstrap's .border-bottom utility is $enable-important-utilities (its
+   default #dee2e6 grey wins over a plain override) - develop's
+   DashboardGroup.vue divides rows with a solid `<hr />` styled
+   `border-top: 1px solid black`. */
+.border-bottom {
+  border-bottom-color: #000 !important;
 }
 
 .new-highlight {
