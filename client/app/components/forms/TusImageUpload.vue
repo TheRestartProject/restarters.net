@@ -80,6 +80,12 @@ onMounted(async () => {
       proudlyDisplayPoweredByUppy: false,
       showProgressDetails: true,
       height: 200,
+      // Uppy's Dashboard defaults to a fixed 750px. In a narrower column -
+      // the profile page's "Change my photo" card is one - that pushed the
+      // panel past the right edge of the viewport and gave the whole page a
+      // horizontal scrollbar (profile/edit measured 1657px wide at a 1440
+      // viewport). Track the container instead.
+      width: '100%',
     })
   }
 
@@ -179,6 +185,14 @@ function onDrop(event) {
 </template>
 
 <style scoped lang="scss">
+// Belt and braces alongside the Dashboard's width option: whatever Uppy
+// computes, its panel must not be able to exceed the column it sits in.
+// A page that scrolls sideways is never what was wanted here.
+:deep(.uppy-Dashboard-inner),
+:deep(.uppy-Dashboard-innerWrap) {
+  max-width: 100%;
+}
+
 .tus-image-upload__preview {
   width: 100px;
   height: 100px;
