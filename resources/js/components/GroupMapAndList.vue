@@ -41,7 +41,7 @@
 <script>
 import {MAX_MAP_ZOOM, MIN_MAP_ZOOM} from "../constants";
 import GroupMap from "./GroupMap.vue";
-import { matchesFilters } from '../misc/groupFilter'
+import { matchesFilters, inNetwork } from '../misc/groupFilter'
 
 // Long enough to sit through normal typing, short enough that the map follows
 // promptly once you stop.
@@ -134,11 +134,7 @@ export default {
   },
   computed: {
     scopedGroups() {
-      const allGroups = this.$store.getters['groups/list']
-
-      return this.network
-        ? allGroups.filter(g => g.networks && g.networks.some(n => n.id === this.network))
-        : allGroups
+      return this.$store.getters['groups/list'].filter(g => inNetwork(g, this.network))
     },
     matchingGroupIds() {
       // Everything the filter allows, wherever it is - this is what the map

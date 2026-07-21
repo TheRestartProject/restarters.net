@@ -47,6 +47,7 @@ import GroupMarker from './GroupMarker.vue'
 // would exercise different code from production. Freegle imports it this way
 // for the same reason.
 import Supercluster from 'supercluster/dist/supercluster'
+import { inNetwork } from '../misc/groupFilter'
 
 export default {
   components: {
@@ -153,12 +154,7 @@ export default {
         groups = groups.filter((g) => this.groupids.includes(g.id || g.idgroups))
       }
 
-      if (!this.network) {
-        return groups
-      }
-
-      // Networks may be summary objects ([{id}]) or plain ids (the names index).
-      return groups.filter((g) => (g.networks || []).some((n) => (n && n.id !== undefined ? n.id : n) === this.network))
+      return groups.filter((g) => inNetwork(g, this.network))
     },
     mappableGroups() {
       // A group with no geocode would put a marker at null island (0,0) —

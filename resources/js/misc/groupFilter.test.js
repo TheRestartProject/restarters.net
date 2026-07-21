@@ -1,4 +1,28 @@
-import { matchesFilters } from './groupFilter'
+import { matchesFilters, inNetwork } from './groupFilter'
+
+// A group's networks arrive in two shapes: the names index that draws the map
+// sends plain ids, while the summary API sends objects. Matching only one of
+// them empties the network pages.
+describe('inNetwork', () => {
+  test('matches plain ids, as sent by the names index', () => {
+    expect(inNetwork({ networks: [5, 6] }, 5)).toBe(true)
+    expect(inNetwork({ networks: [6] }, 5)).toBe(false)
+  })
+
+  test('matches objects, as sent by the summary API', () => {
+    expect(inNetwork({ networks: [{ id: 5 }, { id: 6 }] }, 5)).toBe(true)
+    expect(inNetwork({ networks: [{ id: 6 }] }, 5)).toBe(false)
+  })
+
+  test('a group in no networks matches nothing', () => {
+    expect(inNetwork({}, 5)).toBe(false)
+    expect(inNetwork({ networks: [] }, 5)).toBe(false)
+  })
+
+  test('everything is in scope when no network is asked for', () => {
+    expect(inNetwork({ networks: [] }, null)).toBe(true)
+  })
+})
 
 const group = {
   id: 1,

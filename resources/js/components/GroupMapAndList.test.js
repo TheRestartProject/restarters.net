@@ -16,13 +16,20 @@ const GROUPS = [
   { id: 2, name: 'Beta', networks: [{ id: 6, name: 'N6' }] },
 ]
 
-function makeStore() {
+// What the names index actually sends, and what the map is drawn from: the
+// store maps network_ids straight through, so these are plain integers.
+const INDEX_GROUPS = [
+  { id: 1, name: 'Alpha', networks: [5] },
+  { id: 2, name: 'Beta', networks: [6] },
+]
+
+function makeStore(groups = GROUPS) {
   return new Vuex.Store({
     modules: {
       groups: {
         namespaced: true,
         getters: {
-          list: () => GROUPS,
+          list: () => groups,
         },
         actions: {
           list: () => Promise.resolve(),
@@ -60,10 +67,10 @@ const groupsTableStub = {
   template: '<div class="stub-table" />',
 }
 
-async function makeWrapper(props = {}) {
+async function makeWrapper(props = {}, groups = GROUPS) {
   const wrapper = mount(GroupMapAndList, {
     localVue,
-    store: makeStore(),
+    store: makeStore(groups),
     propsData: {
       initialBounds: [[90, 180], [-90, -180]],
       ...props,
@@ -220,6 +227,24 @@ describe('reframing waits for the typing to stop', () => {
     wrapper.destroy()
 
     expect(() => jest.runAllTimers()).not.toThrow()
+  })
+})
+
+// Regression: the network pages showed an empty map and an empty list, because
+// the scoping check only understood the summary API's {id} objects while the
+// map is drawn from the names index, which sends plain ids.
+describe('network scoping', () => {
+  test('finds the network\'s groups when networks are plain ids', async () => {
+    const wrapper = await makeWrapper({ network: 5 }, INDEX_GROUPS)
+
+    expect(wrapper.vm.matchingGroupIds).toEqual([1])
+    expect(wrapper.findComponent(groupMapStub).props('groupids')).toEqual([1])
+  })
+
+  test('still finds them when networks are objects', async () => {
+    const wrapper = await makeWrapper({ network: 5 }, GROUPS)
+
+    expect(wrapper.vm.matchingGroupIds).toEqual([1])
   })
 })
 
