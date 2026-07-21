@@ -226,7 +226,13 @@ function retry() {
       <template v-if="canManage">
         <section class="mb-4" data-testid="network-groups-moderation">
           <h2>{{ t('networks.moderation.groups_title') }}</h2>
-          <NetworkGroupsModerationTable :network-id="id" />
+          <NetworkGroupsModerationTable :network-id="id">
+            <template #empty>
+              <div class="text-muted" data-testid="network-groups-moderation-empty">
+                {{ t('networks.show.none') }}
+              </div>
+            </template>
+          </NetworkGroupsModerationTable>
         </section>
         <section class="mb-4" data-testid="network-events-moderation">
           <h2>{{ t('networks.moderation.events_title') }}</h2>

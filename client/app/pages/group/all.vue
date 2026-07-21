@@ -63,7 +63,12 @@ const rows = computed(() =>
       hosts: details?.hosts ?? null,
       restarters: details?.restarters ?? null,
       nextEvent: details?.next_event ?? null,
-      isMember: groupsStore.isMember(entry.id),
+      // The Group resource carries is_member (Group.php's
+      // $ret['is_member'] = isVolunteer($user->id)), so the row can say
+      // Follow vs Unfollow correctly for every group - not just the ones
+      // already seen via `mine` or joined this session, which is all the
+      // memberIds fallback knows about.
+      isMember: details?.is_member ?? groupsStore.isMember(entry.id),
     }
   })
 )

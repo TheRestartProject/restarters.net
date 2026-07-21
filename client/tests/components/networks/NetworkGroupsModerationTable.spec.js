@@ -14,7 +14,7 @@ const BBadgeStub = { template: '<span v-bind="$attrs"><slot /></span>' }
 // alongside this Nuxt work (parity-v2/networks.md gap #2) but
 // client/i18n/locales/en.json is a generated, checked-in artifact this
 // change intentionally leaves untouched - overlay the new key here.
-function mountComponent(props = {}) {
+function mountComponent({ slots, ...props } = {}) {
   const messages = {
     en: {
       ...en,
@@ -29,6 +29,7 @@ function mountComponent(props = {}) {
 
   return mount(NetworkGroupsModerationTable, {
     props: { networkId: 1, ...props },
+    slots: slots || {},
     global: { plugins: [i18n], stubs: { NuxtLink: NuxtLinkStub, BBadge: BBadgeStub, GroupsTable: GroupsTableStub } },
   })
 }
@@ -58,7 +59,24 @@ describe('components/networks/NetworkGroupsModerationTable', () => {
     expect(store.fetchGroups).toHaveBeenCalled()
   })
 
-  it('shows the "None" message when there are no groups awaiting moderation for this network', async () => {
+  // The empty placeholder is the caller's, matching develop's split:
+  // GroupsRequiringModeration.vue renders nothing when empty and NetworkPage
+  // supplies its own "None" under the section heading. /group/all reuses this
+  // component with no heading, where an unslotted "None" read as a stray word
+  // above the page title.
+  it('renders the empty slot, and nothing of its own, when there are no groups', async () => {
+    store.fetchGroups = vi.fn(async () => {
+      store.groups.data = []
+    })
+
+    const wrapper = mountComponent({ slots: { empty: '<p data-testid="none-slot">None</p>' } })
+    await flushPromises()
+
+    expect(wrapper.get('[data-testid="none-slot"]').text()).toBe('None')
+    expect(wrapper.find('.table-section').exists()).toBe(false)
+  })
+
+  it('renders nothing when empty and the caller supplies no placeholder', async () => {
     store.fetchGroups = vi.fn(async () => {
       store.groups.data = []
     })
@@ -66,7 +84,7 @@ describe('components/networks/NetworkGroupsModerationTable', () => {
     const wrapper = mountComponent()
     await flushPromises()
 
-    expect(wrapper.get('[data-testid="network-groups-moderation-empty"]').text()).toBe('None')
+    expect(wrapper.get('[data-testid="network-groups-moderation-table"]').text().trim()).toBe('')
   })
 
   // Replaces two tests that asserted this component's own photo/name/location/

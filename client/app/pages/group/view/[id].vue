@@ -43,7 +43,11 @@ const candemote = computed(() => !!permissions.value.can_demote)
 const canPerformArchive = computed(() => !!permissions.value.can_perform_archive)
 const canSeeDelete = computed(() => !!permissions.value.can_see_delete)
 const canPerformDelete = computed(() => !!permissions.value.can_perform_delete)
-const isMember = computed(() => groupsStore.isMember(id.value))
+// group.is_member is the server's answer (Group.php: isVolunteer for the
+// authenticated caller). memberIds only knows about groups seen via `mine`
+// or joined/left this session, so it stays as the fallback for the window
+// before the group has loaded.
+const isMember = computed(() => group.value?.is_member ?? groupsStore.isMember(id.value))
 // GroupEvents.vue's showCalendar: Auth::check() && (isVolunteer OR
 // Administrator) - approximated here with the flags already on hand.
 const showCalendar = computed(() => isMember.value || canedit.value || canPerformArchive.value)

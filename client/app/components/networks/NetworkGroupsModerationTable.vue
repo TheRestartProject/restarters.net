@@ -1,6 +1,5 @@
 <script setup>
 import { computed, onMounted } from 'vue'
-import { useI18n } from 'vue-i18n'
 import { useModerationStore } from '~/stores/moderation.js'
 import GroupsTable from '~/components/groups/GroupsTable.vue'
 
@@ -29,7 +28,6 @@ const props = defineProps({
   },
 })
 
-const { t } = useI18n()
 const moderationStore = useModerationStore()
 
 // Client-side network scoping, same approach as ModerationQueue.vue - the
@@ -49,9 +47,13 @@ onMounted(() => {
 
 <template>
   <div data-testid="network-groups-moderation-table">
-    <div v-if="!groups.length" class="text-muted" data-testid="network-groups-moderation-empty">
-      {{ t('networks.show.none') }}
-    </div>
+    <!-- The "None" placeholder belongs to the caller, not here.
+         GroupsRequiringModeration.vue is `v-if="loaded && groups.length"` and
+         renders nothing when empty; NetworkPage.vue supplies its own
+         `networks.show.none` line under the section's h2. Owning it here put a
+         bare, context-free "None" at the top of /group/all, which reuses this
+         component without a heading. -->
+    <slot v-if="!groups.length" name="empty" />
     <!-- GroupsRequiringModeration.vue:3 wraps the table in
          `<section class="table-section">` - _tables.scss's white/20px-padding/
          1px-black-border/6px-shadow panel, which we had already ported but

@@ -25,10 +25,9 @@ import { useToastStore } from './toast.js'
  *    but not yet implemented server-side).
  *  - `memberIds` is an optimistic, session-local set of "groups the current
  *    user is a member of", seeded from `mine` and updated by join()/leave().
- *    Because there's no per-group "am I a member" field on the names index
- *    or the single-group endpoint, the All Groups tab can only reliably know
- *    membership for groups already surfaced via `mine` (or joined/left this
- *    session) - see the same api-gaps.md entry.
+ *    The names index carries no membership flag, but the single-group
+ *    endpoint does (Group.is_member), so pages holding a full group prefer
+ *    that; memberIds is the fallback for rows not yet hydrated.
  *
  * B5 (/group/view/[id]) adds `current`/`stats`/`events`/`volunteers`, all
  * keyed by the single group being viewed (not by id - only one group view
@@ -36,11 +35,9 @@ import { useToastStore } from './toast.js'
  * keeps the actions simple; see fetchCurrent/fetchStats/fetchEvents/
  * fetchVolunteers). Two more B5-specific gaps (docs/nuxt-migration/
  * api-gaps.md B5):
- *  - GET /api/v2/groups/{id} carries no "am I a member" flag, unlike the
- *    Blade page's server-computed $in_group. fetchCurrent() falls back to
- *    `isMember` (memberIds), which is only reliable for groups already
- *    surfaced via `mine`/join/leave - the page also calls fetchMine() on
- *    mount to seed it best-effort.
+ *  - GET /api/v2/groups/{id} carries is_member, the equivalent of the Blade
+ *    page's server-computed $in_group; the page prefers it and falls back to
+ *    `memberIds` only until the group has loaded.
  *  - GET /api/v2/groups/{id}/stats (group_stats/device_stats/cluster_stats/
  *    top_devices) doesn't exist yet - fetchStats() is written against the
  *    documented shape and fails gracefully (stats.error set, rest of the
