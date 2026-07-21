@@ -42,6 +42,10 @@
 import {MAX_MAP_ZOOM, MIN_MAP_ZOOM} from "../constants";
 import GroupMap from "./GroupMap.vue";
 import { matchesFilters } from '../misc/groupFilter'
+
+// Long enough to sit through normal typing, short enough that the map follows
+// promptly once you stop.
+const REFRAME_DEBOUNCE_MS = 500
 import GroupsTable from "./GroupsTable.vue";
 import VIcon from 'vue-awesome/components/Icon'
 
@@ -121,6 +125,7 @@ export default {
       filters: null,
       // Bumped when a filter changes, to ask the map to frame the matches.
       frameRequest: 0,
+      frameTimer: null,
       mapready: false,
       bounds: null,
       hover: null,
@@ -152,6 +157,13 @@ export default {
       return this.groupidsInBounds.filter(id => matching.includes(id))
     },
   },
+  beforeDestroy() {
+    // Don't wake up and touch a component that has gone away.
+    if (this.frameTimer) {
+      clearTimeout(this.frameTimer)
+      this.frameTimer = null
+    }
+  },
   async mounted() {
     // Wrap to avoid an unhandled async rejection breaking Vue 2's
     // scheduler — see notes in GroupsRequiringModeration.vue.
@@ -170,8 +182,19 @@ export default {
       this.groupidsInBounds = groupids
     },
     filtersChanged(filters) {
+      // The list and the pins follow immediately - they just get shorter. Moving
+      // the viewport waits until the typing stops, or the map lurches around
+      // under the user on every keystroke.
       this.filters = filters
-      this.frameRequest++
+
+      if (this.frameTimer) {
+        clearTimeout(this.frameTimer)
+      }
+
+      this.frameTimer = setTimeout(() => {
+        this.frameTimer = null
+        this.frameRequest++
+      }, REFRAME_DEBOUNCE_MS)
     },
   },
 }

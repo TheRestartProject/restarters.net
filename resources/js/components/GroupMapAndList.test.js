@@ -151,16 +151,6 @@ describe('filters drive the map', () => {
     expect(wrapper.vm.effectiveGroupIds).toEqual([2])
   })
 
-  test('asks the map to reframe, so a search for a group out of view goes to it', async () => {
-    const wrapper = await makeWrapper({ showFilters: true })
-    const before = wrapper.findComponent(groupMapStub).props('frameRequest')
-
-    wrapper.findComponent({ name: 'GroupsTable' }).vm.$emit('update:filters', { name: 'Beta' })
-    await wrapper.vm.$nextTick()
-
-    expect(wrapper.findComponent(groupMapStub).props('frameRequest')).toBeGreaterThan(before)
-  })
-
   test('clearing the filter puts every group back on the map', async () => {
     const wrapper = await makeWrapper({ showFilters: true })
 
@@ -170,6 +160,66 @@ describe('filters drive the map', () => {
     await wrapper.vm.$nextTick()
 
     expect(wrapper.findComponent(groupMapStub).props('groupids')).toEqual([1, 2])
+  })
+})
+
+// Typing a name fires a filter change per keystroke. Narrowing the list and the
+// pins each time is cheap and expected, but moving the viewport each time makes
+// the map lurch around under the user while they are still typing.
+describe('reframing waits for the typing to stop', () => {
+  beforeEach(() => jest.useFakeTimers())
+  afterEach(() => jest.useRealTimers())
+
+  function type(wrapper, name) {
+    wrapper.findComponent({ name: 'GroupsTable' }).vm.$emit('update:filters', { name })
+  }
+
+  test('does not move the map between keystrokes', async () => {
+    const wrapper = await makeWrapper({ showFilters: true })
+    const before = wrapper.findComponent(groupMapStub).props('frameRequest')
+
+    type(wrapper, 'B')
+    type(wrapper, 'Be')
+    type(wrapper, 'Bet')
+    await wrapper.vm.$nextTick()
+
+    expect(wrapper.findComponent(groupMapStub).props('frameRequest')).toBe(before)
+  })
+
+  // This is also what takes you to a group that isn't currently on screen,
+  // rather than reporting no results for something that is just off the edge.
+  test('moves the map once, after the typing stops', async () => {
+    const wrapper = await makeWrapper({ showFilters: true })
+    const before = wrapper.findComponent(groupMapStub).props('frameRequest')
+
+    type(wrapper, 'B')
+    type(wrapper, 'Be')
+    type(wrapper, 'Beta')
+    jest.runAllTimers()
+    await wrapper.vm.$nextTick()
+
+    expect(wrapper.findComponent(groupMapStub).props('frameRequest')).toBe(before + 1)
+  })
+
+  // Only the viewport move waits: the list and the pins should keep up with
+  // what's being typed.
+  test('narrows the list and the pins straight away', async () => {
+    const wrapper = await makeWrapper({ showFilters: true })
+
+    type(wrapper, 'Beta')
+    await wrapper.vm.$nextTick()
+
+    expect(wrapper.findComponent(groupMapStub).props('groupids')).toEqual([2])
+    expect(wrapper.vm.effectiveGroupIds).toEqual([2])
+  })
+
+  test('a pending reframe does not fire after the component goes away', async () => {
+    const wrapper = await makeWrapper({ showFilters: true })
+
+    type(wrapper, 'Beta')
+    wrapper.destroy()
+
+    expect(() => jest.runAllTimers()).not.toThrow()
   })
 })
 
