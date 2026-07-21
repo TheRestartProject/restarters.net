@@ -138,8 +138,55 @@ describe('GroupsTable sorting', () => {
       { ...group, id: 4, name: 'Alpha' },
     ]
     const wrapper = mountTable(groups)
-    // Default page size is 3.
-    expect(wrapper.vm.itemsToShow.map(g => g.name)).toEqual(['Alpha', 'Bravo', 'Charlie'])
+    expect(wrapper.vm.itemsToShow.map(g => g.name)).toEqual(['Alpha', 'Bravo', 'Charlie', 'Delta'])
+  })
+})
+
+// Zooming out puts far more groups in view, but the row count was frozen at
+// whatever the infinite scroll had reached - 3 groups in view or 230, the list
+// showed the same handful, which reads as the list being stuck.
+describe('GroupsTable paging', () => {
+  const many = Array.from({ length: 60 }, (_, i) => ({
+    ...group,
+    id: i + 1,
+    name: 'Group ' + String(i + 1).padStart(3, '0'),
+  }))
+
+  test('shows a useful page of rows, not a handful', () => {
+    const wrapper = mountTable(many)
+
+    expect(wrapper.vm.itemsToShow.length).toBeGreaterThanOrEqual(20)
+  })
+
+  test('starts a fresh page when the map viewport changes', async () => {
+    const wrapper = mountTable(many)
+    wrapper.vm.show = 60
+    await wrapper.vm.$nextTick()
+
+    // The map reports a different set of groups in view.
+    await wrapper.setProps({ groupids: many.slice(0, 30).map(g => g.id) })
+
+    expect(wrapper.vm.show).toBe(wrapper.vm.pageSize)
+  })
+
+  test('leaves the page alone when the same groups are reported again', async () => {
+    const wrapper = mountTable(many)
+    wrapper.vm.show = 60
+    await wrapper.vm.$nextTick()
+
+    // Hydration re-runs the computed and hands over an equal, but new, array.
+    await wrapper.setProps({ groupids: [...many.map(g => g.id)] })
+
+    expect(wrapper.vm.show).toBe(60)
+  })
+
+  test('loads a page at a time, not a row at a time', () => {
+    const wrapper = mountTable(many)
+    const before = wrapper.vm.show
+
+    wrapper.vm.loadMore({ loaded: () => {}, complete: () => {} })
+
+    expect(wrapper.vm.show).toBe(before + wrapper.vm.pageSize)
   })
 })
 

@@ -236,6 +236,21 @@ export default {
       }
       return +b[0][0] <= +b[1][0]
     },
+    placeNameProperties() {
+      // Photon returns several places sharing a name - London in England, in
+      // Ontario, in Kentucky - and the state and country are the only things
+      // that tell them apart in the dropdown.
+      return [
+        'name',
+        'street',
+        'suburb',
+        'hamlet',
+        'town',
+        'city',
+        'state',
+        'country',
+      ]
+    },
     hasUserPoint() {
       // A location of the user's own, as opposed to a box round their country.
       // Only this justifies zooming in to the groups nearest them.
@@ -318,28 +333,18 @@ export default {
             errorMessage: this.__('groups.search_nothing_found'),
             defaultMarkGeocode: false,
             geocoder: new Photon({
-              nameProperties: [
-                'name',
-                'street',
-                'suburb',
-                'hamlet',
-                'town',
-                'city',
-              ],
+              nameProperties: this.placeNameProperties,
               serviceUrl: 'https://photon.komoot.io/api'
             }),
             collapsed: false,
           })
-              .on('markgeocode', async function (e) {
+              .on('markgeocode', function (e) {
                 if (e && e.geocode && e.geocode.bbox) {
-                  // Empty out the query box so that the dropdown closes.  Note that "this" is the control object,
-                  // which is why this isn't in a separate method.
-                  this.moved = true
+                  // Empty out the query box so that the dropdown closes.  Note that "this" is the control
+                  // object, not the component, which is why the rest is a method on the component.
                   this.setQuery('')
 
-                  self.mapObject.flyToBounds(e.geocode.bbox)
-
-                  self.$emit('searched')
+                  self.goToPlace(e.geocode.bbox)
                 }
               })
               .addTo(this.mapObject)
@@ -352,6 +357,15 @@ export default {
       }
 
       this.idle()
+    },
+    goToPlace(bounds) {
+      // fitBounds rather than flyToBounds: the fly animation arcs out and back,
+      // dropping two zoom levels below the destination on a long journey and
+      // taking about three seconds over it. Once a place has been picked from
+      // the dropdown, there's nothing to be learned from watching the trip.
+      this.moved = true
+      this.mapObject.fitBounds(bounds)
+      this.$emit('searched')
     },
     presetSearch() {
       // We've already centred the map on the user's area, so show that area in

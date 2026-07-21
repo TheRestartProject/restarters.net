@@ -371,6 +371,47 @@ describe('GroupMap clustering', () => {
   })
 })
 
+describe('GroupMap place search', () => {
+  // Photon returns a London in England, another in Ontario, and more in
+  // Kentucky, Ohio, Arkansas and California. Without the state and the country
+  // every one of them renders as an identical bare "London".
+  test('labels results with enough to tell same-named places apart', () => {
+    const props = mountMap(WORLD, []).vm.placeNameProperties
+
+    expect(props).toContain('state')
+    expect(props).toContain('country')
+    // Still leads with the specific part of the name.
+    expect(props[0]).toBe('name')
+  })
+
+  // flyToBounds arcs out and back: going from Aberdeen to London it pulls out
+  // two zoom levels below the destination over about three seconds. Once a
+  // place has been picked from the dropdown, the journey isn't worth watching.
+  test('cuts straight to a searched place instead of flying out and back', () => {
+    const wrapper = mountMap(WORLD, [])
+    const map = fakeMap()
+    wrapper.vm.mapObject = map
+    wrapper.vm.$refs.map = { mapObject: map }
+
+    const bbox = L.latLngBounds([[51.28, -0.51], [51.69, 0.33]])
+    wrapper.vm.goToPlace(bbox)
+
+    expect(map.fitBounds).toHaveBeenCalledWith(bbox)
+    expect(map.flyToBounds).not.toHaveBeenCalled()
+  })
+
+  test('counts a search as having moved the map, so it stops reframing itself', () => {
+    const wrapper = mountMap(WORLD, [])
+    const map = fakeMap()
+    wrapper.vm.mapObject = map
+    wrapper.vm.$refs.map = { mapObject: map }
+
+    wrapper.vm.goToPlace(L.latLngBounds([[51.28, -0.51], [51.69, 0.33]]))
+
+    expect(wrapper.vm.moved).toBe(true)
+  })
+})
+
 describe('GroupMap markers', () => {
   test('only renders markers for groups with coordinates', () => {
     const wrapper = mountMap(WORLD, [

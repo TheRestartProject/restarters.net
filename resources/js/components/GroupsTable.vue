@@ -100,6 +100,10 @@ import moment from 'moment'
 import GroupsTableFilters from './GroupsTableFilters.vue'
 import GroupArchivedBadge from "./GroupArchivedBadge.vue";
 import { matchesFilters } from '../misc/groupFilter'
+
+// Rows shown per page. Small enough not to render a thousand rows at once,
+// big enough that zooming out visibly fills the list.
+const PAGE_SIZE = 25
 import InfiniteLoading from 'vue-infinite-loading'
 
 
@@ -165,10 +169,13 @@ export default {
       searchName: null,
       searchTags: null,
       searchShow: false,
-      show: 3
+      show: PAGE_SIZE
     }
   },
   computed: {
+    pageSize() {
+      return PAGE_SIZE
+    },
     fields() {
       const fields = [
         { key: 'group_image', label: 'Group Image', tdClass: 'image'},
@@ -229,6 +236,19 @@ export default {
     },
   },
   watch: {
+    groupids(newVal, oldVal) {
+      // The map is showing a different set of groups, so start the list again
+      // from the top. Without this the row count stays at whatever the
+      // infinite scroll had reached, however much the viewport changes.
+      // Compared by contents, not identity: the parent hands over a freshly
+      // built array whenever the store changes, and resetting on that would
+      // throw away the user's scrolling.
+      const same = newVal.length === oldVal.length && newVal.every((id, i) => id === oldVal[i])
+
+      if (!same) {
+        this.show = PAGE_SIZE
+      }
+    },
     activeFilters: {
       handler(newVal) {
         // Tell the map, so filtering moves the pins rather than just shortening
@@ -308,7 +328,7 @@ export default {
     },
     loadMore($state) {
       if (this.show < this.items.length) {
-        this.show++
+        this.show += PAGE_SIZE
         $state.loaded()
       } else {
         $state.complete()
