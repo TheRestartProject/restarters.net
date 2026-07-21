@@ -624,7 +624,7 @@ function closeAddVolunteer() {
         :canedit="canedit"
       />
 
-      <EventInviteModal :show="showInvite" :event-id="id" @close="showInvite = false" />
+      <EventInviteModal :show="showInvite" :event-id="id" :shareable-link="event?.shareable_link || ''" @close="showInvite = false" />
 
       <EventAddVolunteerModal
         :show="showAddVolunteer"

@@ -147,4 +147,7 @@ return [
   'no_devices_added' => 'No devices added',
   'add_a_device' => 'Add a device',
   'copied_to_clipboard' => 'Copied to clipboard.',
+  'shareable_link' => 'Invite via shareable link',
+  'shareable_link_box' => 'Shareable link',
+  'email_invite' => 'Invite via email',
 ];

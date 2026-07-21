@@ -136,4 +136,7 @@ return [
   'before_submit_text_autoapproved' => 'Quand vous créez ou sauvez cet événement, il sera rendu public.',
   'created_success_message' => 'Evénement créé! Il sera approuvé par un administrateur dans les plus brefs délais. Vous pouvez cependant continuer à l\'éditer en attendant.',
   'created_success_message_autoapproved' => 'Evénement créé! Il est maintenant public.',
+  'shareable_link' => 'Inviter via un lien partagé',
+  'shareable_link_box' => 'Lien partagé',
+  'email_invite' => 'Inviter par e-mail',
 ];

@@ -359,7 +359,7 @@ onMounted(() => {
 
       <GroupDevicesBreakdown :cluster-stats="groupsStore.stats.data?.cluster_stats" />
 
-      <GroupInviteModal :show="showInvite" :group-id="id" @close="showInvite = false" />
+      <GroupInviteModal :show="showInvite" :group-id="id" :shareable-link="group?.shareable_link || ''" @close="showInvite = false" />
       <GroupShareStatsModal
         :show="showShareStats"
         :group-id="id"

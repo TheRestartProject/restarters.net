@@ -1,7 +1,7 @@
 import { flushPromises, mount } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
 import { createI18n } from 'vue-i18n'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import EventCard from '../../../app/components/events/EventCard.vue'
 import { useEventsStore } from '../../../app/stores/events.js'
 import en from '../../../i18n/locales/en.json'
@@ -102,6 +102,42 @@ describe('components/events/EventCard', () => {
   it('shows a hosting badge only when the hosting prop is set', () => {
     expect(mountComponent({ hosting: true }).find('[data-testid="event-card-hosting-42"]').exists()).toBe(true)
     expect(mountComponent({ hosting: false }).find('[data-testid="event-card-hosting-42"]').exists()).toBe(false)
+  })
+
+  // GroupEventsScrollTableActions.vue disables RSVP once an event is
+  // "starting soon" - starting today but not yet begun. The base fixture
+  // starts at 10:00 UTC on 2026-08-01, so the clock decides.
+  describe('starting soon', () => {
+    afterEach(() => {
+      vi.useRealTimers()
+    })
+
+    it('disables RSVP for an event starting later today', () => {
+      vi.useFakeTimers()
+      vi.setSystemTime(new Date('2026-08-01T08:00:00Z'))
+
+      const wrapper = mountComponent()
+
+      expect(wrapper.find('[data-testid="event-attend-42"]').attributes('disabled')).toBeDefined()
+    })
+
+    it('leaves RSVP enabled the day before', () => {
+      vi.useFakeTimers()
+      vi.setSystemTime(new Date('2026-07-31T08:00:00Z'))
+
+      const wrapper = mountComponent()
+
+      expect(wrapper.find('[data-testid="event-attend-42"]').attributes('disabled')).toBeUndefined()
+    })
+
+    it('still lets an attendee withdraw from an event starting today', () => {
+      vi.useFakeTimers()
+      vi.setSystemTime(new Date('2026-08-01T08:00:00Z'))
+
+      const wrapper = mountComponent({ event: baseEvent({ attending: true }) })
+
+      expect(wrapper.find('[data-testid="event-unattend-42"]').attributes('disabled')).toBeUndefined()
+    })
   })
 
   it('shows the RSVP button and calls store.attend() when not attending', async () => {

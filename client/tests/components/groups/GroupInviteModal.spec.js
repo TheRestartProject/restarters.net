@@ -30,6 +30,44 @@ function mountComponent(props = {}) {
 }
 
 describe('components/groups/GroupInviteModal', () => {
+  // The Blade modal's chain-link header toggle swaps the email form for a
+  // box holding the shareable join link. Both halves exist; they are never
+  // shown at once.
+  describe('shareable link panel', () => {
+    it('swaps the email form for the link box when toggled', async () => {
+      const wrapper = mountComponent({ shareableLink: 'https://example.test/group/invite/abc123' })
+
+      expect(wrapper.find('[data-testid="group-invite-form"]').exists()).toBe(true)
+      expect(wrapper.find('[data-testid="group-invite-link-panel"]').exists()).toBe(false)
+
+      await wrapper.find('[data-testid="group-invite-toggle"]').trigger('click')
+
+      expect(wrapper.find('[data-testid="group-invite-form"]').exists()).toBe(false)
+      expect(wrapper.find('[data-testid="group-invite-link-panel"]').exists()).toBe(true)
+      expect(wrapper.find('[data-testid="group-invite-link"]').element.value)
+        .toBe('https://example.test/group/invite/abc123')
+    })
+
+    it('toggles back to the email form', async () => {
+      const wrapper = mountComponent()
+
+      await wrapper.find('[data-testid="group-invite-toggle"]').trigger('click')
+      await wrapper.find('[data-testid="group-invite-toggle"]').trigger('click')
+
+      expect(wrapper.find('[data-testid="group-invite-form"]').exists()).toBe(true)
+      expect(wrapper.find('[data-testid="group-invite-link-panel"]').exists()).toBe(false)
+    })
+
+    it('closes from the link panel', async () => {
+      const wrapper = mountComponent()
+
+      await wrapper.find('[data-testid="group-invite-toggle"]').trigger('click')
+      await wrapper.find('[data-testid="group-invite-link-done"]').trigger('click')
+
+      expect(wrapper.emitted('close')).toBeTruthy()
+    })
+  })
+
   beforeEach(() => {
     setActivePinia(createPinia())
   })

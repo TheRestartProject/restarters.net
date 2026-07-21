@@ -52,7 +52,7 @@ const { t } = useI18n()
 const eventsStore = useEventsStore()
 const pending = ref(false)
 
-const { attending, dayOfMonth, month, date, start, end, timezone } = useEventComputed(() => props.event)
+const { attending, dayOfMonth, month, date, start, end, timezone, startingSoon } = useEventComputed(() => props.event)
 
 // Per-event numbers (RES gap-closure pass, gap 1/17) - legacy's
 // GroupEventScrollTable.vue showed these as icon+number table cells
@@ -220,10 +220,14 @@ async function onToggleAttendance() {
     </template>
 
     <td class="text-end text-nowrap">
+      <!-- GroupEventsScrollTableActions.vue blocks a fresh RSVP once the
+           event is starting soon (starts today, not yet begun). An existing
+           attendee stays free to withdraw - that button is the only way off
+           the list here. -->
       <BButton
         variant="outline-primary"
         size="sm"
-        :disabled="pending"
+        :disabled="pending || (!attending && startingSoon)"
         :data-testid="attending ? `event-unattend-${event.id}` : `event-attend-${event.id}`"
         @click="onToggleAttendance"
       >

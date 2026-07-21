@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useEventsStore } from '../../stores/events.js'
+import IconChainLink from '../icons/IconChainLink.vue'
 
 // POST /api/v2/events/{id}/invites (api-contracts-phase-c.md C1d):
 // {emails:[...], message?} -> {invites_sent, invalid:[...]}. Replaces
@@ -12,10 +13,19 @@ import { useEventsStore } from '../../stores/events.js'
 // exists per the contract doc) is dropped here - manual email entry covers
 // the same endpoint and keeps this component in step with the group one,
 // see docs/nuxt-migration/api-gaps.md Phase C for the scoping note.
+// Which half of the modal is showing - see GroupInviteModal.vue.
+const showingLink = ref(false)
+
 const props = defineProps({
   show: {
     type: Boolean,
     default: false,
+  },
+  // Event.shareable_link, which the API only returns to users who may edit
+  // the event - the same permission that guards sending invites.
+  shareableLink: {
+    type: String,
+    default: '',
   },
   eventId: {
     type: Number,
@@ -107,7 +117,45 @@ function close() {
       {{ generalError }}
     </BAlert>
 
-    <BForm data-testid="event-invite-form" @submit.prevent="submit">
+    <div class="d-flex justify-content-end mb-2">
+      <a
+        href="#"
+        class="invite-modal__toggle text-dark d-inline-flex align-items-center"
+        data-testid="event-invite-toggle"
+        @click.prevent="showingLink = !showingLink"
+      >
+        <IconChainLink class="me-1" />
+        {{ showingLink ? t('events.email_invite') : t('events.shareable_link') }}
+      </a>
+    </div>
+
+    <div v-if="showingLink" data-testid="event-invite-link-panel">
+      <BFormGroup :label="`${t('events.shareable_link_box')}:`" label-for="event-invite-link">
+        <input
+          id="event-invite-link"
+          :value="shareableLink"
+          type="text"
+          class="form-control"
+          autocomplete="off"
+          data-testid="event-invite-link"
+          @focus="$event.target.select()"
+        >
+      </BFormGroup>
+      <!-- events.php has no equivalent of this hint; the Blade event modal
+           reaches across to the groups namespace for it too. -->
+      <small class="text-muted d-block">{{ t('groups.type_shareable_link_message') }}</small>
+
+      <div class="d-flex justify-content-between align-items-center mt-3">
+        <a href="#" data-testid="event-invite-link-cancel" @click.prevent="close">
+          {{ t('events.cancel_invites_link') }}
+        </a>
+        <BButton variant="primary" data-testid="event-invite-link-done" @click="close">
+          {{ t('groups.done_button') }}
+        </BButton>
+      </div>
+    </div>
+
+    <BForm v-else data-testid="event-invite-form" @submit.prevent="submit">
       <BFormGroup :label="`${t('events.manual_invite_box')}:`" label-for="event-invite-emails">
         <textarea
           id="event-invite-emails"

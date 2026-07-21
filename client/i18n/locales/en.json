@@ -821,7 +821,10 @@
         "impact_calculation": "<p><strong>How do we calculate environmental impact?</strong></p>\n<p>We've researched the average weight and CO<sub>2</sub>e footprint of products across a range of categories, from smartphones to t-shirts. When you enter an item that you've repaired, we use these averages to estimate the impact of that repair based on the category of the item.</p>\n<p>For misc items, we apply a generic CO<sub>2</sub>e to weight ratio to estimate the impact of each successful repair.</p>\n<p><a href=\"https://talk.restarters.net/t/how-do-we-measure-the-environmental-impact-of-events/6077\" target=\"_blank\" rel=\"nofollow\">Learn more about how we calculate impact here</a></p>",
         "no_devices_added": "No devices added",
         "add_a_device": "Add a device",
-        "copied_to_clipboard": "Copied to clipboard."
+        "copied_to_clipboard": "Copied to clipboard.",
+        "shareable_link": "Invite via shareable link",
+        "shareable_link_box": "Shareable link",
+        "email_invite": "Invite via email"
     },
     "general": {
         "general": "General",
@@ -1051,7 +1054,12 @@
         "export.events.items_kg_co2_prevent": "kg CO2 prevented",
         "marker_title": "Click for more information",
         "search_place": "Search for a place...",
-        "search_nothing_found": "Nothing found."
+        "search_nothing_found": "Nothing found.",
+        "shareable_link": "Invite via shareable link",
+        "shareable_link_box": "Shareable link",
+        "type_shareable_link_message": "Share the above link to invite people to join this group.  If a person you share the link with does not have an account yet, they will be prompted to register.",
+        "email_invite": "Invite via email",
+        "done_button": "Done"
     },
     "landing": {
         "title": "Welcome to Restarters!",

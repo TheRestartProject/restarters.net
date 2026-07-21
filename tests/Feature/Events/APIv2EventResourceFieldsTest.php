@@ -30,6 +30,47 @@ class APIv2EventResourceFieldsTest extends TestCase
         return [$idgroups, $idevents];
     }
 
+    public function testShareableLinkVisibleToHost(): void
+    {
+        $host = User::factory()->host()->create(['api_token' => 'erf-tok-sl1']);
+        [, $idevents] = $this->createEventAsHost($host);
+
+        $response = $this->get("/api/v2/events/$idevents?api_token=erf-tok-sl1");
+        $response->assertSuccessful();
+
+        $link = $response->json('data.shareable_link');
+        $this->assertNotNull($link);
+        $this->assertStringContainsString('/party/invite/', $link);
+    }
+
+    public function testShareableLinkAbsentForNonHost(): void
+    {
+        $host = User::factory()->host()->create(['api_token' => 'erf-tok-sl2']);
+        [, $idevents] = $this->createEventAsHost($host);
+
+        $restarter = User::factory()->restarter()->create(['api_token' => 'erf-tok-sl3']);
+        $this->actingAs($restarter);
+
+        $response = $this->get("/api/v2/events/$idevents?api_token=erf-tok-sl3");
+        $response->assertSuccessful();
+
+        // Absent, not null: the invite link is only ever rendered in the
+        // host-only invite modal, so a restarter has no use for it.
+        $this->assertArrayNotHasKey('shareable_link', $response->json('data'));
+    }
+
+    public function testShareableLinkAbsentForAnonymousUser(): void
+    {
+        $host = User::factory()->host()->create(['api_token' => 'erf-tok-sl4']);
+        [, $idevents] = $this->createEventAsHost($host);
+
+        Auth::logout();
+        $response = $this->get("/api/v2/events/$idevents");
+        $response->assertSuccessful();
+
+        $this->assertArrayNotHasKey('shareable_link', $response->json('data'));
+    }
+
     public function testDiscourseThreadNullWhenNotLinked(): void
     {
         $host = User::factory()->host()->create(['api_token' => 'erf-tok-1']);
