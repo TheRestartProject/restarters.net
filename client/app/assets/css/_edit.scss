@@ -1,0 +1,28 @@
+// Ported from develop's resources/sass/_edit.scss.
+//
+// `.edit-panel` is applied by the notifications page, the group edit page and
+// the profile tabs, but had NO rule on this side at all - the class was inert,
+// so those panels rendered as bare content with no border, padding or shadow.
+//
+// Bootstrap 5 keeps media-breakpoint-up unchanged (it takes the breakpoint the
+// range starts at), so those calls port verbatim - unlike media-breakpoint-down.
+.edit-panel {
+  background-color: #fff;
+  border: 1px solid $brand;
+  padding: 20px 20px 20px;
+  box-shadow: 5px 5px $brand-black;
+  margin: 0 0 30px 0;
+
+  @include media-breakpoint-up(lg) {
+    padding: 30px;
+  }
+
+  .after-offset {
+    font-size: 13px;
+  }
+
+  &__side {
+    padding: 20px;
+    margin-bottom: 5px;
+  }
+}

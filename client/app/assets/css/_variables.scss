@@ -24,6 +24,9 @@ $brand-danger: #dc3545;
 $brand-placeholder: #6c757d;
 $brand-grey: #f5f7fa;
 $brand-grey-darker: #dce3ec;
+// develop's _variables.scss - the near-black used for panel shadows.
+$brand-black: #222;
+
 $brand-orange: #ffbe5f;
 // Legacy Fixometer brand blue, used only by the .panel__blue content panel
 // (see _panels.scss). Kept as a token rather than a literal so the panel
