@@ -594,7 +594,8 @@
         "send_invites_to_restarters_tickbox": "Ajouter les invitations pour les membres. Les membres marqués avec un ⚠ seront invités mais ne recevront pas un e-mail en raison de leurs paramètres de notifications",
         "select_members_placeholder": "Sélectionner les membres à inviter",
         "manual_invite_placeholder": "Tapez un e-mail et appuyez sur Entrée ou Tab",
-        "youre_going": "Vous participez!"
+        "youre_going": "Vous participez!",
+        "you_have_joined": "Vous avez rejoint <a class=\"plain-link\" href=\"{url}\">{name}</a>"
     },
     "general": {
         "profile": "Votre profil",
@@ -840,7 +841,8 @@
         "now_unfollowed": "Vous ne suivez maintenant plus <a href=\"{link}\">{name}</a>!",
         "delete_group": "Supprimer Repair Café",
         "delete_group_confirm": "Veuillez confirmer que vous voulez supprimer {name}",
-        "invitation_pending": "Vous avez une invitation à rejoindre ce Repair Café. Cliquez <a href=\"{accept}\">ici</a> si vous voulez le rejoindre."
+        "invitation_pending": "Vous avez une invitation à rejoindre ce Repair Café. Cliquez <a href=\"{accept}\">ici</a> si vous voulez le rejoindre.",
+        "you_have_joined": "Vous avez rejoint <a class=\"plain-link\" href=\"{url}\">{name}</a>"
     },
     "landing": {
         "title": "Bienvenue chez Restarters !",

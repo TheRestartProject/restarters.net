@@ -181,4 +181,5 @@ Apprenez à utiliser ce groupe ici : :help.',
   'delete_group' => 'Supprimer Repair Café',
   'delete_group_confirm' => 'Veuillez confirmer que vous voulez supprimer :name',
   'invitation_pending' => 'Vous avez une invitation à rejoindre ce Repair Café. Cliquez <a href=":accept">ici</a> si vous voulez le rejoindre.',
+  'you_have_joined' => 'Vous avez rejoint <a class="plain-link" href=":url">:name</a>',
 ];

@@ -155,4 +155,5 @@ return [
   'select_members_placeholder' => 'Select members to invite',
   'manual_invite_placeholder' => 'Type email and press Enter or Tab',
   'youre_going' => 'You\'re going!',
+  'you_have_joined' => 'You have joined <a class="plain-link" href=":url">:name</a>',
 ];

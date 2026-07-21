@@ -658,7 +658,7 @@ class AuthController extends Controller
             }
 
             if ($group->isVolunteer($user->id)) {
-                return ['type' => 'group', 'id' => $group->idgroups, 'already_member' => true];
+                return ['type' => 'group', 'id' => $group->idgroups, 'name' => $group->name, 'already_member' => true];
             }
 
             UserGroups::updateOrCreate([
@@ -669,7 +669,7 @@ class AuthController extends Controller
                 'role' => 4,
             ]);
 
-            return ['type' => 'group', 'id' => $group->idgroups, 'already_member' => false];
+            return ['type' => 'group', 'id' => $group->idgroups, 'name' => $group->name, 'already_member' => false];
         }
 
         $party = Party::where('shareable_code', $code)->first();
@@ -679,7 +679,7 @@ class AuthController extends Controller
         }
 
         if ($party->isVolunteer($user->id)) {
-            return ['type' => 'event', 'id' => $party->idevents, 'already_member' => true];
+            return ['type' => 'event', 'id' => $party->idevents, 'name' => $party->getEventName(), 'already_member' => true];
         }
 
         EventsUsers::updateOrCreate([
@@ -690,7 +690,7 @@ class AuthController extends Controller
             'role' => 4,
         ]);
 
-        return ['type' => 'event', 'id' => $party->idevents, 'already_member' => false];
+        return ['type' => 'event', 'id' => $party->idevents, 'name' => $party->getEventName(), 'already_member' => false];
     }
 
     private function claimInviteHash(User $user, string $hash): ?array

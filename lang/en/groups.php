@@ -181,4 +181,5 @@ Learn how to use this group here: :help.',
   'delete_group' => 'Delete group',
   'delete_group_confirm' => 'Please confirm that you want to delete :name.',
   'invitation_pending' => 'You have an invitation to this group.  Please click <a href=":accept">here</a> if you would like to join.',
+  'you_have_joined' => 'You have joined <a class="plain-link" href=":url">:name</a>',
 ];

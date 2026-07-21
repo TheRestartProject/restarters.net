@@ -74,6 +74,7 @@ const labels = computed(() => ({
       :form-fields="formFields"
       :labels="labels"
       testid-prefix="brands"
+      :allow-delete="false"
       :edit-id="editId"
       :items="adminStore.brands.data"
       :fetch-items="adminStore.fetchBrands"

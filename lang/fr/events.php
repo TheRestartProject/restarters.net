@@ -144,4 +144,5 @@ return [
   'select_members_placeholder' => 'Sélectionner les membres à inviter',
   'manual_invite_placeholder' => 'Tapez un e-mail et appuyez sur Entrée ou Tab',
   'youre_going' => 'Vous participez!',
+  'you_have_joined' => 'Vous avez rejoint <a class="plain-link" href=":url">:name</a>',
 ];

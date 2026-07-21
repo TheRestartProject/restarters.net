@@ -21,7 +21,7 @@ describe('composables/useInviteClaim', () => {
     vi.stubGlobal('useNuxtApp', () => ({ $api: mockApi }))
   })
 
-  it('redirects to /login carrying invite_code/invite_type/redirect when logged out', async () => {
+  it('redirects to /user/register carrying invite_code/invite_type/redirect when logged out', async () => {
     await claimInvite({
       code: 'abc123',
       inviteType: 'group',
@@ -32,7 +32,7 @@ describe('composables/useInviteClaim', () => {
 
     expect(mockApi.auth.claimInvite).not.toHaveBeenCalled()
     expect(navigateToMock).toHaveBeenCalledWith(
-      '/login?invite_code=abc123&invite_type=group&redirect=%2Fgroup%2Finvite%2Fabc123'
+      '/user/register?invite_code=abc123&invite_type=group&redirect=%2Fgroup%2Finvite%2Fabc123'
     )
   })
 

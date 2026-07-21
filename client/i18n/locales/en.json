@@ -831,7 +831,8 @@
         "send_invites_to_restarters_tickbox": "Add invites for group members. Members marked with a ⚠ will be invited but won't be sent an email due to their notification settings.",
         "select_members_placeholder": "Select members to invite",
         "manual_invite_placeholder": "Type email and press Enter or Tab",
-        "youre_going": "You're going!"
+        "youre_going": "You're going!",
+        "you_have_joined": "You have joined <a class=\"plain-link\" href=\"{url}\">{name}</a>"
     },
     "general": {
         "general": "General",
@@ -1076,7 +1077,8 @@
         "now_unfollowed": "You have now unfollowed <a href=\"{link}\">{name}</a>.",
         "delete_group": "Delete group",
         "delete_group_confirm": "Please confirm that you want to delete {name}.",
-        "invitation_pending": "You have an invitation to this group.  Please click <a href=\"{accept}\">here</a> if you would like to join."
+        "invitation_pending": "You have an invitation to this group.  Please click <a href=\"{accept}\">here</a> if you would like to join.",
+        "you_have_joined": "You have joined <a class=\"plain-link\" href=\"{url}\">{name}</a>"
     },
     "landing": {
         "title": "Welcome to Restarters!",

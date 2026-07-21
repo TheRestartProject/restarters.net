@@ -132,8 +132,23 @@ onUnmounted(() => {
 
 <template>
   <nav class="nav-wrapper ps-0 pe-0" data-testid="app-navbar">
+    <!-- navbar.blade.php swaps the mark at md: includes/logo (the wordmark)
+         inside `d-none d-md-block`, includes/logo-plain (the compact power
+         mark alone) inside its mobile counterpart. We showed the full
+         wordmark at every width, which is what pushes the header wide enough
+         to clip on a phone. -->
     <NuxtLink to="/" class="icon-brand" data-testid="nav-logo">
-      <IconLogo />
+      <span class="d-none d-md-block">
+        <IconLogo />
+      </span>
+      <img
+        src="/images/logo_mini.png"
+        alt=""
+        width="41"
+        height="49"
+        class="d-block d-md-none"
+        data-testid="nav-logo-compact"
+      >
     </NuxtLink>
 
     <ul

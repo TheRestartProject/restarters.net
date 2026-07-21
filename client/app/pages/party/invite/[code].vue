@@ -13,8 +13,11 @@ await claimInvite({
   code: route.params.code,
   inviteType: 'event',
   viewPathPrefix: '/party/view/',
-  joinedMessage: t('client.invite.event_joined'),
-  alreadyMemberMessage: t('events.already_member'),
+  // develop names the group/event and links to it.
+  joinedMessage: (data) =>
+    t('events.you_have_joined', { name: data.name, url: `/party/view/${data.id}` }),
+  alreadyMemberMessage: (data) =>
+    t('events.already_member', { name: data.name, url: `/party/view/${data.id}` }),
   currentPath: route.fullPath,
 })
 </script>
