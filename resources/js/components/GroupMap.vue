@@ -13,7 +13,23 @@
         @moveend="idle"
         @dragend="dragEnd"
     >
-      <GroupMarker :key='"marker-" + group.id' v-for="group in mappableGroups" :id="group.id" :highlight="yourGroup(group.id)" :hover="group.id === hover" @update:hover="$emit('update:hover', $event)" />
+      <template v-for="entry in clusters">
+        <l-marker
+            v-if="entry.properties.cluster"
+            :key="'cluster-' + entry.id"
+            :lat-lng="[entry.geometry.coordinates[1], entry.geometry.coordinates[0]]"
+            :icon="clusterIcon(entry)"
+            @click="clusterClick(entry)"
+        />
+        <GroupMarker
+            v-else
+            :key="'marker-' + entry.properties.groupId"
+            :id="entry.properties.groupId"
+            :highlight="yourGroup(entry.properties.groupId)"
+            :hover="entry.properties.groupId === hover"
+            @update:hover="$emit('update:hover', $event)"
+        />
+      </template>
       <l-tile-layer :url="tiles" :attribution="attribution" />
     </l-map>
   </div>
@@ -26,6 +42,7 @@ import { Photon } from 'leaflet-control-geocoder/src/geocoders/photon'
 // what keeps it hidden until a search actually fails (and styles the button).
 import 'leaflet-control-geocoder/dist/Control.Geocoder.css'
 import GroupMarker from './GroupMarker.vue'
+import Supercluster from 'supercluster'
 
 export default {
   components: {
@@ -92,6 +109,14 @@ export default {
       type: Number,
       required: false,
       default: 0,
+    },
+    // Below this many groups, draw them all rather than clustering. Supercluster
+    // can quietly return fewer points than it was given, which doesn't matter
+    // among thousands but is obvious when there are only a handful.
+    minCluster: {
+      type: Number,
+      required: false,
+      default: 10,
     }
   },
   data() {
@@ -139,6 +164,66 @@ export default {
         const lng = g.location && g.location.lng != null ? g.location.lng : g.lng
         return lat != null && lng != null && !isNaN(+lat) && !isNaN(+lng)
       })
+    },
+    clusterPoints() {
+      return this.mappableGroups.map((g) => ({
+        type: 'Feature',
+        id: g.id,
+        properties: { groupId: g.id, cluster: false },
+        geometry: {
+          type: 'Point',
+          coordinates: [
+            +(g.location && g.location.lng != null ? g.location.lng : g.lng),
+            +(g.location && g.location.lat != null ? g.location.lat : g.lat),
+          ],
+        },
+      }))
+    },
+    clusterIndex() {
+      // The index is immutable, so it has to be rebuilt whenever the points
+      // change rather than updated in place.
+      const index = new Supercluster({
+        radius: 60,
+        maxZoom: this.maxZoom,
+        minZoom: this.minZoom,
+      })
+
+      index.load(this.clusterPoints)
+
+      return index
+    },
+    clusters() {
+      // Which clusters exist depends on the zoom and what's in view, but Leaflet
+      // reports both imperatively, so reading mapIdle here is what makes this
+      // recompute as the map moves.
+      this.mapIdle
+
+      if (!this.mapObject || !this.clusterPoints.length) {
+        return []
+      }
+
+      if (this.clusterPoints.length < this.minCluster) {
+        return this.clusterPoints
+      }
+
+      try {
+        const bounds = this.mapObject.getBounds()
+
+        if (!bounds) {
+          return this.clusterPoints
+        }
+
+        return this.clusterIndex.getClusters([
+          bounds.getWest(),
+          bounds.getSouth(),
+          bounds.getEast(),
+          bounds.getNorth(),
+        ], Math.round(this.mapObject.getZoom()))
+      } catch (e) {
+        // Map state races (no bounds mid-transition) shouldn't lose the markers.
+        console.error('Error clustering groups', e)
+        return this.clusterPoints
+      }
     },
     hasLocation() {
       // The groups page sends the inverted world box [[90,180],[-90,-180]] when
@@ -324,6 +409,33 @@ export default {
       this.moved = true
       this.$emit('update:moved', true)
       this.idle()
+    },
+    clusterIcon(cluster) {
+      const count = cluster.properties.point_count
+      const wide = count >= 1000 ? ' group-cluster__count--wide' : ''
+
+      return L.divIcon({
+        html: '<div class="group-cluster__count' + wide + '">' + count + '</div>',
+        // Replaces Leaflet's .leaflet-div-icon, which would otherwise draw a
+        // white box with a grey border behind the circle.
+        className: 'group-cluster',
+        iconSize: [46, 46],
+        iconAnchor: [23, 23],
+      })
+    },
+    clusterClick(cluster) {
+      // Zoom to where this cluster breaks apart, so a click always reveals
+      // something rather than appearing to do nothing.
+      const zoom = Math.min(
+          this.clusterIndex.getClusterExpansionZoom(cluster.properties.cluster_id),
+          this.maxZoom
+      )
+
+      this.moved = true
+      this.mapObject.flyTo(
+          [cluster.geometry.coordinates[1], cluster.geometry.coordinates[0]],
+          zoom
+      )
     },
     frameShownGroups() {
       // A filter is an explicit request to see something, so take the map there

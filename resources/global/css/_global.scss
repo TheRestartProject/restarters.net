@@ -169,3 +169,33 @@ h2 {
 .group-marker-hover {
   filter: hue-rotate(153deg) saturate(1.5);
 }
+
+// Cluster bubble on the groups map. This class replaces Leaflet's own
+// .leaflet-div-icon, which would otherwise draw a white box with a grey border
+// behind the circle.
+.group-cluster {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: 5px solid #000;
+  background-color: #fff;
+  color: #000;
+  text-align: center;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.group-cluster__count {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  font-size: 16px;
+  line-height: 1;
+}
+
+// The bubble is a fixed size whatever the count, so shrink four-figure numbers
+// rather than letting them spill outside the circle.
+.group-cluster__count--wide {
+  font-size: 12px;
+}

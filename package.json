@@ -91,6 +91,7 @@
         "select2": "~4.0",
         "slick-carousel": "^1.8.1",
         "sortablejs": "^1.7.0",
+        "supercluster": "^7.1.5",
         "tempusdominus-bootstrap-4": "^5.39.2",
         "text-clipper": "^2.1.0",
         "tinysort": "^3.2.8",

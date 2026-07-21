@@ -35,6 +35,7 @@ function fakeMap(size = { x: 688, y: 400 }) {
     invalidateSize: jest.fn(),
     fitBounds: jest.fn(),
     flyToBounds: jest.fn(),
+    flyTo: jest.fn(),
     getSize: () => size,
     getBounds: () => L.latLngBounds([[50, -1], [52, 1]]),
     getZoom: () => 5,
@@ -283,6 +284,90 @@ describe('GroupMap reframing on request', () => {
     await wrapper.setProps({ frameRequest: 1 })
 
     expect(map.fitBounds).not.toHaveBeenCalled()
+  })
+})
+
+// Without clustering a large network is an unreadable mass of overlapping pins.
+describe('GroupMap clustering', () => {
+  // All within the fake map's bounds ([[50,-1],[52,1]]), close enough together
+  // to cluster at its zoom.
+  const many = Array.from({ length: 20 }, (_, i) => ({
+    id: i + 1,
+    location: { lat: 51 + i * 0.001, lng: 0 + i * 0.001 },
+  }))
+
+  function mountWithMap(groups) {
+    const wrapper = mountMap(WORLD, groups)
+    const map = fakeMap()
+    wrapper.vm.mapObject = map
+    wrapper.vm.$refs.map = { mapObject: map }
+    return { wrapper, map }
+  }
+
+  test('gathers overlapping groups into a single cluster', () => {
+    const { wrapper } = mountWithMap(many)
+
+    const clusters = wrapper.vm.clusters
+    expect(clusters.length).toBeLessThan(many.length)
+    expect(clusters.some(c => c.properties.cluster)).toBe(true)
+  })
+
+  // Supercluster can quietly drop points when there are few of them, which is
+  // obvious at high zoom. Below the threshold, show the groups themselves.
+  test('shows every group individually when there are only a few', () => {
+    const few = many.slice(0, 3)
+    const { wrapper } = mountWithMap(few)
+
+    const clusters = wrapper.vm.clusters
+    expect(clusters).toHaveLength(3)
+    expect(clusters.every(c => !c.properties.cluster)).toBe(true)
+    expect(clusters.map(c => c.properties.groupId).sort()).toEqual([1, 2, 3])
+  })
+
+  // A four-figure count won't fit at the normal size in a fixed-size bubble.
+  test('shrinks the text for counts that would overflow the circle', () => {
+    const { wrapper } = mountWithMap(many)
+    const cluster = wrapper.vm.clusters.find(c => c.properties.cluster)
+
+    expect(wrapper.vm.clusterIcon(cluster).options.html)
+      .not.toContain('group-cluster__count--wide')
+
+    const big = { properties: { ...cluster.properties, point_count: 1234 } }
+    expect(wrapper.vm.clusterIcon(big).options.html)
+      .toContain('group-cluster__count--wide')
+  })
+
+  test('the cluster marker shows how many groups are in it', () => {
+    const { wrapper } = mountWithMap(many)
+    const cluster = wrapper.vm.clusters.find(c => c.properties.cluster)
+
+    expect(wrapper.vm.clusterIcon(cluster).options.html)
+      .toContain(String(cluster.properties.point_count))
+  })
+
+  test('clicking a cluster zooms in far enough to break it up', () => {
+    const { wrapper, map } = mountWithMap(many)
+    const cluster = wrapper.vm.clusters.find(c => c.properties.cluster)
+
+    wrapper.vm.clusterClick(cluster)
+
+    expect(map.flyTo).toHaveBeenCalled()
+    const [, zoom] = map.flyTo.mock.calls[0]
+    expect(zoom).toBeGreaterThan(map.getZoom())
+    expect(zoom).toBeLessThanOrEqual(wrapper.vm.maxZoom)
+  })
+
+  // Leaflet's own .leaflet-div-icon would otherwise draw a white box with a grey
+  // border behind the circle.
+  test('the cluster icon replaces Leaflet default styling with its own class', () => {
+    const { wrapper } = mountWithMap(many)
+    const cluster = wrapper.vm.clusters.find(c => c.properties.cluster)
+
+    const options = wrapper.vm.clusterIcon(cluster).options
+    expect(options.className).toBe('group-cluster')
+    // Anchored at its middle, so the circle sits over the point it represents.
+    expect(options.iconSize).toEqual([46, 46])
+    expect(options.iconAnchor).toEqual([23, 23])
   })
 })
 
