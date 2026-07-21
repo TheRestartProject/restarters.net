@@ -959,6 +959,21 @@ class GroupController extends Controller
         ]);
     }
 
+    /**
+     * @OA\Get(
+     *      path="/api/v2/moderate/groups",
+     *      operationId="moderateGroupsv2",
+     *      tags={"Groups"},
+     *      summary="Groups awaiting moderation",
+     *      description="Unapproved groups visible to the caller - every group for an Administrator, a NetworkCoordinator's own networks otherwise.",
+     *      security={{"apiToken":{}}},
+     *      @OA\Response(
+     *          response=200,
+     *          description="Groups awaiting moderation. A bare array, not a {data:...} envelope - response()->json() on a resource collection bypasses Laravel's Responsable wrapping.",
+     *          @OA\JsonContent(type="array", @OA\Items(type="object"))
+     *      )
+     * )
+     */
     public function moderateGroupsv2(Request $request): JsonResponse {
         $user = $this->getUser();
         $ret = \App\Http\Resources\GroupCollection::make(Group::unapprovedVisibleTo($user->id));
