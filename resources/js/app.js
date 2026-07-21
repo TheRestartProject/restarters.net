@@ -436,6 +436,7 @@ function initializeJQuery() {
           Vue.component('l-map', leafletModule.LMap);
           Vue.component('l-marker', leafletModule.LMarker);
           Vue.component('l-tile-layer', leafletModule.LTileLayer);
+          Vue.component('l-tooltip', leafletModule.LTooltip);
         }).catch((e) => {
           console.warn('Vue2-Leaflet components not available, using fallback:', e.message);
         });

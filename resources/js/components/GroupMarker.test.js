@@ -46,11 +46,33 @@ describe('GroupMarker icon', () => {
     expect(mountMarker({ hover: true }).vm.icon.options.iconUrl).toBe('/images/vendor/leaflet/dist/marker-icon.png')
   })
 
+  // Neil's PR feedback: pins looked mispositioned - a group in Ulverston appeared
+  // to be out in Morecambe Bay.  With no iconSize/iconAnchor, Leaflet puts the
+  // image's top-left corner on the coordinate rather than the tip of the pin.
+  test('anchors the tip of the pin to the coordinate, not its top-left corner', () => {
+    const options = mountMarker().vm.icon.options
+    expect(options.iconSize).toEqual([25, 41])
+    expect(options.iconAnchor).toEqual([12, 41])
+  })
+
   test('recolours via a CSS class: green for groups you follow, red on hover', () => {
     expect(mountMarker().vm.icon.options.className).toBe('')
     expect(mountMarker({ highlight: true }).vm.icon.options.className).toBe('group-marker-yours')
     // Hover wins over highlight, matching the previous priority.
     expect(mountMarker({ hover: true, highlight: true }).vm.icon.options.className).toBe('group-marker-hover')
+  })
+})
+
+// Neil's PR feedback: the group name took too long to appear on hover.  It was
+// the native `title` attribute, whose delay is the browser's and can't be tuned;
+// a Leaflet tooltip shows as soon as the pointer arrives.
+describe('GroupMarker tooltip', () => {
+  test('renders the name in a Leaflet tooltip rather than a native title', () => {
+    const wrapper = mountMarker()
+
+    const tooltip = wrapper.find('l-tooltip')
+    expect(tooltip.exists()).toBe(true)
+    expect(tooltip.text()).toContain('Test Group')
   })
 })
 

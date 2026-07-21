@@ -4,12 +4,17 @@
          mouseover drives the highlight. -->
     <l-marker
         :lat-lng="[lat, lng]" :options="{
-          title: group.name + ' - ' + __('groups.marker_title'),
+          alt: label,
         }" :icon="icon"
         @click="openModal"
         @mouseover="markerHover(true)"
         @mouseout="markerHover(false)"
-    />
+    >
+      <!-- A Leaflet tooltip, not the native `title` attribute: `title` is shown
+           by the browser on its own ~1s delay, which we can't tune. This appears
+           as soon as the pointer reaches the pin. -->
+      <l-tooltip :options="{ direction: 'top', opacity: 0.95 }">{{ label }}</l-tooltip>
+    </l-marker>
     <GroupInfoModal v-if="showModal" ref="modal" :id="group.id" @close="showModal = false "/>
   </div>
 </template>
@@ -63,8 +68,19 @@ export default {
 
       return L.icon({
         iconUrl: '/images/vendor/leaflet/dist/marker-icon.png',
+        // Without iconSize/iconAnchor Leaflet pins the image's top-left corner to
+        // the coordinate, so the whole 25x41 teardrop hangs down and to the right
+        // and the pin appears to point at somewhere else entirely. These are
+        // Leaflet's own defaults for this image: anchor the tip of the pin.
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        // Measured from the anchor (the tip), so the tooltip clears the pin head.
+        tooltipAnchor: [0, -41],
         className: className,
       })
+    },
+    label() {
+      return this.group.name + ' - ' + this.__('groups.marker_title')
     },
     group() {
       return this.$store.getters['groups/get'](this.id)

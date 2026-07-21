@@ -7,6 +7,7 @@ use App\Group;
 use App\Party;
 use App\Role;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Tests\TestCase;
@@ -194,6 +195,72 @@ class GroupViewTest extends TestCase
         $this->assertNotNull($group2, "Group Beta (id=$id2) not found in API response");
         $this->assertNotNull($group1['next_event'], 'Group Alpha should have a next_event');
         $this->assertNotNull($group2['next_event'], 'Group Beta should have a next_event');
+    }
+
+    public function testNextEventIsTheSoonestNotTheFurthestAway(): void
+    {
+        $this->loginAsTestUser(Role::ADMINISTRATOR);
+
+        // A group with more than one upcoming event.  The existing coverage only
+        // ever gave a group a single future event, which can't tell "soonest" from
+        // "furthest away" - and the summary API was returning the latter.
+        $id = $this->createGroup('Group With Two Events');
+
+        $soon = Carbon::parse('1pm tomorrow');
+        $later = Carbon::parse('1pm +5 months');
+
+        // Created furthest-first, so a test that happens to pass on insertion order
+        // rather than on the ordering we asked for would still fail here.
+        Party::factory()->create([
+            'group' => $id,
+            'approved' => true,
+            'event_start_utc' => $later->toIso8601String(),
+            'event_end_utc' => $later->copy()->addHours(2)->toIso8601String(),
+        ]);
+        $soonest = Party::factory()->create([
+            'group' => $id,
+            'approved' => true,
+            'event_start_utc' => $soon->toIso8601String(),
+            'event_end_utc' => $soon->copy()->addHours(2)->toIso8601String(),
+        ]);
+
+        // The upcoming events are cached globally, not per group.
+        Cache::forget('future_events');
+
+        $response = $this->get('/api/v2/groups/summary?includeNextEvent=true');
+        $response->assertSuccessful();
+
+        $group = collect($response->json('data'))->firstWhere('id', $id);
+        $this->assertNotNull($group, "Group (id=$id) not found in API response");
+        $this->assertNotNull($group['next_event'], 'Group should have a next_event');
+        $this->assertEquals($soonest->idevents, $group['next_event']['id'], 'next_event should be the soonest upcoming event, not the furthest away');
+    }
+
+    public function testFutureScopeReturnsSoonestFirst(): void
+    {
+        // The summary API relies on Party::future() coming back in ascending date
+        // order.  scopeUndeleted() applies a DESC order and orderBy() appends, so
+        // this needs an explicit reorder() to hold.
+        $this->loginAsTestUser(Role::ADMINISTRATOR);
+        $id = $this->createGroup('Group For Scope Ordering');
+
+        foreach (['1pm +3 months', '1pm tomorrow', '1pm +5 months'] as $when) {
+            $at = Carbon::parse($when);
+            Party::factory()->create([
+                'group' => $id,
+                'approved' => true,
+                'event_start_utc' => $at->toIso8601String(),
+                'event_end_utc' => $at->copy()->addHours(2)->toIso8601String(),
+            ]);
+        }
+
+        $starts = Party::future()->forGroup($id)->get()->pluck('event_start_utc')->map(function ($d) {
+            return Carbon::parse($d)->timestamp;
+        })->all();
+
+        $sorted = $starts;
+        sort($sorted);
+        $this->assertEquals($sorted, $starts, 'Party::future() should return the soonest event first');
     }
 
     public function testGroupIndexQueryCountScalesWithO1NotN(): void
