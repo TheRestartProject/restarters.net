@@ -203,7 +203,7 @@ onMounted(() => {
            ACTIONS (right). -->
       <header class="group-header d-flex flex-wrap" data-testid="group-view-header">
         <div class="group-header__left d-flex">
-          <img :src="groupImage" alt="" class="groupImage me-3" data-testid="group-view-image">
+          <img :src="groupImage" alt="" class="groupImage align-self-start me-4 mb-3" data-testid="group-view-image">
           <div>
             <h1 data-testid="group-view-name">{{ group.name }}</h1>
             <div v-if="group.tags && group.tags.length" class="mb-2" data-testid="group-view-tags">
@@ -378,6 +378,9 @@ onMounted(() => {
 <style scoped>
 /* Match develop's GroupHeading.vue: the group heading image is restricted to
    67px wide (height auto) instead of rendering at its full uploaded size. */
+/* GroupHeading.vue:12 - `align-self-start` on the image itself. Without it
+   the flex row's default `align-items: stretch` stretches the image to the
+   row height, so a portrait logo renders tall and narrow. */
 .groupImage {
   width: 67px;
   height: auto;
@@ -392,8 +395,26 @@ onMounted(() => {
   margin-bottom: 1.5rem;
 }
 
+/* GroupHeading.vue:11,22 - `w-xs-100 w-md-50` on BOTH columns, so each is
+   capped at half the row at md+. Without the cap the left column sizes to its
+   content, and a long group name pushes the actions column onto its own line
+   instead of wrapping within its half. min-width:0 lets a flex item shrink
+   below its content width at all, which is what actually allows the wrap. */
 .group-header__left {
   padding-right: 1.5rem;
+  width: 100%;
+  min-width: 0;
+}
+
+.group-header__left h1 {
+  overflow-wrap: anywhere;
+}
+
+@media (min-width: 768px) {
+  .group-header__left,
+  .group-header__right {
+    width: 50%;
+  }
 }
 
 /* GroupHeading.vue's .bord: a vertical divider between the image+name column
@@ -406,6 +427,7 @@ onMounted(() => {
 
 .group-header__right {
   padding-left: 1.5rem;
+  min-width: 0;
   align-items: center;
 }
 </style>
