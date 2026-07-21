@@ -1968,6 +1968,16 @@ class UserController extends Controller
      */
     public function createUserv2(Request $request): JsonResponse
     {
+        // SECURITY: Administrator only, matching develop's
+        // UserController::create ("Administrators can add users",
+        // UserController.php:621). The route carries auth:sanctum,api and
+        // nothing more, so without this ANY authenticated user could create an
+        // account - and the payload takes a `role`, so any authenticated user
+        // could mint themselves an Administrator.
+        if ($resp = $this->requireAdministrator()) {
+            return $resp;
+        }
+
         $this->authorize('create', User::class);
 
         $validated = $request->validate([
