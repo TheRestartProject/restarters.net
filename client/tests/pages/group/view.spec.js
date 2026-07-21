@@ -1,4 +1,4 @@
-import { mount } from '@vue/test-utils'
+import { flushPromises, mount } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
 import { createI18n } from 'vue-i18n'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -281,6 +281,36 @@ describe('pages/group/view/[id]', () => {
 
       await wrapper.find('[data-testid="group-actions-leave"]').trigger('click')
       expect(groupsStore.leave).toHaveBeenCalledWith(5)
+    })
+
+    // GroupPage.vue confirms a leave with a green banner naming the group,
+    // rather than leaving the flipped button as the only feedback.
+    it('confirms the leave with a banner naming the group', async () => {
+      groupsStore.current.data = BASE_GROUP
+      groupsStore.memberIds = [5]
+      groupsStore.leave = vi.fn().mockResolvedValue()
+
+      const wrapper = mountPage()
+      expect(wrapper.find('[data-testid="group-view-unfollowed"]').exists()).toBe(false)
+
+      await wrapper.find('[data-testid="group-actions-leave"]').trigger('click')
+      await flushPromises()
+
+      const banner = wrapper.find('[data-testid="group-view-unfollowed"]')
+      expect(banner.exists()).toBe(true)
+      expect(banner.text()).toContain(BASE_GROUP.name)
+    })
+
+    it('does not confirm when leaving failed', async () => {
+      groupsStore.current.data = BASE_GROUP
+      groupsStore.memberIds = [5]
+      groupsStore.leave = vi.fn().mockRejectedValue(new Error('nope'))
+
+      const wrapper = mountPage()
+      await wrapper.find('[data-testid="group-actions-leave"]').trigger('click')
+      await flushPromises()
+
+      expect(wrapper.find('[data-testid="group-view-unfollowed"]').exists()).toBe(false)
     })
   })
 

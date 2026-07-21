@@ -177,4 +177,5 @@ Apprenez à utiliser ce groupe ici : :help.',
   'fixed_items' => 'Appareils réparés',
   'repairable_items' => 'Appareils réparables',
   'end_of_life_items' => 'Appareils en fin de vie',
+  'now_unfollowed' => 'Vous ne suivez maintenant plus <a href=":link">:name</a>!',
 ];

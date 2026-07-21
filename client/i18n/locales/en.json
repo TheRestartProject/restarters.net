@@ -1065,7 +1065,8 @@
         "co2_emissions_prevented": "CO2 emissions prevented",
         "fixed_items": "Fixed items",
         "repairable_items": "Repairable items",
-        "end_of_life_items": "End-of-life items"
+        "end_of_life_items": "End-of-life items",
+        "now_unfollowed": "You have now unfollowed <a href=\"{link}\">{name}</a>."
     },
     "landing": {
         "title": "Welcome to Restarters!",

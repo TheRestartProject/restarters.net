@@ -148,8 +148,23 @@ async function onJoin() {
   await groupsStore.join(id.value).catch(() => {})
 }
 
+// GroupPage.vue keeps a `haveLeft` flag and renders a green banner naming
+// the group with a link back to it, so leaving is confirmed rather than only
+// implied by the button flipping to Join. Set only on success - a failed
+// leave already toasts and reverts.
+const haveLeft = ref(false)
+
+const unfollowedMessage = computed(() =>
+  t('groups.now_unfollowed', { name: group.value?.name ?? '', link: `/group/view/${id.value}` })
+)
+
 async function onLeave() {
-  await groupsStore.leave(id.value).catch(() => {})
+  try {
+    await groupsStore.leave(id.value)
+    haveLeft.value = true
+  } catch {
+    // leave() has already toasted and reverted the optimistic update.
+  }
 }
 
 function load() {
@@ -179,6 +194,18 @@ onMounted(() => {
 
 <template>
   <div class="container py-4" data-testid="group-view-page">
+    <BAlert
+      v-if="haveLeft"
+      :model-value="true"
+      variant="success"
+      dismissible
+      data-testid="group-view-unfollowed"
+      @closed="haveLeft = false"
+    >
+      <!-- eslint-disable-next-line vue/no-v-html -->
+      <span v-html="unfollowedMessage" />
+    </BAlert>
+
     <div v-if="groupsStore.current.loading" data-testid="group-view-loading">
       <div class="placeholder-glow">
         <span class="placeholder col-12" style="height: 6rem" />
