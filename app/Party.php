@@ -707,8 +707,11 @@ class Party extends Model implements Auditable
 
     public function scopeEventHasFinished($query)
     {
-        $now = Carbon::now();
-        return $query->whereRaw("`event_end_utc` < '{$now}'");
+        // Bound, not interpolated. $now is server-generated so this was never
+        // injectable, but it was the only interpolated raw SQL in the codebase
+        // - and one benign example is enough to make a grep for the dangerous
+        // pattern useless.
+        return $query->where('event_end_utc', '<', Carbon::now());
     }
 
     public function getWastePreventedAttribute()
