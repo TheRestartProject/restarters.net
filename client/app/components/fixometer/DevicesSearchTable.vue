@@ -143,10 +143,31 @@ function onRowClosed(id) {
 }
 
 const clusters = computed(() => devicesStore.clusters)
-// DeviceBrand.vue's `brands` prop (DeviceForm.vue's own brand field ports
-// this the same way) - a <datalist> of known brand names to suggest while
-// typing, in place of legacy's vue-typeahead-bootstrap dropdown.
+// DeviceBrand.vue's `brands` prop - DeviceForm.vue's own brand field ports
+// this via a real <input> plus a custom-styled suggestion panel (its own doc
+// comment explains why: native <datalist> chrome doesn't match legacy's
+// vue-typeahead-bootstrap look), and this filter field reproduces that exact
+// pattern rather than a <datalist>.
 const brands = computed(() => devicesStore.brands.data)
+const brandSuggestionsOpen = ref(false)
+const brandNames = computed(() => brands.value.map((b) => b.brand_name))
+const brandMatches = computed(() => {
+  const term = filters.brand.trim().toLowerCase()
+  const list = term ? brandNames.value.filter((s) => s.toLowerCase().includes(term)) : brandNames.value
+  return list.slice(0, 5)
+})
+function selectBrand(value) {
+  filters.brand = value
+  brandSuggestionsOpen.value = false
+}
+function onBrandFieldBlur(event) {
+  // Losing focus to our own panel (an option's mousedown is prevented, so
+  // this only fires for a genuine focus move elsewhere) closes it - same
+  // guard as DeviceForm.vue's `onFieldBlur`.
+  if (event.currentTarget.contains(event.relatedTarget)) return
+  brandSuggestionsOpen.value = false
+}
+
 // Only offer categories that match the selected powered/unpowered toggle -
 // DeviceCategorySelect.vue's :powered prop does the same filtering
 // server-props-side in the legacy app.
@@ -342,17 +363,35 @@ function toggleMobileSection(section) {
 
           <div v-if="filters.powered" class="col-sm-6 col-md-4">
             <label class="form-label" for="device-search-brand">{{ t('devices.brand') }}</label>
-            <input
-              id="device-search-brand"
-              v-model="filters.brand"
-              type="text"
-              class="form-control"
-              list="device-search-brand-list"
-              data-testid="device-search-brand"
-            >
-            <datalist id="device-search-brand-list">
-              <option v-for="b in brands" :key="b.id" :value="b.brand_name" />
-            </datalist>
+            <div class="position-relative typeahead-field">
+              <input
+                id="device-search-brand"
+                v-model="filters.brand"
+                type="text"
+                class="form-control"
+                autocomplete="off"
+                data-testid="device-search-brand"
+                @focus="brandSuggestionsOpen = true"
+                @blur="onBrandFieldBlur"
+              >
+              <div
+                v-if="brandSuggestionsOpen && brandMatches.length"
+                class="multiselect__content-wrapper"
+                data-testid="device-search-brand-suggestions"
+              >
+                <ul class="multiselect__content">
+                  <li
+                    v-for="b in brandMatches"
+                    :key="b"
+                    class="multiselect__option"
+                    :data-testid="`device-search-brand-option-${b}`"
+                    @mousedown.prevent="selectBrand(b)"
+                  >
+                    {{ b }}
+                  </li>
+                </ul>
+              </div>
+            </div>
           </div>
 
           <div class="col-sm-6 col-md-4">

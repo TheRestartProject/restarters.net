@@ -30,6 +30,14 @@
     margin-bottom: 5px;
   }
 
+  &__device {
+    @include media-breakpoint-up(lg) {
+      padding: 60px;
+    }
+
+    margin: 10px auto;
+  }
+
   .btn-preferences {
     color: #000;
     text-decoration: underline;

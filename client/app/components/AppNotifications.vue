@@ -141,6 +141,7 @@ onUnmounted(() => {
   padding: 0.25em 0.75em;
   font-size: 16px;
   font-weight: 400;
+  font-family: 'Patua One';
   color: #fff;
   background-color: #ec7f00;
 
@@ -159,6 +160,19 @@ onUnmounted(() => {
     &:active {
       background-color: #7e7e7e;
     }
+  }
+
+  // Ported from develop's .badge-left (_badge.scss): the Discourse badge
+  // is first in the pair and gets its own horizontal padding, a tighter
+  // icon/count gap, and a right margin separating it from the Restarters
+  // badge. develop's .badge-right (the second/last badge) added no
+  // overrides of its own, so it keeps this rule's Bootstrap-default-style
+  // padding/gap above unchanged.
+  &:first-child {
+    gap: 5px;
+    margin-right: 10px;
+    padding-left: 15px;
+    padding-right: 15px;
   }
 }
 

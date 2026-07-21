@@ -215,7 +215,7 @@ function copy(text) {
                 </g>
               </g>
             </g>
-          </svg>{{ t('profile.calendars.all_events') }}
+          </svg> <span class="span-vertically-align-middle">{{ t('profile.calendars.all_events') }}</span>
         </h5>
         <div class="input-group mb-4">
           <input type="text" class="form-control" readonly :value="profileStore.calendars.data.admin_all_events_url">
@@ -236,3 +236,13 @@ function copy(text) {
     </template>
   </div>
 </template>
+
+<style scoped>
+/* develop _buttons.scss:607 - keeps the "All events" label aligned with the
+   cog icon that precedes it. The class was referenced in the markup but never
+   ported; without it the label baseline-aligns and sits low against the icon. */
+.span-vertically-align-middle {
+  display: inline-block;
+  vertical-align: middle;
+}
+</style>

@@ -682,3 +682,35 @@
     }
   }
 }
+
+// Guest/login language bar
+// =========================
+// Ported from resources/sass/_languages.scss's `.fixed-layout &, .login-page
+// & { position: fixed; bottom: 0; z-index: 10 }` plus the matching
+// `.fixed-layout, .login-page { padding-bottom: 65px }` — develop pins the
+// language dropdown to the viewport bottom on the login/register/recover
+// pages (Blade adds `.fixed-layout` on <body> for those routes, or wraps
+// the page in `.login-page` directly) so it stays reachable without
+// scrolling.
+//
+// layouts/plain.vue and layouts/plain-minimal.vue (the guest-page chrome
+// LocaleSwitcher's .language-bar renders inside of there) aren't owned by
+// this change, so there's no route-scoped class to hang off; both already
+// carry a stable `[data-testid="plain-language-bar"]` footer wrapper
+// though, which this keys off instead. `:has()` supplies the compensating
+// page padding without needing a hook on that footer's ancestor.
+//
+// `.language-bar`'s own scoped styles (LocaleSwitcher.vue) share this rule's
+// specificity (one class + one component data-v attribute vs. one
+// attribute + one class here), so cascade order alone can't be trusted to
+// win — hence !important on the properties develop's version relied on
+// plain source order for.
+[data-testid='plain-language-bar'] .language-bar {
+  position: fixed !important;
+  bottom: 0 !important;
+  z-index: 10 !important;
+}
+
+body:has([data-testid='plain-language-bar']) {
+  padding-bottom: 65px;
+}

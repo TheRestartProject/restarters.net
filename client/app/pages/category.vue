@@ -92,7 +92,7 @@ const reliabilityColor = (level) => RELIABILITY_COLORS[level] || RELIABILITY_FAL
 // field below keeps that key, matching category/edit.blade.php's label),
 // and an "N/A" fallback for a blank cluster cell (not blank).
 const tableFields = computed(() => [
-  { key: 'name', label: 'Name', sortable: true },
+  { key: 'name', label: t('admin.category_name'), sortable: true },
   {
     key: 'cluster_name',
     label: t('admin.category_cluster'),

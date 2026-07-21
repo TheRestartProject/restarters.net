@@ -290,14 +290,14 @@ function retry() {
 // classes with no hover affordance.
 .coordinator-card {
   gap: 0.75rem;
-  border: 2px solid #000;
+  border: 2px solid #222;
   border-radius: 50px;
   background: #fff;
   color: inherit;
   transition: box-shadow 0.2s, border-color 0.2s;
 
   &:hover {
-    border-color: var(--bs-primary, #0394a6);
+    border-color: #4aaebc;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
     text-decoration: none;
   }

@@ -124,13 +124,15 @@ describe('pages/category', () => {
 
   // CategoriesTable.vue's b-table field is `{ key: 'name', label: 'Name', ... }`
   // - a plain literal, not translated. The edit form field keeps the
-  // separate admin.category_name key (category/edit.blade.php's `@lang('admin.category_name')`
-  // label), so only the table column changes.
-  it('labels the name table column "Name" (a literal, not admin.category_name), leaving the form field as "Category name"', () => {
+  // Both name labels stay translated (admin.category_name). develop's
+  // CategoriesTable.vue hardcodes an English 'Name' header, but matching that
+  // literally would delete our working fr/fr-BE for the column - a recorded
+  // accepted non-match (see the weight/footprint columns, same reasoning).
+  it('labels the name column from admin.category_name in both table and form', () => {
     const wrapper = mountPage()
     const table = wrapper.findComponent(AdminCrudTableStub)
 
-    expect(table.props('tableFields').find((f) => f.key === 'name').label).toBe('Name')
+    expect(table.props('tableFields').find((f) => f.key === 'name').label).toBe('Category name')
     expect(table.props('formFields').find((f) => f.key === 'name').label).toBe('Category name')
   })
 

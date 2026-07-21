@@ -139,6 +139,26 @@ describe('components/forms/RichTextEditor', () => {
       expect(result.ops[0].attributes).toBeUndefined()
     })
 
+    // Security-relevant: develop's quill-paste-smart allowed.tags is
+    // ['a','b','strong','u','s','i','p','br','ul','ol','li','span','h4',
+    // 'h5','h6'] (node_modules/quill-paste-smart/dist/quill-paste-smart.js
+    // feeds this straight into DOMPurify's ALLOWED_TAGS) - img is not on
+    // that list, so a pasted <img> must not survive even though it's an
+    // element Quill's default clipboard would otherwise convert to an
+    // image embed.
+    it('strips a pasted <img> (outside develop\'s allowed.tags) but keeps an allowed <strong>', async () => {
+      await mountEditor()
+      const sanitize = matcherFor(Node.ELEMENT_NODE)
+
+      const imgDelta = { ops: [{ insert: { image: 'https://evil.example/x.png' } }] }
+      const imgResult = sanitize(document.createElement('img'), imgDelta)
+      expect(imgResult.ops).toEqual([])
+
+      const strongDelta = { ops: [{ insert: 'bold text', attributes: { bold: true } }] }
+      const strongResult = sanitize(document.createElement('strong'), strongDelta)
+      expect(strongResult.ops).toEqual([{ insert: 'bold text', attributes: { bold: true } }])
+    })
+
     it('downgrades pasted h1-h3 headings to plain paragraphs, outside develop\'s h4-h6-only allowed.tags', async () => {
       await mountEditor()
       const downgrade = matcherFor('h1, h2, h3')

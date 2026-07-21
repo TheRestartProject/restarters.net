@@ -168,8 +168,36 @@ describe('components/fixometer/DevicesSearchTable', () => {
   })
 
   // Gap fix: DeviceBrand.vue's vue-typeahead-bootstrap suggestions, ported
-  // as a <datalist> the same way DeviceForm.vue's own brand field is.
-  it('suggests known brands via a datalist sourced from the brands store', async () => {
+  // as the same custom suggestion panel DeviceForm.vue's own brand field
+  // uses (native <datalist> chrome doesn't match legacy's look), capped at 5.
+  it('suggests known brands via a suggestion panel sourced from the brands store, capped at 5', async () => {
+    mockApi.device.brands.mockResolvedValue({
+      data: [
+        { id: 1, brand_name: 'Bosch' },
+        { id: 2, brand_name: 'Dyson' },
+        { id: 3, brand_name: 'Miele' },
+        { id: 4, brand_name: 'Hoover' },
+        { id: 5, brand_name: 'Vax' },
+        { id: 6, brand_name: 'Beko' },
+      ],
+    })
+
+    const wrapper = mountComponent()
+    await flushPromises()
+
+    const input = wrapper.find('[data-testid="device-search-brand"]')
+    expect(input.attributes('list')).toBeUndefined()
+    expect(wrapper.find('[data-testid="device-search-brand-suggestions"]').exists()).toBe(false)
+
+    await input.trigger('focus')
+    const panel = wrapper.find('[data-testid="device-search-brand-suggestions"]')
+    expect(panel.exists()).toBe(true)
+    const options = panel.findAll('li')
+    expect(options).toHaveLength(5)
+    expect(options.map((o) => o.text())).toEqual(['Bosch', 'Dyson', 'Miele', 'Hoover', 'Vax'])
+  })
+
+  it('filters brand suggestions live as the user types, and selecting one fills the field and closes the panel', async () => {
     mockApi.device.brands.mockResolvedValue({
       data: [
         { id: 1, brand_name: 'Bosch' },
@@ -181,9 +209,18 @@ describe('components/fixometer/DevicesSearchTable', () => {
     await flushPromises()
 
     const input = wrapper.find('[data-testid="device-search-brand"]')
-    expect(input.attributes('list')).toBe('device-search-brand-list')
-    const options = wrapper.find('#device-search-brand-list').findAll('option')
-    expect(options.map((o) => o.attributes('value'))).toEqual(['Bosch', 'Dyson'])
+    await input.trigger('focus')
+    await input.setValue('bos')
+    await flushPromises()
+
+    const panel = wrapper.find('[data-testid="device-search-brand-suggestions"]')
+    expect(panel.findAll('li').map((o) => o.text())).toEqual(['Bosch'])
+
+    await wrapper.find('[data-testid="device-search-brand-option-Bosch"]').trigger('mousedown')
+    await flushPromises()
+
+    expect(wrapper.find('[data-testid="device-search-brand"]').element.value).toBe('Bosch')
+    expect(wrapper.find('[data-testid="device-search-brand-suggestions"]').exists()).toBe(false)
   })
 
   it('maps the status filter to the numeric Device::REPAIR_STATUS_* code, not the resource string', async () => {

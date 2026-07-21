@@ -151,6 +151,13 @@ function dismiss() {
   padding-bottom: 56px;
 }
 
+/* resources/sass/_onboarding.scss: .modal-dialog max-width: 615px at lg+. */
+:deep(.modal-dialog) {
+  @media (min-width: 992px) {
+    max-width: 615px;
+  }
+}
+
 .onboarding article {
   padding-bottom: 10px;
 }
@@ -201,27 +208,32 @@ function dismiss() {
 }
 
 .onboarding__dot {
-  width: 8px;
-  height: 8px;
+  width: 15px;
+  height: 15px;
   border-radius: 50%;
-  background-color: #d8d8d8;
+  background-color: #81cad3;
 }
 
 .onboarding__dot--active {
-  background-color: #222;
+  background-color: #000;
 }
 
 .onboarding__nav {
   position: absolute;
-  bottom: 0;
 }
 
 .onboarding__nav--prev {
-  left: 0;
+  left: 40px;
+  bottom: 25px;
 }
 
-.onboarding__nav--next,
+.onboarding__nav--next {
+  right: 40px;
+  bottom: 25px;
+}
+
 .onboarding__nav--finish {
-  right: 0;
+  right: 40px;
+  bottom: 32px;
 }
 </style>

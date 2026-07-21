@@ -61,6 +61,16 @@ function normalize(html) {
 // that list and gets dropped here.
 const DISALLOWED_PASTE_FORMATS = ['align', 'background', 'color', 'direction', 'font', 'size']
 
+// The same allowed.tags list, passed by legacy as quill-paste-smart's
+// `allowed.tags` option (resources/js/components/RichTextEditor.vue),
+// which quill-paste-smart feeds straight into DOMPurify's ALLOWED_TAGS
+// (node_modules/quill-paste-smart/dist/quill-paste-smart.js). Anything
+// outside this - <img>, <table>, <iframe>, <blockquote>, <pre>, etc. - is
+// security-relevant to keep out: DOMPurify strips the tag but keeps its
+// text content, so this mirrors that rather than dropping the content
+// outright.
+const ALLOWED_PASTE_TAGS = ['a', 'b', 'strong', 'u', 's', 'i', 'p', 'br', 'ul', 'ol', 'li', 'span', 'h4', 'h5', 'h6']
+
 function stripAttributes(delta, names) {
   delta.ops.forEach((op) => {
     if (!op.attributes) return
@@ -80,6 +90,18 @@ function stripAttributes(delta, names) {
 // creates, so those need no extra handling here).
 function sanitizePastedFormats(_node, delta) {
   return stripAttributes(delta, DISALLOWED_PASTE_FORMATS)
+}
+
+// Unwraps/strips any element outside allowed.tags, DOMPurify-style: text
+// content survives (e.g. a stray <div> or <blockquote> wrapper), but any
+// non-text embed the tag itself produced - an <img>'s image insert, a
+// <table>/<iframe>'s embed - does not, since there is no text to keep.
+function stripDisallowedTags(node, delta) {
+  const tag = node.tagName?.toLowerCase()
+  if (tag && !ALLOWED_PASTE_TAGS.includes(tag)) {
+    delta.ops = delta.ops.filter((op) => typeof op.insert === 'string')
+  }
+  return delta
 }
 
 // allowed.tags stops at h4/h5/h6 (matching the toolbar's header options),
@@ -151,7 +173,7 @@ onMounted(async () => {
     },
   })
 
-  quill.clipboard.addMatcher(Node.ELEMENT_NODE, sanitizePastedFormats)
+  quill.clipboard.addMatcher(Node.ELEMENT_NODE, (node, delta) => stripDisallowedTags(node, sanitizePastedFormats(node, delta)))
   quill.clipboard.addMatcher('h1, h2, h3', downgradePastedHeadings)
   quill.clipboard.addMatcher(Node.TEXT_NODE, magicPasteLinks)
 
