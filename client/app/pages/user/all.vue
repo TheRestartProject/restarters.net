@@ -259,7 +259,7 @@ onMounted(() => {
           />
           <form data-testid="users-filter-form" @submit.prevent="applyFilters">
             <div class="mb-3">
-              <label class="form-label" for="filter-name">{{ t('users.name') }}</label>
+              <label class="form-label" for="filter-name">{{ t('users.name') }}:</label>
               <input
                 id="filter-name"
                 v-model="filters.name"
@@ -271,7 +271,7 @@ onMounted(() => {
             </div>
 
             <div class="mb-3">
-              <label class="form-label" for="filter-email">{{ t('users.email') }}</label>
+              <label class="form-label" for="filter-email">{{ t('users.email') }}:</label>
               <input
                 id="filter-email"
                 v-model="filters.email"
@@ -283,7 +283,7 @@ onMounted(() => {
             </div>
 
             <div class="mb-3">
-              <label class="form-label" for="filter-location">{{ t('users.location') }}</label>
+              <label class="form-label" for="filter-location">{{ t('users.location') }}:</label>
               <input
                 id="filter-location"
                 v-model="filters.location"
@@ -295,21 +295,21 @@ onMounted(() => {
             </div>
 
             <div class="mb-3">
-              <label class="form-label" for="filter-country">{{ t('users.country') }}</label>
+              <label class="form-label" for="filter-country">{{ t('users.country') }}:</label>
               <select id="filter-country" v-model="filters.country" class="form-select" data-testid="users-filter-country">
                 <option v-for="opt in countryOptions" :key="opt.value" :value="opt.value">{{ opt.text }}</option>
               </select>
             </div>
 
             <div class="mb-3">
-              <label class="form-label" for="filter-role">{{ t('users.role') }}</label>
+              <label class="form-label" for="filter-role">{{ t('users.role') }}:</label>
               <select id="filter-role" v-model="filters.role" class="form-select" data-testid="users-filter-role">
                 <option v-for="opt in roleOptions" :key="opt.value" :value="opt.value">{{ opt.text }}</option>
               </select>
             </div>
 
             <div class="mb-3">
-              <label class="form-label" for="filter-permissions">{{ t('client.users.permission') }}</label>
+              <label class="form-label" for="filter-permissions">{{ t('client.users.permission') }}:</label>
               <select
                 id="filter-permissions"
                 v-model="filters.permissions"
