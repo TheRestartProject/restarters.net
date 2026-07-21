@@ -51,7 +51,9 @@
         <b-img :src="imageUrl('/icons/group_name_ico.svg')" class="mt-3 icon" />
       </template>
       <template slot="cell(group_name)" slot-scope="data">
-        <a :href="'/group/view/' + (data.item.idgroups || data.item.id)">{{ data.item.name }}</a>
+        <!-- The template compiler condenses the newline between these two, so
+             without the margin the badge sits hard against the end of the name. -->
+        <a :href="'/group/view/' + (data.item.idgroups || data.item.id)" class="mr-2">{{ data.item.name }}</a>
         <GroupArchivedBadge :idgroups="data.item.idgroups || data.item.id" />
         <div v-if="showTags && data.item.group_tags_full && data.item.group_tags_full.length" class="mt-1">
           <b-badge
