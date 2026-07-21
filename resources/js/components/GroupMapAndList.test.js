@@ -42,6 +42,8 @@ const groupMapStub = {
     yourLat: { type: Number, default: null },
     yourLng: { type: Number, default: null },
     hover: { type: Number, default: null },
+    groupids: { type: Array, default: null },
+    frameRequest: { type: Number, default: 0 },
   },
   template: '<div class="stub-groupmap" />',
 }
@@ -124,6 +126,51 @@ test('passes the map centre through to the table', async () => {
   await wrapper.vm.$nextTick()
 
   expect(wrapper.findComponent(groupsTableStub).props('centre')).toEqual({ lat: 54.19, lng: -3.09 })
+})
+
+// Filtering used to change only the list, so the map still showed every pin and
+// the count still claimed every group. Searching or filtering has to move the
+// map too, or the two disagree about what you're looking at.
+describe('filters drive the map', () => {
+  test('the map only gets the groups that match the filter', async () => {
+    const wrapper = await makeWrapper({ showFilters: true })
+
+    wrapper.findComponent({ name: 'GroupsTable' }).vm.$emit('update:filters', { name: 'Alpha' })
+    await wrapper.vm.$nextTick()
+
+    expect(wrapper.findComponent(groupMapStub).props('groupids')).toEqual([1])
+  })
+
+  test('the list is narrowed to the filtered groups even when the map has more in view', async () => {
+    const wrapper = await makeWrapper({ showFilters: true })
+    wrapper.vm.groupsChanged([1, 2])
+
+    wrapper.findComponent({ name: 'GroupsTable' }).vm.$emit('update:filters', { name: 'Beta' })
+    await wrapper.vm.$nextTick()
+
+    expect(wrapper.vm.effectiveGroupIds).toEqual([2])
+  })
+
+  test('asks the map to reframe, so a search for a group out of view goes to it', async () => {
+    const wrapper = await makeWrapper({ showFilters: true })
+    const before = wrapper.findComponent(groupMapStub).props('frameRequest')
+
+    wrapper.findComponent({ name: 'GroupsTable' }).vm.$emit('update:filters', { name: 'Beta' })
+    await wrapper.vm.$nextTick()
+
+    expect(wrapper.findComponent(groupMapStub).props('frameRequest')).toBeGreaterThan(before)
+  })
+
+  test('clearing the filter puts every group back on the map', async () => {
+    const wrapper = await makeWrapper({ showFilters: true })
+
+    wrapper.findComponent({ name: 'GroupsTable' }).vm.$emit('update:filters', { name: 'Alpha' })
+    await wrapper.vm.$nextTick()
+    wrapper.findComponent({ name: 'GroupsTable' }).vm.$emit('update:filters', { name: null })
+    await wrapper.vm.$nextTick()
+
+    expect(wrapper.findComponent(groupMapStub).props('groupids')).toEqual([1, 2])
+  })
 })
 
 describe('effectiveGroupIds', () => {

@@ -57,6 +57,13 @@ export default {
       required: false,
       default: () => [],
     },
+    // The groups the map should draw. Null means "everything we know about";
+    // the filter bar narrows it, so searching moves the map too.
+    groupids: {
+      type: Array,
+      required: false,
+      default: null,
+    },
     hover: {
       type: Number,
       required: false,
@@ -76,6 +83,15 @@ export default {
       type: Number,
       required: false,
       default: null,
+    },
+    // Bumped by the parent when the user changes a filter, to ask the map to
+    // frame what it is now showing. Watching the group list instead would move
+    // the map every time rows are hydrated, yanking it away from wherever the
+    // user had panned to.
+    frameRequest: {
+      type: Number,
+      required: false,
+      default: 0,
     }
   },
   data() {
@@ -102,7 +118,11 @@ export default {
       }
     },
     allGroups() {
-      const groups = this.$store.getters['groups/list']
+      let groups = this.$store.getters['groups/list']
+
+      if (this.groupids !== null) {
+        groups = groups.filter((g) => this.groupids.includes(g.id || g.idgroups))
+      }
 
       if (!this.network) {
         return groups
@@ -161,6 +181,9 @@ export default {
     this.destroyed = true
   },
   watch: {
+    frameRequest() {
+      this.frameShownGroups()
+    },
     allGroups: {
       handler(newVal, oldVal) {
         // oldVal is undefined on the first (immediate) run.
@@ -301,6 +324,30 @@ export default {
       this.moved = true
       this.$emit('update:moved', true)
       this.idle()
+    },
+    frameShownGroups() {
+      // A filter is an explicit request to see something, so take the map there
+      // even if the user has panned somewhere else.
+      const bounds = this.boundsOf(this.mappableGroups)
+
+      if (this.mapObject && bounds) {
+        this.bounds = bounds
+        this.mapObject.fitBounds(bounds)
+      }
+    },
+    boundsOf(groups) {
+      const bounds = new L.LatLngBounds()
+
+      groups.forEach((group) => {
+        const lat = +(group.location && group.location.lat != null ? group.location.lat : group.lat)
+        const lng = +(group.location && group.location.lng != null ? group.location.lng : group.lng)
+
+        if (!isNaN(lat) && !isNaN(lng)) {
+          bounds.extend(new L.LatLng(lat, lng))
+        }
+      })
+
+      return bounds.isValid() ? bounds.pad(0.1) : null
     },
     zoomToGroups() {
       try {

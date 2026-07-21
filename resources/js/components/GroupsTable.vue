@@ -99,6 +99,7 @@ import images from '../mixins/images'
 import moment from 'moment'
 import GroupsTableFilters from './GroupsTableFilters.vue'
 import GroupArchivedBadge from "./GroupArchivedBadge.vue";
+import { matchesFilters } from '../misc/groupFilter'
 import InfiniteLoading from 'vue-infinite-loading'
 
 
@@ -193,23 +194,12 @@ export default {
     items() {
       return this.groups.filter((g) => this.groupids.includes(g.id))
     },
+    activeFilters() {
+      return { name: this.searchName, tags: this.searchTags }
+    },
     filteredItems() {
-      let items = this.items
-
-      if (this.searchName) {
-        const name = this.searchName.toLowerCase()
-        items = items.filter(g => g.name && g.name.toLowerCase().includes(name))
-      }
-
-      if (this.searchTags && this.searchTags.length) {
-        const tagIds = this.searchTags.map(t => t.id)
-        items = items.filter(g => {
-          const groupTags = g.group_tags_full || []
-          return tagIds.every(id => groupTags.some(t => t.id === id))
-        })
-      }
-
-      return items
+      // The same predicate the map uses, so the pins and the rows can't disagree.
+      return this.items.filter(g => matchesFilters(g, this.activeFilters))
     },
     itemsToShow() {
       // Sort before slicing, so the first page is the first groups in order
@@ -239,6 +229,14 @@ export default {
     },
   },
   watch: {
+    activeFilters: {
+      handler(newVal) {
+        // Tell the map, so filtering moves the pins rather than just shortening
+        // the list underneath them.
+        this.$emit('update:filters', newVal)
+      },
+      deep: true
+    },
     itemsToShow: {
       immediate: true,
       handler(newVal) {

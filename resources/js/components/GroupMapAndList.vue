@@ -18,6 +18,8 @@
           :your-lat="yourLat"
           :your-lng="yourLng"
           :hover="hover"
+          :groupids="matchingGroupIds"
+          :frame-request="frameRequest"
           @update:hover="hover = $event"
           @update:centre="centre = $event"
           @groups="groupsChanged($event)"
@@ -29,6 +31,7 @@
           :hover.sync="hover"
           :centre="centre"
           :search="showFilters"
+          @update:filters="filtersChanged"
           :all-group-tags="availableTags"
           :show-tags="canManageTags"
       />
@@ -38,6 +41,7 @@
 <script>
 import {MAX_MAP_ZOOM, MIN_MAP_ZOOM} from "../constants";
 import GroupMap from "./GroupMap.vue";
+import { matchesFilters } from '../misc/groupFilter'
 import GroupsTable from "./GroupsTable.vue";
 import VIcon from 'vue-awesome/components/Icon'
 
@@ -111,6 +115,12 @@ export default {
       groupidsInBounds: null,
       // Where the map is centred, which orders the list by what's nearest.
       centre: null,
+      // What the user has typed or picked in the filter bar. Applied to every
+      // group, not just the ones currently in view, so that filtering moves the
+      // map rather than only shortening the list under it.
+      filters: null,
+      // Bumped when a filter changes, to ask the map to frame the matches.
+      frameRequest: 0,
       mapready: false,
       bounds: null,
       hover: null,
@@ -118,15 +128,28 @@ export default {
     }
   },
   computed: {
-    effectiveGroupIds() {
-      if (this.groupidsInBounds !== null) {
-        return this.groupidsInBounds
-      }
+    scopedGroups() {
       const allGroups = this.$store.getters['groups/list']
-      const filtered = this.network
+
+      return this.network
         ? allGroups.filter(g => g.networks && g.networks.some(n => n.id === this.network))
         : allGroups
-      return filtered.map(g => g.id || g.idgroups)
+    },
+    matchingGroupIds() {
+      // Everything the filter allows, wherever it is - this is what the map
+      // draws, so a search can take you to a group you can't currently see.
+      return this.scopedGroups
+        .filter(g => matchesFilters(g, this.filters))
+        .map(g => g.id || g.idgroups)
+    },
+    effectiveGroupIds() {
+      if (this.groupidsInBounds === null) {
+        return this.matchingGroupIds
+      }
+
+      // What's both in view and allowed by the filter.
+      const matching = this.matchingGroupIds
+      return this.groupidsInBounds.filter(id => matching.includes(id))
     },
   },
   async mounted() {
@@ -145,6 +168,10 @@ export default {
   methods: {
     groupsChanged(groupids) {
       this.groupidsInBounds = groupids
+    },
+    filtersChanged(filters) {
+      this.filters = filters
+      this.frameRequest++
     },
   },
 }

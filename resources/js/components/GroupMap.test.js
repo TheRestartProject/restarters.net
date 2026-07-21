@@ -248,6 +248,44 @@ describe('GroupMap place search preload', () => {
   })
 })
 
+// Searching for a group that isn't in the current view should take you to it,
+// not tell you there are no results. Framing is asked for explicitly rather
+// than watching the group list, which changes whenever rows are hydrated and
+// would otherwise yank the map away from wherever the user had panned to.
+describe('GroupMap reframing on request', () => {
+  const groups = [
+    { id: 1, location: { lat: 51.5, lng: -0.1 } },
+    { id: 2, location: { lat: 55.9, lng: -3.2 } },
+  ]
+
+  test('frames the groups it is showing when the request changes', async () => {
+    const wrapper = mountMap(WORLD, groups, { frameRequest: 0 })
+    const map = fakeMap()
+    wrapper.vm.mapObject = map
+    wrapper.vm.$refs.map = { mapObject: map }
+    map.fitBounds.mockClear()
+
+    await wrapper.setProps({ frameRequest: 1 })
+
+    expect(map.fitBounds).toHaveBeenCalledTimes(1)
+    const bounds = map.fitBounds.mock.calls[0][0]
+    expect(bounds.contains([51.5, -0.1])).toBe(true)
+    expect(bounds.contains([55.9, -3.2])).toBe(true)
+  })
+
+  test('does not move the map when there is nothing to frame', async () => {
+    const wrapper = mountMap(WORLD, groups, { frameRequest: 0, groupids: [] })
+    const map = fakeMap()
+    wrapper.vm.mapObject = map
+    wrapper.vm.$refs.map = { mapObject: map }
+    map.fitBounds.mockClear()
+
+    await wrapper.setProps({ frameRequest: 1 })
+
+    expect(map.fitBounds).not.toHaveBeenCalled()
+  })
+})
+
 describe('GroupMap markers', () => {
   test('only renders markers for groups with coordinates', () => {
     const wrapper = mountMap(WORLD, [
