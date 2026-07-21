@@ -34,6 +34,11 @@ const { t } = useI18n()
         </template>
 
         <div class="getting-started__content">
+          <!-- DashboardRightSidebar.vue's intro paragraph, above the bullets.
+               It sits before the mobile-only sidebar_intro_1 repeat and shows
+               at every width - we rendered the bullets with no lead-in. -->
+          <p>{{ t('dashboard.getting_the_most_intro') }}</p>
+
           <p class="d-block d-md-none">{{ t('dashboard.sidebar_intro_1') }}</p>
 
           <ul class="list-unstyled getting-started__list">
