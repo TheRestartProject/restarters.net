@@ -66,13 +66,27 @@ class UserGroupsController extends Controller
 
         $userGroupAudits = self::getUserGroupAudits($dateFrom);
 
+        // Batched, not per-audit. This ran UserGroups::find() and Group::find()
+        // inside the loop, so a caller asking for all changes (no dateFrom) paid
+        // two queries per audit row - thousands of round trips on a mature
+        // database. `volunteer` is eager-loaded for the same reason.
+        $associations = UserGroups::withTrashed()
+            ->with('volunteer')
+            ->whereIn('idusers_groups', $userGroupAudits->pluck('auditable_id')->unique()->all())
+            ->get()
+            ->keyBy('idusers_groups');
+
+        $groups = Group::whereIn('idgroups', $associations->pluck('group')->unique()->all())
+            ->get()
+            ->keyBy('idgroups');
+
         $userGroupChanges = [];
         foreach ($userGroupAudits as $audit) {
-            $userGroupAssociation = UserGroups::withTrashed()->find($audit->auditable_id);
+            $userGroupAssociation = $associations->get($audit->auditable_id);
             if (! is_null($userGroupAssociation) && $userGroupAssociation->isConfirmed()) {
                 $user = $userGroupAssociation->volunteer;
-                $group = Group::find($userGroupAssociation->group);
-                if ($user->changesShouldPushToZapier() && $group->changesShouldPushToZapier()) {
+                $group = $groups->get($userGroupAssociation->group);
+                if ($user && $group && $user->changesShouldPushToZapier() && $group->changesShouldPushToZapier()) {
                     $userGroupChanges[] = self::mapDetailsAndAuditToChange($userGroupAssociation, $audit);
                 }
             }
