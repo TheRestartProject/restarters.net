@@ -53,6 +53,10 @@ cat > /tmp/warming/index.html <<'HTML'
 <!DOCTYPE html>
 <html>
 <head>
+    <!-- Required: this page contains a literal UTF-8 em-dash, and with no
+         declared charset the browser falls back to a legacy encoding and
+         renders it as mojibake ("â€”"). -->
+    <meta charset="utf-8">
     <title>Preview warming up</title>
     <meta http-equiv="refresh" content="15">
     <style>
@@ -82,6 +86,11 @@ http {
         listen 80 default_server;
         listen [::]:80 default_server;
         root /tmp/warming;
+
+        # Matches the main nginx-fly.conf. Without it nginx sends no charset,
+        # so the holding page's em-dash renders as mojibake even in browsers
+        # that would otherwise sniff UTF-8.
+        charset utf-8;
 
         location = /robots.txt { }
         location = /_preview_status {
