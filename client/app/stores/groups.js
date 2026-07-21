@@ -335,6 +335,16 @@ export const useGroupsStore = defineStore('groups', {
       }
     },
 
+    // Group members offered by the event invite modal's picker. Returns the
+    // list rather than storing it: `volunteers` backs the group view page's
+    // own list, and a modal opened from elsewhere must not overwrite it.
+    // exclude_event drops members already confirmed at that event.
+    async fetchMembersForInvite(id, excludeEvent) {
+      const { $api } = useNuxtApp()
+      const { data } = await $api.group.volunteers(id, { exclude_event: excludeEvent })
+      return data || []
+    },
+
     async fetchVolunteers(id) {
       const { $api } = useNuxtApp()
 

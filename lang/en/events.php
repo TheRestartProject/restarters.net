@@ -150,4 +150,6 @@ return [
   'shareable_link' => 'Invite via shareable link',
   'shareable_link_box' => 'Shareable link',
   'email_invite' => 'Invite via email',
+  'select_group_members' => 'Select group members',
+  'send_invites_to_restarters_tickbox' => 'Add invites for group members. Members marked with a ⚠ will be invited but won\'t be sent an email due to their notification settings.',
 ];

@@ -139,4 +139,6 @@ return [
   'shareable_link' => 'Inviter via un lien partagé',
   'shareable_link_box' => 'Lien partagé',
   'email_invite' => 'Inviter par e-mail',
+  'select_group_members' => 'Sélectionner les membres du groupe',
+  'send_invites_to_restarters_tickbox' => 'Ajouter les invitations pour les membres. Les membres marqués avec un ⚠ seront invités mais ne recevront pas un e-mail en raison de leurs paramètres de notifications',
 ];
