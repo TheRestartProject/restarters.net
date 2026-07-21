@@ -251,6 +251,9 @@
       "groups_title": "Groupes à modérer",
       "none": "Rien n’est en attente de modération.",
       "load_error": "Désolé, nous n'avons pas pu charger la liste de modération."
+    },
+    "common": {
+      "more_information": "Plus d’informations"
     }
   }
 }

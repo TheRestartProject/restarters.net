@@ -14,7 +14,7 @@ const NuxtLinkStub = {
 
 const bvnStubs = {
   BForm: { template: '<form @submit.prevent="$emit(\'submit\', $event)"><slot /></form>' },
-  BFormGroup: { template: '<div><slot /></div>' },
+  BFormGroup: { template: '<div><slot name="label" /><slot /></div>' },
   BFormInput: {
     props: ['modelValue'],
     template:

@@ -14,7 +14,7 @@ const BModalStub = {
   template: '<div v-if="modelValue"><slot /><slot name="footer" /></div>',
 }
 const BAlertStub = { template: '<div><slot /></div>' }
-const BFormGroupStub = { template: '<div><slot /></div>' }
+const BFormGroupStub = { template: '<div><slot name="label" /><slot /></div>' }
 const BButtonStub = { template: '<button v-bind="$attrs"><slot /></button>' }
 
 function mountModal(props = {}) {

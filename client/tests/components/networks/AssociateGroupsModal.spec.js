@@ -15,7 +15,7 @@ const BModalStub = {
 const BAlertStub = { template: '<div><slot /></div>' }
 const BButtonStub = { template: '<button v-bind="$attrs"><slot /></button>' }
 const BFormStub = { template: '<form @submit.prevent="$emit(\'submit\', $event)"><slot /></form>' }
-const BFormGroupStub = { template: '<div><slot /></div>' }
+const BFormGroupStub = { template: '<div><slot name="label" /><slot /></div>' }
 
 const GLOBAL_STUBS = {
   BModal: BModalStub,

@@ -5,7 +5,7 @@ import LocationPicker from '../../../app/components/forms/LocationPicker.vue'
 import en from '../../../i18n/locales/en.json'
 import clientEn from '../../../i18n/locales/client-en.json'
 
-const BFormGroupStub = { template: '<div><slot /></div>' }
+const BFormGroupStub = { template: '<div><slot name="label" /><slot /></div>' }
 
 function mountPicker(props = {}) {
   const i18n = createI18n({ legacy: false, locale: 'en', messages: { en: { ...en, ...clientEn } } })

@@ -13,7 +13,7 @@ import clientEn from '../../i18n/locales/client-en.json'
 // prop-wiring.
 const BAlertStub = { template: '<div><slot /></div>' }
 const BButtonStub = { template: '<button v-bind="$attrs"><slot /></button>' }
-const BFormGroupStub = { template: '<div><slot /></div>' }
+const BFormGroupStub = { template: '<div><slot name="label" /><slot /></div>' }
 const BModalStub = {
   props: ['modelValue', 'title'],
   emits: ['hide'],

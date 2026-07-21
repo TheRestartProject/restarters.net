@@ -37,7 +37,7 @@ const BModalStub = {
   template: '<div v-if="modelValue"><slot /></div>',
 }
 const BFormStub = { template: '<form @submit.prevent="$emit(\'submit\', $event)"><slot /></form>' }
-const BFormGroupStub = { template: '<div><slot /></div>' }
+const BFormGroupStub = { template: '<div><slot name="label" /><slot /></div>' }
 // GAP 2/3/15: EventActionsDropdown/EventShareStatsModal/the CO2 info popover
 // use BDropdown/BDropdownItem/BPopover - stubbed the same way
 // tests/helpers/stubs.js does for the group-view parity work (renders

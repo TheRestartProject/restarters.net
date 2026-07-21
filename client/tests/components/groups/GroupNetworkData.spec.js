@@ -6,7 +6,7 @@ import GroupNetworkData from '../../../app/components/groups/GroupNetworkData.vu
 // Ports resources/js/components/NetworkData.vue + NetworkDataField.vue
 // (findings/parity-v2/group-forms.md #5): admin-only editor for a group's
 // arbitrary network_data key/value pairs.
-const BFormGroupStub = { template: '<div><slot /></div>' }
+const BFormGroupStub = { template: '<div><slot name="label" /><slot /></div>' }
 const BButtonStub = { template: '<button v-bind="$attrs" @click="$emit(\'click\')"><slot /></button>' }
 
 function mountEditor(props) {

@@ -4,6 +4,7 @@ import { useI18n } from 'vue-i18n'
 import { useDevicesStore } from '../../stores/devices.js'
 import { suggestDeviceCategory } from '../../composables/useDeviceCategorySuggestion.js'
 import DevicePhotos from './DevicePhotos.vue'
+import FieldInfoPopover from '../forms/FieldInfoPopover.vue'
 
 // Add/edit device form (api-contracts-phase-c.md C5; design.md §6.2 C5 task
 // brief). Functional spec: resources/js/components/EventDevice.vue +
@@ -91,6 +92,16 @@ const { t } = useI18n()
 const devicesStore = useDevicesStore()
 
 const editing = computed(() => !!props.device)
+
+// Item type's help text depends on whether the item is powered - the
+// examples differ ('Blender'/'Drill' vs 'Sofa'/'Denim jeans').
+const itemTypeTooltip = computed(() =>
+  props.powered ? t('devices.tooltip_type_powered') : t('devices.tooltip_type_unpowered')
+)
+
+// Black while adding, green while editing: the edit form sits on the
+// shaded .edit-panel, where a black icon disappears.
+const infoIconVariant = computed(() => (editing.value ? 'brand' : 'black'))
 const miscCategoryId = computed(() => (props.powered ? CATEGORY_MISC_POWERED : CATEGORY_MISC_UNPOWERED))
 
 onMounted(() => {
@@ -324,7 +335,11 @@ defineExpose({ submit })
       <div class="device-form-card" data-testid="device-form-card-item">
         <h3>{{ t('devices.title_items') }}</h3>
 
-        <BFormGroup :label="`${t('devices.item_type')}:`" label-for="device-form-item-type">
+        <BFormGroup label-for="device-form-item-type">
+          <template #label>
+            {{ t('devices.item_type') }}:
+            <FieldInfoPopover :content="itemTypeTooltip" :variant="infoIconVariant" />
+          </template>
           <input
             id="device-form-item-type"
             v-model="form.itemType"
@@ -342,7 +357,11 @@ defineExpose({ submit })
           </small>
         </BFormGroup>
 
-        <BFormGroup :label="`${t('devices.category')}:`" label-for="device-form-category">
+        <BFormGroup label-for="device-form-category">
+          <template #label>
+            {{ t('devices.category') }}:
+            <FieldInfoPopover :content="t('devices.tooltip_category')" :variant="infoIconVariant" />
+          </template>
           <select
             id="device-form-category"
             v-model.number="form.category"
@@ -382,7 +401,11 @@ defineExpose({ submit })
           </small>
         </BFormGroup>
 
-        <BFormGroup :label="`${t('devices.model')}:`" label-for="device-form-model">
+        <BFormGroup label-for="device-form-model">
+          <template #label>
+            {{ t('devices.model') }}:
+            <FieldInfoPopover :content="t('devices.tooltip_model')" :variant="infoIconVariant" />
+          </template>
           <input
             id="device-form-model"
             v-model="form.model"
@@ -489,7 +512,11 @@ defineExpose({ submit })
       <div class="device-form-card" data-testid="device-form-card-assessment">
         <h3>{{ t('devices.title_assessment') }}</h3>
 
-        <BFormGroup :label="`${t('devices.devices_description')}:`" label-for="device-form-problem">
+        <BFormGroup label-for="device-form-problem">
+          <template #label>
+            {{ t('devices.devices_description') }}:
+            <FieldInfoPopover :content="t('devices.tooltip_problem')" :variant="infoIconVariant" />
+          </template>
           <textarea
             id="device-form-problem"
             v-model="form.problem"
@@ -500,7 +527,11 @@ defineExpose({ submit })
           />
         </BFormGroup>
 
-        <BFormGroup :label="`${t('client.devices.notes')}:`" label-for="device-form-notes">
+        <BFormGroup label-for="device-form-notes">
+          <template #label>
+            {{ t('client.devices.notes') }}:
+            <FieldInfoPopover :content="t('devices.tooltip_notes')" :variant="infoIconVariant" />
+          </template>
           <textarea
             id="device-form-notes"
             v-model="form.notes"

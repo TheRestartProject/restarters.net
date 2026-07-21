@@ -25,7 +25,7 @@ const BModalStub = {
 // stub's root <form> IN ADDITION to the explicit $emit below, so a single
 // triggered 'submit' event invokes the handler twice.
 const BFormStub = { emits: ['submit'], template: '<form @submit.prevent="$emit(\'submit\', $event)"><slot /></form>' }
-const BFormGroupStub = { template: '<div><slot /></div>' }
+const BFormGroupStub = { template: '<div><slot name="label" /><slot /></div>' }
 const BFormInputStub = {
   props: ['modelValue'],
   emits: ['update:modelValue'],

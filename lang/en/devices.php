@@ -61,4 +61,10 @@ return [
   'image_upload_error' => 'fail - image could not be uploaded',
   'unknown_item_type' => 'You\'re creating a new item type. Are you sure an existing item type is not suitable?',
   'unknown_brand' => 'You\'re creating a new brand. Are you sure an existing brand is not suitable?',
+  'tooltip_category' => 'Choose the category that best fits this item. <a target=\'_blank\' rel=\'noopener noreferrer\' href=\'https://talk.restarters.net/t/fixometer-how-to-log-repair-data-from-your-event/1028#heading--category\'>More information about these categories...</a>',
+  'tooltip_model' => 'Add as much information about the specific model of device here as you can (e.g. \'Galaxy S10 5G\'). Leave empty if you don\'t know the model.',
+  'tooltip_problem' => '<p>Please provide as much detail as you can about the problem with the device and what was done to repair it. For example:</p><ul><li>How did it break?</li><li>What, specifically, was broken?</li><li>What steps were taken to fix it and did they work?</li></ul><p><a href=\'https://talk.restarters.net/t/fixometer-how-to-log-repair-data-from-your-event/1028#heading--comments\' target=\'_blank\' rel=\'noopener nofollower\'>More information</a></p>',
+  'tooltip_notes' => '<p>Add any additional detail here, for example:</p><ul><li>Did you encounter anything that made the repair more difficult?</li><li>Was the actual problem different to what the owner thought?</li></ul>',
+  'tooltip_type_powered' => 'What type of item is this? (e.g. \'Blender\' or \'Drone\' or \'Drill\')',
+  'tooltip_type_unpowered' => 'Add as much information about the type of item here as you can (e.g. \'Sofa\' or \'Denim jeans\')',
 ];

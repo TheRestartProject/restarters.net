@@ -15,7 +15,7 @@ export const BModalStub = {
   template: '<div v-if="modelValue"><slot /></div>',
 }
 export const BFormStub = { template: '<form @submit.prevent="$emit(\'submit\', $event)"><slot /></form>' }
-export const BFormGroupStub = { template: '<div><slot /></div>' }
+export const BFormGroupStub = { template: '<div><slot name="label" /><slot /></div>' }
 
 // GroupActions.vue / GroupVolunteers.vue's edit dropdown: renders the
 // `text` prop and `button-content` slot as visible content, then the

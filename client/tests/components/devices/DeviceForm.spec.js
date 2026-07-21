@@ -8,7 +8,7 @@ import en from '../../../i18n/locales/en.json'
 import clientEn from '../../../i18n/locales/client-en.json'
 
 const BFormStub = { emits: ['submit'], template: '<form @submit.prevent="$emit(\'submit\', $event)"><slot /></form>' }
-const BFormGroupStub = { template: '<div><slot /></div>' }
+const BFormGroupStub = { template: '<div><slot name="label" /><slot /></div>' }
 const BAlertStub = { template: '<div><slot /></div>' }
 const BButtonStub = { template: '<button v-bind="$attrs"><slot /></button>' }
 const DevicePhotosStub = {
@@ -100,6 +100,28 @@ describe('components/devices/DeviceForm', () => {
     vi.stubGlobal('useNuxtApp', () => ({ $api: { device: {} } }))
     store = useDevicesStore()
     seedMeta(store)
+  })
+
+  // DeviceCategorySelect/DeviceType/DeviceModel/DeviceProblem/DeviceNotes
+  // each carry an info popover; ours had none. Asserting the count rather
+  // than mere presence, because four of the five rendering and one silently
+  // missing would still look fine on screen.
+  it('shows an info popover on each of the five documented fields', () => {
+    const wrapper = mountForm()
+
+    expect(wrapper.findAll('[data-testid="field-info-toggle"]')).toHaveLength(5)
+  })
+
+  // The item-type help text differs by powered-ness: the examples are
+  // appliances vs furniture/clothing.
+  it('picks the item-type tooltip to match powered-ness', () => {
+    const powered = mountForm({ powered: true })
+    const unpowered = mountForm({ powered: false })
+
+    expect(powered.findComponent({ name: 'FieldInfoPopover' }).props('content'))
+      .toBe(en.devices.tooltip_type_powered)
+    expect(unpowered.findComponent({ name: 'FieldInfoPopover' }).props('content'))
+      .toBe(en.devices.tooltip_type_unpowered)
   })
 
   it('requires a category before submitting', async () => {
