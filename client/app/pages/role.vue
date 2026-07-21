@@ -47,12 +47,14 @@ const editError = ref('')
 const feedback = ref('')
 const feedbackVariant = ref('success')
 
-// Role names ("Restarter", "Administrator", ...) are the raw roles.role DB
-// column value - see PublicProfileView.vue's doc comment for why t() (not
-// plain interpolation) is required: those literal strings are themselves
-// top-level i18n keys (lang/en.json et al, exported flat into
-// i18n/locales/{en,fr,fr-BE}.json), translating e.g. Restarter -> "Repairer".
-const editTitle = computed(() => (editingRole.value ? `${t('admin.edit-role')}: ${t(editingRole.value.name)}` : t('admin.edit-role')))
+// Role names are shown RAW here, unlike everywhere else in the client.
+// Those literals ("Restarter", "Administrator", ...) are themselves i18n
+// keys, so t() turns them into user-facing labels - "Repairer", "Admin" -
+// which is right on a profile but wrong on this page. RolesTable.vue renders
+// `{{ data.item.role }}`, and this screen exists to manage the very values
+// that hasRole('Restarter') is checked against: an admin who sees "Repairer"
+// here has no way to know the stored name is "Restarter".
+const editTitle = computed(() => (editingRole.value ? `${t('admin.edit-role')}: ${editingRole.value.name}` : t('admin.edit-role')))
 
 // live RolesPage.vue (07e6abd7cc^) marks id/name sortable but
 // permissions_list explicitly `sortable: false` (it's a display-only
@@ -207,7 +209,7 @@ onMounted(load)
           <tr v-for="role in sortedRoles" :key="role.id" :data-testid="`roles-row-${role.id}`">
             <td>{{ role.id }}</td>
             <td>
-              <a href="#" :data-testid="`roles-edit-link-${role.id}`" @click.prevent="openEditModal(role)">{{ t(role.name) }}</a>
+              <a href="#" :data-testid="`roles-edit-link-${role.id}`" @click.prevent="openEditModal(role)">{{ role.name }}</a>
             </td>
             <td class="text-muted">{{ role.permissions_list }}</td>
           </tr>

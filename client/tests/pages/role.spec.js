@@ -40,6 +40,21 @@ function mountPage() {
 }
 
 describe('pages/role', () => {
+  // RolesTable.vue renders the raw roles.role value. Those literals are also
+  // i18n keys, so t() would turn "Restarter" into "Repairer" - a user-facing
+  // label on the screen that manages the value hasRole('Restarter') checks.
+  it('shows the stored role name, not its translated label', async () => {
+    adminStore.roles.data = [{ id: 4, name: 'Restarter', permissions_list: '' }]
+    adminStore.fetchRoles = vi.fn()
+
+    const wrapper = mountPage()
+    await flushPromises()
+
+    const link = wrapper.find('[data-testid="roles-edit-link-4"]')
+    expect(link.text()).toBe('Restarter')
+    expect(link.text()).not.toBe('Repairer')
+  })
+
   let adminStore
 
   beforeEach(() => {

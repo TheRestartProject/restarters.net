@@ -256,8 +256,8 @@
     },
     "common": {
       "more_information": "More information",
-      "sort_ascending": "Click to sort ascending",
-      "sort_descending": "Click to sort descending"
+      "sort_ascending": "(Click to sort ascending)",
+      "sort_descending": "(Click to sort descending)"
     }
   }
 }
