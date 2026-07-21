@@ -168,3 +168,22 @@
 .cell-info {
   background-color: #d1e5e6;
 }
+
+// _events.scss's remaining state washes. `cell-danger` marks a row needing
+// attention; the `-heading` variants are the saturated header equivalents that
+// sit above a washed column.
+.cell-danger {
+  background-color: #f6e3df;
+}
+
+.cell-warning-heading {
+  background-color: #f9bc67;
+}
+
+.cell-primary-heading {
+  background-color: #0394a6;
+}
+
+.cell-danger-heading {
+  background-color: #f05c4d;
+}
