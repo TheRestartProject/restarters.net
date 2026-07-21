@@ -929,14 +929,25 @@ class DeviceController extends Controller {
             $wheres[] = ['events.event_end_utc', '<=', $to_date];
         }
 
+        // `groups` is joined ONLY when something needs it: the group-name
+        // filter, or a sort on a groups column. It used to be joined
+        // unconditionally, so every request paid for joining the whole devices
+        // table to groups even when no filter or sort referenced it - in both
+        // the COUNT and the fetch. Group data for the returned rows comes from
+        // the `deviceEvent.theGroup` eager load, not this join, so dropping it
+        // changes no output.
+        $needsGroupsJoin = $request->filled('group') || str_starts_with($sortColumn, 'groups.');
+
         $query = Device::with(['deviceEvent.theGroup', 'deviceCategory', 'barriers'])
             ->join('events', 'events.idevents', '=', 'devices.event')
-            ->join('groups', 'events.group', '=', 'groups.idgroups')
+            ->when($needsGroupsJoin, fn ($q) => $q->join('groups', 'events.group', '=', 'groups.idgroups'))
             ->join('categories', 'devices.category', '=', 'categories.idcategories')
             ->where($wheres)
             ->orderBy($sortColumn, $sortDir);
 
-        $count = $query->count();
+        // Count without the ORDER BY: it cannot change the total, and it stops
+        // MySQL sorting the whole joined set just to count it.
+        $count = (clone $query)->reorder()->count();
 
         $items = $query->skip(($page - 1) * $size)
             ->take($size)
