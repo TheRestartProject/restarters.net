@@ -104,7 +104,7 @@ const notCounting = computed(() => {
     <template v-else>
       <div class="group-stats__row">
         <section v-if="groupStats" class="group-stats__col" data-testid="group-stats-facts">
-          <h2>{{ t('groups.group_facts') }}</h2>
+          <h2 class="mt-2 mb-2">{{ t('groups.group_facts') }}</h2>
           <div class="stat-cards stat-cards--facts">
             <div
               v-for="card in achievements"

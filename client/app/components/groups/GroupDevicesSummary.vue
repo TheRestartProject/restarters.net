@@ -50,7 +50,7 @@ function podiumHeight(position) {
 <template>
   <div class="devices-summary__row">
     <section v-if="deviceStats" data-testid="group-stats-devices">
-      <h2>{{ t('groups.total_devices') }}</h2>
+      <h2 class="mt-2 mb-2">{{ t('groups.total_devices') }}</h2>
       <div class="stat-cards">
         <div
           v-for="card in items"
@@ -67,7 +67,7 @@ function podiumHeight(position) {
     </section>
 
     <section data-testid="group-stats-top-devices">
-      <h2>{{ t('groups.most_repaired_devices') }}</h2>
+      <h2 class="mt-2 mb-2">{{ t('groups.most_repaired_devices') }}</h2>
       <div v-if="topDevices.length" class="podium">
         <div
           v-for="(device, index) in topDevices"

@@ -543,7 +543,7 @@ function closeAddVolunteer() {
            treatment. -->
       <div v-if="finished && event.stats" class="stats-grid mb-4">
         <section data-testid="event-view-stats">
-          <h2>{{ t('events.items_fixed') }}</h2>
+          <h2 class="mt-2 mb-2">{{ t('events.items_fixed') }}</h2>
           <div class="d-flex flex-wrap gap-3">
             <!-- EventStatsItems.vue:5 - the fixed-devices card is
                  `variant="primary"` with NO `title` prop, i.e. a $brand-light
