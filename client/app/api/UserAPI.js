@@ -153,16 +153,6 @@ export default class UserAPI extends BaseAPI {
     return this.$post('/api/v2/users/me/photo', { upload_key: uploadKey })
   }
 
-  // Multipart variant, matching what develop's profile form posts
-  // (user/profile/profile.blade.php:138-145 - <input type="file"> + submit).
-  // The endpoint accepts either shape and shares all validation between them.
-  updatePhotoFile(file) {
-    const body = new FormData()
-    body.append('photo', file)
-
-    return this.$post('/api/v2/users/me/photo', body)
-  }
-
   deleteAccount() {
     return this.$del('/api/v2/users/me')
   }

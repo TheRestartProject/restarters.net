@@ -880,28 +880,17 @@ Minor, unconfirmed: our Skills listbox has a grey ground where develop's is
 white - worth checking it hasn't picked up the disabled/readonly background
 rule added to _forms.scss earlier in the migration.
 
-### Profile photo control — the one open parity difference, with a recommendation
+### Profile photo control — deliberate divergence (decided)
 
 develop: `<label>Profile picture:</label>` + `<input type="file">` + a
 CHANGE MY PHOTO submit (user/profile/profile.blade.php:138-145).
-Ours: the shared TusImageUpload dropzone. The label is now restored; the
-control is not changed.
+Ours: the same label, but the shared TusImageUpload (Uppy + resumable tus).
 
-**The endpoint constrains this, verified rather than assumed.**
-`POST /api/v2/users/me/photo` (UserController::updateMyPhotov2) validates
-`'upload_key' => 'required|string'` and resolves that key against the tus
-cache. It accepts no multipart file at all, so matching develop's control
-means adding a multipart branch to that endpoint - validation, image
-processing, storage path and tests - not a template swap.
+**This is a decided divergence, not an open gap.** Every image upload in this
+client - profile photo, group image, event photos, network logo, device
+photos - goes through Uppy/tus, and that consistency is the point. Owner
+decision, 2026-07-21.
 
-**Recommendation: do not match develop here.** Every other image in this
-client (group image, event photos, network logo) goes through TusImageUpload,
-which gives resumable uploads; and develop itself uses a dropzone for group
-images, so the file-input pattern is not even consistent within develop.
-Converting just the profile photo to multipart would make it the only image
-in the client bypassing our upload infrastructure, in order to match a control
-develop applies inconsistently.
-
-This is the single place in the migration where I think exact parity is the
-wrong call, so it is written down for a decision rather than settled quietly
-either way.
+`POST /api/v2/users/me/photo` therefore accepts an `upload_key` only. A
+multipart branch was briefly added and has been removed again, so there is
+one upload path rather than two to keep in step.
