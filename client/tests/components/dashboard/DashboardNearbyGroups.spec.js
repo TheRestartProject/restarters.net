@@ -1,9 +1,11 @@
 import { mount } from '@vue/test-utils'
+import { createPinia, setActivePinia } from 'pinia'
 import { createI18n } from 'vue-i18n'
-import { describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import DashboardNearbyGroups from '../../../app/components/dashboard/DashboardNearbyGroups.vue'
 import en from '../../../i18n/locales/en.json'
 import clientEn from '../../../i18n/locales/client-en.json'
+import { useGroupsStore } from '../../../app/stores/groups.js'
 
 const NuxtLinkStub = {
   props: ['to'],
@@ -27,6 +29,12 @@ function mountComponent(props = {}) {
   })
 }
 
+beforeEach(() => {
+  // The join button calls the groups store directly now, rather than linking
+  // to the group page.
+  setActivePinia(createPinia())
+})
+
 describe('components/dashboard/DashboardNearbyGroups', () => {
   it('shows a "set your location" prompt with no join CTAs when the user has no location', () => {
     const wrapper = mountComponent({ nearbyGroups: [], hasLocation: false })
@@ -43,7 +51,7 @@ describe('components/dashboard/DashboardNearbyGroups', () => {
     expect(wrapper.find('[data-testid="nearby-groups-no-location"]').exists()).toBe(false)
   })
 
-  it('renders nearby groups with distance and a join CTA linking to the group page', () => {
+  it('renders nearby groups with distance and a join CTA that joins', async () => {
     const wrapper = mountComponent({
       hasLocation: true,
       nearbyGroups: [{ id: 5, name: 'Nearby Fixers', distance: 3.2, location: 'Bristol', image_url: null }],
@@ -52,7 +60,16 @@ describe('components/dashboard/DashboardNearbyGroups', () => {
     expect(wrapper.find('[data-testid="nearby-group-link-5"]').attributes('href')).toBe('/group/view/5')
     expect(wrapper.find('[data-testid="nearby-group-distance-5"]').text()).toContain('3.2')
     expect(wrapper.find('[data-testid="nearby-group-location-5"]').text()).toBe('Bristol')
-    expect(wrapper.find('[data-testid="nearby-group-join-5"]').attributes('href')).toBe('/group/view/5')
+    // DashboardGroup.vue's button performs the join. It used to link to the
+    // group page - a control labelled "Join" that did not join.
+    const groupsStore = useGroupsStore()
+    groupsStore.join = vi.fn().mockResolvedValue()
+
+    const cta = wrapper.find('[data-testid="nearby-group-join-5"]')
+    expect(cta.attributes('href')).toBeUndefined()
+
+    await cta.trigger('click')
+    expect(groupsStore.join).toHaveBeenCalledWith(5)
   })
 
   it('has no heading or panel of its own - it nests inside the "Your Groups" panel as its empty state', () => {

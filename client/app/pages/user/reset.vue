@@ -28,7 +28,6 @@ const passwordConfirmation = ref('')
 const submitting = ref(false)
 const generalError = ref('')
 const fieldErrors = ref({})
-const done = ref(false)
 
 function fieldError(field) {
   return fieldErrors.value[field]?.[0] || ''
@@ -62,7 +61,10 @@ async function submit() {
       password: password.value,
       password_confirmation: passwordConfirmation.value,
     })
-    done.value = true
+    // UserController::reset() redirects to the login page with the
+    // passwords.updated flash. Staying here behind an invented in-page alert
+    // left no route back to the sign-in form at all.
+    await navigateTo('/login?reset=1')
   } catch (err) {
     if (err?.status === 422) {
       fieldErrors.value = err.data?.errors || {}
@@ -94,14 +96,11 @@ async function submit() {
       <div v-else class="entry-panel card card__login col-12 mt-5 text-left" data-testid="reset-page">
         <h1>{{ t('auth.reset_password') }}</h1>
 
-        <BAlert v-if="done" :model-value="true" variant="success" data-testid="reset-success">
-          {{ t('client.reset.done') }}
-        </BAlert>
         <BAlert v-if="generalError" :model-value="true" variant="danger" data-testid="reset-error">
           {{ generalError }}
         </BAlert>
 
-        <BForm v-if="!done" data-testid="reset-form" @submit.prevent="submit">
+        <BForm data-testid="reset-form" @submit.prevent="submit">
           <BFormGroup :label="`${t('auth.email_address')}:`" label-for="fp_email">
             <BFormInput id="fp_email" :model-value="accountEmail" disabled data-testid="reset-email" />
           </BFormGroup>

@@ -1,5 +1,7 @@
 <script setup>
+import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useGroupsStore } from '~/stores/groups.js'
 
 // Legacy source: resources/js/components/DashboardNoGroups.vue. Nested
 // inside DashboardYourGroups.vue's own "Your Groups" panel as the empty
@@ -27,6 +29,22 @@ defineProps({
 })
 
 const { t } = useI18n()
+const groupsStore = useGroupsStore()
+
+// Which row is mid-request, so its button can be disabled. The store handles
+// the optimistic update, revert and error toast.
+const joining = ref(null)
+
+async function join(id) {
+  joining.value = id
+  try {
+    await groupsStore.join(id)
+  } catch {
+    // groupsStore.join has already toasted and reverted.
+  } finally {
+    joining.value = null
+  }
+}
 </script>
 
 <template>
@@ -75,13 +93,18 @@ const { t } = useI18n()
                     </div>
                   </div>
                 </div>
-                <!-- The real self-join action lands with B2/B4-B5 (POST
-                     /api/v2/groups/{id}/members/me); until then this CTA sends
-                     the member to the group page where joining will happen. -->
+                <!-- DashboardGroup.vue's button hits the join action directly
+                     (`/group/join/{id}`). This sent the member to the group
+                     page instead, so the button labelled "Join" did not join -
+                     a pixel-identical control pointing somewhere else. The
+                     endpoint it needs (POST /api/v2/groups/{id}/members/me)
+                     has existed since B2; the comment claiming otherwise was
+                     stale. -->
                 <BButton
                   variant="primary"
-                  :to="`/group/view/${group.id}`"
+                  :disabled="joining === group.id"
                   :data-testid="`nearby-group-join-${group.id}`"
+                  @click="join(group.id)"
                 >
                   {{ t('groups.join_group_button') }}
                 </BButton>

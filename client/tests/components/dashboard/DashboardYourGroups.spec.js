@@ -1,9 +1,13 @@
 import { mount } from '@vue/test-utils'
+import { createPinia, setActivePinia } from 'pinia'
 import { createI18n } from 'vue-i18n'
-import { describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 import DashboardYourGroups from '../../../app/components/dashboard/DashboardYourGroups.vue'
 import en from '../../../i18n/locales/en.json'
 import clientEn from '../../../i18n/locales/client-en.json'
+
+// Nests DashboardNearbyGroups, whose join button now calls the groups store.
+beforeEach(() => setActivePinia(createPinia()))
 
 const NuxtLinkStub = {
   props: ['to'],

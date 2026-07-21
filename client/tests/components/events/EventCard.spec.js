@@ -130,13 +130,18 @@ describe('components/events/EventCard', () => {
       expect(wrapper.find('[data-testid="event-attend-42"]').attributes('disabled')).toBeUndefined()
     })
 
-    it('still lets an attendee withdraw from an event starting today', () => {
+    it('shows static text, not a control, to someone already attending', () => {
       vi.useFakeTimers()
       vi.setSystemTime(new Date('2026-08-01T08:00:00Z'))
 
       const wrapper = mountComponent({ event: baseEvent({ attending: true }) })
 
-      expect(wrapper.find('[data-testid="event-unattend-42"]').attributes('disabled')).toBeUndefined()
+      // GroupEventsScrollTableActions.vue renders bold "You're going!" here
+      // with no button - this table offers no un-RSVP at all. An earlier
+      // version of this test asserted a withdraw button, i.e. it pinned our
+      // divergence rather than develop's behaviour.
+      expect(wrapper.find('[data-testid="event-attending-text-42"]').exists()).toBe(true)
+      expect(wrapper.find('[data-testid="event-unattend-42"]').exists()).toBe(false)
     })
   })
 
@@ -154,18 +159,13 @@ describe('components/events/EventCard', () => {
     expect(store.attend).toHaveBeenCalledWith(42)
   })
 
-  it('shows the cancel button and calls store.unattend() when attending', async () => {
-    const store = useEventsStore()
-    store.unattend = vi.fn().mockResolvedValue()
+  it('offers no actions at all on a past event', () => {
+    // develop gates the whole cell on `v-else-if="upcoming"`. We were showing
+    // a live RSVP/cancel button on events that had already happened.
+    const wrapper = mountComponent({ event: baseEvent({ attending: false }), past: true })
 
-    const wrapper = mountComponent({ event: baseEvent({ attending: true }) })
-
-    const button = wrapper.find('[data-testid="event-unattend-42"]')
-    expect(button.exists()).toBe(true)
-
-    await button.trigger('click')
-
-    expect(store.unattend).toHaveBeenCalledWith(42)
+    expect(wrapper.find('[data-testid="event-attend-42"]').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="event-attending-text-42"]').exists()).toBe(false)
   })
 
   it('does not throw when the store action rejects (revert + toast already handled by the store)', async () => {

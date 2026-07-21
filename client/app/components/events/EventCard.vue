@@ -220,19 +220,30 @@ async function onToggleAttendance() {
     </template>
 
     <td class="text-end text-nowrap">
-      <!-- GroupEventsScrollTableActions.vue blocks a fresh RSVP once the
-           event is starting soon (starts today, not yet begun). An existing
-           attendee stays free to withdraw - that button is the only way off
-           the list here. -->
-      <BButton
-        variant="outline-primary"
-        size="sm"
-        :disabled="pending || (!attending && startingSoon)"
-        :data-testid="attending ? `event-unattend-${event.id}` : `event-attend-${event.id}`"
-        @click="onToggleAttendance"
-      >
-        {{ attending ? t('events.rsvp_button') : t('events.RSVP') }}
-      </BButton>
+      <!-- GroupEventsScrollTableActions.vue gates this whole cell on
+           `v-else-if="upcoming"`, so a past event gets no actions at all -
+           we were offering a live RSVP/cancel button on events that had
+           already happened.
+
+           When already attending it shows static bold text, not a control:
+           there is no un-RSVP from this table in develop. The RSVP button is
+           only for an upcoming event you have not joined, and is disabled
+           once the event is starting soon. -->
+      <template v-if="!past">
+        <span v-if="attending" class="fw-bold text-black" :data-testid="`event-attending-text-${event.id}`">
+          {{ t('events.youre_going') }}
+        </span>
+        <BButton
+          v-else
+          variant="outline-primary"
+          size="sm"
+          :disabled="pending || startingSoon"
+          :data-testid="`event-attend-${event.id}`"
+          @click="onToggleAttendance"
+        >
+          {{ t('events.RSVP') }}
+        </BButton>
+      </template>
     </td>
   </tr>
 </template>

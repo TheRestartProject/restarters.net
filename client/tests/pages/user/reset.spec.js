@@ -30,6 +30,7 @@ const bvnStubs = {
 function mountReset(query = { recovery: 'tok-1' }, recoveryInfo = vi.fn()) {
   const i18n = createI18n({ legacy: false, locale: 'en', messages: { en: { ...en, ...clientEn } } })
   vi.stubGlobal('useRoute', () => ({ query, params: {}, fullPath: '/user/reset' }))
+  vi.stubGlobal('navigateTo', vi.fn())
   vi.stubGlobal('useNuxtApp', () => ({ $api: { auth: { recoveryInfo } } }))
 
   return mount(ResetPage, {
@@ -114,6 +115,8 @@ describe('pages/user/reset', () => {
       password: 'newpass123',
       password_confirmation: 'newpass123',
     })
-    expect(wrapper.find('[data-testid="reset-success"]').exists()).toBe(true)
+    // develop redirects to the login page with the passwords.updated flash;
+    // the in-page alert this replaces left no route back to the sign-in form.
+    expect(globalThis.navigateTo).toHaveBeenCalledWith('/login?reset=1')
   })
 })

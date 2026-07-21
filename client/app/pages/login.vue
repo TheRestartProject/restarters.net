@@ -12,6 +12,12 @@ const authStore = useAuthStore()
 const route = useRoute()
 
 const email = ref(typeof route.query.email === 'string' ? route.query.email : '')
+
+// UserController::reset() redirects here with the passwords.updated flash
+// after a successful password change; login.blade.php prints it as a success
+// alert above the form. Carried as a query flag since the SPA has no session
+// flash.
+const resetSucceeded = computed(() => route.query.reset === '1')
 const password = ref('')
 // Honeypot: a field real users never see or fill in (layouts/plain.vue and
 // this page render it visually hidden). Bots that blindly fill every form
@@ -82,6 +88,10 @@ const emailErrors = computed(() => fieldErrors.value.email || [])
             </div>
 
             <legend>{{ t('login.login_title') }}</legend>
+
+            <BAlert v-if="resetSucceeded" :model-value="true" variant="success" data-testid="login-reset-success">
+              {{ t('passwords.updated') }}
+            </BAlert>
 
             <BFormGroup :label="`${t('auth.email_address')}:`" label-for="email">
               <BFormInput
