@@ -24,7 +24,14 @@
     position: relative;
     height: 60px;
 
-    > a {
+    // :not(.btn) - this block styles the icon-and-caption nav items
+    // (TALK/FIXOMETER/EVENTS/GROUPS/WIKI): stacked flex column, fixed 60px
+    // height, colour forced to $black. The logged-out Sign in / Join controls
+    // are also <a> inside <li> here, so they were picking all of it up:
+    // colour #222 landed on .btn-dark's #212529 fill, leaving JOIN's label
+    // invisible at roughly 1.02:1 contrast, and the fixed height plus column
+    // layout broke "SIGN IN" across two lines.
+    > a:not(.btn) {
       @extend .d-flex;
       @extend .flex-column;
       @extend .align-items-center;
@@ -171,6 +178,16 @@
     @extend %nav-items-shared;
 
     margin-left: auto;
+
+    // The logged-out Sign in / Join buttons. They keep Bootstrap's button
+    // colours (see the :not(.btn) note above) but still want the uppercase
+    // treatment the rest of the site's buttons use, and must not break their
+    // label across lines - "SIGN IN" wrapping to "SIGN" / "IN" is what made
+    // this look broken on a phone.
+    > li > a.btn {
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
   }
 }
 

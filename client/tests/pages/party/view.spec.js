@@ -466,9 +466,14 @@ describe('pages/party/view/[id]', () => {
       const wrapper = mountPage()
 
       const note = wrapper.find('[data-testid="event-view-impact-notincluded"]').text()
-      expect(note).toContain('2 items to be recycled')
-      expect(note).toContain('1 item to be repaired')
-      expect(note).toContain('3 misc or unpowered items with no weight estimate')
+      // Exact, not toContain: the strings begin with the count, so a stray
+      // manual prefix produced "2 2 items to be recycled" - which still
+      // CONTAINS "2 items to be recycled", so the substring assertions here
+      // passed all the way through that bug reaching a screenshot.
+      expect(note.replace(/\s+/g, ' ')).toBe(
+        "Not counting toward this event's environmental impact are 2 items to be recycled, " +
+        '1 item to be repaired, 3 misc or unpowered items with no weight estimate.'
+      )
     })
 
     it('omits the notincluded note when nothing is excluded', () => {

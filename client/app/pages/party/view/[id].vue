@@ -143,16 +143,19 @@ const notIncludedParts = computed(() => {
   const stats = event.value?.stats
   if (!stats) return []
 
+  // No manual count prefix: events.to_be_recycled/_repaired/no_weight already
+  // start with ":value", so prefixing rendered "23 23 items to be repaired".
+  // GroupStats.vue builds the same sentence from the same strings without one.
   const parts = []
   if (stats.dead_devices) {
-    parts.push(`${stats.dead_devices} ${t('events.to_be_recycled', { value: stats.dead_devices }, stats.dead_devices)}`)
+    parts.push(t('events.to_be_recycled', { value: stats.dead_devices }, stats.dead_devices))
   }
   if (stats.repairable_devices) {
-    parts.push(`${stats.repairable_devices} ${t('events.to_be_repaired', { value: stats.repairable_devices }, stats.repairable_devices)}`)
+    parts.push(t('events.to_be_repaired', { value: stats.repairable_devices }, stats.repairable_devices))
   }
   const noWeight = (stats.no_weight_powered || 0) + (stats.no_weight_unpowered || 0)
   if (noWeight) {
-    parts.push(`${noWeight} ${t('events.no_weight', { value: noWeight }, noWeight)}`)
+    parts.push(t('events.no_weight', { value: noWeight }, noWeight))
   }
   return parts
 })
@@ -544,7 +547,7 @@ function closeAddVolunteer() {
       <div v-if="finished && event.stats" class="stats-grid mb-4">
         <section data-testid="event-view-stats">
           <h2 class="mt-2 mb-2">{{ t('events.items_fixed') }}</h2>
-          <div class="d-flex flex-wrap gap-3">
+          <div class="d-flex flex-wrap gap-3 stat-cards stat-cards--fixed">
             <!-- EventStatsItems.vue:5 - the fixed-devices card is
                  `variant="primary"` with NO `title` prop, i.e. a $brand-light
                  filled card showing the count alone. The other two are plain
@@ -578,7 +581,7 @@ function closeAddVolunteer() {
               <div v-html="t('events.impact_calculation')" />
             </BPopover>
           </h2>
-          <div class="d-flex flex-wrap gap-3">
+          <div class="d-flex flex-wrap gap-3 stat-cards stat-cards--impact">
             <div class="stat-card" data-testid="event-view-impact-waste">
               <img src="/images/trash.svg" alt="" class="stat-card__icon">
               <div class="stat-card__count">{{ kg(event.stats.waste_total) }}</div>
@@ -760,6 +763,21 @@ function closeAddVolunteer() {
   .stats-grid > section:last-child {
     border-left: 1px solid #000;
     padding-left: 2rem;
+  }
+}
+
+/* Mobile stacking, matching how the live site breaks these down below md.
+   There, "items fixed" puts the fixed count on its own full-width row with
+   powered/unpowered side by side underneath, and the two environmental-impact
+   cards each take the full width.
+
+   Ours let all three items-fixed cards share one row, which at 390px is 109px
+   per card - narrow enough that the icon, count and label stack into a tall
+   thin column and stop lining up with each other across cards. */
+@media (max-width: 767.98px) {
+  .stat-cards--fixed .stat-card--primary,
+  .stat-cards--impact .stat-card {
+    flex: 0 0 100%;
   }
 }
 
