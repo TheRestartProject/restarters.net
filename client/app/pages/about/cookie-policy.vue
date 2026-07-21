@@ -31,15 +31,13 @@ useHead({ title: t('client.cookie_policy.title') })
 // ".gdpr-cookie-notice-settings-button" reopens the GDPR cookie-consent
 // banner so a visitor can revisit their choice after already accepting it,
 // as an inline link inside the "Managing cookies" sentence (not a separate
-// button). `accepted` is the same module-level singleton ref components/
-// CookieConsent.vue reads (useCookieConsent.js) - flipping it back to false
-// here re-shows that banner without touching localStorage, so a hard
-// reload still remembers the visitor's prior choice (matching legacy: this
-// link only *reopens the notice UI*, it doesn't forget consent by itself -
-// re-accepting re-persists the same value).
-const { accepted } = useCookieConsent()
+// button). reopen() clears the composable's in-memory copy of the consent
+// cookie so the banner - and from it the per-category dialog - shows again,
+// without deleting the stored cookie: the link reopens the notice, it does not
+// forget the choice by itself, and re-accepting rewrites the same value.
+const { reopen } = useCookieConsent()
 function reopenCookieSettings() {
-  accepted.value = false
+  reopen()
 }
 </script>
 

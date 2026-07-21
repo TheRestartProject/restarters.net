@@ -1,28 +1,99 @@
 <script setup>
+import { ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useCookieConsent } from '~/composables/useCookieConsent.js'
+import { useCookieConsent, COOKIE_CATEGORIES } from '~/composables/useCookieConsent.js'
 
-// Fixed cookie-consent bar, matching the legacy gdpr-cookie-notice banner
-// (resources/js/gdpr-cookie-notice/en.js): the description text, a "Cookie
-// settings" link to the cookie policy, and an "OK" accept button. Shown until
-// the visitor accepts (persisted via useCookieConsent).
+// Fixed cookie-consent bar, matching gdpr-cookie-notice: the description, a
+// "Cookie settings" control, and an "OK" accept-all button.
+//
+// "Cookie settings" opens the per-category modal (gdpr-cookie-notice's
+// modal.html), it does NOT navigate to the policy article - that is develop's
+// separate "statement" link, which lives inside the modal. Sending the
+// settings control to a static article left a visitor no way to decline
+// analytics at all.
 const { t } = useI18n()
-const { accepted, accept } = useCookieConsent()
+const { decided, choices, acceptAll, save } = useCookieConsent()
+
+const showSettings = ref(false)
+
+// Working copy so cancelling the modal does not persist anything.
+const draft = ref({ ...choices.value })
+
+watch(showSettings, (open) => {
+  if (open) draft.value = { ...choices.value }
+})
+
+// The stored cookie key is develop's misspelled "performace"; the translation
+// key is spelled correctly. Mapping here keeps the misspelling confined to the
+// persisted format, where changing it would drop existing consent.
+const CATEGORY_KEYS = { performace: 'performance', analytics: 'analytics', marketing: 'marketing' }
+const categoryKey = (category) => CATEGORY_KEYS[category] ?? category
+
+function onSave() {
+  save(draft.value)
+  showSettings.value = false
+}
 </script>
 
 <template>
-  <div v-if="!accepted" class="cookie-consent" role="region" aria-label="Cookie notice" data-testid="cookie-consent">
+  <div v-if="!decided" class="cookie-consent" role="region" aria-label="Cookie notice" data-testid="cookie-consent">
     <p class="cookie-consent__text mb-0">
       {{ t('client.cookies.banner_text') }}
     </p>
     <div class="cookie-consent__actions">
-      <NuxtLink to="/about/cookie-policy" class="cookie-consent__item cookie-consent__settings" data-testid="cookie-consent-settings">
+      <button
+        type="button"
+        class="cookie-consent__item cookie-consent__settings"
+        data-testid="cookie-consent-settings"
+        @click="showSettings = true"
+      >
         {{ t('client.cookies.settings') }}
-      </NuxtLink>
-      <button type="button" class="cookie-consent__item cookie-consent__accept" data-testid="cookie-consent-accept" @click="accept">
+      </button>
+      <button type="button" class="cookie-consent__item cookie-consent__accept" data-testid="cookie-consent-accept" @click="acceptAll">
         {{ t('client.cookies.accept') }}
       </button>
     </div>
+
+    <BModal
+      v-model="showSettings"
+      :title="t('client.cookies.settings')"
+      :ok-title="t('client.cookies.save')"
+      ok-only
+      data-testid="cookie-consent-modal"
+      @ok="onSave"
+    >
+      <!-- Essential is listed but has no switch: develop renders "Always on"
+           in place of the toggle, because the site cannot function without it. -->
+      <div class="cookie-category" data-testid="cookie-category-essential">
+        <div class="d-flex justify-content-between align-items-start gap-3">
+          <h3 class="h6 mb-1">{{ t('client.cookies.essential_title') }}</h3>
+          <span class="text-muted small text-nowrap">{{ t('client.cookies.always_on') }}</span>
+        </div>
+        <p class="small text-muted mb-0">{{ t('client.cookies.essential_desc') }}</p>
+      </div>
+
+      <div
+        v-for="category in COOKIE_CATEGORIES"
+        :key="category"
+        class="cookie-category"
+        :data-testid="`cookie-category-${category}`"
+      >
+        <div class="d-flex justify-content-between align-items-start gap-3">
+          <h3 class="h6 mb-1">{{ t(`client.cookies.${categoryKey(category)}_title`) }}</h3>
+          <BFormCheckbox
+            v-model="draft[category]"
+            switch
+            :data-testid="`cookie-toggle-${category}`"
+            :aria-label="t(`client.cookies.${categoryKey(category)}_title`)"
+          />
+        </div>
+        <p class="small text-muted mb-0">{{ t(`client.cookies.${categoryKey(category)}_desc`) }}</p>
+      </div>
+
+      <NuxtLink to="/about/cookie-policy" data-testid="cookie-consent-statement" @click="showSettings = false">
+        {{ t('client.cookies.statement') }}
+      </NuxtLink>
+    </BModal>
   </div>
 </template>
 
@@ -67,6 +138,9 @@ const { accepted, accept } = useCookieConsent()
 // as a button, not a hyperlink.
 .cookie-consent__item {
   display: block;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
   height: 40px;
   line-height: 40px;
   padding: 0 16px;
@@ -79,6 +153,12 @@ const { accepted, accept } = useCookieConsent()
     color: #fff;
     text-decoration: none;
   }
+}
+
+.cookie-category {
+  padding-bottom: 0.75rem;
+  margin-bottom: 0.75rem;
+  border-bottom: 1px solid #dee2e6;
 }
 
 // The OK accept button - brand orange fill (.gdpr-cookie-notice-nav-item-btn).

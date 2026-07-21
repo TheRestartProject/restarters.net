@@ -139,9 +139,11 @@ describe('pages/about/cookie-policy', () => {
   })
 
   it('reopens the cookie-consent banner when the inline "cookie settings" link is clicked', async () => {
-    const { accepted, accept } = useCookieConsent()
-    accept()
-    expect(accepted.value).toBe(true)
+    // Consent is now per-category (essential/performance/analytics/marketing),
+    // so the banner's visibility is `decided` rather than a single accepted flag.
+    const { decided, acceptAll } = useCookieConsent()
+    acceptAll()
+    expect(decided.value).toBe(true)
 
     const wrapper = mountPage()
     const link = wrapper.find('[data-testid="cookie-policy-reopen-settings"]')
@@ -149,6 +151,6 @@ describe('pages/about/cookie-policy', () => {
 
     await link.trigger('click')
 
-    expect(accepted.value).toBe(false)
+    expect(decided.value).toBe(false)
   })
 })

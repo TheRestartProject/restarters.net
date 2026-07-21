@@ -246,7 +246,18 @@
     "cookies": {
       "banner_text": "Nous utilisons des cookies pour faire fonctionner notre site web et des cookies analytiques pour l’améliorer. Cliquez sur Paramètres des cookies pour les modifier, ou sur OK pour tout accepter.",
       "settings": "Paramètres des cookies",
-      "accept": "OK"
+      "accept": "OK",
+      "save": "Enregistrer les paramètres",
+      "always_on": "Toujours actif",
+      "statement": "Notre politique en matière de cookies",
+      "essential_title": "Cookies essentiels du site",
+      "essential_desc": "Les cookies nécessaires contribuent à rendre un site web utilisable en activant des fonctions de base comme la navigation et l'accès aux zones sécurisées. Le site ne peut pas fonctionner correctement sans ces cookies.",
+      "performance_title": "Cookies de performance",
+      "performance_desc": "Ces cookies servent à améliorer les performances et les fonctionnalités de nos sites, sans être essentiels à leur utilisation. Ils sont par exemple utilisés par notre hébergeur pour la répartition de charge.",
+      "analytics_title": "Cookies analytiques",
+      "analytics_desc": "Nous utilisons des cookies analytiques pour analyser l'utilisation de notre site et ses performances, afin de l'améliorer (par exemple, compter le nombre de visiteurs et voir comment ils naviguent sur notre site).",
+      "marketing_title": "Cookies marketing",
+      "marketing_desc": "Nous n'utilisons aucun cookie marketing."
     },
     "moderation": {
       "events_title": "Événements à modérer",
