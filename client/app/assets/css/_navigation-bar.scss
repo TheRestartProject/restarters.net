@@ -596,6 +596,23 @@
 }
 
 #account-nav {
+  // Anchored to the toggle explicitly. develop's markup is
+  // `dropdown-menu collapse navbar-dropdown` driven by Bootstrap 4's COLLAPSE
+  // plugin, so it expands from the toggle; ours is a plain `.show` toggle on a
+  // `.dropdown-menu`, with no Popper run to place it. Without an explicit
+  // anchor it resolved against whichever ancestor happened to be positioned
+  // and could open above the viewport top, putting the menu off-screen and
+  // out of reach. `max-height` + scroll keeps a long admin menu inside the
+  // viewport too.
+  position: absolute;
+  top: 100%;
+  bottom: auto;
+  right: 0;
+  left: auto;
+  z-index: 1001;
+  max-height: calc(100vh - 5rem);
+  overflow-y: auto;
+
   @include media-breakpoint-down(md) {
     position: absolute;
     right: 0;
