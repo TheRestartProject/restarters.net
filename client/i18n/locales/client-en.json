@@ -255,7 +255,9 @@
       "load_error": "Sorry, we couldn't load the moderation queue."
     },
     "common": {
-      "more_information": "More information"
+      "more_information": "More information",
+      "sort_ascending": "Click to sort ascending",
+      "sort_descending": "Click to sort descending"
     }
   }
 }

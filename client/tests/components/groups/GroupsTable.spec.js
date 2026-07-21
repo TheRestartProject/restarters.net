@@ -34,6 +34,46 @@ const rows = [
 ]
 
 describe('components/groups/GroupsTable', () => {
+  // ARIA only honours aria-sort on the columnheader - the <th> - so that is
+  // where it has to live. FixometerSortHeader had it on the sort <button>,
+  // where assistive tech ignores it: the column looked instrumented and
+  // announced nothing. develop gets both this and the "Click to sort
+  // ascending" hint free from b-table.
+  describe('sortable header accessibility', () => {
+    it('marks the active column ascending and the rest none', async () => {
+      const wrapper = mountComponent({ groups: rows })
+      const th = () => wrapper.findAll('th')
+
+      const nameTh = th().find((h) => h.find('[data-testid="groups-table-sort-name"]').exists())
+      expect(nameTh.attributes('aria-sort')).toBe('ascending')
+
+      const otherSorted = th().filter(
+        (h) => h.attributes('aria-sort') && h.attributes('aria-sort') !== 'none'
+      )
+      expect(otherSorted).toHaveLength(1)
+    })
+
+    it('flips to descending when the active column is clicked again', async () => {
+      const wrapper = mountComponent({ groups: rows })
+
+      await wrapper.find('[data-testid="groups-table-sort-name"]').trigger('click')
+
+      const nameTh = wrapper
+        .findAll('th')
+        .find((h) => h.find('[data-testid="groups-table-sort-name"]').exists())
+      expect(nameTh.attributes('aria-sort')).toBe('descending')
+    })
+
+    it('announces what a click will do on the control itself', () => {
+      const wrapper = mountComponent({ groups: rows })
+
+      // Name is already ascending, so its control offers descending; an
+      // unsorted column offers ascending.
+      const nameBtn = wrapper.find('[data-testid="groups-table-sort-name"]')
+      expect(nameBtn.text()).toContain(clientEn.client.common.sort_descending)
+    })
+  })
+
   // GroupsTableFilters (rendered whenever showFilters is set) reads network/
   // tag options straight from the shared stores rather than via props.
   beforeEach(() => {

@@ -6,6 +6,7 @@ import { useDevicesStore } from '../../stores/devices.js'
 import { useAuth } from '../../composables/useAuth.js'
 import { deviceStatusKey, deviceStatusVariant } from '../../composables/useDeviceDisplay.js'
 import FixometerSortHeader from './FixometerSortHeader.vue'
+import { sortAriaValue } from '../../composables/useSortAria.js'
 import DeviceForm from '../devices/DeviceForm.vue'
 
 // Paginated/filterable device search table for /device/search
@@ -99,6 +100,9 @@ const page = ref(1)
 // keys here are exactly those whitelist keys.
 const sortBy = ref('event_start_utc')
 const sortDesc = ref(true)
+
+// Current sort state for the column headers - belongs on <th>, not the button.
+const sortAria = (key) => sortAriaValue(key, sortBy.value, sortDesc.value)
 
 // Clicking a header sorts by that column ascending; clicking the active column
 // again reverses the direction - the affordance the legacy table's helper text
@@ -477,17 +481,17 @@ function toggleMobileSection(section) {
         <table class="table device-search-table" data-testid="device-search-results">
           <thead>
             <tr>
-              <th><FixometerSortHeader :label="t('devices.model_or_type')" sort-key="item_type" :active-key="sortBy" :desc="sortDesc" @sort="toggleSort" /></th>
-              <th><FixometerSortHeader :label="t('devices.category')" sort-key="category" :active-key="sortBy" :desc="sortDesc" @sort="toggleSort" /></th>
+              <th :aria-sort="sortAria('item_type')"><FixometerSortHeader :label="t('devices.model_or_type')" sort-key="item_type" :active-key="sortBy" :desc="sortDesc" @sort="toggleSort" /></th>
+              <th :aria-sort="sortAria('category')"><FixometerSortHeader :label="t('devices.category')" sort-key="category" :active-key="sortBy" :desc="sortDesc" @sort="toggleSort" /></th>
               <!-- Gap fix (MEDIUM): legacy hides Brand/Assessment/Group below
                    md (FixometerRecordsTable.vue's `d-none d-md-table-cell`
                    fields), and restyles the remaining cells into a compact
                    2-column grid on mobile (see the scoped style block below). -->
-              <th v-if="filters.powered" class="d-none d-md-table-cell"><FixometerSortHeader :label="t('devices.brand')" sort-key="brand" :active-key="sortBy" :desc="sortDesc" @sort="toggleSort" /></th>
+              <th v-if="filters.powered" class="d-none d-md-table-cell" :aria-sort="sortAria('brand')"><FixometerSortHeader :label="t('devices.brand')" sort-key="brand" :active-key="sortBy" :desc="sortDesc" @sort="toggleSort" /></th>
               <th class="d-none d-md-table-cell"><FixometerSortHeader :label="t('devices.assessment')" /></th>
-              <th class="d-none d-md-table-cell"><FixometerSortHeader :label="t('devices.group')" sort-key="groupname" :active-key="sortBy" :desc="sortDesc" @sort="toggleSort" /></th>
-              <th><FixometerSortHeader :label="t('devices.status')" sort-key="repair_status" :active-key="sortBy" :desc="sortDesc" @sort="toggleSort" /></th>
-              <th><FixometerSortHeader :label="t('devices.devices_date')" sort-key="created_at" :active-key="sortBy" :desc="sortDesc" @sort="toggleSort" /></th>
+              <th class="d-none d-md-table-cell" :aria-sort="sortAria('groupname')"><FixometerSortHeader :label="t('devices.group')" sort-key="groupname" :active-key="sortBy" :desc="sortDesc" @sort="toggleSort" /></th>
+              <th :aria-sort="sortAria('repair_status')"><FixometerSortHeader :label="t('devices.status')" sort-key="repair_status" :active-key="sortBy" :desc="sortDesc" @sort="toggleSort" /></th>
+              <th :aria-sort="sortAria('created_at')"><FixometerSortHeader :label="t('devices.devices_date')" sort-key="created_at" :active-key="sortBy" :desc="sortDesc" @sort="toggleSort" /></th>
               <th />
             </tr>
           </thead>

@@ -1,5 +1,7 @@
 <script setup>
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { sortHintKey } from '../../composables/useSortAria.js'
 
 // A device-search table column header. When `sortKey` is given the header is a
 // clickable sort control (up/down arrows, active direction highlighted) that
@@ -16,7 +18,13 @@ const props = defineProps({
 
 const emit = defineEmits(['sort'])
 
+const { t } = useI18n()
+
 const isActive = computed(() => props.sortKey !== null && props.activeKey === props.sortKey)
+
+// What clicking does next. aria-sort carries the CURRENT state and belongs on
+// the <th>, not here - see composables/useSortAria.js.
+const hint = computed(() => t(sortHintKey(props.sortKey, props.activeKey, props.desc)))
 </script>
 
 <template>
@@ -24,11 +32,11 @@ const isActive = computed(() => props.sortKey !== null && props.activeKey === pr
     v-if="sortKey"
     type="button"
     class="sort-header"
-    :aria-sort="isActive ? (desc ? 'descending' : 'ascending') : 'none'"
     :data-testid="`device-search-sort-${sortKey}`"
     @click="emit('sort', sortKey)"
   >
     <span>{{ label }}</span>
+    <span class="visually-hidden">{{ hint }}</span>
     <span class="sort-header__arrows" aria-hidden="true">
       <span class="sort-header__up" :class="{ 'sort-header__on': isActive && !desc }">▲</span>
       <span class="sort-header__down" :class="{ 'sort-header__on': isActive && desc }">▼</span>

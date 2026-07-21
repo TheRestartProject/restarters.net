@@ -1,5 +1,6 @@
 <script setup>
 import { computed, ref } from 'vue'
+import { sortAriaValue, sortHintKey } from '../../composables/useSortAria.js'
 import { useI18n } from 'vue-i18n'
 import { useGroupRole } from '../../composables/useGroupRole.js'
 import { useUploadedImageUrl } from '../../composables/useUploadedImageUrl.js'
@@ -161,6 +162,12 @@ function dateLabel(iso) {
   return new Date(iso).toLocaleDateString(locale.value, { day: 'numeric', month: 'short', year: 'numeric' })
 }
 
+// Current sort state, announced from the <th> where ARIA honours it.
+const sortAria = (key) => sortAriaValue(key, sortKey.value, sortDesc.value)
+
+// What a click will do next, announced on the control itself.
+const sortHint = (key) => t(sortHintKey(key, sortKey.value, sortDesc.value))
+
 function sortCaretClass(key) {
   // Every column is sortable. Legacy (bootstrap-vue's b-table) shows a
   // paired up/down arrow glyph next to every sortable header, darkening
@@ -192,7 +199,7 @@ function sortCaretClass(key) {
           <th class="groups-table-photo-col">
             <span class="visually-hidden">{{ t('groups.group_image') }}</span>
           </th>
-          <th>
+          <th :aria-sort="sortAria('name')">
             <button
               type="button"
               class="sort-header"
@@ -200,6 +207,7 @@ function sortCaretClass(key) {
               data-testid="groups-table-sort-name"
               @click="sortBy('name')"
             >
+              <span class="visually-hidden">{{ sortHint('name') }}</span>
               <img src="/icons/group_name_ico.svg" alt="" class="col-icon">
               <span class="sort-carets" :class="sortCaretClass('name')" aria-hidden="true">
                 <span class="sort-caret sort-caret--up" />
@@ -207,7 +215,7 @@ function sortCaretClass(key) {
               </span>
             </button>
           </th>
-          <th v-if="optionalColumns.location">
+          <th v-if="optionalColumns.location" :aria-sort="sortAria('location')">
             <button
               type="button"
               class="sort-header"
@@ -215,6 +223,7 @@ function sortCaretClass(key) {
               data-testid="groups-table-sort-location"
               @click="sortBy('location')"
             >
+              <span class="visually-hidden">{{ sortHint('location') }}</span>
               <img src="/icons/map_marker_ico.svg" alt="" class="col-icon">
               <span class="sort-carets" :class="sortCaretClass('location')" aria-hidden="true">
                 <span class="sort-caret sort-caret--up" />
@@ -222,7 +231,7 @@ function sortCaretClass(key) {
               </span>
             </button>
           </th>
-          <th v-if="optionalColumns.hosts">
+          <th v-if="optionalColumns.hosts" :aria-sort="sortAria('hosts')">
             <button
               type="button"
               class="sort-header"
@@ -230,6 +239,7 @@ function sortCaretClass(key) {
               data-testid="groups-table-sort-hosts"
               @click="sortBy('hosts')"
             >
+              <span class="visually-hidden">{{ sortHint('hosts') }}</span>
               <img src="/icons/user_ico.svg" alt="" class="col-icon col-icon--small">
               <span class="sort-carets" :class="sortCaretClass('hosts')" aria-hidden="true">
                 <span class="sort-caret sort-caret--up" />
@@ -237,7 +247,7 @@ function sortCaretClass(key) {
               </span>
             </button>
           </th>
-          <th v-if="optionalColumns.restarters">
+          <th v-if="optionalColumns.restarters" :aria-sort="sortAria('restarters')">
             <button
               type="button"
               class="sort-header"
@@ -245,6 +255,7 @@ function sortCaretClass(key) {
               data-testid="groups-table-sort-restarters"
               @click="sortBy('restarters')"
             >
+              <span class="visually-hidden">{{ sortHint('restarters') }}</span>
               <img src="/icons/volunteer_ico-thick.svg" alt="" class="col-icon">
               <span class="sort-carets" :class="sortCaretClass('restarters')" aria-hidden="true">
                 <span class="sort-caret sort-caret--up" />
@@ -252,7 +263,7 @@ function sortCaretClass(key) {
               </span>
             </button>
           </th>
-          <th v-if="optionalColumns.next_event">
+          <th v-if="optionalColumns.next_event" :aria-sort="sortAria('next_event')">
             <button
               type="button"
               class="sort-header"
@@ -260,6 +271,7 @@ function sortCaretClass(key) {
               data-testid="groups-table-sort-next_event"
               @click="sortBy('next_event')"
             >
+              <span class="visually-hidden">{{ sortHint('next_event') }}</span>
               <img src="/icons/events_ico.svg" alt="" class="col-icon">
               <span class="sort-carets" :class="sortCaretClass('next_event')" aria-hidden="true">
                 <span class="sort-caret sort-caret--up" />

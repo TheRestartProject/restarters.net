@@ -255,7 +255,9 @@
       "load_error": "Désolé, nous n'avons pas pu charger la liste de modération."
     },
     "common": {
-      "more_information": "Plus d’informations"
+      "more_information": "Plus d’informations",
+      "sort_ascending": "Cliquez pour trier par ordre croissant",
+      "sort_descending": "Cliquez pour trier par ordre décroissant"
     }
   }
 }
