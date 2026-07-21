@@ -1,8 +1,9 @@
 <script setup>
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useEventsStore } from '../../stores/events.js'
 import { useGroupsStore } from '../../stores/groups.js'
+import TagMultiselect from '../forms/TagMultiselect.vue'
 import IconChainLink from '../icons/IconChainLink.vue'
 
 // POST /api/v2/events/{id}/invites (api-contracts-phase-c.md C1d):
@@ -49,7 +50,7 @@ const emit = defineEmits(['close'])
 const { t } = useI18n()
 const eventsStore = useEventsStore()
 
-const emailsText = ref('')
+const manualEmails = ref([])
 const message = ref('')
 const submitting = ref(false)
 const generalError = ref('')
@@ -101,12 +102,10 @@ watch(
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
-function parseEmails(text) {
-  return text
-    .split(/[,;\n]+/)
-    .map((s) => s.trim())
-    .filter(Boolean)
-}
+// Chips the user typed that aren't addresses. The control renders these in the
+// danger fill, as develop's multiselect does via its has-invalid-email class,
+// so a typo is visible before submitting rather than only in the error line.
+const invalidEmails = computed(() => manualEmails.value.filter((e) => !EMAIL_RE.test(e)))
 
 function reset() {
   generalError.value = ''
@@ -120,7 +119,7 @@ async function submit() {
   // allEmails: picked members first, then anything typed - the same
   // combination EventInviteModal.vue makes before submitting. Deduped, since
   // a member's address can also be typed by hand.
-  const typed = parseEmails(emailsText.value)
+  const typed = manualEmails.value
   const emails = [...new Set([...selectedMembers.value, ...typed])]
 
   if (!emails.length) {
@@ -130,7 +129,7 @@ async function submit() {
 
   // Only what the user typed is validated: member addresses come from the
   // API, and flagging one as malformed would blame the user for it.
-  const malformed = typed.filter((e) => !EMAIL_RE.test(e))
+  const malformed = invalidEmails.value
   if (malformed.length) {
     fieldErrors.value = { emails: [t('client.events.invite_emails_invalid', { emails: malformed.join(', ') })] }
     return
@@ -150,7 +149,7 @@ async function submit() {
       successMessage.value = t('events.invite_success')
     }
 
-    emailsText.value = ''
+    manualEmails.value = []
     selectedMembers.value = []
     inviteAllMembers.value = false
     message.value = ''
@@ -223,18 +222,15 @@ function close() {
         :label="`${t('events.select_group_members')}:`"
         label-for="event-invite-members"
       >
-        <select
+        <TagMultiselect
           id="event-invite-members"
           v-model="selectedMembers"
-          multiple
-          class="form-select"
-          :size="Math.min(members.length, 6)"
+          :options="members"
+          track-by="email"
+          label-by="name"
+          :placeholder="t('events.select_members_placeholder')"
           data-testid="event-invite-members"
-        >
-          <option v-for="member in members" :key="member.id" :value="member.email">
-            {{ member.name }}
-          </option>
-        </select>
+        />
         <div class="form-check mt-2">
           <input
             id="event-invite-all-members"
@@ -251,11 +247,13 @@ function close() {
       </BFormGroup>
 
       <BFormGroup :label="`${t('events.manual_invite_box')}:`" label-for="event-invite-emails">
-        <textarea
+        <TagMultiselect
           id="event-invite-emails"
-          v-model="emailsText"
-          class="form-control"
-          rows="3"
+          v-model="manualEmails"
+          :options="[]"
+          taggable
+          :invalid-values="invalidEmails"
+          :placeholder="t('events.manual_invite_placeholder')"
           data-testid="event-invite-emails"
         />
         <small class="text-muted d-block">{{ t('events.type_email_addresses_message') }}</small>

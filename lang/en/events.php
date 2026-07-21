@@ -152,4 +152,6 @@ return [
   'email_invite' => 'Invite via email',
   'select_group_members' => 'Select group members',
   'send_invites_to_restarters_tickbox' => 'Add invites for group members. Members marked with a ⚠ will be invited but won\'t be sent an email due to their notification settings.',
+  'select_members_placeholder' => 'Select members to invite',
+  'manual_invite_placeholder' => 'Type email and press Enter or Tab',
 ];

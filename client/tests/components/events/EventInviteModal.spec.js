@@ -30,6 +30,21 @@ function mountComponent(props = {}) {
   })
 }
 
+// Both pickers are TagMultiselect now (develop uses vue-multiselect for each),
+// so tests set their value through the component rather than through native
+// <select>/<textarea> APIs.
+function setPicker(wrapper, testid, values) {
+  const picker = wrapper.findAllComponents({ name: 'TagMultiselect' })
+    .find((c) => c.attributes('data-testid') === testid)
+  return picker.vm.$emit('update:modelValue', values)
+}
+
+function pickerOptions(wrapper, testid) {
+  const picker = wrapper.findAllComponents({ name: 'TagMultiselect' })
+    .find((c) => c.attributes('data-testid') === testid)
+  return picker ? picker.props('options') : null
+}
+
 describe('components/events/EventInviteModal', () => {
   // The Blade modal's chain-link header toggle swaps the email form for a
   // box holding the shareable join link. Both halves exist; they are never
@@ -94,16 +109,16 @@ describe('components/events/EventInviteModal', () => {
       await flushPromises()
 
       expect(groups.fetchMembersForInvite).toHaveBeenCalledWith(9, 5)
-      const options = wrapper.findAll('[data-testid="event-invite-members"] option')
+      const options = pickerOptions(wrapper, 'event-invite-members')
       expect(options).toHaveLength(2)
-      expect(options.map((o) => o.text())).toEqual(['Ada', 'Grace'])
+      expect(options.map((o) => o.name)).toEqual(['Ada', 'Grace'])
     })
 
     it('is absent when the group has no invitable members', async () => {
       const { wrapper } = mountWithMembers([])
       await flushPromises()
 
-      expect(wrapper.find('[data-testid="event-invite-members"]').exists()).toBe(false)
+      expect(pickerOptions(wrapper, 'event-invite-members')).toBeNull()
     })
 
     it('sends picked members alongside typed addresses, deduped', async () => {
@@ -113,8 +128,8 @@ describe('components/events/EventInviteModal', () => {
       const { wrapper } = mountWithMembers()
       await flushPromises()
 
-      await wrapper.find('[data-testid="event-invite-members"]').setValue(['ada@example.test'])
-      await wrapper.find('[data-testid="event-invite-emails"]').setValue('ada@example.test, new@example.test')
+      await setPicker(wrapper, 'event-invite-members', ['ada@example.test'])
+      await setPicker(wrapper, 'event-invite-emails', ['ada@example.test', 'new@example.test'])
       await wrapper.find('[data-testid="event-invite-form"]').trigger('submit')
       await flushPromises()
 
@@ -130,10 +145,13 @@ describe('components/events/EventInviteModal', () => {
 
       const tickbox = wrapper.find('[data-testid="event-invite-all-members"]')
       await tickbox.setValue(true)
-      expect(wrapper.find('[data-testid="event-invite-members"]').element.selectedOptions.length).toBe(2)
+      const picked = () => wrapper.findAllComponents({ name: 'TagMultiselect' })
+        .find((c) => c.attributes('data-testid') === 'event-invite-members')
+        .props('modelValue')
+      expect(picked()).toHaveLength(2)
 
       await tickbox.setValue(false)
-      expect(wrapper.find('[data-testid="event-invite-members"]').element.selectedOptions.length).toBe(0)
+      expect(picked()).toHaveLength(0)
     })
 
     it('does not blame the user for a member address it fetched', async () => {
@@ -143,7 +161,7 @@ describe('components/events/EventInviteModal', () => {
       const { wrapper } = mountWithMembers([{ id: 1, name: 'Odd', email: 'not-an-email' }])
       await flushPromises()
 
-      await wrapper.find('[data-testid="event-invite-members"]').setValue(['not-an-email'])
+      await setPicker(wrapper, 'event-invite-members', ['not-an-email'])
       await wrapper.find('[data-testid="event-invite-form"]').trigger('submit')
       await flushPromises()
 
@@ -173,7 +191,7 @@ describe('components/events/EventInviteModal', () => {
     store.inviteVolunteers = vi.fn()
 
     const wrapper = mountComponent()
-    await wrapper.find('[data-testid="event-invite-emails"]').setValue('not-an-email, also bad')
+    await setPicker(wrapper, 'event-invite-emails', ['not-an-email', 'also bad'])
     await wrapper.find('[data-testid="event-invite-form"]').trigger('submit')
 
     expect(wrapper.find('[data-testid="event-invite-emails-error"]').exists()).toBe(true)
@@ -185,7 +203,7 @@ describe('components/events/EventInviteModal', () => {
     store.inviteVolunteers = vi.fn().mockResolvedValue({ invites_sent: 2, invalid: [] })
 
     const wrapper = mountComponent()
-    await wrapper.find('[data-testid="event-invite-emails"]').setValue('a@example.com, b@example.com')
+    await setPicker(wrapper, 'event-invite-emails', ['a@example.com', 'b@example.com'])
     await wrapper.find('[data-testid="event-invite-message"]').setValue('Come join us')
     await wrapper.find('[data-testid="event-invite-form"]').trigger('submit')
     await wrapper.vm.$nextTick()
@@ -202,7 +220,7 @@ describe('components/events/EventInviteModal', () => {
     store.inviteVolunteers = vi.fn().mockResolvedValue({ invites_sent: 1, invalid: ['bad@example.com'] })
 
     const wrapper = mountComponent()
-    await wrapper.find('[data-testid="event-invite-emails"]').setValue('a@example.com')
+    await setPicker(wrapper, 'event-invite-emails', ['a@example.com'])
     await wrapper.find('[data-testid="event-invite-form"]').trigger('submit')
     await wrapper.vm.$nextTick()
 
@@ -214,7 +232,7 @@ describe('components/events/EventInviteModal', () => {
     store.inviteVolunteers = vi.fn().mockRejectedValue({ status: 500, message: 'Nope' })
 
     const wrapper = mountComponent()
-    await wrapper.find('[data-testid="event-invite-emails"]').setValue('a@example.com')
+    await setPicker(wrapper, 'event-invite-emails', ['a@example.com'])
     await wrapper.find('[data-testid="event-invite-form"]').trigger('submit')
     await wrapper.vm.$nextTick()
 

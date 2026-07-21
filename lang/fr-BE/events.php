@@ -143,4 +143,6 @@ return [
   'email_invite' => 'Inviter par e-mail',
   'select_group_members' => 'Sélectionner les membres du groupe',
   'send_invites_to_restarters_tickbox' => 'Ajouter les invitations pour les membres. Les membres marqués avec un ⚠ seront invités mais ne recevront pas un e-mail en raison de leurs paramètres de notifications',
+  'select_members_placeholder' => 'Sélectionner les membres à inviter',
+  'manual_invite_placeholder' => 'Tapez un e-mail et appuyez sur Entrée ou Tab',
 ];
