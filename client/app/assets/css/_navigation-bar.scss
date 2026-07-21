@@ -179,13 +179,19 @@
 
     margin-left: auto;
 
-    // The logged-out Sign in / Join buttons. They keep Bootstrap's button
-    // colours (see the :not(.btn) note above) but still want the uppercase
-    // treatment the rest of the site's buttons use, and must not break their
-    // label across lines - "SIGN IN" wrapping to "SIGN" / "IN" is what made
-    // this look broken on a phone.
+    // The logged-out Sign in / Join buttons. navbar.blade.php writes these as
+    // plain anchors carrying inline styles - width 120px, height 40px,
+    // explicit background/colour, and text-transform: initial - precisely to
+    // defeat the nav-link styling above. We use Bootstrap .btn classes
+    // instead, which lose to that selector, so the same defeating has to
+    // happen here. Sentence case, not uppercase: the inline
+    // text-transform: initial is deliberate, the labels are "Sign in" and
+    // "Join".
     > li > a.btn {
-      text-transform: uppercase;
+      width: 120px;
+      height: 40px;
+      padding: 0;
+      text-transform: initial;
       white-space: nowrap;
     }
   }
