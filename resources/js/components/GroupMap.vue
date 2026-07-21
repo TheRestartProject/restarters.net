@@ -42,7 +42,11 @@ import { Photon } from 'leaflet-control-geocoder/src/geocoders/photon'
 // what keeps it hidden until a search actually fails (and styles the button).
 import 'leaflet-control-geocoder/dist/Control.Geocoder.css'
 import GroupMarker from './GroupMarker.vue'
-import Supercluster from 'supercluster'
+// The prebuilt bundle rather than the package root: the root resolves to the
+// ESM source in the browser build but to the UMD bundle under Jest, so tests
+// would exercise different code from production. Freegle imports it this way
+// for the same reason.
+import Supercluster from 'supercluster/dist/supercluster'
 
 export default {
   components: {
