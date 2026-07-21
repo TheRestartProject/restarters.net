@@ -24,6 +24,86 @@ const EVENTS = [
 ]
 
 describe('components/groups/GroupEventsList', () => {
+  // GroupEventScrollTable.vue shows per-event stats on past events. The
+  // columns are icon-only with the label as a tooltip, so they are asserted
+  // by testid rather than by visible text.
+  describe('per-event stats columns', () => {
+    const WITH_STATS = [
+      {
+        id: 1,
+        title: 'Past Cafe',
+        start: PAST_ISO,
+        end: PAST_ISO,
+        location: 'Town Hall',
+        stats: {
+          participants: 12,
+          volunteers: 4,
+          waste_total: 37.4,
+          co2_total: 128.6,
+          fixed_devices: 7,
+          repairable_devices: 2,
+          dead_devices: 1,
+        },
+      },
+    ]
+
+    function pastTable(events) {
+      const wrapper = mountComponent({ events })
+      wrapper.find('[data-testid="group-events-tab-past"]').trigger('click')
+      return wrapper
+    }
+
+    it('renders every stat column on past events', async () => {
+      const wrapper = pastTable(WITH_STATS)
+      await wrapper.vm.$nextTick()
+
+      expect(wrapper.find('[data-testid="group-event-1-participants"]').text()).toBe('12')
+      expect(wrapper.find('[data-testid="group-event-1-volunteers"]').text()).toBe('4')
+      expect(wrapper.find('[data-testid="group-event-1-waste"]').text()).toBe('37 kg')
+      expect(wrapper.find('[data-testid="group-event-1-co2"]').text()).toBe('129 kg')
+      expect(wrapper.find('[data-testid="group-event-1-fixed"]').text()).toBe('7')
+      expect(wrapper.find('[data-testid="group-event-1-repairable"]').text()).toBe('2')
+      expect(wrapper.find('[data-testid="group-event-1-dead"]').text()).toBe('1')
+    })
+
+    it('leaves cells blank rather than showing zero when an event has no stats', async () => {
+      const wrapper = pastTable([{ ...WITH_STATS[0], stats: undefined }])
+      await wrapper.vm.$nextTick()
+
+      expect(wrapper.find('[data-testid="group-event-1-participants"]').text()).toBe('')
+      expect(wrapper.find('[data-testid="group-event-1-waste"]').text()).toBe('')
+    })
+
+    it('flags an event nobody attended, and one with a lone volunteer', async () => {
+      const wrapper = pastTable([
+        { ...WITH_STATS[0], stats: { ...WITH_STATS[0].stats, participants: 0, volunteers: 1 } },
+      ])
+      await wrapper.vm.$nextTick()
+
+      expect(wrapper.find('[data-testid="group-event-1-participants"]').classes()).toContain('cell-danger')
+      expect(wrapper.find('[data-testid="group-event-1-volunteers"]').classes()).toContain('cell-danger')
+      expect(wrapper.find('[data-testid="group-event-1-fixed"]').classes()).not.toContain('cell-danger')
+    })
+
+    it('flags a finished event with no devices logged', async () => {
+      const wrapper = pastTable([
+        {
+          ...WITH_STATS[0],
+          stats: { ...WITH_STATS[0].stats, fixed_devices: 0, repairable_devices: 0, dead_devices: 0 },
+        },
+      ])
+      await wrapper.vm.$nextTick()
+
+      expect(wrapper.find('[data-testid="group-event-1-waste"]').classes()).toContain('cell-danger')
+    })
+
+    it('does not show stat columns on upcoming events', () => {
+      const wrapper = mountComponent({ events: EVENTS })
+
+      expect(wrapper.find('[data-testid="group-events-col-participants"]').exists()).toBe(false)
+    })
+  })
+
   it('shows a loading skeleton', () => {
     const wrapper = mountComponent({ loading: true })
     expect(wrapper.find('[data-testid="group-events-loading"]').exists()).toBe(true)

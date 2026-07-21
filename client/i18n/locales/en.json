@@ -1059,7 +1059,13 @@
         "shareable_link_box": "Shareable link",
         "type_shareable_link_message": "Share the above link to invite people to join this group.  If a person you share the link with does not have an account yet, they will be prompted to register.",
         "email_invite": "Invite via email",
-        "done_button": "Done"
+        "done_button": "Done",
+        "participants_attended": "Participants attended",
+        "volunteers_attended": "Volunteers attended",
+        "co2_emissions_prevented": "CO2 emissions prevented",
+        "fixed_items": "Fixed items",
+        "repairable_items": "Repairable items",
+        "end_of_life_items": "End-of-life items"
     },
     "landing": {
         "title": "Welcome to Restarters!",

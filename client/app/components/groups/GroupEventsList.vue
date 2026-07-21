@@ -8,13 +8,11 @@ import { useI18n } from 'vue-i18n'
 // sortable table (not a bare title+date list) with "Add new event"/"Export
 // event list"/calendar-subscribe controls (parity gap 5).
 //
-// EventSummary only carries {id, start, end, title, location, group,
-// timezone, online, ...} - none of GroupEventScrollTable's per-event stats
-// columns (invited/volunteers/participants/waste/co2/fixed/repairable/dead),
-// which come from a separate events/getStats Vuex lookup develop's Blade
-// props seed up front and this v2 endpoint has no equivalent of. Rather than
-// fabricate those numbers, this table sticks to date/title/location -
-// the closest faithful match the available API data supports.
+// The past-events table carries GroupEventScrollTable's per-event stats
+// columns (participants/volunteers/waste/co2/fixed/repairable/dead), read
+// from PartySummary.stats - getEventStats(), with the relations it needs
+// eager-loaded in getEventsForGroupv2 so the list doesn't N+1. Upcoming
+// events have no stats to show, matching develop's separate field set.
 const props = defineProps({
   events: {
     type: Array,
@@ -69,6 +67,80 @@ const rows = computed(() => {
   })
   return sorted
 })
+
+// Per-event stats on the past-events table, matching the field set
+// GroupEventScrollTable.vue uses for past events (participants, volunteers,
+// waste, co2, then the three repair outcomes). Headers are icon-only with the
+// label as a tooltip, as there.
+//
+// PartySummary already carries `stats` (getEventStats, with the relations
+// eager-loaded in getEventsForGroupv2), so nothing is fabricated here - an
+// event without stats renders blank rather than a zero.
+//
+// The danger highlighting is develop's dangerIfZero/dangerIfOne/
+// noDevicesError: an event nobody attended, or one with a lone volunteer, or
+// a finished event with no devices logged, are all things a host wants to
+// notice.
+const statColumns = computed(() => [
+  {
+    key: 'participants',
+    icon: '/images/participants.svg',
+    label: t('groups.participants_attended'),
+    value: (e) => e.stats?.participants ?? '',
+    danger: (e) => (e.stats?.participants ?? 1) <= 0,
+  },
+  {
+    key: 'volunteers',
+    icon: '/icons/volunteer_ico-thick.svg',
+    label: t('groups.volunteers_attended'),
+    value: (e) => e.stats?.volunteers ?? '',
+    danger: (e) => (e.stats?.volunteers ?? 2) <= 1,
+  },
+  {
+    key: 'waste',
+    icon: '/images/trash.svg',
+    label: t('groups.waste_prevented'),
+    value: (e) => (e.stats ? `${Math.round(e.stats.waste_total ?? 0)} kg` : ''),
+    danger: noDevices,
+  },
+  {
+    key: 'co2',
+    icon: '/images/cloud-empty.svg',
+    label: t('groups.co2_emissions_prevented'),
+    value: (e) => (e.stats ? `${Math.round(e.stats.co2_total ?? 0)} kg` : ''),
+    danger: () => false,
+  },
+  {
+    key: 'fixed',
+    icon: '/images/fixed.svg',
+    label: t('groups.fixed_items'),
+    value: (e) => e.stats?.fixed_devices ?? '',
+    danger: () => false,
+  },
+  {
+    key: 'repairable',
+    icon: '/images/repairable_ico.svg',
+    label: t('groups.repairable_items'),
+    value: (e) => e.stats?.repairable_devices ?? '',
+    danger: () => false,
+  },
+  {
+    key: 'dead',
+    icon: '/images/dead_ico.svg',
+    label: t('groups.end_of_life_items'),
+    value: (e) => e.stats?.dead_devices ?? '',
+    danger: () => false,
+  },
+])
+
+// A finished event with nothing logged at all - develop flags the waste cell.
+function noDevices(event) {
+  const s = event.stats
+
+  if (!s) return false
+
+  return (s.fixed_devices ?? 0) + (s.repairable_devices ?? 0) + (s.dead_devices ?? 0) === 0
+}
 
 function toggleSort() {
   sortDesc.value = !sortDesc.value
@@ -204,6 +276,15 @@ function copyCalendarUrl() {
                 <span class="sort-indicator">{{ sortDesc ? '▼' : '▲' }}</span>
               </th>
               <th scope="col">{{ t('client.groups.column_location') }}</th>
+              <th
+                v-for="column in statColumns"
+                :key="column.key"
+                scope="col"
+                class="stat-col"
+                :data-testid="`group-events-col-${column.key}`"
+              >
+                <img :src="column.icon" :alt="column.label" :title="column.label" width="24" height="24">
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -215,6 +296,15 @@ function copyCalendarUrl() {
                 <div class="small text-muted">{{ dateLabel(event.start) }}</div>
               </td>
               <td>{{ event.location }}</td>
+              <td
+                v-for="column in statColumns"
+                :key="column.key"
+                class="stat-col"
+                :class="column.danger(event) ? 'cell-danger' : null"
+                :data-testid="`group-event-${event.id}-${column.key}`"
+              >
+                {{ column.value(event) }}
+              </td>
             </tr>
           </tbody>
         </table>
