@@ -31,8 +31,7 @@ const OUT = process.env.PARITY_OUT || 'parity-shots'
 // `task parity:capture` runs before this spec). They MUST NOT be hardcoded:
 // every `migrate:fresh --seed` renumbers users, networks and events, and a
 // stale id renders as a 404/permission-denied page on BOTH systems - which
-// then gets "compared" as a matching pair and reported as parity. That is
-// exactly how the event view page stayed unverified for the whole migration.
+// then gets "compared" as a matching pair and reported as parity.
 // Resolved relative to this file, not cwd, so it works whichever directory
 // playwright is invoked from.
 const FIXTURES = (() => {
@@ -67,8 +66,7 @@ const PAGES = [
   { slug: '08-groups-nearby', path: '/group/nearby', auth: true },
   // Detail pages: same URL shape on both systems (legacy /group/view/{id} =
   // GroupController::view; Nuxt /group/view/{id}). Group id 1 = the seeded
-  // "Tag Test Group" (playwright:seed-data). These were the pages the earlier
-  // 8-page harness never covered - exactly where visual diffs were missed.
+  // "Tag Test Group" (playwright:seed-data).
   { slug: '09-group-view', path: '/group/view/1', auth: true },
   // Everything below covers the remaining parity-v2 clusters (group forms,
   // networks, profile, admin CRUD, static). Each path was probed against the
@@ -94,25 +92,18 @@ const PAGES = [
   { slug: '21-admin-brands', path: '/brands', auth: true },
   { slug: '22-cookie-policy', path: '/about/cookie-policy', auth: false },
   { slug: '23-recover', path: '/user/recover', auth: false },
-  // --- pages 24-32: the coverage gap -------------------------------------
-  // Everything above was added ad hoc, and an audit of `client/app/pages`
-  // against this list found 17 routes that had NEVER been render-compared -
-  // including the event view page, which a manual check then showed was not
-  // at parity (its actions were not in a dropdown). Verifying a subset and
-  // reporting it as the whole is how that was missed, so these close the gap
-  // for every route that exists on BOTH systems at the same URL shape.
+  // Every remaining route that exists on BOTH systems at the same URL shape.
   //
-  // Not listed, because develop genuinely has no equivalent and a capture
-  // would only compare our page against develop's 404:
+  // Not listed, because develop has no equivalent and a capture would only
+  // compare our page against develop's 404:
   //   /user/consent   - develop enforces consent via the verifyUserConsent
   //                     middleware, with no standalone page
   //   /group/map      - Nuxt-only
   //   /group/invite/[code], /party/invite/[code] - need a live invite token
   // These are tracked in the findings docs instead.
   //
-  // NB two pages that were ALSO written off as Nuxt-only turned out to exist
-  // on develop at a different URL - a 404 probe at our path is not evidence
-  // the page is absent, only that it isn't at that path. See `path` below.
+  // NB a 404 probe at our path is not evidence the page is absent on develop,
+  // only that it isn't at that path - see the per-system `path` entries below.
   { slug: '24-group-index', path: '/group', auth: true },
   { slug: '25-event-index', path: '/party', auth: true },
   // NB develop's /party/view/{id} is a PUBLIC route that abort(404)s when
@@ -127,11 +118,8 @@ const PAGES = [
   { slug: '30-profile-view', path: `/profile/${FIXTURES.user}`, auth: true },
   { slug: '31-profile-edit', path: `/profile/edit/${FIXTURES.user}`, auth: true },
   { slug: '32-event-duplicate', path: `/party/duplicate/${FIXTURES.event}`, auth: true },
-  // Same page, different URL on each system. develop nests notifications under
-  // its /profile prefix and puts forbidden under /user; this client moved both
-  // to the top level. Probing OUR path against develop returned 404 for both,
-  // which is how they were first (wrongly) written off as Nuxt-only - the page
-  // was there all along, just somewhere else.
+  // Same page, different URL on each system: develop nests notifications under
+  // its /profile prefix and puts forbidden under /user.
   { slug: '33-notifications', path: { new: '/notifications', old: '/profile/notifications' }, auth: true },
   { slug: '34-forbidden', path: { new: '/forbidden', old: '/user/forbidden' }, auth: false },
 ]

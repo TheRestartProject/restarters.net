@@ -116,10 +116,7 @@ foreach ([[$jane, Role::HOST], [$host, Role::HOST]] as [$u, $r]) {
 $out[] = 'members='.UserGroups::where('group', $group->idgroups)->count();
 
 // --- event ---------------------------------------------------------------
-// The event VIEW page (/party/view/{id}) was never comparable before this,
-// because the fixtures created no events - so the capture had nothing to
-// render and the page went unverified for the whole migration. A PAST event
-// is used deliberately: develop's EventActions dropdown branches on
+// A PAST event, deliberately: develop's EventActions dropdown branches on
 // `finished`, and the finished branch carries the items most likely to
 // diverge (request review / share stats / export data).
 $event = Party::where('group', $group->idgroups)->first();
@@ -176,8 +173,7 @@ $out[] = 'events='.Party::where('group', $group->idgroups)->count();
 // Publish the ids for the capture harness. Every migrate:fresh renumbers
 // users/networks/events, so the harness must NOT hardcode them - it reads this
 // file to build detail-page URLs (/party/view/{id} etc.). Without this the
-// detail pages silently 404 and get "compared" as two error pages, which is
-// how the event view page went unverified for the whole migration.
+// detail pages silently 404 and get "compared" as two error pages.
 file_put_contents(base_path('parity-fixtures.json'), json_encode([
     'group' => $group->idgroups,
     'event' => $event->idevents,

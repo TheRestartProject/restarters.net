@@ -420,9 +420,7 @@ defineExpose({ submit })
       </BFormGroup>
 
       <!-- EventAddEdit.vue:17-22 renders the SAME EventGroup control while
-           editing, just `:disabled="!creating"` - a bordered, greyed field.
-           This used to swap it for plain text ("Event group: X"), so the edit
-           form lost the field entirely. -->
+           editing, just `:disabled="!creating"` - a bordered, greyed field. -->
       <div class="event-form-group">
         <BFormGroup :label="`${t('events.field_event_group')}:`" label-for="event-form-group">
           <select
@@ -599,14 +597,11 @@ defineExpose({ submit })
       </BAlert>
 
       <div class="event-form-buttons d-flex align-items-center justify-content-between mt-3">
-        <!-- EventAddEdit.vue:97-125. Two distinct branches, and the edit one
-             was missing here entirely - this used to render the notice only
-             while creating, so an editing host saw nothing where develop
-             shows them what saving will do. On edit develop also suppresses
-             it once the event is already approved-or-being-approved
-             (`!canApprove && moderate !== 'approve'`), and right after a
-             create (`!justCreated`), where the green alert above says it
-             better. -->
+        <!-- EventAddEdit.vue:97-125. Two branches: while creating, and while
+             editing. On edit develop suppresses the notice once the event is
+             approved-or-being-approved (`!canApprove && moderate !==
+             'approve'`), and right after a create (`!justCreated`), where the
+             green alert above says it better. -->
         <div v-if="creating" class="flex-grow-1 text-end pe-3" data-testid="event-form-notice">
           {{ autoApprove ? t('events.before_submit_text_autoapproved') : t('events.before_submit_text') }}
         </div>
@@ -754,9 +749,7 @@ defineExpose({ submit })
 
   // EventAddEdit.vue's .event-admin sits in the RIGHT-hand region at lg+
   // (`grid-column: 2 / 4` of its 3-line grid), beside the description rather
-  // than spanning the full width beneath it. This used to span both columns,
-  // which pushed everything below it down and left a tall gap next to the
-  // description.
+  // than spanning the full width beneath it.
   .event-form-admin {
     grid-row: 5 / 6;
     grid-column: 2 / 3;

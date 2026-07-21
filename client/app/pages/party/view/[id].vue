@@ -52,8 +52,7 @@ import EventDevicesPanel from '~/components/devices/EventDevicesPanel.vue'
 // stats" modal (gap 3, embed-code half only - see EventShareStatsModal.vue's
 // doc comment for what's deliberately not reproduced).
 //
-// Gaps 5/11/13/14 are now BUILT - this comment used to say they were not,
-// on the grounds that the API didn't expose what they needed. It did:
+// Gaps 5/11/13/14:
 // - gap 11, Discourse "Talk thread": EventDetailsPanel.vue, from
 //   session config discourse_url + the resource's discourse_thread.
 // - gap 5, event photos: EventImagesGallery.vue, read-only. develop's
@@ -433,13 +432,10 @@ function closeAddVolunteer() {
             </div>
 
             <div class="d-flex align-items-start gap-2 flex-wrap">
-              <!-- Audit regression: a logged-in viewer used to get this
-                   standalone button AND the dropdown's own RSVP item at the
-                   same time (EventActionsDropdown.vue never had a standalone
-                   RSVP entry point for logged-in users in develop - see its
-                   doc comment). The anonymous "log in to RSVP" link isn't a
-                   duplicate (the dropdown doesn't render at all when
-                   !loggedIn), so it's the only variant left here. -->
+              <!-- Anonymous-only "log in to RSVP" link. develop has no
+                   standalone RSVP entry point for logged-in users - that lives
+                   in EventActionsDropdown - and the dropdown doesn't render at
+                   all when !loggedIn. -->
               <NuxtLink
                 v-if="!isAttending && !finished && !loggedIn"
                 to="/login"
@@ -602,8 +598,7 @@ function closeAddVolunteer() {
               <div v-if="event.stats.co2_total > 0" class="small" data-testid="event-view-impact-equivalent" v-html="equivalentConsumer(event.stats.co2_total)" />
               <!-- StatsValue.vue's "Share this" - the CO2-card trigger for
                    the social-image modal, distinct from the header
-                   dropdown's "Share event stats" embed-code modal above
-                   (both used to wrongly open the latter). -->
+                   dropdown's "Share event stats" embed-code modal above. -->
               <button
                 type="button"
                 class="btn btn-link p-0 small"

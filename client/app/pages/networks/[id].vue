@@ -164,17 +164,11 @@ function retry() {
             {{ network.website }}
           </a>
         </div>
-        <!-- NetworkPage.vue:13-18. Two gaps here, both hidden behind the
-             same stale note: develop gates the DROPDOWN on `isLoggedIn` and
-             only its add-groups item on canAssociateGroups, and its FIRST item
-             is "View groups" -> /group/network/{id}.
-             That item used to be dropped as "a dead link ... deliberately
-             dropped", on the grounds that /group/all had no network-scoping
-             query param and that this page listed every group inline anyway.
-             Neither holds any more: /group/all now honours ?network=, and the
-             inline listing was itself the divergence (develop shows a count
-             sentence). Both reasons were removed by other fixes, and the note
-             would have kept the gap invisible. -->
+        <!-- NetworkPage.vue:13-18: the dropdown itself is gated on being
+             logged in, only its add-groups item on canAssociateGroups. Its
+             first item, "View groups", targets /group/network/{id} in develop;
+             here it points at /group/all?network=, which
+             GroupsTableFilters seeds its network filter from. -->
         <BDropdown variant="primary" placement="bottom-end" :text="t('networks.general.actions')" data-testid="network-show-actions">
           <BDropdownItem :to="`/group/all?network=${network.id}`" data-testid="network-show-view-groups">
             {{ t('networks.show.view_groups_menuitem') }}
@@ -241,14 +235,8 @@ function retry() {
       </template>
 
       <!-- NetworkPage.vue:80-86 - a count sentence and a link out to the
-           groups list filtered to this network. This used to render the full
-           inline groups browser (search, country/network filters, sortable
-           table), justified in a comment as a "functionally-superior
-           divergence flagged for explicit sign-off". It was neither signed off
-           nor parity, and the stated blocker - that develop's
-           /group/network/{id} has no Nuxt equivalent - is handled by pointing
-           at /group/all with a network query param, which GroupsTableFilters
-           now seeds from. -->
+           groups list filtered to this network, not an inline groups
+           browser. -->
       <section class="groups-section mb-4">
         <h2>{{ t('networks.general.groups') }}</h2>
         <div class="groups-info border p-3" data-testid="network-show-groups-info">

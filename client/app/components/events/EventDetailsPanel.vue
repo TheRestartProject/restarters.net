@@ -8,10 +8,8 @@ import EventVenueMap from './EventVenueMap.vue'
 
 // Gap 9: develop's EventDetails.vue renders a bordered, icon-led row list
 // (date [+ add-to-calendar dropdown], time, talk-thread, hosts, link,
-// location [+ map]) - the Nuxt view page used to render this same
-// information as plain unadorned text lines inside the header block. This
-// is that same icon+border-row list, pulled out into its own component and
-// placed in the page's left column (gap 4's 2-col layout) below the
+// location [+ map]). This is that same icon+border-row list, in its own
+// component, placed in the page's left column (gap 4's 2-col layout) below the
 // header, matching EventPage.vue's structure (EventHeading, then
 // EventDetails+EventDescription side-by-side with EventAttendance).
 const props = defineProps({

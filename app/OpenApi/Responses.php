@@ -8,9 +8,8 @@ namespace App\OpenApi;
  * These mirror the uniform JSON error envelopes rendered by
  * app/Exceptions/Handler.php so that individual operations can
  * reference them with `@OA\Response(response=401, ref="#/components/responses/Unauthenticated")`
- * instead of hand-copying the same inline block. See the API audit
- * (2026-07): ~199 inline duplicate error blocks previously existed and
- * 429 (an active `throttle:auth` outcome) was documented nowhere.
+ * instead of hand-copying the same inline block. Includes 429, the
+ * `throttle:auth` outcome.
  *
  * This class holds no runtime logic; it exists purely as an annotation host
  * scanned by darkaonline/l5-swagger (config/l5-swagger.php scans base_path('app')).

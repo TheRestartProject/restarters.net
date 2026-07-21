@@ -169,19 +169,10 @@ export const useGroupsStore = defineStore('groups', {
       }
     },
 
-    // GET /api/v2/users/me/groups (UserController::getMyGroupsv2), which is
-    // UNCAPPED. This used to read the dashboard endpoint's your_groups, which
-    // is capped at 5 alphabetically - so /group silently showed a member of
-    // six or more groups only the first five, with no indication any were
-    // missing. UserAPI.js recorded that the real endpoint had landed and that
-    // adopting it was "out of scope for this slice"; the cap outlived the
-    // slice. Same capped-source bug already fixed once on party/view/[id].vue,
-    // where it hid the device panel from hosts of a 6th group.
-    //
-    // The payload now also carries location/hosts/restarters/next_event, which
-    // develop's /group table shows - they were added to getMyGroupsv2 rather
-    // than left as a gap, since this is the only uncapped "groups I am in"
-    // source and the client was switching four columns off for want of them.
+    // GET /api/v2/users/me/groups (UserController::getMyGroupsv2). Uncapped,
+    // unlike the dashboard endpoint's your_groups (capped at 5 alphabetically),
+    // and carries location/hosts/restarters/next_event for develop's /group
+    // table.
     async fetchMine() {
       const { $api } = useNuxtApp()
 

@@ -12,15 +12,12 @@ import EventAttendanceCount from './EventAttendanceCount.vue'
 // wired to `DELETE .../volunteers/{idevents_users}` (C1d) via
 // stores/events.js#removeAttendee.
 //
-// Email visibility (audit fix): `attendee.volunteer.email` is only present
-// in the API response when the caller has edit-party permission (mirrors
-// listVolunteers' showEmails gate), so it was never a client-side leak, but
-// this component used to render it inline on every confirmed row anyway -
-// develop's EventAttendee.vue never shows email there at all; the only
-// place develop surfaces it is the add-volunteer modal (gap 14 - now built,
-// see EventAddVolunteerModal.vue, wired in below). Rather than keep an
-// exposure develop doesn't have, the field is left unrendered here
-// entirely.
+// Email visibility: `attendee.volunteer.email` is only present in the API
+// response when the caller has edit-party permission (mirrors
+// listVolunteers' showEmails gate). develop's EventAttendee.vue never shows
+// email on a row at all - the only place it surfaces is the add-volunteer
+// modal (EventAddVolunteerModal.vue) - so the field is left unrendered
+// here.
 const props = defineProps({
   eventId: {
     type: Number,

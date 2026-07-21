@@ -23,11 +23,9 @@ const groupsStore = useGroupsStore()
 const { hasRole } = useAuth()
 const showModeration = computed(() => hasRole('Administrator') || hasRole('NetworkCoordinator'))
 
-// Rows come from the UNCAPPED GET /api/v2/users/me/groups, which now also
-// carries location/hosts/restarters/next_event - so develop's full column set
-// renders. Both halves of this used to be wrong: the source was the
-// dashboard's your_groups (capped at 5) and the four columns were switched
-// off because that payload lacked them.
+// Rows come from the uncapped GET /api/v2/users/me/groups, which carries
+// location/hosts/restarters/next_event, so develop's full column set
+// renders.
 const rows = computed(() =>
   groupsStore.mine.data.map((group) => ({
     id: group.id,

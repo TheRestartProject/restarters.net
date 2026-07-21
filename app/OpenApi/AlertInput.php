@@ -7,11 +7,9 @@ namespace App\OpenApi;
  * (PUT /api/v2/alerts and PATCH /api/v2/alerts/{id}).
  *
  * Both AlertController::addAlertv2 and updateAlertv2 accept the same
- * multipart form fields; this used to be copy-pasted verbatim (roughly 45
- * lines each) into both operations, and both copies mapped the "ctatitle"
- * property to the "ctalink" schema property by mistake. Sharing one schema
- * here fixes that once. See app/OpenApi/Responses.php for the equivalent
- * pattern used for the shared error responses.
+ * multipart form fields, so the schema is defined once here and referenced
+ * from both. See app/OpenApi/Responses.php for the equivalent pattern used
+ * for the shared error responses.
  *
  * This class holds no runtime logic; it exists purely as an annotation host
  * scanned by darkaonline/l5-swagger (config/l5-swagger.php scans base_path('app')).

@@ -16,11 +16,9 @@ import { useModerationStore } from '~/stores/moderation.js'
 // component. The columns match develop's: date, title+group, volunteers
 // INVITED, confirmed volunteers, plus a link to the event.
 //
-// The invited count used to be missing here, on the grounds that it "isn't
-// present anywhere in GET /api/v2/moderate/events' payload at all". It wasn't
-// - so it was added (Party resource's `invited`, via whenCounted, with the
-// endpoint calling loadCount so it costs one query). A missing figure was
-// being treated as a fact about the API rather than something to fix.
+// The invited count comes from the Party resource's `invited` (whenCounted);
+// moderateEventsv2 calls loadCount so the whole queue costs one extra
+// query.
 const props = defineProps({
   // Optional, matching develop's EventsRequiringModeration - which takes no
   // network filter at all on events/index.blade.php:55. null = no filtering.

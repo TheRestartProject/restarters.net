@@ -59,8 +59,7 @@ return [
     // configured separately under `audit.user.resolver` and implements a
     // different contract. Adding it makes runResolvers() throw
     // "Invalid Resolver implementation for: user", which disables auditing
-    // entirely while model writes carry on succeeding - a silent failure I hit
-    // and had to revert.
+    // entirely while model writes carry on succeeding.
     'resolvers' => [
         'ip_address' => OwenIt\Auditing\Resolvers\IpAddressResolver::class,
         'user_agent' => OwenIt\Auditing\Resolvers\UserAgentResolver::class,
