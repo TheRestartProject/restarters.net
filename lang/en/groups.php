@@ -107,6 +107,8 @@ return [
   'no_groups_nearest_with_location' => '<p>There are no groups within 50 km of your location. You can <a href="/group/all">see all groups here</a>. Or why not start your own? <a href="https://talk.restarters.net/t/how-to-run-a-repair-event-the-restart-party-kit/324">Learn what running your own repair event involves.</a></p>',
   'group_count' => 'There is <b>:count group</b>.|There are <b>:count groups</b>.',
   'group_count_map' => 'There is <b>:count group</b>.  Zoom out to see more.|There are <b>:count groups</b>.  Zoom out to see more.',
+  'group_count_map_empty' => 'If you can\'t see any here yet, why not :link near you?',
+  'find_a_group' => 'find a group',
   'search_name_placeholder' => 'Search name...',
   'leave_group_button' => 'Unfollow group',
   'leave_group_button_mobile' => 'Unfollow',

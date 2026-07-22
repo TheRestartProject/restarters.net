@@ -131,6 +131,20 @@ describe('pages/group/map', () => {
       expect(wrapper.findAll('tbody tr')).toHaveLength(0)
     })
 
+    it('offers a link to find a group nearby when none are in view', async () => {
+      groupsStore.names = [{ id: 1, name: 'Alpha', lat: 51, lng: 0, archived_at: null }]
+
+      const wrapper = mountPage()
+      await wrapper.findComponent(GroupMapStub).vm.$emit('update:groupIdsInBounds', [])
+
+      const link = wrapper.find('[data-testid="group-map-nearby-link"]')
+      expect(link.exists()).toBe(true)
+      expect(link.attributes('href')).toBe('/group/nearby')
+      expect(wrapper.find('[data-testid="group-map-count"]').text()).toContain('find a group')
+      // The bare "0 groups... zoom out" count is replaced, not shown alongside.
+      expect(wrapper.find('[data-testid="group-map-count"]').text()).not.toContain('Zoom out')
+    })
+
     it('shows only the reported ids when the map narrows the view', async () => {
       groupsStore.names = [
         { id: 1, name: 'Alpha', lat: 51, lng: 0, archived_at: null },
