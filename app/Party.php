@@ -213,7 +213,13 @@ class Party extends Model implements Auditable
     public function scopeFuture($query) {
         // A future event is an event where the start time is greater than now.
         $query = $query->undeleted();
-        $query = $query->where('event_start_utc', '>', date('Y-m-d H:i:s'))->orderBy('event_start_utc','ASC');
+        // reorder() before orderBy: a parent scope may already have applied an
+        // ORDER BY (e.g. DESC), and orderBy() APPENDS rather than replaces, so
+        // without this we get "ORDER BY event_start_utc DESC, event_start_utc
+        // ASC" - the DESC wins and future() returns the LAST future event first,
+        // making a "next event" lookup pick the wrong one (RES-1995 / PR 887).
+        $query = $query->where('event_start_utc', '>', date('Y-m-d H:i:s'))
+            ->reorder()->orderBy('event_start_utc', 'ASC');
         return $query;
     }
 
