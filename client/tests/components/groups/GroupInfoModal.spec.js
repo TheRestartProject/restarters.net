@@ -44,10 +44,21 @@ function mountModal(group) {
   })
 }
 
+// location is the GroupLocation resource object ({location, area, postcode,
+// country, country_code, lat, lng}), NOT a plain string - the summary API
+// returns it that way, matching GroupsTable's row.location.
 const GROUP = {
   id: 42,
   name: 'Hackney Fixers',
-  location: 'London',
+  location: {
+    location: 'London',
+    area: null,
+    postcode: '',
+    country: 'United Kingdom',
+    country_code: 'GB',
+    lat: '51.5416',
+    lng: '-0.0553',
+  },
   image: 'abc.jpg',
   nextEvent: { start: '2026-11-16T13:00:00Z', title: 'Passing Clouds' },
 }
@@ -62,7 +73,10 @@ describe('components/groups/GroupInfoModal', () => {
     const wrapper = mountModal(GROUP)
 
     expect(wrapper.text()).toContain('Hackney Fixers')
+    // Renders the location string (row.location.location), not the raw object.
     expect(wrapper.text()).toContain('London')
+    expect(wrapper.text()).not.toContain('country_code')
+    expect(wrapper.text()).not.toMatch(/[{}]/)
     // The header links to the group, same destination as Go to group.
     const headerLink = wrapper.find('header a')
     expect(headerLink.attributes('href')).toBe('/group/view/42')

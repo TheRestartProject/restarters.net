@@ -62,7 +62,7 @@ function close() {
         <img :src="imageUrl" alt="" width="67" height="67" class="me-3 rounded" style="object-fit: cover">
         <span>
           <span class="d-block fw-bold">{{ group.name }}</span>
-          <span v-if="group.location" class="small text-muted">{{ group.location }}</span>
+          <span v-if="group.location" class="small text-muted">{{ group.location.location }}</span>
         </span>
       </NuxtLink>
     </template>
