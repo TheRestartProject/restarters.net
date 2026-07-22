@@ -15,9 +15,23 @@ export default defineNuxtPlugin(async () => {
   if (auth.token && !session.loaded) {
     try {
       await session.fetch()
+
+      // Resolved, but with no user - a token that no longer maps to an
+      // account (common on preview apps, whose DB is periodically reset).
+      // Without this the token stays and loggedIn (=!!token) remains true, so
+      // the auth guard lets the dead session onto /dashboard, which then 401s
+      // and shows an error while the navbar - reading the null user - already
+      // says logged out.
+      if (!session.user) {
+        auth.clear()
+      }
     } catch {
-      // Invalid/expired token: BaseAPI's 401-on-/session handling has already
-      // cleared auth state; the app proceeds as a guest.
+      // Any failure establishing who we are means we are not logged in. Only a
+      // /session 401 clears auth via BaseAPI; a 500 (or the token mapping to a
+      // deleted user) does not, and would otherwise leave the token in place
+      // with loggedIn true. Clear it here so the whole app - guard, navbar,
+      // guest pages - treats it consistently as a guest.
+      auth.clear()
     }
   }
 })

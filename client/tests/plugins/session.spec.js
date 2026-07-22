@@ -50,10 +50,27 @@ describe('plugins/session (cold-boot bootstrap)', () => {
     expect(mockApi.session.fetch).not.toHaveBeenCalled()
   })
 
-  it('survives a rejected fetch (expired token) and stays guest', async () => {
+  it('clears the token when the session fetch fails, so the app treats it as a guest', async () => {
     useAuthStore().token = 'tok-expired'
-    mockApi.session.fetch.mockRejectedValueOnce(Object.assign(new Error('401'), { status: 401 }))
+    mockApi.session.fetch.mockRejectedValueOnce(Object.assign(new Error('500'), { status: 500 }))
 
     await expect(runPlugin()).resolves.toBeUndefined()
+
+    // A 500 (or the token mapping to a deleted user) is not a /session 401, so
+    // BaseAPI did not clear auth. Without clearing it here the token survives,
+    // loggedIn stays true, and the auth guard lets the dead session onto
+    // /dashboard - which 401s and shows an error while the navbar says guest.
+    expect(useAuthStore().token).toBeNull()
+    expect(useAuthStore().loggedIn).toBe(false)
+  })
+
+  it('clears the token when the session resolves with no user (e.g. a reset preview DB)', async () => {
+    useAuthStore().token = 'tok-orphan'
+    mockApi.session.fetch.mockResolvedValueOnce({ data: { user: null, config: {}, flags: {} } })
+
+    await runPlugin()
+
+    expect(useAuthStore().token).toBeNull()
+    expect(useAuthStore().loggedIn).toBe(false)
   })
 })

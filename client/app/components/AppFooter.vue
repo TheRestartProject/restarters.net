@@ -9,7 +9,7 @@ import LocaleSwitcher from '~/components/LocaleSwitcher.vue'
 </script>
 
 <template>
-  <footer class="language-bar container d-flex justify-content-end py-3" data-testid="app-language-bar">
+  <footer class="language-bar d-flex justify-content-end px-4 py-3" data-testid="app-language-bar">
     <LocaleSwitcher />
   </footer>
 </template>

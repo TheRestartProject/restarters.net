@@ -180,19 +180,48 @@
     margin-left: auto;
 
     // The logged-out Sign in / Join buttons. navbar.blade.php writes these as
-    // plain anchors carrying inline styles - width 120px, height 40px,
-    // explicit background/colour, and text-transform: initial - precisely to
-    // defeat the nav-link styling above. We use Bootstrap .btn classes
-    // instead, which lose to that selector, so the same defeating has to
-    // happen here. Sentence case, not uppercase: the inline
-    // text-transform: initial is deliberate, the labels are "Sign in" and
-    // "Join".
+    // plain anchors carrying inline styles that defeat the nav-link styling
+    // above: text-transform:initial; width:120px; height:40px; square corners
+    // (no border-radius); Sign in white with a 2px black border, Join solid
+    // black with white text; and a 10px gap (their <li> is 130px around a
+    // 120px button). We use .btn classes, which lose to that selector AND add
+    // a pill radius, so all of it has to be re-asserted here.
+    column-gap: 10px;
+
     > li > a.btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       width: 120px;
       height: 40px;
       padding: 0;
+      border-radius: 0;
       text-transform: initial;
       white-space: nowrap;
+    }
+
+    > li > a.btn-outline-dark {
+      background: #fff;
+      color: $black;
+      border: 2px solid $black;
+
+      &:hover,
+      &:focus {
+        background: #fff;
+        color: $black;
+      }
+    }
+
+    > li > a.btn-dark {
+      background: $black;
+      color: #fff;
+      border: 2px solid $black;
+
+      &:hover,
+      &:focus {
+        background: $black;
+        color: #fff;
+      }
     }
   }
 }
@@ -705,6 +734,18 @@
 // attribute + one class here), so cascade order alone can't be trusted to
 // win — hence !important on the properties develop's version relied on
 // plain source order for.
+// develop's _languages.scss base: a full-width bar (border spans the whole
+// viewport), white, with a light top rule, its content right-aligned at lg+.
+// Ours had wrapped the footer in Bootstrap's `.container`, which caps the bar
+// to the content max-width and centres it, so the bar was not full width.
+.language-bar {
+  width: 100%;
+  background: #fff;
+  border-top: 2px solid #d9d9d9;
+  flex-flow: row wrap;
+  align-content: center;
+}
+
 [data-testid='plain-language-bar'] .language-bar {
   position: fixed !important;
   bottom: 0 !important;
