@@ -231,7 +231,7 @@ async function performDelete() {
         {{ t('networks.tags.delete_warning', { count: tagToDelete.groups_count }, tagToDelete.groups_count) }}
       </p>
       <div class="d-flex justify-content-end gap-2">
-        <BButton variant="outline-secondary" @click="cancelDelete">{{ t('partials.cancel') }}</BButton>
+        <BButton variant="outline-secondary" data-testid="network-tags-delete-cancel" @click="cancelDelete">{{ t('partials.cancel') }}</BButton>
         <BButton variant="danger" :disabled="deleting" data-testid="network-tags-delete-confirm" @click="performDelete">
           {{ t('networks.tags.delete') }}
         </BButton>

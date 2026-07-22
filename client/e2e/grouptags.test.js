@@ -76,27 +76,31 @@ async function openNetworkTagsPage(page, networkId) {
 }
 
 async function createNetworkTag(page, networkId, name) {
-  await page.getByTestId('tag-add-button').click()
-  await expect(page.getByTestId('tag-create-modal')).toBeVisible()
-  await page.getByTestId('tag-create-name').fill(name)
+  // NetworkTagsManager renders an always-visible inline create form
+  // (network-tags-create-*), not a modal opened by an add button. Earlier this
+  // helper drove a modal UI that was never built, so it hung 360s waiting for
+  // tag-add-button and timed the whole e2e job out.
+  await page.getByTestId('network-tags-create-name').fill(name)
 
   const [response] = await Promise.all([
     page.waitForResponse(
       (resp) => resp.url().includes(`/api/v2/networks/${networkId}/tags`) && resp.request().method() === 'POST',
     ),
-    page.getByTestId('tag-create-submit').click(),
+    page.getByTestId('network-tags-create-submit').click(),
   ])
   return response
 }
 
 async function editNetworkTagByRow(page, tagId, newName) {
-  await page.getByTestId(`tag-edit-link-${tagId}`).click()
-  await expect(page.getByTestId('tag-edit-modal')).toBeVisible()
-  await page.getByTestId('tag-edit-name').fill(newName)
+  // Edit IS a modal here (network-tags-edit-modal), opened from the per-row
+  // network-tag-edit-<id> button.
+  await page.getByTestId(`network-tag-edit-${tagId}`).click()
+  await expect(page.getByTestId('network-tags-edit-modal')).toBeVisible()
+  await page.getByTestId('network-tags-edit-name').fill(newName)
 
   const [response] = await Promise.all([
     page.waitForResponse((resp) => resp.url().includes(`/tags/${tagId}`) && resp.request().method() === 'PUT'),
-    page.getByTestId('tag-edit-submit').click(),
+    page.getByTestId('network-tags-edit-submit').click(),
   ])
   return response
 }
@@ -180,7 +184,7 @@ for (const { label, user } of ROLES) {
       const tagName = `${label} Create Tag ${Date.now()}`
       const response = await createNetworkTag(page, networkId, tagName)
       expect(response.status()).toBe(201)
-      await expect(page.getByTestId('tag-table')).toContainText(tagName)
+      await expect(page.getByTestId('network-tags-manager')).toContainText(tagName)
     })
 
     test(`${label} cannot create a duplicate network tag`, async ({ page }) => {
@@ -191,17 +195,15 @@ for (const { label, user } of ROLES) {
 
       const tagName = `${label} Dup Tag ${Date.now()}`
       await createNetworkTag(page, networkId, tagName)
-      await expect(page.getByTestId('tag-create-modal')).toBeHidden({ timeout: 10000 })
 
-      await page.getByTestId('tag-add-button').click()
-      await page.getByTestId('tag-create-name').fill(tagName)
-      await page.getByTestId('tag-create-submit').click()
+      await page.getByTestId('network-tags-create-name').fill(tagName)
+      await page.getByTestId('network-tags-create-submit').click()
 
       // NetworkController's duplicate check returns a bare {message}, not
       // field-level errors - AdminCrudTable surfaces that as the general
       // create-error paragraph, not a per-field one.
-      await expect(page.getByTestId('tag-create-error')).toBeVisible({ timeout: 10000 })
-      await expect(page.getByTestId('tag-create-modal')).toBeVisible()
+      await expect(page.getByTestId('network-tags-create-error')).toBeVisible({ timeout: 10000 })
+      await expect(page.getByTestId('network-tags-create-form')).toBeVisible()
     })
 
     test(`${label} can create a network tag with the same name as an existing global tag`, async ({ page }) => {
@@ -221,7 +223,7 @@ for (const { label, user } of ROLES) {
 
       const response = await createNetworkTag(page, networkId, globalTagName)
       expect(response.status()).toBe(201)
-      await expect(page.getByTestId('tag-table')).toContainText(globalTagName)
+      await expect(page.getByTestId('network-tags-manager')).toContainText(globalTagName)
     })
 
     test(`${label} can edit a network tag`, async ({ page }) => {
@@ -237,8 +239,8 @@ for (const { label, user } of ROLES) {
       const editedName = `${originalName} Edited`
       const editResponse = await editNetworkTagByRow(page, tagId, editedName)
       expect(editResponse.status()).toBe(200)
-      await expect(page.getByTestId('tag-edit-modal')).toBeHidden({ timeout: 10000 })
-      await expect(page.getByTestId('tag-table')).toContainText(editedName)
+      await expect(page.getByTestId('network-tags-edit-modal')).toBeHidden({ timeout: 10000 })
+      await expect(page.getByTestId('network-tags-manager')).toContainText(editedName)
     })
 
     test(`${label} cannot edit a network tag to a duplicate name`, async ({ page }) => {
@@ -249,19 +251,17 @@ for (const { label, user } of ROLES) {
 
       const firstName = `${label} Existing Tag ${Date.now()}`
       await createNetworkTag(page, networkId, firstName)
-      await expect(page.getByTestId('tag-create-modal')).toBeHidden({ timeout: 10000 })
 
       const secondName = `${label} Second Tag ${Date.now()}`
       const secondResponse = await createNetworkTag(page, networkId, secondName)
       const secondId = await networkTagRowId(secondResponse)
-      await expect(page.getByTestId('tag-create-modal')).toBeHidden({ timeout: 10000 })
 
-      await page.getByTestId(`tag-edit-link-${secondId}`).click()
-      await expect(page.getByTestId('tag-edit-modal')).toBeVisible()
-      await page.getByTestId('tag-edit-name').fill(firstName)
-      await page.getByTestId('tag-edit-submit').click()
+      await page.getByTestId(`network-tag-edit-${secondId}`).click()
+      await expect(page.getByTestId('network-tags-edit-modal')).toBeVisible()
+      await page.getByTestId('network-tags-edit-name').fill(firstName)
+      await page.getByTestId('network-tags-edit-submit').click()
 
-      await expect(page.getByTestId('tag-edit-error')).toBeVisible({ timeout: 10000 })
+      await expect(page.getByTestId('network-tags-edit-error')).toBeVisible({ timeout: 10000 })
     })
 
     test(`${label} can delete a network tag with 0 groups`, async ({ page }) => {
@@ -273,19 +273,18 @@ for (const { label, user } of ROLES) {
       const tagName = `${label} Delete Me ${Date.now()}`
       const createResponse = await createNetworkTag(page, networkId, tagName)
       const tagId = await networkTagRowId(createResponse)
-      await expect(page.getByTestId('tag-create-modal')).toBeHidden({ timeout: 10000 })
 
-      await page.getByTestId(`tag-delete-${tagId}`).click()
-      await expect(page.getByTestId('tag-delete-modal')).toBeVisible()
+      await page.getByTestId(`network-tag-delete-${tagId}`).click()
+      await expect(page.getByTestId('network-tags-delete-modal')).toBeVisible()
       // 0 groups -> no in-use warning.
-      await expect(page.getByTestId('tag-delete-warning')).toHaveCount(0)
+      await expect(page.getByTestId('network-tags-delete-warning')).toHaveCount(0)
 
       const deleteResponse = await Promise.all([
         page.waitForResponse((resp) => resp.url().includes(`/tags/${tagId}`) && resp.request().method() === 'DELETE'),
-        page.getByTestId('tag-delete-confirm').click(),
+        page.getByTestId('network-tags-delete-confirm').click(),
       ]).then(([resp]) => resp)
       expect(deleteResponse.status()).toBe(200)
-      await expect(page.getByTestId(`tag-row-${tagId}`)).toHaveCount(0)
+      await expect(page.getByTestId(`network-tag-${tagId}`)).toHaveCount(0)
     })
 
     test(`${label} sees a warning deleting a network tag with groups attached`, async ({ page }) => {
@@ -298,19 +297,18 @@ for (const { label, user } of ROLES) {
       const tagName = `${label} Tag With Group ${Date.now()}`
       const createResponse = await createNetworkTag(page, networkId, tagName)
       const tagId = await networkTagRowId(createResponse)
-      await expect(page.getByTestId('tag-create-modal')).toBeHidden({ timeout: 10000 })
 
       await setGroupTagAssignment(page, groupId, tagName, true)
 
       await openNetworkTagsPage(page, networkId)
-      await expect(page.getByTestId(`tag-row-${tagId}`)).toContainText('1')
+      await expect(page.getByTestId(`network-tag-${tagId}`)).toContainText('1')
 
-      await page.getByTestId(`tag-delete-${tagId}`).click()
-      await expect(page.getByTestId('tag-delete-modal')).toBeVisible()
-      await expect(page.getByTestId('tag-delete-warning')).toBeVisible()
+      await page.getByTestId(`network-tag-delete-${tagId}`).click()
+      await expect(page.getByTestId('network-tags-delete-modal')).toBeVisible()
+      await expect(page.getByTestId('network-tags-delete-warning')).toBeVisible()
 
       // Clean up the assignment so this tag doesn't linger attached.
-      await page.getByTestId('tag-delete-cancel').click()
+      await page.getByTestId('network-tags-delete-cancel').click()
       await setGroupTagAssignment(page, groupId, tagName, false)
     })
   })
@@ -331,7 +329,6 @@ for (const { label, user } of ROLES) {
       await openNetworkTagsPage(page, networkId)
       const tagName = `${label} Assign Tag ${Date.now()}`
       await createNetworkTag(page, networkId, tagName)
-      await expect(page.getByTestId('tag-create-modal')).toBeHidden({ timeout: 10000 })
 
       await setGroupTagAssignment(page, groupId, tagName, true)
       await expect(page.getByTestId('group-form-error')).toHaveCount(0)
@@ -353,7 +350,6 @@ test.describe('tag visibility', () => {
       await openNetworkTagsPage(page, networkId)
       const tagName = `${label} Visible Tag ${Date.now()}`
       await createNetworkTag(page, networkId, tagName)
-      await expect(page.getByTestId('tag-create-modal')).toBeHidden({ timeout: 10000 })
 
       await setGroupTagAssignment(page, groupId, tagName, true)
 
@@ -374,7 +370,6 @@ test.describe('tag visibility', () => {
     await openNetworkTagsPage(page, networkId)
     const tagName = `Host Hidden Tag ${Date.now()}`
     await createNetworkTag(page, networkId, tagName)
-    await expect(page.getByTestId('tag-create-modal')).toBeHidden({ timeout: 10000 })
     await setGroupTagAssignment(page, groupId, tagName, true)
 
     // Group.php's getFilteredTagsForUser() strips non-global tags server-
@@ -415,7 +410,6 @@ test('NC/Admin can filter a network\'s groups table by tag', async ({ page }) =>
   await openNetworkTagsPage(page, networkId)
   const tagName = `Filter Tag ${Date.now()}`
   await createNetworkTag(page, networkId, tagName)
-  await expect(page.getByTestId('tag-create-modal')).toBeHidden({ timeout: 10000 })
   await setGroupTagAssignment(page, groupId, tagName, true)
 
   await page.goto(`/networks/${networkId}`)
