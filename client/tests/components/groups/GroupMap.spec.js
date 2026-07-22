@@ -235,5 +235,17 @@ describe('components/groups/GroupMap', () => {
       marker.fire('mouseout')
       expect(wrapper.emitted('update:hoveredId').at(-1)).toEqual([null])
     })
+
+    // PR 887: a marker click opens the group-info modal. The imperative
+    // Leaflet marker bridges to Vue by emitting `select` with the group id,
+    // which the page turns into a GroupInfoModal.
+    it('emits select with the group id when a marker is clicked', async () => {
+      const wrapper = mountMap({ groups: [{ id: 7, name: 'Click Me', lat: 51.0, lng: 0.0 }] })
+      await wrapper.findComponent(LMapStub).vm.$emit('ready', fakeLeafletMap())
+
+      const marker = fakeClusterGroup.addLayers.mock.calls[0][0][0]
+      marker.fire('click')
+      expect(wrapper.emitted('select').at(-1)).toEqual([7])
+    })
   })
 })

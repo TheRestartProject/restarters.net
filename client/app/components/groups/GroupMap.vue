@@ -35,12 +35,12 @@ import { boundingBoxFor, filterMappableGroups, hasLocation as computeHasLocation
 //    computeHasLocation treats as "no location" - the map frames every
 //    group on first paint instead of centring into the user's own area.
 //    Panning/zooming/search behave identically once loaded.
-//  - Marker click: legacy opens a Vue-rendered GroupInfoModal. Markers here
-//    are plain Leaflet layers (imperative, for clustering - vue-leaflet has
-//    no cluster-aware child component), so a Vue modal isn't reachable from
-//    inside a marker's click handler without extra plumbing; each marker's
-//    popup is instead a name + link straight to /group/view/{id}, which
-//    already has the fuller view (B5).
+//  - Marker click: opens develop's GroupInfoModal (next event + Go to group,
+//    PR 887 / RES-1995). Markers here are plain Leaflet layers (imperative,
+//    for clustering - vue-leaflet has no cluster-aware child component), so a
+//    Vue modal isn't reachable from inside the click handler directly; the
+//    handler emits `select` with the group id instead, and the page renders
+//    GroupInfoModal for it (components/groups/GroupInfoModal.vue).
 const props = defineProps({
   // Names-index entries: {id, name, lat, lng, network_ids, ...}.
   groups: {
@@ -76,7 +76,7 @@ const props = defineProps({
   },
 })
 
-const emit = defineEmits(['update:groupIdsInBounds', 'update:hoveredId'])
+const emit = defineEmits(['update:groupIdsInBounds', 'update:hoveredId', 'select'])
 
 const { t } = useI18n()
 
@@ -112,13 +112,6 @@ function buildIcon(className) {
   })
 }
 
-// Untrusted group name -> the marker popup's raw HTML (Leaflet popups take
-// a content string, not a Vue template - see the file doc comment on why
-// this isn't a Vue-rendered modal).
-function escapeHtml(value) {
-  return String(value).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c])
-}
-
 function iconFor(groupId) {
   return buildIcon(markerClassName(groupId, { hoveredId: props.hoveredId, yourGroupIds: props.yourGroupIds }))
 }
@@ -134,7 +127,10 @@ function rebuildMarkers() {
       title: `${group.name} - ${t('groups.marker_title')}`,
       icon: iconFor(group.id),
     })
-    marker.bindPopup(`<a href="/group/view/${group.id}" data-testid="group-map-marker-link-${group.id}">${escapeHtml(group.name)}</a>`)
+    // Imperative Leaflet marker -> Vue: a click emits `select` with the id,
+    // which the page turns into a GroupInfoModal (next event + Go to group),
+    // replacing develop's marker popup with PR 887's modal (RES-1995).
+    marker.on('click', () => emit('select', group.id))
     marker.on('mouseover', () => emit('update:hoveredId', group.id))
     marker.on('mouseout', () => emit('update:hoveredId', null))
     markersById.set(group.id, marker)

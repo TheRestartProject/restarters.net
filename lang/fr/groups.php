@@ -104,6 +104,8 @@ return [
   'group_count' => 'Il y a <b>:count Repair Café. Il y a <b>:count Repair Cafés.',
   'group_count_map' => 'Il y a <b>:count Repair Café</b> dans cette zone.  Cherchez et zoomez pour en trouver d\'autres.|Il y a <b>:count Repair Cafés</b> dans cette zone.  Cherchez et zoomez pour en trouver d\'autres.',
   'group_count_none' => 'Si vous ne pouvez encore en voir aucun ici, pourquoi ne pas <a href="/group/nearby">trouver un Repair Café</a> près de chez vous?',
+  'next_event' => 'Prochain événement',
+  'goto_group' => 'Aller au Repair Café',
   'leave_group_button' => 'Ne plus suivre ce Repair Café',
   'leave_group_button_mobile' => 'Ne plus suivre',
   'leave_group_confirm' => 'Veuillez confirmer que vous ne voulez plus suivre ce Repair Café',

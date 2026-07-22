@@ -6,6 +6,7 @@ import { useAuth } from '~/composables/useAuth.js'
 import GroupsTabsNav from '~/components/groups/GroupsTabsNav.vue'
 import GroupsTable from '~/components/groups/GroupsTable.vue'
 import GroupMap from '~/components/groups/GroupMap.vue'
+import GroupInfoModal from '~/components/groups/GroupInfoModal.vue'
 import GroupsRequiringModeration from '~/components/networks/NetworkGroupsModerationTable.vue'
 
 // /group/map - resources/js/components/GroupMapAndList.vue (map+list shell)
@@ -37,6 +38,19 @@ const showModeration = computed(() => hasRole('Administrator') || hasRole('Netwo
 // listing every group).
 const groupIdsInBounds = ref(null)
 const hoveredId = ref(null)
+
+// PR 887: a marker click selects a group; the page shows its info modal
+// (next event + Go to group). The selected group is always one the map is
+// showing, so it's already in `rows` with its summary (image/location/next
+// event) hydrated; fall back to the minimal names entry if not.
+const selectedGroupId = ref(null)
+const selectedGroup = computed(() => {
+  if (selectedGroupId.value === null) return null
+  const row = rows.value.find((r) => r.id === selectedGroupId.value)
+  if (row) return row
+  const entry = mapGroups.value.find((g) => g.id === selectedGroupId.value)
+  return entry ? { id: entry.id, name: entry.name, image: null, location: null, nextEvent: null } : null
+})
 const search = ref('')
 
 const loading = computed(() => groupsStore.namesLoading)
@@ -139,7 +153,10 @@ onMounted(() => {
         :groups="mapGroups"
         :your-group-ids="groupsStore.memberIds"
         @update:group-ids-in-bounds="groupIdsInBounds = $event"
+        @select="selectedGroupId = $event"
       />
+
+      <GroupInfoModal :group="selectedGroup" @close="selectedGroupId = null" />
 
       <div class="d-flex flex-wrap gap-3 align-items-center my-3">
         <input

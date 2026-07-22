@@ -17,10 +17,17 @@ const BBadgeStub = { template: '<span v-bind="$attrs"><slot /></span>' }
 // own wiring (bounds/hover plumbing, search, summary hydration) is what's
 // under test, matching resources/js/components/GroupMapAndList.test.js's own
 // groupMapStub.
+const GroupInfoModalStub = {
+  name: 'GroupInfoModal',
+  props: ['group'],
+  emits: ['close'],
+  template: '<div data-testid="group-info-modal-stub" :data-group-id="group ? group.id : \'\'" />',
+}
+
 const GroupMapStub = {
   name: 'GroupMap',
   props: ['groups', 'yourGroupIds', 'hoveredId'],
-  emits: ['update:groupIdsInBounds', 'update:hoveredId'],
+  emits: ['update:groupIdsInBounds', 'update:hoveredId', 'select'],
   template: '<div class="stub-groupmap" data-testid="stub-group-map" />',
 }
 
@@ -48,7 +55,7 @@ function mountPage() {
   return mount(GroupMapPage, {
     global: {
       plugins: [i18n],
-      stubs: { NuxtLink: NuxtLinkStub, BAlert: BAlertStub, BButton: BButtonStub, BBadge: BBadgeStub, GroupMap: GroupMapStub },
+      stubs: { NuxtLink: NuxtLinkStub, BAlert: BAlertStub, BButton: BButtonStub, BBadge: BBadgeStub, GroupMap: GroupMapStub, GroupInfoModal: GroupInfoModalStub },
     },
   })
 }
@@ -147,7 +154,39 @@ describe('pages/group/map', () => {
       expect(wrapper.find('[data-testid="group-map-count"]').text()).not.toContain('in this area')
     })
 
-    it('shows only the reported ids when the map narrows the view', async () => {
+    // PR 887: clicking a marker opens a group-info modal (next event + Go to
+  // group). GroupMap emits `select`; the page shows GroupInfoModal for that
+  // group's summary and clears it on close.
+  describe('marker selection modal', () => {
+    it('opens the info modal for the group a marker selects', async () => {
+      groupsStore.names = [{ id: 7, name: 'Selected Group', lat: 51, lng: 0, archived_at: null }]
+
+      const wrapper = mountPage()
+      const modal = () => wrapper.findComponent(GroupInfoModalStub)
+
+      // Nothing selected initially.
+      expect(modal().props('group')).toBeNull()
+
+      await wrapper.findComponent(GroupMapStub).vm.$emit('select', 7)
+
+      expect(modal().props('group')).not.toBeNull()
+      expect(modal().props('group').id).toBe(7)
+      expect(modal().props('group').name).toBe('Selected Group')
+    })
+
+    it('closes the info modal, clearing the selection', async () => {
+      groupsStore.names = [{ id: 7, name: 'Selected Group', lat: 51, lng: 0, archived_at: null }]
+
+      const wrapper = mountPage()
+      await wrapper.findComponent(GroupMapStub).vm.$emit('select', 7)
+      expect(wrapper.findComponent(GroupInfoModalStub).props('group')).not.toBeNull()
+
+      await wrapper.findComponent(GroupInfoModalStub).vm.$emit('close')
+      expect(wrapper.findComponent(GroupInfoModalStub).props('group')).toBeNull()
+    })
+  })
+
+  it('shows only the reported ids when the map narrows the view', async () => {
       groupsStore.names = [
         { id: 1, name: 'Alpha', lat: 51, lng: 0, archived_at: null },
         { id: 2, name: 'Beta', lat: 52, lng: 1, archived_at: null },
