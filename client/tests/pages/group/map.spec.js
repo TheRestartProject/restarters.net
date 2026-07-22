@@ -37,7 +37,8 @@ function mountPage() {
         ...clientEn,
         groups: {
           ...en.groups,
-          group_count_map: 'There is <b>{count} group</b>.  Zoom out to see more.|There are <b>{count} groups</b>.  Zoom out to see more.',
+          group_count_map: 'There is <b>{count} group</b> in this area.  Search and zoom to find more.|There are <b>{count} groups</b> in this area.  Search and zoom to find more.',
+          group_count_none: 'If you can\'t see any here yet, why not <a href="/group/nearby">find a group</a> near you?',
           create_groups_mobile2: 'Add new',
         },
       },
@@ -137,12 +138,13 @@ describe('pages/group/map', () => {
       const wrapper = mountPage()
       await wrapper.findComponent(GroupMapStub).vm.$emit('update:groupIdsInBounds', [])
 
-      const link = wrapper.find('[data-testid="group-map-nearby-link"]')
-      expect(link.exists()).toBe(true)
-      expect(link.attributes('href')).toBe('/group/nearby')
-      expect(wrapper.find('[data-testid="group-map-count"]').text()).toContain('find a group')
-      // The bare "0 groups... zoom out" count is replaced, not shown alongside.
-      expect(wrapper.find('[data-testid="group-map-count"]').text()).not.toContain('Zoom out')
+      // PR 887's group_count_none carries the link inline, rendered via v-html.
+      const none = wrapper.find('[data-testid="group-map-count-none"]')
+      expect(none.exists()).toBe(true)
+      expect(none.text()).toContain('find a group')
+      expect(none.html()).toContain('href="/group/nearby"')
+      // The bare count is replaced, not shown alongside.
+      expect(wrapper.find('[data-testid="group-map-count"]').text()).not.toContain('in this area')
     })
 
     it('shows only the reported ids when the map narrows the view', async () => {
@@ -212,7 +214,7 @@ describe('pages/group/map', () => {
   // gap #15: the "zoom out to see more" count copy is map-specific
   // (groups.group_count_map), distinct from /group/all's plain
   // groups.group_count.
-  it('shows a "zoom out to see more" group count above the list', () => {
+  it('shows an "in this area, search and zoom" group count above the list', () => {
     groupsStore.names = [
       { id: 1, name: 'Alpha', lat: 51, lng: 0, archived_at: null },
       { id: 2, name: 'Beta', lat: 52, lng: 1, archived_at: null },
@@ -221,7 +223,7 @@ describe('pages/group/map', () => {
     const wrapper = mountPage()
 
     expect(wrapper.find('[data-testid="group-map-count"]').text()).toContain('There are')
-    expect(wrapper.find('[data-testid="group-map-count"]').text()).toContain('Zoom out to see more')
+    expect(wrapper.find('[data-testid="group-map-count"]').text()).toContain('in this area')
   })
 
   it('shows the mobile-length create-group label alongside the full label', () => {

@@ -153,22 +153,13 @@ onMounted(() => {
       </div>
 
       <p data-testid="group-map-count">
-        <!-- Zero in view gets a friendlier prompt with a link to the nearby
-             page, rather than the bare "There are 0 groups" count. i18n-t keeps
-             the link's position in the sentence translatable (it moves in
-             French), same pattern as party/edit's editing heading. -->
-        <i18n-t
-          v-if="rows.length === 0"
-          keypath="groups.group_count_map_empty"
-          tag="span"
-          scope="global"
-        >
-          <template #link>
-            <NuxtLink to="/group/nearby" data-testid="group-map-nearby-link">
-              {{ t('groups.find_a_group') }}
-            </NuxtLink>
-          </template>
-        </i18n-t>
+        <!-- Wording and zero-state from PR 887 (RES-1995 map of groups):
+             "... in this area. Search and zoom to find more." with a count, and
+             a friendlier "why not find a group near you?" (linking to
+             /group/nearby) when nothing is in view. group_count_none carries the
+             link inline, as develop's does, so it's rendered with v-html. -->
+        <!-- eslint-disable-next-line vue/no-v-html -->
+        <span v-if="rows.length === 0" data-testid="group-map-count-none" v-html="t('groups.group_count_none')" />
         <!-- eslint-disable-next-line vue/no-v-html -->
         <span v-else v-html="t('groups.group_count_map', { count: rows.length }, rows.length)" />
       </p>
