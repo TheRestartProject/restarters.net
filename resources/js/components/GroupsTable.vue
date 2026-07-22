@@ -230,6 +230,12 @@ export default {
       return items.slice(0, this.show)
     },
     translatedGroupCount() {
+      // "There are 0 groups in this area" is a dead end; when nothing is in
+      // view, point at finding a group near them instead of counting nothing.
+      if (!this.items.length) {
+        return this.__('groups.group_count_none')
+      }
+
       return this.__('groups.group_count', {
         count: this.items.length
       })

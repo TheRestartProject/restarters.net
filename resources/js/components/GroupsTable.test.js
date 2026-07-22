@@ -145,6 +145,22 @@ describe('GroupsTable sorting', () => {
 // Zooming out puts far more groups in view, but the row count was frozen at
 // whatever the infinite scroll had reached - 3 groups in view or 230, the list
 // showed the same handful, which reads as the list being stuck.
+describe('GroupsTable count text', () => {
+  test('counts the groups in the area when there are some', () => {
+    const wrapper = mountTable([group], { count: true })
+
+    expect(wrapper.vm.translatedGroupCount).toBe('groups.group_count')
+  })
+
+  // "There are 0 groups in this area" is a dead end. When nothing is in view,
+  // point the user at finding a group near them instead.
+  test('points elsewhere when there are none in the area', () => {
+    const wrapper = mountTable([], { count: true })
+
+    expect(wrapper.vm.translatedGroupCount).toBe('groups.group_count_none')
+  })
+})
+
 describe('GroupsTable paging', () => {
   const many = Array.from({ length: 60 }, (_, i) => ({
     ...group,
