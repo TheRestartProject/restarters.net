@@ -63,7 +63,10 @@
 
             <div class="button-group row">
                 <div class="col-6 d-flex align-items-center justify-content-start">
-                    <a href="/skills/delete/{{ $skill->id }}" class="btn btn-primary btn-danger">@lang('admin.delete-skill')</a>
+                    <form method="POST" action="/skills/delete/{{ $skill->id }}" class="d-inline">
+                        @csrf
+                        <button type="submit" class="btn btn-primary btn-danger">@lang('admin.delete-skill')</button>
+                    </form>
                 </div>
                 <div class="col-6 d-flex align-items-center justify-content-end">
                     <button type="submit" class="btn btn-primary btn-create">@lang('admin.save-skill')</button>

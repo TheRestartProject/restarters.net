@@ -254,4 +254,40 @@ class AuthorizationHardeningTest extends TestCase
 
         $response->assertStatus(404);
     }
+
+    // -------------------------------------------------------------------------
+    // Destructive actions must not be reachable by GET
+    // -------------------------------------------------------------------------
+
+    /**
+     * Laravel's CSRF middleware only covers POST/PUT/PATCH/DELETE, so a destructive action
+     * on a GET route can be triggered by any page an admin happens to load. These are all
+     * POST now; a GET must not reach the controller at all.
+     *
+     * @test
+     */
+    public function destructive_actions_are_not_reachable_by_get(): void
+    {
+        $this->withExceptionHandling();
+
+        $admin = User::factory()->administrator()->create();
+        $this->actingAs($admin);
+
+        $group = Group::factory()->create(['approved' => true]);
+        $skill = \App\Skills::create(['skill_name' => 'Soldering', 'description' => 'x', 'category' => 2]);
+        $tag = \App\GroupTags::create(['tag_name' => 'Tagged', 'description' => 'x']);
+
+        foreach ([
+            '/group/delete/' . $group->idgroups,
+            '/skills/delete/' . $skill->id,
+            '/tags/delete/' . $tag->id,
+        ] as $url) {
+            $this->get($url)->assertStatus(405, "GET $url should not be routable");
+        }
+
+        // ...and the objects are all still there.
+        $this->assertNotNull(Group::find($group->idgroups));
+        $this->assertNotNull(\App\Skills::find($skill->id));
+        $this->assertNotNull(\App\GroupTags::find($tag->id));
+    }
 }
