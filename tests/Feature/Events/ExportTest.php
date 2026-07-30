@@ -68,11 +68,6 @@ class ExportTest extends TestCase
                                                     'name' => 'test3'
                                                 ]);
         $this->networkService->addGroupToNetwork($admin, $group3, $network);
-        if ($role == 'Host') {
-            $group3->addVolunteer($user);
-            $group3->makeMemberAHost($user);
-        }
-
         $group3->approved = false;
         $group3->save();
 
@@ -93,7 +88,12 @@ class ExportTest extends TestCase
         $event2->approved = true;
         $event2->save();
 
+        // group3 is deliberately left unapproved and unrelated to $user - the point of the
+        // test is that its data stays out of $user's export - so create its event as the
+        // admin rather than as $user, who has no authority over that group.
+        $this->actingAs($admin);
         $idevents3 = $this->createEvent($group3->idgroups, '2000-01-01');
+        $this->actingAs($user);
         $event3 = Party::find($idevents3);
         $event3->approved = true;
         $event3->save();
