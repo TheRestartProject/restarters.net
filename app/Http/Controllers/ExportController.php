@@ -72,7 +72,8 @@ class ExportController extends Controller
         }
 
         $filename .= '.csv';
-        $file = fopen(base_path() . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . $filename, 'w+');
+        $fullpath = $this->exportPath($filename);
+        $file = fopen($fullpath, 'w+');
 
         $me = auth()->user();
 
@@ -121,7 +122,7 @@ class ExportController extends Controller
                     }
                 }
 
-                fputcsv($file, [
+                fputcsv($file, $this->csvSafeRow([
                     $device->item_type,
                     $device->deviceCategory->name,
                     $device->brand,
@@ -135,7 +136,7 @@ class ExportController extends Controller
                     $wasteImpact,
                     $co2Diverted,
                     $device->deviceCategory->powered ? 'Powered' : 'Unpowered'
-                ]);
+                ]));
             }
         }
 
@@ -145,7 +146,7 @@ class ExportController extends Controller
             'Content-Type' => 'text/csv',
         ];
 
-        return Response::download(base_path() . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . $filename, $filename, $headers);
+        return Response::download($fullpath, $filename, $headers)->deleteFileAfterSend(true);
     }
 
     /**
@@ -220,11 +221,12 @@ class ExportController extends Controller
         // write content to file
         $filename = 'events.csv';
 
-        $file = fopen($filename, 'w+');
+        $fullpath = $this->exportPath($filename);
+        $file = fopen($fullpath, 'w+');
         fputcsv($file, $headers);
 
         foreach ($PartyArray as $d) {
-            fputcsv($file, $d);
+            fputcsv($file, $this->csvSafeRow($d));
         }
         fclose($file);
 
@@ -232,6 +234,37 @@ class ExportController extends Controller
             'Content-Type' => 'text/csv',
         ];
 
-        return Response::download($filename, $filename, $headers);
+        return Response::download($fullpath, $filename, $headers)->deleteFileAfterSend(true);
+    }
+
+    /**
+     * Somewhere to build an export that is not served by the webserver.  These files were
+     * previously written into public/ under a name derived from the group or venue, where
+     * they persisted and could be fetched by anyone who guessed the name.
+     */
+    private function exportPath($filename)
+    {
+        $dir = storage_path('app' . DIRECTORY_SEPARATOR . 'exports');
+
+        if (! is_dir($dir)) {
+            mkdir($dir, 0755, true);
+        }
+
+        return $dir . DIRECTORY_SEPARATOR . $filename;
+    }
+
+    /**
+     * Spreadsheets treat a cell starting with =, +, - or @ as a formula, so prefix those
+     * with an apostrophe.  Device fields are free text entered at events.
+     */
+    private function csvSafeRow(array $row)
+    {
+        return array_map(function ($value) {
+            if (is_string($value) && $value !== '' && in_array($value[0], ['=', '+', '-', '@'], true)) {
+                return "'" . $value;
+            }
+
+            return $value;
+        }, $row);
     }
 }

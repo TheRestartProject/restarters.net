@@ -458,10 +458,6 @@ Route::middleware('ensureAPIToken')->group(function () {
 
     Route::post('/set-cookie', InformationAlertCookieController::class);
 
-    Route::get('/test/check-auth', function () {
-        return new \App\Services\CheckAuthService;
-    });
-
     Route::prefix('style')->group(function () {
         Route::get('/', [StyleController::class, 'index']);
         Route::get('/guide', [StyleController::class, 'guide']);
