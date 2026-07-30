@@ -55,3 +55,6 @@ parity-shots/
 # canvas stays untainted - see the stats-share composable.
 client/public/images/stats/
 parity-fixtures.json
+
+# Generated from fly.preview.toml by CI (and by hand for manual deploys)
+fly.*.generated.toml

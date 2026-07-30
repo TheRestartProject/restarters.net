@@ -50,10 +50,4 @@ return [
   'save-role' => 'Save role',
   'role_update_success' => 'Role permissions updated.',
   'role_update_error' => 'Could not update role permissions.',
-  'main_branches' => 'Main branches',
-  'open_pull_requests' => 'Open pull requests',
-  'preview_deploy_confirm' => 'This will redeploy restarters.dev with the selected branch and restore the overnight database. Continue?',
-  'branch_to_deploy' => 'Branch to deploy',
-  'preview_deploy_queued' => 'Deploys are queued as GitHub Actions runs.',
-  'view_workflows' => 'View running workflows →',
 ];

@@ -51,10 +51,4 @@ return [
   'save-role' => 'Enregistrer le rôle',
   'role_update_success' => 'Permissions du rôle mises à jour.',
   'role_update_error' => 'Impossible de mettre à jour les permissions du rôle.',
-  'main_branches' => 'Branches principales',
-  'open_pull_requests' => 'Demandes de tirage ouvertes',
-  'preview_deploy_confirm' => 'Ceci va redéployer restarters.dev avec la branche sélectionnée et restaurer la sauvegarde de la base de données de la nuit dernière. Continuer ?',
-  'branch_to_deploy' => 'Branche à déployer',
-  'preview_deploy_queued' => 'Les déploiements sont mis en file d\'attente en tant qu\'exécutions GitHub Actions.',
-  'view_workflows' => 'Voir les workflows en cours →',
 ];

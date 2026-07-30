@@ -19,7 +19,6 @@ use Illuminate\Support\Facades\Route;
 |   (c) anonymous data exports and calendar feeds,
 |   (d) the embeddable stats widgets partners iframe,
 |   (e) a catch-all that sends any other browser navigation to the SPA.
-| (Admin preview-deploy tooling moved to /api/v2 + the SPA.)
 | See docs/nuxt-migration/cutover-checklist.md for what died here and why.
 |
 */
@@ -83,11 +82,6 @@ Route::get('/admin/stats/2', function () {
 Route::get('/party/stats/{id}/wide', function ($id) {
     return App\Http\Controllers\PartyController::stats($id);
 });
-
-// (Admin PR-preview-deploy tooling moved to GET/POST /api/v2/admin/
-// preview-deploys + client/app/pages/admin/preview-deploy.vue - the Blade page
-// couldn't authenticate the post-cutover SPA admin, who has a bearer token but
-// no web session.)
 
 // Everything else: 404. The Nuxt Node server is the origin (nginx routes every
 // non-API, non-widget path to it — see docker/nginx-fly.conf), so browsers

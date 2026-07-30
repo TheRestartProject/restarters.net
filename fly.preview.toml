@@ -1,18 +1,29 @@
-# Template for per-PR preview apps (restarters-pr-<N>.fly.dev).
+# Template for every preview app. Two callers substitute the placeholders:
 #
-# __PR_NUMBER__ placeholders are substituted by .github/workflows/pr-preview.yml
-# before deploying. Do not deploy this file directly.
+#   .github/workflows/pr-preview.yml   per-PR previews  restarters-pr-<N>
+#   .circleci/config.yml (deploy-fly-dev)  the develop branch  restarters-dev
 #
-# Each preview runs the PR's code against a local embedded MariaDB restored
+# develop is deliberately just another preview: same disposable database, same
+# suspend-on-idle teardown, same read-only credentials. The only differences
+# are the four placeholders below. Do not deploy this file directly.
+#
+#   __APP_NAME__    fly app name        restarters-pr-7 / restarters-dev
+#   __APP_TITLE__   human-facing name   Restarters PR #7 / Restarters develop
+#   __BASE_URL__    the app's origin    https://restarters-pr-7.fly.dev
+#                                       https://restarters-dev.fly.dev
+#   __SENTRY_ENV__  Sentry environment  preview / dev
+#
+# Each preview runs its branch's code against a local embedded MariaDB restored
 # from the most recent hourly production backup at cold boot. The machine
 # suspends after ~5 min idle (whole-VM snapshot, so the DB stays loaded and
-# resume is sub-second) and is destroyed when the PR closes.
+# resume is sub-second). PR apps are destroyed when the PR closes;
+# restarters-dev is long-lived and simply sleeps.
 #
-# Secrets are set once at app creation by the workflow (see docs/fly-deployment.md):
-# a fresh per-app APP_KEY, BASIC_AUTH_PASSWORD, read-only Tigris credentials,
-# and read-only Google Drive credentials for the backup restore.
+# Secrets are set once at app creation (see docs/fly-deployment.md): a fresh
+# per-app APP_KEY, BASIC_AUTH_PASSWORD, read-only Tigris credentials, and
+# read-only Google Drive credentials for the backup restore.
 
-app = "restarters-pr-__PR_NUMBER__"
+app = "__APP_NAME__"
 primary_region = "lhr"
 
 [build]
@@ -21,15 +32,15 @@ primary_region = "lhr"
     STARTUP_SCRIPT = "preview-startup.sh"
 
 [env]
-  APP_NAME = "Restarters PR #__PR_NUMBER__"
+  APP_NAME = "__APP_TITLE__"
   APP_ENV = "staging"
   APP_DEBUG = "false"
-  APP_URL = "https://restarters-pr-__PR_NUMBER__.fly.dev"
+  APP_URL = "__BASE_URL__"
   # The Nuxt SPA is served same-origin (nginx → Nitro on :3000); the SPA's
   # apiBase is this host (API paths already include /api/v2). FRONTEND_URL keeps
   # any residual Laravel link-building on-host instead of the localhost default.
-  FRONTEND_URL = "https://restarters-pr-__PR_NUMBER__.fly.dev"
-  NUXT_PUBLIC_API_BASE = "https://restarters-pr-__PR_NUMBER__.fly.dev"
+  FRONTEND_URL = "__BASE_URL__"
+  NUXT_PUBLIC_API_BASE = "__BASE_URL__"
   # Local embedded MariaDB (restored from backup at cold boot; 127.0.0.1 only)
   DB_CONNECTION = "mysql"
   DB_HOST = "127.0.0.1"
@@ -39,7 +50,17 @@ primary_region = "lhr"
   DB_PASSWORD = "restarters_preview"
   CACHE_DRIVER = "file"
   SESSION_DRIVER = "file"
-  QUEUE_CONNECTION = "sync"
+  # Background jobs exactly as production does them: dispatch to the local
+  # `jobs` table, worked by the supervisord queue-worker (which runs
+  # `queue:work database` regardless of this setting) and kept alive by the
+  # queue-watchdog cron. Never "sync" - that blocks the dispatching request
+  # while the job runs, which is both slow and unlike production.
+  #
+  # This does not hold the machine awake: Fly suspends on the proxy seeing no
+  # requests, not on CPU activity. A job dispatched moments before suspend
+  # simply waits in the table and is worked when the next request resumes the
+  # machine.
+  QUEUE_CONNECTION = "database"
   SESSION_DOMAIN = ""
   LOG_CHANNEL = "stderr"
   FILESYSTEM_DISK = "s3"
@@ -53,16 +74,18 @@ primary_region = "lhr"
   # Reads come from the shared live bucket; writes are disabled (and the
   # Tigris credentials are read-only anyway).
   FEATURE__IMAGE_UPLOAD = "false"
-  SENTRY_ENVIRONMENT = "preview"
+  SENTRY_ENVIRONMENT = "__SENTRY_ENV__"
   # Mail goes to the shared Mailpit instance, never to real inboxes.
   MAIL_MAILER = "smtp"
   MAIL_HOST = "restarters-dev-mail.internal"
   MAIL_PORT = "1025"
   MAIL_ENCRYPTION = ""
   MAIL_FROM_ADDRESS = "preview@restarters.dev"
-  MAIL_FROM_NAME = "Restarters PR Preview"
+  MAIL_FROM_NAME = "__APP_TITLE__"
   MAILPIT_URL = "https://restarters-dev-mail.fly.dev"
-  # Show the red branch banner (label derived from FLY_APP_NAME → "PR-<N>").
+  # Show the red branch banner. Its label is FLY_APP_NAME, which Fly injects
+  # (config/restarters.php:44), so it reads e.g. "restarters-pr-7" or
+  # "restarters-dev" without needing a placeholder here.
   APP_SHOW_BRANCH = "true"
   BASIC_AUTH_ENABLED = "true"
   # Table type constants
@@ -85,7 +108,9 @@ primary_region = "lhr"
   EMISSION_RATIO_UNPOWERED = "17.70147059"
   EMISSION_RATIO_POWERED = "32.06679233"
   # Session
-  SESSION_COOKIE = "restarters_pr_session"
+  # Shared across every preview app - cookies are host-scoped, so PR previews
+  # and restarters-dev cannot collide.
+  SESSION_COOKIE = "restarters_preview_session"
   SESSION_LIFETIME = "10080"
   SESSION_TABLE = "laravel_sessions"
   # Misc

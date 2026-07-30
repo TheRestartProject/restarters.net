@@ -13,7 +13,6 @@ import BrandAPI from './BrandAPI.js'
 import SkillAPI from './SkillAPI.js'
 import GroupTagAPI from './GroupTagAPI.js'
 import CategoryAPI from './CategoryAPI.js'
-import PreviewDeployAPI from './PreviewDeployAPI.js'
 import ModerationAPI from './ModerationAPI.js'
 import TalkAPI from './TalkAPI.js'
 import AlertsAPI from './AlertsAPI.js'
@@ -39,7 +38,6 @@ export default (config) => ({
   skill: new SkillAPI(config),
   groupTag: new GroupTagAPI(config),
   category: new CategoryAPI(config),
-  previewDeploy: new PreviewDeployAPI(config),
   moderation: new ModerationAPI(config),
   talk: new TalkAPI(config),
   alerts: new AlertsAPI(config),

@@ -101,10 +101,6 @@ return [
         ],
     ],
 
-    'github' => [
-        'deploy_pat' => env('GITHUB_DEPLOY_PAT'),
-    ],
-
     'tus' => [
         // Endpoint the frontend (Uppy) uploads to. Defaults to this app's own /api/tus
         // route (see routes/api.php + App\Http\Controllers\TusController).

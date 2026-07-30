@@ -13,7 +13,7 @@ else → Nitro). Files changed:
   18 (runtime) to run the Nitro server.
 - `docker/supervisord-fly.conf`: `[program:nuxt]` → `node client/.output/server/index.mjs` on 127.0.0.1:3000, inherits Fly env.
 - `docker/nginx-fly.conf`: `^~ /api|/auth/bridge|/discourse|/export|/calendar|/outbound|/{group,admin,party}/stats` → php-fpm; `location / { try_files $uri @nuxt }` + `@nuxt` proxy to :3000; `/images/` now falls back to @nuxt (SPA-vs-widget image overlap). Redirectors dropped — the SPA owns user/reset, user/register, party|group/invite natively.
-- `fly.pr.toml` / `fly.toml` / `fly.dev.toml`: `FRONTEND_URL` + `NUXT_PUBLIC_API_BASE` = the app's own origin (apiBase carries /api/v2).
+- `fly.preview.toml` / `fly.toml`: `FRONTEND_URL` + `NUXT_PUBLIC_API_BASE` = the app's own origin (apiBase carries /api/v2).
 First redeploy result (2026-07-18): build went GREEN on Node 22 (Nuxt 4 needs
 >=22 — bumped Dockerfile.fly) and `/` now 302s to the site gate, NOT localhost —
 **the localhost-redirect is fixed.** The redeploy then failed at the *migrate*
@@ -47,12 +47,12 @@ container, not these Fly files). **Validate on a preview deploy — checklist:**
 The PR-preview "redirects to localhost" because the deploy image only runs
 Laravel, and post-cutover Laravel's catch-all redirects `/` to
 `config('restarters.frontend_url')` which **defaults to `http://localhost:3000`**
-(`config/restarters.php:33`) and is unset in `fly.pr.toml`. Root causes:
+(`config/restarters.php:33`) and is unset in `fly.preview.toml`. Root causes:
 - `Dockerfile.fly` builds only Laravel (`npm run production` = widget/wiki
   vite); it never builds `client/` (the Nuxt SPA).
 - `docker/nginx-fly.conf` `location /` is `try_files … /index.php` → all
   requests hit Laravel; there is no Nitro upstream.
-- `fly.pr.toml`/`fly.toml` set no `FRONTEND_URL` / `NUXT_PUBLIC_API_BASE`.
+- `fly.preview.toml`/`fly.toml` set no `FRONTEND_URL` / `NUXT_PUBLIC_API_BASE`.
 So neither preview NOR prod serves the SPA. Deploy fix (prerequisite for
 everything, do FIRST):
 1. `Dockerfile.fly`: build `client/` (`nuxt build`), and install Node in the
@@ -61,7 +61,7 @@ everything, do FIRST):
 3. `docker/nginx-fly.conf`: route `location ^~ /api/` → php-fpm (Laravel);
    `location /` → `proxy_pass http://127.0.0.1:3000` (Nitro), keeping the auth
    gate + static asset handling.
-4. `fly.pr.toml` (+ `fly.toml`) `[env]`: `FRONTEND_URL` and
+4. `fly.preview.toml` (+ `fly.toml`) `[env]`: `FRONTEND_URL` and
    `NUXT_PUBLIC_API_BASE` = the app's own `https://…` URL.
 Can only be validated on a preview deploy.
 

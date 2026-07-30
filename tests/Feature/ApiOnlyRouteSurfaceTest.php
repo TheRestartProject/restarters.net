@@ -8,7 +8,7 @@ use Tests\TestCase;
 /**
  * F4: pins the post-cutover web-route surface. Laravel serves the API plus
  * exactly the small web surface below (SSO bridge, deep-link redirectors,
- * anonymous exports/calendars, embeddable widgets, preview-deploy, and the
+ * anonymous exports/calendars, embeddable widgets, and the
  * SPA catch-all). If this test fails you either added a web route that
  * belongs in the SPA/API, or removed something partners still iframe —
  * either way it should be a deliberate edit here, not an accident.

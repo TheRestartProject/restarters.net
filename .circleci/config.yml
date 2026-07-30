@@ -312,6 +312,10 @@ jobs:
       - store_test_results:
           path: /tmp/test-results
 
+  # develop is deployed as a preview, exactly like a PR: same fly.preview.toml,
+  # same preview-startup.sh, same disposable database restored from the latest
+  # hourly production backup, same suspend-on-idle teardown. The only
+  # develop-specific things left are the app name and the custom domain.
   deploy-fly-dev:
     docker:
       - image: cimg/base:current
@@ -323,11 +327,53 @@ jobs:
             curl -L https://fly.io/install.sh | sh || true
             echo 'export PATH=/home/circleci/.fly/bin:$PATH' >> $BASH_ENV
       - run:
-          name: Deploy to restarters-dev
+          name: Deploy develop preview to restarters-dev
           command: |
             export FLY_API_TOKEN="FlyV1 $FLY_API_TOKEN"
-            flyctl deploy --config fly.dev.toml --remote-only
+            # Keep this substitution list in step with the one in
+            # .github/workflows/pr-preview.yml.
+            sed -e "s|__APP_NAME__|restarters-dev|g" \
+                -e "s|__APP_TITLE__|Restarters develop|g" \
+                -e "s|__BASE_URL__|https://restarters-dev.fly.dev|g" \
+                -e "s|__SENTRY_ENV__|dev|g" \
+                fly.preview.toml > fly.develop.generated.toml
+            if grep -q '__[A-Z_]*__' fly.develop.generated.toml; then
+              echo "Unsubstituted placeholder left in the generated config:"
+              grep -n '__[A-Z_]*__' fly.develop.generated.toml
+              exit 1
+            fi
+            flyctl deploy --config fly.develop.generated.toml \
+              --app restarters-dev --remote-only --ha=false
+            # --ha=false has a history of not reliably keeping one machine.
+            flyctl scale count 1 --app restarters-dev --yes
           no_output_timeout: 15m
+      - run:
+          name: Wait for restore and migrations
+          command: |
+            # Cold boot restores ~98MB of backup then migrates; until that
+            # finishes visitors get the warming page. Fail the build if the
+            # branch's migrations do not apply to real production data.
+            # preview-startup.sh writes the status with printf as one flat
+            # line, so sed reads it without needing jq on the image.
+            field() { echo "$1" | sed -n "s/.*\"$2\":\"\([^\"]*\)\".*/\1/p"; }
+            PHASE=""
+            for i in $(seq 1 80); do
+              BODY=$(curl -fsS --max-time 10 https://restarters-dev.fly.dev/_preview_status 2>/dev/null) || BODY=""
+              PHASE=$(field "$BODY" phase)
+              echo "poll $i: phase='${PHASE:-n/a}'"
+              case "$PHASE" in
+                ready|failed) break ;;
+              esac
+              sleep 15
+            done
+            if [ "$PHASE" != "ready" ]; then
+              echo "restarters-dev.fly.dev did not become ready (phase='${PHASE:-unknown}')."
+              echo "detail: $(field "$BODY" detail)"
+              echo "Check: flyctl logs --app restarters-dev"
+              exit 1
+            fi
+            echo "restarters-dev.fly.dev is ready."
+          no_output_timeout: 25m
 
   deploy-fly-prod:
     docker:

@@ -37,7 +37,6 @@ const PAGES_DIR = path.resolve(process.cwd(), 'app/pages')
 const EXPECTED_GATES = {
   '/': 'public',
   '/about/cookie-policy': 'public',
-  '/admin/preview-deploy': 'auth+role:Administrator',
   '/brands': 'auth+role:Administrator',
   // category sits inside the legacy auth group (line 321) and CategoryController
   // enforces no role, so auth-without-role is correct here.

@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-# Startup script for per-PR preview apps (see fly.pr.toml).
+# Startup script for every preview app - per-PR previews and the develop
+# branch's restarters-dev alike (see fly.preview.toml).
 #
 # Cold-boot sequence (rootfs is always fresh — Fly resets it on every start):
 #   1. Serve a static "warming up" page on port 80 immediately, so the Fly
