@@ -63,10 +63,10 @@
 
             <div class="button-group row">
                 <div class="col-6 d-flex align-items-center justify-content-start">
-                    <form method="POST" action="/skills/delete/{{ $skill->id }}" class="d-inline">
-                        @csrf
-                        <button type="submit" class="btn btn-primary btn-danger">@lang('admin.delete-skill')</button>
-                    </form>
+                    {{-- Posts the surrounding form (which carries @csrf) to the delete route. A nested
+                         nested form element would be dropped by the browser, and the button
+                         would submit the edit action instead. --}}
+                    <button type="submit" formaction="/skills/delete/{{ $skill->id }}" formmethod="POST" class="btn btn-primary btn-danger">@lang('admin.delete-skill')</button>
                 </div>
                 <div class="col-6 d-flex align-items-center justify-content-end">
                     <button type="submit" class="btn btn-primary btn-create">@lang('admin.save-skill')</button>
