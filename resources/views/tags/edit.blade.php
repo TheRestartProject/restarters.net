@@ -52,10 +52,7 @@
 
         <div class="button-group row">
             <div class="col-6 d-flex align-items-center justify-content-start">
-                {{-- Posts the surrounding form (which carries @csrf) to the delete route. A nested
-                         nested form element would be dropped by the browser, and the button
-                         would submit the edit action instead. --}}
-                    <button type="submit" formaction="/tags/delete/{{ $tag->id }}" formmethod="POST" class="btn btn-primary btn-danger">@lang('admin.delete-tag')</button>
+                <a href="/tags/delete/{{ $tag->id }}" data-method="post" class="btn btn-primary btn-danger">@lang('admin.delete-tag')</a>
             </div>
             <div class="col-6 d-flex align-items-center justify-content-end">
                 <button type="submit" class="btn btn-primary btn-create">@lang('admin.save-tag')</button>

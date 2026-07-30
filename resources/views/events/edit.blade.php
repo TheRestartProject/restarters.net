@@ -91,10 +91,7 @@
                         <div id="device-image-{{ $formdata['idevents'] }}" class="dz-image">
                           <a href="/uploads/{{ $image->path }}" data-toggle="lightbox">
                           <img src="/uploads/thumbnail_{{ $image->path }}" alt="placeholder"></a>
-                          <form method="POST" action="/party/image/delete/{{ $formdata['idevents'] }}/{{{ $image->idimages }}}/{{{ $image->path }}}" class="d-inline">
-                            @csrf
-                            <button type="submit" data-device-id="{{ $formdata['idevents'] }}" class="dz-remove ajax-delete-image btn btn-link p-0">Remove file</button>
-                          </form>
+                          <a href="/party/image/delete/{{ $formdata['idevents'] }}/{{{ $image->idimages }}}/{{{ $image->path }}}" data-method="post" data-device-id="{{ $formdata['idevents'] }}" class="dz-remove ajax-delete-image">Remove file</a>
                         </div>
                       @endforeach
                     @endif
