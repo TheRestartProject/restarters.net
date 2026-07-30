@@ -746,6 +746,15 @@ class PartyController extends Controller
 
     public function imageUpload(Request $request, $id)
     {
+        // Same rule as deleteImage below: you must be an admin or have some
+        // involvement in the event to attach photos to it.
+        $user = Auth::user();
+        $in_event = EventsUsers::where('event', $id)->where('user', $user->id)->first();
+
+        if (! Fixometer::hasRole($user, 'Administrator') && ! is_object($in_event)) {
+            abort(403);
+        }
+
         try {
             if (empty($_FILES) && ! empty($request->files)) {
                 // Shim to handle uploads from Tests
