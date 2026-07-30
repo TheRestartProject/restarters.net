@@ -17,7 +17,7 @@
         <div class="row">
       <div class="col">
         <h1 class="mb-30 mr-30">
-            @lang('events.editing', ['event' => '<a style="color:black; text-decoration:underline" href="/party/view/'. $formdata['idevents'] .'">'. $formdata['venue'] .'</a>'])
+            @lang('events.editing', ['event' => '<a style="color:black; text-decoration:underline" href="/party/view/'. intval($formdata['idevents']) .'">'. e($formdata['venue']) .'</a>'])
         </h1>
       </div>
     </div>
