@@ -213,4 +213,70 @@ class StoredXssHardeningTest extends TestCase
         // literal "onerror=alert" text survives escaping and would false-pass.
         $response->assertDontSee('<img src=x', false);
     }
+
+    /**
+     * The sanitiser must not quietly degrade the rich text that already exists. This
+     * asserts against the constructs found in a survey of the live data: links opening
+     * in a new tab (~5,100 of them), inline styles (~7,100), Quill's alignment classes
+     * (~1,300), plus div, hr, sub/sup and the occasional table.
+     *
+     * @test
+     */
+    public function sanitiser_preserves_the_rich_text_the_live_content_actually_uses(): void
+    {
+        $this->loginAsTestUser(Role::HOST);
+
+        $rich = '<p class="ql-align-center" style="text-align: center;">Centred</p>'
+            . '<p><a href="https://therestartproject.org" target="_blank" rel="noopener">A link</a></p>'
+            . '<p><span style="font-size: 14px; color: rgb(0, 0, 0);">Styled</span></p>'
+            . '<div>A div</div><hr><p>H<sub>2</sub>O and x<sup>2</sup></p>'
+            . '<table><tbody><tr><td>Mon</td><td>10-4</td></tr></tbody></table>'
+            . '<ul><li>One</li></ul><blockquote>Quoted</blockquote><h4>A heading</h4>';
+
+        $idgroups = $this->createGroup('Rich Text Group', 'https://therestartproject.org', 'London', $rich);
+        $stored = Group::findOrFail($idgroups)->free_text;
+
+        foreach ([
+            'target="_blank"' => 'links opening in a new tab',
+            'class="ql-align-center"' => "Quill's alignment classes",
+            'font-size' => 'inline font styling',
+            '<div>' => 'divs',
+            '<hr' => 'horizontal rules',
+            '<sub>' => 'subscript',
+            '<sup>' => 'superscript',
+            '<table>' => 'tables',
+            '<blockquote>' => 'blockquotes',
+            '<h4>' => 'headings',
+        ] as $needle => $what) {
+            $this->assertStringContainsString($needle, $stored, "Sanitiser stripped $what");
+        }
+    }
+
+    /**
+     * The corresponding negative: the things that make a payload dangerous are removed
+     * even though the allowlist is wide.
+     *
+     * @test
+     */
+    public function sanitiser_removes_script_handlers_and_javascript_urls(): void
+    {
+        $this->loginAsTestUser(Role::HOST);
+
+        $nasty = '<p>Text</p><script>alert(1)</script>'
+            . '<img src=x onerror="alert(2)">'
+            . '<a href="javascript:alert(3)">Click</a>'
+            . '<iframe src="https://evil.example/"></iframe>'
+            . '<div style="background: url(javascript:alert(4))">Styled</div>'
+            . '<form action="https://evil.example/"><input name="p"></form>';
+
+        $idgroups = $this->createGroup('Nasty Group', 'https://therestartproject.org', 'London', $nasty);
+        $stored = Group::findOrFail($idgroups)->free_text;
+
+        foreach (['<script', 'onerror', 'javascript:', '<iframe', '<form', '<input'] as $needle) {
+            $this->assertStringNotContainsString($needle, $stored, "Sanitiser kept $needle");
+        }
+
+        // ...while the surrounding legitimate content survives.
+        $this->assertStringContainsString('Text', $stored);
+    }
 }

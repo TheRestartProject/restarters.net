@@ -68,6 +68,11 @@ class ExportTest extends TestCase
                                                     'name' => 'test3'
                                                 ]);
         $this->networkService->addGroupToNetwork($admin, $group3, $network);
+        if ($role == 'Host') {
+            $group3->addVolunteer($user);
+            $group3->makeMemberAHost($user);
+        }
+
         $group3->approved = false;
         $group3->save();
 
