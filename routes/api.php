@@ -129,5 +129,9 @@ Route::prefix('v2')->group(function() {
             Route::patch('{id}', [API\DeviceController::class, 'updateDevicev2']);
             Route::delete('{id}', [API\DeviceController::class, 'deleteDevicev2']);
         });
+
+        // Open Repair Data Standard export.  Returns 503 until ORDS_ID_PREFIX and
+        // ORDS_DATA_PROVIDER are set; see config/ords.php for why they have no defaults.
+        Route::get('/repairs', [API\RepairController::class, 'listRepairsv2'])->middleware('auth:api');
     });
 });
