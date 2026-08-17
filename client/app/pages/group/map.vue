@@ -9,14 +9,13 @@ import GroupMap from '~/components/groups/GroupMap.vue'
 import GroupInfoModal from '~/components/groups/GroupInfoModal.vue'
 import GroupsRequiringModeration from '~/components/networks/NetworkGroupsModerationTable.vue'
 
-// /group/map - resources/js/components/GroupMapAndList.vue (map+list shell)
-// + GroupMap.vue (the Leaflet map itself) are the functional spec. Unlike
-// legacy, where the map lived as a tab panel of /group/{nearby,other}
-// (GroupsPage.vue), this is its own route: /group/nearby was already
-// ported as a plain list page (B4), so the map gets its own tab/URL rather
-// than folding back into that page - see GroupsTabsNav.vue's doc comment
-// and stores/groups.js's B7 doc comment for the names/summary split this
-// leans on.
+// /group/map - PR 887's "Find a group" tab of /group. resources/js/
+// components/GroupMapAndList.vue (map+list shell) + GroupMap.vue (the
+// Leaflet map itself) are the functional spec; 887 keeps it as a b-tab
+// panel URL-rewritten to /group/other, here it's its own Nuxt route with
+// /group/nearby and /group/all forwarding in - see GroupsTabsNav.vue's doc
+// comment, and stores/groups.js's B7 doc comment for the names/summary
+// split this leans on.
 definePageMeta({ auth: true })
 
 const { t } = useI18n()

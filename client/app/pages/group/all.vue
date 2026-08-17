@@ -1,146 +1,15 @@
 <script setup>
-import { computed, onMounted, watch } from 'vue'
-import { useI18n } from 'vue-i18n'
-import { useGroupsStore } from '~/stores/groups.js'
-import { useAuth } from '~/composables/useAuth.js'
-import GroupsTabsNav from '~/components/groups/GroupsTabsNav.vue'
-import GroupsTable from '~/components/groups/GroupsTable.vue'
-import GroupsRequiringModeration from '~/components/networks/NetworkGroupsModerationTable.vue'
-
-// /group/all - resources/views/group/index.blade.php (tab="all") +
-// resources/js/components/GroupsPage.vue's "All Groups" tab /
-// GroupsTable.vue + GroupsTableFilters.vue are the functional spec.
-//
-// GET /api/v2/groups/names carries {id, name, lat, lng, country,
-// network_ids, tag_ids, archived_at} (PR #887 - api-contracts-phase-b.md
-// client notes, docs/nuxt-migration/api-gaps.md); `network_ids`/`tag_ids`
-// power GroupsTable's network/tag filter dropdowns immediately, without
-// waiting on per-row hydration (see `rows` below). Full location/hosts/
-// restarters/next_event/tags (for the tag *badges*, as opposed to the
-// filter) still only arrive via GET /api/v2/groups/{id} - see fetchDetails
-// below. Name/tag/location/country/network search/sort is GroupsTable's
-// own built-in filter bar (show-filters, gap #6) rather than a page-level
-// search box, so it applies over the full list, not just whichever rows
-// happen to be hydrated. There is no pagination (gap #7, matching legacy):
-// every filtered row renders, and full details are hydrated for all of
-// them (not just a "current page") - each request is cached in
-// groupsStore.details, so filtering/re-rendering afterwards is free.
+// PR 887 (RES-1995) reworks /group to two tabs, dropping the separate All
+// Groups list - every group is on the map, with the list panel below it.
+// The route survives only as a forward so old links and bookmarks keep
+// working. What this page's list had beyond the map's panel (full-list
+// filter bar, tag badges, archived groups) is 887 GroupMapAndList list
+// functionality still to be ported into pages/group/map.vue.
 definePageMeta({ auth: true })
 
-const { t } = useI18n()
-useHead({ title: t('groups.groups') })
-
-const groupsStore = useGroupsStore()
-
-// Groups-requiring-moderation queue, and per-row tag badges, for
-// Administrators / NetworkCoordinators (legacy: GroupsRequiringModeration
-// above the shared tabs on every /group tab, and showTags on All Groups -
-// parity-v2/groups-lists.md gaps #2 and #11).
-const { hasRole } = useAuth()
-const showModeration = computed(() => hasRole('Administrator') || hasRole('NetworkCoordinator'))
-const showTags = computed(() => hasRole('Administrator') || hasRole('NetworkCoordinator'))
-
-// Legacy has no "hide archived groups" toggle anywhere - archived groups
-// are always listed, just badge-marked (GroupArchivedBadge) - so there is
-// no client-side narrowing here beyond the sort (gap #14/#3 in the
-// original diff pass; the API call below still fetches the full set,
-// archived included).
-const sortedNames = computed(() => [...groupsStore.names].sort((a, b) => a.name.localeCompare(b.name)))
-
-const rows = computed(() =>
-  sortedNames.value.map((entry) => {
-    const details = groupsStore.details[entry.id]
-
-    return {
-      id: entry.id,
-      name: entry.name,
-      archivedAt: entry.archived_at,
-      image: details?.image ?? null,
-      tags: details?.tags ?? null,
-      tagIds: entry.tag_ids ?? [],
-      networkIds: entry.network_ids ?? [],
-      location: details?.location ?? null,
-      hosts: details?.hosts ?? null,
-      restarters: details?.restarters ?? null,
-      nextEvent: details?.next_event ?? null,
-      // The Group resource carries is_member (Group.php's
-      // $ret['is_member'] = isVolunteer($user->id)), so the row can say
-      // Follow vs Unfollow correctly for every group - not just the ones
-      // already seen via `mine` or joined this session, which is all the
-      // memberIds fallback knows about.
-      isMember: details?.is_member ?? groupsStore.isMember(entry.id),
-    }
-  })
-)
-
-// Hydrate full details for every row in the (sorted) list - see the class
-// doc comment above for why this isn't limited to a "current page".
-watch(
-  sortedNames,
-  (entries) => {
-    entries.forEach((entry) => groupsStore.fetchDetails(entry.id))
-  },
-  { immediate: true }
-)
-
-function retry() {
-  groupsStore.fetchNames({ includeArchived: 'true' })
-}
-
-onMounted(() => {
-  // Fetch the full set, including archived groups - legacy always shows
-  // them (badge-marked), so there's no separate "include archived" toggle
-  // to gate this on.
-  groupsStore.fetchNames({ includeArchived: 'true' })
-})
+navigateTo('/group/map', { replace: true })
 </script>
 
 <template>
-  <div class="container py-4" data-testid="group-all-page">
-    <!-- Legacy's group.index.blade.php renders GroupsRequiringModeration
-         BEFORE GroupsPage (whose own template opens with this h1) - not
-         after it. Order matters here, not just visibility (parity-v2/
-         groups-lists.md gap #2 says "above the h1/tabs"; this had drifted
-         to below the h1 - a mobile-only screenshot pass is what surfaced
-         it, since desktop's wider layout made the reordering easy to miss). -->
-    <!-- group/index.blade.php:53 - the full GroupsTable(approve), not
-         the plain name-only list. These three pages are tabs of develop\'s
-         single /group page, which renders it once above the tabs. -->
-    <GroupsRequiringModeration v-if="showModeration"  />
-
-    <h1 class="d-flex justify-content-between align-items-start">
-      <span class="d-flex align-items-center">
-        {{ t('groups.groups') }}
-        <img src="/images/group_doodle_ico.svg" alt="" class="ms-4" style="height: 76px">
-      </span>
-      <NuxtLink to="/group/create" class="btn btn-primary" data-testid="group-create-link">
-        <span class="d-block d-lg-none">{{ t('groups.create_groups_mobile2') }}</span>
-        <span class="d-none d-lg-block">{{ t('groups.create_groups') }}</span>
-      </NuxtLink>
-    </h1>
-
-    <GroupsTabsNav active="all">
-      <div v-if="groupsStore.namesLoading" data-testid="group-all-loading">
-        <div class="placeholder-glow mb-3">
-          <span class="placeholder col-12" style="height: 6rem" />
-        </div>
-      </div>
-
-      <BAlert v-else-if="groupsStore.namesError" :model-value="true" variant="danger" data-testid="group-all-error">
-        <p>{{ t('client.groups.load_error') }}</p>
-        <BButton variant="danger" data-testid="group-all-retry" @click="retry">
-          {{ t('client.dashboard.retry') }}
-        </BButton>
-      </BAlert>
-
-      <template v-else>
-        <p data-testid="group-all-count">
-          <!-- eslint-disable-next-line vue/no-v-html -->
-          <span v-html="t('groups.group_count', { count: rows.length }, rows.length)" />
-        </p>
-
-        <GroupsTable :groups="rows" :show-filters="true" :show-tags="showTags" />
-      </template>
-    </GroupsTabsNav>
-  </div>
+  <div data-testid="group-all-redirect" />
 </template>

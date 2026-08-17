@@ -18,39 +18,40 @@ function mountNav(active, slots) {
 }
 
 describe('components/groups/GroupsTabsNav', () => {
-  // PR 887 reworks the groups page so the map is one of its tabs - the
-  // earlier "no Map tab" pinning here dated from before that integration
-  // (it cited pre-887 legacy, which indeed had only three tabs). The map
-  // must be reachable from /group, so the bar renders it alongside the
-  // three legacy tabs.
-  it('renders the three legacy tabs plus the map tab, linked to their routes', () => {
+  // PR 887 (RES-1995) reworks the groups page to exactly two tabs: "Your
+  // Groups" and "Find a group", where "Find a group" IS the map+list. The
+  // port's earlier three-list-tabs layout (mine/nearby/all, map on an
+  // unlinked side route) matched pre-887 develop, not the 887 page this
+  // branch is integrating - /group/nearby and /group/all now redirect to
+  // /group/map.
+  it('renders exactly the two 887 tabs: Your Groups and Find a group (the map)', () => {
     const wrapper = mountNav('mine')
 
     expect(wrapper.find('[data-testid="groups-tab-mine"]').attributes('href')).toBe('/group')
-    expect(wrapper.find('[data-testid="groups-tab-nearby"]').attributes('href')).toBe('/group/nearby')
-    expect(wrapper.find('[data-testid="groups-tab-all"]').attributes('href')).toBe('/group/all')
     expect(wrapper.find('[data-testid="groups-tab-map"]').attributes('href')).toBe('/group/map')
+    expect(wrapper.find('[data-testid="groups-tab-nearby"]').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="groups-tab-all"]').exists()).toBe(false)
   })
 
-  it('highlights the map tab when active is "map"', () => {
-    const wrapper = mountNav('map')
+  it('highlights the active tab', () => {
+    const mine = mountNav('mine')
+    expect(mine.find('[data-testid="groups-tab-mine"]').classes()).toContain('active')
+    expect(mine.find('[data-testid="groups-tab-map"]').classes()).not.toContain('active')
 
-    expect(wrapper.find('[data-testid="groups-tab-map"]').classes()).toContain('active')
-    expect(wrapper.find('[data-testid="groups-tab-mine"]').classes()).not.toContain('active')
-    expect(wrapper.find('[data-testid="groups-tab-nearby"]').classes()).not.toContain('active')
-    expect(wrapper.find('[data-testid="groups-tab-all"]').classes()).not.toContain('active')
+    const map = mountNav('map')
+    expect(map.find('[data-testid="groups-tab-map"]').classes()).toContain('active')
+    expect(map.find('[data-testid="groups-tab-mine"]').classes()).not.toContain('active')
   })
 
   it('renders resolved translation labels, not raw i18n keys', () => {
-    // Regression guard: the /group/all tab used a non-existent key
-    // (groups.all_groups) and rendered the raw path, which CSS uppercased to
-    // "GROUPS.ALL_GROUPS" in the UI. Every tab label must resolve to real text.
+    // Regression guard: a tab once used a non-existent key and rendered the
+    // raw path, which CSS uppercased in the UI. Every tab label must resolve
+    // to real text - the map tab carries 887's "Find a group" title
+    // (groups_title2), not a generic "Map".
     const wrapper = mountNav('mine')
 
     expect(wrapper.find('[data-testid="groups-tab-mine"]').text()).toBe('Your Groups')
-    expect(wrapper.find('[data-testid="groups-tab-nearby"]').text()).toBe('Find a group')
-    expect(wrapper.find('[data-testid="groups-tab-all"]').text()).toBe('All groups')
-    expect(wrapper.find('[data-testid="groups-tab-map"]').text()).toBe('Map')
+    expect(wrapper.find('[data-testid="groups-tab-map"]').text()).toBe('Find a group')
   })
 
   // gap #2: legacy's .ourtabs border/shadow box wraps the tab-content as

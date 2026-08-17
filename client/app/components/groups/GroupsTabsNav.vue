@@ -1,30 +1,29 @@
 <script setup>
 import { useI18n } from 'vue-i18n'
 
-// Tab nav shared by /group, /group/nearby, /group/all, /group/map. The
-// legacy GroupsPage.vue keeps "mine"/"nearby"/"all" as three panels of one
-// <b-tabs class="ourtabs"> and rewrites the URL on tab change; here each is
-// its own Nuxt page/route (design.md §6.2 B4 task brief), so this is just a
-// small nav bar highlighting the active one, wrapping a default slot so the
-// page content below it shares the same bordered/shadowed box legacy's
-// single .ourtabs element draws around both its nav *and* its tab-content
-// (resources/sass/_events.scss:326-368) - see parity-v2/groups-lists.md
-// gap #1/#2.
+// Tab nav shared by /group and /group/map. PR 887 (RES-1995)'s
+// GroupsPage.vue is the functional spec: exactly two tabs - "Your Groups"
+// (groups_title1) and "Find a group" (groups_title2), where "Find a group"
+// IS the map+list. Legacy keeps them as two panels of one <b-tabs
+// class="ourtabs"> and rewrites the URL on tab change; here each is its
+// own Nuxt page/route, so this is just a small nav bar highlighting the
+// active one, wrapping a default slot so the page content below it shares
+// the same bordered/shadowed box legacy's single .ourtabs element draws
+// around both its nav *and* its tab-content (resources/sass/
+// _events.scss:326-368).
 //
-// /group/map (B7) started as an unlinked net-new route because
-// /group/nearby had already been ported as a plain list rather than folded
-// back in as a fourth panel (see stores/groups.js's B7 doc comment) -
-// pre-887 legacy only ever had three tabs. But PR 887 (RES-1995) reworks
-// the groups page so the map IS one of /group's tabs, so it must be
-// reachable from here: rendered as a fourth tab rather than replacing
-// nearby/all, because this port's /group/all carries the full-list filter
-// bar and tag badges that 887 folded into its map list panel (not ported
-// into pages/group/map.vue's list).
+// The port originally had pre-887 develop's three list tabs
+// (mine/nearby/all) with the map on an unlinked side route - that matched
+// the wrong baseline for a branch integrating 887. /group/nearby and
+// /group/all now redirect to /group/map (their pages carry the history);
+// what /group/all's list had beyond the map page's list panel (full-list
+// filter bar, tag badges, archived groups) is 887's GroupMapAndList list
+// functionality, to be ported into pages/group/map.vue's panel.
 const props = defineProps({
   active: {
     type: String,
     required: true,
-    validator: (value) => ['mine', 'nearby', 'all', 'map'].includes(value),
+    validator: (value) => ['mine', 'map'].includes(value),
   },
 })
 
@@ -48,31 +47,13 @@ function isActive(tab) {
         <b>{{ t('groups.groups_title1') }}</b>
       </NuxtLink>
       <NuxtLink
-        to="/group/nearby"
-        class="groups-tab"
-        :class="{ active: isActive('nearby') }"
-        data-testid="groups-tab-nearby"
-        :aria-current="isActive('nearby') ? 'page' : undefined"
-      >
-        <b>{{ t('groups.groups_title2') }}</b>
-      </NuxtLink>
-      <NuxtLink
-        to="/group/all"
-        class="groups-tab"
-        :class="{ active: isActive('all') }"
-        data-testid="groups-tab-all"
-        :aria-current="isActive('all') ? 'page' : undefined"
-      >
-        <b>{{ t('client.groups.all_tab') }}</b>
-      </NuxtLink>
-      <NuxtLink
         to="/group/map"
         class="groups-tab"
         :class="{ active: isActive('map') }"
         data-testid="groups-tab-map"
         :aria-current="isActive('map') ? 'page' : undefined"
       >
-        <b>{{ t('client.groups.map_tab') }}</b>
+        <b>{{ t('groups.groups_title2') }}</b>
       </NuxtLink>
     </nav>
     <div class="groups-tabs-panel-body">

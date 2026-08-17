@@ -43,7 +43,9 @@ const PAGES = [
   '/user/all',
   '/category',
   '/device/search',
-  '/group/all',
+  // /group/all now redirects to the map page (PR 887's two-tab layout);
+  // check the map+list page it lands on instead.
+  '/group/map',
 ]
 
 for (const vp of VIEWPORTS) {
