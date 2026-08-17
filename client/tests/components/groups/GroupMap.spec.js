@@ -158,6 +158,17 @@ describe('components/groups/GroupMap', () => {
     expect(L.markerClusterGroup).toHaveBeenCalledWith(expect.objectContaining({ maxClusterRadius: 120 }))
   })
 
+  // The identical-location nudge is only ~tens of px at z18, well inside the
+  // cluster radius - without this, co-located pins would render as a "2"
+  // cluster bubble even at max zoom and never visibly split.
+  it('disables clustering at the map\'s max zoom so split pins render individually', async () => {
+    const wrapper = mountMap({ groups: [{ id: 1, name: 'Alpha', lat: 51.5, lng: -0.1 }], maxZoom: 12 })
+
+    await wrapper.findComponent(LMapStub).vm.$emit('ready', fakeLeafletMap())
+
+    expect(L.markerClusterGroup).toHaveBeenCalledWith(expect.objectContaining({ disableClusteringAtZoom: 12 }))
+  })
+
   // Freegle's identical-location separation (ClusterMarker.vue): two groups
   // sharing exact coordinates must not render as one unclickable stack.
   it('separates markers for groups at identical coordinates', async () => {

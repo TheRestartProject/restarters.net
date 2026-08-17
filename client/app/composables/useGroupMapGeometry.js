@@ -81,7 +81,13 @@ export function boundingBoxFor(mappableGroups) {
 // objects - mutating the input would corrupt the store's coordinates and
 // accumulate on every recompute (a bug Freegle actually hit, per its own
 // comment). Coordinates are coerced to numbers first: the names index can
-// carry them as strings, and "51.5" + 0.003 would concatenate.
+// carry them as strings, and "51.5" + 0.00015 would concatenate.
+//
+// The offset is much smaller than Freegle's 0.003: that put pins streets
+// apart, which read as two genuinely different locations (user feedback).
+// 0.00015 degrees is ~28px lng / ~45px lat at max zoom (z18, UK latitudes) -
+// pins only visibly split right at max zoom, where GroupMap.vue also
+// disables clustering so the split is actually shown.
 export function separateIdenticalLocations(mappableGroups) {
   const seen = {}
 
@@ -92,7 +98,7 @@ export function separateIdenticalLocations(mappableGroups) {
     const already = seen[key] || 0
     seen[key] = already + 1
 
-    return { ...group, lat: lat + already * 0.003, lng: lng + already * 0.003 }
+    return { ...group, lat: lat + already * 0.00015, lng: lng + already * 0.00015 }
   })
 }
 

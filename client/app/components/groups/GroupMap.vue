@@ -200,7 +200,14 @@ function onReady(mapInstance) {
     resizeObserver.observe(containerEl.value)
   }
 
-  clusterGroup = L.markerClusterGroup({ maxClusterRadius: MAP_CLUSTER_RADIUS })
+  // disableClusteringAtZoom: the identical-location nudge (see
+  // separateIdenticalLocations) is only ~tens of px at max zoom, well
+  // inside the cluster radius - without this, co-located pins would render
+  // as a "2" cluster bubble even at max zoom and never visibly split.
+  clusterGroup = L.markerClusterGroup({
+    maxClusterRadius: MAP_CLUSTER_RADIUS,
+    disableClusteringAtZoom: props.maxZoom,
+  })
   mapInstance.addLayer(clusterGroup)
   rebuildMarkers()
 

@@ -135,7 +135,11 @@ describe('composables/useGroupMapGeometry', () => {
       expect(separateIdenticalLocations(groups)).toEqual(groups)
     })
 
-    it('nudges each subsequent duplicate at a location by 0.003 degrees', () => {
+    // 0.00015 degrees is ~28px lng / ~45px lat at max zoom (z18, UK
+    // latitudes) - just enough to tell two pins apart there, without
+    // reading as two genuinely different locations (user feedback on
+    // Freegle's original 0.003, which put pins streets apart).
+    it('nudges each subsequent duplicate at a location by 0.00015 degrees', () => {
       const groups = [
         { id: 1, lat: 51.5, lng: -0.1 },
         { id: 2, lat: 51.5, lng: -0.1 },
@@ -145,10 +149,10 @@ describe('composables/useGroupMapGeometry', () => {
       const [first, second, third] = separateIdenticalLocations(groups)
       expect(first.lat).toBe(51.5)
       expect(first.lng).toBe(-0.1)
-      expect(second.lat).toBeCloseTo(51.503, 10)
-      expect(second.lng).toBeCloseTo(-0.097, 10)
-      expect(third.lat).toBeCloseTo(51.506, 10)
-      expect(third.lng).toBeCloseTo(-0.094, 10)
+      expect(second.lat).toBeCloseTo(51.50015, 10)
+      expect(second.lng).toBeCloseTo(-0.09985, 10)
+      expect(third.lat).toBeCloseTo(51.5003, 10)
+      expect(third.lng).toBeCloseTo(-0.0997, 10)
     })
 
     it('never mutates the input groups (Freegle regression: offsets would accumulate)', () => {
@@ -171,8 +175,8 @@ describe('composables/useGroupMapGeometry', () => {
 
       const [first, second] = separateIdenticalLocations(groups)
       expect(first.lat).toBe(51.5)
-      expect(second.lat).toBeCloseTo(51.503, 10)
-      expect(second.lng).toBeCloseTo(-0.097, 10)
+      expect(second.lat).toBeCloseTo(51.50015, 10)
+      expect(second.lng).toBeCloseTo(-0.09985, 10)
     })
 
     it('preserves the other names-index fields on nudged entries', () => {
