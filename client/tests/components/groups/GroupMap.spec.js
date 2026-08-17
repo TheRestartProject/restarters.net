@@ -105,6 +105,13 @@ describe('components/groups/GroupMap', () => {
     vi.spyOn(L, 'markerClusterGroup').mockReturnValue(fakeClusterGroup)
   })
 
+  // User feedback on PR 887: zoom 14 was too shallow to read street names or
+  // tell close-together pins apart. CARTO's raster tiles serve up to z18.
+  it('defaults to street-level max zoom (18)', () => {
+    const wrapper = mountMap()
+    expect(wrapper.findComponent(LMapStub).props('maxZoom')).toBe(18)
+  })
+
   it('passes zoom bounds and CARTO tiles through to the underlying map/tile layer', () => {
     const wrapper = mountMap({ minZoom: 3, maxZoom: 12 })
 
@@ -138,6 +145,33 @@ describe('components/groups/GroupMap', () => {
     expect(map.addLayer).toHaveBeenCalledWith(fakeClusterGroup)
     expect(fakeClusterGroup.addLayers).toHaveBeenCalledTimes(1)
     expect(fakeClusterGroup.addLayers.mock.calls[0][0]).toHaveLength(1)
+  })
+
+  // User feedback on PR 887: the default 80px cluster radius left too many
+  // small cluster bubbles on screen at once - a wider radius merges them
+  // into fewer, larger clusters.
+  it('widens the cluster radius to 120px to cut cluster-icon clutter', async () => {
+    const wrapper = mountMap({ groups: [{ id: 1, name: 'Alpha', lat: 51.5, lng: -0.1 }] })
+
+    await wrapper.findComponent(LMapStub).vm.$emit('ready', fakeLeafletMap())
+
+    expect(L.markerClusterGroup).toHaveBeenCalledWith(expect.objectContaining({ maxClusterRadius: 120 }))
+  })
+
+  // Freegle's identical-location separation (ClusterMarker.vue): two groups
+  // sharing exact coordinates must not render as one unclickable stack.
+  it('separates markers for groups at identical coordinates', async () => {
+    const wrapper = mountMap({
+      groups: [
+        { id: 1, name: 'Alpha', lat: 51.5, lng: -0.1 },
+        { id: 2, name: 'Beta', lat: 51.5, lng: -0.1 },
+      ],
+    })
+
+    await wrapper.findComponent(LMapStub).vm.$emit('ready', fakeLeafletMap())
+
+    const [first, second] = fakeClusterGroup.addLayers.mock.calls[0][0]
+    expect(first.getLatLng()).not.toEqual(second.getLatLng())
   })
 
   it('only clusters groups with real coordinates', async () => {

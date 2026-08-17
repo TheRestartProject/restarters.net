@@ -4,4 +4,11 @@ export const LEAFLET_TILES = 'https://{s}.basemaps.cartocdn.com/rastertiles/voya
 export const LEAFLET_ATTRIBUTION =
   '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="https://carto.com/attribution">CARTO</a>'
 export const MIN_MAP_ZOOM = 1
-export const MAX_MAP_ZOOM = 14
+// Legacy capped this at 14, which user feedback found too shallow to read
+// street names or tell close-together pins apart; CARTO's raster tiles
+// serve up to z18.
+export const MAX_MAP_ZOOM = 18
+// leaflet.markercluster's maxClusterRadius (px). The default 80 left too
+// many small cluster bubbles on screen at once (user feedback); wider
+// merges them into fewer, larger clusters.
+export const MAP_CLUSTER_RADIUS = 120

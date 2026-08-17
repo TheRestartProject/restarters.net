@@ -75,6 +75,27 @@ export function boundingBoxFor(mappableGroups) {
   return { minLat, maxLat, minLng, maxLng }
 }
 
+// Groups at the exact same coordinates would render as one unclickable
+// stack even at max zoom. Ported from Freegle's ClusterMarker.vue: nudge
+// each subsequent duplicate at a location by a small fixed offset, into NEW
+// objects - mutating the input would corrupt the store's coordinates and
+// accumulate on every recompute (a bug Freegle actually hit, per its own
+// comment). Coordinates are coerced to numbers first: the names index can
+// carry them as strings, and "51.5" + 0.003 would concatenate.
+export function separateIdenticalLocations(mappableGroups) {
+  const seen = {}
+
+  return mappableGroups.map((group) => {
+    const lat = +group.lat
+    const lng = +group.lng
+    const key = `${lat}|${lng}`
+    const already = seen[key] || 0
+    seen[key] = already + 1
+
+    return { ...group, lat: lat + already * 0.003, lng: lng + already * 0.003 }
+  })
+}
+
 // GroupMarker.vue's icon computed, ported: hover wins over "yours".
 export function markerClassName(groupId, { hoveredId = null, yourGroupIds = [] } = {}) {
   if (hoveredId === groupId) return 'group-marker-hover'

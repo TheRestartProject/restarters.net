@@ -6,6 +6,7 @@ import {
   idsInBounds,
   markerClassName,
   nearestGroups,
+  separateIdenticalLocations,
 } from '../../app/composables/useGroupMapGeometry.js'
 
 // The groups page sends this inverted whole-world box when the user has no
@@ -118,6 +119,72 @@ describe('composables/useGroupMapGeometry', () => {
       ]
 
       expect(boundingBoxFor(groups)).toEqual({ minLat: 51.5, maxLat: 55.9, minLng: -3.2, maxLng: 1.0 })
+    })
+  })
+
+  // Freegle's ClusterMarker.vue approach for pins at the exact same
+  // coordinates: each subsequent duplicate is nudged by a small fixed offset
+  // so both pins are visible/clickable when zoomed right in.
+  describe('separateIdenticalLocations', () => {
+    it('leaves groups at distinct locations untouched', () => {
+      const groups = [
+        { id: 1, name: 'A', lat: 51.5, lng: -0.1 },
+        { id: 2, name: 'B', lat: 53.4, lng: -2.2 },
+      ]
+
+      expect(separateIdenticalLocations(groups)).toEqual(groups)
+    })
+
+    it('nudges each subsequent duplicate at a location by 0.003 degrees', () => {
+      const groups = [
+        { id: 1, lat: 51.5, lng: -0.1 },
+        { id: 2, lat: 51.5, lng: -0.1 },
+        { id: 3, lat: 51.5, lng: -0.1 },
+      ]
+
+      const [first, second, third] = separateIdenticalLocations(groups)
+      expect(first.lat).toBe(51.5)
+      expect(first.lng).toBe(-0.1)
+      expect(second.lat).toBeCloseTo(51.503, 10)
+      expect(second.lng).toBeCloseTo(-0.097, 10)
+      expect(third.lat).toBeCloseTo(51.506, 10)
+      expect(third.lng).toBeCloseTo(-0.094, 10)
+    })
+
+    it('never mutates the input groups (Freegle regression: offsets would accumulate)', () => {
+      const groups = [
+        { id: 1, lat: 51.5, lng: -0.1 },
+        { id: 2, lat: 51.5, lng: -0.1 },
+      ]
+
+      separateIdenticalLocations(groups)
+      separateIdenticalLocations(groups)
+
+      expect(groups[1]).toEqual({ id: 2, lat: 51.5, lng: -0.1 })
+    })
+
+    it('coerces string coordinates so the nudge is arithmetic, not concatenation', () => {
+      const groups = [
+        { id: 1, lat: '51.5', lng: '-0.1' },
+        { id: 2, lat: '51.5', lng: '-0.1' },
+      ]
+
+      const [first, second] = separateIdenticalLocations(groups)
+      expect(first.lat).toBe(51.5)
+      expect(second.lat).toBeCloseTo(51.503, 10)
+      expect(second.lng).toBeCloseTo(-0.097, 10)
+    })
+
+    it('preserves the other names-index fields on nudged entries', () => {
+      const groups = [
+        { id: 1, name: 'A', lat: 51.5, lng: -0.1, network_ids: [1] },
+        { id: 2, name: 'B', lat: 51.5, lng: -0.1, network_ids: [2] },
+      ]
+
+      const [, second] = separateIdenticalLocations(groups)
+      expect(second.id).toBe(2)
+      expect(second.name).toBe('B')
+      expect(second.network_ids).toEqual([2])
     })
   })
 

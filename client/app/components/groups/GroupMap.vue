@@ -17,8 +17,8 @@ import markerShadowUrl from 'leaflet/dist/images/marker-shadow.png'
 // as a bare global) is imported - see the file's own comment.
 import L from '../../utils/leafletGlobal.js'
 import 'leaflet.markercluster'
-import { LEAFLET_ATTRIBUTION, LEAFLET_TILES, MAX_MAP_ZOOM, MIN_MAP_ZOOM } from '../../utils/mapConstants.js'
-import { boundingBoxFor, filterMappableGroups, hasLocation as computeHasLocation, idsInBounds, markerClassName, nearestGroups } from '../../composables/useGroupMapGeometry.js'
+import { LEAFLET_ATTRIBUTION, LEAFLET_TILES, MAP_CLUSTER_RADIUS, MAX_MAP_ZOOM, MIN_MAP_ZOOM } from '../../utils/mapConstants.js'
+import { boundingBoxFor, filterMappableGroups, hasLocation as computeHasLocation, idsInBounds, markerClassName, nearestGroups, separateIdenticalLocations } from '../../composables/useGroupMapGeometry.js'
 
 // Leaflet map for /group/map: clustering pins from the names index (drawn
 // for every non-archived group up front - see stores/groups.js's B7 doc
@@ -122,7 +122,9 @@ function rebuildMarkers() {
   clusterGroup.clearLayers()
   markersById.clear()
 
-  const markers = mappableGroups.value.map((group) => {
+  // Nudged copies for display only - bounds reporting and zoom framing
+  // (idle/zoomToGroups) stay on the groups' real coordinates.
+  const markers = separateIdenticalLocations(mappableGroups.value).map((group) => {
     const marker = L.marker([group.lat, group.lng], {
       title: `${group.name} - ${t('groups.marker_title')}`,
       icon: iconFor(group.id),
@@ -198,7 +200,7 @@ function onReady(mapInstance) {
     resizeObserver.observe(containerEl.value)
   }
 
-  clusterGroup = L.markerClusterGroup()
+  clusterGroup = L.markerClusterGroup({ maxClusterRadius: MAP_CLUSTER_RADIUS })
   mapInstance.addLayer(clusterGroup)
   rebuildMarkers()
 
