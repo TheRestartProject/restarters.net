@@ -11,14 +11,15 @@ import { useI18n } from 'vue-i18n'
 // (resources/sass/_events.scss:326-368) - see parity-v2/groups-lists.md
 // gap #1/#2.
 //
-// /group/map (B7) has no legacy equivalent - it's a deliberate net-new
-// route (design.md §6.2 "Groups: ... map (RES-1995 work)"), added because
+// /group/map (B7) started as an unlinked net-new route because
 // /group/nearby had already been ported as a plain list rather than folded
-// back in as a fourth panel (see stores/groups.js's B7 doc comment). Legacy
-// only ever had three tabs, so it is intentionally NOT rendered in this
-// shared bar; 'map' stays an accepted `active` value purely so
-// pages/group/map.vue's existing `active="map"` usage keeps working (no tab
-// highlights there, which is expected - it isn't part of this bar).
+// back in as a fourth panel (see stores/groups.js's B7 doc comment) -
+// pre-887 legacy only ever had three tabs. But PR 887 (RES-1995) reworks
+// the groups page so the map IS one of /group's tabs, so it must be
+// reachable from here: rendered as a fourth tab rather than replacing
+// nearby/all, because this port's /group/all carries the full-list filter
+// bar and tag badges that 887 folded into its map list panel (not ported
+// into pages/group/map.vue's list).
 const props = defineProps({
   active: {
     type: String,
@@ -63,6 +64,15 @@ function isActive(tab) {
         :aria-current="isActive('all') ? 'page' : undefined"
       >
         <b>{{ t('client.groups.all_tab') }}</b>
+      </NuxtLink>
+      <NuxtLink
+        to="/group/map"
+        class="groups-tab"
+        :class="{ active: isActive('map') }"
+        data-testid="groups-tab-map"
+        :aria-current="isActive('map') ? 'page' : undefined"
+      >
+        <b>{{ t('client.groups.map_tab') }}</b>
       </NuxtLink>
     </nav>
     <div class="groups-tabs-panel-body">

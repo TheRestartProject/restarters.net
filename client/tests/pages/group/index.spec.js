@@ -108,12 +108,12 @@ describe('pages/group/index (mine)', () => {
   // gap #1/#2: legacy's shared tab bar only ever has three tabs (no "Map"),
   // and its .ourtabs border/shadow box wraps the tab-content (here: the
   // table) as well as the nav itself.
-  it('has no Map tab, and renders the table inside the shared tabs panel box', () => {
+  it('shows the Map tab, and renders the table inside the shared tabs panel box', () => {
     groupsStore.mine.data = [{ id: 1, name: 'Fixers United', role: 3, archived: false, image_url: null }]
 
     const wrapper = mountPage()
 
-    expect(wrapper.find('[data-testid="groups-tab-map"]').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="groups-tab-map"]').exists()).toBe(true)
     expect(
       wrapper.find('[data-testid="groups-tabs-panel"] [data-testid="group-mine-table"]').exists()
     ).toBe(true)

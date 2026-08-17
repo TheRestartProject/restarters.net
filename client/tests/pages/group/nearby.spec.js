@@ -188,12 +188,12 @@ describe('pages/group/nearby', () => {
   // gap #1/#2: legacy's shared tab bar only ever has three tabs (no "Map"),
   // and its .ourtabs border/shadow box wraps the tab-content (here: the
   // heading + table) as well as the nav itself.
-  it('has no Map tab, and renders the table inside the shared tabs panel box', () => {
+  it('shows the Map tab, and renders the table inside the shared tabs panel box', () => {
     groupsStore.nearby.data = [{ id: 5, name: 'Riverside Fixers', distance: 2.1, location: 'Riverside', image_url: null }]
 
     const wrapper = mountPage()
 
-    expect(wrapper.find('[data-testid="groups-tab-map"]').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="groups-tab-map"]').exists()).toBe(true)
     expect(
       wrapper.find('[data-testid="groups-tabs-panel"] [data-testid="group-nearby-list"]').exists()
     ).toBe(true)
