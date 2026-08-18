@@ -158,6 +158,48 @@ describe('components/groups/GroupMap', () => {
     expect(L.markerClusterGroup).toHaveBeenCalledWith(expect.objectContaining({ maxClusterRadius: 120 }))
   })
 
+  // User feedback: cluster bubbles should visually indicate how many groups
+  // they hold - bigger and more saturated for larger clusters, in the
+  // restart style (black ring) rather than markercluster's default green/
+  // yellow/orange discs.
+  it('sizes and tiers the cluster bubbles by group count', async () => {
+    const wrapper = mountMap({ groups: [{ id: 1, name: 'Alpha', lat: 51.5, lng: -0.1 }] })
+
+    await wrapper.findComponent(LMapStub).vm.$emit('ready', fakeLeafletMap())
+
+    const { iconCreateFunction } = L.markerClusterGroup.mock.calls[0][0]
+    const iconFor = (count) => iconCreateFunction({ getChildCount: () => count }).options
+
+    const small = iconFor(3)
+    expect(small.className).toBe('group-cluster group-cluster--small')
+    expect(small.iconSize).toEqual([36, 36])
+    expect(small.html).toContain('>3<')
+
+    const medium = iconFor(20)
+    expect(medium.className).toBe('group-cluster group-cluster--medium')
+    expect(medium.iconSize).toEqual([46, 46])
+
+    const large = iconFor(150)
+    expect(large.className).toBe('group-cluster group-cluster--large')
+    expect(large.iconSize).toEqual([56, 56])
+    expect(large.iconAnchor).toEqual([28, 28])
+  })
+
+  // The pin matches the cluster's restart style: an inline-SVG divIcon with
+  // black border and white inner, not the stock blue Leaflet PNG.
+  it('draws restart-style SVG pins', async () => {
+    const wrapper = mountMap({ groups: [{ id: 1, name: 'Alpha', lat: 51.5, lng: -0.1 }] })
+
+    await wrapper.findComponent(LMapStub).vm.$emit('ready', fakeLeafletMap())
+
+    const marker = fakeClusterGroup.addLayers.mock.calls[0][0][0]
+    const options = marker.getIcon().options
+    expect(options.html).toContain('<svg')
+    expect(options.className).toBe('group-pin')
+    expect(options.iconSize).toEqual([30, 42])
+    expect(options.iconAnchor).toEqual([15, 42])
+  })
+
   // The identical-location nudge is only ~tens of px at z18, well inside the
   // cluster radius - without this, co-located pins would render as a "2"
   // cluster bubble even at max zoom and never visibly split.

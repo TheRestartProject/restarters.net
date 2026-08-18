@@ -192,17 +192,20 @@ describe('composables/useGroupMapGeometry', () => {
     })
   })
 
+  // The pin shares the cluster bubble's restart style (black border, white
+  // inner, PR 887 user feedback): the base class draws the SVG pin and the
+  // modifiers recolour its fill.
   describe('markerClassName', () => {
-    it('is plain by default', () => {
-      expect(markerClassName(1)).toBe('')
+    it('is the plain restart-style pin by default', () => {
+      expect(markerClassName(1)).toBe('group-pin')
     })
 
-    it('is the "yours" class for a group the user belongs to', () => {
-      expect(markerClassName(1, { yourGroupIds: [1, 2] })).toBe('group-marker-yours')
+    it('adds the "yours" modifier for a group the user belongs to', () => {
+      expect(markerClassName(1, { yourGroupIds: [1, 2] })).toBe('group-pin group-pin--yours')
     })
 
     it('hover wins over "yours", matching GroupMarker.vue\'s priority', () => {
-      expect(markerClassName(1, { hoveredId: 1, yourGroupIds: [1] })).toBe('group-marker-hover')
+      expect(markerClassName(1, { hoveredId: 1, yourGroupIds: [1] })).toBe('group-pin group-pin--hover')
     })
   })
 })

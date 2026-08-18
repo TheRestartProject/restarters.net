@@ -102,9 +102,11 @@ export function separateIdenticalLocations(mappableGroups) {
   })
 }
 
-// GroupMarker.vue's icon computed, ported: hover wins over "yours".
+// GroupMarker.vue's icon computed, ported: hover wins over "yours". The
+// classes style the restart-style SVG pin (black border, white inner - PR
+// 887 user feedback); the modifiers recolour its fill.
 export function markerClassName(groupId, { hoveredId = null, yourGroupIds = [] } = {}) {
-  if (hoveredId === groupId) return 'group-marker-hover'
-  if (yourGroupIds.includes(groupId)) return 'group-marker-yours'
-  return ''
+  if (hoveredId === groupId) return 'group-pin group-pin--hover'
+  if (yourGroupIds.includes(groupId)) return 'group-pin group-pin--yours'
+  return 'group-pin'
 }

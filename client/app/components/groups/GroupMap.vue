@@ -9,10 +9,9 @@ import { Geocoder, geocoders } from 'leaflet-control-geocoder'
 import 'leaflet-control-geocoder/dist/Control.Geocoder.css'
 import 'leaflet/dist/leaflet.css'
 import 'leaflet.markercluster/dist/MarkerCluster.css'
-import 'leaflet.markercluster/dist/MarkerCluster.Default.css'
-import markerIconUrl from 'leaflet/dist/images/marker-icon.png'
-import markerIcon2xUrl from 'leaflet/dist/images/marker-icon-2x.png'
-import markerShadowUrl from 'leaflet/dist/images/marker-shadow.png'
+// MarkerCluster.Default.css (the green/yellow/orange discs) is deliberately
+// NOT imported: the bubbles use the restart-style .group-cluster classes
+// below instead, via clusterIcon.
 // Side-effecting: sets window.L before leaflet.markercluster (which reads it
 // as a bare global) is imported - see the file's own comment.
 import L from '../../utils/leafletGlobal.js'
@@ -99,16 +98,47 @@ let zoomedToGroups = false
 let moved = false
 const markersById = new Map()
 
+// The pin shares the cluster bubble's restart style - black border, white
+// inner (PR 887 user feedback; it was the stock blue Leaflet teardrop). An
+// inline-SVG divIcon rather than an image, so the follow/hover states
+// recolour the fill directly instead of hue-rotating a PNG.
 function buildIcon(className) {
-  return L.icon({
-    iconUrl: markerIconUrl,
-    iconRetinaUrl: markerIcon2xUrl,
-    shadowUrl: markerShadowUrl,
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-    popupAnchor: [1, -34],
-    shadowSize: [41, 41],
+  return L.divIcon({
+    html:
+      '<svg viewBox="0 0 30 42" width="30" height="42" aria-hidden="true">' +
+      '<path d="M15 1.5C7.8 1.5 2 7.3 2 14.5c0 9.5 13 26 13 26s13-16.5 13-26C28 7.3 22.2 1.5 15 1.5z"/>' +
+      '<circle cx="15" cy="14.5" r="4.5"/>' +
+      '</svg>',
+    // Anchor the tip of the teardrop to the coordinate, not its corner.
+    iconSize: [30, 42],
+    iconAnchor: [15, 42],
+    popupAnchor: [0, -42],
     className,
+  })
+}
+
+// The bubble indicates how many groups it holds: bigger and more saturated
+// for larger clusters (user feedback - a flat wall of identical bubbles
+// gave no sense of where the groups actually are). Same tiers and markup
+// as PR 887's clusterIcon.
+function clusterIcon(cluster) {
+  const count = cluster.getChildCount()
+
+  let tier = 'small'
+  let size = 36
+  if (count >= 100) {
+    tier = 'large'
+    size = 56
+  } else if (count >= 10) {
+    tier = 'medium'
+    size = 46
+  }
+
+  return L.divIcon({
+    html: `<div class="group-cluster__count">${count}</div>`,
+    className: `group-cluster group-cluster--${tier}`,
+    iconSize: [size, size],
+    iconAnchor: [size / 2, size / 2],
   })
 }
 
@@ -207,6 +237,7 @@ function onReady(mapInstance) {
   clusterGroup = L.markerClusterGroup({
     maxClusterRadius: MAP_CLUSTER_RADIUS,
     disableClusteringAtZoom: props.maxZoom,
+    iconCreateFunction: clusterIcon,
   })
   mapInstance.addLayer(clusterGroup)
   rebuildMarkers()
@@ -317,14 +348,60 @@ onBeforeUnmount(() => {
   color: #6c757d;
 }
 
-// Only the stock blue marker ships in the bundled leaflet images -
-// recolour it via CSS instead of shipping green/red variants (ported from
-// resources/global/css/_global.scss; stock marker hue ~207deg).
-:deep(.group-marker-yours) {
-  filter: hue-rotate(273deg);
+// Restart-style pin (black border, white inner), matching the cluster
+// bubbles - same markup and palette as PR 887's GroupMarker/_global.scss.
+:deep(.group-pin) {
+  background: transparent;
+  border: none;
 }
 
-:deep(.group-marker-hover) {
-  filter: hue-rotate(153deg) saturate(1.5);
+:deep(.group-pin svg path) {
+  fill: #fff;
+  stroke: #000;
+  stroke-width: 2.5;
+}
+
+:deep(.group-pin svg circle) {
+  fill: #000;
+}
+
+// Green for groups you follow, red on hover - the same signals the old
+// hue-rotated stock pin gave.
+:deep(.group-pin--yours svg path) {
+  fill: #21a453;
+}
+
+:deep(.group-pin--hover svg path) {
+  fill: #e0301e;
+}
+
+// Cluster bubbles: bigger and more saturated for larger clusters. Sizes are
+// set by clusterIcon's iconSize so Leaflet's positioning agrees with them;
+// the tint ramps white -> amber -> orange with the black border throughout.
+:deep(.group-cluster) {
+  border-radius: 50%;
+  border: 5px solid #000;
+  background-color: #fff;
+  color: #000;
+  text-align: center;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+:deep(.group-cluster--medium) {
+  background-color: #ffd166;
+}
+
+:deep(.group-cluster--large) {
+  background-color: #f77f00;
+}
+
+:deep(.group-cluster__count) {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  font-size: 16px;
+  line-height: 1;
 }
 </style>
