@@ -174,8 +174,6 @@ h2 {
 // .leaflet-div-icon, which would otherwise draw a white box with a grey border
 // behind the circle.
 .group-cluster {
-  width: 46px;
-  height: 46px;
   border-radius: 50%;
   border: 5px solid #000;
   background-color: #fff;
@@ -183,6 +181,54 @@ h2 {
   text-align: center;
   font-weight: bold;
   cursor: pointer;
+}
+
+// The bubble tells you how many groups it holds: bigger and more saturated
+// for larger clusters. Sizes are set by GroupMap.clusterIcon's iconSize so
+// Leaflet's positioning agrees with them; the tint ramps white -> amber ->
+// orange while keeping the black border and count.
+.group-cluster--small {
+  width: 36px;
+  height: 36px;
+}
+
+.group-cluster--medium {
+  width: 46px;
+  height: 46px;
+  background-color: #ffd166;
+}
+
+.group-cluster--large {
+  width: 56px;
+  height: 56px;
+  background-color: #f77f00;
+}
+
+// The map pin shares the cluster's restart style: black border, white
+// inner. The SVG comes from GroupMarker.vue; the states recolour its fill.
+.group-pin {
+  background: transparent;
+  border: none;
+}
+
+.group-pin svg path {
+  fill: #fff;
+  stroke: #000;
+  stroke-width: 2.5;
+}
+
+.group-pin svg circle {
+  fill: #000;
+}
+
+// Green for groups you follow, red on hover - the same signals the old
+// hue-rotated stock pin gave.
+.group-pin--yours svg path {
+  fill: #21a453;
+}
+
+.group-pin--hover svg path {
+  fill: #e0301e;
 }
 
 .group-cluster__count {

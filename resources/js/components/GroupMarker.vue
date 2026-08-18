@@ -39,6 +39,15 @@ export default {
       type: Boolean,
       required: false,
       default: false,
+    },
+    // [lat, lng] override for where to draw the pin. GroupMap separates
+    // groups at the exact same coordinates by a tiny display-only nudge
+    // (see its clusterPoints); the marker must draw at that nudged position
+    // rather than the store's, or both pins still stack on the same spot.
+    latLng: {
+      type: Array,
+      required: false,
+      default: null,
     }
   },
   data() {
@@ -56,26 +65,31 @@ export default {
   },
   computed: {
     icon() {
-      // Only the stock blue marker ships in public/images; recolour it with a
-      // CSS hue-rotate class rather than referencing images we don't have.
-      let className = ''
+      // The pin shares the cluster bubble's restart style - black border,
+      // white inner (user feedback; it was the stock blue Leaflet teardrop).
+      // An inline-SVG divIcon rather than an image, so the follow/hover
+      // states recolour the fill directly instead of hue-rotating a PNG.
+      let className = 'group-pin'
 
       if (this.hovering) {
-        className = 'group-marker-hover'
+        className += ' group-pin--hover'
       } else if (this.highlight) {
-        className = 'group-marker-yours'
+        className += ' group-pin--yours'
       }
 
-      return L.icon({
-        iconUrl: '/images/vendor/leaflet/dist/marker-icon.png',
-        // Without iconSize/iconAnchor Leaflet pins the image's top-left corner to
-        // the coordinate, so the whole 25x41 teardrop hangs down and to the right
-        // and the pin appears to point at somewhere else entirely. These are
-        // Leaflet's own defaults for this image: anchor the tip of the pin.
-        iconSize: [25, 41],
-        iconAnchor: [12, 41],
+      return L.divIcon({
+        html:
+          '<svg viewBox="0 0 30 42" width="30" height="42" aria-hidden="true">' +
+          '<path d="M15 1.5C7.8 1.5 2 7.3 2 14.5c0 9.5 13 26 13 26s13-16.5 13-26C28 7.3 22.2 1.5 15 1.5z"/>' +
+          '<circle cx="15" cy="14.5" r="4.5"/>' +
+          '</svg>',
+        // Without iconSize/iconAnchor Leaflet pins the icon's top-left corner
+        // to the coordinate, so the teardrop would hang down and to the right
+        // and appear to point at somewhere else entirely: anchor the tip.
+        iconSize: [30, 42],
+        iconAnchor: [15, 42],
         // Measured from the anchor (the tip), so the tooltip clears the pin head.
-        tooltipAnchor: [0, -41],
+        tooltipAnchor: [0, -42],
         className: className,
       })
     },
@@ -86,9 +100,15 @@ export default {
       return this.$store.getters['groups/get'](this.id)
     },
     lat() {
+      if (this.latLng) {
+        return this.latLng[0]
+      }
       return this.group.location ? this.group.location.lat : this.group.lat
     },
     lng() {
+      if (this.latLng) {
+        return this.latLng[1]
+      }
       return this.group.location ? this.group.location.lng : this.group.lng
     }
   },

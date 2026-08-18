@@ -364,10 +364,99 @@ describe('GroupMap clustering', () => {
     const cluster = wrapper.vm.clusters.find(c => c.properties.cluster)
 
     const options = wrapper.vm.clusterIcon(cluster).options
-    expect(options.className).toBe('group-cluster')
+    expect(options.className).toBe('group-cluster group-cluster--medium')
     // Anchored at its middle, so the circle sits over the point it represents.
     expect(options.iconSize).toEqual([46, 46])
     expect(options.iconAnchor).toEqual([23, 23])
+  })
+})
+
+// User feedback on the PR 887 preview (Stratford): zoom 14 was too shallow to
+// read street names, clustering stayed active right up to max zoom so a
+// cluster of co-located groups could never be broken apart, and the 60px
+// cluster radius left too many small bubbles on screen at once.
+describe('GroupMap street-level zoom and identical locations', () => {
+  // Twelve groups at the exact same venue - above the minCluster threshold,
+  // so the clustering path (not the draw-them-all shortcut) is exercised.
+  const colocated = Array.from({ length: 12 }, (_, i) => ({
+    id: i + 1,
+    location: { lat: 51.5417, lng: -0.0035 },
+  }))
+
+  test('allows zooming to street level (max zoom 18) by default', () => {
+    expect(mountMap(WORLD, []).vm.maxZoom).toBe(18)
+  })
+
+  test('uses a wide cluster radius (120px) so fewer, larger bubbles show', () => {
+    const wrapper = mountMap(WORLD, [])
+    expect(wrapper.vm.clusterIndex.options.radius).toBe(120)
+  })
+
+  test('nudges each subsequent duplicate at a location by 0.00015 degrees', () => {
+    const groups = [
+      { id: 1, location: { lat: 51.5, lng: -0.1 } },
+      { id: 2, location: { lat: 51.5, lng: -0.1 } },
+    ]
+    const wrapper = mountMap(WORLD, groups)
+
+    const [first, second] = wrapper.vm.clusterPoints
+    expect(first.geometry.coordinates).toEqual([-0.1, 51.5])
+    expect(second.geometry.coordinates[0]).toBeCloseTo(-0.09985, 10)
+    expect(second.geometry.coordinates[1]).toBeCloseTo(51.50015, 10)
+
+    // Never mutate the store's own objects - the offset would corrupt the
+    // group's real coordinates and accumulate on every recompute (a bug
+    // Freegle hit with this exact approach, per its ClusterMarker comment).
+    expect(groups[1].location).toEqual({ lat: 51.5, lng: -0.1 })
+  })
+
+  test('shows individual pins, not a cluster, at max zoom', () => {
+    const wrapper = mountMap(WORLD, colocated)
+    const map = fakeMap()
+    map.getZoom = () => wrapper.vm.maxZoom
+    map.getBounds = () => L.latLngBounds([[51.5, -0.1], [51.6, 0.1]])
+    wrapper.vm.mapObject = map
+    wrapper.vm.$refs.map = { mapObject: map }
+
+    const clusters = wrapper.vm.clusters
+    expect(clusters).toHaveLength(12)
+    expect(clusters.every((c) => !c.properties.cluster)).toBe(true)
+  })
+
+  // User feedback: cluster bubbles should visually indicate how many groups
+  // they hold - bigger and more saturated for larger clusters.
+  test('scales the cluster bubble and its colour tier with the group count', () => {
+    const wrapper = mountMap(WORLD, [])
+    const iconFor = (count) => wrapper.vm.clusterIcon({ properties: { cluster: true, point_count: count } }).options
+
+    const small = iconFor(3)
+    expect(small.iconSize).toEqual([36, 36])
+    expect(small.className).toBe('group-cluster group-cluster--small')
+
+    const medium = iconFor(20)
+    expect(medium.iconSize).toEqual([46, 46])
+    expect(medium.className).toBe('group-cluster group-cluster--medium')
+
+    const large = iconFor(150)
+    expect(large.iconSize).toEqual([56, 56])
+    expect(large.className).toBe('group-cluster group-cluster--large')
+    expect(large.iconAnchor).toEqual([28, 28])
+  })
+
+  test('clicking a cluster of co-located groups flies to max zoom, where it splits', () => {
+    const wrapper = mountMap(WORLD, colocated)
+    const map = fakeMap()
+    map.getZoom = () => 17
+    map.getBounds = () => L.latLngBounds([[51.5, -0.1], [51.6, 0.1]])
+    wrapper.vm.mapObject = map
+    wrapper.vm.$refs.map = { mapObject: map }
+
+    const cluster = wrapper.vm.clusters.find((c) => c.properties.cluster)
+    expect(cluster).toBeTruthy()
+    wrapper.vm.clusterClick(cluster)
+
+    const [, zoom] = map.flyTo.mock.calls[0]
+    expect(zoom).toBe(wrapper.vm.maxZoom)
   })
 })
 

@@ -25,6 +25,7 @@
             v-else
             :key="'marker-' + entry.properties.groupId"
             :id="entry.properties.groupId"
+            :lat-lng="[entry.geometry.coordinates[1], entry.geometry.coordinates[0]]"
             :highlight="yourGroup(entry.properties.groupId)"
             :hover="entry.properties.groupId === hover"
             @update:hover="$emit('update:hover', $event)"
@@ -48,6 +49,7 @@ import GroupMarker from './GroupMarker.vue'
 // for the same reason.
 import Supercluster from 'supercluster/dist/supercluster'
 import { inNetwork } from '../misc/groupFilter'
+import { MAX_MAP_ZOOM, MIN_MAP_ZOOM } from '../constants'
 
 export default {
   components: {
@@ -59,15 +61,18 @@ export default {
       type: Array,
       required: true,
     },
+    // Default to the shared constants rather than hardcoded numbers - a
+    // stale literal 15 here is what capped the zoom regardless of what the
+    // constants said.
     minZoom: {
       type: Number,
       required: false,
-      default: 5,
+      default: MIN_MAP_ZOOM,
     },
     maxZoom: {
       type: Number,
       required: false,
-      default: 15,
+      default: MAX_MAP_ZOOM,
     },
     network: {
       type: Number,
@@ -166,25 +171,49 @@ export default {
       })
     },
     clusterPoints() {
-      return this.mappableGroups.map((g) => ({
-        type: 'Feature',
-        id: g.id,
-        properties: { groupId: g.id, cluster: false },
-        geometry: {
-          type: 'Point',
-          coordinates: [
-            +(g.location && g.location.lng != null ? g.location.lng : g.lng),
-            +(g.location && g.location.lat != null ? g.location.lat : g.lat),
-          ],
-        },
-      }))
+      // Groups at the exact same coordinates would draw as one unclickable
+      // stack even at max zoom, so each subsequent duplicate is nudged by a
+      // small fixed offset (Freegle's ClusterMarker.vue approach). 0.00015
+      // degrees is ~28px lng / ~45px lat at max zoom (z18, UK latitudes) -
+      // the pins only visibly split right at max zoom, where clustering is
+      // also off (see clusterIndex). Computed into LOCAL values, never
+      // written back to the store's groups: mutating them would corrupt the
+      // real coordinates and accumulate on every recompute (a bug Freegle
+      // actually hit, per its own comment).
+      const seen = {}
+
+      return this.mappableGroups.map((g) => {
+        const lat = +(g.location && g.location.lat != null ? g.location.lat : g.lat)
+        const lng = +(g.location && g.location.lng != null ? g.location.lng : g.lng)
+        const key = lat + '|' + lng
+        const already = seen[key] || 0
+        seen[key] = already + 1
+
+        return {
+          type: 'Feature',
+          id: g.id,
+          properties: { groupId: g.id, cluster: false },
+          geometry: {
+            type: 'Point',
+            coordinates: [lng + already * 0.00015, lat + already * 0.00015],
+          },
+        }
+      })
     },
     clusterIndex() {
       // The index is immutable, so it has to be rebuilt whenever the points
       // change rather than updated in place.
       const index = new Supercluster({
-        radius: 60,
-        maxZoom: this.maxZoom,
+        // 60 left too many small bubbles on screen at once (user feedback,
+        // comparing against communityrepairnetwork.org.uk/find) - wider
+        // merges them into fewer, larger clusters.
+        radius: 120,
+        // Stop clustering one level short of the map's max zoom, so at max
+        // zoom every group renders as its own pin. Without this a cluster of
+        // co-located groups could never be broken apart: getClusters still
+        // returns clusters at the index's maxZoom, and clusterClick's
+        // expansion zoom is capped at the map's.
+        maxZoom: this.maxZoom - 1,
         minZoom: this.minZoom,
       })
 
@@ -428,13 +457,26 @@ export default {
       const count = cluster.properties.point_count
       const wide = count >= 1000 ? ' group-cluster__count--wide' : ''
 
+      // The bubble indicates how many groups it holds: bigger and more
+      // saturated for larger clusters (user feedback - a flat wall of
+      // identical bubbles gave no sense of where the groups actually are).
+      let tier = 'small'
+      let size = 36
+      if (count >= 100) {
+        tier = 'large'
+        size = 56
+      } else if (count >= 10) {
+        tier = 'medium'
+        size = 46
+      }
+
       return L.divIcon({
         html: '<div class="group-cluster__count' + wide + '">' + count + '</div>',
         // Replaces Leaflet's .leaflet-div-icon, which would otherwise draw a
         // white box with a grey border behind the circle.
-        className: 'group-cluster',
-        iconSize: [46, 46],
-        iconAnchor: [23, 23],
+        className: 'group-cluster group-cluster--' + tier,
+        iconSize: [size, size],
+        iconAnchor: [size / 2, size / 2],
       })
     },
     clusterClick(cluster) {
