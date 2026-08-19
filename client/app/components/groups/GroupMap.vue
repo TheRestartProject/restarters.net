@@ -358,29 +358,30 @@ onBeforeUnmount(() => {
 :deep(.group-pin svg path) {
   fill: #fff;
   stroke: #000;
-  stroke-width: 2.5;
+  stroke-width: 2;
 }
 
 :deep(.group-pin svg circle) {
   fill: #000;
 }
 
-// Green for groups you follow, red on hover - the same signals the old
-// hue-rotated stock pin gave.
+// Green for groups you follow, brand red (#F45B69) on hover - the same
+// signals the old hue-rotated stock pin gave.
 :deep(.group-pin--yours svg path) {
   fill: #21a453;
 }
 
 :deep(.group-pin--hover svg path) {
-  fill: #e0301e;
+  fill: #f45b69;
 }
 
 // Cluster bubbles: bigger and more saturated for larger clusters. Sizes are
 // set by clusterIcon's iconSize so Leaflet's positioning agrees with them;
-// the tint ramps white -> amber -> orange with the black border throughout.
+// the tint ramps pale yellow -> amber -> brand orange (#F18F01) with the
+// black border throughout.
 :deep(.group-cluster) {
   border-radius: 50%;
-  border: 5px solid #000;
+  border: 2px solid #000;
   background-color: #fff;
   color: #000;
   text-align: center;
@@ -388,12 +389,16 @@ onBeforeUnmount(() => {
   cursor: pointer;
 }
 
+:deep(.group-cluster--small) {
+  background-color: #fff396;
+}
+
 :deep(.group-cluster--medium) {
-  background-color: #ffd166;
+  background-color: #ffd16a;
 }
 
 :deep(.group-cluster--large) {
-  background-color: #f77f00;
+  background-color: #f18f01;
 }
 
 :deep(.group-cluster__count) {
