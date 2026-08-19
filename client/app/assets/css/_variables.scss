@@ -35,6 +35,22 @@ $brand-orange: #ffbe5f;
 // variants read consistently against $brand / $brand-orange.
 $brand-blue: #0faca8;
 
+// The official brand orange and brand red (per user feedback on the groups
+// map, 2026-08-19). Distinct tokens from $brand-orange above, which is the
+// softer legacy tint some ported partials still depend on. $brand-red is
+// also the hex the navbar's notification badge hardcodes.
+$brand-orange-official: #f18f01;
+$brand-red: #f45b69;
+
+// Groups-map palette (components/groups/GroupMap.vue): the cluster-bubble
+// tier ramp - more saturated for larger clusters, ending at the official
+// brand orange - and the pin state fills.
+$map-cluster-small: #fff396;
+$map-cluster-medium: #ffd16a;
+$map-cluster-large: $brand-orange-official;
+$map-pin-yours: #21a453;
+$map-pin-hover: $brand-red;
+
 // Present in the source file but not consumed by anything ported into this
 // stylesheet yet; kept for parity so a later page/component partial that
 // needs it doesn't have to reintroduce it.

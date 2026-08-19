@@ -327,6 +327,8 @@ onBeforeUnmount(() => {
 </template>
 
 <style scoped lang="scss">
+@use '../../assets/css/variables' as *;
+
 .group-map {
   width: 100%;
 }
@@ -365,20 +367,20 @@ onBeforeUnmount(() => {
   fill: #000;
 }
 
-// Green for groups you follow, brand red (#F45B69) on hover - the same
-// signals the old hue-rotated stock pin gave.
+// Green for groups you follow, brand red on hover - the same signals the
+// old hue-rotated stock pin gave. Palette tokens from _variables.scss.
 :deep(.group-pin--yours svg path) {
-  fill: #21a453;
+  fill: $map-pin-yours;
 }
 
 :deep(.group-pin--hover svg path) {
-  fill: #f45b69;
+  fill: $map-pin-hover;
 }
 
 // Cluster bubbles: bigger and more saturated for larger clusters. Sizes are
 // set by clusterIcon's iconSize so Leaflet's positioning agrees with them;
-// the tint ramps pale yellow -> amber -> brand orange (#F18F01) with the
-// black border throughout.
+// the tint ramps pale yellow -> amber -> the official brand orange with the
+// black border throughout (tokens from _variables.scss).
 :deep(.group-cluster) {
   border-radius: 50%;
   border: 2px solid #000;
@@ -390,15 +392,15 @@ onBeforeUnmount(() => {
 }
 
 :deep(.group-cluster--small) {
-  background-color: #fff396;
+  background-color: $map-cluster-small;
 }
 
 :deep(.group-cluster--medium) {
-  background-color: #ffd16a;
+  background-color: $map-cluster-medium;
 }
 
 :deep(.group-cluster--large) {
-  background-color: #f18f01;
+  background-color: $map-cluster-large;
 }
 
 :deep(.group-cluster__count) {
