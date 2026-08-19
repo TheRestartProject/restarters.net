@@ -175,7 +175,7 @@ h2 {
 // behind the circle.
 .group-cluster {
   border-radius: 50%;
-  border: 5px solid #000;
+  border: 2px solid #000;
   background-color: #fff;
   color: #000;
   text-align: center;
@@ -185,23 +185,24 @@ h2 {
 
 // The bubble tells you how many groups it holds: bigger and more saturated
 // for larger clusters. Sizes are set by GroupMap.clusterIcon's iconSize so
-// Leaflet's positioning agrees with them; the tint ramps white -> amber ->
-// orange while keeping the black border and count.
+// Leaflet's positioning agrees with them; the tint ramps pale yellow ->
+// amber -> brand orange (#F18F01) while keeping the black border and count.
 .group-cluster--small {
   width: 36px;
   height: 36px;
+  background-color: #fff396;
 }
 
 .group-cluster--medium {
   width: 46px;
   height: 46px;
-  background-color: #ffd166;
+  background-color: #ffd16a;
 }
 
 .group-cluster--large {
   width: 56px;
   height: 56px;
-  background-color: #f77f00;
+  background-color: #f18f01;
 }
 
 // The map pin shares the cluster's restart style: black border, white
@@ -214,21 +215,21 @@ h2 {
 .group-pin svg path {
   fill: #fff;
   stroke: #000;
-  stroke-width: 2.5;
+  stroke-width: 2;
 }
 
 .group-pin svg circle {
   fill: #000;
 }
 
-// Green for groups you follow, red on hover - the same signals the old
-// hue-rotated stock pin gave.
+// Green for groups you follow, brand red (#F45B69) on hover - the same
+// signals the old hue-rotated stock pin gave.
 .group-pin--yours svg path {
   fill: #21a453;
 }
 
 .group-pin--hover svg path {
-  fill: #e0301e;
+  fill: #f45b69;
 }
 
 .group-cluster__count {
