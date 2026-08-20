@@ -102,6 +102,25 @@ export function separateIdenticalLocations(mappableGroups) {
   })
 }
 
+// Real kilometres between two {lat, lng} points (haversine, mean Earth
+// radius). Unlike nearestGroups' flat-degree ordering approximation, this
+// number is shown to the user (the list's distance column), so it has to be
+// a genuine distance. Null when either point is missing or unplaceable.
+export function haversineKm(a, b) {
+  // `+null` is 0, so the null check has to come before coercion.
+  const placeable = (p) => p && p.lat != null && p.lng != null && !isNaN(+p.lat) && !isNaN(+p.lng)
+  if (!placeable(a) || !placeable(b)) return null
+
+  const lat1 = +a.lat
+  const lat2 = +b.lat
+  const toRad = (deg) => (deg * Math.PI) / 180
+  const h =
+    Math.sin(toRad(lat2 - lat1) / 2) ** 2 +
+    Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(toRad(+b.lng - +a.lng) / 2) ** 2
+
+  return 6371 * 2 * Math.atan2(Math.sqrt(h), Math.sqrt(1 - h))
+}
+
 // GroupMarker.vue's icon computed, ported: hover wins over "yours". The
 // classes style the restart-style SVG pin (black border, white inner - PR
 // 887 user feedback); the modifiers recolour its fill.

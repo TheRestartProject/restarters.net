@@ -150,6 +150,7 @@
       "column_event": "Event",
       "column_hosts": "Hosts",
       "column_location": "Location",
+      "column_distance": "Distance",
       "column_next_event": "Next event",
       "column_restarters": "Restarters",
       "columns_label": "Columns",

@@ -1069,6 +1069,10 @@ class UserController extends Controller
             'email' => $user->email,
             'country_code' => $user->country_code,
             'location' => $user->location,
+            // The geocoded point behind `location`, for the groups map's
+            // distance column (anchored to the user's own coordinates).
+            'lat' => $user->latitude === null ? null : (float) $user->latitude,
+            'lng' => $user->longitude === null ? null : (float) $user->longitude,
             'age' => $user->age,
             'gender' => $user->gender,
             'biography' => $user->biography,

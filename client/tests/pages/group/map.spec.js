@@ -4,6 +4,7 @@ import { createI18n } from 'vue-i18n'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import GroupMapPage from '../../../app/pages/group/map.vue'
 import { useGroupsStore } from '../../../app/stores/groups.js'
+import { useProfileStore } from '../../../app/stores/profile.js'
 import en from '../../../i18n/locales/en.json'
 import clientEn from '../../../i18n/locales/client-en.json'
 
@@ -27,7 +28,7 @@ const GroupInfoModalStub = {
 const GroupMapStub = {
   name: 'GroupMap',
   props: ['groups', 'yourGroupIds', 'hoveredId'],
-  emits: ['update:groupIdsInBounds', 'update:hoveredId', 'select'],
+  emits: ['update:groupIdsInBounds', 'update:hoveredId', 'select', 'searched'],
   template: '<div class="stub-groupmap" data-testid="stub-group-map" />',
 }
 
@@ -62,6 +63,7 @@ function mountPage() {
 
 describe('pages/group/map', () => {
   let groupsStore
+  let profileStore
 
   beforeEach(() => {
     setActivePinia(createPinia())
@@ -69,6 +71,8 @@ describe('pages/group/map', () => {
     groupsStore.fetchNames = vi.fn().mockResolvedValue([])
     groupsStore.fetchMine = vi.fn().mockResolvedValue([])
     groupsStore.fetchSummaries = vi.fn().mockResolvedValue([])
+    profileStore = useProfileStore()
+    profileStore.fetchProfileInfo = vi.fn().mockResolvedValue({})
   })
 
   it('fetches the names index and best-effort seeds membership on mount', () => {
@@ -76,6 +80,53 @@ describe('pages/group/map', () => {
 
     expect(groupsStore.fetchNames).toHaveBeenCalledTimes(1)
     expect(groupsStore.fetchMine).toHaveBeenCalledTimes(1)
+  })
+
+  // User feedback: the list under the map gets a distance column, anchored
+  // to the user's own location - or, once they search, the searched place -
+  // and opens nearest-first.
+  describe('distance column anchoring', () => {
+    const LONDON = { id: 1, name: 'London Fixers', lat: 51.5, lng: -0.1 }
+    const BRUM = { id: 2, name: 'Brum Fixers', lat: 52.48, lng: -1.9 }
+
+    it('fetches the profile for the anchor point on mount', () => {
+      mountPage()
+      expect(profileStore.fetchProfileInfo).toHaveBeenCalledTimes(1)
+    })
+
+    it('hides the distance column with no profile location and no search', () => {
+      groupsStore.names = [LONDON, BRUM]
+      const wrapper = mountPage()
+
+      expect(wrapper.find('[data-testid="groups-table-sort-distance"]').exists()).toBe(false)
+    })
+
+    it('anchors distances to the profile location, nearest first', async () => {
+      profileStore.info.data = { location: 'London', lat: 51.5074, lng: -0.1278 }
+      groupsStore.names = [BRUM, LONDON]
+
+      const wrapper = mountPage()
+      await wrapper.vm.$nextTick()
+
+      // London ~3km away sorts above Birmingham ~160km away, despite the
+      // store order, and the cells carry real kilometres.
+      const links = wrapper.findAll('[data-testid^="group-row-link-"]').map((a) => a.text())
+      expect(links).toEqual(['London Fixers', 'Brum Fixers'])
+      expect(wrapper.find('[data-testid="group-row-distance-1"]').text()).toBe('2.1 km')
+    })
+
+    it('re-anchors to the searched place after a place search', async () => {
+      profileStore.info.data = { location: 'London', lat: 51.5074, lng: -0.1278 }
+      groupsStore.names = [BRUM, LONDON]
+
+      const wrapper = mountPage()
+      wrapper.findComponent(GroupMapStub).vm.$emit('searched', { lat: 52.48, lng: -1.9 })
+      await wrapper.vm.$nextTick()
+
+      const links = wrapper.findAll('[data-testid^="group-row-link-"]').map((a) => a.text())
+      expect(links).toEqual(['Brum Fixers', 'London Fixers'])
+      expect(wrapper.find('[data-testid="group-row-distance-2"]').text()).toBe('0 km')
+    })
   })
 
   it('shows a loading skeleton while the names index loads', () => {

@@ -67,6 +67,12 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  // Which column the table is sorted by before the user clicks any header -
+  // /group/map passes 'distance' so the list opens nearest-first.
+  initialSortKey: {
+    type: String,
+    default: 'name',
+  },
 })
 
 const emit = defineEmits(['update:hoveredId'])
@@ -81,7 +87,7 @@ function imageSrc(row) {
   return uploadedImageUrl(row.image) || DEFAULT_PROFILE
 }
 
-const sortKey = ref('name')
+const sortKey = ref(props.initialSortKey)
 const sortDesc = ref(false)
 
 const filters = ref({ name: '', location: '', country: '', tags: [], network: '' })
@@ -155,6 +161,13 @@ const sortedGroups = computed(() => {
       case 'next_event':
         result = compareNullableNumber(nextEventTime(a), nextEventTime(b))
         break
+      case 'distance':
+        // Unplaceable groups sit last whichever way the column is sorted.
+        if (a.distance == null || b.distance == null) {
+          return compareNullableNumber(a.distance, b.distance)
+        }
+        result = a.distance - b.distance
+        break
       default:
         result = (a.name || '').localeCompare(b.name || '')
     }
@@ -167,6 +180,14 @@ const sortedGroups = computed(() => {
 
 function dateLabel(iso) {
   return new Date(iso).toLocaleDateString(locale.value, { day: 'numeric', month: 'short', year: 'numeric' })
+}
+
+// Same rounding as PR 887's GroupsTable.distance(): tenths close up, whole
+// kilometres beyond, where the decimal is noise.
+function distanceLabel(km) {
+  if (km == null) return ''
+  const rounded = km < 5 ? Math.round(km * 10) / 10 : Math.round(km)
+  return `${rounded} km`
 }
 
 // Current sort state, announced from the <th> where ARIA honours it.
@@ -230,6 +251,24 @@ function sortCaretClass(key) {
           <th v-if="optionalColumns.location">
             <span class="visually-hidden">{{ t('client.groups.column_location') }}</span>
             <img src="/icons/map_marker_ico.svg" alt="" class="col-icon">
+          </th>
+          <!-- No icon exists for distance; a literal "km" reads like the
+               A-Z name header does. -->
+          <th v-if="optionalColumns.distance" :aria-sort="sortAria('distance')">
+            <button
+              type="button"
+              class="sort-header"
+              :aria-label="t('client.groups.column_distance')"
+              data-testid="groups-table-sort-distance"
+              @click="sortBy('distance')"
+            >
+              <span class="visually-hidden">{{ sortHint('distance') }}</span>
+              <span class="col-icon col-text" aria-hidden="true">km</span>
+              <span class="sort-carets" :class="sortCaretClass('distance')" aria-hidden="true">
+                <span class="sort-caret sort-caret--up" />
+                <span class="sort-caret sort-caret--down" />
+              </span>
+            </button>
           </th>
           <th v-if="optionalColumns.hosts" :aria-sort="sortAria('hosts')">
             <button
@@ -338,6 +377,9 @@ function sortCaretClass(key) {
               <span v-if="row.location.country" class="text-muted small">{{ row.location.country }}</span>
             </template>
           </td>
+          <td v-if="optionalColumns.distance" class="hidecell text-nowrap" :data-testid="`group-row-distance-${row.id}`">
+            {{ distanceLabel(row.distance) }}
+          </td>
           <td v-if="optionalColumns.hosts" class="hidecell" :data-testid="`group-row-hosts-${row.id}`">
             {{ row.hosts ?? '' }}
           </td>
@@ -409,6 +451,16 @@ function sortCaretClass(key) {
 .col-icon--small {
   width: 25px;
   height: 25px;
+}
+
+// Text stand-in for a column icon (the distance header's "km") - same box
+// as .col-icon so the header row stays aligned.
+.col-text {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  text-transform: uppercase;
 }
 
 // Paired up/down carets, matching legacy's b-table sortable-header icon

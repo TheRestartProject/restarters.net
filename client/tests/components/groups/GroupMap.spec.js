@@ -315,6 +315,20 @@ describe('components/groups/GroupMap', () => {
       expect(control.setQuery).toHaveBeenCalledWith('')
       expect(map.flyToBounds).toHaveBeenCalledWith(bbox)
     })
+
+    // The distance column in the list below anchors to the searched place,
+    // so the page needs to know where the search landed.
+    it('tells the page where a search landed', async () => {
+      const wrapper = mountMap()
+      await wrapper.findComponent(LMapStub).vm.$emit('ready', fakeLeafletMap())
+
+      const bbox = L.latLngBounds([51.28, -0.51], [51.69, 0.33])
+      geocoderInstances[0].fire('markgeocode', { geocode: { bbox } })
+
+      const [[point]] = wrapper.emitted('searched')
+      expect(point.lat).toBeCloseTo(51.485, 2)
+      expect(point.lng).toBeCloseTo(-0.09, 2)
+    })
   })
 
   describe('hover linking', () => {

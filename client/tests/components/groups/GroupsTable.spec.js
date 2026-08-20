@@ -371,3 +371,55 @@ describe('components/groups/GroupsTable', () => {
     })
   })
 })
+
+// User feedback: the list under the map should say how far away each group
+// is and be ordered nearest-first by default. The distance column is
+// opt-in (optionalColumns.distance) so the other group lists are unchanged.
+describe('distance column', () => {
+  const distRows = [
+    { id: 1, name: 'Alpha Far', distance: 166.2 },
+    { id: 2, name: 'Zed Near', distance: 6.93 },
+    { id: 3, name: 'Mid Nowhere', distance: null },
+  ]
+  const cols = { location: true, hosts: true, restarters: true, next_event: true, distance: true }
+
+  it('is hidden unless opted into', () => {
+    const wrapper = mountComponent({ groups: distRows })
+    expect(wrapper.find('[data-testid="groups-table-sort-distance"]').exists()).toBe(false)
+  })
+
+  it('shows formatted km per row: one decimal under 5 km, whole numbers above', () => {
+    const wrapper = mountComponent({
+      groups: [
+        { id: 1, name: 'Near', distance: 3.14159 },
+        { id: 2, name: 'Far', distance: 166.2 },
+      ],
+      optionalColumns: cols,
+    })
+
+    expect(wrapper.find('[data-testid="group-row-distance-1"]').text()).toBe('3.1 km')
+    expect(wrapper.find('[data-testid="group-row-distance-2"]').text()).toBe('166 km')
+  })
+
+  it('leaves the cell blank for groups without a distance', () => {
+    const wrapper = mountComponent({ groups: distRows, optionalColumns: cols })
+    expect(wrapper.find('[data-testid="group-row-distance-3"]').text()).toBe('')
+  })
+
+  it('sorts nearest-first by default when initialSortKey is distance, unplaced groups last', () => {
+    const wrapper = mountComponent({ groups: distRows, optionalColumns: cols, initialSortKey: 'distance' })
+
+    const names = wrapper.findAll('tbody tr td a').map((a) => a.text())
+    expect(names).toEqual(['Zed Near', 'Alpha Far', 'Mid Nowhere'])
+  })
+
+  it('is click-sortable like the other columns', async () => {
+    const wrapper = mountComponent({ groups: distRows, optionalColumns: cols, initialSortKey: 'distance' })
+
+    await wrapper.find('[data-testid="groups-table-sort-distance"]').trigger('click')
+
+    const names = wrapper.findAll('tbody tr td a').map((a) => a.text())
+    // Toggled to descending; nulls stay pinned last by compareNullableNumber.
+    expect(names[0]).toBe('Alpha Far')
+  })
+})

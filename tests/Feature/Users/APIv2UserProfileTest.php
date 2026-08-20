@@ -30,6 +30,8 @@ class APIv2UserProfileTest extends TestCase
             'email' => 'jo@restarters.dev',
             'country_code' => 'GB',
             'location' => 'London',
+            'latitude' => 51.5074,
+            'longitude' => -0.1278,
             'age' => '1980',
             'gender' => 'Non-binary',
             'biography' => 'I like fixing toasters.',
@@ -42,6 +44,10 @@ class APIv2UserProfileTest extends TestCase
         $this->assertEquals('jo@restarters.dev', $response->json('data.email'));
         $this->assertEquals('GB', $response->json('data.country_code'));
         $this->assertEquals('London', $response->json('data.location'));
+        // The groups map's distance column anchors to the user's own
+        // coordinates, so the profile must carry them, as floats.
+        $this->assertEquals(51.5074, $response->json('data.lat'));
+        $this->assertEquals(-0.1278, $response->json('data.lng'));
         $this->assertEquals('1980', $response->json('data.age'));
         $this->assertEquals('Non-binary', $response->json('data.gender'));
         $this->assertEquals('I like fixing toasters.', $response->json('data.biography'));

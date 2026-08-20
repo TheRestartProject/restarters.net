@@ -75,7 +75,7 @@ const props = defineProps({
   },
 })
 
-const emit = defineEmits(['update:groupIdsInBounds', 'update:hoveredId', 'select'])
+const emit = defineEmits(['update:groupIdsInBounds', 'update:hoveredId', 'select', 'searched'])
 
 const { t } = useI18n()
 
@@ -261,6 +261,10 @@ function onReady(mapInstance) {
         // Empty the query box so the dropdown closes.
         control.setQuery('')
         mapInstance.flyToBounds(e.geocode.bbox)
+        // Where the search landed, so the page's distance column can anchor
+        // to the searched place instead of the user's own location.
+        const centre = e.geocode.bbox.getCenter()
+        emit('searched', { lat: centre.lat, lng: centre.lng })
       }
     })
 

@@ -2,7 +2,9 @@
 import { computed, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useGroupsStore } from '~/stores/groups.js'
+import { useProfileStore } from '~/stores/profile.js'
 import { useAuth } from '~/composables/useAuth.js'
+import { haversineKm } from '~/composables/useGroupMapGeometry.js'
 import GroupsTabsNav from '~/components/groups/GroupsTabsNav.vue'
 import GroupsTable from '~/components/groups/GroupsTable.vue'
 import GroupMap from '~/components/groups/GroupMap.vue'
@@ -43,6 +45,20 @@ const hoveredId = ref(null)
 // showing, so it's already in `rows` with its summary (image/location/next
 // event) hydrated; fall back to the minimal names entry if not.
 const selectedGroupId = ref(null)
+
+// What the list's distance column measures from: the searched place if
+// there has been a search, else the user's own profile coordinates (GET
+// /api/v2/users/me/profile lat/lng), else nothing - the column hides.
+const profileStore = useProfileStore()
+const searchedPoint = ref(null)
+const referencePoint = computed(() => {
+  if (searchedPoint.value) return searchedPoint.value
+
+  const p = profileStore.info.data
+  if (p && p.lat != null && p.lng != null) return { lat: p.lat, lng: p.lng }
+
+  return null
+})
 const selectedGroup = computed(() => {
   if (selectedGroupId.value === null) return null
   const row = rows.value.find((r) => r.id === selectedGroupId.value)
@@ -87,6 +103,9 @@ const rows = computed(() =>
       restarters: summary?.restarters ?? null,
       nextEvent: summary?.next_event ?? null,
       isMember: groupsStore.isMember(id),
+      // Real km from the reference point (null hides the cell) - the names
+      // index carries every group's lat/lng, so no hydration needed.
+      distance: haversineKm(referencePoint.value, entry ?? null),
     }
   })
 )
@@ -110,6 +129,9 @@ onMounted(() => {
   // Best-effort seed for GroupMap's "your groups" pin colour - same
   // memberIds gap as /group/all (stores/groups.js's class doc comment).
   groupsStore.fetchMine().catch(() => {})
+  // Best-effort anchor for the distance column; without it (guest profile
+  // fetch failure, or no location set) the column just stays hidden.
+  profileStore.fetchProfileInfo().catch(() => {})
 })
 </script>
 
@@ -153,6 +175,7 @@ onMounted(() => {
         :your-group-ids="groupsStore.memberIds"
         @update:group-ids-in-bounds="groupIdsInBounds = $event"
         @select="selectedGroupId = $event"
+        @searched="searchedPoint = $event"
       />
 
       <GroupInfoModal :group="selectedGroup" @close="selectedGroupId = null" />
@@ -180,7 +203,14 @@ onMounted(() => {
         <span v-else v-html="t('groups.group_count_map', { count: rows.length }, rows.length)" />
       </p>
 
-      <GroupsTable v-model:hovered-id="hoveredId" :groups="rows" />
+      <!-- Distance column only with an anchor point; nearest-first is the
+           default order either way (all-null distances fall back stably). -->
+      <GroupsTable
+        v-model:hovered-id="hoveredId"
+        :groups="rows"
+        :optional-columns="{ location: true, hosts: true, restarters: true, next_event: true, distance: referencePoint !== null }"
+        initial-sort-key="distance"
+      />
     </template>
   </div>
 </template>

@@ -4,6 +4,7 @@ import {
   filterMappableGroups,
   hasLocation,
   idsInBounds,
+  haversineKm,
   markerClassName,
   nearestGroups,
   separateIdenticalLocations,
@@ -189,6 +190,29 @@ describe('composables/useGroupMapGeometry', () => {
       expect(second.id).toBe(2)
       expect(second.name).toBe('B')
       expect(second.network_ids).toEqual([2])
+    })
+  })
+
+  // Real kilometres for the list's distance column - unlike the sorting
+  // approximations, this number is shown to the user.
+  describe('haversineKm', () => {
+    it('measures ~6.9 km for 0.1 degrees of longitude at 51.5N', () => {
+      expect(haversineKm({ lat: 51.5, lng: -0.1 }, { lat: 51.5, lng: -0.2 })).toBeCloseTo(6.9, 0)
+    })
+
+    it('is zero for the same point', () => {
+      expect(haversineKm({ lat: 51.5, lng: -0.1 }, { lat: 51.5, lng: -0.1 })).toBe(0)
+    })
+
+    it('coerces string coordinates', () => {
+      expect(haversineKm({ lat: '51.5', lng: '-0.1' }, { lat: '51.5', lng: '-0.2' })).toBeCloseTo(6.9, 0)
+    })
+
+    it('returns null when either point is missing or unplaceable', () => {
+      expect(haversineKm(null, { lat: 51.5, lng: -0.1 })).toBeNull()
+      expect(haversineKm({ lat: 51.5, lng: -0.1 }, null)).toBeNull()
+      expect(haversineKm({ lat: 51.5, lng: -0.1 }, { lat: null, lng: null })).toBeNull()
+      expect(haversineKm({ lat: 51.5, lng: -0.1 }, { lat: 'x', lng: 'y' })).toBeNull()
     })
   })
 
