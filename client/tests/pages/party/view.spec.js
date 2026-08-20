@@ -71,8 +71,6 @@ const GLOBAL_STUBS = {
 const DAY_MS = 86400000
 const FUTURE_START = new Date(Date.now() + 30 * DAY_MS).toISOString()
 const FUTURE_END = new Date(Date.now() + 30 * DAY_MS + 2 * 3600000).toISOString()
-const LATER_START = new Date(Date.now() + 31 * DAY_MS).toISOString()
-const LATER_END = new Date(Date.now() + 31 * DAY_MS + 2 * 3600000).toISOString()
 
 function baseEvent(overrides = {}) {
   return {
