@@ -511,11 +511,18 @@ test.describe('global tags admin page', () => {
     await expect(page.getByTestId('tags-edit-modal')).toBeHidden({ timeout: 10000 })
     await expect(page.getByTestId('tags-table')).toContainText(editedName)
 
+    // Delete - lives inside the edit form since 638e285f4e ("admin Delete
+    // moves to the edit form, where develop has it"), not on the row.
+    await page.getByTestId(`tags-edit-link-${tagId}`).click()
+    await expect(page.getByTestId('tags-edit-modal')).toBeVisible()
     await page.getByTestId(`tags-delete-${tagId}`).click()
     await expect(page.getByTestId('tags-delete-modal')).toBeVisible()
     await page.getByTestId('tags-delete-confirm').click()
     await expect(page.getByTestId('tags-delete-modal')).toBeHidden({ timeout: 10000 })
-    await expect(page.getByTestId('tags-table')).not.toContainText(editedName)
+    // Row-count 0 rather than table-not-contains: the list refetches after a
+    // delete, and while the loading placeholder is up the table element
+    // itself is absent, which fails a not-toContainText outright.
+    await expect(page.getByTestId(`tags-row-${tagId}`)).toHaveCount(0, { timeout: 10000 })
   })
 
   test('Admin cannot create a duplicate global tag', async ({ page }) => {

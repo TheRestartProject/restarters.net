@@ -27,7 +27,7 @@ const GroupInfoModalStub = {
 
 const GroupMapStub = {
   name: 'GroupMap',
-  props: ['groups', 'yourGroupIds', 'hoveredId'],
+  props: ['groups', 'yourGroupIds', 'hoveredId', 'network'],
   emits: ['update:groupIdsInBounds', 'update:hoveredId', 'select', 'searched'],
   template: '<div class="stub-groupmap" data-testid="stub-group-map" />',
 }
@@ -80,6 +80,17 @@ describe('pages/group/map', () => {
 
     expect(groupsStore.fetchNames).toHaveBeenCalledTimes(1)
     expect(groupsStore.fetchMine).toHaveBeenCalledTimes(1)
+  })
+
+  // /group/all?network=N (linked from the networks page) now forwards here
+  // with its query intact - the map must apply it as its network filter.
+  it('applies a ?network= query as the map network filter', () => {
+    vi.stubGlobal('useRoute', () => ({ query: { network: '5' }, params: {}, fullPath: '/group/map?network=5' }))
+
+    const wrapper = mountPage()
+    expect(wrapper.findComponent(GroupMapStub).props('network')).toBe(5)
+
+    vi.stubGlobal('useRoute', () => ({ query: {}, params: {}, fullPath: '/' }))
   })
 
   // User feedback: the list under the map gets a distance column, anchored

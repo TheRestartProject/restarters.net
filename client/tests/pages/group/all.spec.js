@@ -14,9 +14,13 @@ describe('pages/group/all', () => {
     vi.stubGlobal('navigateTo', navigateToMock)
   })
 
-  it('redirects to /group/map', () => {
+  // The networks page links here as /group/all?network=N - the filter must
+  // survive the forward.
+  it('redirects to /group/map, preserving the query string', () => {
+    vi.stubGlobal('useRoute', () => ({ query: { network: '5' }, params: {}, fullPath: '/group/all?network=5' }))
+
     mount(GroupAllPage)
 
-    expect(navigateToMock).toHaveBeenCalledWith('/group/map', { replace: true })
+    expect(navigateToMock).toHaveBeenCalledWith({ path: '/group/map', query: { network: '5' } }, { replace: true })
   })
 })

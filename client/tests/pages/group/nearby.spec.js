@@ -14,9 +14,9 @@ describe('pages/group/nearby', () => {
     vi.stubGlobal('navigateTo', navigateToMock)
   })
 
-  it('redirects to /group/map', () => {
+  it('redirects to /group/map, preserving the query string', () => {
     mount(GroupNearbyPage)
 
-    expect(navigateToMock).toHaveBeenCalledWith('/group/map', { replace: true })
+    expect(navigateToMock).toHaveBeenCalledWith({ path: '/group/map', query: {} }, { replace: true })
   })
 })

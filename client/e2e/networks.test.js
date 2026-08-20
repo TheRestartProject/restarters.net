@@ -30,6 +30,9 @@ test.describe('network management', () => {
 
     await page.goto(`/networks/${networkId}`, { waitUntil: 'domcontentloaded' })
 
+    // "Add groups" is an item inside the Actions dropdown - clicking it
+    // while the menu is closed waits forever on an invisible element.
+    await page.getByTestId('network-show-actions').click()
     await page.getByTestId('network-show-add-groups').click()
     await expect(page.getByTestId('network-associate-groups-modal')).toBeVisible({ timeout: 10000 })
 

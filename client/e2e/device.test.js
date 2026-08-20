@@ -31,6 +31,12 @@ async function setUpApprovedEvent(page, { past = true } = {}) {
   return eventId
 }
 
+// The devices panel renders twice - a desktop box (event-devices-desktop)
+// and mobile collapsible sections - so bare device-form/device-photo
+// testids resolve to two elements and trip strict mode. Scope to desktop,
+// which is what these tests drive.
+const desktopPanel = (page) => page.getByTestId('event-devices-desktop')
+
 test.describe('devices', () => {
   test('Spare parts tick shown when parts are needed', async ({ page }) => {
     test.slow()
@@ -40,7 +46,7 @@ test.describe('devices', () => {
     const response = await addDevice(page, eventId, { repairStatus: 'Fixed', spareParts: 'Manufacturer' })
     const { device } = await response.json()
 
-    await expect(page.getByTestId(`event-device-spare-parts-${device.id}`)).toBeVisible()
+    await expect(desktopPanel(page).getByTestId(`event-device-spare-parts-${device.id}`)).toBeVisible()
   })
 
   test('Spare parts tick not shown when parts are not needed', async ({ page }) => {
@@ -51,7 +57,7 @@ test.describe('devices', () => {
     const response = await addDevice(page, eventId, { repairStatus: 'Fixed' })
     const { device } = await response.json()
 
-    await expect(page.getByTestId(`event-device-spare-parts-${device.id}`)).toHaveCount(0)
+    await expect(desktopPanel(page).getByTestId(`event-device-spare-parts-${device.id}`)).toHaveCount(0)
   })
 
   test('Can create misc powered device', async ({ page }) => {
@@ -62,7 +68,7 @@ test.describe('devices', () => {
     const response = await addDevice(page, eventId, {})
     const { device } = await response.json()
 
-    await expect(page.getByTestId(`event-device-${device.id}`)).toBeVisible()
+    await expect(desktopPanel(page).getByTestId(`event-device-${device.id}`)).toBeVisible()
   })
 
   test('Can create device with photo', async ({ page }) => {
@@ -73,11 +79,11 @@ test.describe('devices', () => {
     const response = await addDevice(page, eventId, {})
     const { device } = await response.json()
 
-    await page.getByTestId(`event-device-edit-${device.id}`).click()
-    await expect(page.getByTestId('device-photos')).toBeVisible({ timeout: 10000 })
+    await desktopPanel(page).getByTestId(`event-device-edit-${device.id}`).click()
+    await expect(desktopPanel(page).getByTestId('device-photos')).toBeVisible({ timeout: 10000 })
 
     // Age was never set, so the edit form's age field should be blank.
-    await expect(page.getByTestId('device-form-age')).toHaveValue('')
+    await expect(desktopPanel(page).getByTestId('device-form-age')).toHaveValue('')
 
     // TusImageUpload.vue mounts an Uppy Dashboard with two hidden file
     // inputs (plain picker + webkitdirectory folder picker) - same pattern
@@ -87,14 +93,14 @@ test.describe('devices', () => {
         (resp) => resp.url().includes(`/api/v2/devices/${device.id}/images`) && resp.request().method() === 'POST',
         { timeout: 20000 },
       ),
-      page.locator('.uppy-Dashboard-input:not([webkitdirectory])').setInputFiles(TEST_IMAGE),
+      desktopPanel(page).locator('.uppy-Dashboard-input:not([webkitdirectory])').setInputFiles(TEST_IMAGE),
     ])
     expect(uploadResponse.status()).toBe(200)
 
-    await expect(page.getByTestId('device-photo').first()).toBeVisible({ timeout: 10000 })
+    await expect(desktopPanel(page).getByTestId('device-photo').first()).toBeVisible({ timeout: 10000 })
 
-    await page.getByTestId('device-form-cancel').click()
-    await expect(page.getByTestId(`event-device-${device.id}`)).toBeVisible()
+    await desktopPanel(page).getByTestId('device-form-cancel').click()
+    await expect(desktopPanel(page).getByTestId(`event-device-${device.id}`)).toBeVisible()
   })
 
   test('Automatic category suggestion from item type', async ({ page }) => {
@@ -120,12 +126,15 @@ test.describe('devices', () => {
     // Fresh page load so the item-types cache refetches with the new mapping.
     await page.goto(`/party/view/${eventId}`, { waitUntil: 'domcontentloaded' })
     await page.getByTestId('add-powered-device-desktop').click()
-    await page.getByTestId('device-form').waitFor({ timeout: 10000 })
+    await desktopPanel(page).getByTestId('device-form').waitFor({ timeout: 10000 })
 
-    await page.getByTestId('device-form-item-type').fill(itemType)
+    await desktopPanel(page).getByTestId('device-form-item-type').fill(itemType)
     // Assert on the selected VALUE (category id): display labels can alias
     // the raw name (e.g. category 'Misc' renders as 'None of the above').
-    await expect(page.getByTestId('device-form-category')).toHaveValue(
+    // The control is DeviceForm's plain-element multiselect (a div, not a
+    // <select>), which mirrors its selection into data-value.
+    await expect(desktopPanel(page).getByTestId('device-form-category')).toHaveAttribute(
+      'data-value',
       String(seeded.category.id),
       { timeout: 10000 },
     )

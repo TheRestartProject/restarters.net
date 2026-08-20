@@ -84,12 +84,15 @@ test.describe('admin', () => {
     await expect(page.getByTestId('brands-edit-modal')).toBeHidden({ timeout: 10000 })
     await expect(page.getByTestId('brands-table')).toContainText(editedName)
 
-    // Delete
-    await page.getByTestId(`brands-delete-${brandId}`).click()
-    await expect(page.getByTestId('brands-delete-modal')).toBeVisible()
-    await page.getByTestId('brands-delete-confirm').click()
-    await expect(page.getByTestId('brands-delete-modal')).toBeHidden({ timeout: 10000 })
-    await expect(page.getByTestId('brands-table')).not.toContainText(editedName)
+    // No delete: develop has no brand delete anywhere (no route, control or
+    // controller method), so brands.vue deliberately passes
+    // :allow-delete="false" (b17158caad). Pin the absence - the button
+    // moved into the edit form for the pages that do have it (638e285f4e).
+    await page.getByTestId(`brands-edit-link-${brandId}`).click()
+    await expect(page.getByTestId('brands-edit-modal')).toBeVisible()
+    await expect(page.getByTestId(`brands-delete-${brandId}`)).toHaveCount(0)
+    await page.getByTestId('brands-edit-modal').getByRole('button', { name: /cancel/i }).click()
+    await expect(page.getByTestId('brands-table')).toContainText(editedName)
   })
 
   test('editId deep-link opens the brands edit modal', async ({ page }) => {

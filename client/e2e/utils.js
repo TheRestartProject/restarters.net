@@ -189,6 +189,9 @@ export async function approveGroup(page, groupId) {
 // photo upload only happens once a device already exists, i.e. via editing
 // it after this call). Returns the POST response so callers can read the
 // created device's id off its body.
+// The devices panel renders twice (desktop box + mobile collapsible
+// sections), so bare device-form* testids resolve to two elements and trip
+// Playwright strict mode - scope to the desktop panel this helper drives.
 export async function addDevice(page, eventId, { powered = true, itemType, category, repairStatus, spareParts } = {}) {
   const expectedUrl = `/party/view/${eventId}`
   if (!page.url().includes(expectedUrl)) {
@@ -197,25 +200,33 @@ export async function addDevice(page, eventId, { powered = true, itemType, categ
 
   const addButtonTestId = powered ? 'add-powered-device-desktop' : 'add-unpowered-device-desktop'
   await page.getByTestId(addButtonTestId).click()
-  await page.getByTestId('device-form').waitFor({ timeout: 10000 })
+  await page.getByTestId('event-devices-desktop').getByTestId('device-form').waitFor({ timeout: 10000 })
 
   if (itemType) {
-    await page.getByTestId('device-form-item-type').fill(itemType)
+    await page.getByTestId('event-devices-desktop').getByTestId('device-form-item-type').fill(itemType)
   }
 
+  // Category/status/spare-parts are DeviceForm's plain-element multiselects
+  // (vue-multiselect markup on divs - see its doc comment), not native
+  // <select>s: click the control, then click the option.
+  const desktop = page.getByTestId('event-devices-desktop')
+  const realOptions = desktop.locator('.multiselect__option:not(.multiselect__option--group)')
+
+  await desktop.getByTestId('device-form-category').click()
   if (category) {
-    await page.getByTestId('device-form-category').selectOption({ label: category })
+    await realOptions.filter({ hasText: category }).first().click()
   } else {
-    // Index 0 is the blank placeholder option - pick the first real one.
-    await page.getByTestId('device-form-category').selectOption({ index: 1 })
+    await realOptions.first().click()
   }
 
   if (repairStatus) {
-    await page.getByTestId('device-form-status').selectOption(repairStatus)
+    await desktop.getByTestId('device-form-status').click()
+    await desktop.getByTestId(`device-form-status-option-${repairStatus}`).click()
   }
 
   if (spareParts) {
-    await page.getByTestId('device-form-spare-parts').selectOption(spareParts)
+    await desktop.getByTestId('device-form-spare-parts').click()
+    await desktop.getByTestId(`device-form-spare-parts-option-${spareParts}`).click()
   }
 
   const [createResponse] = await Promise.all([
@@ -223,7 +234,7 @@ export async function addDevice(page, eventId, { powered = true, itemType, categ
       (resp) => new URL(resp.url()).pathname === '/api/v2/devices' && resp.request().method() === 'POST',
       { timeout: 15000 },
     ),
-    page.getByTestId('device-form-submit').click(),
+    page.getByTestId('event-devices-desktop').getByTestId('device-form-submit').click(),
   ])
   expect(createResponse.status()).toBe(200)
 

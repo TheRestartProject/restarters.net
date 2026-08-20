@@ -7,7 +7,9 @@
 // functionality still to be ported into pages/group/map.vue.
 definePageMeta({ auth: true })
 
-navigateTo('/group/map', { replace: true })
+// Query preserved: the networks page links here as /group/all?network=N,
+// and the filter must survive the forward.
+navigateTo({ path: '/group/map', query: useRoute().query }, { replace: true })
 </script>
 
 <template>

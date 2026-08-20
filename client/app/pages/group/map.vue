@@ -25,6 +25,12 @@ useHead({ title: t('groups.groups') })
 
 const groupsStore = useGroupsStore()
 
+// /group/all?network=N (linked from the networks page) forwards here with
+// its query intact; GroupMap's own network filter narrows the pins, and the
+// list follows the viewport so it inherits the filter.
+const route = useRoute()
+const networkFilter = computed(() => (route.query.network ? Number(route.query.network) : null))
+
 // Groups-requiring-moderation queue for Administrators / NetworkCoordinators
 // (legacy showed a "Groups requiring moderation" panel above the group list/map
 // for those roles).
@@ -172,6 +178,7 @@ onMounted(() => {
       <GroupMap
         v-model:hovered-id="hoveredId"
         :groups="mapGroups"
+        :network="networkFilter"
         :your-group-ids="groupsStore.memberIds"
         @update:group-ids-in-bounds="groupIdsInBounds = $event"
         @select="selectedGroupId = $event"

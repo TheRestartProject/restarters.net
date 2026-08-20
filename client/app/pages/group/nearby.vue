@@ -6,7 +6,8 @@
 // inline link) keep working.
 definePageMeta({ auth: true })
 
-navigateTo('/group/map', { replace: true })
+// Query preserved: e.g. ?network=N must survive the forward.
+navigateTo({ path: '/group/map', query: useRoute().query }, { replace: true })
 </script>
 
 <template>
