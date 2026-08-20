@@ -55,6 +55,15 @@ function mountPage() {
   })
 }
 
+// Dates safely in the future whenever the suite runs: hardcoded "future"
+// dates rot into the past and time-bomb the upcoming/past split (the
+// original 2026-08-20 fixtures did exactly that, mid-morning on the day).
+const DAY_MS = 86400000
+const FUTURE_START = new Date(Date.now() + 30 * DAY_MS).toISOString()
+const FUTURE_END = new Date(Date.now() + 30 * DAY_MS + 2 * 3600000).toISOString()
+const LATER_START = new Date(Date.now() + 31 * DAY_MS).toISOString()
+const LATER_END = new Date(Date.now() + 31 * DAY_MS + 2 * 3600000).toISOString()
+
 function evt(overrides = {}) {
   return {
     id: 1,
@@ -133,7 +142,7 @@ describe('pages/party/index (mine)', () => {
 
   it('splits mine events into upcoming and past tabs', async () => {
     eventsStore.myEvents.data = [
-      evt({ id: 1, title: 'Future', start: '2026-08-20T10:00:00Z', end: '2026-08-20T12:00:00Z' }),
+      evt({ id: 1, title: 'Future', start: FUTURE_START, end: FUTURE_END }),
       evt({ id: 2, title: 'Past', start: '2020-01-01T10:00:00Z', end: '2020-01-01T12:00:00Z' }),
     ]
 
@@ -150,7 +159,7 @@ describe('pages/party/index (mine)', () => {
 
   it('excludes a nearby-tagged event from the mine (upcoming) bucket', () => {
     eventsStore.myEvents.data = [
-      evt({ id: 3, title: 'Nearby', start: '2026-08-20T10:00:00Z', end: '2026-08-20T12:00:00Z', nearby: true }),
+      evt({ id: 3, title: 'Nearby', start: FUTURE_START, end: FUTURE_END, nearby: true }),
     ]
 
     const wrapper = mountPage()
@@ -163,8 +172,8 @@ describe('pages/party/index (mine)', () => {
 
   it('shows the other-events section with nearby/all tabs when tagged events are present', async () => {
     eventsStore.myEvents.data = [
-      evt({ id: 3, title: 'Nearby Event', start: '2026-08-20T10:00:00Z', end: '2026-08-20T12:00:00Z', nearby: true }),
-      evt({ id: 4, title: 'All Event', start: '2026-08-21T10:00:00Z', end: '2026-08-21T12:00:00Z', all: true }),
+      evt({ id: 3, title: 'Nearby Event', start: FUTURE_START, end: FUTURE_END, nearby: true }),
+      evt({ id: 4, title: 'All Event', start: LATER_START, end: LATER_END, all: true }),
     ]
 
     const wrapper = mountPage()
@@ -264,7 +273,7 @@ describe('pages/party/index (mine)', () => {
       your_groups: [{ id: 9, name: 'A Group', role: 3, archived: false, image_url: null }],
     }
     eventsStore.myEvents.data = [
-      evt({ id: 1, start: '2026-08-20T10:00:00Z', end: '2026-08-20T12:00:00Z', group: { id: 9, name: 'A Group' } }),
+      evt({ id: 1, start: FUTURE_START, end: FUTURE_END, group: { id: 9, name: 'A Group' } }),
     ]
 
     const wrapper = mountPage()
@@ -382,8 +391,8 @@ describe('pages/party/index (mine)', () => {
   // Gap 7: mobile-collapsible sections with a count badge next to the heading.
   it('shows a count badge on the "Your events" and "Other events" section headings', () => {
     eventsStore.myEvents.data = [
-      evt({ id: 1, title: 'Upcoming', start: '2026-08-20T10:00:00Z', end: '2026-08-20T12:00:00Z' }),
-      evt({ id: 2, title: 'Nearby', start: '2026-08-20T10:00:00Z', end: '2026-08-20T12:00:00Z', nearby: true }),
+      evt({ id: 1, title: 'Upcoming', start: FUTURE_START, end: FUTURE_END }),
+      evt({ id: 2, title: 'Nearby', start: FUTURE_START, end: FUTURE_END, nearby: true }),
     ]
 
     const wrapper = mountPage()

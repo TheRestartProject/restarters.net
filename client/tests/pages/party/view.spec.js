@@ -65,13 +65,22 @@ const GLOBAL_STUBS = {
   BPopover: BPopoverStub,
 }
 
+// Dates safely in the future whenever the suite runs: hardcoded "future"
+// dates rot into the past and time-bomb the upcoming/past split (the
+// original 2026-08-20 fixtures did exactly that, mid-morning on the day).
+const DAY_MS = 86400000
+const FUTURE_START = new Date(Date.now() + 30 * DAY_MS).toISOString()
+const FUTURE_END = new Date(Date.now() + 30 * DAY_MS + 2 * 3600000).toISOString()
+const LATER_START = new Date(Date.now() + 31 * DAY_MS).toISOString()
+const LATER_END = new Date(Date.now() + 31 * DAY_MS + 2 * 3600000).toISOString()
+
 function baseEvent(overrides = {}) {
   return {
     id: 5,
     title: 'Repair Café',
     description: '<p>Bring your broken things.</p>',
-    start: '2026-08-20T10:00:00+00:00',
-    end: '2026-08-20T12:00:00+00:00',
+    start: FUTURE_START,
+    end: FUTURE_END,
     timezone: 'Europe/London',
     location: 'Town Hall',
     online: false,
@@ -220,7 +229,10 @@ describe('pages/party/view/[id]', () => {
     const wrapper = mountPage()
 
     expect(wrapper.find('[data-testid="event-view-title"]').text()).toBe('Repair Café')
-    expect(wrapper.find('[data-testid="event-view-date"]').text()).toContain('20')
+    // The fixture date is dynamic (see FUTURE_START), so derive the expected
+    // day-of-month in the event's own timezone rather than hardcoding it.
+    const day = new Date(FUTURE_START).toLocaleString('en-GB', { timeZone: 'Europe/London', day: 'numeric' })
+    expect(wrapper.find('[data-testid="event-view-date"]').text()).toContain(day)
     expect(wrapper.find('[data-testid="event-view-venue"]').text()).toContain('Town Hall')
     expect(wrapper.find('[data-testid="event-view-online"]').exists()).toBe(false)
   })
