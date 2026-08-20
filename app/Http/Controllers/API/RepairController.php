@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use League\Csv\EscapeFormula;
 use League\Csv\Writer;
@@ -25,6 +26,24 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
  */
 class RepairController extends Controller
 {
+    /**
+     * What "changed" means to an incremental consumer.
+     *
+     * Keying off `devices.updated_at` alone hides work that only ever touched
+     * a parent row: approving an old event, or approving the group it belongs
+     * to, makes devices exportable that every earlier pull filtered out, while
+     * their own updated_at stands still. Those devices would never appear in
+     * an incremental crawl again.
+     *
+     * All three columns are NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE
+     * CURRENT_TIMESTAMP (see 2018_05_10_085751_rename_modified_at), so GREATEST
+     * needs no null handling and the values maintain themselves.
+     *
+     * The filter and the watermark both use this, so a consumer that resumes
+     * from max_updated_at resumes from the same clock it was filtered on.
+     */
+    private const CHANGED_AT = 'GREATEST(devices.updated_at, events.updated_at, groups.updated_at)';
+
     public function __construct(private readonly OrdsRecordMapper $mapper)
     {
     }
@@ -52,7 +71,7 @@ class RepairController extends Controller
      *      ),
      *      @OA\Parameter(
      *          name="updated_since",
-     *          description="Only records whose device row changed at or after this time",
+     *          description="Only records whose device, event or group row changed at or after this time",
      *          required=false,
      *          in="query",
      *          @OA\Schema(type="string", format="date-time")
@@ -172,7 +191,7 @@ class RepairController extends Controller
 
         // Formatted once here rather than in each responder: CSV and JSON carry
         // the same watermark, they just carry it in different places.
-        $rawMaxUpdatedAt = (clone $query)->max('devices.updated_at');
+        $rawMaxUpdatedAt = (clone $query)->max(DB::raw(self::CHANGED_AT));
         $maxUpdatedAt = $rawMaxUpdatedAt ? Carbon::parse($rawMaxUpdatedAt)->toIso8601String() : null;
 
         $perPage = (int) ($validated['per_page'] ?? config('ords.pagination.default_per_page'));
@@ -332,7 +351,7 @@ class RepairController extends Controller
             // offset in the input still wins, but a bare value no longer depends
             // on config('app.timezone') happening to be UTC.
             $updatedSince = Carbon::parse($validated['updated_since'], 'UTC')->setTimezone('UTC')->toDateTimeString();
-            $query->where('devices.updated_at', '>=', $updatedSince);
+            $query->whereRaw(self::CHANGED_AT.' >= ?', [$updatedSince]);
         }
 
         if (! empty($validated['event_start'])) {

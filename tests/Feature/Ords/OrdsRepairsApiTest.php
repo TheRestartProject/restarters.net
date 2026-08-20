@@ -551,13 +551,61 @@ class OrdsRepairsApiTest extends TestCase
 
     public function test_updated_since_filter(): void
     {
+        // All three rows are backdated: "unchanged since" now means the device
+        // and both of its parents have stood still, not the device alone.
         $device = $this->seedRepair();
-        $device->timestamps = false;
-        $device->updated_at = '2000-01-01 00:00:00';
-        $device->save();
+        $this->backdate($device, '2000-01-01 00:00:00');
 
         $this->assertEmpty($this->fetchRecords(['updated_since' => '2010-01-01T00:00:00+00:00']));
         $this->assertCount(1, $this->fetchRecords(['updated_since' => '1999-01-01T00:00:00+00:00']));
+    }
+
+    /**
+     * The case that made incremental consumers miss data: an event sits
+     * unapproved for months, the devices on it are exported by nobody, and
+     * approving it never touches devices.updated_at. Keyed on the device row
+     * alone those devices stay invisible for good.
+     */
+    public function test_updated_since_sees_a_device_whose_event_changed_later(): void
+    {
+        $device = $this->seedRepair();
+        $this->backdate($device, '2000-01-01 00:00:00');
+
+        $this->touchRow(Party::class, $device->event, 'idevents', '2020-06-01 12:00:00');
+
+        $this->assertCount(1, $this->fetchRecords(['updated_since' => '2010-01-01T00:00:00+00:00']));
+    }
+
+    public function test_updated_since_sees_a_device_whose_group_changed_later(): void
+    {
+        $device = $this->seedRepair();
+        $this->backdate($device, '2000-01-01 00:00:00');
+
+        $groupId = Party::findOrFail($device->event)->group;
+        $this->touchRow(Group::class, $groupId, 'idgroups', '2020-06-01 12:00:00');
+
+        $this->assertCount(1, $this->fetchRecords(['updated_since' => '2010-01-01T00:00:00+00:00']));
+    }
+
+    /**
+     * The watermark has to run on the same clock as the filter, or a consumer
+     * resuming from it would skip the parent-row changes the filter just
+     * started returning.
+     */
+    public function test_the_sync_watermark_covers_the_parent_rows_too(): void
+    {
+        $device = $this->seedRepair();
+        $this->backdate($device, '2000-01-01 00:00:00');
+
+        $this->touchRow(Party::class, $device->event, 'idevents', '2020-06-01 12:00:00');
+
+        $response = $this->getJson($this->url());
+        $response->assertSuccessful();
+
+        $this->assertEquals(
+            '2020-06-01T12:00:00+00:00',
+            Carbon::parse($response->json('sync.max_updated_at'))->utc()->toIso8601String()
+        );
     }
 
     public function test_event_window_filters(): void
@@ -801,6 +849,29 @@ class OrdsRepairsApiTest extends TestCase
      * here, so a regression in the gate fails the whole class rather than one
      * test.
      */
+    /** Backdates the device and both parent rows past the auto-maintained columns. */
+    private function backdate(Device $device, string $when): void
+    {
+        $device->timestamps = false;
+        $device->updated_at = $when;
+        $device->save();
+
+        $event = Party::findOrFail($device->event);
+        $this->touchRow(Party::class, $event->idevents, 'idevents', $when);
+        $this->touchRow(Group::class, $event->group, 'idgroups', $when);
+    }
+
+    /**
+     * `events` and `groups` carry ON UPDATE CURRENT_TIMESTAMP, which only fires
+     * when updated_at is left out of the statement, so an explicit value wins.
+     *
+     * @param class-string<\Illuminate\Database\Eloquent\Model> $model
+     */
+    private function touchRow(string $model, int $id, string $key, string $when): void
+    {
+        $model::query()->where($key, $id)->update(['updated_at' => $when]);
+    }
+
     private function apiToken(): string
     {
         if ($this->apiToken === null) {
