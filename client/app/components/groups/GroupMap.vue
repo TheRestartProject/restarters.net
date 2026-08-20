@@ -408,6 +408,8 @@ onBeforeUnmount(() => {
   align-items: center;
   justify-content: center;
   height: 100%;
+  // The count sits inside a Leaflet pane, outside the body's font cascade.
+  font-family: $font-family-sans-serif; // Asap
   font-size: 16px;
   line-height: 1;
 }
