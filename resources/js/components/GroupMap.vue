@@ -49,6 +49,7 @@ import GroupMarker from './GroupMarker.vue'
 // for the same reason.
 import Supercluster from 'supercluster/dist/supercluster'
 import { inNetwork } from '../misc/groupFilter'
+import { buildPlaceSearchGeocoder, PLACE_LAYERS } from '../misc/placeSearchGeocoder'
 import { MAX_MAP_ZOOM, MIN_MAP_ZOOM } from '../constants'
 
 export default {
@@ -359,13 +360,24 @@ export default {
 
       if (this.mapObject) {
         try {
+          const photonOptions = {
+            nameProperties: this.placeNameProperties,
+            serviceUrl: 'https://photon.komoot.io/api'
+          }
+
           this.geocoder = new Geocoder({
             placeholder: this.__('groups.search_place'),
             errorMessage: this.__('groups.search_nothing_found'),
             defaultMarkGeocode: false,
-            geocoder: new Photon({
-              nameProperties: this.placeNameProperties,
-              serviceUrl: 'https://photon.komoot.io/api'
+            // Two Photon queries merged, places first - see
+            // placeSearchGeocoder.js for why a plain query can't find
+            // boroughs like Haringey.
+            geocoder: buildPlaceSearchGeocoder({
+              places: new Photon({
+                ...photonOptions,
+                geocodingQueryParams: { layer: PLACE_LAYERS }
+              }),
+              general: new Photon(photonOptions)
             }),
             collapsed: false,
           })
