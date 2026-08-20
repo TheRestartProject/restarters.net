@@ -35,10 +35,10 @@ class RepairController extends Controller
      *      operationId="listRepairsv2",
      *      tags={"Repairs"},
      *      summary="Export repair records in Open Repair Data Standard v0.3",
-     *      description="Bulk export of repair records for the Open Repair Alliance. Covers approved events on approved groups only. Returns JSON by default, or CSV when format=csv.",
+     *      description="Bulk export of repair records for the Open Repair Alliance. Covers approved events on approved groups only. Returns JSON by default, or CSV when format=csv. Administrator role required.",
      *      @OA\Parameter(
      *          name="api_token",
-     *          description="A valid user API token",
+     *          description="A valid user API token. The caller must hold the Administrator role.",
      *          required=true,
      *          in="query",
      *          @OA\Schema(type="string")
@@ -127,6 +127,14 @@ class RepairController extends Controller
      *          )
      *      ),
      *      @OA\Response(
+     *          response=401,
+     *          description="Unauthenticated",
+     *      ),
+     *      @OA\Response(
+     *          response=403,
+     *          description="Forbidden - the authenticated user is not an Administrator",
+     *      ),
+     *      @OA\Response(
      *          response=503,
      *          description="Export is not configured: no id namespace or data provider name has been set",
      *          @OA\JsonContent(
@@ -137,6 +145,12 @@ class RepairController extends Controller
      */
     public function listRepairsv2(Request $request): Response
     {
+        // Checked before the config guard so the export's configuration state
+        // is not readable by an account that cannot use the export anyway.
+        if (! $request->user()->hasRole('Administrator')) {
+            return abort(403, 'The authenticated user is not authorized to access this resource');
+        }
+
         if ($guard = $this->guardExportConfig()) {
             return $guard;
         }
@@ -207,11 +221,12 @@ class RepairController extends Controller
      * `id_prefix` and `data_provider` are instance-specific with no safe
      * default. Both are checked for emptiness, not just presence, because an
      * env var set to "" yields an empty string rather than falling back to
-     * any default.
+     * any default. Normalisation lives on the mapper so the value checked here
+     * is exactly the value emitted on every row.
      */
     private function guardExportConfig(): ?JsonResponse
     {
-        $prefix = trim((string) config('ords.id_prefix'));
+        $prefix = OrdsRecordMapper::configuredIdPrefix();
 
         if ($prefix === '' || $prefix === OrdsRecordMapper::UNASSIGNED_ID_PREFIX) {
             return response()->json([
@@ -219,7 +234,7 @@ class RepairController extends Controller
             ], 503);
         }
 
-        if (trim((string) config('ords.data_provider')) === '') {
+        if (OrdsRecordMapper::configuredDataProvider() === '') {
             return response()->json([
                 'message' => 'ORDS export is not configured: no data provider name has been set.',
             ], 503);
@@ -313,7 +328,10 @@ class RepairController extends Controller
     private function applyFilters(Builder $query, array $validated): void
     {
         if (! empty($validated['updated_since'])) {
-            $updatedSince = Carbon::parse($validated['updated_since'])->setTimezone('UTC')->toDateTimeString();
+            // 'UTC' passed explicitly, as OrdsRecordMapper::eventDate does: an
+            // offset in the input still wins, but a bare value no longer depends
+            // on config('app.timezone') happening to be UTC.
+            $updatedSince = Carbon::parse($validated['updated_since'], 'UTC')->setTimezone('UTC')->toDateTimeString();
             $query->where('devices.updated_at', '>=', $updatedSince);
         }
 
@@ -323,15 +341,21 @@ class RepairController extends Controller
             // connection sets no session timezone, so MySQL 8.0.19+ reads a
             // trailing "+00:00" as an offset and shifts the bound into the
             // server's timezone. `updated_since` already binds this way.
-            $start = Carbon::parse($validated['event_start'])->setTimezone('UTC')->toDateTimeString();
+            $start = Carbon::parse($validated['event_start'], 'UTC')->setTimezone('UTC')->toDateTimeString();
             $query->where('events.event_start_utc', '>=', $start);
         }
 
         if (! empty($validated['event_end'])) {
-            $end = Carbon::parse($validated['event_end']);
+            $raw = trim((string) $validated['event_end']);
+            $end = Carbon::parse($raw, 'UTC');
 
-            // A date-only bound reads as "include that day"; left at 00:00 it'd exclude it entirely.
-            if ($end->format('H:i:s') === '00:00:00') {
+            // A date-only bound reads as "include that day"; left at 00:00 it'd
+            // exclude it entirely. Decided from the raw input rather than from
+            // the parsed value's local H:i:s, which reads "00:00:00" for a full
+            // timestamp that happens to land on midnight in its own offset:
+            // event_end=2024-06-15T00:00:00-05:00 means 05:00 UTC, and widening
+            // that to end-of-day admitted a further 24 hours of events.
+            if (! preg_match('~\d:\d~', $raw)) {
                 $end = $end->endOfDay();
             }
 

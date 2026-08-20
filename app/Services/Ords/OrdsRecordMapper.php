@@ -69,7 +69,7 @@ class OrdsRecordMapper
 
     private readonly string $idPrefix;
 
-    private readonly mixed $dataProvider;
+    private readonly string $dataProvider;
 
     /** @var array<string,array{0:string,1:int}> */
     private readonly array $poweredCategories;
@@ -94,14 +94,38 @@ class OrdsRecordMapper
      */
     public function __construct(private readonly ProblemTextScrubber $scrubber)
     {
-        $this->idPrefix = trim((string) config('ords.id_prefix'));
-        $this->dataProvider = config('ords.data_provider');
+        $this->idPrefix = self::configuredIdPrefix();
+        $this->dataProvider = self::configuredDataProvider();
         $this->poweredCategories = config('ords.categories_powered');
         $this->unpoweredCategories = config('ords.categories_unpowered');
         $this->unpoweredFallback = config('ords.categories_unpowered_fallback');
         $this->repairStatuses = config('ords.repair_status');
         $this->repairStatusUnknown = config('ords.repair_status_unknown');
         $this->barrierVocabulary = config('ords.barriers');
+    }
+
+    /**
+     * The one place either setting is read and normalised, so the controller's
+     * guard and the value emitted here cannot drift apart.
+     *
+     * A non-string is treated as unset. Laravel's env() casts the literal
+     * "true" in a .env file to a boolean, and "(string) true" is "1", so
+     * ORDS_ID_PREFIX=true would otherwise sail past the guard and publish
+     * every record under a one-character namespace. "false", "null" and
+     * "empty" already fail closed; only "true" did not.
+     */
+    public static function configuredIdPrefix(): string
+    {
+        $prefix = config('ords.id_prefix');
+
+        return is_string($prefix) ? trim($prefix) : '';
+    }
+
+    public static function configuredDataProvider(): string
+    {
+        $provider = config('ords.data_provider');
+
+        return is_string($provider) ? trim($provider) : '';
     }
 
     public function resetRedactions(): void
@@ -123,8 +147,9 @@ class OrdsRecordMapper
         [$productCategory, $productCategoryId] = $this->productCategory($device);
 
         return [
-            // Trimmed to match the controller's guard: untrimmed, " ifixit_" would
-            // pass validation and emit ids with a leading space.
+            // Normalised by the same helper the controller's guard uses, so
+            // " restarters_ " cannot pass validation and then emit ids with a
+            // leading space.
             'id' => $this->idPrefix.$device->iddevices,
             'data_provider' => $this->dataProvider,
             'country' => Iso3166::alpha3($device->ords_country_code),

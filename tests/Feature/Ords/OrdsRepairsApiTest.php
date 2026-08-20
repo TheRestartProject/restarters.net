@@ -64,6 +64,22 @@ class OrdsRepairsApiTest extends TestCase
         $this->assertSame('Unauthenticated.', $response->json('message'));
     }
 
+    public function test_refuses_a_caller_who_is_not_an_administrator(): void
+    {
+        // This is a bulk export of volunteer-written text across every approved
+        // group, so it is gated the same way the other global exports are.
+        $this->withExceptionHandling();
+
+        $this->seedRepair();
+
+        foreach (['restarter', 'host', 'networkCoordinator'] as $role) {
+            $token = User::factory()->{$role}()->create()->ensureAPIToken();
+
+            $this->getJson('/api/v2/repairs?'.http_build_query(['api_token' => $token]))
+                ->assertStatus(403);
+        }
+    }
+
     // ------------------------------------------------------ id namespace
 
     public function test_refuses_to_serve_under_an_unassigned_id_namespace(): void
@@ -87,6 +103,28 @@ class OrdsRepairsApiTest extends TestCase
         // to the config default, so a deployment shipping ORDS_ID_PREFIX="" must
         // not be mistaken for a configured export.
         config(['ords.id_prefix' => '']);
+
+        $this->seedRepair();
+
+        $this->getJson($this->url())->assertStatus(503);
+    }
+
+    public function test_refuses_a_prefix_that_env_casting_turned_into_a_boolean(): void
+    {
+        // ORDS_ID_PREFIX=true in a .env file reaches config() as boolean true,
+        // and "(string) true" is "1", which used to pass the guard and publish
+        // every record under a one-character namespace. "false", "null" and
+        // "empty" already failed closed; only "true" did not.
+        config(['ords.id_prefix' => true]);
+
+        $this->seedRepair();
+
+        $this->getJson($this->url())->assertStatus(503);
+    }
+
+    public function test_refuses_a_data_provider_that_env_casting_turned_into_a_boolean(): void
+    {
+        config(['ords.data_provider' => true]);
 
         $this->seedRepair();
 
@@ -479,6 +517,28 @@ class OrdsRepairsApiTest extends TestCase
         $this->assertContains('testinstance_'.$unpowered->iddevices, $ids);
     }
 
+    /**
+     * Regression: "date-only" was decided from the parsed value's local
+     * H:i:s, which reads "00:00:00" for a full timestamp that lands on midnight
+     * in its own offset. event_end=2024-06-15T00:00:00-05:00 means 05:00 UTC,
+     * and widening it to end-of-day admitted a further 24 hours of events.
+     */
+    public function test_a_midnight_event_end_carrying_an_offset_is_taken_as_given(): void
+    {
+        // Seeded event starts 2024-06-15 18:00:00 UTC.
+        $this->seedRepair();
+
+        // 2024-06-15T00:00:00-05:00 is 2024-06-15 05:00:00 UTC, before the event.
+        $this->assertEmpty($this->fetchRecords(['event_end' => '2024-06-15T00:00:00-05:00']));
+
+        // 2024-06-16T00:00:00-05:00 is 2024-06-16 05:00:00 UTC, after it.
+        $this->assertCount(1, $this->fetchRecords(['event_end' => '2024-06-16T00:00:00-05:00']));
+
+        // An explicit UTC midnight is likewise a boundary, not a whole day.
+        $this->assertEmpty($this->fetchRecords(['event_end' => '2024-06-15T00:00:00+00:00']));
+        $this->assertEmpty($this->fetchRecords(['event_end' => '2024-06-15 00:00:00']));
+    }
+
     public function test_a_date_only_event_end_includes_that_whole_day(): void
     {
         // The fixture event runs at 18:00 on 2024-06-15. A caller asking for a
@@ -735,10 +795,16 @@ class OrdsRepairsApiTest extends TestCase
         ]);
     }
 
+    /**
+     * An Administrator, because the export is gated on that role the same way
+     * UserController::changes is. Every other fixture in this file goes through
+     * here, so a regression in the gate fails the whole class rather than one
+     * test.
+     */
     private function apiToken(): string
     {
         if ($this->apiToken === null) {
-            $this->apiToken = User::factory()->create()->ensureAPIToken();
+            $this->apiToken = User::factory()->administrator()->create()->ensureAPIToken();
         }
 
         return $this->apiToken;

@@ -109,6 +109,70 @@ class ProblemTextScrubberTest extends TestCase
         }
     }
 
+    /**
+     * Regression: every one of these was exported byte-for-byte. The candidate
+     * class only admitted space, parentheses, dot and hyphen, so a number
+     * grouped any other way fell to the bare-digit pass, which needs eight
+     * contiguous digits and never saw them either.
+     *
+     * @dataProvider separatedNumberProvider
+     */
+    public function test_redacts_numbers_grouped_by_other_separators(string $problem): void
+    {
+        $result = $this->scrubber->scrub($problem);
+
+        $this->assertStringNotContainsString('7946', $result);
+        $this->assertStringNotContainsString('0958', $result);
+        $this->assertStringContainsString('[phone removed]', $result);
+        $this->assertEquals(1, $this->scrubber->counts()[ProblemTextScrubber::PHONE]);
+    }
+
+    public static function separatedNumberProvider(): array
+    {
+        return [
+            // Standard continental grouping, and the reason this matters here:
+            // the instance serves fr-BE and the Repair Together integration.
+            'slash' => ['owner on 020/7946/0958 most days'],
+            'comma' => ['ring 020,7946,0958 please'],
+            'en dash' => ["call 020\u{2013}7946\u{2013}0958 today"],
+            'em dash' => ["call 020\u{2014}7946\u{2014}0958 today"],
+            'non-breaking hyphen' => ["call 020\u{2011}7946\u{2011}0958 today"],
+            'minus sign' => ["call 020\u{2212}7946\u{2212}0958 today"],
+            'mixed slash and space' => ['owner on 020/7946 0958 most days'],
+        ];
+    }
+
+    /**
+     * \d is ASCII-only under /u without PCRE_UCP, so fullwidth digits render as
+     * a perfectly readable number that no pattern could see.
+     */
+    public function test_redacts_numbers_written_with_fullwidth_digits(): void
+    {
+        $result = $this->scrubber->scrub("call \u{FF10}\u{FF12}\u{FF10} 7946 0958 back");
+
+        $this->assertEquals('call [phone removed] back', $result);
+        $this->assertEquals(1, $this->scrubber->counts()[ProblemTextScrubber::PHONE]);
+    }
+
+    /**
+     * Admitting "/" and "," to the candidate class brings day-first and
+     * slash-separated dates within reach of the phone pattern, so the date
+     * guard has to cover them too.
+     */
+    public function test_leaves_dates_in_other_separators_alone(): void
+    {
+        foreach ([
+            'logged 15/06/2024 14:30 at the bench',
+            'logged 2024/06/15 14:30 at the bench',
+            'logged 15.06.2024 14:30 at the bench',
+            'logged 1/2/2024 09:15 at the bench',
+        ] as $input) {
+            $this->scrubber->reset();
+            $this->assertEquals($input, $this->scrubber->scrub($input));
+            $this->assertEquals(0, $this->scrubber->counts()[ProblemTextScrubber::PHONE], $input);
+        }
+    }
+
     public function test_redacts_non_ascii_and_homoglyph_email_addresses(): void
     {
         // An ASCII-only pattern left the first two untouched or, worse, redacted
@@ -166,11 +230,33 @@ class ProblemTextScrubberTest extends TestCase
     /** The tolerant pass must not treat prices, measurements or citations as addresses. */
     public function test_does_not_redact_at_signs_that_are_not_addresses(): void
     {
-        foreach (['cost 10 @ 2.50 each', '5 @ 3 . 2 volts', 'see p . 4', 'met @ the cafe . nice'] as $kept) {
+        foreach ([
+            'cost 10 @ 2.50 each',
+            '5 @ 3 . 2 volts',
+            'see p . 4',
+            'met @ the cafe . nice',
+            // Regression: the strict pass had no digit exclusion, so the
+            // unspaced form matched as an address and the price was destroyed.
+            'cost 10@2.50 each',
+            'ratio 3@1.75 measured',
+        ] as $kept) {
+            $this->scrubber->reset();
             $this->assertEquals($kept, $this->scrubber->scrub($kept));
+            $this->assertEquals(0, $this->scrubber->counts()[ProblemTextScrubber::EMAIL], $kept);
         }
+    }
 
-        $this->assertEquals(0, $this->scrubber->counts()[ProblemTextScrubber::EMAIL]);
+    /**
+     * The guard that keeps "10@2.50" is "contains a letter", not "the top-level
+     * domain is non-numeric", precisely so this still redacts.
+     */
+    public function test_redacts_an_address_at_a_bare_ip(): void
+    {
+        $this->assertEquals(
+            'logs went to [email removed] overnight',
+            $this->scrubber->scrub('logs went to user@192.168.1.10 overnight')
+        );
+        $this->assertEquals(1, $this->scrubber->counts()[ProblemTextScrubber::EMAIL]);
     }
 
     /** Inline tags close up; block tags still mark a word boundary. */
@@ -198,6 +284,58 @@ class ProblemTextScrubberTest extends TestCase
             'See https://example.com/guide',
             $this->scrubber->scrub('See https://example.com/guide#step-4-user-jane')
         );
+    }
+
+    /**
+     * Regression: the pattern required an explicit scheme, and a volunteer
+     * rarely types one, so the tracking parameters this pass exists to remove
+     * were published whole.
+     *
+     * @dataProvider schemelessUrlProvider
+     */
+    public function test_strips_query_strings_from_schemeless_urls(string $problem, string $expected): void
+    {
+        $this->assertEquals($expected, $this->scrubber->scrub($problem));
+        $this->assertEquals(1, $this->scrubber->counts()[ProblemTextScrubber::URL_QUERY]);
+    }
+
+    public static function schemelessUrlProvider(): array
+    {
+        return [
+            'www host' => [
+                'Part at www.example.com/parts/motor?gclid=ABC123 ordered',
+                'Part at www.example.com/parts/motor ordered',
+            ],
+            'bare host with a path' => [
+                'Part at example.com/parts/motor?gclid=ABC123 ordered',
+                'Part at example.com/parts/motor ordered',
+            ],
+            'www host with no path' => [
+                'Listed on www.example.co.uk?ref=jane ordered',
+                'Listed on www.example.co.uk ordered',
+            ],
+            'schemeless fragment' => [
+                'See www.example.com/guide#step-4-user-jane',
+                'See www.example.com/guide',
+            ],
+        ];
+    }
+
+    /**
+     * The bare-host arm requires a path segment so that ordinary prose is not
+     * mistaken for a URL and truncated at the first question mark.
+     */
+    public function test_leaves_prose_containing_a_question_mark_alone(): void
+    {
+        foreach ([
+            'did you mean file.txt?yes',
+            'is it the M.2 SSD?',
+            'replaced fuse. Still dead?',
+        ] as $kept) {
+            $this->scrubber->reset();
+            $this->assertEquals($kept, $this->scrubber->scrub($kept));
+            $this->assertEquals(0, $this->scrubber->counts()[ProblemTextScrubber::URL_QUERY], $kept);
+        }
     }
 
     public function test_redacts_long_digit_runs(): void

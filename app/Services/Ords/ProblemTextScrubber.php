@@ -61,6 +61,10 @@ class ProblemTextScrubber
         // "owner@\u{00A0}example.com" are reconstructible addresses, and the
         // redaction patterns cannot see through the break while it is still there.
         $text = $this->normaliseWhitespace($text);
+        // Also before the redaction passes: the patterns below are bounded on
+        // ASCII digits and separators, so a fullwidth digit or a typographic
+        // dash leaves a number perfectly readable but unmatchable.
+        $text = $this->normaliseConfusables($text);
         // Must run before the digit/phone passes, or they chew through tracking params.
         $text = $this->stripUrlQueryStrings($text);
         $text = $this->redactEmails($text);
@@ -109,10 +113,19 @@ class ProblemTextScrubber
         return $this->record($result, $count, self::HTML);
     }
 
+    /**
+     * Strips the query string and fragment, which is where tracking and
+     * identifying parameters live.
+     *
+     * Three shapes, because a volunteer rarely types the scheme: an explicit
+     * http(s):// URL, a "www." host, and a bare "host.tld/path". The last
+     * requires a path segment so ordinary prose ("did you mean file.txt?") is
+     * not mistaken for a URL and truncated mid-sentence.
+     */
     private function stripUrlQueryStrings(string $text): string
     {
         return $this->replace(
-            '~(https?://[^\s<>"\']+?)[?#][^\s<>"\']*~iu',
+            '~((?:https?://|www\.)[^\s<>"\']+?|(?:[a-z0-9-]+\.)+[a-z]{2,}/[^\s<>"\']*?)[?#][^\s<>"\']*~iu',
             '$1',
             $text,
             self::URL_QUERY
@@ -126,19 +139,35 @@ class ProblemTextScrubber
      * takes addresses a single space still runs through, which survive because a
      * volunteer wrapped a line or pasted from a client that inserted one. Its
      * top-level domain excludes digits so it cannot swallow "cost 10 @ 2.50 each".
-     * Runs after normaliseWhitespace, so one optional space is enough.
+     * Runs after normaliseConfusables and normaliseWhitespace, so the fullwidth
+     * commercial-at is already an "@" and one optional space is enough.
+     *
+     * The strict pass carries the same protection differently: it is guarded on
+     * the candidate containing a letter rather than on a non-numeric top-level
+     * domain, because excluding digits there would also stop "user@192.168.1.10"
+     * redacting. Without the guard "cost 10@2.50 each" matched as an address.
      */
     private function redactEmails(string $text): string
     {
-        // Fullwidth (U+FF20)/small (U+FE6B) commercial-at also render as "@" and must be normalised first.
-        $normalised = str_replace(["\u{FF20}", "\u{FE6B}"], '@', $text);
+        $strictCount = 0;
 
-        $strict = $this->replace(
+        $strict = preg_replace_callback(
             '~[^\s@<>"\'()\[\],;:]+@[^\s@<>"\'()\[\],;:]+\.[^\s@<>"\'()\[\],;:.]{2,}~u',
-            self::PLACEHOLDERS[self::EMAIL],
-            $normalised,
-            self::EMAIL
+            function (array $match) use (&$strictCount) {
+                // No letter anywhere means a numeric expression ("10@2.50"),
+                // not an address; a real local part or domain always has one.
+                if (! preg_match('~\p{L}~u', $match[0])) {
+                    return $match[0];
+                }
+
+                $strictCount++;
+
+                return self::PLACEHOLDERS[self::EMAIL];
+            },
+            $text
         );
+
+        $strict = $this->record($strict, $strictCount, self::EMAIL);
 
         return $this->replace(
             '~[^\s@<>"\'()\[\],;:]+ ?@ ?[^\s@<>"\'()\[\],;:]+ ?\. ?[^\s@<>"\'()\[\],;:.\d]{2,}~u',
@@ -149,8 +178,15 @@ class ProblemTextScrubber
     }
 
     /**
-     * Separator-bearing sequences only; bare runs go to the digit pass below,
-     * so an IMEI isn't mislabelled as a phone. Nine-digit floor: rpm ranges,
+     * Separator-bearing sequences only; bare runs go to the digit pass below.
+     * The separator set includes "/" and "," as well as space, parentheses, dot
+     * and hyphen: "020/7946/0958" is a standard continental format, and without
+     * them a number written that way was published verbatim -- each group is too
+     * short for the bare-digit pass to catch. One consequence is that a
+     * slash-grouped serial now redacts as a phone rather than a number; the
+     * label is wrong but the digits are gone, which is the point.
+     *
+     * Nine-digit floor: rpm ranges,
      * part numbers, firmware versions and year ranges sit at 8 digits or
      * fewer, while a dialable number needs 9+ once an area/country code is
      * present. A 7-digit local number is missed by design -- cheaper than
@@ -162,18 +198,21 @@ class ProblemTextScrubber
 
         $result = preg_replace_callback(
             // Bounded on digits only: \b would let "phone-555-123-4567" through untouched.
-            '~(?<!\d)\+?\d[\d\s().-]{5,}\d(?!\d)~u',
+            '~(?<!\d)\+?\d[\d\s(),./-]{5,}\d(?!\d)~u',
             function (array $match) use (&$count) {
                 $candidate = $match[0];
 
                 // Prefix match ("2024-06-15 14:30" arrives as "2024-06-15 14"):
-                // ":" is absent from the candidate class.
-                if (preg_match('/^\d{4}-\d{2}-\d{2}(?!\d)/', $candidate)) {
+                // ":" is absent from the candidate class. Slash- and dot-separated
+                // forms are covered too now that the candidate class admits "/",
+                // and day-first because European notes are written that way.
+                if (preg_match('~^\d{4}[-/.]\d{1,2}[-/.]\d{1,2}(?!\d)~', $candidate)
+                    || preg_match('~^\d{1,2}[-/.]\d{1,2}[-/.]\d{4}(?!\d)~', $candidate)) {
                     return $candidate;
                 }
 
                 $digits = preg_match_all('/\d/u', $candidate);
-                $hasSeparator = (bool) preg_match('/[\s().-]/u', $candidate);
+                $hasSeparator = (bool) preg_match('~[\s(),./-]~u', $candidate);
 
                 if ($digits < 9 || ! $hasSeparator) {
                     return $candidate;
@@ -219,6 +258,52 @@ class ProblemTextScrubber
         $this->counts[$countKey] += $count;
 
         return $result;
+    }
+
+    /**
+     * Characters that render as an ASCII separator or digit but are not one.
+     * Every redaction pattern below is ASCII-bounded, so "020\u{2013}7946\u{2013}0958"
+     * and fullwidth "\u{FF10}\u{FF12}\u{FF10} 7946 0958" are both readable
+     * numbers that would otherwise pass through untouched.
+     *
+     * The substitution is kept in the exported text rather than being undone
+     * afterwards, matching how the fullwidth commercial-at was already handled.
+     */
+    private const CONFUSABLES = [
+        // Commercial at.
+        "\u{FF20}" => '@',
+        "\u{FE6B}" => '@',
+        // Hyphen, figure/en/em dash, horizontal bar, minus, and small/fullwidth forms.
+        "\u{2010}" => '-',
+        "\u{2011}" => '-',
+        "\u{2012}" => '-',
+        "\u{2013}" => '-',
+        "\u{2014}" => '-',
+        "\u{2015}" => '-',
+        "\u{2212}" => '-',
+        "\u{FE58}" => '-',
+        "\u{FE63}" => '-',
+        "\u{FF0D}" => '-',
+        // Separators that appear in dialling and serial formats.
+        "\u{FF0F}" => '/',
+        "\u{FF0C}" => ',',
+        "\u{FF0E}" => '.',
+        // Fullwidth digits.
+        "\u{FF10}" => '0',
+        "\u{FF11}" => '1',
+        "\u{FF12}" => '2',
+        "\u{FF13}" => '3',
+        "\u{FF14}" => '4',
+        "\u{FF15}" => '5',
+        "\u{FF16}" => '6',
+        "\u{FF17}" => '7',
+        "\u{FF18}" => '8',
+        "\u{FF19}" => '9',
+    ];
+
+    private function normaliseConfusables(string $text): string
+    {
+        return strtr($text, self::CONFUSABLES);
     }
 
     /**
