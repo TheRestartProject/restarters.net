@@ -107,6 +107,7 @@ return [
   'create_groups_mobile2' => 'Ajouter nouveau',
   'groups_title1_mobile' => 'Le vôtre',
   'groups_title2_mobile' => 'Trouver',
+  'distance' => 'Distance',
   'group_count' => 'Il y a <b>:count Repair Café</b> dans cette zone.  Cherchez et zoomez pour en trouver d\'autres.|Il y a <b>:count Repair Cafés</b> dans cette zone.  Cherchez et zoomez pour en trouver d\'autres.',
   'group_count_none' => 'Si vous ne pouvez encore en voir aucun ici, pourquoi ne pas <a href="/group/nearby">trouver un Repair Café</a> près de chez vous?',
   'hide_filters' => 'Cacher les filtres',

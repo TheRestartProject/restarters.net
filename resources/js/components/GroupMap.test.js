@@ -495,6 +495,22 @@ describe('GroupMap place search', () => {
     expect(map.flyToBounds).not.toHaveBeenCalled()
   })
 
+  // The distance column in the list below anchors to the searched place, so
+  // the parent needs to know where the search landed.
+  test('tells the parent where a search landed', () => {
+    const wrapper = mountMap(WORLD, [])
+    const map = fakeMap()
+    wrapper.vm.mapObject = map
+    wrapper.vm.$refs.map = { mapObject: map }
+
+    const bbox = L.latLngBounds([[51.28, -0.51], [51.69, 0.33]])
+    wrapper.vm.goToPlace(bbox)
+
+    const [[point]] = wrapper.emitted().searched
+    expect(point.lat).toBeCloseTo(51.485, 2)
+    expect(point.lng).toBeCloseTo(-0.09, 2)
+  })
+
   test('counts a search as having moved the map, so it stops reframing itself', () => {
     const wrapper = mountMap(WORLD, [])
     const map = fakeMap()

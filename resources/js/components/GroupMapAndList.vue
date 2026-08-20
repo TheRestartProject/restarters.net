@@ -22,6 +22,7 @@
           :frame-request="frameRequest"
           @update:hover="hover = $event"
           @update:centre="centre = $event"
+          @searched="searchedPoint = $event"
           @groups="groupsChanged($event)"
       />
       <GroupsTable
@@ -30,6 +31,7 @@
           count
           :hover.sync="hover"
           :centre="centre"
+          :reference-point="referencePoint"
           :search="showFilters"
           @update:filters="filtersChanged"
           :all-group-tags="availableTags"
@@ -119,6 +121,9 @@ export default {
       groupidsInBounds: null,
       // Where the map is centred, which orders the list by what's nearest.
       centre: null,
+      // Where the last place search landed. While set, the list's distance
+      // column anchors here rather than to the user's own location.
+      searchedPoint: null,
       // What the user has typed or picked in the filter bar. Applied to every
       // group, not just the ones currently in view, so that filtering moves the
       // map rather than only shortening the list under it.
@@ -151,6 +156,20 @@ export default {
       // What's both in view and allowed by the filter.
       const matching = this.matchingGroupIds
       return this.groupidsInBounds.filter(id => matching.includes(id))
+    },
+    referencePoint() {
+      // What the list's distance column measures from: the searched place if
+      // there has been a search, else the user's own location, else nothing
+      // (the column hides).
+      if (this.searchedPoint) {
+        return this.searchedPoint
+      }
+
+      if (this.yourLat !== null && this.yourLng !== null && !isNaN(+this.yourLat) && !isNaN(+this.yourLng)) {
+        return { lat: +this.yourLat, lng: +this.yourLng }
+      }
+
+      return null
     },
   },
   beforeDestroy() {

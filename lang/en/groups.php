@@ -110,6 +110,7 @@ return [
   'no_groups_mine' => '<b>If you can\'t see any here yet, why not <a href="/group/other">find a group near you</a>?</b>',
   'no_groups_nearest_no_location' => '<b><p>You do not currently have a town/city set.  You can set one in <a href="/profile/edit">your profile</a>.</p><p>You can also <a href="/group/all">view all groups</a>.</p></b>',
   'no_groups_nearest_with_location' => '<p>There are no groups within 50 km of your location. You can <a href="/group/all">see all groups here</a>. Or why not start your own? <a href="https://talk.restarters.net/t/how-to-run-a-repair-event-the-restart-party-kit/324">Learn what running your own repair event involves.</a></p>',
+  'distance' => 'Distance',
   'group_count' => 'There is <b>:count group</b> in this area.  Search and zoom to find more.|There are <b>:count groups</b> in this area.  Search and zoom to find more.',
   'group_count_none' => 'If you can\'t see any here yet, why not <a href="/group/nearby">find a group</a> near you?',
   'search_name_placeholder' => 'Search by name',

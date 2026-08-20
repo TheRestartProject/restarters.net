@@ -64,6 +64,7 @@ const groupsTableStub = {
     allGroupTags: { type: Array, default: null },
     showTags: { type: Boolean, default: false },
     centre: { type: Object, default: null },
+    referencePoint: { type: Object, default: null },
   },
   template: '<div class="stub-table" />',
 }
@@ -283,4 +284,27 @@ test('map update:hover lands in the table hover prop', async () => {
   wrapper.findComponent({ name: 'GroupMap' }).vm.$emit('update:hover', null)
   await wrapper.vm.$nextTick()
   expect(wrapper.vm.hover).toBe(null)
+})
+
+// User feedback: the list's distance column anchors to your own location -
+// or, once you search for a place, to that place.
+describe('GroupMapAndList distance reference point', () => {
+  test('anchors to your own location by default', async () => {
+    const wrapper = await makeWrapper({ yourLat: 51.5, yourLng: -0.1 })
+    expect(wrapper.findComponent(groupsTableStub).props('referencePoint')).toEqual({ lat: 51.5, lng: -0.1 })
+  })
+
+  test('has no reference point when the user has no location', async () => {
+    const wrapper = await makeWrapper()
+    expect(wrapper.findComponent(groupsTableStub).props('referencePoint')).toBeNull()
+  })
+
+  test('re-anchors to the searched place after a place search', async () => {
+    const wrapper = await makeWrapper({ yourLat: 51.5, yourLng: -0.1 })
+
+    wrapper.findComponent(groupMapStub).vm.$emit('searched', { lat: 53.48, lng: -2.24 })
+    await wrapper.vm.$nextTick()
+
+    expect(wrapper.findComponent(groupsTableStub).props('referencePoint')).toEqual({ lat: 53.48, lng: -2.24 })
+  })
 })

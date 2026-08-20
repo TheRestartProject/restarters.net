@@ -284,3 +284,39 @@ describe('GroupsTable pin-hover row highlight', () => {
     expect(mountTable([group]).find('tbody tr').classes()).not.toContain('group-row-hover')
   })
 })
+
+// User feedback: the list under the map should say how far away each group
+// is - from your own location, or from the place you searched for - and be
+// ordered nearest-first by default.
+describe('GroupsTable distance column', () => {
+  const reference = { lat: 51.5, lng: -0.1 }
+  const near = { ...group, id: 1, name: 'Zed Near', location: { location: 'Town', country: 'UK', distance: null, lat: 51.5, lng: -0.2 } }
+  const far = { ...group, id: 2, name: 'Alpha Far', location: { location: 'City', country: 'UK', distance: null, lat: 52.5, lng: -1.9 } }
+  const nowhere = { ...group, id: 3, name: 'Mid Nowhere', location: { location: 'X', country: 'UK', distance: null, lat: null, lng: null } }
+
+  test('hides the distance column without a reference point', () => {
+    const wrapper = mountTable([near, far])
+    expect(wrapper.vm.fields.map(f => f.key)).not.toContain('distance')
+  })
+
+  test('shows a sortable distance column when a reference point is given', () => {
+    const wrapper = mountTable([near, far], { referencePoint: reference })
+    const field = wrapper.vm.fields.find(f => f.key === 'distance')
+    expect(field).toBeTruthy()
+    expect(field.sortable).toBe(true)
+    expect(wrapper.text()).toContain('km')
+  })
+
+  test('measures real km from the reference point', () => {
+    const wrapper = mountTable([near], { referencePoint: reference })
+    // 0.1 degrees of longitude at 51.5N is ~6.9 km - a haversine result, not
+    // the flat-degree approximation used for relative ordering.
+    expect(wrapper.vm.distanceKmFrom(near)).toBeCloseTo(6.9, 0)
+  })
+
+  test('orders nearest-first by default, groups without coordinates last', () => {
+    // Alphabetical order would put Alpha Far first - nearest-first must win.
+    const wrapper = mountTable([far, nowhere, near], { referencePoint: reference })
+    expect(wrapper.vm.itemsToShow.map(g => g.name)).toEqual(['Zed Near', 'Alpha Far', 'Mid Nowhere'])
+  })
+})

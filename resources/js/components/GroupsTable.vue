@@ -65,6 +65,9 @@
           <span class="small text-muted">{{ data.item.location.country }}</span>
         </div>
       </template>
+      <template slot="cell(distance)" slot-scope="data">
+        <span v-if="distanceKmFrom(data.item) !== null" class="text-nowrap">{{ distance(distanceKmFrom(data.item)) }}&nbsp;km</span>
+      </template>
       <template slot="head(next_event)">
         <b-img :src="imageUrl('/icons/events_ico.svg')" class="mt-3 icon" />
       </template>
@@ -118,6 +121,14 @@ export default {
     // Where the map is centred, so the list can be ordered by what's nearest to
     // the middle of what the user is looking at.  Null away from the map.
     centre: {
+      type: Object,
+      required: false,
+      default: null
+    },
+    // {lat, lng} the distance column measures from - the user's own location,
+    // or the place they searched for (see GroupMapAndList.referencePoint).
+    // Null hides the column and leaves the ordering to centre/name.
+    referencePoint: {
       type: Object,
       required: false,
       default: null
@@ -184,6 +195,12 @@ export default {
         { key: 'next_event', label: 'Next Event', sortable: true, tdClass: "hidecell event", thClass: "hidecell" },
       ]
 
+      if (this.referencePoint) {
+        // After next_event: distance is secondary to what the group is called
+        // and where, and hides on mobile like the other detail columns.
+        fields.splice(3, 0, { key: 'distance', label: this.__('groups.distance'), sortable: true, tdClass: "hidecell", thClass: "hidecell" })
+      }
+
       if (this.approve) {
         // Moderation reuses this table, and its rows need a way through to the
         // group that is waiting to be approved.
@@ -212,7 +229,18 @@ export default {
       // Sort before slicing, so the first page is the first groups in order
       // rather than whichever ones happened to load first.
       const items = [...this.filteredItems].sort((a, b) => {
-        if (this.centre) {
+        if (this.referencePoint) {
+          // Nearest the user (or their searched place) first - the distance
+          // column's own order. Groups we can't place go last.
+          const da = this.distanceKmFrom(a)
+          const db = this.distanceKmFrom(b)
+          const ka = da === null ? Number.MAX_VALUE : da
+          const kb = db === null ? Number.MAX_VALUE : db
+
+          if (ka !== kb) {
+            return ka - kb
+          }
+        } else if (this.centre) {
           // Nearest the middle of the map first: someone looking at a map wants
           // what's in front of them, and alphabetical order says nothing about
           // where a group is.  Groups we can't place go last.
@@ -278,6 +306,31 @@ export default {
     }
   },
   methods: {
+    distanceKmFrom(group) {
+      // Real kilometres (haversine) from the reference point - unlike
+      // distanceFromCentre below, this one is shown to the user, so the
+      // flat-degree approximation isn't good enough.
+      if (!this.referencePoint) {
+        return null
+      }
+
+      const lat = group.location && group.location.lat != null ? group.location.lat : group.lat
+      const lng = group.location && group.location.lng != null ? group.location.lng : group.lng
+
+      if (lat == null || lng == null || isNaN(+lat) || isNaN(+lng)) {
+        return null
+      }
+
+      const toRad = (deg) => (deg * Math.PI) / 180
+      const dLat = toRad(+lat - this.referencePoint.lat)
+      const dLng = toRad(+lng - this.referencePoint.lng)
+      const a =
+        Math.sin(dLat / 2) ** 2 +
+        Math.cos(toRad(this.referencePoint.lat)) * Math.cos(toRad(+lat)) * Math.sin(dLng / 2) ** 2
+
+      // Mean Earth radius in km.
+      return 6371 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+    },
     distanceFromCentre(group) {
       // Only ever compared with each other, so the flat-earth approximation is
       // fine and avoids the cost of a great-circle calculation per row.
@@ -317,6 +370,12 @@ export default {
       if (key === 'group_name') {
         // We need a custom sort because we are putting a link into the group field.
         return aRow.name.localeCompare(bRow.name, compareLocale, compareOptions)
+      } else if (key === 'distance') {
+        // A virtual column - the rows carry no `distance` property, so the
+        // default string compare would sort every row as "undefined".
+        const da = this.distanceKmFrom(aRow)
+        const db = this.distanceKmFrom(bRow)
+        return (da === null ? Number.MAX_VALUE : da) - (db === null ? Number.MAX_VALUE : db)
       } else if (key === 'next_event') {
         // Sort no events to the end.
         if (!aRow.next_event && !bRow.next_event) {

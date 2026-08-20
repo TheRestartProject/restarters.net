@@ -396,7 +396,10 @@ export default {
       // the dropdown, there's nothing to be learned from watching the trip.
       this.moved = true
       this.mapObject.fitBounds(bounds)
-      this.$emit('searched')
+      // Where the search landed, so the list's distance column can anchor to
+      // the searched place instead of the user's own location.
+      const centre = bounds.getCenter()
+      this.$emit('searched', { lat: centre.lat, lng: centre.lng })
     },
     presetSearch() {
       // We've already centred the map on the user's area, so show that area in
