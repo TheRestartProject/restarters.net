@@ -129,6 +129,13 @@ describe('components/groups/GroupMap', () => {
       expect(wrapper.findComponent(LMapStub).props('options').dragging).toBe(true)
     })
 
+    // User feedback: the wheel scrolled the page instead of zooming the map,
+    // and people couldn't work out how to zoom in/out.
+    it('zooms with the mouse wheel', () => {
+      const wrapper = mountMap()
+      expect(wrapper.findComponent(LMapStub).props('options').scrollWheelZoom).toBe(true)
+    })
+
     it('does not set gestureHandling (the plugin is not installed)', () => {
       const wrapper = mountMap()
       expect('gestureHandling' in wrapper.findComponent(LMapStub).props('options')).toBe(false)
