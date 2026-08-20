@@ -148,7 +148,9 @@ export default {
         zoomControl: true,
         dragging: true,
         touchZoom: true,
-        scrollWheelZoom: false,
+        // User feedback: with this off, the wheel scrolled the page instead
+        // of zooming the map, and people couldn't work out how to zoom.
+        scrollWheelZoom: true,
         bounceAtZoomLimits: true,
       }
     },

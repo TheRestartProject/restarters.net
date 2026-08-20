@@ -151,6 +151,12 @@ describe('GroupMap options', () => {
     expect(mountMap(WORLD, []).vm.mapOptions.dragging).toBe(true)
   })
 
+  // User feedback: the wheel scrolled the page instead of zooming the map,
+  // and people couldn't work out how to zoom in/out.
+  test('zooms with the mouse wheel', () => {
+    expect(mountMap(WORLD, []).vm.mapOptions.scrollWheelZoom).toBe(true)
+  })
+
   test('does not set gestureHandling (the plugin is not installed)', () => {
     expect('gestureHandling' in mountMap(WORLD, []).vm.mapOptions).toBe(false)
   })
