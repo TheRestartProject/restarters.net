@@ -297,6 +297,11 @@ describe('components/groups/GroupMap', () => {
       await wrapper.findComponent(LMapStub).vm.$emit('ready', map)
 
       expect(geocoderInstances).toHaveLength(1)
+      // Merged place-first search: two Photon instances, the first filtered
+      // to Photon's place layers so boroughs like Haringey are findable.
+      const { geocoder } = geocoderInstances[0].options
+      expect(typeof geocoder.geocode).toBe('function')
+      expect(typeof geocoder.suggest).toBe('function')
       expect(geocoderInstances[0].options.placeholder).toBe(en.groups.search_place)
       expect(geocoderInstances[0].options.errorMessage).toBe(en.groups.search_nothing_found)
       expect(geocoderInstances[0].options.collapsed).toBe(false)

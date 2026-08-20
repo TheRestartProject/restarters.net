@@ -18,6 +18,7 @@ import L from '../../utils/leafletGlobal.js'
 import 'leaflet.markercluster'
 import { LEAFLET_ATTRIBUTION, LEAFLET_TILES, MAP_CLUSTER_RADIUS, MAX_MAP_ZOOM, MIN_MAP_ZOOM } from '../../utils/mapConstants.js'
 import { boundingBoxFor, filterMappableGroups, hasLocation as computeHasLocation, idsInBounds, markerClassName, nearestGroups, separateIdenticalLocations } from '../../composables/useGroupMapGeometry.js'
+import { buildPlaceSearchGeocoder, PLACE_LAYERS } from '../../utils/placeSearchGeocoder.js'
 
 // Leaflet map for /group/map: clustering pins from the names index (drawn
 // for every non-archived group up front - see stores/groups.js's B7 doc
@@ -245,13 +246,23 @@ function onReady(mapInstance) {
   rebuildMarkers()
 
   try {
+    const photonOptions = {
+      nameProperties: ['name', 'street', 'suburb', 'hamlet', 'town', 'city'],
+      serviceUrl: 'https://photon.komoot.io/api/',
+    }
+
     const control = new Geocoder({
       placeholder: t('groups.search_place'),
       errorMessage: t('groups.search_nothing_found'),
       defaultMarkGeocode: false,
-      geocoder: new geocoders.Photon({
-        nameProperties: ['name', 'street', 'suburb', 'hamlet', 'town', 'city'],
-        serviceUrl: 'https://photon.komoot.io/api/',
+      // Two Photon queries merged, places first - see placeSearchGeocoder.js
+      // for why a plain query can't find boroughs like Haringey.
+      geocoder: buildPlaceSearchGeocoder({
+        places: new geocoders.Photon({
+          ...photonOptions,
+          geocodingQueryParams: { layer: PLACE_LAYERS },
+        }),
+        general: new geocoders.Photon(photonOptions),
       }),
       collapsed: false,
     })
