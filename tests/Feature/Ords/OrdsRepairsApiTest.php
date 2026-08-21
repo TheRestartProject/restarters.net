@@ -843,12 +843,6 @@ class OrdsRepairsApiTest extends TestCase
         ]);
     }
 
-    /**
-     * An Administrator, because the export is gated on that role the same way
-     * UserController::changes is. Every other fixture in this file goes through
-     * here, so a regression in the gate fails the whole class rather than one
-     * test.
-     */
     /** Backdates the device and both parent rows past the auto-maintained columns. */
     private function backdate(Device $device, string $when): void
     {
@@ -872,6 +866,12 @@ class OrdsRepairsApiTest extends TestCase
         $model::query()->where($key, $id)->update(['updated_at' => $when]);
     }
 
+    /**
+     * An Administrator, because the export is gated on that role the same way
+     * UserController::changes is. Every other fixture in this file goes through
+     * here, so a regression in the gate fails the whole class rather than one
+     * test.
+     */
     private function apiToken(): string
     {
         if ($this->apiToken === null) {
