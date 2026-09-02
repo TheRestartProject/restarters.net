@@ -120,16 +120,16 @@ test.describe('groups', () => {
     await page.goto(`/group/edit/${id}`)
     await expect(page.getByTestId('group-form')).toBeVisible()
 
-    // TusImageUpload.vue mounts an Uppy Dashboard, which renders two hidden
-    // `.uppy-Dashboard-input` file inputs (the normal picker plus a
-    // webkitdirectory folder picker) - target the plain file one.
+    // GroupForm renders <TusImageUpload compact>, and the compact path skips
+    // @uppy/dashboard entirely (see that component's comment) - so there is no
+    // .uppy-Dashboard-input here, just its own hidden file input.
     // autoProceed:true starts the tus upload immediately on selection.
     const [uploadResponse] = await Promise.all([
       page.waitForResponse(
         (resp) => resp.url().includes(`/api/v2/groups/${id}/images`) && resp.request().method() === 'POST',
         { timeout: 20000 },
       ),
-      page.locator('.uppy-Dashboard-input:not([webkitdirectory])').setInputFiles(TEST_IMAGE),
+      page.getByTestId('tus-image-upload-file-input').setInputFiles(TEST_IMAGE),
     ])
     expect(uploadResponse.status()).toBe(200)
 
