@@ -71,7 +71,7 @@ const discourseGroup = computed(() => {
 })
 
 // Read-more/read-less toggle for the About description, ported from
-// pages/networks/[id].vue's truncatedDescription/showReadMore pattern
+// pages/networks/[id]/index.vue's truncatedDescription/showReadMore pattern
 // (develop's GroupDescription.vue uses ReadMore.vue with :max-chars="440").
 const DESCRIPTION_LIMIT = 440
 const showFullDescription = ref(false)
