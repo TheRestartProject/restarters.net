@@ -1294,21 +1294,11 @@ class GroupController extends Controller
         }, ARRAY_FILTER_USE_BOTH);
 
         if (isset($_FILES) && !empty($_FILES)) {
-            // Update the group image.
+            // Update the group image.  We don't pass a URL through in the event data - the listeners which
+            // push to WordPress read the image back off the group via groupImagePath().
             $file = new \FixometerFile();
-            $group_avatar = $file->upload('image', 'image', $idGroup, env('TBL_GROUPS'), false, true, true);
-            $group_avatar = env('UPLOADS_URL').'mid_'.$group_avatar;
-        } else {
-            // Get the existing image to pass in data to the notification in case it needs it.
-            $existing_image = Fixometer::hasImage($idGroup, 'groups', true);
-            if (! empty($existing_image)) {
-                $group_avatar = env('UPLOADS_URL').'mid_'.$existing_image[0]->path;
-            } else {
-                $group_avatar = 'null';
-            }
+            $file->upload('image', 'image', $idGroup, env('TBL_GROUPS'), false, true, true);
         }
-
-        $data['group_avatar'] = $group_avatar;
 
         $group->update($data);
 
