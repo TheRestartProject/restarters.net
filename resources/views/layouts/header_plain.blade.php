@@ -64,6 +64,9 @@
          window.restarters = {};
          restarters.cookie_domain = '{{ env('SESSION_DOMAIN') }}';
          restarters.tusEndpoint = '{{ config('services.tus.endpoint') }}';
+         // Passed through at runtime rather than baked into the built JS: the
+         // production key only exists as a Fly secret, long after the asset build.
+         restarters.cartoApiKey = @json(config('restarters.carto.api_key'));
          var gdprCookiesCheck = Cookies;
          var gdprCurrentCookiesSelection = gdprCookiesCheck.getJSON('gdprcookienotice');
          restarters.analyticsCookieEnabled = (typeof gdprCurrentCookiesSelection !== 'undefined' && gdprCurrentCookiesSelection['analytics']);
