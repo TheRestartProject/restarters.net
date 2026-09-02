@@ -5,7 +5,7 @@
     <div class="stat1">
         <span>
                 <img style="height:40px" class="" alt="Volunteers" src="{{ asset('/icons/icon_pax.png') }}">
-                <span class="subtext">participants</span>
+                <span class="subtext">@lang('groups.participants')</span>
         </span>
         <?php echo $party['participants']; ?>
     </div>

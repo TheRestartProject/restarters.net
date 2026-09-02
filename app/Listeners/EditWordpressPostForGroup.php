@@ -28,7 +28,6 @@ class EditWordpressPostForGroup extends BaseEvent
     public function handle(EditGroup $event): void
     {
         $id = $event->group->idgroups;
-        $data = $event->data;
 
         $group = Group::find($id);
 
@@ -45,20 +44,23 @@ class EditWordpressPostForGroup extends BaseEvent
 
         try {
             if (is_numeric($group->wordpress_post_id)) {
+                // Read everything off the group, which the caller has already saved, rather than off the
+                // event payload.  That keeps this in step with CreateWordpressPostForGroup - notably the
+                // avatar, which the payload only ever held as a bare filename.
                 $custom_fields = [
                     ['key' => 'group_city', 'value' => $group->area],
                     ['key' => 'group_country', 'value' => Fixometer::getCountryFromCountryCode($group->country_code)],
-                    ['key' => 'group_website', 'value' => $data['website']],
+                    ['key' => 'group_website', 'value' => $group->website],
                     ['key' => 'group_hash', 'value' => $id],
-                    ['key' => 'group_avatar_url', 'value' => $data['group_avatar']],
-                    ['key' => 'group_latitude', 'value' => $data['latitude']],
-                    ['key' => 'group_longitude', 'value' => $data['longitude']],
+                    ['key' => 'group_avatar_url', 'value' => $group->groupImagePath()],
+                    ['key' => 'group_latitude', 'value' => $group->latitude],
+                    ['key' => 'group_longitude', 'value' => $group->longitude],
                 ];
 
                 $content = [
                     'post_type' => 'group',
-                    'post_title' => $data['name'],
-                    'post_content' => $data['free_text'],
+                    'post_title' => $group->name,
+                    'post_content' => $group->free_text,
                     'custom_fields' => $custom_fields,
                 ];
 
@@ -79,7 +81,7 @@ class EditWordpressPostForGroup extends BaseEvent
                     $content['custom_fields'] = $custom_fields;
                     $this->wpClient->editPost($group->wordpress_post_id, $content);
                 } else {
-                    $wpid = $this->wpClient->newPost($data['name'], $data['free_text'], $content);
+                    $wpid = $this->wpClient->newPost($group->name, $group->free_text, $content);
                     $group->wordpress_post_id = $wpid;
                     $group->save();
                 }
