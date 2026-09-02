@@ -128,12 +128,13 @@ async function createGlobalTag(page, name) {
   return response
 }
 
-// ---------- group-edit tag assignment (BFormCheckboxGroup) ----------
+// ---------- group-edit tag assignment (GroupMultiSelect) ----------
 
-// tagOptions renders one `.form-check` per tag with a label showing the
-// tag's (network-suffixed, for non-global tags) name - GroupForm.vue's
-// tagOptions computed. Unique per-test tag names keep the `hasText` filter
-// unambiguous without needing exact-match regex gymnastics.
+// GroupForm.vue passes tagOptions to GroupMultiSelect, not to a checkbox
+// group: selected tags show as chips, and the unselected ones live in a
+// dropdown that is only rendered while the search box has focus. Unique
+// per-test tag names keep the `hasText` filters unambiguous without needing
+// exact-match regex gymnastics.
 async function setGroupTagAssignment(page, groupId, tagName, checked) {
   await page.goto(`/group/edit/${groupId}`)
   await expect(page.getByTestId('group-form')).toBeVisible({ timeout: 10000 })
@@ -141,14 +142,29 @@ async function setGroupTagAssignment(page, groupId, tagName, checked) {
   const container = page.getByTestId('group-form-tags')
   await expect(container).toBeVisible({ timeout: 10000 })
 
-  const checkbox = container.locator('.form-check').filter({ hasText: tagName }).locator('input[type="checkbox"]')
-  await expect(checkbox).toHaveCount(1, { timeout: 10000 })
+  const chip = container.locator('.group-multiselect__chip').filter({ hasText: tagName })
 
   if (checked) {
-    await checkbox.check()
+    // Focus opens the dropdown and typing narrows it; the group headings are
+    // plain list items, so only the actionable ones are real options.
+    const search = container.getByTestId('group-form-tags-search')
+    await search.click()
+    await search.fill(tagName)
+
+    const option = container.locator('li.list-group-item-action').filter({ hasText: tagName })
+    await expect(option).toHaveCount(1, { timeout: 10000 })
+    await option.click()
+
+    // Selecting clears the search box but leaves the dropdown open, and it is
+    // absolutely positioned over the rest of the form - including the submit
+    // button. Blur closes it (the component's own @blur="open = false").
+    await search.blur()
   } else {
-    await checkbox.uncheck()
+    await expect(chip).toHaveCount(1, { timeout: 10000 })
+    await chip.locator('.group-multiselect__chip-remove').click()
   }
+
+  await expect(chip).toHaveCount(checked ? 1 : 0, { timeout: 10000 })
 
   const [response] = await Promise.all([
     page.waitForResponse(
