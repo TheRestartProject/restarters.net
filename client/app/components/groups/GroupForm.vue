@@ -9,7 +9,10 @@ import markerShadowUrl from 'leaflet/dist/images/marker-shadow.png'
 // Side-effecting: sets window.L before <LMap use-global-leaflet> reads it -
 // see the file's own comment and GroupMap.vue, which does the same.
 import L from '../../utils/leafletGlobal.js'
-import { LEAFLET_ATTRIBUTION, LEAFLET_TILES } from '../../utils/mapConstants.js'
+import { LEAFLET_ATTRIBUTION } from '../../utils/mapConstants.js'
+import { useLeafletTiles } from '~/composables/useLeafletTiles.js'
+
+const leafletTiles = useLeafletTiles()
 import { useGroupsStore } from '../../stores/groups.js'
 import { useUploadedImageUrl } from '../../composables/useUploadedImageUrl.js'
 import RichTextEditor from '../forms/RichTextEditor.vue'
@@ -401,7 +404,7 @@ defineExpose({ submit })
           use-global-leaflet
           style="width: 100%; height: 200px"
         >
-          <LTileLayer :url="LEAFLET_TILES" :attribution="LEAFLET_ATTRIBUTION" />
+          <LTileLayer :url="leafletTiles" :attribution="LEAFLET_ATTRIBUTION" />
           <LMarker :lat-lng="previewCenter" :icon="previewIcon" />
         </LMap>
       </div>

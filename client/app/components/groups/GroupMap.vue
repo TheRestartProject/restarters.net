@@ -16,7 +16,10 @@ import 'leaflet.markercluster/dist/MarkerCluster.css'
 // as a bare global) is imported - see the file's own comment.
 import L from '../../utils/leafletGlobal.js'
 import 'leaflet.markercluster'
-import { LEAFLET_ATTRIBUTION, LEAFLET_TILES, MAP_CLUSTER_RADIUS, MAX_MAP_ZOOM, MIN_MAP_ZOOM } from '../../utils/mapConstants.js'
+import { LEAFLET_ATTRIBUTION, MAP_CLUSTER_RADIUS, MAX_MAP_ZOOM, MIN_MAP_ZOOM } from '../../utils/mapConstants.js'
+import { useLeafletTiles } from '~/composables/useLeafletTiles.js'
+
+const leafletTiles = useLeafletTiles()
 import { boundingBoxFor, filterMappableGroups, hasLocation as computeHasLocation, idsInBounds, markerClassName, nearestGroups, separateIdenticalLocations } from '../../composables/useGroupMapGeometry.js'
 import { buildPlaceSearchGeocoder, PLACE_LAYERS } from '../../utils/placeSearchGeocoder.js'
 
@@ -338,7 +341,7 @@ onBeforeUnmount(() => {
       @zoomend="idle"
       @dragend="onDragEnd"
     >
-      <LTileLayer :url="LEAFLET_TILES" :attribution="LEAFLET_ATTRIBUTION" />
+      <LTileLayer :url="leafletTiles" :attribution="LEAFLET_ATTRIBUTION" />
     </LMap>
   </div>
 </template>

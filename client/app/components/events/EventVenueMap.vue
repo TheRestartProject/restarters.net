@@ -9,7 +9,10 @@ import markerShadowUrl from 'leaflet/dist/images/marker-shadow.png'
 // Leaflet instance the manually-built L.icon() below comes from - see
 // components/groups/GroupMap.vue's identical import and doc comment.
 import L from '../../utils/leafletGlobal.js'
-import { LEAFLET_ATTRIBUTION, LEAFLET_TILES } from '../../utils/mapConstants.js'
+import { LEAFLET_ATTRIBUTION } from '../../utils/mapConstants.js'
+import { useLeafletTiles } from '~/composables/useLeafletTiles.js'
+
+const leafletTiles = useLeafletTiles()
 
 // Small, static single-marker map for the event venue (party/view/[id].vue,
 // gap D6). Functional spec: resources/js/components/EventDetails.vue's
@@ -71,7 +74,7 @@ const icon = L.icon({
       use-global-leaflet
       style="width: 100%; height: 200px"
     >
-      <LTileLayer :url="LEAFLET_TILES" :attribution="LEAFLET_ATTRIBUTION" />
+      <LTileLayer :url="leafletTiles" :attribution="LEAFLET_ATTRIBUTION" />
       <LMarker :lat-lng="center" :icon="icon" :interactive="false" />
     </LMap>
   </div>

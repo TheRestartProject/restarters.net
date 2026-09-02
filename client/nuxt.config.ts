@@ -30,6 +30,10 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       apiBase: process.env.NUXT_PUBLIC_API_BASE || 'http://localhost:8001',
+      // CARTO's raster basemaps are watermarked without a key. Falls back to
+      // CARTO_API_KEY, which the Laravel side already has as a Fly secret and
+      // Nitro shares the machine environment with - no second secret needed.
+      cartoApiKey: process.env.NUXT_PUBLIC_CARTO_API_KEY || process.env.CARTO_API_KEY || '',
       // Reserved for the future Capacitor build (design.md §1).
       isApp: process.env.NUXT_PUBLIC_IS_APP === 'true',
     },
