@@ -227,8 +227,9 @@ export default {
     clusters() {
       // Which clusters exist depends on the zoom and what's in view, but Leaflet
       // reports both imperatively, so reading mapIdle here is what makes this
-      // recompute as the map moves.
-      this.mapIdle
+      // recompute as the map moves.  Keep it in a named value rather than a bare
+      // read, so it doesn't look like a line that does nothing.
+      const mapGeneration = this.mapIdle
 
       if (!this.mapObject || !this.clusterPoints.length) {
         return []
@@ -253,7 +254,7 @@ export default {
         ], Math.round(this.mapObject.getZoom()))
       } catch (e) {
         // Map state races (no bounds mid-transition) shouldn't lose the markers.
-        console.error('Error clustering groups', e)
+        console.error('Error clustering groups at map generation', mapGeneration, e)
         return this.clusterPoints
       }
     },
