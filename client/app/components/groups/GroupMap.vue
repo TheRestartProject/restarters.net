@@ -17,11 +17,12 @@ import 'leaflet.markercluster/dist/MarkerCluster.css'
 import L from '../../utils/leafletGlobal.js'
 import 'leaflet.markercluster'
 import { LEAFLET_ATTRIBUTION, MAP_CLUSTER_RADIUS, MAX_MAP_ZOOM, MIN_MAP_ZOOM } from '../../utils/mapConstants.js'
-import { useLeafletTiles } from '~/composables/useLeafletTiles.js'
+import { useLeafletTiles } from '../../composables/useLeafletTiles.js'
 
-const leafletTiles = useLeafletTiles()
 import { boundingBoxFor, filterMappableGroups, hasLocation as computeHasLocation, idsInBounds, markerClassName, nearestGroups, separateIdenticalLocations } from '../../composables/useGroupMapGeometry.js'
 import { buildPlaceSearchGeocoder, PLACE_LAYERS } from '../../utils/placeSearchGeocoder.js'
+
+const leafletTiles = useLeafletTiles()
 
 // Leaflet map for /group/map: clustering pins from the names index (drawn
 // for every non-archived group up front - see stores/groups.js's B7 doc

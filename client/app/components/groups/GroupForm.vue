@@ -10,9 +10,8 @@ import markerShadowUrl from 'leaflet/dist/images/marker-shadow.png'
 // see the file's own comment and GroupMap.vue, which does the same.
 import L from '../../utils/leafletGlobal.js'
 import { LEAFLET_ATTRIBUTION } from '../../utils/mapConstants.js'
-import { useLeafletTiles } from '~/composables/useLeafletTiles.js'
+import { useLeafletTiles } from '../../composables/useLeafletTiles.js'
 
-const leafletTiles = useLeafletTiles()
 import { useGroupsStore } from '../../stores/groups.js'
 import { useUploadedImageUrl } from '../../composables/useUploadedImageUrl.js'
 import RichTextEditor from '../forms/RichTextEditor.vue'
@@ -20,6 +19,8 @@ import LocationPicker from '../forms/LocationPicker.vue'
 import TusImageUpload from '../forms/TusImageUpload.vue'
 import GroupMultiSelect from './GroupMultiSelect.vue'
 import GroupNetworkData from './GroupNetworkData.vue'
+
+const leafletTiles = useLeafletTiles()
 
 // Shared by /group/create and /group/edit/[id.vue] (design.md §6.2 B6 task
 // brief). Functional spec: resources/views/group/create.blade.php +

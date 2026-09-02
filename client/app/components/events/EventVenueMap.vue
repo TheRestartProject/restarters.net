@@ -10,9 +10,10 @@ import markerShadowUrl from 'leaflet/dist/images/marker-shadow.png'
 // components/groups/GroupMap.vue's identical import and doc comment.
 import L from '../../utils/leafletGlobal.js'
 import { LEAFLET_ATTRIBUTION } from '../../utils/mapConstants.js'
-import { useLeafletTiles } from '~/composables/useLeafletTiles.js'
+import { useLeafletTiles } from '../../composables/useLeafletTiles.js'
 
 const leafletTiles = useLeafletTiles()
+
 
 // Small, static single-marker map for the event venue (party/view/[id].vue,
 // gap D6). Functional spec: resources/js/components/EventDetails.vue's
