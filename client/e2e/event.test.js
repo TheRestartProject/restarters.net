@@ -6,19 +6,18 @@ import { USERS, login, logout, createGroup, createEvent, approveEvent, approveGr
 // volunteers modal from the event view page. See client/e2e/utils.js for
 // the shared createGroup/createEvent/approveEvent helpers this file uses.
 //
-// Two behavioural differences from the legacy suite, both because the Nuxt
-// components genuinely work differently (not test bugs):
-//  - There's no "EVENT ACTIONS" dropdown any more - EventForm.vue/
-//    party/view/[id].vue render a single "Invite Volunteers" button
-//    directly (data-testid=event-view-invite).
-//  - The invite button is gated on `canedit && upcoming && approved`, not
-//    on the viewer attending the event (api-contracts-phase-c.md C1d gates
-//    the invites endpoint to host/NC/admin) - so there's no need to join
-//    the event first, unlike the legacy flow's explicit /party/join/ step.
+// One behavioural difference from the legacy suite, because the Nuxt
+// component genuinely works differently (not a test bug):
 //  - EventInviteModal.vue's "select group members" multiselect was
 //    deliberately dropped (docs/nuxt-migration/api-gaps.md Phase C) in
 //    favour of manual email entry against the same invites endpoint - the
 //    modal + email textarea are the Nuxt equivalent asserted below.
+//
+// The invite item lives in EventActionsDropdown.vue, which deliberately
+// mirrors EventActions.vue's gating, including `isAttending`.  No explicit
+// join is needed even so, unlike the legacy flow's /party/join/ step:
+// createEventv2 records the creator as a HOST attendee, so whoever made the
+// event is already attending it.
 
 test.describe('events', () => {
   test('Can create future event', async ({ page }) => {
@@ -39,7 +38,7 @@ test.describe('events', () => {
     await approveEvent(page, eventId)
   })
 
-  test('Invite volunteers modal opens from the event view page', async ({ page }) => {
+  test('Invite volunteers modal opens from the event actions dropdown', async ({ page }) => {
     test.slow()
     await login(page, USERS.admin)
 
@@ -49,8 +48,10 @@ test.describe('events', () => {
 
     await page.goto(`/party/view/${eventId}`, { waitUntil: 'domcontentloaded' })
 
-    const inviteButton = page.getByTestId('event-view-invite')
+    await page.getByTestId('event-actions-dropdown').click()
+    const inviteButton = page.getByTestId('event-actions-invite')
     await expect(inviteButton).toBeVisible({ timeout: 10000 })
+    await expect(inviteButton).toBeEnabled()
     await inviteButton.click()
 
     const modal = page.getByTestId('event-invite-modal')
