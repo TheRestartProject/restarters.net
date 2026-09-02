@@ -24,7 +24,7 @@ L.Icon.Default.mergeOptions({
     shadowUrl: markerShadow,
 });
 
-import './constants';
+import { LEAFLET_ATTRIBUTION, leafletTiles } from './constants';
 
 import Vue from 'vue'
 import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
@@ -775,8 +775,8 @@ function initAutocomplete() {
       if( latitude && longitude ){
           let map = L.map('event-map').setView([latitude, longitude], zoom);
 
-          L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_labels_under/{z}/{x}/{y}{r}.png', {
-              attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="https://carto.com/attribution">CARTO</a>'
+          L.tileLayer(leafletTiles(), {
+              attribution: LEAFLET_ATTRIBUTION
           }).addTo(map);
 
           var icon = new L.Icon.Default();
