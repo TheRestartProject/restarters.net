@@ -72,10 +72,11 @@ test.describe('events', () => {
 
     await page.goto(`/party/view/${eventId}`, { waitUntil: 'domcontentloaded' })
 
-    // The button only shows for a host viewing a finished event — it was a
+    // The item only shows for a host viewing a finished event — it was a
     // dropped feature (the old event-request-review modal), so its presence
     // AND that it hits the real POST endpoint are both under test.
-    const button = page.getByTestId('event-view-request-review')
+    await page.getByTestId('event-actions-dropdown').click()
+    const button = page.getByTestId('event-actions-request-review')
     await expect(button).toBeVisible({ timeout: 10000 })
 
     const [response] = await Promise.all([
@@ -104,7 +105,8 @@ test.describe('events', () => {
     await login(page, USERS.host)
     await page.goto(`/party/view/${eventId}`, { waitUntil: 'domcontentloaded' })
 
-    const followButton = page.getByTestId('event-view-follow-group')
+    await page.getByTestId('event-actions-dropdown').click()
+    const followButton = page.getByTestId('event-actions-follow-group')
     await expect(followButton).toBeVisible({ timeout: 10000 })
 
     // This used to be a NuxtLink to the dead /group/join/{id} page; it must
