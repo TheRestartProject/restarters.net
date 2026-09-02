@@ -78,13 +78,21 @@ test.describe('group map', () => {
     await page.waitForResponse(
       (resp) => new URL(resp.url()).pathname === '/api/v2/groups/names' && resp.request().method() === 'GET'
     )
-    await expect(page.getByTestId(`group-row-link-${groupId}`)).toBeVisible()
+    // Administrators and NCs also get the groups-requiring-moderation queue
+    // above the map, and that is a second GroupsTable whose rows the map's
+    // search box deliberately does not touch. Scope to the map's own list -
+    // it renders after the moderation panel, and is the only table when the
+    // viewer isn't a moderator.
+    const mapList = page.getByTestId('groups-table').last()
+    const rowLinks = mapList.locator('[data-testid^="group-row-link-"]')
+
+    await expect(mapList.getByTestId(`group-row-link-${groupId}`)).toBeVisible()
 
     await page.getByTestId('group-map-search').fill('Tag Test Group')
 
-    await expect(page.getByTestId(`group-row-link-${groupId}`)).toBeVisible()
+    await expect(mapList.getByTestId(`group-row-link-${groupId}`)).toBeVisible()
     // Every remaining row's link text should contain the search term.
-    const rowLinks = page.locator('[data-testid^="group-row-link-"]')
+    await expect(rowLinks).not.toHaveCount(0)
     const count = await rowLinks.count()
     for (let i = 0; i < count; i++) {
       await expect(rowLinks.nth(i)).toContainText('Tag Test Group')
