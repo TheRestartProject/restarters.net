@@ -95,7 +95,6 @@ import DeviceRepairStatus from './DeviceRepairStatus.vue'
 import DeviceProblem from './DeviceProblem.vue'
 import DeviceNotes from './DeviceNotes.vue'
 import DeviceQuantity from './DeviceQuantity.vue'
-import FileUploader from './FileUploader.vue'
 import DeviceImages from './DeviceImages.vue'
 import ConfirmModal from './ConfirmModal.vue'
 
@@ -103,7 +102,6 @@ export default {
   components: {
     ConfirmModal,
     DeviceImages,
-    FileUploader,
     DeviceQuantity,
     DeviceNotes,
     DeviceProblem,

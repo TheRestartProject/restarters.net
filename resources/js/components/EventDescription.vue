@@ -14,12 +14,11 @@
 <script>
 import map from '../mixins/map'
 import event from '../mixins/event'
-import ExternalLink from './ExternalLink.vue'
 import CollapsibleSection from './CollapsibleSection.vue'
 import ReadMore from './ReadMore.vue'
 
 export default {
-  components: {ReadMore, CollapsibleSection, ExternalLink},
+  components: {ReadMore, CollapsibleSection},
   mixins: [ map, event ],
   props: {
     idevents: {
