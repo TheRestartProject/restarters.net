@@ -225,7 +225,75 @@ jobs:
           name: Deploy to restarters (production)
           command: |
             export FLY_API_TOKEN="FlyV1 $FLY_API_TOKEN"
-            flyctl deploy --app restarters --remote-only
+            # Deliberately not failing the job here.  A rolling deploy that
+            # times out waiting for health checks leaves the machine on the new
+            # image but out of the proxy pool, which with a single machine is a
+            # total outage - and that is precisely when we must not stop and
+            # walk away.  The verify step below decides whether the site is
+            # actually serving, and that is the thing we care about.
+            if flyctl deploy --app restarters --remote-only; then
+              echo ok > /tmp/deploy-result
+            else
+              echo failed > /tmp/deploy-result
+              echo "flyctl reported failure; the verify step will check whether production is serving."
+            fi
+          no_output_timeout: 15m
+      - run:
+          name: Verify production is serving, restarting once if not
+          command: |
+            export FLY_API_TOKEN="FlyV1 $FLY_API_TOKEN"
+
+            # Probe from outside Fly, on the same path the Fly health check
+            # uses.  robots.txt is static, so a 200 means nginx is up and the
+            # proxy has a healthy instance to route to - it does not depend on
+            # the database being reachable.
+            serving() {
+              for _ in $(seq 1 "$1"); do
+                code=$(curl -sS -o /dev/null -w '%{http_code}' --max-time 15 \
+                       https://restarters.net/robots.txt || echo 000)
+                [ "$code" = "200" ] && return 0
+                sleep 10
+              done
+              return 1
+            }
+
+            if serving 12; then
+              echo "Production is serving."
+              [ "$(cat /tmp/deploy-result)" = failed ] && \
+                echo "NOTE: flyctl exited non-zero but the site is up - check the deploy log above."
+              exit 0
+            fi
+
+            echo "=============================================="
+            echo "Production is NOT serving after the deploy."
+            echo "=============================================="
+            flyctl status --app restarters || true
+
+            # On 2026-09-02 a deploy timed out waiting for health checks and
+            # left the machine started but critical for 43 minutes; restarting
+            # that same image brought it straight back.  Try that once per
+            # machine before giving up, re-checking after each so we stop as
+            # soon as the site returns - and never loop, because a restart that
+            # does not help means something a restart cannot fix.
+            command -v jq >/dev/null 2>&1 || sudo apt-get install -y jq
+            for id in $(flyctl machines list --app restarters --json | jq -r '.[].id'); do
+              echo "Restarting machine $id"
+              flyctl machine restart "$id" --app restarters || true
+              if serving 18; then
+                echo "=============================================="
+                echo "RECOVERED after restarting $id."
+                echo "The deploy could not bring this machine up healthy on"
+                echo "its own - worth finding out why rather than relying on"
+                echo "this path."
+                echo "=============================================="
+                exit 0
+              fi
+            done
+
+            echo "Still not serving after restarting. Production needs a human."
+            flyctl status --app restarters || true
+            flyctl logs --app restarters --no-tail 2>&1 | tail -50 || true
+            exit 1
           no_output_timeout: 15m
 
 workflows:
