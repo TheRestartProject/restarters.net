@@ -58,11 +58,13 @@ test.describe('network management', () => {
     await login(page, USERS.admin)
     const networkId = await getNetworkId(page)
 
-    await page.goto(`/networks/${networkId}`, { waitUntil: 'domcontentloaded' })
+    // The tus uploader lives on the network edit page, inside the branch that
+    // only renders when canManage is true; /networks/{id} is the read-only
+    // view and carries no upload control at all.
+    await page.goto(`/networks/${networkId}/edit`, { waitUntil: 'domcontentloaded' })
 
-    // The logo-management section (with its tus uploader) renders for a
-    // manager — this is the UI that was entirely absent before.
-    await expect(page.getByTestId('network-logo-manage')).toBeVisible({ timeout: 10000 })
+    await expect(page.getByTestId('network-edit-heading')).toBeVisible({ timeout: 10000 })
+    await expect(page.getByTestId('network-edit-forbidden')).toHaveCount(0)
     await expect(page.getByTestId('network-logo-upload')).toBeVisible()
   })
 })
