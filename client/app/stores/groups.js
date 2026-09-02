@@ -219,6 +219,11 @@ export const useGroupsStore = defineStore('groups', {
       if (!wasMember) {
         this.memberIds = [...this.memberIds, id]
       }
+      // /group/view/[id] reads `group.is_member ?? isMember(id)`, and
+      // GET /api/v2/groups/{id} always sends is_member for a logged-in
+      // caller - so a defined `false` wins and flipping memberIds alone
+      // leaves the Join/Leave item stuck until the page is reloaded.
+      const restoreIsMember = this._setCurrentIsMember(id, true)
 
       const { $api } = useNuxtApp()
 
@@ -229,8 +234,23 @@ export const useGroupsStore = defineStore('groups', {
         if (!wasMember) {
           this.memberIds = this.memberIds.filter((mid) => mid !== id)
         }
+        restoreIsMember()
         useToastStore().error(error)
         throw error
+      }
+    },
+
+    // Mirrors an optimistic membership flip onto the currently-loaded group,
+    // returning the undo for the revert paths above.
+    _setCurrentIsMember(id, value) {
+      const current = this.current.data
+      if (!current || current.id !== id) {
+        return () => {}
+      }
+      const previous = current.is_member
+      current.is_member = value
+      return () => {
+        current.is_member = previous
       }
     },
 
@@ -245,6 +265,7 @@ export const useGroupsStore = defineStore('groups', {
       if (mineEntry) {
         this.mine.data = this.mine.data.filter((g) => g.id !== id)
       }
+      const restoreIsMember = this._setCurrentIsMember(id, false)
 
       const { $api } = useNuxtApp()
 
@@ -255,6 +276,7 @@ export const useGroupsStore = defineStore('groups', {
         if (wasMember) {
           this.memberIds = [...this.memberIds, id]
         }
+        restoreIsMember()
         if (mineEntry) {
           const restored = [...this.mine.data]
           restored.splice(mineIndex, 0, mineEntry)
@@ -265,10 +287,11 @@ export const useGroupsStore = defineStore('groups', {
       }
     },
 
-    // Fetches the single group shown by /group/view/[id]. See the class doc
-    // comment: there's no is_member flag on the response, so this also
-    // seeds memberIds from the dashboard's your_groups (best-effort, capped
-    // at 5) unless we already know something about this id.
+    // Fetches the single group shown by /group/view/[id]. The response does
+    // carry is_member (see the class doc comment), but memberIds is what the
+    // group lists elsewhere read, so this also seeds it from the dashboard's
+    // your_groups (best-effort, capped at 5) unless we already know
+    // something about this id.
     async fetchCurrent(id) {
       const { $api } = useNuxtApp()
 

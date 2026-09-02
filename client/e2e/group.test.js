@@ -73,39 +73,41 @@ test.describe('groups', () => {
     const id = await getGroupIdByName(page, TAG_TEST_GROUP)
     await page.goto(`/group/view/${id}`)
 
-    const joinButton = page.getByTestId(`group-join-${id}`)
-    const leaveButton = page.getByTestId(`group-leave-${id}`)
+    // The view page renders GroupActions, not GroupJoinButton: join and leave
+    // are dropdown items with fixed testids, and the menu closes after each
+    // click, so it has to be reopened to see the membership change.
+    const dropdown = page.getByTestId('group-actions-dropdown')
+    const joinItem = page.getByTestId('group-actions-join')
+    const leaveItem = page.getByTestId('group-actions-leave')
 
-    // Self-healing: GroupJoinButton renders exactly one of these two
-    // testids depending on current membership. A prior failed/retried run
-    // may have left nc mid-flow (joined but not left), so normalize to "not
-    // a member" first rather than assuming a fixed starting state.
-    await expect(joinButton.or(leaveButton)).toBeVisible({ timeout: 10000 })
-    if (await leaveButton.isVisible()) {
-      await Promise.all([
-        page.waitForResponse(
-          (resp) => resp.url().includes(`/api/v2/groups/${id}/members/me`) && resp.request().method() === 'DELETE',
-        ),
-        leaveButton.click(),
-      ])
-      await expect(joinButton).toBeVisible()
+    const openMenu = async () => {
+      await dropdown.click()
+      await expect(joinItem.or(leaveItem)).toBeVisible({ timeout: 10000 })
     }
 
-    await Promise.all([
+    const membership = (method) =>
       page.waitForResponse(
-        (resp) => resp.url().includes(`/api/v2/groups/${id}/members/me`) && resp.request().method() === 'POST',
-      ),
-      joinButton.click(),
-    ])
-    await expect(leaveButton).toBeVisible()
+        (resp) => resp.url().includes(`/api/v2/groups/${id}/members/me`) && resp.request().method() === method,
+      )
 
-    await Promise.all([
-      page.waitForResponse(
-        (resp) => resp.url().includes(`/api/v2/groups/${id}/members/me`) && resp.request().method() === 'DELETE',
-      ),
-      leaveButton.click(),
-    ])
-    await expect(joinButton).toBeVisible()
+    // Self-healing: exactly one of join/leave renders depending on current
+    // membership. A prior failed/retried run may have left nc mid-flow
+    // (joined but not left), so normalize to "not a member" first rather than
+    // assuming a fixed starting state.
+    await openMenu()
+    if (await leaveItem.isVisible()) {
+      await Promise.all([membership('DELETE'), leaveItem.click()])
+      await openMenu()
+      await expect(joinItem).toBeVisible()
+    }
+
+    await Promise.all([membership('POST'), joinItem.click()])
+    await openMenu()
+    await expect(leaveItem).toBeVisible()
+
+    await Promise.all([membership('DELETE'), leaveItem.click()])
+    await openMenu()
+    await expect(joinItem).toBeVisible()
   })
 
   test('Group image upload persists on view page', async ({ page }) => {
