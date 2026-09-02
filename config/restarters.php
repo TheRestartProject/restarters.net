@@ -18,6 +18,14 @@ return [
         'base_url' => env('REPAIRDIRECTORY_URL'),
     ],
 
+    'carto' => [
+        // CARTO's raster basemaps need an API key; without one the tiles come
+        // back watermarked. The key is served to the browser, so it isn't a
+        // secret in the usual sense, but keeping it in config means it stays
+        // out of the repo and can differ per environment.
+        'api_key' => env('CARTO_API_KEY'),
+    ],
+
     'xref_types' => [
         'networks' => 7,
     ],
