@@ -130,6 +130,7 @@ const countryOptions = computed(() => {
           type="search"
           class="form-control"
           :placeholder="t('groups.search_name_placeholder')"
+          :aria-label="t('groups.search_name_placeholder')"
           data-testid="groups-table-filter-name"
         >
       </div>
@@ -147,17 +148,18 @@ const countryOptions = computed(() => {
           type="search"
           class="form-control"
           :placeholder="t('groups.search_location_placeholder')"
+          :aria-label="t('groups.search_location_placeholder')"
           data-testid="groups-table-filter-location"
         >
       </div>
       <div class="col-12 col-md">
-        <select v-model="filters.country" class="form-select" data-testid="groups-table-filter-country">
+        <select v-model="filters.country" class="form-select" :aria-label="t('groups.search_country_placeholder')" data-testid="groups-table-filter-country">
           <option value="">{{ t('groups.search_country_placeholder') }}</option>
           <option v-for="country in countryOptions" :key="country" :value="country">{{ country }}</option>
         </select>
       </div>
       <div class="col-12 col-md">
-        <select v-model="filters.network" class="form-select" data-testid="groups-table-filter-network">
+        <select v-model="filters.network" class="form-select" :aria-label="t('networks.network')" data-testid="groups-table-filter-network">
           <option value="">{{ t('networks.network') }}</option>
           <option v-for="network in networkOptions" :key="network.id" :value="network.id">{{ network.name }}</option>
         </select>

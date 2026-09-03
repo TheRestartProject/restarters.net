@@ -180,6 +180,7 @@ async function performDelete() {
           type="text"
           class="form-control form-control-sm mb-2"
           :placeholder="t('networks.tags.new_tag_placeholder')"
+          :aria-label="t('networks.tags.new_tag_placeholder')"
           required
           data-testid="network-tags-create-name"
         >
@@ -188,6 +189,7 @@ async function performDelete() {
           type="text"
           class="form-control form-control-sm mb-2"
           :placeholder="t('networks.tags.description_placeholder')"
+          :aria-label="t('networks.tags.description_placeholder')"
           data-testid="network-tags-create-description"
         >
         <BButton type="submit" variant="primary" size="sm" :disabled="!newTagName.trim() || creating" data-testid="network-tags-create-submit">
@@ -204,11 +206,11 @@ async function performDelete() {
       data-testid="network-tags-edit-modal"
       @hide="closeEdit"
     >
-      <BFormGroup :label="`${t('networks.tags.name_label')}:`">
-        <input v-model="editName" type="text" class="form-control" required data-testid="network-tags-edit-name">
+      <BFormGroup :label="`${t('networks.tags.name_label')}:`" label-for="network-tags-edit-name">
+        <input id="network-tags-edit-name" v-model="editName" type="text" class="form-control" required data-testid="network-tags-edit-name">
       </BFormGroup>
-      <BFormGroup :label="`${t('networks.tags.description_label')}:`">
-        <textarea v-model="editDescription" class="form-control" rows="3" data-testid="network-tags-edit-description" />
+      <BFormGroup :label="`${t('networks.tags.description_label')}:`" label-for="network-tags-edit-description">
+        <textarea id="network-tags-edit-description" v-model="editDescription" class="form-control" rows="3" data-testid="network-tags-edit-description" />
       </BFormGroup>
       <p v-if="editError" class="text-danger small" data-testid="network-tags-edit-error">{{ editError }}</p>
       <div class="d-flex justify-content-end gap-2 mt-3">

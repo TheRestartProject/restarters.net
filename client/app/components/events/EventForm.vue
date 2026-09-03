@@ -495,6 +495,7 @@ defineExpose({ submit })
           v-model="form.eventDate"
           type="date"
           class="form-control d-block d-lg-none"
+          :aria-label="t('events.field_event_date')"
           data-testid="event-form-date-native"
         >
         <div v-if="fieldError('eventDate')" class="invalid-feedback d-block" data-testid="event-form-date-error">
@@ -625,7 +626,7 @@ defineExpose({ submit })
             </svg>
             {{ t('events.approve_event') }}:
           </template>
-          <select id="event-form-approve" v-model="form.moderate" class="form-select" data-testid="event-approve">
+          <select id="event-form-approve" v-model="form.moderate" class="form-select" :aria-label="t('events.approve_event')" data-testid="event-approve">
             <option value="" />
             <option value="approve">{{ t('client.groups.approve_option') }}</option>
           </select>

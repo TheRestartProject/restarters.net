@@ -70,7 +70,7 @@ function copy(text) {
     <template v-else-if="profileStore.calendars.data">
       <h5>{{ t('profile.calendars.my_events') }}</h5>
       <div class="input-group mb-4">
-        <input type="text" class="form-control" readonly :value="profileStore.calendars.data.user_url" data-testid="calendars-user-url">
+        <input type="text" class="form-control" readonly :value="profileStore.calendars.data.user_url" :aria-label="t('profile.calendars.my_events')" data-testid="calendars-user-url">
         <BButton variant="primary" @click="copy(profileStore.calendars.data.user_url)">{{ t('profile.calendars.copy_link') }}</BButton>
       </div>
 
@@ -78,7 +78,7 @@ function copy(text) {
       <template v-for="g in profileStore.calendars.data.groups" :key="g.id">
         <p class="mb-2">{{ g.name }}</p>
         <div class="input-group mb-4">
-          <input type="text" class="form-control" readonly :value="g.url">
+          <input type="text" class="form-control" readonly :value="g.url" :aria-label="g.name">
           <BButton variant="primary" @click="copy(g.url)">{{ t('profile.calendars.copy_link') }}</BButton>
         </div>
       </template>
@@ -218,7 +218,7 @@ function copy(text) {
           </svg> <span class="span-vertically-align-middle">{{ t('profile.calendars.all_events') }}</span>
         </h5>
         <div class="input-group mb-4">
-          <input type="text" class="form-control" readonly :value="profileStore.calendars.data.admin_all_events_url">
+          <input type="text" class="form-control" readonly :value="profileStore.calendars.data.admin_all_events_url" :aria-label="t('profile.calendars.all_events')">
           <BButton variant="primary" @click="copy(profileStore.calendars.data.admin_all_events_url)">{{ t('profile.calendars.copy_link') }}</BButton>
         </div>
       </template>

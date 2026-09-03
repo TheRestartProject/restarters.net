@@ -43,9 +43,11 @@ function addField() {
       v-for="key in Object.keys(modelValue || {})"
       :key="`networkdata-${key}`"
       :label="`${key}:`"
+      :label-for="`group-network-data-field-${key}`"
       class="mt-1"
     >
       <input
+        :id="`group-network-data-field-${key}`"
         type="text"
         class="form-control"
         :value="modelValue[key]"
@@ -58,8 +60,8 @@ function addField() {
       {{ t('networks.edit.add_new_field') }}
     </BButton>
     <div v-if="showAddNew" class="mt-1">
-      <label>{{ t('networks.edit.new_field_name') }}:</label>
-      <input v-model="newLabel" type="text" class="form-control" data-testid="group-network-data-new-label">
+      <label for="group-network-data-new-label">{{ t('networks.edit.new_field_name') }}:</label>
+      <input id="group-network-data-new-label" v-model="newLabel" type="text" class="form-control" data-testid="group-network-data-new-label">
       <BButton variant="primary" class="mt-2" data-testid="group-network-data-add-field" @click="addField">
         {{ t('networks.edit.add_field') }}
       </BButton>

@@ -149,6 +149,7 @@ async function confirmRemove() {
               class="mt-2 mb-4"
               :count="participants"
               :canedit="canedit"
+              :label="t('events.stat-0')"
               testid="event-attendees-participants-count"
               @change="emit('update-participants', $event)"
             />
@@ -162,6 +163,7 @@ async function confirmRemove() {
               class="mt-2"
               :count="volunteers"
               :canedit="canedit"
+              :label="t('events.stat-2')"
               testid="event-attendees-volunteers-count"
               @change="emit('update-volunteers', $event)"
             />

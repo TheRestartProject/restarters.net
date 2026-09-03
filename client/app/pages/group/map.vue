@@ -194,6 +194,7 @@ onMounted(() => {
           class="form-control"
           style="max-width: 20rem"
           :placeholder="t('groups.search_name_placeholder')"
+          :aria-label="t('groups.search_name_placeholder')"
           data-testid="group-map-search"
         >
       </div>

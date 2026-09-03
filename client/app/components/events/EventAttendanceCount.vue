@@ -19,6 +19,12 @@ const props = defineProps({
     type: String,
     default: 'event-attendance-count',
   },
+  // The visible heading sits above the stepper rather than being tied to the
+  // input, so the number field needs its own accessible name.
+  label: {
+    type: String,
+    default: '',
+  },
 })
 
 const emit = defineEmits(['change'])
@@ -72,6 +78,7 @@ function onInput(event) {
       step="1"
       class="form-control form-control-sm text-center attendance-count-input"
       :value="current"
+      :aria-label="label || undefined"
       :data-testid="`${testid}-input`"
       @input="onInput"
     >

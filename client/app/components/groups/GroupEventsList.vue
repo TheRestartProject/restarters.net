@@ -383,7 +383,7 @@ function copyCalendarUrl() {
     >
       <p>{{ t('groups.calendar_copy_description', { group: groupName }) }}</p>
       <div class="input-group">
-        <input type="text" class="form-control" readonly :value="calendarUrl" data-testid="group-events-calendar-url">
+        <input type="text" class="form-control" readonly :value="calendarUrl" :aria-label="t('profile.calendars.group_calendars')" data-testid="group-events-calendar-url">
         <BButton variant="primary" @click="copyCalendarUrl">{{ t('profile.calendars.copy_link') }}</BButton>
       </div>
     </BModal>

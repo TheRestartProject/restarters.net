@@ -383,6 +383,7 @@ onMounted(load)
             class="form-control"
             readonly
             :value="profileStore.calendars.data.user_url"
+            :aria-label="t('profile.calendars.my_events')"
             data-testid="party-calendar-url"
           >
           <BButton
