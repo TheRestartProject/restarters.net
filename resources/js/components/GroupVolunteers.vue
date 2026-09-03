@@ -31,10 +31,9 @@
 import group from '../mixins/group'
 import GroupVolunteer from './GroupVolunteer.vue'
 import CollapsibleSection from './CollapsibleSection.vue'
-import Group from '../mixins/group'
 
 export default {
-  components: {Group, CollapsibleSection, GroupVolunteer},
+  components: {CollapsibleSection, GroupVolunteer},
   mixins: [group],
   props: {
     idgroups: {
