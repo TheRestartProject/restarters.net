@@ -43,7 +43,10 @@ function toggle() {
       :class="hideTitle ? 'd-md-none' : 'd-md-block'"
       role="button"
       data-testid="event-collapsible-title"
+      tabindex="0"
       @click="toggle"
+      @keydown.enter.prevent="toggle"
+      @keydown.space.prevent="toggle"
     >
       <div class="d-flex align-items-center">
         <slot name="title" />

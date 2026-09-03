@@ -280,7 +280,7 @@ function copyCalendarUrl() {
         <table v-else class="table" data-testid="group-events-table-upcoming">
           <thead>
             <tr>
-              <th scope="col" class="sortable" role="button" :aria-sort="sortAria()" @click="toggleSort('start')">
+              <th scope="col" class="sortable" role="button" :aria-sort="sortAria()" tabindex="0" @click="toggleSort('start')" @keydown.enter.prevent="toggleSort('start')" @keydown.space.prevent="toggleSort('start')">
                 <span>{{ t('client.groups.column_event') }}</span>
                 <span class="sort-indicator" aria-hidden="true">{{ sortDesc ? '▼' : '▲' }}</span>
                 <span class="visually-hidden">{{ sortHint() }}</span>
@@ -290,7 +290,10 @@ function copyCalendarUrl() {
                 class="sortable"
                 role="button"
                 :aria-sort="sortAria('location')"
+                tabindex="0"
                 @click="toggleSort('location')"
+                @keydown.enter.prevent="toggleSort('location')"
+                @keydown.space.prevent="toggleSort('location')"
               >
                 <span>{{ t('client.groups.column_location') }}</span>
                 <span class="sort-indicator" aria-hidden="true">{{ sortKey === 'location' && sortDesc ? '▼' : '▲' }}</span>
@@ -319,7 +322,7 @@ function copyCalendarUrl() {
         <table v-else class="table" data-testid="group-events-table-past">
           <thead>
             <tr>
-              <th scope="col" class="sortable" role="button" :aria-sort="sortAria()" @click="toggleSort('start')">
+              <th scope="col" class="sortable" role="button" :aria-sort="sortAria()" tabindex="0" @click="toggleSort('start')" @keydown.enter.prevent="toggleSort('start')" @keydown.space.prevent="toggleSort('start')">
                 <span>{{ t('client.groups.column_event') }}</span>
                 <span class="sort-indicator" aria-hidden="true">{{ sortDesc ? '▼' : '▲' }}</span>
                 <span class="visually-hidden">{{ sortHint() }}</span>
@@ -329,7 +332,10 @@ function copyCalendarUrl() {
                 class="sortable"
                 role="button"
                 :aria-sort="sortAria('location')"
+                tabindex="0"
                 @click="toggleSort('location')"
+                @keydown.enter.prevent="toggleSort('location')"
+                @keydown.space.prevent="toggleSort('location')"
               >
                 <span>{{ t('client.groups.column_location') }}</span>
                 <span class="sort-indicator" aria-hidden="true">{{ sortKey === 'location' && sortDesc ? '▼' : '▲' }}</span>
@@ -343,7 +349,10 @@ function copyCalendarUrl() {
                 role="button"
                 :aria-sort="sortAria(column.key)"
                 :data-testid="`group-events-col-${column.key}`"
+                tabindex="0"
                 @click="toggleSort(column.key)"
+                @keydown.enter.prevent="toggleSort(column.key)"
+                @keydown.space.prevent="toggleSort(column.key)"
               >
                 <img :src="column.icon" :alt="column.label" :title="column.label" width="24" height="24">
                 <span class="visually-hidden">{{ sortHint(column.key) }}</span>

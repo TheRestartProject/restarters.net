@@ -30,7 +30,10 @@ function toggle() {
     <div
       class="collapsible-title d-flex d-md-block justify-content-between align-items-center"
       role="button"
+      tabindex="0"
       @click="toggle"
+      @keydown.enter.prevent="toggle"
+      @keydown.space.prevent="toggle"
     >
       <div class="d-flex align-items-center">
         <slot name="title" />

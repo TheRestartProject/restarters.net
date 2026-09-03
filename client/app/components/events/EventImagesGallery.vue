@@ -62,7 +62,10 @@ function closeZoom() {
         class="event-image-thumb me-2 mb-2"
         data-testid="event-image-thumb"
         role="button"
+        tabindex="0"
         @click="zoom(image)"
+        @keydown.enter.prevent="zoom(image)"
+        @keydown.space.prevent="zoom(image)"
       >
     </div>
 

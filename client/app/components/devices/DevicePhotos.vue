@@ -126,7 +126,10 @@ function closeZoom() {
           alt=""
           role="button"
           data-testid="device-photo-thumb"
+          tabindex="0"
           @click="zoom(image)"
+          @keydown.enter.prevent="zoom(image)"
+          @keydown.space.prevent="zoom(image)"
         >
         <button
           v-if="!readonly"
