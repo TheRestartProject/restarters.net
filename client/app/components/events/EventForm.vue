@@ -17,6 +17,8 @@ import 'vue-datepicker-next/index.css'
 // is the same NetworkData.vue/NetworkDataField.vue port GroupForm.vue
 // already uses for its own admin-only card).
 import GroupNetworkData from '../groups/GroupNetworkData.vue'
+import EventDuplicateModal from './EventDuplicateModal.vue'
+import { findDuplicateEvents } from '../../utils/duplicateEvents.js'
 
 // Shared by /party/create/[[group_id]], /party/edit/[id] and
 // /party/duplicate/[id] (design.md §6.2 section 4 C4 task brief).
@@ -204,6 +206,15 @@ const showVenueMap = computed(() => !form.online && venueLat.value !== null && v
 
 const submitting = ref(false)
 const generalError = ref('')
+
+// Duplicate check: groups kept ending up with the same event posted twice.
+// Populated just before a create; when it finds anything the modal is shown
+// instead of posting, and the host decides.
+const duplicateMatches = ref([])
+const showDuplicates = ref(false)
+// Set once the host has said "post anyway", so the second run through submit()
+// doesn't ask again.
+const duplicatesAccepted = ref(false)
 const fieldErrors = ref({})
 
 function fieldError(field) {
@@ -332,6 +343,22 @@ function validate() {
   return errors
 }
 
+// Events the group already has around this date, for the duplicate check.
+// A window either side of the day covers every criterion - including the
+// double submit, which re-posts the same date - and keeps the response small.
+async function existingEventsNearby() {
+  const { $api } = useNuxtApp()
+  const day = new Date(`${form.eventDate}T00:00:00Z`)
+  if (Number.isNaN(day.getTime())) return []
+
+  const iso = (offsetDays) =>
+    new Date(day.getTime() + offsetDays * 86400000).toISOString()
+
+  const { data } = await $api.group.events(form.idgroups, { start: iso(-1), end: iso(2) })
+
+  return Array.isArray(data) ? data : (data?.data ?? [])
+}
+
 async function submit() {
   generalError.value = ''
   fieldErrors.value = {}
@@ -340,6 +367,32 @@ async function submit() {
   if (Object.keys(errors).length) {
     fieldErrors.value = errors
     return
+  }
+
+  // Only on create, and only until the host has decided. A failed lookup must
+  // never stop someone posting, so anything thrown here is swallowed.
+  if (creating.value && !duplicatesAccepted.value) {
+    try {
+      const matches = findDuplicateEvents(
+        {
+          start: toUtcIso(form.eventDate, form.startTime, form.timezone),
+          end: toUtcIso(form.eventDate, form.endTime, form.timezone),
+          title: form.venue,
+          location: form.location,
+          online: form.online,
+          timezone: form.timezone,
+        },
+        await existingEventsNearby(),
+      )
+
+      if (matches.length) {
+        duplicateMatches.value = matches
+        showDuplicates.value = true
+        return
+      }
+    } catch {
+      // Couldn't check - carry on and post.
+    }
   }
 
   submitting.value = true
@@ -384,6 +437,17 @@ async function submit() {
   } finally {
     submitting.value = false
   }
+}
+
+function closeDuplicates() {
+  showDuplicates.value = false
+}
+
+// "It's a different event" - remember that and post it.
+function postAnyway() {
+  showDuplicates.value = false
+  duplicatesAccepted.value = true
+  submit()
 }
 
 defineExpose({ submit })
@@ -677,6 +741,13 @@ defineExpose({ submit })
       </div>
     </div>
   </BForm>
+
+  <EventDuplicateModal
+    :show="showDuplicates"
+    :matches="duplicateMatches"
+    @close="closeDuplicates"
+    @post-anyway="postAnyway"
+  />
 </template>
 
 <style scoped lang="scss">

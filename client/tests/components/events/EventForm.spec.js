@@ -1,8 +1,9 @@
-import { mount } from '@vue/test-utils'
+import { flushPromises, mount } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
 import { createI18n } from 'vue-i18n'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import EventForm from '../../../app/components/events/EventForm.vue'
+import EventDuplicateModal from '../../../app/components/events/EventDuplicateModal.vue'
 import { useEventsStore } from '../../../app/stores/events.js'
 import { useGroupsStore } from '../../../app/stores/groups.js'
 import en from '../../../i18n/locales/en.json'
@@ -605,6 +606,105 @@ describe('components/events/EventForm', () => {
       )
       expect(store.createEvent.mock.calls[0][0]).not.toHaveProperty('moderate')
       expect(wrapper.emitted('created')).toEqual([[99]])
+    })
+  })
+  // Groups kept posting the same event twice - a second host adding one that
+  // is already there, or a re-submit after fixing a typo. Before a create the
+  // form asks the API what the group already has around that date and, if
+  // anything looks like a match, shows it rather than posting.
+  describe('duplicate check before creating', () => {
+    const alreadyThere = (over = {}) => ({
+      id: 77,
+      title: 'Repair Café',
+      location: 'Town Hall',
+      online: false,
+      start: '2026-08-20T09:00:00Z',
+      end: '2026-08-20T11:00:00Z',
+      timezone: 'Europe/London',
+      updated_at: '2020-01-01T00:00:00Z',
+      ...over,
+    })
+
+    const withGroupEvents = (events) =>
+      vi.stubGlobal('useNuxtApp', () => ({
+        $api: { group: { events: vi.fn().mockResolvedValue({ data: events }) } },
+      }))
+
+    it('shows what already exists instead of posting a second copy', async () => {
+      withGroupEvents([alreadyThere()])
+      const store = useEventsStore()
+      store.createEvent = vi.fn().mockResolvedValue(42)
+
+      const wrapper = mountForm({ groups: [{ id: 9, name: 'Acme Restarters' }] })
+      await fillRequiredFields(wrapper)
+      await wrapper.find('[data-testid="event-form"]').trigger('submit')
+      await flushPromises()
+
+      expect(store.createEvent).not.toHaveBeenCalled()
+      expect(wrapper.findComponent(EventDuplicateModal).props('show')).toBe(true)
+      expect(wrapper.findComponent(EventDuplicateModal).props('matches')[0].event.id).toBe(77)
+    })
+
+    it('posts once the host says it is a different event', async () => {
+      withGroupEvents([alreadyThere()])
+      const store = useEventsStore()
+      store.createEvent = vi.fn().mockResolvedValue(42)
+
+      const wrapper = mountForm({ groups: [{ id: 9, name: 'Acme Restarters' }] })
+      await fillRequiredFields(wrapper)
+      await wrapper.find('[data-testid="event-form"]').trigger('submit')
+      await flushPromises()
+
+      wrapper.findComponent(EventDuplicateModal).vm.$emit('post-anyway')
+      await flushPromises()
+
+      expect(store.createEvent).toHaveBeenCalledTimes(1)
+      expect(wrapper.emitted('created')).toEqual([[42]])
+    })
+
+    it('stays on the form, without posting, when the host backs out', async () => {
+      withGroupEvents([alreadyThere()])
+      const store = useEventsStore()
+      store.createEvent = vi.fn()
+
+      const wrapper = mountForm({ groups: [{ id: 9, name: 'Acme Restarters' }] })
+      await fillRequiredFields(wrapper)
+      await wrapper.find('[data-testid="event-form"]').trigger('submit')
+      await flushPromises()
+
+      wrapper.findComponent(EventDuplicateModal).vm.$emit('close')
+      await flushPromises()
+
+      expect(store.createEvent).not.toHaveBeenCalled()
+      expect(wrapper.findComponent(EventDuplicateModal).props('show')).toBe(false)
+    })
+
+    it('posts as normal when the group has nothing like it', async () => {
+      withGroupEvents([alreadyThere({ id: 5, title: 'Something else', location: 'Elsewhere', start: '2026-12-25T09:00:00Z' })])
+      const store = useEventsStore()
+      store.createEvent = vi.fn().mockResolvedValue(42)
+
+      const wrapper = mountForm({ groups: [{ id: 9, name: 'Acme Restarters' }] })
+      await fillRequiredFields(wrapper)
+      await wrapper.find('[data-testid="event-form"]').trigger('submit')
+      await flushPromises()
+
+      expect(store.createEvent).toHaveBeenCalledTimes(1)
+    })
+
+    it('never blocks a post because the check itself failed', async () => {
+      vi.stubGlobal('useNuxtApp', () => ({
+        $api: { group: { events: vi.fn().mockRejectedValue(new Error('offline')) } },
+      }))
+      const store = useEventsStore()
+      store.createEvent = vi.fn().mockResolvedValue(42)
+
+      const wrapper = mountForm({ groups: [{ id: 9, name: 'Acme Restarters' }] })
+      await fillRequiredFields(wrapper)
+      await wrapper.find('[data-testid="event-form"]').trigger('submit')
+      await flushPromises()
+
+      expect(store.createEvent).toHaveBeenCalledTimes(1)
     })
   })
 })
