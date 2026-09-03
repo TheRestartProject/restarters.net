@@ -33,14 +33,18 @@ class GroupJoinTest extends TestCase
         $user = User::factory()->restarter()->create();
         $this->actingAs($user);
 
-        $this->followingRedirects();
-
         // When we follow a Restarters group, we should try to follow the Discourse group.
         $this->instance(AddUserToDiscourseGroup::class, Mockery::mock(AddUserToDiscourseGroup::class, function ($mock) {
             $mock->shouldReceive('handle')->once();
         }));
 
-        $response = $this->get('/group/join/'.$group->idgroups);
+        // GET /group/join/{id} is gone; joining a group is now a plain API mutation
+        // (GroupMembershipController::joinv2).
+        $response = $this->post('/api/v2/groups/'.$group->idgroups.'/members/me?api_token='.$user->api_token);
+        $response->assertSuccessful();
+        $json = json_decode($response->getContent(), true);
+        $this->assertFalse($json['data']['already_member']);
+
         $this->artisan("queue:work --stop-when-empty");
 
         Notification::assertSentTo(
@@ -55,21 +59,13 @@ class GroupJoinTest extends TestCase
             }
         );
 
-        // Should redirect to the dashboard.
-        $this->assertVueProperties($response, [
-            [],
-            [
-                'VueComponent' => 'dashboardpage',
-            ],
-        ]);
-
-        // Try again.
-        $this->followingRedirects();
-        $response = $this->get('/group/join/'.$group->idgroups);
-        $this->assertStringContainsString('You are already part of this group', $response->getContent());
+        // Try again - joining a second time is idempotent and reports already_member.
+        $response = $this->post('/api/v2/groups/'.$group->idgroups.'/members/me?api_token='.$user->api_token);
+        $response->assertSuccessful();
+        $json = json_decode($response->getContent(), true);
+        $this->assertTrue($json['data']['already_member']);
 
         // Now leave via API.
-        $response = $this->get('/logout');
         $this->actingAs($host);
         $userGroupAssociation = UserGroups::where('user', $host->id)
             ->where('group', $group->idgroups)->first();

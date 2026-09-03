@@ -1,72 +1,67 @@
 version: 2.1
 
-jobs:
-  build:
-    machine:
-      image: ubuntu-2204:current
-    resource_class: large
-    environment:
-      - TZ: "UTC"
-
+commands:
+  install-task:
     steps:
-      - checkout
-      
-      # Install Task
       - run:
           name: Install Task
           command: |
             sudo sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b /usr/local/bin
             task --version
 
-      # Set up environment file
+  setup-env:
+    steps:
       - run:
           name: Setup environment
           command: |
             cp .env.example .env
-            
+
             # Configure for Docker Compose setup
             sed -i 's/DB_HOST=.*$/DB_HOST=restarters_db/g' .env
             sed -i 's/DB_DATABASE=.*$/DB_DATABASE=restarters_db_test/g' .env
             sed -i 's/DB_USERNAME=.*$/DB_USERNAME=restarters/g' .env
             sed -i 's/DB_PASSWORD=.*$/DB_PASSWORD=s3cr3t/g' .env
-            
+
             # Configure Discourse integration
             sed -i 's/FEATURE__DISCOURSE_INTEGRATION=.*$/FEATURE__DISCOURSE_INTEGRATION=true/g' .env
             sed -i 's/DISCOURSE_URL=.*$/DISCOURSE_URL=http:\/\/restarters_discourse/g' .env
             sed -i 's/DISCOURSE_APIKEY=.*$/DISCOURSE_APIKEY=fb71f38ca2b8b7cd6a041e57fd8202c9937088f0ecae7db40722bd758dda92fc/g' .env
             sed -i 's/DISCOURSE_APIUSER=.*$/DISCOURSE_APIUSER=someuser/g' .env
-            
+
             # Configure for testing
             sed -i 's/APP_DEBUG=.*$/APP_DEBUG=false/g' .env
             sed -i 's/SESSION_DOMAIN=.*$/SESSION_DOMAIN=localhost/g' .env
             sed -i 's/HONEYPOT_DISABLE=.*$/HONEYPOT_DISABLE=TRUE/g' .env
             sed -i 's/APP_URL=.*$/APP_URL=http:\/\/localhost:8001/g' .env
-            
-            # Add environment variables from CircleCI
+
+            # The Nuxt client origin (SSO bridge redirects, session config).
             echo "" >> .env
+            echo "FRONTEND_URL=http://localhost:3000" >> .env
+
+            # The mysql_testing connection (used by the Taskfile's explicit
+            # pre-phpunit migrate:fresh). phpunit.xml sets these inside the
+            # phpunit process, but plain artisan reads .env — without them
+            # DB_TEST_HOST falls back to 127.0.0.1 and the reset fails.
+            echo "DB_TEST_HOST=restarters_db" >> .env
+            echo "DB_TEST_PORT=3306" >> .env
+            echo "DB_TEST_DATABASE=restarters_db_test" >> .env
+            echo "DB_TEST_USERNAME=restarters" >> .env
+            echo "DB_TEST_PASSWORD=s3cr3t" >> .env
+
+            # Add environment variables from CircleCI
             echo "GOOGLE_API_CONSOLE_KEY=$GOOGLE_API_CONSOLE_KEY" >> .env
             echo "MAPBOX_TOKEN=$MAPBOX_TOKEN" >> .env
 
-      # Start Docker services using Task
+  wait-for-core:
+    parameters:
+      probe:
+        type: string
+        # Blade homepage by default; jobs with SKIP_NPM_INSTALL must probe an
+        # API route instead (no Vite manifest -> Blade pages 500).
+        default: "http://localhost:8001"
+    steps:
       - run:
-          name: Start Docker services
-          command: |
-            # Set environment variable for CircleCI detection
-            export CIRCLECI=true
-            # Enable Docker Compose bake for build optimization
-            export COMPOSE_BAKE=true
-            # Start all services using Task
-            task docker:up-all
-          no_output_timeout: 10m
-
-      # Wait for core services to be ready (MySQL + web app). Discourse is started
-      # via docker:up-all but its readiness is checked separately (non-blocking).
-      # docker_run.sh runs npm install + npx playwright install + migrate:fresh --seed
-      # on every startup, which can take 20-25 min on cold CI machines. We poll
-      # directly here with a 25-minute ceiling rather than using the Taskfile helper
-      # (which only allows 10 min) to avoid blocking on that limit.
-      - run:
-          name: Wait for services
+          name: Wait for core services
           command: |
             # Wait for MySQL first
             echo "Waiting for MySQL..."
@@ -89,7 +84,7 @@ jobs:
                 docker logs restarters --tail=100 2>&1 || true
                 exit 1
               fi
-              curl -f -s http://localhost:8001 >/dev/null 2>&1 && echo "✓ Web app ready after $((i*5))s" && break
+              curl -f -s << parameters.probe >> >/dev/null 2>&1 && echo "✓ Web app ready after $((i*5))s" && break
               if [ $i -eq 420 ]; then
                 echo "❌ Web app not ready after 35 minutes — container logs:"
                 docker logs restarters --tail=100 2>&1 || true
@@ -99,6 +94,44 @@ jobs:
               sleep 5
             done
           no_output_timeout: 38m
+
+jobs:
+  build:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large
+    environment:
+      - TZ: "UTC"
+
+    steps:
+      - checkout
+      - install-task
+      - setup-env
+
+      # Start Docker services using Task
+      - run:
+          name: Start Docker services
+          command: |
+            # Set environment variable for CircleCI detection
+            export CIRCLECI=true
+            # Enable Docker Compose bake for build optimization
+            export COMPOSE_BAKE=true
+            # phpunit-only job: skip the ~10-12 min npm/Vite container startup
+            # (the suite outgrew CircleCI's 60-min job cap as one monolith;
+            # the legacy jest+Playwright suites died at the Phase F cutover).
+            export SKIP_NPM_INSTALL=true
+            # Start all services using Task
+            task docker:up-all
+            # This job tests the Laravel side only; the Nuxt client container
+            # is only needed by e2e-client.
+            docker stop restarters_client || true
+          no_output_timeout: 10m
+
+      # Wait for core services to be ready (MySQL + web app). Discourse is started
+      # via docker:up-all but its readiness is checked separately (non-blocking).
+      # Probe an API route: SKIP_NPM_INSTALL means Blade pages 500 (no Vite manifest).
+      - wait-for-core:
+          probe: "http://localhost:8001/api/v2/session"
 
       # Setup database and application
       - run:
@@ -116,6 +149,15 @@ jobs:
 
             # Generate additional Laravel artifacts for testing
             docker exec restarters php artisan l5-swagger:generate
+            # Fail fast on a broken OpenAPI document (dangling refs, orphaned
+            # security schemes, duplicate operationIds) before running tests.
+            docker exec restarters php tools/openapi-lint.php
+
+      # The committed client locale JSONs must match a fresh export from lang/
+      - run:
+          name: Check client translations in sync
+          command: |
+            docker exec restarters php artisan translations:export-client --check
 
       # Setup Discourse API (PostgreSQL must be ready; Discourse web app not required)
       - run:
@@ -141,6 +183,17 @@ jobs:
             # Configure Discourse settings (only if Discourse web app is up)
             docker exec restarters php artisan discourse:setting personal_message_enabled_groups 10 || echo "Warning: discourse:setting failed - Discourse may not be fully started"
 
+            # Wait for the Discourse web app itself (non-fatal). Skipping npm
+            # made phpunit start ~12 min earlier, and Discourse-integration
+            # tests crawl against a cold Discourse (5s timeout + retries per
+            # call) — give it the warm-up window it used to get by accident.
+            echo "Waiting for Discourse web app (up to 10 min, non-fatal)..."
+            for i in $(seq 1 120); do
+              curl -f -s http://localhost:8003 >/dev/null 2>&1 && echo "✓ Discourse ready after $((i*5))s" && break
+              [ $((i % 12)) -eq 0 ] && echo "  Still waiting for Discourse... ($((i*5))s)"
+              sleep 5
+            done
+
       # Run PHPUnit tests
       - run:
           name: Run PHPUnit tests
@@ -151,41 +204,6 @@ jobs:
             docker cp restarters:/tmp/phpunit-results.xml /tmp/test-results/phpunit/results.xml
           no_output_timeout: 45m
 
-      # Run Jest tests
-      - run:
-          name: Run Jest tests
-          command: |
-            # Run Jest tests using Task for consistency with local development
-            task docker:test:jest
-            # Copy test results to host if they exist
-            docker cp restarters:/tmp/test-results/junit.xml /tmp/test-results/jest/junit.xml || echo "Jest results not found, skipping"
-
-      # Run main Playwright tests (excluding autocomplete)
-      - run:
-          name: Run main Playwright tests
-          command: |
-            # Run Playwright tests using Task for consistency with local development
-            task docker:test:playwright
-          no_output_timeout: 10m
-
-      # Copy test results and artifacts
-      - run:
-          name: Copy Playwright artifacts
-          command: |
-            # Create test results directory on host
-            mkdir -p /tmp/test-results/playwright
-            mkdir -p /tmp/test-results/logs
-
-            # List what's available in the playwright container
-            docker exec restarters_playwright bash -c "ls -la /tmp/test-results/* || echo 'No playwright directories found'"
-
-            # Copy test results and artifacts from playwright container to host
-            docker cp restarters_playwright:/tmp/test-results/. /tmp/test-results/playwright/ || echo "Playwright HTML report not found"
-
-            # Copy Vite log from restarters container for debugging
-            docker cp restarters:/tmp/vite.log /tmp/test-results/logs/vite.log || echo "Vite log not found"
-          when: always
-
       # Store artifacts
       - store_artifacts:
           path: /tmp/test-results
@@ -194,6 +212,110 @@ jobs:
       - store_test_results:
           path: /tmp/test-results
 
+  # Nuxt client: lint + unit tests + production build. Fast feedback, no
+  # docker-compose stack needed.
+  build-client:
+    docker:
+      - image: cimg/node:22.16
+    resource_class: medium
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - client-npm-v1-{{ checksum "client/package-lock.json" }}
+            - client-npm-v1-
+      - run:
+          name: Install client dependencies
+          command: cd client && npm ci
+      - save_cache:
+          key: client-npm-v1-{{ checksum "client/package-lock.json" }}
+          paths:
+            - ~/.npm
+      - run:
+          name: Lint
+          command: cd client && npm run lint
+      - run:
+          name: Vitest
+          command: |
+            mkdir -p /tmp/test-results/vitest
+            cd client && npx vitest run --reporter=default --reporter=junit --outputFile=/tmp/test-results/vitest/results.xml
+      - run:
+          name: Nuxt build
+          command: cd client && npx nuxi build
+      - store_test_results:
+          path: /tmp/test-results
+      - store_artifacts:
+          path: /tmp/test-results
+          destination: client-test-results
+
+  # Playwright against the real two-container stack (Laravel API + Nuxt client).
+  # Separate machine job — the monolithic `build` job's time budget is already
+  # tight, so client e2e gets its own timeout envelope.
+  e2e-client:
+    machine:
+      image: ubuntu-2204:current
+    resource_class: large
+    environment:
+      - TZ: "UTC"
+    steps:
+      - checkout
+      - install-task
+      - setup-env
+      - run:
+          name: Start Docker services (core + client, production client build)
+          command: |
+            export CIRCLECI=true
+            export COMPOSE_BAKE=true
+            export NUXT_DEV_MODE=false
+            task docker:up-core
+          no_output_timeout: 10m
+      # Probe an API route, not the default "/": post-cutover Laravel no longer
+      # serves "/" (the Nuxt/Nitro origin does), so "/" now returns 404 and the
+      # curl -f readiness check would never pass. /api/v2/session is a live API
+      # route (same probe the phpunit build job uses).
+      - wait-for-core:
+          probe: "http://localhost:8001/api/v2/session"
+      - run:
+          name: Wait for Nuxt client
+          command: |
+            echo "Waiting for the client container (npm ci + nuxi build on first boot)..."
+            for i in $(seq 1 120); do
+              curl -f -s http://localhost:3000 >/dev/null 2>&1 && echo "✓ Client ready after $((i*5))s" && exit 0
+              [ $((i % 12)) -eq 0 ] && echo "  Still waiting... ($((i*5))s elapsed)"
+              sleep 5
+            done
+            echo "❌ Client not ready after 10 minutes — container logs:"
+            docker logs restarters_client --tail=100 2>&1 || true
+            exit 1
+          no_output_timeout: 12m
+      - run:
+          name: Setup application
+          command: |
+            docker exec restarters_db mysql -u root -ps3cr3t -e "GRANT SELECT ON mysql.time_zone_name TO 'restarters'@'%';"
+            docker exec restarters_db mysql -u root -ps3cr3t -e "SET GLOBAL log_bin_trust_function_creators = 1;"
+            docker exec restarters_db mysql -u root -ps3cr3t -e "SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));"
+            docker exec restarters php artisan l5-swagger:generate
+      - run:
+          name: Run client Playwright tests
+          command: |
+            task docker:test:playwright:client
+          no_output_timeout: 15m
+      - run:
+          name: Copy Playwright artifacts
+          command: |
+            mkdir -p /tmp/test-results/playwright-client
+            docker cp restarters_playwright:/tmp/test-results/. /tmp/test-results/playwright-client/ || echo "No playwright results found"
+          when: always
+      - store_artifacts:
+          path: /tmp/test-results
+          destination: client-e2e-results
+      - store_test_results:
+          path: /tmp/test-results
+
+  # develop is deployed as a preview, exactly like a PR: same fly.preview.toml,
+  # same preview-startup.sh, same disposable database restored from the latest
+  # hourly production backup, same suspend-on-idle teardown. The only
+  # develop-specific things left are the app name and the custom domain.
   deploy-fly-dev:
     docker:
       - image: cimg/base:current
@@ -205,11 +327,53 @@ jobs:
             curl -L https://fly.io/install.sh | sh || true
             echo 'export PATH=/home/circleci/.fly/bin:$PATH' >> $BASH_ENV
       - run:
-          name: Deploy to restarters-dev
+          name: Deploy develop preview to restarters-dev
           command: |
             export FLY_API_TOKEN="FlyV1 $FLY_API_TOKEN"
-            flyctl deploy --config fly.dev.toml --remote-only
+            # Keep this substitution list in step with the one in
+            # .github/workflows/pr-preview.yml.
+            sed -e "s|__APP_NAME__|restarters-dev|g" \
+                -e "s|__APP_TITLE__|Restarters develop|g" \
+                -e "s|__BASE_URL__|https://restarters-dev.fly.dev|g" \
+                -e "s|__SENTRY_ENV__|dev|g" \
+                fly.preview.toml > fly.develop.generated.toml
+            if grep -q '__[A-Z_]*__' fly.develop.generated.toml; then
+              echo "Unsubstituted placeholder left in the generated config:"
+              grep -n '__[A-Z_]*__' fly.develop.generated.toml
+              exit 1
+            fi
+            flyctl deploy --config fly.develop.generated.toml \
+              --app restarters-dev --remote-only --ha=false
+            # --ha=false has a history of not reliably keeping one machine.
+            flyctl scale count 1 --app restarters-dev --yes
           no_output_timeout: 15m
+      - run:
+          name: Wait for restore and migrations
+          command: |
+            # Cold boot restores ~98MB of backup then migrates; until that
+            # finishes visitors get the warming page. Fail the build if the
+            # branch's migrations do not apply to real production data.
+            # preview-startup.sh writes the status with printf as one flat
+            # line, so sed reads it without needing jq on the image.
+            field() { echo "$1" | sed -n "s/.*\"$2\":\"\([^\"]*\)\".*/\1/p"; }
+            PHASE=""
+            for i in $(seq 1 80); do
+              BODY=$(curl -fsS --max-time 10 https://restarters-dev.fly.dev/_preview_status 2>/dev/null) || BODY=""
+              PHASE=$(field "$BODY" phase)
+              echo "poll $i: phase='${PHASE:-n/a}'"
+              case "$PHASE" in
+                ready|failed) break ;;
+              esac
+              sleep 15
+            done
+            if [ "$PHASE" != "ready" ]; then
+              echo "restarters-dev.fly.dev did not become ready (phase='${PHASE:-unknown}')."
+              echo "detail: $(field "$BODY" detail)"
+              echo "Check: flyctl logs --app restarters-dev"
+              exit 1
+            fi
+            echo "restarters-dev.fly.dev is ready."
+          no_output_timeout: 25m
 
   deploy-fly-prod:
     docker:
@@ -235,9 +399,19 @@ workflows:
           filters:
             branches:
               ignore: production
+      - build-client:
+          filters:
+            branches:
+              ignore: production
+      - e2e-client:
+          filters:
+            branches:
+              ignore: production
       - deploy-fly-dev:
           requires:
             - build
+            - build-client
+            - e2e-client
           filters:
             branches:
               only: develop

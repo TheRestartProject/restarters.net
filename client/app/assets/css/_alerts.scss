@@ -1,0 +1,125 @@
+// Alerts
+// ======
+// Ported from resources/global/css/components/_alerts.scss. BS4->BS5:
+// .close renamed to .btn-close (see
+// docs/nuxt-migration/findings/styles.md's close/sr-only conversion list);
+// BS5's .btn-close is a single self-closing element (background-image X,
+// no nested <span>&times;</span>) so the old nested `span` text-shadow
+// override has no BS5 target and was dropped rather than translated.
+.alert {
+  &-success {
+    color: #222;
+    background-color: #fff4e4;
+    border: 3px dashed #222;
+    border-radius: 0;
+    padding-left: 15px;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    font-size: 16px;
+    overflow: hidden;
+
+    p {
+      font-size: 18px;
+      font-family: $font-family-third;
+      font-weight: bold;
+      font-stretch: normal;
+      font-style: normal;
+      color: $white;
+    }
+  }
+
+  &-custom {
+    @extend .border-0;
+    @extend .rounded-0;
+
+    p {
+      font-size: 18px;
+      font-family: $font-family-third;
+      font-weight: bold;
+      font-stretch: normal;
+      font-style: normal;
+    }
+
+    a {
+      @extend .text-white;
+
+      text-decoration: underline;
+    }
+
+    .btn-close {
+      opacity: 1;
+    }
+  }
+
+  &-danger {
+    background-color: #f49292 !important;
+
+    p {
+      @extend .text-white;
+    }
+
+    .btn-primary {
+      color: black;
+    }
+  }
+}
+
+.information-alert {
+  color: #222;
+  background-color: #fff4e4;
+  border: 3px dashed #222;
+  border-radius: 0;
+  padding-left: 10px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  font-size: 16px;
+  overflow: hidden;
+
+  a {
+    color: #222;
+    text-decoration: underline;
+  }
+
+  .action-text-left {
+    .icon {
+      margin-right: 30px;
+    }
+
+    .action-text {
+      line-height: 22px;
+      padding-right: 30px;
+    }
+  }
+
+  .btn-action {
+    min-width: 155px;
+  }
+
+  button.btn-close {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    margin: auto 1.25rem;
+    height: 30px;
+    padding: 0;
+  }
+
+  &.set-information-box-margin {
+    margin-top: -25px;
+    margin-bottom: 50px;
+  }
+
+  @include media-breakpoint-down(sm) {
+    // BS4 .float-right -> BS5 .float-end
+    .float-end,
+    .btn-action {
+      width: 100%;
+      display: block;
+    }
+
+    button.btn-close {
+      margin: 1.25rem;
+    }
+  }
+}

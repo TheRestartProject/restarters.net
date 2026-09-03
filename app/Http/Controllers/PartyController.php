@@ -715,8 +715,16 @@ class PartyController extends Controller
         return redirect()->back()->with('warning', __('events.invite_noemails'));
     }
 
+    /**
+     * Emailed deep link (App\Http\Controllers\API\EventAttendanceController:300). The status-hash
+     * DB update is frozen server-side (F2-5) - it's idempotent and this is the only writer - but
+     * the final destination is now the SPA's party page rather than the Blade one, with a query
+     * flag instead of session flash (a redirect out of this app can't carry Laravel session state).
+     */
     public function confirmInvite($event_id, $hash): RedirectResponse
     {
+        $frontend = rtrim(config('restarters.frontend_url'), '/');
+
         $user_event = EventsUsers::where('status', $hash)->where('event', $event_id)->first();
 
         if (! empty($user_event)) {
@@ -727,11 +735,11 @@ class PartyController extends Controller
 
             $this->notifyHostsOfRsvp($user_event, $event_id);
 
-            return redirect('/party/view/'.$user_event->event);
+            return redirect($frontend.'/party/view/'.$user_event->event.'?joined=1');
         }
 
         \Sentry\CaptureMessage(__('events.invite_invalid'));
-        return redirect('/party/view/'.intval($event_id))->with('warning', __('events.invite_invalid'));
+        return redirect($frontend.'/party/view/'.intval($event_id).'?invite=invalid');
     }
 
     public function cancelInvite($event_id): RedirectResponse
@@ -856,36 +864,13 @@ class PartyController extends Controller
     }
 
     /**
-     * [confirmCodeInvite description].
-     *
-     * @author Christopher Kelker - @date 2019-03-25
-     * @editor  Christopher Kelker
-     * @version 1.0.0
-     * @param   [type]      $code
-     * @return  [type]
+     * Shareable-code deep link (Party::shareable_link). Thin redirector into the SPA (F2-5):
+     * POST /api/v2/invites/claim (App\Http\Controllers\API\AuthController::claimShareableCode)
+     * now owns validating the code and claiming it - including the unknown-code 404 - so there's
+     * no DB read, Invite row, or session-array bookkeeping left to do here.
      */
     public function confirmCodeInvite(Request $request, $code): RedirectResponse
     {
-        // Variables
-        $party = Party::where('shareable_code', $code)->first();
-        $hash = substr(bin2hex(openssl_random_pseudo_bytes(32)), 0, 24);
-
-        // Validate a record exists with the Event code
-        if (empty($party)) {
-            abort(404);
-        }
-
-        // Create a new Invite record
-        Invite::create([
-            'record_id' => $party->idevents,
-            'email' => '',
-            'hash' => $hash,
-            'type' => 'event',
-        ]);
-
-        // Push this into a session variable to find by the Event prefix
-        session()->push('events.'.$code, $hash);
-
-        return redirect('/user/register')->with('auth-for-invitation', __('auth.login_before_using_shareable_link', ['login_url' => url('/login')]));
+        return redirect(rtrim(config('restarters.frontend_url'), '/').'/party/invite/'.$code);
     }
 }

@@ -1,0 +1,42 @@
+// Layout classes develop defines that this client applies in markup but never
+// styled - so they were inert and the elements carrying them fell back to
+// Bootstrap defaults.
+//
+// _global.scss:99 - tighter gutters than Bootstrap's .row. Used by the profile
+// header and device rows.
+.row-compressed {
+  margin-left: -10px;
+  margin-right: -10px;
+
+  > div {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+}
+
+.row-compressed-xs {
+  margin-left: -2px;
+  margin-right: -2px;
+
+  > div {
+    padding-left: 2px;
+    padding-right: 2px;
+  }
+}
+
+// _user.scss:18 - the profile header's name/role/location block sits tighter
+// than default heading rhythm.
+.profile-header {
+  h3,
+  p {
+    margin-bottom: 10px;
+    line-height: 1.2;
+  }
+}
+
+// _groups.scss:152 - the pencil/actions toggle is a bare icon, not a button.
+.edit-dropdown button.dropdown-toggle {
+  background: none;
+  border: none;
+  padding: 0;
+}

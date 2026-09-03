@@ -15,9 +15,7 @@ use App\Group;
 use App\Helpers\Fixometer;
 use App\Http\Controllers\PartyController;
 use App\Invite;
-use App\Network;
 use App\Notifications\AdminNewUser;
-use App\Notifications\ResetPassword;
 use App\Party;
 use App\Permissions;
 use App\Preferences;
@@ -392,120 +390,30 @@ class UserController extends Controller
         return redirect()->back()->with('message', __('profile.admin_success'));
     }
 
-    public function recover(Request $request): View
+    /**
+     * Thin redirector into the SPA (F2-5): password recovery is now owned end-to-end by
+     * POST /api/v2/auth/password/forgot (App\Http\Controllers\API\AuthController::forgotPasswordv2),
+     * which is what the SPA's /user/recover page submits to. This GET-only route exists so any
+     * old bookmarks/links to /user/recover still land somewhere useful.
+     */
+    public function recover(): RedirectResponse
     {
-        $User = new User;
-
-        $email = $request->get('email');
-
-        if ($request->getMethod() == 'POST' && $email) {
-            if (empty($email) || ! filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                $response['danger'] = __('passwords.invalid');
-
-                // Don't log to Sentry - legitimate user error.
-            } else {
-                $user = $User->where('email', $email)->first();
-
-                if (! empty($user)) {
-                    $id = $user->id;
-                    $data = [];
-
-                    // generate recovery code
-                    $bytes = 32;
-                    $data['recovery'] = substr(bin2hex(openssl_random_pseudo_bytes($bytes)), 0, 24);
-
-                    // add date timestamp
-                    $data['recovery_expires'] = strftime('%Y-%m-%d %X', time() + (24 * 60 * 60));
-
-                    // update record
-                    $user->update([
-                        'recovery' => $data['recovery'],
-                        'recovery_expires' => $data['recovery_expires'],
-                    ]);
-
-                    User::find($id)->notify(new ResetPassword([
-                      'url' => url('/user/reset?recovery='.$data['recovery']),
-                    ]));
-
-                    $response['success'] = __('passwords.sent');
-                } else {
-                    $response['danger'] = __('passwords.user');
-
-                    // Don't log to Sentry - legitimate user error.
-                }
-            }
-
-            return view('auth.forgot-password', [//user.recover
-                'title' => __('passwords.recover_title'),
-                'response' => $response,
-            ]);
-        }
-
-        return view('auth.forgot-password', [//user.recover
-            'title' => __('passwords.recover_title'),
-        ]);
+        return redirect(rtrim(config('restarters.frontend_url'), '/').'/user/recover');
     }
 
-    public function reset(Request $request)
+    /**
+     * Thin redirector into the SPA (F2-5): the emailed recovery link
+     * (App\Http\Controllers\API\AuthController::forgotPasswordv2) still points at this Laravel
+     * URL so it keeps working unchanged, but submission is now owned end-to-end by
+     * POST /api/v2/auth/password/reset (resetPasswordv2), which the SPA's /user/reset page
+     * (client/app/pages/user/reset.vue) calls.
+     */
+    public function reset(Request $request): RedirectResponse
     {
-        $User = new User;
-        $user = null;
+        $frontend = rtrim(config('restarters.frontend_url'), '/');
+        $recovery = $request->query('recovery');
 
-        $recovery = $request->recovery;
-
-        if (!$recovery) {
-            $valid_code = false;
-        } else {
-            $recovery = filter_var($recovery, FILTER_SANITIZE_STRING);
-            $user = $User->where('recovery', '=', $recovery)->first();
-
-            if (is_object($user) && strtotime($user->recovery_expires) > time()) {
-                $valid_code = true;
-            } else {
-                $valid_code = false;
-            }
-        }
-
-        $pwd = $request->post('password');
-        $cpwd = $request->post('confirm_password');
-        $response = null;
-        $email = null;
-
-        if ($request->getMethod() == 'POST' && $pwd && $cpwd) {
-            if (!$valid_code) {
-                $response['danger'] = __('passwords.token');
-                \Sentry\CaptureMessage($response['danger']);
-            } elseif ($pwd !== $cpwd) {
-                $response['danger'] = __('passwords.match');
-
-                // Don't log to Sentry - legitimate user error.
-            } else {
-                $email = $user->email;
-                $oldPassword = $user->password;
-
-                $update = $user->update([
-                    'password' => Hash::make($pwd),
-                ]);
-
-                if ($update) {
-                    event(new PasswordChanged($user, $oldPassword));
-                    return redirect('login')->with('success', __('passwords.updated'));
-                } else {
-                    $response['danger'] = __('passwords.failed');
-                    \Sentry\CaptureMessage($response['danger']);
-                }
-            }
-        } else {
-            $email = $user ? $user->email : null;
-        }
-
-        return view('auth.reset-password', [
-            'title' => 'Account recovery',
-            'recovery' => $recovery,
-            'valid_code' => $valid_code,
-            'response' => $response,
-            'email' => $email,
-        ]);
+        return redirect($frontend.'/user/reset'.($recovery ? '?recovery='.urlencode($recovery) : ''));
     }
 
     public function all()
@@ -836,27 +744,19 @@ class UserController extends Controller
         return redirect('/login');
     }
 
-    public function getRegister($hash = null)
+    /**
+     * Thin redirector into the SPA (F2-4): registration is now owned end-to-end by the SPA
+     * (client/app/pages/user/register.vue + login.vue), which POSTs to /api/v2/auth/register
+     * and understands invite_hash the same way this legacy hash param used to. The emailed
+     * invite links that carry $hash (App\Http\Controllers\API\GroupMembershipController:272,
+     * EventAttendanceController:336, EventController:214) still point at this Laravel URL, so
+     * they keep working unchanged - only what happens when they're opened has changed.
+     */
+    public function getRegister($hash = null): RedirectResponse
     {
-        if (Auth::check() && Auth::user()->hasUserGivenConsent()) {
-            return redirect('dashboard');
-        }
+        $frontend = rtrim(config('restarters.frontend_url'), '/');
 
-        $stats = Fixometer::loginRegisterStats();
-        $deviceCount = array_key_exists(0, $stats['device_count_status']) ? $stats['device_count_status'][0]->counter : 0;
-
-        $activeRepairNetworkId = session()->get('repair_network');
-        $network = Network::find($activeRepairNetworkId);
-        $showNewsletterSignup = $network->shortname == 'restarters';
-
-        return view('auth.register-new', [
-            'skills' => Fixometer::allSkills(),
-            'co2Total' => $stats['waste_stats'][0]->powered_footprint + $stats['waste_stats'][0]->unpowered_footprint,
-            'wasteTotal' => $stats['waste_stats'][0]->powered_waste + $stats['waste_stats'][0]->unpowered_waste,
-            'partiesCount' => $stats['partiesCount'],
-            'deviceCount' => $deviceCount,
-            'showNewsletterSignup' => $showNewsletterSignup,
-        ]);
+        return redirect($frontend.'/user/register'.($hash ? '?invite_hash='.urlencode($hash) : ''));
     }
 
     public function postRegister(Request $request, $hash = null): RedirectResponse

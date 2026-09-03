@@ -32,9 +32,29 @@ restarters-anonymised.sql
 /.claude/settings.local.json
 /public/build/
 /storage/api-docs/api-docs.json
+/storage/app/tus
+/storage/app/tus-cache
 /.phpunit.result.cache
 /playwright-report/
 /events.csv
 /public/repair-data*.csv
 /uploads/*.jpg
 .mcp.json
+
+# Local ralph session log (not for commit)
+.claude-session.md
+# PHPUnit coverage artifact
+/tests/clover.xml
+
+# Visual parity capture output (task parity:capture) - screenshots, never committed
+parity-shots/
+
+# Canvas share-image backgrounds (224MB, 267 files). These live in the Laravel
+# app at public/images/stats and must NOT be duplicated into the client bundle.
+# The client reaches them through an /api/* endpoint so CORS applies and the
+# canvas stays untainted - see the stats-share composable.
+client/public/images/stats/
+parity-fixtures.json
+
+# Generated from fly.preview.toml by CI (and by hand for manual deploys)
+fly.*.generated.toml

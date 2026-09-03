@@ -46,6 +46,26 @@ class APIv2NetworkTest extends TestCase
         self::assertTrue($found);
     }
 
+    /**
+     * App\Http\Resources\NetworkSummary - the "Your networks" table on
+     * client/app/pages/networks/index.vue needs `description` to show the
+     * Description column the legacy resources/views/networks/index.blade.php
+     * had (docs/nuxt-migration/api-gaps.md Phase E).
+     */
+    public function testListIncludesDescription(): void {
+        $network = Network::factory()->create([
+            'description' => 'A network description for the summary list.',
+        ]);
+
+        $response = $this->get('/api/v2/networks');
+        $response->assertSuccessful();
+        $json = json_decode($response->getContent(), true)['data'];
+
+        $found = collect($json)->firstWhere('id', $network->id);
+        $this->assertNotNull($found);
+        $this->assertEquals('A network description for the summary list.', $found['description']);
+    }
+
     public function testGet(): void {
         $network = Network::first();
         self::assertNotNull($network);
@@ -64,6 +84,8 @@ class APIv2NetworkTest extends TestCase
         $this->assertStringEndsWith('/uploads/' . $network->logo, $json['logo']);
         $this->assertTrue(array_key_exists('stats', $json));
         $this->assertTrue(array_key_exists('default_language', $json));
+        $this->assertTrue(array_key_exists('coordinators', $json));
+        $this->assertIsArray($json['coordinators']);
 
         $response = $this->get('/api/v2/networks');
         $response->assertSuccessful();
@@ -75,6 +97,41 @@ class APIv2NetworkTest extends TestCase
                 break;
             }
         }
+    }
+
+    /**
+     * App\Http\Resources\Network - the "Network Coordinators" section on
+     * client/app/pages/networks/[id].vue (avatar + name cards, matching
+     * legacy resources/js/components/NetworkPage.vue) needs `coordinators`
+     * as {id, name, avatar_url} (docs/nuxt-migration/api-gaps.md Phase E).
+     */
+    public function testGetIncludesCoordinators(): void {
+        $network = Network::factory()->create();
+
+        $coordinator = User::factory()->create(['name' => 'Coord Inator']);
+        $network->addCoordinator($coordinator);
+
+        $response = $this->get('/api/v2/networks/' . $network->id);
+        $response->assertSuccessful();
+        $json = json_decode($response->getContent(), true)['data'];
+
+        $this->assertCount(1, $json['coordinators']);
+        $this->assertEquals((int) $coordinator->id, $json['coordinators'][0]['id']);
+        $this->assertEquals('Coord Inator', $json['coordinators'][0]['name']);
+        $this->assertArrayHasKey('avatar_url', $json['coordinators'][0]);
+        // No uploaded profile image for this user, so the avatar is null -
+        // the client falls back to the placeholder image itself.
+        $this->assertNull($json['coordinators'][0]['avatar_url']);
+    }
+
+    public function testGetReturnsEmptyCoordinatorsArrayWhenNetworkHasNone(): void {
+        $network = Network::factory()->create();
+
+        $response = $this->get('/api/v2/networks/' . $network->id);
+        $response->assertSuccessful();
+        $json = json_decode($response->getContent(), true)['data'];
+
+        $this->assertEquals([], $json['coordinators']);
     }
 
     /**
@@ -573,6 +630,75 @@ class APIv2NetworkTest extends TestCase
         $json = json_decode($response->getContent(), true)['data'];
         $this->assertEquals(1, count($json));
         $this->assertEquals($event1->idevents, $json[0]['id']);
+    }
+
+    /**
+     * PartySummary (and Party, on the includeDetails=true branch) each call getEventStats()
+     * per event, which needs the allDevices/allInvited relations loaded or it's an N+1 - see
+     * GroupNetworkStatsQueryTest::testGroupNetworkStatsQueryCountDoesNotScaleWithGroupCount and
+     * GroupViewTest::testGroupIndexQueryCountScalesWithO1NotN for the same pattern applied
+     * elsewhere. Regression check for the eager-loading added to getNetworkEventsv2.
+     *
+     * @dataProvider providerIncludeDetails
+     */
+    public function testEventsQueryCountDoesNotScaleWithEventCount($includeDetails): void {
+        $network = Network::factory()->create();
+
+        $addGroupWithPastEventAndDevice = function () use ($network) {
+            $group = Group::factory()->create(['approved' => true]);
+            $network->addGroup($group);
+
+            $event = Party::factory()->moderated()->create([
+                'group' => $group->idgroups,
+                'event_start_utc' => Carbon::parse('1pm last month')->toIso8601String(),
+                'event_end_utc' => Carbon::parse('3pm last month')->toIso8601String(),
+            ]);
+            \App\Device::factory()->fixed()->create([
+                'category' => 11,
+                'category_creation' => 11,
+                'event' => $event->idevents,
+            ]);
+        };
+
+        $url = "/api/v2/networks/{$network->id}/events" . ($includeDetails ? '?includeDetails=true' : '');
+
+        // 3 events.
+        for ($i = 0; $i < 3; $i++) {
+            $addGroupWithPastEventAndDevice();
+        }
+
+        // Warm up (first request may have extra overhead).
+        $this->get($url)->assertSuccessful();
+
+        DB::enableQueryLog();
+        $this->get($url)->assertSuccessful();
+        $queriesFor3 = count(DB::getQueryLog());
+        DB::disableQueryLog();
+        DB::flushQueryLog();
+
+        // 6 events.
+        for ($i = 0; $i < 3; $i++) {
+            $addGroupWithPastEventAndDevice();
+        }
+
+        DB::enableQueryLog();
+        $this->get($url)->assertSuccessful();
+        $queriesFor6 = count(DB::getQueryLog());
+        DB::disableQueryLog();
+        DB::flushQueryLog();
+
+        $this->assertLessThan(
+            $queriesFor3 * 1.5,
+            $queriesFor6,
+            "Query count scaled with event count — N+1 in getNetworkEventsv2. 3 events: $queriesFor3, 6 events: $queriesFor6"
+        );
+    }
+
+    public function providerIncludeDetails(): array {
+        return [
+            'summary' => [false],
+            'includeDetails' => [true],
+        ];
     }
 
     public function testNetworkCoordinatorCanUpdateGroupTags(): void {

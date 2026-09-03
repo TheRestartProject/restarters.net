@@ -82,10 +82,6 @@ class NetworkController extends Controller
      *              )
      *          )
      *       ),
-     *      @OA\Response(
-     *          response=404,
-     *          description="Network not found",
-     *      ),
      *     )
      */
 
@@ -122,10 +118,7 @@ class NetworkController extends Controller
      *              )
      *          )
      *       ),
-     *      @OA\Response(
-     *          response=404,
-     *          description="Event not found",
-     *      ),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound"),
      *     )
      */
 
@@ -238,10 +231,7 @@ class NetworkController extends Controller
      *              )
      *          )
      *       ),
-     *      @OA\Response(
-     *          response=404,
-     *          description="Network not found",
-     *      ),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound"),
      *     )
      */
 
@@ -377,10 +367,7 @@ class NetworkController extends Controller
      *              )
      *          )
      *       ),
-     *      @OA\Response(
-     *          response=404,
-     *          description="Network not found",
-     *      ),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound"),
      *     )
      */
 
@@ -397,8 +384,21 @@ class NetworkController extends Controller
 
         // We need to explicity select events.*, otherwise the updated_at values we get back are from the group_network
         // table, which is mightily confusing.  We only want to return approved events on approved groups.
+        //
+        // Both PartySummary and Party (full) call getEventStats() per event, which needs allDevices
+        // and allInvited loaded or it's an N+1 - same eager-load as GroupController::getEventsForGroupv2
+        // and Group::bulkGroupStats(). This endpoint has no upper bound on the date range, so an
+        // unfiltered network can return a lot of events.
+        //
+        // theGroup is also rendered per event (via GroupSummary), and unlike
+        // getEventsForGroupv2 every event here can belong to a DIFFERENT group - so without
+        // eager-loading it (and the relations GroupSummary itself touches unconditionally:
+        // groupImage.image, networks - same set listSummaryv2 eager-loads) this scales with
+        // event count too, just less obviously than the stats N+1.
         $query = Party::join('groups', 'groups.idgroups', '=', 'events.group')
             ->join('group_network', 'group_network.group_id', '=', 'groups.idgroups')
+            ->with('allDevices', 'theGroup.networks', 'theGroup.groupImage.image')
+            ->withCount('allInvited')
             ->where('group_network.network_id', $id)
             ->where('event_start_utc', '>=', $start)
             ->where('event_end_utc', '<=', $end)
@@ -414,7 +414,13 @@ class NetworkController extends Controller
                 ->where('grouptags_groups.group_tag', $tagId);
         }
 
-        $events = $query->select('events.*')->get();
+        // addSelect(), not select() - select() replaces the whole column list, which would
+        // silently discard the all_invited_count column withCount('allInvited') staged above via
+        // its own addSelect() (found by diffing the actual SQL between the 3-event and 6-event
+        // runs of testEventsQueryCountDoesNotScaleWithEventCount: it grew by exactly a
+        // lazy-loaded events_users query per new event - withCount() was running but its result
+        // was being thrown away before the query even executed).
+        $events = $query->addSelect('events.*')->get();
 
         if ($request->get('includeDetails', false)) {
             return \App\Http\Resources\PartyCollection::make($events);
@@ -463,10 +469,7 @@ class NetworkController extends Controller
      *              )
      *          )
      *       ),
-     *      @OA\Response(
-     *          response=404,
-     *          description="Network not found",
-     *      ),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound"),
      *     )
      */
     public function getNetworkTagsv2(Request $request, $id)
@@ -519,16 +522,19 @@ class NetworkController extends Controller
      *              @OA\Property(property="fixed_unpowered", type="integer", example=13),
      *              @OA\Property(property="repairable_devices", type="integer", example=520),
      *              @OA\Property(property="dead_devices", type="integer", example=178),
+     *              @OA\Property(property="unknown_repair_status", type="integer", example=22),
+     *              @OA\Property(property="devices_powered", type="integer", example=610),
+     *              @OA\Property(property="devices_unpowered", type="integer", example=90),
+     *              @OA\Property(property="no_weight_powered", type="integer", example=4),
+     *              @OA\Property(property="no_weight_unpowered", type="integer", example=1),
      *              @OA\Property(property="participants", type="integer", example=880),
      *              @OA\Property(property="volunteers", type="integer", example=556),
      *              @OA\Property(property="hours_volunteered", type="integer", example=3152),
+     *              @OA\Property(property="invited", type="integer", example=940),
      *              @OA\Property(property="parties", type="integer", example=161)
      *          )
      *       ),
-     *      @OA\Response(
-     *          response=404,
-     *          description="Network not found",
-     *      ),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound"),
      *     )
      */
     public function getNetworkStatsv2(Request $request, $id): JsonResponse
@@ -588,22 +594,10 @@ class NetworkController extends Controller
      *              )
      *          )
      *       ),
-     *      @OA\Response(
-     *          response=401,
-     *          description="Unauthenticated",
-     *      ),
-     *      @OA\Response(
-     *          response=403,
-     *          description="Forbidden - User is not a coordinator for this network",
-     *      ),
-     *      @OA\Response(
-     *          response=404,
-     *          description="Network not found",
-     *      ),
-     *      @OA\Response(
-     *          response=422,
-     *          description="Validation error - tag name already exists in this network",
-     *      ),
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound"),
+     *      @OA\Response(response=422, ref="#/components/responses/ValidationError"),
      *     )
      */
     public function createNetworkTagv2(Request $request, $id)
@@ -683,23 +677,17 @@ class NetworkController extends Controller
      *      @OA\Response(
      *          response=200,
      *          description="Tag updated successfully",
+     *          @OA\JsonContent(
+     *              @OA\Property(
+     *                property="data",
+     *                ref="#/components/schemas/Tag"
+     *              )
+     *          )
      *       ),
-     *      @OA\Response(
-     *          response=401,
-     *          description="Unauthenticated",
-     *      ),
-     *      @OA\Response(
-     *          response=403,
-     *          description="Forbidden - User is not a coordinator for this network",
-     *      ),
-     *      @OA\Response(
-     *          response=404,
-     *          description="Network or tag not found",
-     *      ),
-     *      @OA\Response(
-     *          response=422,
-     *          description="Validation error or duplicate tag name",
-     *      ),
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound"),
+     *      @OA\Response(response=422, ref="#/components/responses/ValidationError"),
      *     )
      */
     public function updateNetworkTagv2(Request $request, $id, $tagId)
@@ -777,19 +765,13 @@ class NetworkController extends Controller
      *      @OA\Response(
      *          response=200,
      *          description="Tag deleted successfully",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="message", type="string", example="Tag deleted successfully")
+     *          )
      *       ),
-     *      @OA\Response(
-     *          response=401,
-     *          description="Unauthenticated",
-     *      ),
-     *      @OA\Response(
-     *          response=403,
-     *          description="Forbidden - User is not a coordinator for this network or tag is global",
-     *      ),
-     *      @OA\Response(
-     *          response=404,
-     *          description="Network or tag not found",
-     *      ),
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound"),
      *     )
      */
     public function deleteNetworkTagv2(Request $request, $id, $tagId)
@@ -819,5 +801,154 @@ class NetworkController extends Controller
         $tag->delete();
 
         return response()->json(['message' => 'Tag deleted successfully']);
+    }
+
+    /**
+     * @OA\Post(
+     *      path="/api/v2/networks/{id}/groups",
+     *      operationId="associateNetworkGroups",
+     *      tags={"Networks"},
+     *      summary="Associate groups with a network",
+     *      description="Add one or more groups to a network. Requires authentication as a Network Coordinator for this network or an Administrator.",
+     *      security={{"apiToken":{}}},
+     *      @OA\Parameter(name="id", description="Network id", required=true, in="path", @OA\Schema(type="integer")),
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent(
+     *              required={"groups"},
+     *              @OA\Property(property="groups", type="array", minItems=1, @OA\Items(type="integer"), description="Group ids to add to the network. Unknown ids are silently skipped."),
+     *          )
+     *      ),
+     *      @OA\Response(response=200, description="Groups associated",
+     *          @OA\JsonContent(@OA\Property(property="data", type="object",
+     *              @OA\Property(property="associated", type="integer", description="Number of groups actually found and associated")))),
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound"),
+     *      @OA\Response(response=422, ref="#/components/responses/ValidationError"),
+     * )
+     *
+     * Port of NetworkController::associateGroup (the old session+CSRF web form).
+     */
+    public function associateGroupsv2(Request $request, $id): JsonResponse
+    {
+        $network = Network::findOrFail($id);
+        $user = Auth::user();
+
+        if (! $user) {
+            return response()->json(['message' => 'Unauthenticated'], 401);
+        }
+
+        if (! $user->hasRole('Administrator') && ! $user->isCoordinatorOf($network)) {
+            return response()->json(['message' => 'You do not have permission to add groups to this network'], 403);
+        }
+
+        $validated = $request->validate([
+            'groups' => 'required|array|min:1',
+            'groups.*' => 'integer',
+        ]);
+
+        $associated = 0;
+        foreach ($validated['groups'] as $groupId) {
+            $group = Group::find($groupId);
+            if ($group) {
+                $network->addGroup($group);
+                $associated++;
+            }
+        }
+
+        return response()->json(['data' => ['associated' => $associated]]);
+    }
+
+    /**
+     * @OA\Post(
+     *      path="/api/v2/networks/{id}/logo",
+     *      operationId="uploadNetworkLogo",
+     *      tags={"Networks"},
+     *      summary="Upload a network logo",
+     *      description="Set the network's logo from a completed tus upload. Requires authentication as a Network Coordinator for this network or an Administrator.",
+     *      security={{"apiToken":{}}},
+     *      @OA\Parameter(name="id", description="Network id", required=true, in="path", @OA\Schema(type="integer")),
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent(
+     *              required={"upload_key"},
+     *              @OA\Property(property="upload_key", type="string", description="Key of the completed tus upload"),
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Logo stored",
+     *          @OA\JsonContent(@OA\Property(property="data", type="object",
+     *              @OA\Property(property="logo", type="string")))
+     *      ),
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound"),
+     *      @OA\Response(response=422, ref="#/components/responses/ValidationError"),
+     * )
+     *
+     * Port of NetworkController::update's network_logo handling: stores the
+     * image under network_logos/ (with a -_x100 sized copy) and sets
+     * network->logo. The SPA uploads the file via tus first, then calls this
+     * with the resulting upload_key.
+     */
+    public function uploadLogov2(Request $request, $id): JsonResponse
+    {
+        $network = Network::findOrFail($id);
+        $user = Auth::user();
+
+        if (! $user) {
+            return response()->json(['message' => 'Unauthenticated'], 401);
+        }
+
+        if (! $user->hasRole('Administrator') && ! $user->isCoordinatorOf($network)) {
+            return response()->json(['message' => 'You do not have permission to edit this network'], 403);
+        }
+
+        $validated = $request->validate([
+            'upload_key' => 'required|string',
+        ]);
+
+        if (! config('restarters.features.image_upload')) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'upload_key' => [__('events.image_upload_error')],
+            ]);
+        }
+
+        // Resolve (and validate: complete, <=2MB, image mime) the tus upload.
+        $tusPath = EventAttendanceController::validatedTusFilePath($validated['upload_key'], 'events');
+
+        $extByMime = [
+            'image/jpeg' => 'jpg',
+            'image/png' => 'png',
+            'image/gif' => 'gif',
+        ];
+        $mime = @finfo_file(finfo_open(FILEINFO_MIME_TYPE), $tusPath);
+        $ext = $extByMime[$mime] ?? 'jpg';
+
+        // Same disk selection as the old web controller (s3 on Fly, else public).
+        $disk = config('filesystems.default') === 's3' ? 's3' : 'public_uploads';
+        $storage = \Illuminate\Support\Facades\Storage::disk($disk);
+
+        $path = 'network_logos/'.\Illuminate\Support\Str::random(40).'.'.$ext;
+        if (! $storage->put($path, file_get_contents($tusPath))) {
+            abort(500, 'Failed to save logo');
+        }
+
+        // Generate the _x100 sized version by copying the file (matches the
+        // old controller; the sized image is served at that derived path).
+        $sizedPath = preg_replace('/\.([^.\s]{3,4})$/', '-_x100.$1', $path);
+        $storage->copy($path, $sizedPath);
+
+        $network->logo = $path;
+        $network->save();
+
+        // Clean up the consumed tus upload.
+        $cache = \App\Helpers\Tus::buildCache();
+        $cache->delete($validated['upload_key']);
+        @unlink($tusPath);
+
+        return response()->json(['data' => ['logo' => $network->logo]]);
     }
 }

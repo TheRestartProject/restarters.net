@@ -25,6 +25,20 @@ use Illuminate\Support\Facades\Log;
 
 class EventController extends Controller
 {
+    /**
+     * @OA\Get(
+     *      path="/api/events/network/{date_from}/{date_to}",
+     *      operationId="getEventsByUsersNetworksLegacy",
+     *      tags={"Legacy", "Events"},
+     *      summary="Events across the authenticated user's networks (legacy, used by Repair Together)",
+     *      description="Legacy endpoint outside the /api/v2 surface, used by the Repair Together integration. Returns approved events for every group in every network the caller coordinates, each with per-event impact stats and widget URLs. Authenticated via the ?api_token= query string.",
+     *      security={{"ApiKeyAuth":{}}},
+     *      @OA\Parameter(name="date_from", in="path", required=false, description="Optional ISO-8601 lower bound on event start.", @OA\Schema(type="string", format="date-time")),
+     *      @OA\Parameter(name="date_to", in="path", required=false, description="Optional ISO-8601 upper bound on event end.", @OA\Schema(type="string", format="date-time")),
+     *      @OA\Response(response=200, description="A list of events with per-event impact stats and widget URLs.", @OA\JsonContent(type="array", @OA\Items(type="object"))),
+     *      @OA\Response(response=404, description="No events found for the caller's networks.")
+     * )
+     */
     public function getEventsByUsersNetworks(Request $request, $date_from = null, $date_to = null, $timezone = 'UTC')
     {
         $authenticatedUser = Auth::user();
@@ -146,6 +160,28 @@ class EventController extends Controller
         return $collection;
     }
 
+    /**
+     * @OA\Put(
+     *      path="/api/events/{id}/volunteers",
+     *      operationId="addVolunteerLegacy",
+     *      tags={"Legacy", "Events"},
+     *      summary="Add a volunteer to an event (legacy)",
+     *      description="Legacy endpoint outside the /api/v2 surface. Adds a registered or unregistered volunteer to an event; requires edit-party permission. When volunteer_email_address is supplied for a non-existent user, an invitation email is sent.",
+     *      security={{"ApiKeyAuth":{}}},
+     *      @OA\Parameter(name="id", in="path", required=true, description="Event id.", @OA\Schema(type="integer")),
+     *      @OA\RequestBody(
+     *          @OA\MediaType(mediaType="application/json", @OA\Schema(
+     *              @OA\Property(property="user", description="Existing user id, or 'not-registered'.", type="string", nullable=true),
+     *              @OA\Property(property="volunteer_email_address", type="string", format="email", nullable=true),
+     *              @OA\Property(property="full_name", type="string", nullable=true)
+     *          ))
+     *      ),
+     *      @OA\Response(response=200, description="Volunteer added.", @OA\JsonContent(@OA\Property(property="success", type="string", example="success"))),
+     *      @OA\Response(response=403, description="Caller lacks edit-party permission."),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound"),
+     *      @OA\Response(response=422, ref="#/components/responses/ValidationError")
+     * )
+     */
     public function addVolunteer(Request $request, $idevents): JsonResponse
     {
         $request->validate([
@@ -210,7 +246,7 @@ class EventController extends Controller
             // Send email.
             $from = User::find(Auth::user()->id);
 
-            $hash = substr(bin2hex(openssl_random_pseudo_bytes(32)), 0, 24);
+            $hash = Fixometer::generateHash();
             $url = url('/user/register/'.$hash);
 
             $invite = Invite::create([
@@ -237,12 +273,26 @@ class EventController extends Controller
     }
 
 
+    /**
+     * @OA\Get(
+     *      path="/api/events/{id}/volunteers",
+     *      operationId="listVolunteersLegacy",
+     *      tags={"Legacy", "Events"},
+     *      summary="List an event's confirmed volunteers (legacy)",
+     *      description="Legacy endpoint outside the /api/v2 surface (the v2 replacement is GET /api/v2/events/{id}/attendees). Returns the event's confirmed volunteers.",
+     *      security={{"ApiKeyAuth":{}}},
+     *      @OA\Parameter(name="id", in="path", required=true, description="Event id.", @OA\Schema(type="integer")),
+     *      @OA\Response(response=200, description="The event's confirmed volunteers.", @OA\JsonContent(type="array", @OA\Items(type="object"))),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound")
+     * )
+     */
     public function listVolunteers(Request $request, $idevents): JsonResponse
     {
         $party = Party::findOrFail($idevents);
 
-        // Get the user that the API has been authenticated as.
-        $user = auth('api')->user();
+        // Get the user that the API has been authenticated as (whichever guard
+        // the auth:sanctum,api middleware resolved).
+        $user = $request->user();
 
         // Only show emails to users who have edit permission on this event.
         $showEmails = $user && Fixometer::userHasEditPartyPermission($idevents, $user->id);
@@ -281,10 +331,7 @@ class EventController extends Controller
      *              )
      *          )
      *       ),
-     *      @OA\Response(
-     *          response=404,
-     *          description="Event not found",
-     *      ),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound"),
      *     )
      */
 
@@ -292,26 +339,166 @@ class EventController extends Controller
     {
         $party = Party::findOrFail($idevents);
 
+        // Events on unapproved (unmoderated) groups are only visible to the
+        // relevant hosts/coordinators/admins - restores the legacy
+        // PartyController::view() gate the API-only cutover dropped. Events on
+        // approved groups stay fully public.
+        if (! Fixometer::userHasViewPartyPermission($idevents, $this->optionalUser()?->id, $party)) {
+            abort(404);
+        }
+
         return \App\Http\Resources\Party::make($party);
     }
 
-    private function getUser()
+
+    /**
+     * Resolve the acting user across all guards (web session, SPA sanctum
+     * bearer, api_token) without throwing - for optional-auth endpoints that
+     * are public but behave differently for a recognised user. Plain
+     * $request->user() only checks the default 'web' guard, so it misses the
+     * client's bearer token on routes that carry no auth middleware.
+     */
+    private function optionalUser()
     {
-        // We want to allow this call to work if a) we are logged in as a user, or b) we have a valid API token.
-        //
-        // This is a slightly odd thing to do, but it is necessary to get both the PHPUnit tests and the
-        // real client use of the API to work.
-        $user = Auth::user();
+        return Auth::user() ?? auth('sanctum')->user() ?? auth('api')->user();
+    }
 
-        if (!$user) {
-            $user = auth('api')->user();
+    /**
+     * @OA\Get(
+     *      path="/api/v2/events/{id}/attendees",
+     *      operationId="getEventAttendeesv2",
+     *      tags={"Events","Volunteers"},
+     *      summary="Get event attendees",
+     *      description="Confirmed attendees (participants/volunteers/hosts) and pending invitees for an event. Replaces the Blade-only attended/invited/hosts computation in PartyController::view() and extends v1 GET /api/events/{id}/volunteers (confirmed-only). Unlike the Blade view, lists are NOT truncated.",
+     *      @OA\Parameter(
+     *          name="id",
+     *          description="Event id",
+     *          required=true,
+     *          in="path",
+     *          @OA\Schema(type="integer")
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(@OA\Property(property="data", type="object",
+     *              @OA\Property(property="confirmed", type="array", @OA\Items(
+     *                  @OA\Property(property="id", type="integer", description="events_users.idevents_users"),
+     *                  @OA\Property(property="user", type="integer", nullable=true, description="Null for a manually-added, unregistered volunteer"),
+     *                  @OA\Property(property="fullName", type="string"),
+     *                  @OA\Property(property="role", type="integer", description="Role: HOST=3, RESTARTER=4, GUEST=5 (guest = plain attendee/participant)"),
+     *                  @OA\Property(property="confirmed", type="boolean"),
+     *                  @OA\Property(property="profilePath", type="string"),
+     *                  @OA\Property(property="volunteer", type="object", nullable=true, description="Present only when user is set",
+     *                      @OA\Property(property="id", type="integer"),
+     *                      @OA\Property(property="name", type="string"),
+     *                      @OA\Property(property="email", type="string", nullable=true, description="Only when the caller has edit-party permission"),
+     *                      @OA\Property(property="user_skills", type="array", @OA\Items(type="object"))
+     *                  )
+     *              )),
+     *              @OA\Property(property="invited", type="array", description="Same shape as confirmed, with confirmed:false; the raw status hash is not surfaced", @OA\Items(
+     *                  @OA\Property(property="id", type="integer"),
+     *                  @OA\Property(property="user", type="integer", nullable=true),
+     *                  @OA\Property(property="fullName", type="string"),
+     *                  @OA\Property(property="role", type="integer"),
+     *                  @OA\Property(property="confirmed", type="boolean"),
+     *                  @OA\Property(property="profilePath", type="string"),
+     *                  @OA\Property(property="volunteer", type="object", nullable=true,
+     *                      @OA\Property(property="id", type="integer"),
+     *                      @OA\Property(property="name", type="string"),
+     *                      @OA\Property(property="email", type="string", nullable=true),
+     *                      @OA\Property(property="user_skills", type="array", @OA\Items(type="object"))
+     *                  )
+     *              ))
+     *          ))
+     *      ),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound")
+     * )
+     */
+    public function attendeesv2(Request $request, $idevents): JsonResponse
+    {
+        $party = Party::findOrFail($idevents);
+
+        // Optional auth: showEmails mirrors listVolunteers' gate, everything else is public.
+        // Resolve across guards so the SPA's bearer token is recognised on this
+        // auth-middleware-free route (default 'web' guard alone would miss it).
+        $user = $this->optionalUser();
+
+        // Events on unapproved groups are hidden from the public (legacy
+        // PartyController::view() gate) - approved-group events stay public.
+        if (! Fixometer::userHasViewPartyPermission($idevents, $user?->id, $party)) {
+            abort(404);
         }
 
-        if (!$user) {
-            throw new AuthenticationException();
+        $showEmails = $user && Fixometer::userHasEditPartyPermission($idevents, $user->id);
+
+        $confirmed = Party::expandVolunteers($party->allConfirmedVolunteers()->get(), $showEmails);
+        $invited = Party::expandVolunteers($party->allInvited()->get(), $showEmails);
+
+        return response()->json([
+            'data' => [
+                'confirmed' => array_map(fn ($row) => self::shapeAttendee($row, true), $confirmed),
+                'invited' => array_map(fn ($row) => self::shapeAttendee($row, false), $invited),
+            ],
+        ]);
+    }
+
+    /**
+     * Shape an EventsUsers row (as expanded by Party::expandVolunteers()) into the
+     * confirmed/invited attendee JSON documented in api-contracts-phase-c.md#C1b.
+     */
+    private static function shapeAttendee($row, bool $confirmed): array
+    {
+        $shaped = [
+            'id' => $row->idevents_users,
+            'user' => $row->user,
+            'fullName' => $row['fullName'],
+            'role' => (int) $row->role,
+            'confirmed' => $confirmed,
+            'profilePath' => $row['profilePath'],
+        ];
+
+        if ($row->user) {
+            $shaped['volunteer'] = $row['volunteer'];
         }
 
-        return $user;
+        return $shaped;
+    }
+
+    /**
+     * @OA\Get(
+     *      path="/api/v2/events/{id}/devices",
+     *      operationId="getEventDevicesv2",
+     *      tags={"Events","Devices"},
+     *      summary="Get the devices logged at an event",
+     *      description="Replaces the Blade view() controller's inline device-resolve loop - not exposed as a callable endpoint today (Blade passes it as an initial prop). The Nuxt client needs it as a real call since there's no server render.",
+     *      @OA\Parameter(
+     *          name="id",
+     *          description="Event id",
+     *          required=true,
+     *          in="path",
+     *          @OA\Schema(type="integer")
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(@OA\Property(property="data", type="array", @OA\Items(ref="#/components/schemas/Device")))
+     *      ),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound")
+     * )
+     */
+    public function devicesv2(Request $request, $idevents): JsonResponse
+    {
+        $party = Party::findOrFail($idevents);
+
+        // Events on unapproved groups are hidden from the public (legacy
+        // PartyController::view() gate) - approved-group events stay public.
+        if (! Fixometer::userHasViewPartyPermission($idevents, $this->optionalUser()?->id, $party)) {
+            abort(404);
+        }
+
+        return response()->json([
+            'data' => \App\Http\Resources\Device::collection($party->devices()->get()),
+        ]);
     }
 
     /**
@@ -320,29 +507,123 @@ class EventController extends Controller
      *      operationId="getEventsModeratev2",
      *      tags={"Events"},
      *      summary="Get Events for Moderation",
-     *      description="Only available for Administrators and Network Coordinators.",
-     *      @OA\Parameter(
-     *          name="api_token",
-     *          description="A valid user API token",
-     *          required=true,
-     *          in="query",
-     *          @OA\Schema(
-     *              type="string",
-     *              example="1234"
-     *          )
-     *      ),
+     *      description="Events requiring moderation across the networks the caller can moderate: Administrators see every network, Network Coordinators see their own networks. Returns an empty list for an authenticated user who is neither.",
+     *      security={{"apiToken":{}}},
      *      @OA\Response(
      *          response=200,
      *          description="Successful operation",
      *          @OA\JsonContent(
      *             type="array",
-     *             description="An array of groups",
+     *             description="An array of events",
      *             @OA\Items(
      *                 ref="#/components/schemas/Event"
      *             )
      *          )
      *       ),
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
      *     )
+     */
+    /**
+     * @OA\Get(
+     *      path="/api/v2/events/{id}/audits",
+     *      operationId="getEventAuditsv2",
+     *      tags={"Events"},
+     *      summary="Audit trail for an event",
+     *      description="Backs the edit page's Event log tab. Administrator only, matching the legacy edit view's `$audits && hasRole(Administrator)` gate. Strings are rendered server-side from the event-audits lang files so the placeholder substitution stays in one place; each entry's `heading` and `changes` are HTML.",
+     *      security={{"apiToken":{}}},
+     *      @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Audit entries, newest first",
+     *          @OA\JsonContent(@OA\Property(property="data", type="array", @OA\Items(
+     *              @OA\Property(property="id", type="integer"),
+     *              @OA\Property(property="event", type="string", example="updated"),
+     *              @OA\Property(property="heading", type="string"),
+     *              @OA\Property(property="changes", type="array", @OA\Items(type="string"))
+     *          )))
+     *      ),
+     *      @OA\Response(response=403, description="Not an administrator"),
+     *      @OA\Response(response=404, description="No such event")
+     * )
+     */
+    public function auditsv2($id): JsonResponse
+    {
+        if ($resp = $this->requireAdministrator()) {
+            return $resp;
+        }
+
+        $event = Party::find($id);
+
+        if (! $event) {
+            return response()->json(['error' => 'No such event'], 404);
+        }
+
+        // Rendered server-side, as the legacy view does
+        // (partials/log-accordion.blade.php's
+        // `@lang($type.'.'.$audit->event.'.metadata', $audit->getMetadata())`).
+        // Resolving them client-side would mean reimplementing the placeholder
+        // substitution and keeping two copies of the key layout in step.
+        $audits = $event->audits()->with('user')->orderBy('created_at', 'desc')->get();
+
+        return response()->json([
+            'data' => $audits->map(function ($audit) {
+                $changes = [];
+
+                foreach ($audit->getModified() as $attribute => $modified) {
+                    $key = 'event-audits.'.$audit->event.'.modified.'.$attribute;
+                    $line = __($key, $modified);
+
+                    // An attribute with no lang entry returns the key itself -
+                    // skip it rather than showing a raw key to the user, which
+                    // is exactly the failure the /party moderation header had.
+                    if ($line !== $key) {
+                        $changes[] = $line;
+                    }
+                }
+
+                // SECURITY: audit_url is the full request URL, so for any write
+                // authenticated with ?api_token= it contains a VALID API TOKEN.
+                // laravel-auditing stores that verbatim, and the legacy view
+                // renders it to any Administrator opening the log. Strip the
+                // query string before rendering. NB this only stops the
+                // display. New rows no longer carry one either
+                // (App\Auditing\SanitisedUrlResolver), and `php artisan
+                // audits:scrub-urls` clears any written before that landed -
+                // this stays as defence in depth for environments that have
+                // not run it.
+                $metadata = $audit->getMetadata();
+
+                if (isset($metadata['audit_url']) && is_string($metadata['audit_url'])) {
+                    $metadata['audit_url'] = strtok($metadata['audit_url'], '?');
+                }
+
+                $headingKey = 'event-audits.'.$audit->event.'.metadata';
+                $heading = __($headingKey, $metadata);
+
+                return [
+                    'id' => $audit->id,
+                    'event' => $audit->event,
+                    'heading' => $heading === $headingKey ? null : $heading,
+                    'changes' => $changes,
+                ];
+            })->values()->all(),
+        ]);
+    }
+
+    /**
+     * @OA\Get(
+     *      path="/api/v2/moderate/events",
+     *      operationId="moderateEventsv2",
+     *      tags={"Events"},
+     *      summary="Events awaiting moderation",
+     *      description="Events requiring moderation across every network the caller coordinates (all networks for an Administrator). Returns a bare array, not a {data:...} envelope. Deduped by id - an event whose group belongs to several networks would otherwise appear once per network.",
+     *      security={{"apiToken":{}}},
+     *      @OA\Response(
+     *          response=200,
+     *          description="Events awaiting moderation, soonest first",
+     *          @OA\JsonContent(type="array", @OA\Items(type="object"))
+     *      )
+     * )
      */
     public function moderateEventsv2(Request $request)
     {
@@ -365,11 +646,25 @@ class EventController extends Controller
             $events = array_merge($events, $network->eventsRequiringModeration());
         }
 
+        // Dedupe by id: an event whose group belongs to more than one network
+        // is returned once per network by the loop above, so it appeared
+        // twice in the moderation queue. Observed against the parity fixtures,
+        // where the queue rendered the same pending event twice while develop
+        // showed it once.
+        $events = collect($events)->unique('idevents')->values()->all();
+
         usort($events, function ($a, $b) {
             return strtotime($a->event_start_utc) - strtotime($b->event_start_utc);
         });
 
-        $ret = \App\Http\Resources\Party::collection(collect($events));
+        // One query for every event's invited count, rather than one per event
+        // (see the Party resource's `invited` field).
+        // Eloquent's collection, not the base one - loadCount only exists on
+        // the former, and collect() returns the latter.
+        $collection = new \Illuminate\Database\Eloquent\Collection($events);
+        $collection->loadCount('allInvited');
+
+        $ret = \App\Http\Resources\Party::collection($collection);
 
         return response()->json($ret);
     }
@@ -380,22 +675,13 @@ class EventController extends Controller
      *      operationId="createEvent",
      *      tags={"Events"},
      *      summary="Create Event",
-     *      description="Creates an event.",
-     *      @OA\Parameter(
-     *          name="api_token",
-     *          description="A valid user API token",
-     *          required=true,
-     *          in="query",
-     *          @OA\Schema(
-     *              type="string",
-     *              example="1234"
-     *          )
-     *      ),
+     *      description="Creates an event. `location` is required unless `online` is true.",
+     *      security={{"apiToken":{}}},
      *     @OA\RequestBody(
      *         @OA\MediaType(
      *             mediaType="multipart/form-data",
      *             @OA\Schema(
-     *                required={"start","end","title","description","location","lat","lng"},
+     *                required={"groupid","start","end","title","description"},
      *                @OA\Property(
      *                   property="groupid",
      *                   title="id",
@@ -448,12 +734,17 @@ class EventController extends Controller
      *        description="Successful operation",
      *        @OA\JsonContent(
      *            @OA\Property(
-     *              property="data",
-     *              title="data",
-     *              ref="#/components/schemas/Event"
+     *              property="id",
+     *              type="integer",
+     *              description="Unique identifier of the newly-created event",
+     *              example=1
      *            )
      *        ),
-     *     )
+     *     ),
+     *     @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *     @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *     @OA\Response(response=404, ref="#/components/responses/NotFound"),
+     *     @OA\Response(response=422, ref="#/components/responses/ValidationError")
      *  )
      */
     public function createEventv2(Request $request): JsonResponse
@@ -561,22 +852,14 @@ class EventController extends Controller
      *      operationId="editEvent",
      *      tags={"Events"},
      *      summary="Edit Event",
-     *      description="Edits an event.  The event of a group cannot be changed after creation.",
-     *      @OA\Parameter(
-     *          name="api_token",
-     *          description="A valid user API token",
-     *          required=true,
-     *          in="query",
-     *          @OA\Schema(
-     *              type="string",
-     *              example="1234"
-     *          )
-     *      ),
+     *      description="Edits an event.  The event of a group cannot be changed after creation. `location` is required unless `online` is true.",
+     *      security={{"apiToken":{}}},
+     *      @OA\Parameter(name="id", description="Event id", required=true, in="path", @OA\Schema(type="integer")),
      *     @OA\RequestBody(
      *         @OA\MediaType(
      *             mediaType="multipart/form-data",
      *             @OA\Schema(
-     *                required={"start","end","title","description","location","lat","lng"},
+     *                required={"start","end","title","description"},
      *                @OA\Property(
      *                   property="start",
      *                   ref="#/components/schemas/Event/properties/start",
@@ -609,6 +892,23 @@ class EventController extends Controller
      *                   property="link",
      *                   ref="#/components/schemas/Event/properties/link",
      *                ),
+     *                @OA\Property(
+     *                   description="Network-defined JSON data",
+     *                   property="network_data",
+     *                   @OA\Schema()
+     *                ),
+     *                @OA\Property(
+     *                   property="participants",
+     *                   description="New value for the participants headcount counter (replaces POST /party/update-quantity). Host/NC/admin gated, same as the rest of this endpoint.",
+     *                   type="integer",
+     *                   minimum=0,
+     *                ),
+     *                @OA\Property(
+     *                   property="volunteers",
+     *                   description="New value for the volunteers headcount counter (replaces POST /party/update-volunteerquantity). Host/NC/admin gated, same as the rest of this endpoint.",
+     *                   type="integer",
+     *                   minimum=0,
+     *                ),
      *             )
      *         )
      *    ),
@@ -617,12 +917,17 @@ class EventController extends Controller
      *        description="Successful operation",
      *        @OA\JsonContent(
      *            @OA\Property(
-     *              property="data",
-     *              title="data",
-     *              ref="#/components/schemas/Event"
+     *              property="id",
+     *              type="string",
+     *              description="The event's id",
+     *              example=1
      *            )
      *        ),
-     *     )
+     *     ),
+     *     @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *     @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *     @OA\Response(response=404, ref="#/components/responses/NotFound"),
+     *     @OA\Response(response=422, ref="#/components/responses/ValidationError")
      *  )
      */
     public function updateEventv2(Request $request, $idEvents): JsonResponse
@@ -658,6 +963,26 @@ class EventController extends Controller
             'timezone' => $timezone,
             'network_data' => $network_data,
         ];
+
+        // Headcount counters (the +/- control next to "Participants"/"Volunteers"): folded in here
+        // instead of the legacy POST /party/update-quantity + update-volunteerquantity routes
+        // (judgment call #3 in api-contracts-phase-c.md). Those two routes had their own inline
+        // role check ((Host||NetworkCoordinator)&&userHasEditPartyPermission || Administrator) which
+        // is a SUBSET of the userHasEditPartyPermission check already enforced above (that helper
+        // already returns true for Administrator/NetworkCoordinator-for-network/host-of-group), so
+        // reusing it here only tightens, never loosens, who can bump the counters.
+        $request->validate([
+            'participants' => 'nullable|integer|min:0',
+            'volunteers' => 'nullable|integer|min:0',
+        ]);
+
+        if ($request->filled('participants')) {
+            $update['pax'] = $request->input('participants');
+        }
+
+        if ($request->filled('volunteers')) {
+            $update['volunteers'] = $request->input('volunteers');
+        }
 
         $party = Party::findOrFail($idEvents);
         $party->update($update);

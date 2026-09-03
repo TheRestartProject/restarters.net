@@ -72,7 +72,16 @@ class ExportController extends Controller
         }
 
         $filename .= '.csv';
-        $file = fopen(base_path() . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . $filename, 'w+');
+
+        // Built in a temp file, not public/. The rows below are filtered by
+        // userCanSeeEvent for THIS caller, so the finished CSV holds whatever
+        // that caller was allowed to see - writing it under the docroot
+        // published it at a guessable URL (the name derives from the group or
+        // event name) and left it there for anyone to fetch, since
+        // Response::download does not remove the file. $filename stays as the
+        // download's presented name.
+        $path = tempnam(sys_get_temp_dir(), 'repair-data');
+        $file = fopen($path, 'w+');
 
         $me = auth()->user();
 
@@ -145,7 +154,7 @@ class ExportController extends Controller
             'Content-Type' => 'text/csv',
         ];
 
-        return Response::download(base_path() . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . $filename, $filename, $headers);
+        return Response::download($path, $filename, $headers)->deleteFileAfterSend(true);
     }
 
     /**
@@ -170,7 +179,25 @@ class ExportController extends Controller
         return $this->exportEvents($parties);
     }
 
+    /**
+     * Drop events the caller isn't allowed to see.
+     *
+     * undeleted() excludes deleted events, not unapproved ones, so without
+     * this an anonymous request returned events belonging to groups still
+     * awaiting moderation - data /api/v2 withholds from the same caller
+     * (User::userCanSeeEvent, asserted by APIv2EventVisibilityTest). The
+     * device export has always filtered this way; the event export did not.
+     */
+    private function visibleTo($parties)
+    {
+        $me = auth()->user();
+
+        return $parties->filter(fn ($party) => User::userCanSeeEvent($me, $party));
+    }
+
     private function exportEvents($parties) {
+        $parties = $this->visibleTo($parties);
+
         // We can't put accented characters into a CSV file, so flatten them.
         // Use //TRANSLIT//IGNORE to handle characters that can't be transliterated on
         // servers with older glibc (e.g. 2.27) and POSIX locale, which lack transliteration
@@ -220,7 +247,12 @@ class ExportController extends Controller
         // write content to file
         $filename = 'events.csv';
 
-        $file = fopen($filename, 'w+');
+        // Per-request temp file. This was a fixed, relative path, so every
+        // caller wrote to the same events.csv in the process working
+        // directory - two concurrent exports for different groups raced, and
+        // one caller could be handed the other's rows.
+        $path = tempnam(sys_get_temp_dir(), 'events');
+        $file = fopen($path, 'w+');
         fputcsv($file, $headers);
 
         foreach ($PartyArray as $d) {
@@ -232,6 +264,6 @@ class ExportController extends Controller
             'Content-Type' => 'text/csv',
         ];
 
-        return Response::download($filename, $filename, $headers);
+        return Response::download($path, $filename, $headers)->deleteFileAfterSend(true);
     }
 }

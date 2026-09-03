@@ -2,8 +2,8 @@
 
 return [
   'edit' => [
-    'button_save' => 'Sauver les changements',
     'label_logo' => 'Logo du réseau',
+    'button_save' => 'Sauver les changements',
     'add_new_field' => 'Ajouter un nouveau champ',
     'new_field_name' => 'Nouveau nom de champ',
     'add_field' => 'Ajouter le champ',
@@ -23,6 +23,11 @@ return [
     'events' => '{1} Événement|[0,*] Événements',
     'waste_diverted' => 'Déchets évités',
     'co2_prevented' => 'CO2 évité',
+  ],
+  'moderation' => [
+    'groups_title' => 'Repair Cafés à modérer',
+    'events_title' => 'Evénements à approuver',
+    'group_requires_moderation' => 'Repair Café a besoin de modération',
   ],
   'tags' => [
     'title' => 'Etiquettes du Repair Café',
@@ -53,15 +58,15 @@ return [
   'network' => 'Réseau',
   'networks' => 'Réseaux',
   'show' => [
+    'groups_count' => '{0} Il n\'y a actuellement aucun repair café dans le réseau :name.|{1} Il y a actuellement :count repair café dans le réseau :name.|[2,*] Il y a actuellement :count repair cafés dans le réseau :name.',
+    'view_groups_menuitem' => 'Voir les repair cafés',
+    'view_groups_link' => 'Voir ces repair cafés.',
     'add_groups_menuitem' => 'Ajouter des repair cafés',
     'add_groups_modal_header' => 'Ajouter des repair cafés à :name',
     'add_groups_save_button' => 'Ajouter',
     'add_groups_select_label' => 'Choisissez des repair cafés à ajouter',
     'add_groups_success' => '{1} :number repair café ajouté.|[2,*] :number repair cafés ajoutés.',
     'add_groups_warning_none_selected' => 'Pas de repair café(s) sélectionné(s)',
-    'view_groups_menuitem' => 'Voir les repair cafés',
-    'groups_count' => '{0} Il n\'y a actuellement aucun repair café dans le réseau :name.|{1} Il y a actuellement :count repair café dans le réseau :name.|[2,*] Il y a actuellement :count repair cafés dans le réseau :name.',
-    'view_groups_link' => 'Voir ces repair cafés.',
     'none' => 'Aucun',
   ],
 ];

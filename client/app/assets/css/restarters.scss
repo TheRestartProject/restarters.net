@@ -1,0 +1,57 @@
+// Restarters.net brand stylesheet
+// ================================
+// The Nuxt client's global stylesheet — brand tokens, Bootstrap 5 variable
+// overrides, top nav, footer, base typography, buttons/forms/alerts/
+// cards/tables/tabs base only. Seeded from resources/global/css (the
+// umbrella brand layer already shared with the Wiki skin), NOT
+// resources/sass/_variables.scss (the legacy, Fixometer-only palette) —
+// see docs/nuxt-migration/findings/styles.md and each partial's own header
+// comment for exactly what was ported from where and why.
+//
+// Page/component-specific styles (event tables, host forms, card
+// carousels, modals, Talk-post cards, …) do NOT belong here — they move to
+// scoped <style> blocks on their own Vue components as those are built.
+
+// Fonts
+// -----
+// Self-hosted via @fontsource, replacing the old
+// `@import url("https://fonts.googleapis.com/...")` pattern (loaded twice,
+// render-blocking, in the source). Weights match what the source's Google
+// Fonts URLs actually requested: Asap 400/500/600/700, Open Sans 400/700,
+// Patua One 400 (its only available weight).
+@import '@fontsource/asap/400.css';
+@import '@fontsource/asap/500.css';
+@import '@fontsource/asap/600.css';
+@import '@fontsource/asap/700.css';
+@import '@fontsource/open-sans/400.css';
+@import '@fontsource/open-sans/700.css';
+@import '@fontsource/patua-one/400.css';
+
+// Brand tokens — must load before Bootstrap so its variable overrides win
+// (see _variables.scss's header comment on Sass assignment order).
+@import 'variables';
+
+// Bootstrap 5, with the brand's variable overrides spliced in.
+@import 'bootstrap';
+
+// Base typography + brand utility classes.
+@import 'type';
+
+// Site chrome.
+@import 'navigation-bar';
+@import 'footer';
+
+// Component base layers.
+@import 'buttons';
+@import 'forms';
+@import 'alerts';
+@import 'tables';
+@import 'tabs';
+@import 'pagination';
+@import 'cards';
+@import 'panels';
+@import 'list-group';
+@import 'notifications';
+@import 'edit';
+@import 'layout-helpers';
+@import 'multiselect';

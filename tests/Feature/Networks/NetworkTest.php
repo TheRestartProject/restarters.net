@@ -11,7 +11,6 @@ use App\User;
 use Carbon\Carbon;
 use DB;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Symfony\Component\DomCrawler\Crawler;
 use Tests\TestCase;
 
 class NetworkTest extends TestCase
@@ -193,6 +192,60 @@ class NetworkTest extends TestCase
     }
 
     /** @test */
+    public function admin_can_associate_groups_via_the_api(): void
+    {
+        $admin = User::factory()->administrator()->create(['api_token' => 'assoc-admin']);
+        $network = Network::factory()->create();
+        $group1 = Group::factory()->create();
+        $group2 = Group::factory()->create();
+
+        $this->actingAs($admin);
+        $response = $this->postJson('/api/v2/networks/'.$network->id.'/groups?api_token=assoc-admin', [
+            'groups' => [$group1->idgroups, $group2->idgroups],
+        ]);
+
+        $response->assertSuccessful();
+        $this->assertEquals(2, $response->json('data.associated'));
+        $this->assertTrue($network->fresh()->containsGroup($group1));
+        $this->assertTrue($network->fresh()->containsGroup($group2));
+    }
+
+    /** @test */
+    public function coordinator_can_associate_groups_via_the_api(): void
+    {
+        $network = Network::factory()->create();
+        $coordinator = User::factory()->networkCoordinator()->create(['api_token' => 'assoc-coord']);
+        $network->addCoordinator($coordinator);
+        $group = Group::factory()->create();
+
+        $this->actingAs($coordinator);
+        $response = $this->postJson('/api/v2/networks/'.$network->id.'/groups?api_token=assoc-coord', [
+            'groups' => [$group->idgroups],
+        ]);
+
+        $response->assertSuccessful();
+        $this->assertTrue($network->fresh()->containsGroup($group));
+    }
+
+    /** @test */
+    public function non_admin_cannot_associate_groups_via_the_api(): void
+    {
+        $this->withExceptionHandling();
+
+        $network = Network::factory()->create();
+        $host = User::factory()->host()->create(['api_token' => 'assoc-host']);
+        $group = Group::factory()->create();
+
+        $this->actingAs($host);
+        $response = $this->postJson('/api/v2/networks/'.$network->id.'/groups?api_token=assoc-host', [
+            'groups' => [$group->idgroups],
+        ]);
+
+        $response->assertStatus(403);
+        $this->assertFalse($network->fresh()->containsGroup($group));
+    }
+
+    /** @test */
     public function user_can_be_set_as_coordinator_of_network(): void
     {
         $this->withoutExceptionHandling();
@@ -237,6 +290,13 @@ class NetworkTest extends TestCase
     /** @test */
     public function network_page(): void
     {
+        // The /networks and /networks/{id} Blade pages, and the
+        // /networks/{id}/groups form post, are retired under the Nuxt
+        // cutover (the SPA renders the network page itself, backed by
+        // /api/v2/networks/* and /api/v2/groups/summary). What remains
+        // worth covering here is the underlying data: a coordinator can be
+        // attached to a network, a group can be associated to it, and the
+        // group then carries that network in the API data the SPA fetches.
         $network = Network::factory()->create([
                                                        'shortname' => 'restarters'
                                                    ]);
@@ -247,58 +307,35 @@ class NetworkTest extends TestCase
         $group = Group::factory()->create();
         $group->save();
 
-        // Not a coordinator yet.
-        $response = $this->get('/networks');
-        $response->assertSee(__('networks.index.your_networks_no_networks'));
-        $response->assertDontSee(__('networks.index.all_networks_explainer'));
-
         // Make a coordinator.
         $network->addCoordinator($coordinator);
         $coordinator->refresh();
-        $response = $this->get('/networks');
-        $response->assertDontSee(__('networks.index.your_networks_no_networks'));
-        $response->assertDontSee(__('networks.index.all_networks_explainer'));
-        $response->assertSee($network->name);
+        $this->assertTrue($coordinator->isCoordinatorOf($network));
 
-        // Coordinator should show on network page.
-        $response = $this->get('/networks/' . $network->id);
-        $response->assertSee($coordinator->name);
+        // Add the group (the /networks/{id}/groups web form post was
+        // deleted; there's no API v2 replacement for this association, so
+        // we go via the model relation directly, as other tests in this
+        // file do).
+        $network->addGroup($group);
+        $this->assertTrue($network->containsGroup($group));
 
-        // Group should not show on network page yet.
-        $response = $this->get('/group/network/' . $network->id);
-        $response->assertDontSee('&quot;networks&quot;:[' . $network->id . ']');
-
-        // Add the group.
-        $response = $this->get('/networks/' . $network->id);
-        $crawler = new Crawler($response->getContent());
-
-        $tokens = $crawler->filter('input[name=_token]')->each(function (Crawler $node, $i)
-        {
-            return $node;
-        });
-
-        $tokenValue = $tokens[0]->attr('value');
-
-        $response = $this->post('/networks/' . $network->id . '/groups', [
-            '_token' => $tokenValue,
-            'groups' => [$group->idgroups]
-        ]);
-        $response->assertRedirect();
-
-        // Group should now show on network page and in encoded list of networks for a group.
-        $response = $this->get('/group/network/' . $network->id);
-        $response->assertSee($group->name);
-        $response->assertSee('&quot;networks&quot;:[' . $network->id . ']', false);
-
-        // All networks list visible to admin.
-        $this->loginAsTestUser(Role::ADMINISTRATOR);
-        $response = $this->get('/networks');
-        $response->assertSee(__('networks.index.all_networks_explainer'));
+        // And the group must be in the API data the page will fetch.
+        $response = $this->get('/api/v2/groups/summary');
+        $summary = collect($response->json('data'))->firstWhere('id', $group->idgroups);
+        $this->assertNotNull($summary);
+        $this->assertEquals($network->id, collect($summary['networks'])->first()['id']);
     }
 
     /** @test */
     public function admins_can_edit(): void
     {
+        // The /networks/{id}/edit and /networks/{id} (PUT) Blade routes,
+        // and the /networks/{id}/groups form post, are retired under the
+        // Nuxt cutover. Editing a network's own fields isn't exercised
+        // elsewhere by an API route, so what's left worth covering here is
+        // that an admin can associate a group to a network — via the model
+        // relation directly, since there's no API v2 replacement for that
+        // association (see NetworkController).
         $this->withoutExceptionHandling();
 
         $admin = User::factory()->administrator()->create();
@@ -306,23 +343,13 @@ class NetworkTest extends TestCase
 
         $network = Network::where('shortname', 'restarters')->first();
 
-        $response = $this->get('/networks/' . $network->id . '/edit', $network->attributesToArray());
-        $response->assertSuccessful();
-        $response->assertSee('Editing');
-
-        $response = $this->put('/networks/' . $network->id, $network->attributesToArray());
-        $response->assertRedirect();
-
         // Associate a group.
         $group = Group::factory()->create();
         $group->name = 'Hackney Fixers';
         $group->save();
 
-        $response = $this->post('/networks/' . $network->id . '/groups', [
-            'groups' => [ $group->idgroups ]
-        ]);
+        $network->addGroup($group);
 
-        $response->assertRedirect();
         $this->assertTrue($network->containsGroup($group));
         $this->assertTrue($group->isMemberOf($network));
     }
@@ -336,27 +363,19 @@ class NetworkTest extends TestCase
         $coordinator = User::factory()->networkCoordinator()->create();
         $network->addCoordinator($coordinator);
 
+        $admin->api_token = 'nctok';
+        $admin->save();
         $this->actingAs($admin);
 
-        $response = $this->get('/user/edit/' . $coordinator->id);
-        $response->assertStatus(200);
-
-        $crawler = new Crawler($response->getContent());
-
-        $tokens = $crawler->filter('input[name=_token]')->each(function (Crawler $node, $i) {
-            return $node;
-        });
-
-        $tokenValue = $tokens[0]->attr('value');
-
-        $response = $this->post('/profile/edit-admin-settings', [
-            '_token' => $tokenValue,
-            'id' => $coordinator->id,
-            'assigned_groups' => [],
+        // The admin-settings form on /user/edit is now the AdminSettingsTab Vue
+        // component, which PATCHes this endpoint.
+        $response = $this->patchJson('/api/v2/users/' . $coordinator->id . '/admin-settings?api_token=nctok', [
             'user_role' => Role::HOST,
+            'assigned_groups' => [],
+            'preferences' => [],
+            'permissions' => [],
         ]);
-        $response->assertSessionHas('message');
-        $this->assertTrue($response->isRedirection());
+        $response->assertStatus(200);
 
         // Demoting to host should remove as a network coordinator.
         $this->assertFalse($network->coordinators->contains($coordinator));

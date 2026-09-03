@@ -17,7 +17,19 @@ return [
     'groups' => '{1} Group|[0,*] Groups',
     'events' => '{1} Event|[0,*] Events',
     'waste_diverted' => 'Waste Diverted',
-    'co2_prevented' => 'CO2 Prevented'
+    'co2_prevented' => 'CO2 Prevented',
+  ],
+  'moderation' => [
+    // Legacy lang/en/groups.php#groups_title_admin / events.php#
+    // events_title_admin / groups.php#group_requires_moderation were
+    // dropped from THIS branch's en/fr/fr-BE lang files by the "Laravel
+    // becomes API-only" cleanup (still present in it/nl/de/es/no and on
+    // origin/develop) - restoring them there is out of scope for this
+    // pass (lang/en/groups.php isn't an editable file here), so the exact
+    // legacy copy is kept under this new networks.* namespace instead.
+    'groups_title' => 'Groups to moderate',
+    'events_title' => 'Events to moderate',
+    'group_requires_moderation' => 'Group requires moderation',
   ],
   'tags' => [
     'title' => 'Group Tags',
@@ -46,15 +58,15 @@ return [
     'description' => 'Description',
   ],
   'show' => [
+    'groups_count' => '{0} There are currently no groups in the :name network.|{1} There is currently :count group in the :name network.|[2,*] There are currently :count groups in the :name network.',
+    'view_groups_menuitem' => 'View groups',
+    'view_groups_link' => 'View these groups.',
     'add_groups_menuitem' => 'Add groups',
     'add_groups_modal_header' => 'Add groups to :name',
     'add_groups_select_label' => 'Choose groups to add',
     'add_groups_save_button' => 'Add',
     'add_groups_warning_none_selected' => 'No groups selected.',
     'add_groups_success' => '{1} :number group added.|[2,*] :number groups added.',
-    'view_groups_menuitem' => 'View groups',
-    'groups_count' => '{0} There are currently no groups in the :name network.|{1} There is currently :count group in the :name network.|[2,*] There are currently :count groups in the :name network.',
-    'view_groups_link' => 'View these groups.',
     'none' => 'None',
   ],
   'edit' => [

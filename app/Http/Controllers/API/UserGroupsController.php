@@ -19,6 +19,41 @@ class UserGroupsController extends Controller
      * Only confirmed group memberships - pending invitations not pulled in.
      *
      * Only Administrators allowed to access this endpoint.
+     *
+     * @OA\Get(
+     *      path="/api/usersgroups/changes",
+     *      operationId="getUserGroupChanges",
+     *      tags={"UserGroups"},
+     *      summary="List confirmed group-membership changes",
+     *      description="Administrator only. Used by Zapier as a trigger. Built from the audit log for App\UserGroups, restricted to confirmed (status=1) memberships whose user and group both still opt in to Zapier pushes (User/Group::changesShouldPushToZapier()). Pending invitations are not included.",
+     *      security={{"apiToken":{}}},
+     *      @OA\Parameter(
+     *          name="date_from",
+     *          description="Only include audit events created on or after this date/time. Omit for all history.",
+     *          required=false,
+     *          in="query",
+     *          @OA\Schema(type="string", format="date-time")
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Membership changes, most recently audited first",
+     *          @OA\JsonContent(type="array", @OA\Items(
+     *              @OA\Property(property="idusers_groups", type="integer", description="Primary key of the users_groups row"),
+     *              @OA\Property(property="id", type="string", description="md5 hash of idusers_groups + change_occurred_at; unique per change record"),
+     *              @OA\Property(property="change_type", type="string", description="Audit event type, e.g. created/updated/deleted", example="updated"),
+     *              @OA\Property(property="change_occurred_at", type="string", format="date-time"),
+     *              @OA\Property(property="user_id", type="integer"),
+     *              @OA\Property(property="user_email", type="string"),
+     *              @OA\Property(property="role", type="string", description="Role name for the membership, or 'Unknown' if the role record no longer exists"),
+     *              @OA\Property(property="group_id", type="integer"),
+     *              @OA\Property(property="group_name", type="string"),
+     *              @OA\Property(property="group_area", type="string"),
+     *              @OA\Property(property="group_country", type="string")
+     *          ))
+     *      ),
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=403, ref="#/components/responses/Forbidden")
+     * )
      */
     public static function changes(Request $request)
     {
@@ -31,13 +66,27 @@ class UserGroupsController extends Controller
 
         $userGroupAudits = self::getUserGroupAudits($dateFrom);
 
+        // Batched, not per-audit. This ran UserGroups::find() and Group::find()
+        // inside the loop, so a caller asking for all changes (no dateFrom) paid
+        // two queries per audit row - thousands of round trips on a mature
+        // database. `volunteer` is eager-loaded for the same reason.
+        $associations = UserGroups::withTrashed()
+            ->with('volunteer')
+            ->whereIn('idusers_groups', $userGroupAudits->pluck('auditable_id')->unique()->all())
+            ->get()
+            ->keyBy('idusers_groups');
+
+        $groups = Group::whereIn('idgroups', $associations->pluck('group')->unique()->all())
+            ->get()
+            ->keyBy('idgroups');
+
         $userGroupChanges = [];
         foreach ($userGroupAudits as $audit) {
-            $userGroupAssociation = UserGroups::withTrashed()->find($audit->auditable_id);
+            $userGroupAssociation = $associations->get($audit->auditable_id);
             if (! is_null($userGroupAssociation) && $userGroupAssociation->isConfirmed()) {
                 $user = $userGroupAssociation->volunteer;
-                $group = Group::find($userGroupAssociation->group);
-                if ($user->changesShouldPushToZapier() && $group->changesShouldPushToZapier()) {
+                $group = $groups->get($userGroupAssociation->group);
+                if ($user && $group && $user->changesShouldPushToZapier() && $group->changesShouldPushToZapier()) {
                     $userGroupChanges[] = self::mapDetailsAndAuditToChange($userGroupAssociation, $audit);
                 }
             }
@@ -91,6 +140,26 @@ class UserGroupsController extends Controller
 
     /**
      * Leave the specified group.
+     *
+     * @OA\Delete(
+     *      path="/api/usersgroups/{id}",
+     *      operationId="leaveGroupLegacy",
+     *      tags={"UserGroups"},
+     *      summary="Leave a group (legacy endpoint)",
+     *      description="Legacy - despite the routes/api.php comment, the Nuxt client actually uses DELETE /api/v2/groups/{id}/members/me (GroupMembershipController::leavev2). Kept for backwards compatibility. Idempotent: if the authenticated user has no confirmed membership of the group (e.g. already left), this still returns a 200 success response rather than an error.",
+     *      security={{"apiToken":{}}},
+     *      @OA\Parameter(name="id", description="Group id", required=true, in="path", @OA\Schema(type="integer")),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Left (or was already not a member)",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="success", type="boolean", example=true),
+     *              @OA\Property(property="all_restarters_count", type="integer", description="Group's restarter-count column after the change"),
+     *              @OA\Property(property="all_hosts_count", type="integer", description="Group's host-count column after the change")
+     *          )
+     *      ),
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated")
+     * )
      *
      * @return \Illuminate\Http\Response
      */

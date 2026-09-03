@@ -120,7 +120,7 @@ class Volunteer extends JsonResource
 
         // Only include email when the authenticated user is a group host, network coordinator, or admin
         // Check both web and API authentication
-        $currentUser = Auth::user() ?? auth('api')->user();
+        $currentUser = Auth::user() ?? auth('sanctum')->user() ?? auth('api')->user();
         if ($currentUser) {
             $isAdmin = Fixometer::hasRole($currentUser, 'Administrator');
             $isHost = Fixometer::userIsHostOfGroup($this->group, $currentUser->id);

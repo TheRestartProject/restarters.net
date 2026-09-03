@@ -1,0 +1,286 @@
+<script setup>
+import { computed, ref, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { useEventsStore } from '../../stores/events.js'
+import { useGroupsStore } from '../../stores/groups.js'
+import TagMultiselect from '../forms/TagMultiselect.vue'
+import IconChainLink from '../icons/IconChainLink.vue'
+
+// POST /api/v2/events/{id}/invites (api-contracts-phase-c.md C1d):
+// {emails:[...], message?} -> {invites_sent, invalid:[...]}. Replaces
+// EventInviteModal.vue's hidden-form POST to /party/invite. Modelled
+// directly on components/groups/GroupInviteModal.vue (same shape); the
+// legacy component's "select group members" multiselect (backed by
+// GET /api/v2/groups/{id}/volunteers?exclude_event={id}, which already
+// exists per the contract doc) is dropped here - manual email entry covers
+// the same endpoint and keeps this component in step with the group one,
+// see docs/nuxt-migration/api-gaps.md Phase C for the scoping note.
+// Which half of the modal is showing - see GroupInviteModal.vue.
+const showingLink = ref(false)
+
+const props = defineProps({
+  show: {
+    type: Boolean,
+    default: false,
+  },
+  // Event.shareable_link, which the API only returns to users who may edit
+  // the event - the same permission that guards sending invites.
+  shareableLink: {
+    type: String,
+    default: '',
+  },
+  eventId: {
+    type: Number,
+    required: true,
+  },
+  // Group whose members can be picked. EventInviteModal.vue reads this off
+  // the fetched event; the page already holds it, so it's passed in.
+  groupId: {
+    type: Number,
+    default: null,
+  },
+  groupName: {
+    type: String,
+    default: '',
+  },
+})
+
+const emit = defineEmits(['close'])
+
+const { t } = useI18n()
+const eventsStore = useEventsStore()
+
+const manualEmails = ref([])
+const message = ref('')
+const submitting = ref(false)
+const generalError = ref('')
+const fieldErrors = ref({})
+const successMessage = ref('')
+
+// Group members can be invited by picking them rather than retyping their
+// addresses - EventInviteModal.vue's multiselect plus a tickbox that selects
+// everyone at once. Members already confirmed at this event are excluded
+// server-side via exclude_event, so the list only offers people it makes
+// sense to invite.
+//
+// Only members with an address are offered: Volunteer.email is returned only
+// to group hosts, coordinators and admins, so for anyone else the list comes
+// back without addresses and there is nothing to select. That matches the
+// permission guarding this modal in the first place.
+const groupsStore = useGroupsStore()
+const members = ref([])
+const selectedMembers = ref([])
+const inviteAllMembers = ref(false)
+
+async function loadMembers() {
+  if (!props.groupId) return
+
+  try {
+    const data = await groupsStore.fetchMembersForInvite(props.groupId, props.eventId)
+    members.value = data.filter((v) => v.email)
+  } catch {
+    // A failure here just means no picker; manual entry still works.
+    members.value = []
+  }
+}
+
+// The tickbox is "select all", exactly as onCheckboxChange does.
+function toggleAllMembers(checked) {
+  selectedMembers.value = checked ? members.value.map((m) => m.email) : []
+}
+
+// Members are loaded when the modal opens, not on mount: the modal lives on
+// the event page whether or not it's shown, and the list should reflect who
+// is confirmed at the time it's opened.
+watch(
+  () => props.show,
+  (visible) => {
+    if (visible) loadMembers()
+  },
+  { immediate: true }
+)
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+// Chips the user typed that aren't addresses. The control renders these in the
+// danger fill, as develop's multiselect does via its has-invalid-email class,
+// so a typo is visible before submitting rather than only in the error line.
+const invalidEmails = computed(() => manualEmails.value.filter((e) => !EMAIL_RE.test(e)))
+
+function reset() {
+  generalError.value = ''
+  fieldErrors.value = {}
+  successMessage.value = ''
+}
+
+async function submit() {
+  reset()
+
+  // allEmails: picked members first, then anything typed - the same
+  // combination EventInviteModal.vue makes before submitting. Deduped, since
+  // a member's address can also be typed by hand.
+  const typed = manualEmails.value
+  const emails = [...new Set([...selectedMembers.value, ...typed])]
+
+  if (!emails.length) {
+    fieldErrors.value = { emails: [t('client.events.invite_emails_required')] }
+    return
+  }
+
+  // Only what the user typed is validated: member addresses come from the
+  // API, and flagging one as malformed would blame the user for it.
+  const malformed = invalidEmails.value
+  if (malformed.length) {
+    fieldErrors.value = { emails: [t('client.events.invite_emails_invalid', { emails: malformed.join(', ') })] }
+    return
+  }
+
+  submitting.value = true
+
+  try {
+    const data = await eventsStore.inviteVolunteers(props.eventId, {
+      emails,
+      message: message.value || undefined,
+    })
+
+    if (data?.invalid?.length) {
+      successMessage.value = t('client.events.invite_success_apart_from', { emails: data.invalid.join(', ') })
+    } else {
+      successMessage.value = t('events.invite_success')
+    }
+
+    manualEmails.value = []
+    selectedMembers.value = []
+    inviteAllMembers.value = false
+    message.value = ''
+  } catch (err) {
+    if (err?.status === 422) {
+      fieldErrors.value = err.data?.errors || {}
+    }
+    generalError.value = err?.message || t('partials.something_wrong')
+  } finally {
+    submitting.value = false
+  }
+}
+
+function close() {
+  reset()
+  emit('close')
+}
+</script>
+
+<template>
+  <BModal :model-value="show" data-testid="event-invite-modal" :title="t('events.invite_restarters_modal_heading')" no-footer @hide="close">
+    <BAlert v-if="successMessage" :model-value="true" variant="success" data-testid="event-invite-success">
+      {{ successMessage }}
+    </BAlert>
+    <BAlert v-if="generalError" :model-value="true" variant="danger" data-testid="event-invite-error">
+      {{ generalError }}
+    </BAlert>
+
+    <div class="d-flex justify-content-end mb-2">
+      <a
+        href="#"
+        class="invite-modal__toggle text-dark d-inline-flex align-items-center"
+        data-testid="event-invite-toggle"
+        @click.prevent="showingLink = !showingLink"
+      >
+        <IconChainLink class="me-1" />
+        {{ showingLink ? t('events.email_invite') : t('events.shareable_link') }}
+      </a>
+    </div>
+
+    <div v-if="showingLink" data-testid="event-invite-link-panel">
+      <BFormGroup :label="`${t('events.shareable_link_box')}:`" label-for="event-invite-link">
+        <input
+          id="event-invite-link"
+          :value="shareableLink"
+          type="text"
+          class="form-control"
+          autocomplete="off"
+          data-testid="event-invite-link"
+          @focus="$event.target.select()"
+        >
+      </BFormGroup>
+      <!-- events.php has no equivalent of this hint; the Blade event modal
+           reaches across to the groups namespace for it too. -->
+      <small class="text-muted d-block">{{ t('groups.type_shareable_link_message') }}</small>
+
+      <div class="d-flex justify-content-between align-items-center mt-3">
+        <a href="#" data-testid="event-invite-link-cancel" @click.prevent="close">
+          {{ t('events.cancel_invites_link') }}
+        </a>
+        <BButton variant="primary" data-testid="event-invite-link-done" @click="close">
+          {{ t('groups.done_button') }}
+        </BButton>
+      </div>
+    </div>
+
+    <BForm v-else data-testid="event-invite-form" @submit.prevent="submit">
+      <BFormGroup
+        v-if="members.length"
+        :label="`${t('events.select_group_members')}:`"
+        label-for="event-invite-members"
+      >
+        <TagMultiselect
+          id="event-invite-members"
+          v-model="selectedMembers"
+          :options="members"
+          track-by="email"
+          label-by="name"
+          :placeholder="t('events.select_members_placeholder')"
+          data-testid="event-invite-members"
+        />
+        <div class="form-check mt-2">
+          <input
+            id="event-invite-all-members"
+            v-model="inviteAllMembers"
+            class="form-check-input"
+            type="checkbox"
+            data-testid="event-invite-all-members"
+            @change="toggleAllMembers($event.target.checked)"
+          >
+          <label class="form-check-label" for="event-invite-all-members">
+            {{ t('events.send_invites_to_restarters_tickbox', { group: groupName }) }}
+          </label>
+        </div>
+      </BFormGroup>
+
+      <BFormGroup :label="`${t('events.manual_invite_box')}:`" label-for="event-invite-emails">
+        <TagMultiselect
+          id="event-invite-emails"
+          v-model="manualEmails"
+          :options="[]"
+          taggable
+          :invalid-values="invalidEmails"
+          :placeholder="t('events.manual_invite_placeholder')"
+          data-testid="event-invite-emails"
+        />
+        <small class="text-muted d-block">{{ t('events.type_email_addresses_message') }}</small>
+        <div v-if="fieldErrors.emails" class="invalid-feedback d-block" data-testid="event-invite-emails-error">
+          {{ fieldErrors.emails[0] }}
+        </div>
+      </BFormGroup>
+
+      <BFormGroup :label="`${t('events.message_to_restarters')}:`" label-for="event-invite-message" class="mt-3">
+        <textarea
+          id="event-invite-message"
+          v-model="message"
+          class="form-control"
+          rows="3"
+          :placeholder="t('events.sample_text_message_to_restarters')"
+          data-testid="event-invite-message"
+        />
+      </BFormGroup>
+
+      <div class="d-flex justify-content-between align-items-center mt-3">
+        <a href="#" data-testid="event-invite-cancel" @click.prevent="close">
+          {{ t('events.cancel_invites_link') }}
+        </a>
+        <BButton type="submit" variant="primary" :disabled="submitting" data-testid="event-invite-submit">
+          {{ t('events.send_invite_button') }}
+        </BButton>
+      </div>
+    </BForm>
+  </BModal>
+</template>

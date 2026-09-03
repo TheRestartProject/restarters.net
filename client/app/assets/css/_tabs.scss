@@ -1,0 +1,392 @@
+// Tabs / accordion-on-mobile chrome
+// ==================================
+// Ported from resources/global/css/components/_tabs.scss and
+// components/_tabs-no-space-mobile.scss (folded in — a small modifier of
+// the same tab component). BS4->BS5: theme-color('primary') (a Bootstrap 4
+// function, removed in BS5) replaced with the $primary variable directly —
+// both resolve to the same brand teal since _variables.scss sets
+// $primary: $brand before Bootstrap's own variables are imported.
+@function map-get-next($map, $key, $fallback: false, $return: value) {
+  @if type-of($map) == map {
+    @if map-has-key($map, $key) {
+      $i: 0;
+      $key-index: false;
+
+      @each $map-key, $map-value in $map {
+        $i: $i + 1;
+
+        @if $map-key == $key {
+          $key-index: $i;
+        }
+
+        @if $i == $key-index + 1 {
+          @if $return == key {
+            @return $map-key;
+          } @else {
+            @return $map-value;
+          }
+        }
+
+        @if $i == length($map) {
+          @return $fallback;
+        }
+      }
+
+      @warn 'No next map item for key #{$key}';
+
+      @return $fallback;
+    }
+
+    @warn 'No valid key #{$key} in map';
+
+    @return $fallback;
+  }
+
+  @warn 'No valid map';
+
+  @return $fallback;
+}
+
+@function map-previous-key($map, $retrieve_key) {
+  $retrieve_value: map-get($map, $retrieve_key);
+
+  @for $i from 1 through length($map) {
+    $current_key: nth(map-keys($map), $i);
+
+    @if map-get($map, $current_key) == $retrieve_value and $i != 1 {
+      @return nth(map-keys($map), $i - 1);
+    }
+  }
+
+  @warn 'No previous value found for "#{$retrieve_key}"';
+
+  @return false;
+}
+
+@each $breakpoint, $value in map-keys(map-remove($grid-breakpoints, xs)) {
+  .nav-#{$breakpoint}-tabs {
+    .nav-tabs {
+      display: none;
+    }
+
+    .accordion-tab-header.white {
+      background-color: $white;
+    }
+
+    .accordion-tab-header {
+      button {
+        @extend .btn;
+        @extend .rounded-0;
+        @extend .w-100;
+        @extend .text-start; // BS4 .text-left -> BS5 .text-start
+        @extend .position-relative;
+        @extend .text-dark;
+
+        padding-top: 15px;
+        padding-bottom: 15px;
+        background-color: $primary;
+        border: 1px solid #000 !important;
+
+        h5 {
+          @extend .mb-0;
+          @extend .position-relative;
+          @extend .text-center;
+
+          font-family: $font-family-third;
+          font-size: 16px;
+          font-weight: bold;
+          font-stretch: normal;
+          font-style: normal;
+          line-height: 1.13;
+          letter-spacing: 1.2px;
+          text-align: center;
+          color: $black;
+          text-transform: uppercase;
+        }
+      }
+    }
+
+    @include media-breakpoint-up($breakpoint) {
+      .nav-tabs {
+        display: flex;
+      }
+
+      .accordion-tab-header {
+        display: none;
+      }
+
+      .collapse-wrapper {
+        display: block;
+      }
+    }
+
+    @include media-breakpoint-down(map-previous-key($grid-breakpoints, $breakpoint)) {
+      .tab-content > .tab-pane {
+        display: block !important;
+        opacity: 1;
+      }
+    }
+  }
+}
+
+.nav-tabs-block {
+  @extend .rounded-0;
+  @extend .border-0;
+
+  .nav-item {
+    @extend .text-white;
+    @extend .bg-transparent;
+    @extend .border-0;
+    @extend .rounded-0;
+    @extend .position-relative;
+    @extend .m-0;
+
+    .nav-link {
+      @extend .rounded-0;
+
+      border: 1px solid $black;
+      background-color: $primary;
+      font-family: $font-family-third;
+      font-size: 16px;
+      font-weight: bold;
+      font-stretch: normal;
+      font-style: normal;
+      line-height: 1.13;
+      letter-spacing: 1.2px;
+      text-align: center;
+      color: $black;
+      text-transform: uppercase;
+      padding-top: 18px;
+      padding-bottom: 18px;
+      padding-left: 0;
+      padding-right: 0;
+
+      &.active {
+        border-bottom: 1px solid $primary;
+
+        &::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 5px;
+          background: black;
+        }
+      }
+    }
+
+    .nav-link.active {
+      border-bottom: 1px solid $black;
+    }
+
+    flex: 1;
+    text-align: center;
+
+    &:not(:last-child) {
+      .nav-link {
+        border-right: 0;
+      }
+    }
+
+    &.dropdown {
+      .nav-link {
+        background-color: $white !important;
+        border: 1px solid $black !important;
+
+        &::after {
+          content: '';
+          background-repeat: no-repeat;
+          background-size: cover;
+          background-position: center;
+          width: 15px;
+          height: 8px;
+          background-image: url('/images/dropdown-arrow-up.svg') !important;
+          border: 0;
+          margin-left: 8px;
+          transform: rotate(181deg) translateY(50%);
+          display: inline-block;
+          vertical-align: middle;
+          margin-top: 5px;
+          right: 0;
+        }
+      }
+
+      &.show {
+        .nav-link {
+          &::after {
+            transform: rotate(0deg) translateY(-50%);
+          }
+        }
+      }
+    }
+  }
+}
+
+.tab-content {
+  @extend .rounded-0;
+  @extend .border-0;
+
+  .collapse-wrapper {
+    .collapse-content {
+      padding: 30px;
+      border: 1px solid $black;
+      background-color: $primary;
+      border-top: 1px solid $primary;
+    }
+
+    .collapse-content.white {
+      background-color: $white;
+      border-top: 1px solid $black;
+    }
+  }
+
+  .tab-pane {
+    .tab-pane-content {
+      background-color: $white;
+
+      &:not(:last-child) {
+        .accordion-tab-header {
+          button {
+            border-bottom: 0 !important;
+          }
+        }
+      }
+    }
+  }
+}
+
+.nav-tab-summary-section {
+  @extend .d-flex;
+  @extend .flex-row;
+  @extend .align-items-center;
+  @extend .p-30;
+
+  border: 1px solid $black;
+  border-top: 1px solid $primary;
+  background-color: $primary;
+}
+
+.call_to_action {
+  @extend .text-white;
+  @extend .d-flex;
+  @extend .flex-row;
+  @extend .align-items-center;
+
+  background-color: $black;
+  padding-left: 0.5rem;
+  padding-right: 1.5rem;
+  font-family: $font-family-third;
+  font-size: 18px;
+  font-weight: bold;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: 1.17;
+  letter-spacing: normal;
+  text-align: left;
+  color: $white;
+}
+
+// components/_tabs-no-space-mobile.scss
+.no-space-mobile {
+  .tab-pane-content {
+    border-left: 1px solid $black;
+    border-right: 1px solid $black;
+    border-bottom: 1px solid $black;
+  }
+
+  .nav-tabs-block {
+    .nav-item {
+      .nav-link {
+        &.active {
+          border-bottom: 1px solid $white !important;
+        }
+      }
+    }
+  }
+
+  @include media-breakpoint-down(xs) {
+    position: relative;
+    left: 0;
+    right: 0;
+
+    .nav-tabs-block {
+      .nav-item {
+        &:first-child {
+          .nav-link {
+            border-left: 0 !important;
+          }
+        }
+
+        &:last-child {
+          .nav-link {
+            border-right: 0 !important;
+          }
+        }
+      }
+    }
+
+    .tab-pane-content {
+      border-left: 0;
+      border-right: 0;
+    }
+  }
+}
+
+// _events.scss:326,387 - the bordered tab panel used by the event page's
+// attendance and items sections. Global (as in develop) because both the
+// black default and the teal `ourtabs-brand` variant are needed by two
+// different components; scoping it to one of them meant the other silently
+// rendered its tabs and content flat on the page background.
+.ourtabs {
+  background-color: #fff;
+  border: 1px solid #000;
+  box-shadow: 5px 5px #000;
+
+  .nav-tabs {
+    border-bottom: none;
+  }
+
+  .nav-item {
+    width: 50%;
+  }
+
+  .nav-link {
+    width: 100%;
+    border: none;
+    border-right: 1px solid #000;
+    border-bottom: 1px solid #000;
+    border-radius: 0;
+    padding-top: 10px;
+    padding-left: calc(10% + 1px);
+    text-align: left;
+    text-transform: uppercase;
+    color: inherit;
+    background: none;
+  }
+
+  .nav-item:last-child .nav-link {
+    border-right: none;
+  }
+
+  .nav-link.active {
+    border-bottom-color: transparent;
+    background-color: #fff;
+  }
+
+  // The panel supplies its own padding; the tab content sits inside it.
+  > div:not(.nav) {
+    padding: 0 1rem 1rem;
+  }
+}
+
+// _events.scss:387 - the items-at-this-event variant, teal rather than black.
+.ourtabs.ourtabs-brand {
+  border: 1px solid #0394a6;
+  box-shadow: 5px 5px #0394a6;
+
+  .nav-link {
+    border-right-color: #0394a6;
+    border-bottom-color: #0394a6;
+  }
+}

@@ -40,37 +40,31 @@ class JoinEventTest extends TestCase
             }
         });
 
-        // Join.  Should get redirected, and also prompted to follow the group (which we haven't).
+        // Join.  Should be marked as attending, and also prompted to follow the group (which we haven't).
         $user = User::factory()->restarter()->create();
         $this->actingAs($user);
-        $response = $this->get('/party/join/'.$event->idevents);
-        $this->assertTrue($response->isRedirection());
-        $response->assertSessionHas('prompt-follow-group');
+        $response = $this->post('/api/v2/events/'.$event->idevents.'/attendees/me?api_token='.$user->api_token);
+        $response->assertSuccessful();
+        $this->assertTrue($response->json('data.prompt_follow_group'));
         $attending = EventsUsers::where('event', $event->idevents)->where('user', $user->id)->get()->first();
         $this->assertEquals($user->id, $attending->user);
 
-        // Should now show attendance on the event page.
-        $response = $this->get('/party/view/'.$event->idevents);
-        $this->assertVueProperties($response, [
-            [],
-            [
-                ':is-attending' => 'true',
-            ],
-        ]);
+        // Should now show attendance on the event.
+        $response = $this->get('/api/v2/events/'.$event->idevents);
+        $response->assertSuccessful();
+        $this->assertTrue($response->json('data.attending'));
 
         // Should show in count
         $event->refresh();
         assertEquals(2, $event->volunteers);
 
         // Say we can't attend.
-        $this->followingRedirects();
-        $response = $this->get('/party/cancel-invite/'.$event->idevents);
-        $this->assertVueProperties($response, [
-            [],
-            [
-                ':is-attending' => 'false',
-            ],
-        ]);
+        $response = $this->delete('/api/v2/events/'.$event->idevents.'/attendees/me?api_token='.$user->api_token);
+        $response->assertSuccessful();
+
+        $response = $this->get('/api/v2/events/'.$event->idevents);
+        $response->assertSuccessful();
+        $this->assertFalse($response->json('data.attending'));
 
         $event->refresh();
         assertEquals(1, $event->volunteers);
@@ -86,8 +80,7 @@ class JoinEventTest extends TestCase
         $user = User::factory()->restarter()->create();
         $this->actingAs($user);
 
-        $response = $this->get('/party/join/-1');
-        $response->assertSessionHas('danger');
-        $this->assertTrue($response->isRedirection());
+        $this->expectException(\Illuminate\Database\Eloquent\ModelNotFoundException::class);
+        $this->post('/api/v2/events/-1/attendees/me?api_token='.$user->api_token);
     }
 }

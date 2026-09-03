@@ -28,22 +28,7 @@ use Illuminate\Validation\ValidationException;
 class CreateEventTest extends TestCase
 {
     /** @test */
-    public function a_host_without_a_group_cant_create_an_event(): void
-    {
-        $this->withoutExceptionHandling();
-
-        $host = User::factory()->host()->create();
-        $this->actingAs($host);
-
-        $response = $this->get('/party/create');
-        $response->assertSee('You need to be a host of a group in order to create a new event listing');
-    }
-
-    /**
-     * @test
-     * @dataProvider roles
-     */
-    public function a_host_with_a_group_can_create_an_event($data): void
+    public function a_host_with_a_group_can_create_an_event(): void
     {
         Notification::fake();
         $this->withoutExceptionHandling();
@@ -57,10 +42,6 @@ class CreateEventTest extends TestCase
         ]);
         $group->addVolunteer($host);
         $group->makeMemberAHost($host);
-
-        // Fetch the event create page.
-        $response = $this->get('/party/create');
-        $this->get('/party/create')->assertStatus(200);
 
         // Create a party for the specific group.
         $eventAttributes = Party::factory()->raw();
@@ -90,70 +71,12 @@ class CreateEventTest extends TestCase
         self::assertEquals(1, $upcoming_events->count());
         self::assertEquals($event->idevents, $upcoming_events[0]->idevents);
 
-        // Check that we can view the event.
-        $this->get('/party/view/'.$event->idevents)->
-            assertSee($eventAttributes['venue']);
-
         // Check that the event appears in the API.
         $response = $this->get("/api/v2/groups/{$group->idgroups}/events");
         $response->assertSuccessful();
         $json = json_decode($response->getContent(), true);
         $this->assertEquals(1, count($json['data']));
         $this->assertEquals($event->idevents, $json['data'][0]['id']);
-
-        // Now check whether the event shows/doesn't show correctly for different user roles.
-        list($role, $seeEvent, $canModerate) = $data;
-
-        if ($role != 'Host') {
-            // Need to act as someone else.
-            $this->actingAs(User::factory()->{lcfirst($role)}()->create());
-        }
-
-        // Check the group page.
-        $response = $this->get('/group/view/'.$group->idgroups);
-
-        $props = $this->assertVueProperties($response, [
-            [],
-            [
-                ':idgroups' => $group->idgroups,
-            ],
-        ]);
-
-        $events = json_decode($props[1][':events'], TRUE);
-
-        if ($seeEvent) {
-            // We should be able to see this upcoming event in the Vue properties.
-            $this->assertEquals(true, $events[0]['requiresModeration']);
-            $this->assertEquals($canModerate, $events[0]['canModerate']);
-            $this->assertEquals(true, $events[0]['attending']);
-            $this->assertEquals(true, $events[0]['isVolunteer']);
-        } else {
-            $this->assertEquals(true, $events[0]['requiresModeration']);
-        }
-
-        // Check the top-level events page.
-        $response = $this->get('/party');
-
-        $props = $this->getVueProperties($response);
-        if ($role == 'Administrator' || $role == 'NetworkCoordinator') {
-            // Should see the moderation list.  The Vue component fetches the events, so we don't check the props.
-            $props = $this->assertVueProperties($response, [
-                [],
-                [
-                    'VueComponent' => 'eventsrequiringmoderation'
-                ],
-                [
-                    'heading-level' => 'h2',
-                ],
-            ]);
-        } else {
-            $props = $this->assertVueProperties($response, [
-                [],
-                [
-                    'heading-level' => 'h2',
-                ],
-            ]);
-        }
 
         // Approve the event.
         $event->approve();
@@ -177,88 +100,16 @@ class CreateEventTest extends TestCase
             }
         );
 
-        // Check that the event shows for a restarter.
-        $this->loginAsTestUser(Role::RESTARTER);
+        // Check that the event shows for a restarter, and that joining the group works.
+        $restarterUser = $this->loginAsTestUser(Role::RESTARTER);
 
-        $response = $this->get('/party');
-
-        $props = $this->assertVueProperties($response, [
-            [],
-            [
-                'heading-level' => 'h2',
-            ],
-        ]);
-
-        $events = json_decode($props[1][':initial-events'], TRUE);
-        $this->assertEquals(1, count($events));
-
-        // Should have the 'all' property set because we've not joined the group.
-        $this->assertEquals(true, $events[0]['all']);
-        $this->assertEquals(false, array_key_exists('nearby', $events[0]));
-
-        // Now join the group.
-        $response = $this->get('/group/join/' . $group->idgroups);
-        $this->assertTrue($response->isRedirection());
-
-        $response = $this->get('/party');
-
-        $props = $this->assertVueProperties($response, [
-            [],
-            [
-                'heading-level' => 'h2',
-            ],
-        ]);
-
-        $events = json_decode($props[1][':initial-events'], TRUE);
-        $this->assertEquals(1, count($events));
-
-        // Should not have 'all' or 'nearby' flag - those go in the "Other events" section.
-        $this->assertEquals(false, array_key_exists('all', $events[0]));
-        $this->assertEquals(false, array_key_exists('nearby', $events[0]));
+        // Join the group.
+        $response = $this->post('/api/v2/groups/'.$group->idgroups.'/members/me?api_token='.$restarterUser->api_token);
+        $response->assertSuccessful();
+        $this->assertTrue(
+            \App\UserGroups::where('group', $group->idgroups)->where('user', $restarterUser->id)->where('status', 1)->exists()
+        );
     }
-
-    public function roles(): array
-    {
-        return [
-            // Hosts can see but not moderate.
-            [['Host', true, false]],
-
-            // Nobody else can see the event in the list of events.
-            //
-            // Administrators and NetworkCoordinators arguably should be able to, but that's the current function.
-            // They will see it in the lists of events to moderate, but that's not what we are testing here.
-            [['Restarter', false, false]],
-            [['Administrator', false, false]],
-            [['NetworkCoordinator', false, false]],
-        ];
-    }
-
-    /** @test */
-    public function a_host_can_duplicate_an_event(): void
-    {
-        $this->withoutExceptionHandling();
-
-        // arrange
-        $host = User::factory()->host()->create();
-        $this->actingAs($host);
-
-        $group = Group::factory()->create();
-        $group->addVolunteer($host);
-        $group->makeMemberAHost($host);
-
-        // act
-        $party = Party::factory()->create([
-           'group' => $group->idgroups,
-           'latitude'=>'1',
-           'longitude'=>'1',
-       ]);
-
-        // Duplicate it - should bring up the page to add a new event, with some info from the first one.
-        $response = $this->get('/party/duplicate/'.$party->idevents);
-        $response->assertSee('duplicate-from');
-        $response->assertSee($party->description);
-    }
-
 
     public function providerTrueFalse(): array
     {
@@ -493,9 +344,8 @@ class CreateEventTest extends TestCase
 
         // Remove the host from the event
         $volunteer = EventsUsers::where('user', $host->id)->first();
-        $this->post('/party/remove-volunteer/', [
-            'id' => $volunteer->idevents_users,
-        ])->assertSee('true');
+        $this->delete('/api/v2/events/'.$party->idevents.'/volunteers/'.$volunteer->idevents_users.'?api_token='.$host->api_token)
+            ->assertJson(['data' => ['deleted' => true]]);
 
         Queue::assertPushed(\Illuminate\Events\CallQueuedListener::class, function ($job) use ($party, $host) {
             if ($job->class == RemoveUserFromDiscourseThreadForEvent::class) {
@@ -760,14 +610,6 @@ class CreateEventTest extends TestCase
         $idgroup = $this->createGroup();
         $groupNotInNetwork = Group::findOrFail($idgroup);
 
-        // Both groups should show in the dropdown list for event creation.
-        $response = $this->get('/party/create');
-        $props = $this->getVueProperties($response);
-        $groups = json_decode($props[1][':groups'], TRUE);
-        self::assertEquals(2, count($groups));
-        self::assertEquals($groupNotInNetwork->idgroups, $groups[0]['idgroups']);
-        self::assertEquals($groupInNetwork->idgroups, $groups[1]['idgroups']);
-
         // Create the event.
         $eventAttributes = Party::factory()->raw();
         $eventAttributes['group'] = $idgroup;
@@ -781,9 +623,7 @@ class CreateEventTest extends TestCase
         $response = $this->post('/api/v2/events?api_token=' . $coordinator->api_token, $this->eventAttributesToAPI($eventAttributes));
         $response->assertSuccessful();
         $idevents = Party::latest()->first()->idevents;
-
-        $response = $this->get('/party/edit/'.$idevents);
-        $response->assertSuccessful();
+        $this->assertEquals($idgroup, Party::findOrFail($idevents)->group);
     }
 
     /**

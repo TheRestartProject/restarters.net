@@ -552,6 +552,78 @@ class APIv2GroupTest extends TestCase
         $this->assertGroupFound($groups, $idgroups, true);
     }
 
+    // group/view.blade.php banners an outstanding invitation so it can be
+    // accepted without the email. has_pending_invite carries the invite hash,
+    // so it must only ever be the caller's own.
+    public function testPendingInviteVisibleToTheInvitedUser(): void
+    {
+        $admin = User::factory()->administrator()->create(['api_token' => 'pi-tok-1']);
+        $this->actingAs($admin);
+        $idgroups = $this->createGroup();
+
+        $invitee = User::factory()->restarter()->create(['api_token' => 'pi-tok-2']);
+        \App\UserGroups::create([
+            'user' => $invitee->id,
+            'group' => $idgroups,
+            'status' => 'invitehash123',
+            'role' => \App\Role::RESTARTER,
+        ]);
+
+        $this->app['auth']->forgetGuards();
+        $this->actingAs($invitee);
+        $response = $this->get("/api/v2/groups/$idgroups?api_token=pi-tok-2");
+
+        $response->assertSuccessful();
+        $this->assertEquals('invitehash123', $response->json('data.has_pending_invite'));
+    }
+
+    public function testPendingInviteNotLeakedToOtherUsers(): void
+    {
+        $admin = User::factory()->administrator()->create(['api_token' => 'pi-tok-3']);
+        $this->actingAs($admin);
+        $idgroups = $this->createGroup();
+
+        $invitee = User::factory()->restarter()->create();
+        \App\UserGroups::create([
+            'user' => $invitee->id,
+            'group' => $idgroups,
+            'status' => 'someoneelseshash',
+            'role' => \App\Role::RESTARTER,
+        ]);
+
+        // A different authenticated user must not see the invitee's hash.
+        $other = User::factory()->restarter()->create(['api_token' => 'pi-tok-4']);
+        $this->app['auth']->forgetGuards();
+        $this->actingAs($other);
+        $response = $this->get("/api/v2/groups/$idgroups?api_token=pi-tok-4");
+
+        $response->assertSuccessful();
+        $this->assertNull($response->json('data.has_pending_invite'));
+    }
+
+    public function testPendingInviteNullForJoinedMember(): void
+    {
+        // A joined member has status '1', which is not a pending invite.
+        $admin = User::factory()->administrator()->create(['api_token' => 'pi-tok-5']);
+        $this->actingAs($admin);
+        $idgroups = $this->createGroup();
+
+        $member = User::factory()->restarter()->create(['api_token' => 'pi-tok-6']);
+        \App\UserGroups::create([
+            'user' => $member->id,
+            'group' => $idgroups,
+            'status' => '1',
+            'role' => \App\Role::RESTARTER,
+        ]);
+
+        $this->app['auth']->forgetGuards();
+        $this->actingAs($member);
+        $response = $this->get("/api/v2/groups/$idgroups?api_token=pi-tok-6");
+
+        $response->assertSuccessful();
+        $this->assertNull($response->json('data.has_pending_invite'));
+    }
+
     public function testGroupStatsOmittedByDefault(): void
     {
         $user = User::factory()->administrator()->create(['api_token' => 'testtoken']);

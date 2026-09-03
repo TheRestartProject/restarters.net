@@ -32,11 +32,9 @@ use DB;
 use FixometerFile;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
 use Notification;
 use Spatie\ValidationRules\Rules\Delimited;
-use Carbon\Carbon;
 
 class GroupController extends Controller
 {
@@ -64,7 +62,7 @@ class GroupController extends Controller
 
         // Look for groups we have joined, not just been invited to.  We have to explicitly test on deleted_at because
         // the normal filtering out of soft deletes won't happen for joins.
-        $your_groups =array_column(Group::with(['networks'])
+        $your_groups = array_column(Group::with(['networks'])
             ->join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
             ->leftJoin('events', 'events.group', '=', 'groups.idgroups')
             ->where('users_groups.user', $user->id)
@@ -75,13 +73,40 @@ class GroupController extends Controller
             ->get()
             ->toArray(), 'idgroups');
 
-        // We pass a high limit to the groups nearby; there is a distance limit which will normally kick in first.
-        $groups_near_you = array_column($user->groupsNearby(1000), 'idgroups');
+        $nearby_groups = [];
+        $min_lat = 90;
+        $max_lat = -90;
+        $min_lng = 180;
+        $max_lng = -180;
+
+        if ($user->latitude || $user->longitude || $user->country_code) {
+            // We pass a high limit to the groups nearby; there is a distance limit which will normally kick in first.
+            $nearby_groups = $user->groupsNearby(1000);
+
+            // Now find the lat/lng bounding box which contains these groups.
+            foreach ($nearby_groups as $group) {
+                if ($group->latitude < $min_lat) {
+                    $min_lat = $group->latitude;
+                }
+                if ($group->latitude > $max_lat) {
+                    $max_lat = $group->latitude;
+                }
+                if ($group->longitude < $min_lng) {
+                    $min_lng = $group->longitude;
+                }
+                if ($group->longitude > $max_lng) {
+                    $max_lng = $group->longitude;
+                }
+            }
+        }
 
         return view('group.index', [
-            'groups' => GroupController::expandGroups($groups, $your_groups, $groups_near_you),
+            'your_groups' => $your_groups,
+            'nearby_groups' => [ [ $min_lat, $min_lng ], [ $max_lat, $max_lng ] ],
             'your_area' => $user->location,
-            'tab' => $tab,
+            'your_lat' => $user->latitude,
+            'your_lng' => $user->longitude,
+            'tab' => (!$tab || $tab === 'mine') ? 'mine' : 'other',
             'network' => $network,
             'networks' => $networks,
             'all_group_tags' => $all_group_tags,
@@ -105,7 +130,9 @@ class GroupController extends Controller
 
     public function network($id)
     {
-        return $this->indexVariations('all', $id);
+        // Retired: network coordinators now see their groups on the network
+        // page itself (map + list). Kept as a redirect for old links.
+        return redirect('/networks/' . $id);
     }
 
     public function create(Request $request)
@@ -388,13 +415,21 @@ class GroupController extends Controller
         ]));
     }
 
+    /**
+     * Emailed deep link (App\Http\Controllers\API\GroupMembershipController:236). The status-hash
+     * DB update is frozen server-side (F2-5) - it's idempotent and this is the only writer - but
+     * the final destination is now the SPA's group page rather than the Blade one, with a query
+     * flag instead of session flash (a redirect out of this app can't carry Laravel session state).
+     */
     public function confirmInvite($group_id, $hash): RedirectResponse
     {
+        $frontend = rtrim(config('restarters.frontend_url'), '/');
+
         // Find user/group relationship based on the invitation hash.
         $user_group = UserGroups::where('status', $hash)->where('group', $group_id)->first();
         if (empty($user_group)) {
             \Sentry\CaptureMessage(__('groups.invite_invalid'));
-            return redirect('/group/view/'.intval($group_id))->with('warning', __('groups.invite_invalid'));
+            return redirect($frontend.'/group/view/'.intval($group_id).'?invite=invalid');
         }
 
         // Set user as confirmed member of group.
@@ -417,7 +452,7 @@ class GroupController extends Controller
             ]));
         }
 
-        return redirect('/group/view/'.$user_group->group)->with('success', __('groups.invite_confirmed'));
+        return redirect($frontend.'/group/view/'.$user_group->group.'?joined=1');
     }
 
     public function edit(Request $request, $id, Geocoder $geocoder)
@@ -479,68 +514,6 @@ class GroupController extends Controller
         } else {
             return redirect('/user/forbidden');
         }
-    }
-
-    public static function expandGroups($groups, $your_groupids, $nearby_groupids)
-    {
-        $ret = [];
-        $user = Auth::user();
-
-        if ($groups) {
-            foreach ($groups as $group) {
-                $group_image = $group->groupImage;
-
-                $event = $group->nextUpcomingParty;
-
-                // We want to return the distance from our own location.
-                $distance = null;
-                $grouplat = $group->latitude;
-                $grouplng = $group->longitude;
-                $userlat = $user->latitude;
-                $userlng = $user->longitude;
-
-                if ($grouplat !== null && $grouplng !== null && $userlat !== null && $userlng !== null) {
-                    if ($grouplat == $userlat && $grouplng == $userlng) {
-                        $distance = 0;
-                    } else {
-                        $distance = 6371 * acos( cos(deg2rad($userlat)) * cos(deg2rad($grouplat)) * cos(deg2rad($grouplng) -
-                                                                                                        deg2rad($userlng)) + sin(deg2rad($userlat) ) * sin(deg2rad($grouplat)));
-                    }
-                }
-
-                $ret[] = [
-                    'idgroups' => $group->idgroups,
-                    'name' => $group->name,
-                    'image' => (is_object($group_image) && is_object($group_image->image)) ?
-                        asset('uploads/mid_'.$group_image->image->path) : null,
-                    'location' => [
-                        'location' => rtrim($group->location),
-                        'country' => Fixometer::getCountryFromCountryCode($group->country_code),
-                        'country_code' => $group->country_code,
-                        'distance' => $distance,
-                    ],
-                    'next_event' => $event ? $event->event_date_local : null,
-                    'all_restarters_count' => $group->all_restarters_count,
-                    'all_hosts_count' => $group->all_hosts_count,
-                    'all_confirmed_restarters_count' => $group->all_confirmed_restarters_count,
-                    'all_confirmed_hosts_count' => $group->all_confirmed_hosts_count,
-                    'networks' => \Illuminate\Support\Arr::pluck($group->networks, 'id'),
-                    'group_tags' => $group->group_tags->pluck('id'),
-                    'group_tags_full' => $group->group_tags->map(function($tag) {
-                        return [
-                            'id' => $tag->id,
-                            'name' => $tag->tag_name,
-                            'network_id' => $tag->network_id,
-                        ];
-                    }),
-                    'following' => in_array($group->idgroups, $your_groupids),
-                    'nearby' => in_array($group->idgroups, $nearby_groupids),
-                    'archived_at' => $group->archived_at ? Carbon::parse($group->archived_at)->toIso8601String() : null
-                ];
-            }
-        }
-
-        return $ret;
     }
 
     public static function stats($id, $format = 'row')
@@ -647,36 +620,13 @@ class GroupController extends Controller
     }
 
     /**
-     * [confirmCodeInvite description].
-     *
-     * @author Christopher Kelker - @date 2019-03-25
-     * @editor  Christopher Kelker
-     * @version 1.0.0
-     * @param   [type]      $code
-     * @return  [type]
+     * Shareable-code deep link (Group::shareable_link). Thin redirector into the SPA (F2-5):
+     * POST /api/v2/invites/claim (App\Http\Controllers\API\AuthController::claimShareableCode)
+     * now owns validating the code and claiming it - including the unknown-code 404 - so there's
+     * no DB read, Invite row, or session-array bookkeeping left to do here.
      */
     public function confirmCodeInvite(Request $request, $code): RedirectResponse
     {
-        // Variables
-        $group = Group::where('shareable_code', $code)->first();
-        $hash = substr(bin2hex(openssl_random_pseudo_bytes(32)), 0, 24);
-
-        // Validate a record exists with the Group code
-        if (empty($group)) {
-            abort(404);
-        }
-
-        // Create a new Invite record
-        Invite::create([
-            'record_id' => $group->idgroups,
-            'email' => '',
-            'hash' => $hash,
-            'type' => 'group',
-        ]);
-
-        // Push this into a session variable to find by the Group prefix
-        session()->push('groups.'.$code, $hash);
-
-        return redirect('/user/register')->with('auth-for-invitation', __('auth.login_before_using_shareable_link', ['login_url' => url('/login')]));
+        return redirect(rtrim(config('restarters.frontend_url'), '/').'/group/invite/'.$code);
     }
 }

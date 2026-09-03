@@ -4,100 +4,17 @@ namespace Tests\Feature\Fixometer;
 
 use App\Category;
 use App\Device;
-use App\Group;
-use App\Helpers\RepairNetworkService;
-use App\Party;
 use App\Role;
-use App\User;
 use DB;
-use Hash;
-use Mockery;
 use Tests\TestCase;
 
 class BasicTest extends TestCase
 {
-    public function testPageLoads(): void
-    {
-        // Create a past event with a fixed device.  This is shown on the Fixometer page as the latest data.
-        $group = Group::factory()->create([
-                                              'approved' => true,
-                                          ]);
-        $event = Party::factory()->create([
-                                                   'group' => $group,
-                                                   'event_start_utc' => '2000-01-01T12:13:00+00:00',
-                                                   'event_end_utc' => '2000-01-01T13:14:00+00:00',
-                                               ]);
-        $device = Device::factory()->fixed()->create([
-                                                                      'category' => 111,
-                                                                      'category_creation' => 111,
-                                                                      'event' => $event->idevents,
-                                                                  ]);
-
-        // Test the dashboard page loads.  Most of the work is done inside Vue, so a basic test is just that the
-        // Vue component exists.
-        $this->loginAsTestUser();
-        $response = $this->get('/fixometer');
-
-        $clusters = json_encode([
-            [
-                'idclusters' => 1,
-                'name' => 'Computers and Home Office',
-                'categories' => [
-                    0 => [
-                        'idcategories' => 11,
-                        'name' => 'Desktop computer',
-                        'powered' => 1,
-                        'weight' => null,
-                        'footprint' => null,
-                        'footprint_reliability' => null,
-                        'lifecycle' => null,
-                        'lifecycle_reliability' => null,
-                        'extendend_lifecycle' => null,
-                        'extendend_lifecycle_reliability' => null,
-                        'revision' => 2,
-                        'cluster' => 1,
-                        'aggregate' => 0,
-                        'description_short' => '',
-                        'description_long' => '',
-                    ]
-                ]
-            ],
-            [
-                'idclusters' => 2,
-                'name' => 'Electronic Gadgets',
-                'categories' => [],
-            ],
-            [
-                'idclusters' => 3,
-                'name' => 'Home Entertainment',
-                'categories' => [],
-            ],
-            [
-                'idclusters' => 4,
-                'name' => 'Kitchen and Household Items',
-                'categories' => [],
-            ],
-            [
-                'idclusters' => 5,
-                'name' => 'Non-Powered Items',
-                'categories' => [],
-            ],
-        ]);
-
-        $props = $this->assertVueProperties($response, [
-            [],
-            [
-                // Can't assert on latest-data or impact-data as dev systems might have varying info.
-                ':clusters' => $clusters,
-                ':brands' => '[]',
-                ':barrier-list' => '[{"id":1,"barrier":"Spare parts not available"},{"id":2,"barrier":"Spare parts too expensive"},{"id":3,"barrier":"No way to open the product"},{"id":4,"barrier":"Repair information not available"},{"id":5,"barrier":"Lack of equipment"}]',
-                ':is-admin' => 'false',
-            ],
-        ]);
-
-        $data = json_decode($props[1][':latest-data'], TRUE);
-        $this->assertEquals($event->idevents, $data['idevents']);
-    }
+    // testPageLoads was a pure Blade-render check of the /fixometer page
+    // (Vue props for clusters/brands/barrier-list/latest-data). That route
+    // is retired under the Nuxt cutover — the Fixometer page is now
+    // client-side in the SPA, backed by /api/devices and friends, which
+    // have their own coverage (see DeviceApiQueryTest).
 
     public function testExport(): void {
         $this->loginAsTestUser(Role::ADMINISTRATOR);
@@ -129,10 +46,11 @@ class BasicTest extends TestCase
 
         $this->assertEquals('attachment; filename=repair-data.csv', $response->headers->get('content-disposition'));
 
-        // Bit hacky, but grab the file that was created.  Can't find a way to do this in Laravel easily, though it's
-        // probably possible using mocking.
-        $filename = base_path() . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'repair-data.csv';
-        $fh = fopen($filename, 'r');
+        // Read the CSV off the response. It used to be picked up from
+        // public/repair-data.csv - the export no longer leaves a copy under
+        // the docroot, because doing so republished one caller's filtered
+        // rows to everyone.
+        $fh = fopen($response->getFile()->getPathname(), 'r');
 
         # Skip headers.
         fgetcsv($fh);

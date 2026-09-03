@@ -50,11 +50,27 @@ return [
     | Define the User, IP Address, User Agent and URL resolver implementations.
     |
     */
+    // The key laravel-auditing 13 actually reads. It ships its own default for
+    // this (ip_address / user_agent / url) which is merged in and wins over the
+    // legacy singular `resolver` block below, so overriding the URL resolver
+    // there alone had no effect.
+    //
+    // NB there is deliberately NO 'user' key here: the user resolver is
+    // configured separately under `audit.user.resolver` and implements a
+    // different contract. Adding it makes runResolvers() throw
+    // "Invalid Resolver implementation for: user", which disables auditing
+    // entirely while model writes carry on succeeding.
+    'resolvers' => [
+        'ip_address' => OwenIt\Auditing\Resolvers\IpAddressResolver::class,
+        'user_agent' => OwenIt\Auditing\Resolvers\UserAgentResolver::class,
+        'url'        => App\Auditing\SanitisedUrlResolver::class,
+    ],
+
     'resolver' => [
         'user'       => OwenIt\Auditing\Resolvers\UserResolver::class,
         'ip_address' => OwenIt\Auditing\Resolvers\IpAddressResolver::class,
         'user_agent' => OwenIt\Auditing\Resolvers\UserAgentResolver::class,
-        'url'        => OwenIt\Auditing\Resolvers\UrlResolver::class,
+        'url'        => App\Auditing\SanitisedUrlResolver::class,
     ],
 
     /*

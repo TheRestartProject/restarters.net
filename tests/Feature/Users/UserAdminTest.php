@@ -2,66 +2,34 @@
 
 namespace Tests\Feature;
 
-use App\Events\UserUpdated;
+use App\Policies\UserPolicy;
 use App\Role;
 use App\User;
-use Carbon\Carbon;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Event;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Tests\TestCase;
 
 class UserAdminTest extends TestCase
 {
-    public function provider()
-    {
-        return [
-            [
-                'Administrator', true,
-            ],
-            [
-                'NetworkCoordinator', false,
-            ],
-            [
-                'Host', false,
-            ],
-            [
-                'Restarter', false,
-            ],
-        ];
-    }
-
-    /**
-     *@dataProvider provider
-     */
-    public function testUsersPage($role, $cansee): void
-    {
-        // Fetch the list of all users and check that we're in it.
-        $admin = User::factory()->{lcfirst($role)}()->create();
-        $this->actingAs($admin);
-
-        $response = $this->get('/user/all');
-
-        if ($cansee) {
-            $response->assertSee('Create new user');
-            $response->assertSee($admin->name);
-        } else {
-            $response->assertDontSee('Create new user');
-        }
-    }
-
     public function testSoftDelete(): void {
+        // POST /user/soft-delete is dead (Nuxt cutover); there is no v2 API endpoint for an
+        // admin soft-deleting ANOTHER user - deleteMyAccountv2 always operates on
+        // Auth::user() only (see APIv2UserDeleteAccountTest::testSoftDeletesCallingUser /
+        // testCannotDeleteAnotherUsersAccount, which cover the self-delete + anonymization
+        // path). The authorization rule this route relied on (self or administrator) is
+        // still live in UserPolicy::delete(), so assert against that directly, and confirm
+        // the soft-delete it would have triggered.
         $user = User::factory()->restarter()->create();
-        $this->loginAsTestUser(Role::ADMINISTRATOR);
-        $response = $this->post('/user/soft-delete', [
-            'id' => $user->id
-        ]);
-        $response->assertSessionHas('danger');
-        $this->assertTrue($response->isRedirection());
+        $admin = $this->loginAsTestUser(Role::ADMINISTRATOR);
 
-        $response = $this->post('/user/soft-delete');
-        $this->assertTrue($response->isRedirection());
-        $redirectTo = $response->getTargetUrl();
-        $this->assertNotFalse(strpos($redirectTo, '/login'));
+        $policy = new UserPolicy();
+
+        // An administrator acting on another user - allowed.
+        $this->assertTrue($policy->delete($admin, $user));
+        $user->delete();
+        $this->assertTrue($user->fresh()->trashed());
+
+        // A non-admin, non-self actor - forbidden.
+        $other = User::factory()->restarter()->create();
+        $victim = User::factory()->restarter()->create();
+        $this->assertFalse($policy->delete($other, $victim));
     }
 }

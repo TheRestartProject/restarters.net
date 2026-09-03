@@ -5,6 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Cache;
 
 /**
  * @OA\Schema(
@@ -50,6 +51,17 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *         )
  *     ),
  *     @OA\Property(
+ *         property="group_tags_full",
+ *         title="group_tags_full",
+ *         description="Tags on this group.  Only present on calls which load them, e.g. the summary list.",
+ *         type="array",
+ *         @OA\Items(
+ *            @OA\Property(property="id", type="integer"),
+ *            @OA\Property(property="name", type="string"),
+ *            @OA\Property(property="network_id", type="integer", nullable=true),
+ *         )
+ *     ),
+ *     @OA\Property(
  *          property="updated_at",
  *          title="updated_at",
  *          description="The last change to this group.  This includes changes which affect the stats.",
@@ -61,6 +73,18 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *          description="The next event, if any, for this group.  Only present if includeNextEvent=true.",
  *          format="object",
  *          ref="#/components/schemas/EventSummary"
+ *     ),
+ *     @OA\Property(
+ *         property="hosts",
+ *         title="hosts",
+ *         description="The number of hosts of this group (if requested via API call flag).",
+ *         type="number",
+ *     ),
+ *     @OA\Property(
+ *         property="restarters",
+ *         title="hosts",
+ *         description="The number of restarters in this group (if requested via API call flag).",
+ *         type="number",
  *     ),
  *     @OA\Property(
  *          property="summary",
@@ -91,32 +115,74 @@ class GroupSummary extends JsonResource
             'image' => $this->groupImage && is_object($this->groupImage) && is_object($this->groupImage->image) ? $this->groupImage->image->path : null,
             'location' => new GroupLocation($this),
             'networks' => new NetworkSummaryCollection($this->resource->networks),
+            // Tags drive the badges and the tag filter on the groups list.
+            // Only included when the caller eager-loaded them, so other users
+            // of this resource don't pick up an N+1.
+            'group_tags_full' => $this->whenLoaded('group_tags', function () {
+                return $this->resource->group_tags->map(function ($tag) {
+                    return [
+                        'id' => $tag->id,
+                        'name' => $tag->tag_name,
+                        'network_id' => $tag->network_id,
+                    ];
+                });
+            }),
             'updated_at' => Carbon::parse($this->updated_at)->toIso8601String(),
             'archived_at' => $this->archived_at ? Carbon::parse($this->archived_at)->toIso8601String() : null,
             'summary' => true
         ];
 
-        if ($request->get('includeNextEvent', false)) {
-            // Get next approved event for group.
-            $nextevent = \App\Group::find($this->idgroups)->getNextUpcomingEvent();
+        if ($request->get('includeCounts', false)) {
+            $ret['hosts'] = $this->resource->all_confirmed_hosts_count;
+            $ret['restarters'] = $this->resource->all_confirmed_restarters_count;
+        }
 
-            if ($nextevent) {
-                // Using the resource for the nested event causes infinite loops.  Just add the model attributes we
-                // need directly.
-                $ret['next_event'] = [
-                    'id' => $nextevent->idevents,
-                    'start' => $nextevent->event_start_utc,
-                    'end' => $nextevent->event_end_utc,
-                    'timezone' => $nextevent->timezone,
-                    'title' => $nextevent->venue ?? $nextevent->location,
-                    'location' => $nextevent->location,
-                    'online' => $nextevent->online,
-                    'lat' => $nextevent->latitude,
-                    'lng' => $nextevent->longitude,
-                    'updated_at' => $nextevent->updated_at->toIso8601String(),
-                    'summary' => true
-                ];
+        if ($request->get('includeNextEvent', false)) {
+            // Get next approved event for group.  We cache all upcoming events to speed up the case where we
+            // are fetching many groups.
+            if (Cache::has('future_approved_events')) {
+                $upcoming = Cache::get('future_approved_events');
+            } else {
+                // approved only: the base intent (Group::getNextUpcomingEvent filters
+                // where approved=true), which this bulk-cached rewrite had dropped -
+                // an unapproved, not-yet-public event could surface as a group's
+                // next event on the map/summary (RES-1995 / PR 887).
+                $future = \App\Party::future()->where('approved', true)->get();
+
+                // Can't serialise the whole event, and we only need a few fields.
+                $upcoming = [];
+
+                foreach ($future as $event) {
+                    $upcoming[] = [
+                        'id' => $event->idevents,
+                        'group_id' => $event->group,
+                        'start' => $event->event_start_utc,
+                        'end' => $event->event_end_utc,
+                        'timezone' => $event->timezone,
+                        'title' => $event->venue ?? $event->location,
+                        'location' => $event->location,
+                        'online' => $event->online,
+                        'lat' => $event->latitude,
+                        'lng' => $event->longitude,
+                        'updated_at' => $event->updated_at->toIso8601String(),
+                        'summary' => true
+                    ];
+                }
+
+                Cache::put('future_approved_events', $upcoming, 60);
             }
+
+            // Find the next event for this group.
+            $nextevent = null;
+
+            foreach ($upcoming as $event) {
+                if ($event['group_id'] == $this->idgroups) {
+                    $nextevent = $event;
+                    break;
+                }
+            }
+
+           $ret['next_event'] = $nextevent;
         }
 
         return($ret);

@@ -51,9 +51,17 @@ class GroupController extends Controller
 
         $groupAudits = self::getGroupAudits($dateFrom);
 
+        // Batched, not one Group::find() per audit row - same fix as
+        // UserGroupsController::changes. A caller asking for all changes (no
+        // dateFrom) otherwise pays one query per audit, which grows with the
+        // whole history rather than with the result set.
+        $groups = Group::whereIn('idgroups', $groupAudits->pluck('auditable_id')->unique()->all())
+            ->get()
+            ->keyBy('idgroups');
+
         $groupChanges = [];
         foreach ($groupAudits as $groupAudit) {
-            $group = Group::find($groupAudit->auditable_id);
+            $group = $groups->get($groupAudit->auditable_id);
             if (! is_null($group) && $group->changesShouldPushToZapier()) {
                 $groupChanges[] = self::mapDetailsAndAuditToChange($group, $groupAudit);
             }
@@ -257,10 +265,17 @@ class GroupController extends Controller
      *                   type="object",
      *                   @OA\Property(property="id", type="integer", example=1),
      *                   @OA\Property(property="name", type="string", example="Group Name"),
+     *                   @OA\Property(property="lat", type="number", nullable=true, example=51.5),
+     *                   @OA\Property(property="lng", type="number", nullable=true, example=-0.12),
+     *                   @OA\Property(property="country", type="string", nullable=true, example="United Kingdom"),
+     *                   @OA\Property(property="network_ids", type="array", @OA\Items(type="integer")),
+     *                   @OA\Property(property="tag_ids", type="array", @OA\Items(type="integer")),
+     *                   @OA\Property(property="archived_at", type="string", format="date-time", nullable=true),
      *                )
      *             )
      *          )
      *       ),
+     *      @OA\Response(response=422, ref="#/components/responses/ValidationError"),
      *     )
      */
 
@@ -269,26 +284,140 @@ class GroupController extends Controller
             'includeArchived' => ['string', 'in:true,false'],
         ]);
 
-        // We only return the group id and name, for speed.
-        $query = Group::select('idgroups', 'name', 'archived_at');
+        // We only return a small number of attributes, for speed: this index
+        // drives the groups map (positions/tooltips) and the client-side
+        // name/country/network/tag filters, with full rows hydrated on demand
+        // via /groups/summary?ids=.
+        $query = Group::select('idgroups', 'name', 'latitude', 'longitude', 'country_code', 'archived_at');
 
         if (!$request->has('includeArchived') || $request->get('includeArchived') == 'false') {
             $query = $query->whereNull('archived_at');
         }
 
         $groups = $query->get();
+
+        // Two cheap lookups instead of per-group relation loads.
+        $networkIds = \DB::table('group_network')
+            ->whereIn('group_id', $groups->pluck('idgroups'))
+            ->get()
+            ->groupBy('group_id');
+        $tagIds = \DB::table('grouptags_groups')
+            ->whereIn('group', $groups->pluck('idgroups'))
+            ->get()
+            ->groupBy('group');
+
         $ret = [];
 
         foreach ($groups as $group) {
             $ret[] = [
                 'id' => $group->idgroups,
                 'name' => $group->name,
+                'lat' => $group->latitude !== null ? (float) $group->latitude : null,
+                'lng' => $group->longitude !== null ? (float) $group->longitude : null,
+                'country' => \App\Helpers\Fixometer::getCountryFromCountryCode($group->country_code),
+                'network_ids' => $networkIds->has($group->idgroups) ? $networkIds[$group->idgroups]->pluck('network_id')->map(fn ($id) => (int) $id)->all() : [],
+                // The pivot columns are varchars; the API contract is integers.
+                'tag_ids' => $tagIds->has($group->idgroups) ? $tagIds[$group->idgroups]->pluck('group_tag')->map(fn ($id) => (int) $id)->all() : [],
                 'archived_at' => $group->archived_at ? Carbon::parse($group->archived_at)->toIso8601String() : null
             ];
         }
 
         return [
             'data' => $ret
+        ];
+    }
+
+    /**
+     * @OA\Get(
+     *      path="/api/v2/groups/summary",
+     *      operationId="getGroupSummariesv2",
+     *      tags={"Groups"},
+     *      summary="Get list of groups with summary information",
+     *      @OA\Parameter(
+     *          name="archived",
+     *          description="Include archived groups.  Default false.",
+     *          required=false,
+     *          in="query",
+     *          @OA\Schema(
+     *              type="boolean"
+     *          )
+     *      ),
+     *      @OA\Parameter(
+     *          name="includeNextEvent",
+     *          description="Include the next event for the group.  This makes the call slower.  Default false.",
+     *          required=false,
+     *          in="query",
+     *          @OA\Schema(
+     *              type="boolean"
+     *          )
+     *      ),
+     *      @OA\Parameter(
+     *          name="includeCounts",
+     *          description="Include the counts of hosts and restarters.  This makes the call slower.  Default false.",
+     *          required=false,
+     *          in="query",
+     *          @OA\Schema(
+     *              type="boolean"
+     *          )
+     *      ),
+     *      @OA\Parameter(
+     *          name="ids",
+     *          description="Comma-separated group ids.  When present, only these groups are returned (used by the groups list to hydrate the visible rows).  Maximum 200 ids.",
+     *          required=false,
+     *          in="query",
+     *          @OA\Schema(
+     *              type="string"
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(
+     *              @OA\Property(
+     *                property="data",
+     *                title="data",
+     *                description="An array of events",
+     *                type="array",
+     *                @OA\Items(
+     *                    @OA\Schema(
+     *                       ref="#/components/schemas/GroupSummary"
+     *                    ),
+     *                 )
+     *              )
+     *          )
+     *       ),
+     *      @OA\Response(response=422, ref="#/components/responses/ValidationError"),
+     *     )
+     */
+
+    public static function listSummaryv2(Request $request) {
+        $request->validate([
+            'archived' => ['string', 'in:true,false'],
+            'ids' => ['string', 'regex:/^\d+(,\d+)*$/', function ($attribute, $value, $fail) {
+                if (count(explode(',', $value)) > 200) {
+                    $fail('A maximum of 200 ids may be requested at once.');
+                }
+            }],
+        ]);
+
+        // Eager-load everything the GroupSummary resource touches, otherwise
+        // each group lazy-loads its relations and the call scales O(N).
+        $query = Group::with(['networks', 'groupImage.image', 'group_tags']);
+
+        if ($request->get('archived', 'false') !== 'true') {
+            $query = $query->whereNull('archived_at');
+        }
+
+        // The groups list hydrates just its visible rows this way, instead of
+        // paying to serialise every group on page load.
+        if ($request->filled('ids')) {
+            $query = $query->whereIn('idgroups', explode(',', $request->get('ids')));
+        }
+
+        $groups = $query->get();
+
+        return [
+            'data' => \App\Http\Resources\GroupSummaryCollection::make($groups)
         ];
     }
 
@@ -318,6 +447,11 @@ class GroupController extends Controller
     public static function listTagsv2(Request $request) {
         // Try session auth first, then API token auth
         $user = Auth::user();
+        if (!$user) {
+            // SPA bearer tokens authenticate via the sanctum guard.
+            $user = auth('sanctum')->user();
+        }
+
         if (!$user) {
             $user = auth('api')->user();
         }
@@ -354,7 +488,7 @@ class GroupController extends Controller
      *      operationId="getGroup",
      *      tags={"Groups"},
      *      summary="Get Group",
-     *      description="Returns information about a group.",
+     *      description="Returns information about a group. Not behind auth - if a user is authenticated (via session or bearer token) the response also includes a permissions block of UI flags for that user; anonymous requests get all-false flags.",
      *      @OA\Parameter(
      *          name="id",
      *          description="Group id",
@@ -371,19 +505,86 @@ class GroupController extends Controller
      *              @OA\Property(
      *                property="data",
      *                title="data",
-     *                ref="#/components/schemas/Group"
+     *                allOf={
+     *                    @OA\Schema(ref="#/components/schemas/Group"),
+     *                    @OA\Schema(
+     *                        @OA\Property(
+     *                            property="permissions",
+     *                            type="object",
+     *                            description="UI show/hide flags for the requesting user against this group. Advisory only - the mutating endpoints enforce their own authorization independently.",
+     *                            @OA\Property(property="can_edit", type="boolean"),
+     *                            @OA\Property(property="can_demote", type="boolean"),
+     *                            @OA\Property(property="can_see_delete", type="boolean"),
+     *                            @OA\Property(property="can_perform_delete", type="boolean"),
+     *                            @OA\Property(property="can_perform_archive", type="boolean")
+     *                        )
+     *                    )
+     *                }
      *              )
      *          )
      *       ),
-     *      @OA\Response(
-     *          response=404,
-     *          description="Group not found",
-     *      ),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound"),
      *     )
      */
     public static function getGroupv2(Request $request, $idgroups) {
         $group = Group::findOrFail($idgroups);
-        return \App\Http\Resources\Group::make($group);
+
+        // This endpoint is not behind auth:api, so the request may be anonymous.  Try session auth first (the
+        // group view page is loaded via a normal browser session), then fall back to API token auth.  If there is
+        // no authenticated user at all, every permission flag is false.
+        $user = Auth::user();
+        if (! $user) {
+            // SPA bearer tokens authenticate via the sanctum guard.
+            $user = auth('sanctum')->user();
+        }
+        if (! $user) {
+            $user = auth('api')->user();
+        }
+
+        $permissions = self::groupPermissionsFor($user, $group);
+
+        return \App\Http\Resources\Group::make($group)->additional([
+            'data' => [
+                'permissions' => $permissions,
+            ],
+        ]);
+    }
+
+    /**
+     * Compute the UI show/hide permission flags for a given (possibly null) user against a group.
+     *
+     * These flags are for UI purposes only - the actual edit/delete/archive endpoints enforce their own
+     * authorization independently.  Mirrors the logic previously computed server-side in group/view.blade.php.
+     */
+    private static function groupPermissionsFor(?User $user, Group $group): array
+    {
+        if (! $user) {
+            return [
+                'can_edit' => false,
+                'can_demote' => false,
+                'can_see_delete' => false,
+                'can_perform_delete' => false,
+                'can_perform_archive' => false,
+            ];
+        }
+
+        $isAdministrator = Fixometer::hasRole($user, 'Administrator');
+        $isCoordinatorForGroup = $user->isCoordinatorForGroup($group);
+        $isHostOfGroup = Fixometer::userHasEditGroupPermission($group->idgroups, $user->id);
+
+        $canEdit = $isAdministrator || $isCoordinatorForGroup || $isHostOfGroup;
+        $canDemote = $isAdministrator || $isCoordinatorForGroup;
+        $canSeeDelete = $isAdministrator;
+        $canPerformDelete = $canSeeDelete && $group->canDelete();
+        $canPerformArchive = $isAdministrator || $isCoordinatorForGroup;
+
+        return [
+            'can_edit' => $canEdit,
+            'can_demote' => $canDemote,
+            'can_see_delete' => $canSeeDelete,
+            'can_perform_delete' => $canPerformDelete,
+            'can_perform_archive' => $canPerformArchive,
+        ];
     }
 
     /**
@@ -437,10 +638,7 @@ class GroupController extends Controller
      *              )
      *          )
      *       ),
-     *      @OA\Response(
-     *          response=404,
-     *          description="Group not found",
-     *      ),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound"),
      *     )
      */
 
@@ -456,7 +654,18 @@ class GroupController extends Controller
             $start = Carbon::parse($request->get('start', '1970-01-01'))->setTimezone('UTC')->toIso8601String();
             $end = Carbon::parse($request->get('end', '3000-01-01'))->setTimezone('UTC')->toIso8601String();
 
+            // Eager-load the relations PartySummary::getEventStats() needs (per-event stats now shown
+            // on the group events list), the same way Group::bulkGroupStats() does - otherwise each
+            // event would trigger its own device/invited queries as the resource is built.
+            //
+            // theGroup (via GroupSummary, rendered per event too) is the same group every time here,
+            // but Eloquent doesn't dedupe lazy loads across model instances - without eager-loading it
+            // (and groupImage.image/networks, which GroupSummary touches unconditionally, same set
+            // listSummaryv2 eager-loads) this still scales with event count, just less obviously than
+            // the stats N+1.
             $parties = Party::undeleted()->forGroup($idgroups)
+                ->with('allDevices', 'theGroup.networks', 'theGroup.groupImage.image')
+                ->withCount('allInvited')
                 ->where('event_start_utc', '>=', $start)
                 ->where('event_end_utc', '<=', $end)
                 ->get();
@@ -481,6 +690,15 @@ class GroupController extends Controller
      *              type="integer"
      *          )
      *      ),
+     *      @OA\Parameter(
+     *          name="exclude_event",
+     *          description="Event id. When present, excludes users already confirmed as a volunteer at that event.",
+     *          required=false,
+     *          in="query",
+     *          @OA\Schema(
+     *              type="integer"
+     *          )
+     *      ),
      *      @OA\Response(
      *          response=200,
      *          description="Successful operation",
@@ -496,10 +714,7 @@ class GroupController extends Controller
      *              )
      *          )
      *       ),
-     *      @OA\Response(
-     *          response=404,
-     *          description="Group not found",
-     *      ),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound"),
      *     )
      */
 
@@ -529,7 +744,8 @@ class GroupController extends Controller
      *      operationId="deleteVolunteerForGroupv2",
      *      tags={"Groups","Volunteers"},
      *      summary="Delete Group Volunteer",
-     *      description="Removes a volunteer from a group",
+     *      description="Removes a volunteer from a group. Requires administrator, network-coordinator-for-group, or host-of-group permission - an authenticated user lacking that permission still gets 401 (not 403), since this check is implemented via AuthenticationException.",
+     *      security={{"apiToken":{}}},
      *      @OA\Parameter(
      *          name="id",
      *          description="Group id",
@@ -552,10 +768,8 @@ class GroupController extends Controller
      *          response=200,
      *          description="Successful operation",
      *       ),
-     *      @OA\Response(
-     *          response=404,
-     *          description="Group not found",
-     *      ),
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound"),
      *     )
      */
 
@@ -584,7 +798,8 @@ class GroupController extends Controller
      *      operationId="patchVolunteerForGroupv2",
      *      tags={"Groups","Volunteers"},
      *      summary="Modify Group Volunteer",
-     *      description="Modify a volunteer's status on a group",
+     *      description="Modify a volunteer's host/restarter role on a group. Requires administrator, network-coordinator-for-group, or host-of-group permission - an authenticated user lacking that permission still gets 401 (not 403), since this check is implemented via AuthenticationException.",
+     *      security={{"apiToken":{}}},
      *      @OA\Parameter(
      *          name="id",
      *          description="Group id",
@@ -595,22 +810,30 @@ class GroupController extends Controller
      *          )
      *      ),
      *      @OA\Parameter(
-     *          name="host",
-     *          description="Host",
+     *          name="iduser",
+     *          description="User id",
      *          required=true,
      *          in="path",
      *          @OA\Schema(
-     *              type="boolean"
+     *              type="integer"
+     *          )
+     *      ),
+     *      @OA\RequestBody(
+     *          @OA\JsonContent(
+     *              @OA\Property(
+     *                  property="host",
+     *                  description="Promote the volunteer to host (true) or demote to restarter (false). Defaults to false when omitted.",
+     *                  type="boolean",
+     *                  default=false
+     *              )
      *          )
      *      ),
      *      @OA\Response(
      *          response=200,
      *          description="Successful operation",
      *       ),
-     *      @OA\Response(
-     *          response=404,
-     *          description="Group not found",
-     *      ),
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound"),
      *     )
      */
 
@@ -641,23 +864,6 @@ class GroupController extends Controller
         }
     }
 
-    private function getUser() {
-        // We want to allow this call to work if a) we are logged in as a user, or b) we have a valid API token.
-        //
-        // This is a slightly odd thing to do, but it is necessary to get both the PHPUnit tests and the
-        // real client use of the API to work.
-        $user = Auth::user();
-
-        if (!$user) {
-            $user = auth('api')->user();
-        }
-
-        if (!$user) {
-            throw new AuthenticationException();
-        }
-
-        return $user;
-    }
 
     /**
      * @OA\Get(
@@ -665,17 +871,8 @@ class GroupController extends Controller
      *      operationId="getGroupsModeratev2",
      *      tags={"Groups"},
      *      summary="Get Groups for Moderation",
-     *      description="Only available for Administrators and Network Coordinators. ",
-     *      @OA\Parameter(
-     *          name="api_token",
-     *          description="A valid user API token",
-     *          required=true,
-     *          in="query",
-     *          @OA\Schema(
-     *              type="string",
-     *              example="1234"
-     *          )
-     *      ),
+     *      description="Unapproved groups visible to the authenticated user: Administrators see all, Network Coordinators see groups in networks they coordinate. Other authenticated users get an empty array (no error).",
+     *      security={{"apiToken":{}}},
      *      @OA\Response(
      *          response=200,
      *          description="Successful operation",
@@ -687,7 +884,103 @@ class GroupController extends Controller
      *             )
      *          )
      *       ),
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
      *     )
+     */
+    /**
+     * @OA\Get(
+     *      path="/api/v2/groups/{id}/audits",
+     *      operationId="getGroupAuditsv2",
+     *      tags={"Groups"},
+     *      summary="Audit trail for a group",
+     *      description="Backs the edit page's Group log tab. Administrator only, matching the legacy edit view's gate. Strings are rendered server-side from the group-audits lang files, so the placeholder substitution stays in one place; heading and changes are HTML.",
+     *      security={{"apiToken":{}}},
+     *      @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Audit entries, newest first",
+     *          @OA\JsonContent(@OA\Property(property="data", type="array", @OA\Items(
+     *              @OA\Property(property="id", type="integer"),
+     *              @OA\Property(property="event", type="string", example="updated"),
+     *              @OA\Property(property="heading", type="string"),
+     *              @OA\Property(property="changes", type="array", @OA\Items(type="string"))
+     *          )))
+     *      ),
+     *      @OA\Response(response=403, description="Not an administrator"),
+     *      @OA\Response(response=404, description="No such group")
+     * )
+     */
+    public function auditsv2($id): JsonResponse
+    {
+        if ($resp = $this->requireAdministrator()) {
+            return $resp;
+        }
+
+        $group = Group::find($id);
+
+        if (! $group) {
+            return response()->json(['error' => 'No such group'], 404);
+        }
+
+        // Same shape and rationale as EventController::auditsv2 - see there.
+        $audits = $group->audits()->with('user')->orderBy('created_at', 'desc')->get();
+
+        return response()->json([
+            'data' => $audits->map(function ($audit) {
+                $changes = [];
+
+                foreach ($audit->getModified() as $attribute => $modified) {
+                    $key = 'group-audits.'.$audit->event.'.modified.'.$attribute;
+                    $line = __($key, $modified);
+
+                    if ($line !== $key) {
+                        $changes[] = $line;
+                    }
+                }
+
+                // SECURITY: audit_url is the full request URL, so for any write
+                // authenticated with ?api_token= it contains a VALID API TOKEN.
+                // laravel-auditing stores that verbatim, and the legacy view
+                // renders it to any Administrator opening the log. Strip the
+                // query string before rendering. NB this only stops the
+                // display. New rows no longer carry one either
+                // (App\Auditing\SanitisedUrlResolver), and `php artisan
+                // audits:scrub-urls` clears any written before that landed -
+                // this stays as defence in depth for environments that have
+                // not run it.
+                $metadata = $audit->getMetadata();
+
+                if (isset($metadata['audit_url']) && is_string($metadata['audit_url'])) {
+                    $metadata['audit_url'] = strtok($metadata['audit_url'], '?');
+                }
+
+                $headingKey = 'group-audits.'.$audit->event.'.metadata';
+                $heading = __($headingKey, $metadata);
+
+                return [
+                    'id' => $audit->id,
+                    'event' => $audit->event,
+                    'heading' => $heading === $headingKey ? null : $heading,
+                    'changes' => $changes,
+                ];
+            })->values()->all(),
+        ]);
+    }
+
+    /**
+     * @OA\Get(
+     *      path="/api/v2/moderate/groups",
+     *      operationId="moderateGroupsv2",
+     *      tags={"Groups"},
+     *      summary="Groups awaiting moderation",
+     *      description="Unapproved groups visible to the caller - every group for an Administrator, a NetworkCoordinator's own networks otherwise.",
+     *      security={{"apiToken":{}}},
+     *      @OA\Response(
+     *          response=200,
+     *          description="Groups awaiting moderation. A bare array, not a {data:...} envelope - response()->json() on a resource collection bypasses Laravel's Responsable wrapping.",
+     *          @OA\JsonContent(type="array", @OA\Items(type="object"))
+     *      )
+     * )
      */
     public function moderateGroupsv2(Request $request): JsonResponse {
         $user = $this->getUser();
@@ -701,17 +994,8 @@ class GroupController extends Controller
      *      operationId="createGroup",
      *      tags={"Groups"},
      *      summary="Create Group",
-     *      description="Creates a group.",
-     *      @OA\Parameter(
-     *          name="api_token",
-     *          description="A valid user API token",
-     *          required=true,
-     *          in="query",
-     *          @OA\Schema(
-     *              type="string",
-     *              example="1234"
-     *          )
-     *      ),
+     *      description="Creates a group and adds the authenticated user as its host (converting them to a host if not already one). Notifies admins with the admin-moderate-group preference for approval.",
+     *      security={{"apiToken":{}}},
      *     @OA\RequestBody(
      *         @OA\MediaType(
      *             mediaType="multipart/form-data",
@@ -762,13 +1046,11 @@ class GroupController extends Controller
      *        response=200,
      *        description="Successful operation",
      *        @OA\JsonContent(
-     *            @OA\Property(
-     *              property="data",
-     *              title="data",
-     *              ref="#/components/schemas/Group"
-     *            )
-     *        ),
-     *     )
+     *            @OA\Property(property="id", type="integer", description="Id of the newly-created group", example=1)
+     *        )
+     *     ),
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=422, ref="#/components/responses/ValidationError"),
      *  )
      */
     public function createGroupv2(Request $request): JsonResponse {
@@ -843,22 +1125,21 @@ class GroupController extends Controller
      *      operationId="editGroup",
      *      tags={"Groups"},
      *      summary="Edit Group",
-     *      description="Edit a group.",
+     *      description="Edit a group. Requires administrator, network-coordinator-for-group, or host-of-group permission. `area`, `postcode` and `archived_at` are only persisted for an administrator or a network coordinator of the group's network(s); a host's submitted values for those fields are silently ignored.",
+     *      security={{"apiToken":{}}},
      *      @OA\Parameter(
-     *          name="api_token",
-     *          description="A valid user API token",
+     *          name="id",
+     *          description="Group id",
      *          required=true,
-     *          in="query",
+     *          in="path",
      *          @OA\Schema(
-     *              type="string",
-     *              example="1234"
+     *              type="integer"
      *          )
      *      ),
      *     @OA\RequestBody(
      *         @OA\MediaType(
      *             mediaType="multipart/form-data",
      *             @OA\Schema(
-     *                required={"name","location","description"},
      *                @OA\Property(
      *                   property="name",
      *                   ref="#/components/schemas/Group/properties/name",
@@ -900,8 +1181,39 @@ class GroupController extends Controller
      *                @OA\Property(
      *                   property="archived_at",
      *                   title="archived_at",
-     *                   description="If present, this group has been archived and is no longer active.",
+     *                   description="If present, this group has been archived and is no longer active. Administrator/network-coordinator only.",
      *                   format="date-time",
+     *                ),
+     *                @OA\Property(
+     *                   property="area",
+     *                   description="Administrator/network-coordinator only.",
+     *                   type="string",
+     *                   nullable=true
+     *                ),
+     *                @OA\Property(
+     *                   property="postcode",
+     *                   description="Administrator/network-coordinator only.",
+     *                   type="string",
+     *                   nullable=true
+     *                ),
+     *                @OA\Property(
+     *                   property="networks",
+     *                   description="JSON-encoded array of network ids to associate with the group (replaces the existing set). Administrator only.",
+     *                   type="string",
+     *                   example="[1,2]"
+     *                ),
+     *                @OA\Property(
+     *                   property="tags",
+     *                   description="JSON-encoded array of tag ids to associate with the group (replaces the existing set). Administrators may use any tag (global or any network's); network coordinators may only submit tags belonging to networks they coordinate that the group is also a member of - existing tags outside that scope are preserved automatically.",
+     *                   type="string",
+     *                   example="[3,4]"
+     *                ),
+     *                @OA\Property(
+     *                   property="moderate",
+     *                   description="Set to ""approve"" to approve a pending group. Administrator or network-coordinator-for-group only; ignored otherwise.",
+     *                   type="string",
+     *                   enum={"approve"},
+     *                   nullable=true
      *                )
      *            )
      *         )
@@ -910,13 +1222,13 @@ class GroupController extends Controller
      *        response=200,
      *        description="Successful operation",
      *        @OA\JsonContent(
-     *            @OA\Property(
-     *              property="data",
-     *              title="data",
-     *              ref="#/components/schemas/Group"
-     *            )
-     *        ),
-     *     )
+     *            @OA\Property(property="id", type="string", description="Id of the edited group", example=1)
+     *        )
+     *     ),
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound"),
+     *      @OA\Response(response=422, ref="#/components/responses/ValidationError"),
      *  )
      */
     public function updateGroupv2(Request $request, $idGroup): JsonResponse {
@@ -961,6 +1273,25 @@ class GroupController extends Controller
             $data['postcode'] = $postcode;
             $data['archived_at'] = $archived_at;
         }
+
+        // This is a PATCH, so a field the caller did not send must be left
+        // ALONE. $request->input() returns null for an absent key, and writing
+        // that null wiped real data: a PATCH sending only {name, phone}
+        // cleared the group's location, latitude and longitude outright.
+        // Observed against the parity fixtures.
+        //
+        // latitude/longitude/country_code are derived from `location` by the
+        // geocoder above rather than sent by the caller, so they follow
+        // whether `location` was sent.
+        $derivedFromLocation = ['latitude', 'longitude', 'country_code'];
+
+        $data = array_filter($data, function ($value, $field) use ($request, $derivedFromLocation) {
+            $sentAs = in_array($field, $derivedFromLocation, true)
+                ? 'location'
+                : ($field === 'free_text' ? 'description' : $field);
+
+            return $request->has($sentAs);
+        }, ARRAY_FILTER_USE_BOTH);
 
         if (isset($_FILES) && !empty($_FILES)) {
             // Update the group image.  We don't pass a URL through in the event data - the listeners which
@@ -1105,7 +1436,10 @@ class GroupController extends Controller
 
         $name = $request->input('name');
         $area = $request->input('area');
-        $postcode = $request->input('postcode', '');
+        // NOT NULL in the schema, and ConvertEmptyStringsToNull rewrites a
+        // submitted '' to null before this runs - so an explicitly-sent null
+        // means "clear it", which for this column is '' rather than null.
+        $postcode = $request->input('postcode') ?? '';
         $location = $request->input('location');
         $phone = $request->input('phone');
         $website = $request->input('website');

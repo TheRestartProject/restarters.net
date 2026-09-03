@@ -114,39 +114,37 @@ class TimezoneTest extends TestCase
         $response = $this->post('/api/v2/events?api_token=' . $host2->api_token, $this->eventAttributesToAPI($event));
         $response->assertSuccessful();
 
-        // Now get them and check the ordering works.
-        $response = $this->get('/party');
+        // Now get them and check the ordering works.  The Blade /party list page is gone
+        // post-cutover; the live equivalent of PartyController::index() (which is what this
+        // used to render) is GET /api/v2/users/me/events (API\UserController::getMyEventsv2):
+        // it builds the list the same way - the caller's own events first (via
+        // Party::forUser()), then other upcoming public events appended afterwards.
+        $response = $this->get('/api/v2/users/me/events?api_token=' . $host2->api_token);
+        $response->assertSuccessful();
 
-        $props = $this->assertVueProperties($response, [
-            [],
-            [],
-            [
-                'heading-level' => 'h2',
-            ],
-        ]);
-
-        $events = json_decode($props[2][':initial-events'], TRUE);
+        $events = $response->json('data');
 
         // Check the returned events:
-        // - The events should be second first because that is the earliest actual time and therefore the soonest
-        //   starting event.
+        // - Host2's own event should be first (index 0): it's the only event returned by
+        //   Party::forUser() for host2 (they're a host of group2, not group1). Host1's event
+        //   comes second (index 1), appended via the "other upcoming events" pass.
         // - The UTC fields should be returned, but having converted to UTC and therefore having +00:00.
         // - The timezone should be set.
         $this->assertEquals($tz2, $events[0]['timezone']);
-        $this->assertEquals(Carbon::parse("$date $start2", $tz2)->setTimezone('UTC')->toIso8601String(), $events[0]['event_start_utc']);
-        $this->assertEquals(Carbon::parse("$date $end2", $tz2)->setTimezone('UTC')->toIso8601String(), $events[0]['event_end_utc']);
-        $this->assertStringContainsString('+00:00', $events[0]['event_start_utc']);
-        $this->assertStringContainsString('+00:00', $events[0]['event_end_utc']);
+        $this->assertEquals(Carbon::parse("$date $start2", $tz2)->setTimezone('UTC')->toIso8601String(), $events[0]['start']);
+        $this->assertEquals(Carbon::parse("$date $end2", $tz2)->setTimezone('UTC')->toIso8601String(), $events[0]['end']);
+        $this->assertStringContainsString('+00:00', $events[0]['start']);
+        $this->assertStringContainsString('+00:00', $events[0]['end']);
 
         $this->assertEquals($tz1, $events[1]['timezone']);
-        $this->assertEquals(Carbon::parse("$date $start1", $tz1)->setTimezone('UTC')->toIso8601String(), $events[1]['event_start_utc']);
-        $this->assertEquals(Carbon::parse("$date $end1", $tz1)->setTimezone('UTC')->toIso8601String(), $events[1]['event_end_utc']);
-        $this->assertStringContainsString('+00:00', $events[1]['event_start_utc']);
-        $this->assertStringContainsString('+00:00', $events[1]['event_end_utc']);
+        $this->assertEquals(Carbon::parse("$date $start1", $tz1)->setTimezone('UTC')->toIso8601String(), $events[1]['start']);
+        $this->assertEquals(Carbon::parse("$date $end1", $tz1)->setTimezone('UTC')->toIso8601String(), $events[1]['end']);
+        $this->assertStringContainsString('+00:00', $events[1]['start']);
+        $this->assertStringContainsString('+00:00', $events[1]['end']);
 
         // Edit the event to check timezones work there too.
         $this->actingAs($host2);
-        $id2 = $events[0]['idevents'];
+        $id2 = $events[0]['id'];
         $event = Party::findOrFail($id2);
         $eventData = $event->getAttributes();
         $eventData['id'] = $id2;

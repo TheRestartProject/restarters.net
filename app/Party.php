@@ -213,7 +213,13 @@ class Party extends Model implements Auditable
     public function scopeFuture($query) {
         // A future event is an event where the start time is greater than now.
         $query = $query->undeleted();
-        $query = $query->where('event_start_utc', '>', date('Y-m-d H:i:s'))->orderBy('event_start_utc','ASC');
+        // reorder() before orderBy: a parent scope may already have applied an
+        // ORDER BY (e.g. DESC), and orderBy() APPENDS rather than replaces, so
+        // without this we get "ORDER BY event_start_utc DESC, event_start_utc
+        // ASC" - the DESC wins and future() returns the LAST future event first,
+        // making a "next event" lookup pick the wrong one (RES-1995 / PR 887).
+        $query = $query->where('event_start_utc', '>', date('Y-m-d H:i:s'))
+            ->reorder()->orderBy('event_start_utc', 'ASC');
         return $query;
     }
 
@@ -630,7 +636,10 @@ class Party extends Model implements Auditable
     public function getShareableLinkAttribute()
     {
         if (! empty($this->shareable_code)) {
-            return url("party/invite/{$this->shareable_code}");
+            // Points at the SPA, matching Group::getShareableLinkAttribute();
+            // the claim happens via POST /api/v2/invites/claim (or the
+            // invite_code param on login/register).
+            return rtrim(config('restarters.frontend_url'), '/')."/party/invite/{$this->shareable_code}";
         }
 
         return '';
@@ -649,6 +658,22 @@ class Party extends Model implements Auditable
             ['user', '=', $userId],
             ['status', '=', 1],
         ])->exists();
+    }
+
+    // Set by callers that batch-load images to avoid N+1 (see FixometerFile::findImagesForMany).
+    public ?array $preloadedImages = null;
+
+    // Mirrors Device::getImages() - event photos are a gallery (multiple per event), same
+    // xref-backed images table the upload/delete endpoints already use.
+    public function getImages()
+    {
+        if ($this->preloadedImages !== null) {
+            return $this->preloadedImages;
+        }
+
+        $File = new \FixometerFile;
+
+        return $File->findImages(env('TBL_EVENTS'), $this->idevents);
     }
 
     /**
@@ -688,8 +713,11 @@ class Party extends Model implements Auditable
 
     public function scopeEventHasFinished($query)
     {
-        $now = Carbon::now();
-        return $query->whereRaw("`event_end_utc` < '{$now}'");
+        // Bound, not interpolated. $now is server-generated so this was never
+        // injectable, but it was the only interpolated raw SQL in the codebase
+        // - and one benign example is enough to make a grep for the dangerous
+        // pattern useless.
+        return $query->where('event_end_utc', '<', Carbon::now());
     }
 
     public function getWastePreventedAttribute()

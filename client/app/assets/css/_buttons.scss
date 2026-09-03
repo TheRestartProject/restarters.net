@@ -1,0 +1,332 @@
+// Buttons + dropdown-toggle chrome
+// =================================
+// Ported from resources/global/css/components/_buttons.scss and
+// components/_dropdown.scss (folded in here — 4 lines, purely
+// dropdown-toggle-arrow related). No BS4-only class renames needed: this
+// file hand-rolls .btn-secondary/.btn-primary/.btn-tertiary explicitly
+// rather than relying on Bootstrap's $theme-colors-driven variant loop, so
+// there's no badge-{variant}/close/sr-only surface here.
+// BS4->BS5: button-size() dropped its $line-height parameter (BS4 took 5
+// args: padding-y, padding-x, font-size, line-height, border-radius; BS5
+// takes 4: padding-y, padding-x, font-size, border-radius). The dropped
+// line-height: 1 is set as a plain declaration alongside each call instead.
+.btn {
+  @include button-size(13px, 25px, 16px, 10px);
+
+  line-height: 1;
+  font-family: $font-family-third;
+  white-space: normal;
+  text-decoration: none !important;
+}
+
+.btn-sm {
+  @include button-size(0.8em, 0.8em, 0.75rem, 10px);
+
+  line-height: 1;
+}
+
+.btn-md {
+  @include button-size(0.9em, 0.9em, 0.9rem, 10px);
+
+  line-height: 1;
+}
+
+.btn-secondary {
+  width: auto;
+  border: solid 1px $black;
+  padding: 10px;
+  background-color: $brand-orange;
+  border-radius: 0;
+  font-size: 16px;
+  font-weight: bold;
+  font-stretch: normal;
+  font-style: normal;
+  text-transform: uppercase;
+  line-height: 1.13;
+  letter-spacing: 1.2px;
+  color: $black;
+  transition: none;
+
+  &:hover {
+    border: 2px solid $black;
+    padding: 9px;
+    background-color: $brand-orange;
+    color: $black;
+    border-color: $black;
+    text-decoration: underline;
+
+    &:active {
+      color: $white;
+    }
+  }
+}
+
+.btn-primary {
+  width: auto;
+  box-shadow: 5px 5px 0 0 $black;
+  border: solid 1px $black;
+  padding: 10px;
+  background-color: $white !important;
+  border-radius: 0;
+  font-size: 16px;
+  font-weight: bold;
+  font-stretch: normal;
+  font-style: normal;
+  text-transform: uppercase;
+  line-height: 1.13;
+  letter-spacing: 1.2px;
+  color: $black;
+  transition: none;
+
+  svg {
+    path,
+    text {
+      fill: $black !important;
+    }
+  }
+
+  &.dropdown-toggle {
+    svg {
+      path,
+      text {
+        fill: $black !important;
+      }
+    }
+
+    &:hover {
+      box-shadow: 5px 5px 0 0 $black;
+      border: 2px solid $black;
+      padding: 9px;
+      background-color: $white;
+      color: $black;
+      border-color: $black;
+
+      &:active {
+        color: $white;
+      }
+    }
+  }
+
+  &.dropdown-toggle:focus,
+  &.dropdown-toggle:active {
+    border: solid 2px $black;
+    padding: 9px;
+    background-color: $black !important;
+    font-size: 16px;
+    font-weight: bold;
+    font-stretch: normal;
+    font-style: normal;
+    line-height: 1.13;
+    letter-spacing: 1.2px;
+    text-align: left;
+    color: $white;
+
+    svg {
+      path,
+      text {
+        fill: $white !important;
+      }
+    }
+
+    &:hover {
+      padding: 9px;
+      color: $white !important;
+    }
+  }
+
+  &:focus {
+    background-color: $black;
+    color: $white;
+    box-shadow: 0 0 0 0.2rem rgba($black, 0.5) !important;
+    border-color: $black !important;
+
+    svg {
+      path,
+      text {
+        fill: $white !important;
+      }
+    }
+  }
+
+  &:hover {
+    svg {
+      path,
+      text {
+        fill: $black !important;
+      }
+    }
+
+    box-shadow: 5px 5px 0 0 $black;
+    border: 2px solid $black;
+    padding: 9px;
+    background-color: $white;
+    color: $black;
+    border-color: $black;
+  }
+
+  &:active {
+    background-color: $black !important;
+    color: $white !important;
+
+    svg {
+      path,
+      text {
+        fill: $white !important;
+      }
+    }
+  }
+
+  &:disabled,
+  &.disabled {
+    color: grey !important;
+    box-shadow: 5px 5px 0 0 grey !important;
+    border-color: grey;
+  }
+}
+
+.btn-outline-primary {
+  @extend .btn-primary;
+
+  box-shadow: unset !important;
+  color: $white !important;
+  background-color: $black !important;
+  border-color: $black !important;
+}
+
+.btn-tertiary {
+  color: $white;
+  background-color: transparent;
+  box-shadow: 5px 5px 0 0 $white;
+  width: auto;
+  border: solid 1px $white;
+  padding: 10px;
+  border-radius: 0;
+  font-size: 16px;
+  font-weight: bold;
+  font-stretch: normal;
+  font-style: normal;
+  text-transform: uppercase;
+  line-height: 1.13;
+  letter-spacing: 1.2px;
+  transition: none;
+
+  &:hover {
+    box-shadow: 5px 5px 0 0 $black !important;
+    border: 1px solid $black !important;
+    background-color: $brand-orange;
+    color: $black;
+    border-color: $black;
+    text-decoration: underline;
+
+    &:active {
+      color: $white;
+    }
+  }
+}
+
+.dropdown.show {
+  .dropdown-toggle {
+    background-color: $black !important;
+    color: $white;
+
+    svg {
+      path {
+        fill: $white !important;
+      }
+    }
+  }
+}
+
+// components/_dropdown.scss
+.dropdown-toggle[aria-expanded='true']::after {
+  transform: rotate(180deg);
+}
+
+.dropdown-toggle::after {
+  transition: 0.7s;
+}
+
+// _global.scss:511. Deliberately targets the inner `button` rather than the
+// wrapper: BDropdown renders <div class="dropdown"><button …>, so Bootstrap's
+// `text-nowrap` on the component sets white-space on the div, where it has no
+// effect on the button's own text. The event/group action toggles need this -
+// "Event actions" wraps to two lines in a narrow header column without it.
+.deepnowrap button {
+  white-space: nowrap !important;
+}
+
+.btn-group {
+  &__duo {
+    .btn {
+      padding-right: 10px;
+      padding-left: 10px;
+    }
+
+    .dropdown:first-child .btn {
+      border-radius: 0;
+    }
+
+    .dropdown:last-child .btn {
+      border-radius: 0;
+
+      @include media-breakpoint-down(md) {
+        border-radius: 0;
+      }
+    }
+
+    .dropdown-item {
+      padding: 0 10px;
+      background-color: $white;
+      color: $brand;
+      text-transform: uppercase;
+      font-family: $font-family-third;
+      font-size: 14px;
+      font-weight: bold;
+
+      input[type='checkbox'] {
+        appearance: none;
+        height: 12px;
+        width: 12px;
+        cursor: pointer;
+        position: relative;
+        border-radius: 0;
+        background-color: $white;
+        border: 1px solid $black;
+        margin-right: 5px;
+
+        &:checked {
+          &::before {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            background-image: url('/images/check-tick.svg');
+            background-repeat: no-repeat;
+            background-position: center center;
+            content: '';
+          }
+        }
+      }
+
+      &:hover,
+      &:focus {
+        background-color: #f9f9f9;
+      }
+    }
+  }
+}
+
+// resources/global/css/app.scss root-level rules — a checkbox styled to
+// look like a .btn-primary toggle.
+.btn-checkbox {
+  @extend .btn-primary;
+}
+
+[type='checkbox']:checked + label.btn-checkbox {
+  background-color: $black !important;
+  border-radius: 0;
+  border: 0 !important;
+  color: $white !important;
+}

@@ -15,7 +15,7 @@ use Illuminate\Http\Request;
  * @OA\Info(
  *      version="2.0.0",
  *      title="Restarters API",
- *      description="An API for accessing Restarters data.  No API authorisation is necessary - all data is read-only and public.",
+ *      description="The Restarters API. The v2 surface (`/api/v2/*`) powers the Nuxt single-page app and is authenticated with a Sanctum bearer token (`Authorization: Bearer <token>`) unless an operation is explicitly marked public. A small number of legacy read-only endpoints outside `/api/v2` use the `?api_token=` query-string convention (see the ApiKeyAuth scheme).",
  *      @OA\Contact(
  *          email="tech@therestartproject.org"
  *      ),
@@ -36,16 +36,55 @@ use Illuminate\Http\Request;
  * )
  *
  * @OA\SecurityScheme(
+ *   securityScheme="apiToken",
+ *   type="http",
+ *   scheme="bearer",
+ *   bearerFormat="Sanctum",
+ *   description="Sanctum personal-access token issued by POST /api/v2/auth/login or /register. Send as `Authorization: Bearer <token>`. This is the scheme every authenticated /api/v2 operation requires.",
+ * )
+ *
+ * @OA\SecurityScheme(
  *   securityScheme="ApiKeyAuth",
  *   type="apiKey",
  *   in="query",
  *   name="api_token",
+ *   description="Legacy query-string token (`?api_token=`) used only by the pre-v2 read-only endpoints outside /api/v2.",
  *  )
  */
 class ApiController extends Controller
 {
     /**
-     * Embedded at https://therestartproject.org
+     * @OA\Get(
+     *      path="/api/homepage_data",
+     *      operationId="getHomepageDataLegacy",
+     *      tags={"Legacy"},
+     *      summary="Get sitewide headline stats for the public homepage widget",
+     *      description="Legacy, unauthenticated endpoint. Used from DeviceController and embedded at https://therestartproject.org. Aggregates events-held/participants/hours-volunteered/items-fixed/waste/CO2 figures across all past, non-deleted events. The result is cached for 12 hours (`homepage_data` cache key); a stale or empty result may be served briefly while another worker rebuilds the cache.",
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="events_held", type="integer", example=1200),
+     *              @OA\Property(property="participants", type="integer", example=45000),
+     *              @OA\Property(property="hours_volunteered", type="integer", example=180000),
+     *              @OA\Property(property="items_fixed", type="integer", example=28000),
+     *              @OA\Property(property="waste_powered", type="number", example=12000),
+     *              @OA\Property(property="waste_unpowered", type="number", example=8000),
+     *              @OA\Property(property="waste_total", type="number", example=20000),
+     *              @OA\Property(property="co2_powered", type="number", example=5000),
+     *              @OA\Property(property="co2_unpowered", type="number", example=3000),
+     *              @OA\Property(property="co2_total", type="number", example=8000),
+     *              @OA\Property(property="fixed_powered", type="integer", example=18000),
+     *              @OA\Property(property="fixed_unpowered", type="integer", example=10000),
+     *              @OA\Property(property="total_powered", type="integer", example=25000),
+     *              @OA\Property(property="total_unpowered", type="integer", example=15000),
+     *              @OA\Property(property="weights", type="number", description="Alias of waste_total, kept for backward compatibility.", example=20000),
+     *              @OA\Property(property="ewaste", type="number", description="Alias of waste_powered, kept for backward compatibility.", example=12000),
+     *              @OA\Property(property="unpowered_waste", type="number", description="Alias of waste_unpowered, kept for backward compatibility.", example=8000),
+     *              @OA\Property(property="emissions", type="number", description="Alias of co2_total, kept for backward compatibility.", example=8000)
+     *          )
+     *      )
+     * )
      */
     public static function homepage_data(): JsonResponse
     {
@@ -65,6 +104,7 @@ class ApiController extends Controller
                     ->whereNull('deleted_at')
                     ->where('event_end_utc', '<', now())
                     ->selectRaw("
+                        COUNT(*) as events_held,
                         SUM(pax) as participants,
                         SUM(CASE
                             WHEN cancelled = 1 THEN 3
@@ -74,6 +114,10 @@ class ApiController extends Controller
                     ")
                     ->first();
 
+                // events_held mirrors legacy Fixometer::computeStats()'s
+                // partiesCount (past, non-deleted events) - it is the "Events
+                // held" figure in the logged-out header stats bar.
+                $result['events_held'] = (int) ($eventStats->events_held ?? 0);
                 $result['participants'] = (int) ($eventStats->participants ?? 0);
                 $result['hours_volunteered'] = (int) ($eventStats->hours_volunteered ?? 0);
 
@@ -113,6 +157,41 @@ class ApiController extends Controller
             ->json($result, 200);
     }
 
+    /**
+     * @OA\Get(
+     *      path="/api/party/{id}/stats",
+     *      operationId="getPartyStatsLegacy",
+     *      tags={"Legacy","Events"},
+     *      summary="Get impact stats for a single event",
+     *      description="Legacy, unauthenticated endpoint used from TRP.org.",
+     *      @OA\Parameter(
+     *          name="id",
+     *          description="Event (party) id",
+     *          required=true,
+     *          in="path",
+     *          @OA\Schema(type="integer")
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="num_participants", type="integer", example=25),
+     *              @OA\Property(property="num_volunteers", type="integer", example=6),
+     *              @OA\Property(property="num_hours_volunteered", type="integer", example=42),
+     *              @OA\Property(property="num_fixed_devices", type="integer", example=14),
+     *              @OA\Property(property="num_repairable_devices", type="integer", example=3),
+     *              @OA\Property(property="num_dead_devices", type="integer", example=2),
+     *              @OA\Property(property="kg_powered_co2_diverted", type="integer", example=120),
+     *              @OA\Property(property="kg_unpowered_co2_diverted", type="integer", example=40),
+     *              @OA\Property(property="kg_powered_waste_diverted", type="integer", example=300),
+     *              @OA\Property(property="kg_unpowered_waste_diverted", type="integer", example=90),
+     *              @OA\Property(property="kg_co2_diverted", type="integer", example=160),
+     *              @OA\Property(property="kg_waste_diverted", type="integer", example=390)
+     *          )
+     *      ),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound")
+     * )
+     */
     public static function partyStats($partyId): JsonResponse
     {
         $event = Party::where('idevents', $partyId)->first();
@@ -143,6 +222,41 @@ class ApiController extends Controller
         return response()->json($result, 200);
     }
 
+    /**
+     * @OA\Get(
+     *      path="/api/group/{id}/stats",
+     *      operationId="getGroupStatsLegacy",
+     *      tags={"Legacy","Groups"},
+     *      summary="Get impact stats for a single group",
+     *      description="Legacy, unauthenticated endpoint used from TRP.org.",
+     *      @OA\Parameter(
+     *          name="id",
+     *          description="Group id",
+     *          required=true,
+     *          in="path",
+     *          @OA\Schema(type="integer")
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="num_parties", type="integer", example=18),
+     *              @OA\Property(property="num_participants", type="integer", example=450),
+     *              @OA\Property(property="num_hours_volunteered", type="integer", example=760),
+     *              @OA\Property(property="num_fixed_devices", type="integer", example=260),
+     *              @OA\Property(property="num_repairable_devices", type="integer", example=40),
+     *              @OA\Property(property="num_dead_devices", type="integer", example=20),
+     *              @OA\Property(property="kg_powered_co2_diverted", type="integer", example=2100),
+     *              @OA\Property(property="kg_unpowered_co2_diverted", type="integer", example=700),
+     *              @OA\Property(property="kg_powered_waste_diverted", type="integer", example=5400),
+     *              @OA\Property(property="kg_unpowered_waste_diverted", type="integer", example=1600),
+     *              @OA\Property(property="kg_co2_diverted", type="integer", example=2800),
+     *              @OA\Property(property="kg_waste_diverted", type="integer", example=7000)
+     *          )
+     *      ),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound")
+     * )
+     */
     public static function groupStats($groupId): JsonResponse
     {
         $group = Group::where('idgroups', $groupId)->first();
@@ -174,6 +288,33 @@ class ApiController extends Controller
         return response()->json($result, 200);
     }
 
+    /**
+     * @OA\Get(
+     *      path="/api/users/me",
+     *      operationId="getUserInfoLegacy",
+     *      tags={"Legacy","Users"},
+     *      summary="Get the authenticated user's profile",
+     *      description="Legacy endpoint kept for backward compatibility; the Nuxt client uses GET /api/v2/session instead. Returns the raw user row (all columns) with credential/PII fields (api_token, calendar_hash, recovery, recovery_expires, mediawiki, latitude, longitude) stripped.",
+     *      security={{"apiToken":{}}},
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="id", type="integer", example=42),
+     *              @OA\Property(property="name", type="string", example="Jane Doe"),
+     *              @OA\Property(property="email", type="string", example="jane@example.com"),
+     *              @OA\Property(property="username", type="string", nullable=true, example="janedoe"),
+     *              @OA\Property(property="role", type="integer", example=3),
+     *              @OA\Property(property="language", type="string", nullable=true, example="en"),
+     *              @OA\Property(property="location", type="string", nullable=true, example="London"),
+     *              @OA\Property(property="country_code", type="string", nullable=true, example="GB"),
+     *              @OA\Property(property="created_at", type="string", format="date-time", nullable=true),
+     *              @OA\Property(property="updated_at", type="string", format="date-time", nullable=true)
+     *          )
+     *      ),
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated")
+     * )
+     */
     public static function getUserInfo(): JsonResponse
     {
         $user = Auth::user();
@@ -185,6 +326,32 @@ class ApiController extends Controller
         return response()->json($user->toArray());
     }
 
+    /**
+     * @OA\Get(
+     *      path="/api/users",
+     *      operationId="getUserListLegacy",
+     *      tags={"Legacy","Users"},
+     *      summary="List all users (Administrator only)",
+     *      description="Legacy endpoint. Returns every non-deleted user as a raw user row (all columns except the model's hidden credential fields), newest-created first.",
+     *      security={{"apiToken":{}}},
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(
+     *              type="array",
+     *              @OA\Items(
+     *                  @OA\Property(property="id", type="integer", example=42),
+     *                  @OA\Property(property="name", type="string", example="Jane Doe"),
+     *                  @OA\Property(property="email", type="string", example="jane@example.com"),
+     *                  @OA\Property(property="role", type="integer", example=3),
+     *                  @OA\Property(property="created_at", type="string", format="date-time", nullable=true)
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=403, ref="#/components/responses/Forbidden")
+     * )
+     */
     public static function getUserList()
     {
         $authenticatedUser = Auth::user();
@@ -200,7 +367,36 @@ class ApiController extends Controller
     }
 
     /**
-     * List/search devices.
+     * @OA\Get(
+     *      path="/api/devices/{page}/{size}",
+     *      operationId="getDevicesLegacy",
+     *      tags={"Legacy","Devices"},
+     *      summary="Search/paginate devices",
+     *      description="Legacy, unauthenticated endpoint used by the Vue client. Joins events/groups/categories to support filtering; results are ordered by sortBy/sortDesc.",
+     *      @OA\Parameter(name="page", description="1-based page number", required=true, in="path", @OA\Schema(type="integer", example=1)),
+     *      @OA\Parameter(name="size", description="Number of items per page", required=true, in="path", @OA\Schema(type="integer", example=20)),
+     *      @OA\Parameter(name="powered", description="Filter by whether the device's category is powered", required=false, in="query", @OA\Schema(type="string", enum={"true","false"})),
+     *      @OA\Parameter(name="sortBy", description="Column to sort by", required=false, in="query", @OA\Schema(type="string")),
+     *      @OA\Parameter(name="sortDesc", description="Sort direction, passed straight through to orderBy()", required=false, in="query", @OA\Schema(type="string")),
+     *      @OA\Parameter(name="category", description="Filter by category id", required=false, in="query", @OA\Schema(type="integer")),
+     *      @OA\Parameter(name="brand", description="Filter by brand (partial match)", required=false, in="query", @OA\Schema(type="string")),
+     *      @OA\Parameter(name="model", description="Filter by model (partial match)", required=false, in="query", @OA\Schema(type="string")),
+     *      @OA\Parameter(name="item_type", description="Filter by item type (partial match)", required=false, in="query", @OA\Schema(type="string")),
+     *      @OA\Parameter(name="status", description="Filter by repair status", required=false, in="query", @OA\Schema(type="string")),
+     *      @OA\Parameter(name="comments", description="Filter by problem/comments text (partial match)", required=false, in="query", @OA\Schema(type="string")),
+     *      @OA\Parameter(name="wiki", description="Only include devices flagged for the wiki", required=false, in="query", @OA\Schema(type="boolean")),
+     *      @OA\Parameter(name="group", description="Filter by group name (partial match)", required=false, in="query", @OA\Schema(type="string")),
+     *      @OA\Parameter(name="from_date", description="Only include devices from events starting on/after this date", required=false, in="query", @OA\Schema(type="string", format="date")),
+     *      @OA\Parameter(name="to_date", description="Only include devices from events ending on/before this date", required=false, in="query", @OA\Schema(type="string", format="date")),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="count", type="integer", description="Total number of matching devices across all pages", example=532),
+     *              @OA\Property(property="items", type="array", @OA\Items(ref="#/components/schemas/Device"))
+     *          )
+     *      )
+     * )
      */
     public static function getDevices(Request $request, $page, $size): JsonResponse
     {
@@ -296,6 +492,25 @@ class ApiController extends Controller
         ]);
     }
 
+    /**
+     * @OA\Get(
+     *      path="/api/timezones",
+     *      operationId="getTimezonesLegacy",
+     *      tags={"Legacy"},
+     *      summary="List all known IANA timezone identifiers",
+     *      description="Legacy, unauthenticated endpoint backed by PHP's DateTimeZone::listIdentifiers(ALL_WITH_BC).",
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(
+     *              type="array",
+     *              @OA\Items(
+     *                  @OA\Property(property="name", type="string", example="Europe/London")
+     *              )
+     *          )
+     *      )
+     * )
+     */
     public function timezones(): JsonResponse {
         $zones = \DateTimeZone::listIdentifiers(\DateTimeZone::ALL_WITH_BC);
         $ret = [];

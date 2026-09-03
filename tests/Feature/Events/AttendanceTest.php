@@ -41,12 +41,15 @@ class AttendanceTest extends TestCase
         // Initial count will be 0.
         self::assertEquals(0, $this->party->pax);
 
-        $rsp = $this->post('/party/update-quantity', [
-            'event_id' => $this->idevents,
-            'quantity' => 3
-        ]);
+        // The old POST /party/update-quantity route is gone post-cutover; the headcount
+        // counters were folded into PATCH /api/v2/events/{id} (see the "participants"
+        // handling in EventController::updateEventv2).
+        $atts = $this->eventAttributesToAPI(Party::find($this->idevents)->getAttributes());
+        $atts['participants'] = 3;
 
-        self::assertTrue($rsp['success']);
+        $rsp = $this->patch('/api/v2/events/' . $this->idevents, $atts);
+
+        $rsp->assertSuccessful();
         $this->party->refresh();
         self::assertEquals(3, $this->party->pax);
     }
@@ -56,12 +59,15 @@ class AttendanceTest extends TestCase
         // Initial count will be 1, for the host.
         self::assertEquals(1, $this->party->volunteers);
 
-        $rsp = $this->post('/party/update-volunteerquantity', [
-            'event_id' => $this->idevents,
-            'quantity' => 4
-        ]);
+        // The old POST /party/update-volunteerquantity route is gone post-cutover; the
+        // headcount counters were folded into PATCH /api/v2/events/{id} (see the
+        // "volunteers" handling in EventController::updateEventv2).
+        $atts = $this->eventAttributesToAPI(Party::find($this->idevents)->getAttributes());
+        $atts['volunteers'] = 4;
 
-        self::assertTrue($rsp['success']);
+        $rsp = $this->patch('/api/v2/events/' . $this->idevents, $atts);
+
+        $rsp->assertSuccessful();
         $this->party->refresh();
         self::assertEquals(4, $this->party->volunteers);
     }

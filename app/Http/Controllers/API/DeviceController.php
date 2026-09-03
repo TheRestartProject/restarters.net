@@ -8,9 +8,11 @@ use App\Device;
 use App\DeviceBarrier;
 use App\Events\DeviceCreatedOrUpdated;
 use App\Helpers\Fixometer;
+use App\Helpers\Tus;
 use App\Http\Controllers\Controller;
 use App\Notifications\AdminAbnormalDevices;
 use App\Party;
+use App\User;
 use App\Xref;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Validation\ValidationException;
@@ -28,7 +30,7 @@ class DeviceController extends Controller {
      *      operationId="getDevice",
      *      tags={"Devices"},
      *      summary="Get Device",
-     *      description="Returns information about a device.",
+     *      description="Returns information about a device. Public - no authentication required.",
      *      @OA\Parameter(
      *          name="id",
      *          description="Device id",
@@ -49,10 +51,7 @@ class DeviceController extends Controller {
      *              )
      *          )
      *       ),
-     *      @OA\Response(
-     *          response=404,
-     *          description="Device not found",
-     *      ),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound"),
      *     )
      */
 
@@ -69,17 +68,8 @@ class DeviceController extends Controller {
      *      operationId="createDevice",
      *      tags={"Devices"},
      *      summary="Create Device",
-     *      description="Creates a device.",
-     *      @OA\Parameter(
-     *          name="api_token",
-     *          description="A valid user API token",
-     *          required=true,
-     *          in="query",
-     *          @OA\Schema(
-     *              type="string",
-     *              example="1234"
-     *          )
-     *      ),
+     *      description="Creates a device against an event. Requires edit-events-devices permission (typically the event's host) on the target event (`eventid`). 404 if that event does not exist.",
+     *      security={{"apiToken":{}}},
      *     @OA\RequestBody(
      *         @OA\MediaType(
      *             mediaType="multipart/form-data",
@@ -145,15 +135,38 @@ class DeviceController extends Controller {
      *    ),
      *    @OA\Response(
      *        response=200,
-     *        description="Successful operation",
+     *        description="Successful operation. Returns the device and the owning event's stats, to save the client another API call to update its store.",
      *        @OA\JsonContent(
-     *            @OA\Property(
-     *              property="data",
-     *              title="data",
-     *              ref="#/components/schemas/Device"
+     *            @OA\Property(property="id", type="integer", description="The id of the created device"),
+     *            @OA\Property(property="device", ref="#/components/schemas/Device"),
+     *            @OA\Property(property="stats", type="object", description="Party::getEventStats() for the device's event - the same shape as the stats block on GET /api/v2/events/{id}.",
+     *                @OA\Property(property="co2_powered", type="number"),
+     *                @OA\Property(property="co2_unpowered", type="number"),
+     *                @OA\Property(property="co2_total", type="number"),
+     *                @OA\Property(property="waste_powered", type="number"),
+     *                @OA\Property(property="waste_unpowered", type="number"),
+     *                @OA\Property(property="waste_total", type="number"),
+     *                @OA\Property(property="fixed_devices", type="number"),
+     *                @OA\Property(property="fixed_powered", type="number"),
+     *                @OA\Property(property="fixed_unpowered", type="number"),
+     *                @OA\Property(property="repairable_devices", type="number"),
+     *                @OA\Property(property="dead_devices", type="number"),
+     *                @OA\Property(property="unknown_repair_status", type="number"),
+     *                @OA\Property(property="devices_powered", type="number"),
+     *                @OA\Property(property="devices_unpowered", type="number"),
+     *                @OA\Property(property="no_weight_powered", type="number"),
+     *                @OA\Property(property="no_weight_unpowered", type="number"),
+     *                @OA\Property(property="participants", type="number"),
+     *                @OA\Property(property="volunteers", type="number"),
+     *                @OA\Property(property="hours_volunteered", type="number"),
+     *                @OA\Property(property="invited", type="number")
      *            )
      *        ),
-     *     )
+     *     ),
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound"),
+     *      @OA\Response(response=422, ref="#/components/responses/ValidationError")
      *  )
      */
     public function createDevicev2(Request $request)
@@ -258,15 +271,15 @@ class DeviceController extends Controller {
      *      operationId="editDevice",
      *      tags={"Devices"},
      *      summary="Edit Device",
-     *      description="Edits a device.",
+     *      description="Edits a device. Requires edit-events-devices permission on both the target event (`eventid` in the body) and the device's current owning event - an IDOR guard against a host of one event reassigning/overwriting a device that belongs to another event.",
+     *      security={{"apiToken":{}}},
      *      @OA\Parameter(
-     *          name="api_token",
-     *          description="A valid user API token",
+     *          name="id",
+     *          description="Device id",
      *          required=true,
-     *          in="query",
+     *          in="path",
      *          @OA\Schema(
-     *              type="string",
-     *              example="1234"
+     *              type="integer"
      *          )
      *      ),
      *     @OA\RequestBody(
@@ -334,15 +347,38 @@ class DeviceController extends Controller {
      *    ),
      *    @OA\Response(
      *        response=200,
-     *        description="Successful operation",
+     *        description="Successful operation. Returns the device and the owning event's stats, to save the client another API call to update its store.",
      *        @OA\JsonContent(
-     *            @OA\Property(
-     *              property="data",
-     *              title="data",
-     *              ref="#/components/schemas/Device"
+     *            @OA\Property(property="id", type="string", description="The id of the updated device"),
+     *            @OA\Property(property="device", ref="#/components/schemas/Device"),
+     *            @OA\Property(property="stats", type="object", description="Party::getEventStats() for the device's event - the same shape as the stats block on GET /api/v2/events/{id}.",
+     *                @OA\Property(property="co2_powered", type="number"),
+     *                @OA\Property(property="co2_unpowered", type="number"),
+     *                @OA\Property(property="co2_total", type="number"),
+     *                @OA\Property(property="waste_powered", type="number"),
+     *                @OA\Property(property="waste_unpowered", type="number"),
+     *                @OA\Property(property="waste_total", type="number"),
+     *                @OA\Property(property="fixed_devices", type="number"),
+     *                @OA\Property(property="fixed_powered", type="number"),
+     *                @OA\Property(property="fixed_unpowered", type="number"),
+     *                @OA\Property(property="repairable_devices", type="number"),
+     *                @OA\Property(property="dead_devices", type="number"),
+     *                @OA\Property(property="unknown_repair_status", type="number"),
+     *                @OA\Property(property="devices_powered", type="number"),
+     *                @OA\Property(property="devices_unpowered", type="number"),
+     *                @OA\Property(property="no_weight_powered", type="number"),
+     *                @OA\Property(property="no_weight_unpowered", type="number"),
+     *                @OA\Property(property="participants", type="number"),
+     *                @OA\Property(property="volunteers", type="number"),
+     *                @OA\Property(property="hours_volunteered", type="number"),
+     *                @OA\Property(property="invited", type="number")
      *            )
      *        ),
-     *     )
+     *     ),
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound"),
+     *      @OA\Response(response=422, ref="#/components/responses/ValidationError")
      *  )
      */
     public function updateDevicev2(Request $request, $iddevices): JsonResponse
@@ -394,6 +430,17 @@ class DeviceController extends Controller {
         ];
 
         $device = Device::findOrFail($iddevices);
+
+        // IDOR guard: the permission check above validated the *target* eventid
+        // from the request body, but the device is loaded by its URL id. Also
+        // require edit permission on the device's *current* owning event -
+        // otherwise a host of event A could pass eventid=A and reassign/
+        // overwrite a device that actually belongs to someone else's event B
+        // (deleteDevicev2 derives the event from the device for the same reason).
+        if (!Fixometer::userHasEditEventsDevicesPermission($device->event, $user->id)) {
+            abort(403);
+        }
+
         $device->update($data);
 
         event(new DeviceCreatedOrUpdated($device));
@@ -420,7 +467,8 @@ class DeviceController extends Controller {
      *      operationId="deleteDevice",
      *      tags={"Devices"},
      *      summary="Delete Device",
-     *      description="Deletes a device.",
+     *      description="Deletes a device. Requires edit-events-devices permission on the device's owning event.",
+     *      security={{"apiToken":{}}},
      *      @OA\Parameter(
      *          name="id",
      *          description="Device id",
@@ -432,12 +480,36 @@ class DeviceController extends Controller {
      *      ),
      *      @OA\Response(
      *          response=200,
-     *          description="Successful operation",
+     *          description="Successful operation. Returns the owning event's stats, to save the client another API call to update its store.",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="id", type="string", description="The id of the deleted device"),
+     *              @OA\Property(property="stats", type="object", description="Party::getEventStats() for the device's (now former) event - the same shape as the stats block on GET /api/v2/events/{id}.",
+     *                  @OA\Property(property="co2_powered", type="number"),
+     *                  @OA\Property(property="co2_unpowered", type="number"),
+     *                  @OA\Property(property="co2_total", type="number"),
+     *                  @OA\Property(property="waste_powered", type="number"),
+     *                  @OA\Property(property="waste_unpowered", type="number"),
+     *                  @OA\Property(property="waste_total", type="number"),
+     *                  @OA\Property(property="fixed_devices", type="number"),
+     *                  @OA\Property(property="fixed_powered", type="number"),
+     *                  @OA\Property(property="fixed_unpowered", type="number"),
+     *                  @OA\Property(property="repairable_devices", type="number"),
+     *                  @OA\Property(property="dead_devices", type="number"),
+     *                  @OA\Property(property="unknown_repair_status", type="number"),
+     *                  @OA\Property(property="devices_powered", type="number"),
+     *                  @OA\Property(property="devices_unpowered", type="number"),
+     *                  @OA\Property(property="no_weight_powered", type="number"),
+     *                  @OA\Property(property="no_weight_unpowered", type="number"),
+     *                  @OA\Property(property="participants", type="number"),
+     *                  @OA\Property(property="volunteers", type="number"),
+     *                  @OA\Property(property="hours_volunteered", type="number"),
+     *                  @OA\Property(property="invited", type="number")
+     *              )
+     *          )
      *       ),
-     *      @OA\Response(
-     *          response=404,
-     *          description="Device not found",
-     *      ),
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound"),
      *     )
      */
 
@@ -594,22 +666,349 @@ class DeviceController extends Controller {
         ];
     }
 
-    private function getUser()
+
+    /**
+     * @OA\Post(
+     *      path="/api/v2/devices/{id}/images",
+     *      operationId="uploadDeviceImagev2",
+     *      tags={"Devices"},
+     *      summary="Attach a completed tus upload as a device photo",
+     *      description="Mirrors GroupMembershipController::uploadImagev2 and EventAttendanceController::uploadImagev2 (design §5 point 11: extend PR #868's tus pattern to device images too) - upload the file to /api/tus first, then attach it here by upload_key. Devices support multiple photos, so an upload never clears previous ones. Permission: userHasEditEventsDevicesPermission for the device's event.",
+     *      security={{"apiToken":{}}},
+     *      @OA\Parameter(name="id", required=true, in="path", @OA\Schema(type="integer")),
+     *      @OA\RequestBody(
+     *          required=true,
+     *          @OA\JsonContent(required={"upload_key"}, @OA\Property(property="upload_key", type="string"))
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Image attached",
+     *          @OA\JsonContent(@OA\Property(property="data", type="object",
+     *              @OA\Property(property="image_url", type="string")
+     *          ))
+     *      ),
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound"),
+     *      @OA\Response(response=422, ref="#/components/responses/ValidationError")
+     * )
+     */
+    public function uploadImagev2(Request $request, $iddevices): JsonResponse
     {
-        // We want to allow this call to work if a) we are logged in as a user, or b) we have a valid API token.
-        //
-        // This is a slightly odd thing to do, but it is necessary to get both the PHPUnit tests and the
-        // real client use of the API to work.
-        $user = Auth::user();
+        $user = $request->user();
+        $device = Device::findOrFail($iddevices);
 
-        if (!$user) {
-            $user = auth('api')->user();
+        if (!Fixometer::userHasEditEventsDevicesPermission($device->event, $user->id)) {
+            abort(403);
         }
 
-        if (!$user) {
-            throw new AuthenticationException();
+        $validated = $request->validate([
+            'upload_key' => 'required|string',
+        ]);
+
+        $filePath = EventAttendanceController::validatedTusFilePath($validated['upload_key'], 'devices');
+
+        $file = new \FixometerFile();
+        // $clear=false: devices support multiple photos, unlike a group/profile picture.
+        $filename = $file->uploadLocalFile($filePath, 'image', $device->iddevices, env('TBL_DEVICES'), false, true, false);
+
+        $cache = Tus::buildCache();
+        $cache->delete($validated['upload_key']);
+        @unlink($filePath);
+
+        if (! $filename) {
+            throw ValidationException::withMessages([
+                'upload_key' => [__('devices.image_upload_error')],
+            ]);
         }
 
-        return $user;
+        return response()->json([
+            'data' => [
+                'image_url' => url('/uploads/mid_'.$filename),
+            ],
+        ]);
+    }
+
+    /**
+     * @OA\Delete(
+     *      path="/api/v2/devices/{id}/images/{idimages}",
+     *      operationId="deleteDeviceImagev2",
+     *      tags={"Devices"},
+     *      summary="Detach a photo from a device",
+     *      security={{"apiToken":{}}},
+     *      @OA\Parameter(name="id", required=true, in="path", @OA\Schema(type="integer")),
+     *      @OA\Parameter(name="idimages", description="The xref id linking the image to the device", required=true, in="path", @OA\Schema(type="integer")),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Deleted",
+     *          @OA\JsonContent(@OA\Property(property="data", type="object",
+     *              @OA\Property(property="deleted", type="boolean")
+     *          ))
+     *      ),
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=403, ref="#/components/responses/Forbidden"),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound")
+     * )
+     */
+    public function deleteImagev2(Request $request, $iddevices, $idimages): JsonResponse
+    {
+        $user = $request->user();
+        $device = Device::findOrFail($iddevices);
+
+        if (!Fixometer::userHasEditEventsDevicesPermission($device->event, $user->id)) {
+            abort(403);
+        }
+
+        $xref = Xref::where('idxref', $idimages)
+            ->where('reference', $device->iddevices)
+            ->where('reference_type', env('TBL_DEVICES'))
+            ->first();
+
+        if (! $xref) {
+            abort(404, 'Image not found for this device.');
+        }
+
+        $xref->delete();
+
+        return response()->json(['data' => ['deleted' => true]]);
+    }
+
+    /**
+     * @OA\Get(
+     *      path="/api/v2/devices/options",
+     *      operationId="getDeviceOptionsv2",
+     *      tags={"Devices"},
+     *      summary="Hard-coded device option lists: barriers, spare parts, next steps",
+     *      description="Item-type autocomplete/category suggestion is GET /api/v2/items and brands is GET /api/v2/brands (both already exist and are reused, not duplicated here). spare_parts/next_steps have no table - hard-coded the same way Device::REPAIR_STATUS_*_STR constants already are.",
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(@OA\Property(property="data", type="object",
+     *              @OA\Property(property="barriers", type="array", @OA\Items(
+     *                  @OA\Property(property="id", type="integer"),
+     *                  @OA\Property(property="name", type="string")
+     *              )),
+     *              @OA\Property(property="spare_parts", type="array", @OA\Items(type="string")),
+     *              @OA\Property(property="next_steps", type="array", @OA\Items(type="string"))
+     *          ))
+     *      )
+     * )
+     */
+    public function optionsv2(): JsonResponse
+    {
+        return response()->json([
+            'data' => [
+                'barriers' => Barrier::all()->map(fn ($b) => ['id' => $b->id, 'name' => $b->barrier])->values()->all(),
+                'spare_parts' => [
+                    Device::PARTS_PROVIDER_NO_STR,
+                    Device::PARTS_PROVIDER_MANUFACTURER_STR,
+                    Device::PARTS_PROVIDER_THIRD_PARTY_STR,
+                ],
+                'next_steps' => [
+                    Device::NEXT_STEPS_MORE_TIME_NEEDED_STR,
+                    Device::NEXT_STEPS_PROFESSIONAL_HELP_STR,
+                    Device::NEXT_STEPS_DO_IT_YOURSELF_STR,
+                ],
+            ],
+        ]);
+    }
+
+    /**
+     * @OA\Get(
+     *      path="/api/v2/devices",
+     *      operationId="listDevicesv2",
+     *      tags={"Devices"},
+     *      summary="List/search devices, paginated",
+     *      description="v2 equivalent of GET /api/devices/{page}/{size} (v1, kept for the legacy client). Read ApiController::getDevices() for the query builder this mirrors - same filters, same join/LIKE semantics, same batch-loaded images.",
+     *      @OA\Parameter(name="page", in="query", @OA\Schema(type="integer", default=1)),
+     *      @OA\Parameter(name="size", in="query", @OA\Schema(type="integer", default=20)),
+     *      @OA\Parameter(name="sortBy", in="query", @OA\Schema(type="string", default="event_start_utc")),
+     *      @OA\Parameter(name="sortDesc", in="query", @OA\Schema(type="string", default="DESC")),
+     *      @OA\Parameter(name="powered", in="query", @OA\Schema(type="string")),
+     *      @OA\Parameter(name="category", in="query", @OA\Schema(type="integer")),
+     *      @OA\Parameter(name="brand", in="query", @OA\Schema(type="string")),
+     *      @OA\Parameter(name="model", in="query", @OA\Schema(type="string")),
+     *      @OA\Parameter(name="item_type", in="query", @OA\Schema(type="string")),
+     *      @OA\Parameter(name="status", in="query", @OA\Schema(type="integer")),
+     *      @OA\Parameter(name="comments", in="query", @OA\Schema(type="string")),
+     *      @OA\Parameter(name="wiki", in="query", @OA\Schema(type="boolean")),
+     *      @OA\Parameter(name="group", in="query", @OA\Schema(type="string")),
+     *      @OA\Parameter(name="from_date", in="query", @OA\Schema(type="string")),
+     *      @OA\Parameter(name="to_date", in="query", @OA\Schema(type="string")),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(@OA\Property(property="data", type="object",
+     *              @OA\Property(property="count", type="integer"),
+     *              @OA\Property(property="items", type="array", @OA\Items(ref="#/components/schemas/Device"))
+     *          ))
+     *      )
+     * )
+     */
+    public function listDevicesv2(Request $request): JsonResponse
+    {
+        $page = max(1, (int) $request->input('page', 1));
+        $size = max(1, (int) $request->input('size', 20));
+
+        // Whitelist the sortable columns. The value comes from the client's
+        // clickable table headers (DevicesSearchTable.vue), so it must NOT be
+        // fed raw into orderBy(): the column argument is interpolated into the
+        // query grammar, so an un-whitelisted string is a SQL-injection vector.
+        // Keys are the field names the client sends per column; values are the
+        // qualified columns on the joined query. Default (and fallback for any
+        // unknown key) is the repair-event date, matching the legacy default.
+        $sortColumns = [
+            'event_start_utc' => 'events.event_start_utc',
+            'item_type' => 'devices.item_type',
+            'category' => 'categories.name',
+            'brand' => 'devices.brand',
+            'groupname' => 'groups.name',
+            'repair_status' => 'devices.repair_status',
+            'created_at' => 'devices.created_at',
+        ];
+        $sortKey = $request->input('sortBy');
+        // is_string guards against a non-scalar sortBy (e.g. ?sortBy[]=x), which
+        // would otherwise throw on the array-key lookup rather than fall back.
+        $sortColumn = (is_string($sortKey) && isset($sortColumns[$sortKey])) ? $sortColumns[$sortKey] : 'events.event_start_utc';
+        $sortDir = strtolower((string) $request->input('sortDesc', 'DESC')) === 'asc' ? 'asc' : 'desc';
+        $powered = $request->input('powered');
+        $category = $request->input('category');
+        $brand = $request->input('brand');
+        $model = $request->input('model');
+        $item_type = $request->input('item_type');
+        $status = $request->input('status');
+        $comments = $request->input('comments');
+        $wiki = filter_var($request->input('wiki', false), FILTER_VALIDATE_BOOLEAN);
+        $group = $request->input('group');
+        $from_date = $request->input('from_date');
+        $to_date = $request->input('to_date');
+
+        // Same filter set as v1 ApiController::getDevices(), including its "powered defaults to
+        // unpowered when the param is absent" quirk - preserved for parity, not a new decision.
+        $wheres = [
+            ['categories.powered', '=', $powered == 'true' ? 1 : 0],
+        ];
+
+        if ($category) {
+            $wheres[] = ['idcategories', '=', $category];
+        }
+
+        if ($brand) {
+            $wheres[] = ['devices.brand', 'LIKE', '%'.$brand.'%'];
+        }
+
+        if ($model) {
+            $wheres[] = ['devices.model', 'LIKE', '%'.$model.'%'];
+        }
+
+        if ($item_type) {
+            $wheres[] = ['devices.item_type', 'LIKE', '%'.$item_type.'%'];
+        }
+
+        if ($comments) {
+            $wheres[] = ['devices.problem', 'LIKE', '%'.$comments.'%'];
+        }
+
+        if ($wiki) {
+            $wheres[] = ['devices.wiki', '=', 1];
+        }
+
+        if ($status) {
+            $wheres[] = ['repair_status', '=', $status];
+        }
+
+        if ($group) {
+            $wheres[] = ['groups.name', 'LIKE', '%'.$group.'%'];
+        }
+
+        if ($from_date) {
+            $wheres[] = ['events.event_start_utc', '>=', $from_date];
+        }
+
+        if ($to_date) {
+            $wheres[] = ['events.event_end_utc', '<=', $to_date];
+        }
+
+        // `groups` is joined ONLY when something needs it: the group-name
+        // filter, or a sort on a groups column. It used to be joined
+        // unconditionally, so every request paid for joining the whole devices
+        // table to groups even when no filter or sort referenced it - in both
+        // the COUNT and the fetch. Group data for the returned rows comes from
+        // the `deviceEvent.theGroup` eager load, not this join, so dropping it
+        // changes no output.
+        $needsGroupsJoin = $request->filled('group') || str_starts_with($sortColumn, 'groups.');
+
+        $query = Device::with(['deviceEvent.theGroup', 'deviceCategory', 'barriers'])
+            ->join('events', 'events.idevents', '=', 'devices.event')
+            ->when($needsGroupsJoin, fn ($q) => $q->join('groups', 'events.group', '=', 'groups.idgroups'))
+            ->join('categories', 'devices.category', '=', 'categories.idcategories')
+            ->where($wheres)
+            ->orderBy($sortColumn, $sortDir);
+
+        // Count without the ORDER BY: it cannot change the total, and it stops
+        // MySQL sorting the whole joined set just to count it.
+        $count = (clone $query)->reorder()->count();
+
+        $items = $query->skip(($page - 1) * $size)
+            ->take($size)
+            ->get();
+
+        // Batch-load device images to avoid N+1 per device.
+        $device_ids = $items->pluck('iddevices')->toArray();
+        $allImages = (new \FixometerFile)->findImagesForMany(env('TBL_DEVICES'), $device_ids);
+        foreach ($items as $item) {
+            $item->preloadedImages = $allImages[$item->iddevices] ?? [];
+        }
+
+        $item_data = [];
+        foreach ($items as $item) {
+            $item_data[] = (new \App\Http\Resources\Device($item))->resolve();
+        }
+
+        return response()->json([
+            'data' => [
+                'count' => $count,
+                'items' => $item_data,
+            ],
+        ]);
+    }
+
+    /**
+     * @OA\Get(
+     *      path="/api/v2/stats/latest-repaired-event",
+     *      operationId="getLatestRepairedEventv2",
+     *      tags={"Devices"},
+     *      summary="Most recent finished event with at least one repaired device",
+     *      description="Public. Mirrors the inline query in the legacy DeviceController::index() (fixometer home page banner) - Party::with('theGroup')->hasDevicesRepaired(1)->eventHasFinished()->orderBy('event_start_utc','DESC')->first().",
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(@OA\Property(property="data", type="object", nullable=true,
+     *              @OA\Property(property="id", type="integer"),
+     *              @OA\Property(property="waste_prevented", type="number"),
+     *              @OA\Property(property="group", ref="#/components/schemas/GroupSummary")
+     *          ))
+     *      )
+     * )
+     */
+    public function latestRepairedEventv2(): JsonResponse
+    {
+        $event = Party::with('theGroup')
+            ->hasDevicesRepaired(1)
+            ->eventHasFinished()
+            ->orderBy('event_start_utc', 'DESC')
+            ->first();
+
+        if (! $event) {
+            return response()->json(['data' => null]);
+        }
+
+        return response()->json([
+            'data' => [
+                'id' => $event->idevents,
+                'waste_prevented' => $event->waste_prevented,
+                'group' => \App\Http\Resources\GroupSummary::make($event->theGroup),
+            ],
+        ]);
     }
 }
