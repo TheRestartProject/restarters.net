@@ -141,7 +141,7 @@ onUnmounted(() => {
   padding: 0.25em 0.75em;
   font-size: 16px;
   font-weight: 400;
-  font-family: 'Patua One';
+  font-family: 'Patua One', serif;
   color: #fff;
   background-color: #ec7f00;
 

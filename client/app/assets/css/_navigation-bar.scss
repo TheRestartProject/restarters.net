@@ -41,7 +41,7 @@
       display: block;
       text-align: center;
       color: $black;
-      font-family: Asap;
+      font-family: $font-family-third;
       font-size: 16px;
       font-weight: normal;
       font-stretch: normal;
@@ -524,7 +524,6 @@
 .nav-wrapper .dropdown-menu {
   border-radius: 0;
   background-color: #fff;
-  border: 0;
   left: -180px !important;
   width: 260px;
   padding: 0;

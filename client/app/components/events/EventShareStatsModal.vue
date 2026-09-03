@@ -127,6 +127,7 @@ function close() {
           <p class="small text-muted">{{ t('events.headline_stats_message') }}</p>
           <iframe
             :src="headlineUrl"
+            :title="t('events.headline_stats_dropdown')"
             frameborder="0"
             width="100%"
             height="370"
@@ -170,6 +171,7 @@ function close() {
           </div>
           <iframe
             :src="co2Url"
+            :title="t('events.co2_equivalence_visualisation_dropdown')"
             frameborder="0"
             width="100%"
             height="370"

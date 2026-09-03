@@ -80,6 +80,7 @@ function close() {
     </div>
     <iframe
       :src="headlineUrl"
+      :title="t('groups.headline_stats_dropdown')"
       frameborder="0"
       width="100%"
       height="370"
@@ -104,6 +105,7 @@ function close() {
     </div>
     <iframe
       :src="co2Url"
+      :title="t('groups.co2_equivalence_visualisation_dropdown')"
       frameborder="0"
       width="100%"
       height="370"

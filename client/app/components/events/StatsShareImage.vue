@@ -71,10 +71,12 @@ function fillText(ctx, str, x, y, colour) {
   return x + ctx.measureText(str).width
 }
 
-function fillCentredText(ctx, canvasEl, text, x, y, wholeLine) {
+// x is computed here, never taken from the caller - it used to be a
+// parameter that was overwritten on the first line.
+function fillCentredText(ctx, canvasEl, text, y, wholeLine) {
   const length = ctx.measureText(wholeLine || text).width
-  x = portrait.value ? (canvasEl.width - length) / 2 : canvasEl.width / 40
-  return fillText(ctx, text, x, y)
+  const centredX = portrait.value ? (canvasEl.width - length) / 2 : canvasEl.width / 40
+  return fillText(ctx, text, centredX, y)
 }
 
 // The white-on-black "pill" behind a headline number (e.g. the kg figure).
@@ -181,14 +183,14 @@ async function paint() {
 
     if (portrait.value) {
       const wholeline = t('partials.share_modal_weve_saved') + kgStr + t('partials.share_modal_of_co2')
-      x = fillCentredText(ctx, canvasEl, `${t('partials.share_modal_weve_saved')} `, x, y, wholeline)
+      x = fillCentredText(ctx, canvasEl, `${t('partials.share_modal_weve_saved')} `, y, wholeline)
       x = fillWhiteBlackBox(ctx, kgStr, x, y)
       x = fillText(ctx, ` ${t('partials.share_modal_of_co2')}`, x, y)
 
       y += height1
 
       const repairLine = `${t('partials.share_modal_by_repairing')} ${t('partials.share_modal_broken_stuff')}`
-      x = fillCentredText(ctx, canvasEl, `${t('partials.share_modal_by_repairing')} `, x, y, repairLine)
+      x = fillCentredText(ctx, canvasEl, `${t('partials.share_modal_by_repairing')} `, y, repairLine)
       x = fillText(ctx, t('partials.share_modal_broken_stuff'), x, y)
     } else {
       x = fillText(ctx, `${t('partials.share_modal_weve_saved')} `, x, y)
@@ -232,13 +234,13 @@ async function paint() {
     if (range.type !== 'Hectare') {
       if (portrait.value) {
         const wholeline = `${t('partials.share_modal_thats_like')} ${t('partials.share_modal_growing_about')} `
-        x = fillCentredText(ctx, canvasEl, `${t('partials.share_modal_thats_like')} `, x, y, wholeline)
+        x = fillCentredText(ctx, canvasEl, `${t('partials.share_modal_thats_like')} `, y, wholeline)
         x = fillText(ctx, `${t('partials.share_modal_growing_about')} `, x, y)
         x = fillWhiteBlackBox(ctx, countStr, x, y)
         y += height1
         x = initialX(props.target)
         const seedlingsLine = t('partials.share_modal_seedlings', { count: numericCount }, numericCount)
-        x = fillCentredText(ctx, canvasEl, seedlingsLine, x, y, seedlingsLine)
+        x = fillCentredText(ctx, canvasEl, seedlingsLine, y, seedlingsLine)
       } else {
         x = fillText(ctx, t('partials.share_modal_thats_like'), x, y)
         y += height1
@@ -252,13 +254,13 @@ async function paint() {
     } else {
       if (portrait.value) {
         const wholeline = `${t('partials.share_modal_thats_like')} ${t('partials.share_modal_planting_around')} `
-        x = fillCentredText(ctx, canvasEl, `${t('partials.share_modal_thats_like')} `, x, y, wholeline)
+        x = fillCentredText(ctx, canvasEl, `${t('partials.share_modal_thats_like')} `, y, wholeline)
         x = fillText(ctx, `${t('partials.share_modal_planting_around')} `, x, y)
         x = fillWhiteBlackBox(ctx, countStr, x, y)
         y += height1
         x = initialX(props.target)
         const hectaresLine = t('partials.share_modal_hectares', { count: numericCount }, numericCount)
-        x = fillCentredText(ctx, canvasEl, hectaresLine, x, y, hectaresLine)
+        x = fillCentredText(ctx, canvasEl, hectaresLine, y, hectaresLine)
       } else {
         x = fillText(ctx, t('partials.share_modal_thats_like'), x, y)
         y += height1
