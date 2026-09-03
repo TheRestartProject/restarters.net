@@ -243,10 +243,14 @@ jobs:
           command: |
             export FLY_API_TOKEN="FlyV1 $FLY_API_TOKEN"
 
-            # Probe from outside Fly, on the same path the Fly health check
-            # uses.  robots.txt is static, so a 200 means nginx is up and the
-            # proxy has a healthy instance to route to - it does not depend on
-            # the database being reachable.
+            # Two probes, because they answer different questions.
+            #
+            # robots.txt is static: a 200 means nginx is up and the proxy has an
+            # instance to route to.  That is also the path the Fly health check
+            # uses - which is exactly why it cannot be the only probe.  On
+            # 2026-09-03 restarters-dev served robots.txt, and reported a passing
+            # health check, while every database-backed page returned 500,
+            # because it was pointed at a database app that no longer existed.
             serving() {
               for _ in $(seq 1 "$1"); do
                 code=$(curl -sS -o /dev/null -w '%{http_code}' --max-time 15 \
@@ -257,11 +261,37 @@ jobs:
               return 1
             }
 
-            if serving 12; then
-              echo "Production is serving."
+            # homepage_data is public, cheap and aggregates over the database, so
+            # it answers the question that matters: does the app actually work?
+            working() {
+              for _ in $(seq 1 "$1"); do
+                body=$(curl -sS --max-time 20 https://restarters.net/api/homepage_data || true)
+                case "$body" in *'"items_fixed"'*) return 0 ;; esac
+                sleep 10
+              done
+              return 1
+            }
+
+            if working 12; then
+              echo "Production is serving and talking to the database."
               [ "$(cat /tmp/deploy-result)" = failed ] && \
                 echo "NOTE: flyctl exited non-zero but the site is up - check the deploy log above."
               exit 0
+            fi
+
+            # Up, but not working: the machine is serving and a restart will not
+            # fix a bad config or an unreachable database.  Restarting here would
+            # just cycle a healthy-looking machine and hide the real fault.
+            if serving 3; then
+              echo "=============================================="
+              echo "Production is serving but NOT working - the app"
+              echo "answers robots.txt while /api/homepage_data does"
+              echo "not.  That is a config or database fault, which"
+              echo "a restart cannot fix.  Needs a human."
+              echo "=============================================="
+              flyctl status --app restarters || true
+              flyctl logs --app restarters --no-tail 2>&1 | tail -50 || true
+              exit 1
             fi
 
             echo "=============================================="
@@ -279,7 +309,8 @@ jobs:
             for id in $(flyctl machines list --app restarters --json | jq -r '.[].id'); do
               echo "Restarting machine $id"
               flyctl machine restart "$id" --app restarters || true
-              if serving 18; then
+              # Recovered means working, not merely answering robots.txt.
+              if working 18; then
                 echo "=============================================="
                 echo "RECOVERED after restarting $id."
                 echo "The deploy could not bring this machine up healthy on"
@@ -290,7 +321,7 @@ jobs:
               fi
             done
 
-            echo "Still not serving after restarting. Production needs a human."
+            echo "Still not working after restarting. Production needs a human."
             flyctl status --app restarters || true
             flyctl logs --app restarters --no-tail 2>&1 | tail -50 || true
             exit 1
