@@ -38,3 +38,6 @@ restarters-anonymised.sql
 /public/repair-data*.csv
 /uploads/*.jpg
 .mcp.json
+
+# PHPUnit coverage output, regenerated on every test run.
+tests/clover.xml

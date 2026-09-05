@@ -72,6 +72,7 @@ Route::get('/timezones', [App\Http\Controllers\ApiController::class, 'timezones'
 Route::prefix('v2')->group(function() {
     Route::middleware(\App\Http\Middleware\APISetLocale::class)->group(function() {
         Route::prefix('/groups')->group(function() {
+            Route::get('/summary', [API\GroupController::class, 'listSummaryv2']);
             Route::get('/names', [API\GroupController::class, 'listNamesv2']);
             Route::get('/tags', [API\GroupController::class, 'listTagsv2']);
             Route::get('{id}/events', [API\GroupController::class, 'getEventsForGroupv2']);

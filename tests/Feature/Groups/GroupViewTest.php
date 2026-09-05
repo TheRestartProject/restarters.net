@@ -7,6 +7,7 @@ use App\Group;
 use App\Party;
 use App\Role;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Tests\TestCase;
@@ -182,26 +183,205 @@ class GroupViewTest extends TestCase
             'event_end_utc' => $nextWeek->addHours(2)->toIso8601String(),
         ]);
 
-        // Load the group index and check both groups appear with a next_event.
-        $response = $this->get('/group');
+        // Groups are fetched via API (not server-rendered) — test that next_event is returned.
+        $response = $this->get('/api/v2/groups/summary?includeNextEvent=true');
         $response->assertSuccessful();
 
-        $props = $this->getVueProperties($response);
-        $allGroupsJson = null;
-        foreach ($props as $prop) {
-            if (isset($prop[':all-groups'])) {
-                $allGroupsJson = $prop[':all-groups'];
-                break;
-            }
+        $groups = $response->json('data');
+        $group1 = collect($groups)->firstWhere('id', $id1);
+        $group2 = collect($groups)->firstWhere('id', $id2);
+
+        $this->assertNotNull($group1, "Group Alpha (id=$id1) not found in API response");
+        $this->assertNotNull($group2, "Group Beta (id=$id2) not found in API response");
+        $this->assertNotNull($group1['next_event'], 'Group Alpha should have a next_event');
+        $this->assertNotNull($group2['next_event'], 'Group Beta should have a next_event');
+    }
+
+    public function testGroupsPageFramesTheCountryForAUserWithNoTown(): void
+    {
+        // A user who has only set their country has no coordinates, so
+        // groupsNearby() can't help - the map used to open on the whole world.
+        // Frame the groups in their country instead.
+        $this->loginAsTestUser(Role::ADMINISTRATOR);
+        $id = $this->createGroup('Group In Country', 'https://therestartproject.org', 'London');
+
+        $group = Group::find($id);
+        $group->country_code = 'GB';
+        $group->latitude = 54.19;
+        $group->longitude = -3.09;
+        $group->approved = true;
+        $group->save();
+
+        $user = \App\User::factory()->restarter()->create([
+            'country_code' => 'GB',
+            'location' => null,
+            'latitude' => null,
+            'longitude' => null,
+        ]);
+        $this->actingAs($user);
+
+        $props = $this->getVueProperties($this->get('/group/other'));
+        $bounds = json_decode($props[1][':nearby-groups'], true);
+
+        // [[min_lat, min_lng], [max_lat, max_lng]] - a real box, not the inverted
+        // world box [[90,180],[-90,-180]] that means "no location".
+        $this->assertLessThanOrEqual($bounds[1][0], $bounds[0][0], 'Should be a real bounding box, not the inverted world box');
+        $this->assertEqualsWithDelta(54.19, $bounds[0][0], 0.001);
+        $this->assertEqualsWithDelta(-3.09, $bounds[0][1], 0.001);
+    }
+
+    public function testGroupsPageFallsBackToTheWorldWhenTheCountryHasNoGroups(): void
+    {
+        $this->loginAsTestUser(Role::ADMINISTRATOR);
+        $id = $this->createGroup('Group Somewhere Else');
+
+        $group = Group::find($id);
+        $group->country_code = 'GB';
+        $group->latitude = 54.19;
+        $group->longitude = -3.09;
+        $group->save();
+
+        // Country with no groups in it: nothing to frame, so we fall back to the
+        // inverted world box, which the map reads as "show me everything".
+        $user = \App\User::factory()->restarter()->create([
+            'country_code' => 'NZ',
+            'location' => null,
+            'latitude' => null,
+            'longitude' => null,
+        ]);
+        $this->actingAs($user);
+
+        $props = $this->getVueProperties($this->get('/group/other'));
+        $bounds = json_decode($props[1][':nearby-groups'], true);
+
+        $this->assertEquals([[90, 180], [-90, -180]], $bounds);
+    }
+
+    public function testNextEventIsTheSoonestNotTheFurthestAway(): void
+    {
+        $this->loginAsTestUser(Role::ADMINISTRATOR);
+
+        // A group with more than one upcoming event.  The existing coverage only
+        // ever gave a group a single future event, which can't tell "soonest" from
+        // "furthest away" - and the summary API was returning the latter.
+        $id = $this->createGroup('Group With Two Events');
+
+        $soon = Carbon::parse('1pm tomorrow');
+        $later = Carbon::parse('1pm +5 months');
+
+        // Created furthest-first, so a test that happens to pass on insertion order
+        // rather than on the ordering we asked for would still fail here.
+        Party::factory()->create([
+            'group' => $id,
+            'approved' => true,
+            'event_start_utc' => $later->toIso8601String(),
+            'event_end_utc' => $later->copy()->addHours(2)->toIso8601String(),
+        ]);
+        $soonest = Party::factory()->create([
+            'group' => $id,
+            'approved' => true,
+            'event_start_utc' => $soon->toIso8601String(),
+            'event_end_utc' => $soon->copy()->addHours(2)->toIso8601String(),
+        ]);
+
+        // The upcoming events are cached globally, not per group.
+        Cache::forget('future_approved_events');
+
+        $response = $this->get('/api/v2/groups/summary?includeNextEvent=true');
+        $response->assertSuccessful();
+
+        $group = collect($response->json('data'))->firstWhere('id', $id);
+        $this->assertNotNull($group, "Group (id=$id) not found in API response");
+        $this->assertNotNull($group['next_event'], 'Group should have a next_event');
+        $this->assertEquals($soonest->idevents, $group['next_event']['id'], 'next_event should be the soonest upcoming event, not the furthest away');
+    }
+
+    public function testNextEventIgnoresUnapprovedEvents(): void
+    {
+        $this->loginAsTestUser(Role::ADMINISTRATOR);
+
+        // The group page only ever counts approved events as the "next" one
+        // (Group::getNextUpcomingEvent), but the summary API used to take any
+        // future event - so an unapproved event showed on the public map as the
+        // group's next event while the group's own page ignored it.
+        $id = $this->createGroup('Group With An Unapproved Event');
+
+        $soon = Carbon::parse('1pm tomorrow');
+        $later = Carbon::parse('1pm +3 months');
+
+        Party::factory()->create([
+            'group' => $id,
+            'approved' => false,
+            'event_start_utc' => $soon->toIso8601String(),
+            'event_end_utc' => $soon->copy()->addHours(2)->toIso8601String(),
+        ]);
+        $approved = Party::factory()->create([
+            'group' => $id,
+            'approved' => true,
+            'event_start_utc' => $later->toIso8601String(),
+            'event_end_utc' => $later->copy()->addHours(2)->toIso8601String(),
+        ]);
+
+        Cache::forget('future_approved_events');
+
+        $response = $this->get('/api/v2/groups/summary?includeNextEvent=true');
+        $response->assertSuccessful();
+
+        $group = collect($response->json('data'))->firstWhere('id', $id);
+        $this->assertNotNull($group, "Group (id=$id) not found in API response");
+        $this->assertNotNull($group['next_event'], 'Group should have a next_event');
+        $this->assertEquals($approved->idevents, $group['next_event']['id'], 'next_event should skip the unapproved event and use the approved one');
+    }
+
+    public function testNextEventIsNullWhenTheOnlyUpcomingEventIsUnapproved(): void
+    {
+        $this->loginAsTestUser(Role::ADMINISTRATOR);
+
+        $id = $this->createGroup('Group With Only An Unapproved Event');
+
+        $soon = Carbon::parse('1pm tomorrow');
+        Party::factory()->create([
+            'group' => $id,
+            'approved' => false,
+            'event_start_utc' => $soon->toIso8601String(),
+            'event_end_utc' => $soon->copy()->addHours(2)->toIso8601String(),
+        ]);
+
+        Cache::forget('future_approved_events');
+
+        $response = $this->get('/api/v2/groups/summary?includeNextEvent=true');
+        $response->assertSuccessful();
+
+        $group = collect($response->json('data'))->firstWhere('id', $id);
+        $this->assertNotNull($group, "Group (id=$id) not found in API response");
+        $this->assertNull($group['next_event'], 'An unapproved event must not be advertised as the next event');
+    }
+
+    public function testFutureScopeReturnsSoonestFirst(): void
+    {
+        // The summary API relies on Party::future() coming back in ascending date
+        // order.  scopeUndeleted() applies a DESC order and orderBy() appends, so
+        // this needs an explicit reorder() to hold.
+        $this->loginAsTestUser(Role::ADMINISTRATOR);
+        $id = $this->createGroup('Group For Scope Ordering');
+
+        foreach (['1pm +3 months', '1pm tomorrow', '1pm +5 months'] as $when) {
+            $at = Carbon::parse($when);
+            Party::factory()->create([
+                'group' => $id,
+                'approved' => true,
+                'event_start_utc' => $at->toIso8601String(),
+                'event_end_utc' => $at->copy()->addHours(2)->toIso8601String(),
+            ]);
         }
-        $this->assertNotNull($allGroupsJson, 'Could not find :all-groups prop. Props found: ' . json_encode(array_map('array_keys', $props)));
-        $groups = json_decode($allGroupsJson, true);
 
-        $group1 = collect($groups)->firstWhere('idgroups', $id1);
-        $group2 = collect($groups)->firstWhere('idgroups', $id2);
+        $starts = Party::future()->forGroup($id)->get()->pluck('event_start_utc')->map(function ($d) {
+            return Carbon::parse($d)->timestamp;
+        })->all();
 
-        $this->assertNotNull($group1['next_event'], 'Group 1 should have a next_event');
-        $this->assertNotNull($group2['next_event'], 'Group 2 should have a next_event');
+        $sorted = $starts;
+        sort($sorted);
+        $this->assertEquals($sorted, $starts, 'Party::future() should return the soonest event first');
     }
 
     public function testGroupIndexQueryCountScalesWithO1NotN(): void
