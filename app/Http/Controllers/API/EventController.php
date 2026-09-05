@@ -292,6 +292,16 @@ class EventController extends Controller
     {
         $party = Party::findOrFail($idevents);
 
+        // Events on approved groups are public, but an event on a group still awaiting
+        // moderation is not - and the resource returns its exact lat/lng, which for a
+        // pending group may be someone's home address.  This is the same rule the web
+        // event page applies; getEventsForGroupv2 already gates on the group too.
+        $user = Auth::user() ?: auth('api')->user();
+
+        if (! Fixometer::userHasViewPartyPermission($idevents, $user ? $user->id : null, $party)) {
+            abort(404);
+        }
+
         return \App\Http\Resources\Party::make($party);
     }
 
@@ -472,7 +482,16 @@ class EventController extends Controller
         $autoapprove = $group->auto_approve;
 
         if (!Fixometer::userCanCreateEvents($user)) {
-            // TODO: This doesn't check that they are a host of this particular group.
+            abort(403);
+        }
+
+        // Being a host of *some* group is not enough - the event has to be on a group you
+        // have authority over.  Without this, any host could attach events to any group,
+        // and because event visibility is inherited from the group's approved flag those
+        // events go public with no moderation.  Admins are covered by
+        // userHasEditGroupPermission; network coordinators are checked separately because
+        // their authority comes from the group's networks rather than users_groups.
+        if (!Fixometer::userHasEditGroupPermission($groupid, $user->id) && !$user->isCoordinatorForGroup($group)) {
             abort(403);
         }
 

@@ -42,7 +42,7 @@ class BrandsTest extends TestCase
         $response->assertSee('UT Brand2');
 
         // Delete
-        $response = $this->get('/brands/delete/' . $brand->id);
+        $response = $this->post('/brands/delete/' . $brand->id);
         $response->assertRedirect();
         $response->assertSessionHas('message');
     }
@@ -66,7 +66,7 @@ class BrandsTest extends TestCase
         ]);
         $response->assertRedirect('/user/forbidden');
 
-        $response = $this->get('/brands/delete/1');
+        $response = $this->post('/brands/delete/1');
         $response->assertRedirect('/user/forbidden');
     }
 }

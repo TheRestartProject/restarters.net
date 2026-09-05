@@ -68,7 +68,7 @@
                 <div class="form-check">
                   <label class="form-check-label" for="invites_to_volunteers">
                     <input type="checkbox" name="invite_group" class="form-check-input" id="invites_to_volunteers" value="1" data-member-emails="{{ implode(',', $memberEmails) }}">
-                    @lang('events.send_invites_to_restarters_tickbox', ['group' => $formdata->group_name])
+                    @lang('events.send_invites_to_restarters_tickbox', ['group' => e($formdata->group_name)])
                   </label>
                 </div>
                 <br>

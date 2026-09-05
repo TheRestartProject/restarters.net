@@ -42,7 +42,7 @@
       @if (\Session::has('prompt-follow-group'))
         <div class="alert alert-info" style="min-height: 88px;">
           <div class="row">
-            <div class="col-md-8 col-lg-9 d-flex flex-column align-content-center">@lang('events.follow_hosting_group', ['group' => $event->theGroup->name])</div>
+            <div class="col-md-8 col-lg-9 d-flex flex-column align-content-center">@lang('events.follow_hosting_group', ['group' => e($event->theGroup->name)])</div>
             <div class="col-md-4 col-lg-3 d-flex flex-column align-content-center">
               <a href="/group/join/{{ $event->theGroup->idgroups }}" class="btn btn-info">@lang('groups.join_group_button')</a>
             </div>

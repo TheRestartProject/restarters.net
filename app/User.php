@@ -585,6 +585,22 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
         return $api_token;
     }
 
+    /**
+     * Issue a new API token, invalidating the previous one.
+     *
+     * The token is a bearer credential for the whole API and is readable by the client's
+     * JavaScript, so anything that revokes access to the account - a password change or
+     * reset - has to replace it as well.
+     */
+    public function rotateAPIToken()
+    {
+        $api_token = \Illuminate\Support\Str::random(60);
+        $this->api_token = $api_token;
+        $this->save();
+
+        return $api_token;
+    }
+
     public function notifications()
     {
         return $this->morphMany(
