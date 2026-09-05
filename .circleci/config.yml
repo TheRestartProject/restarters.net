@@ -210,6 +210,78 @@ jobs:
             export FLY_API_TOKEN="FlyV1 $FLY_API_TOKEN"
             flyctl deploy --config fly.dev.toml --remote-only
           no_output_timeout: 15m
+      - run:
+          name: Verify dev came up, and fail if it did not
+          command: |
+            export FLY_API_TOKEN="FlyV1 $FLY_API_TOKEN"
+            BASE=https://restarters-dev.fly.dev
+
+            # preview-startup.sh publishes its own outcome at /_preview_status -
+            # phase starting -> restoring -> migrating -> ready, or failed with a
+            # detail. It was written for this job to read and nothing ever did,
+            # so a deploy could report success while the site was unusable: on
+            # 2026-09-03 dev served every page as a 500 for weeks because it
+            # pointed at a decommissioned database app, and this job was green
+            # throughout.
+            #
+            # Deliberately not probing robots.txt. It is static, it is the Fly
+            # health check path, and the warming nginx serves it during the
+            # restore - so it is 200 in every one of the states worth catching.
+            #
+            # A cold boot restores the whole production backup, which took ~19
+            # minutes on 2026-09-03, so allow well past that.
+            deadline=$(( $(date +%s) + 2100 ))
+            phase=""
+
+            while [ "$(date +%s)" -lt "$deadline" ]; do
+              body=$(curl -sS --max-time 20 "$BASE/_preview_status" || true)
+              phase=$(printf '%s' "$body" | sed -n 's/.*"phase":"\([a-z]*\)".*/\1/p')
+
+              case "$phase" in
+                ready)
+                  echo "Restore and migrations reported ready."
+                  break
+                  ;;
+                failed)
+                  echo "=============================================="
+                  echo "Dev start-up FAILED: $body"
+                  echo "=============================================="
+                  flyctl logs --app restarters-dev --no-tail 2>&1 | tail -60 || true
+                  exit 1
+                  ;;
+                "")
+                  # No status at all: the machine is not running
+                  # preview-startup.sh, which is exactly the misconfiguration
+                  # that caused the 2026-09-03 outage.
+                  echo "waiting - no /_preview_status yet"
+                  ;;
+                *)
+                  echo "waiting - phase=$phase"
+                  ;;
+              esac
+              sleep 20
+            done
+
+            if [ "$phase" != ready ]; then
+              echo "Dev never reached ready (last phase: '${phase:-none}'). Failing."
+              flyctl status --app restarters-dev || true
+              flyctl logs --app restarters-dev --no-tail 2>&1 | tail -60 || true
+              exit 1
+            fi
+
+            # The real app is serving, not the warming page: during warming
+            # nginx answers everything except robots.txt and _preview_status
+            # with a 503, and the gate at /_login is PHP, so a 200 here means
+            # nginx and PHP-FPM are both up on the deployed image.
+            code=$(curl -sS -o /dev/null -w '%{http_code}' --max-time 20 "$BASE/_login" || echo 000)
+            if [ "$code" != "200" ]; then
+              echo "Dev reported ready but /_login returned $code - the app is not serving."
+              flyctl logs --app restarters-dev --no-tail 2>&1 | tail -60 || true
+              exit 1
+            fi
+
+            echo "Dev is up: restore ok, migrations ok, app serving."
+          no_output_timeout: 40m
 
   deploy-fly-prod:
     docker:
