@@ -21,7 +21,9 @@ class Geocoder
                 GeocodeQuery::create($location)->withData('location_type', [Mapbox::TYPE_PLACE, Mapbox::TYPE_ADDRESS])
             );
             $addressCollection = $geocodeResponse->get();
-            $address = $addressCollection->get(0);
+            // get(0) throws OutOfBounds on an empty collection, so an address the
+            // provider can't place would crash rather than returning false.
+            $address = $addressCollection->isEmpty() ? null : $addressCollection->first();
 
             if ($address && $address->getCoordinates()) {
                 // The provider gives us both the country name and its ISO code - use the code directly rather
