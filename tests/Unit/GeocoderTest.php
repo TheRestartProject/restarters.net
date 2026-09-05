@@ -1,76 +1,117 @@
 <?php
 
+use Geocoder\Model\Address;
+use Geocoder\Model\AddressCollection;
 use Tests\TestCase;
 
 class GeocoderTest extends TestCase
 {
     /**
-     * A trimmed response for the address below, keeping the parts geocode()
-     * reads: the location and the country component.
+     * Geocoder::geocode() resolves the provider chain out of the container, so a
+     * test binds its own in place of the real Mapbox/GeoPlugin pair. Nothing here
+     * touches the network: these tests are about how we read a provider's answer,
+     * not whether Mapbox is up.
      */
-    private function cannedResponse(): string
+    private function bindGeocoderReturning(array $addresses): void
     {
-        return json_encode([
-            'status' => 'OK',
-            'results' => [
-                [
-                    'geometry' => [
-                        'location' => ['lat' => 51.4643585, 'lng' => -0.1135401],
-                    ],
-                    'address_components' => [
-                        ['short_name' => 'SW9 7QD', 'types' => ['postal_code']],
-                        ['short_name' => 'GB', 'types' => ['country', 'political']],
-                    ],
-                ],
-            ],
-        ]);
+        $collection = new AddressCollection($addresses);
+
+        // instance(), not bind(): geocoder-laravel registers a singleton, and by
+        // the time a test runs it may already be resolved - in which case bind()
+        // is ignored and the real Mapbox chain answers. That failure looks like a
+        // wrong country code rather than a network call, so it is worth being
+        // explicit about.
+        $fake = new class($collection)
+            {
+                private $collection;
+
+                public function __construct($collection)
+                {
+                    $this->collection = $collection;
+                }
+
+                public function geocodeQuery($query)
+                {
+                    return new class($this->collection)
+                    {
+                        private $collection;
+
+                        public function __construct($collection)
+                        {
+                            $this->collection = $collection;
+                        }
+
+                        public function get()
+                        {
+                            return $this->collection;
+                        }
+                    };
+                }
+            };
+
+        // Both keys: geocoder-laravel binds the string 'geocoder' through to
+        // ProviderAndDumperAggregator, which is itself a singleton, so replacing
+        // only the string leaves the real chain reachable - and a test that
+        // "passes" then is really talking to Mapbox.
+        $this->app->instance('geocoder', $fake);
+        $this->app->instance(\Geocoder\Laravel\ProviderAndDumperAggregator::class, $fake);
     }
 
-    private function geocoderReturning($body): \App\Helpers\Geocoder
+    private function address(array $over = []): Address
     {
-        return new class($body) extends \App\Helpers\Geocoder {
-            private $body;
-
-            public function __construct($body)
-            {
-                parent::__construct();
-                $this->body = $body;
-            }
-
-            protected function fetch($url)
-            {
-                return $this->body;
-            }
-        };
+        return Address::createFromArray(array_merge([
+            'providedBy' => 'test',
+            'latitude' => 51.4643585,
+            'longitude' => -0.1135401,
+            'country' => 'United Kingdom',
+            'countryCode' => 'GB',
+        ], $over));
     }
 
     public function testGeocode(): void
     {
-        $ret = $this->geocoderReturning($this->cannedResponse())
-            ->geocode('6 Canterbury Crescent, London SW9 7QD');
+        $this->bindGeocoderReturning([$this->address()]);
+
+        $ret = (new \App\Helpers\Geocoder)->geocode('6 Canterbury Crescent, London SW9 7QD');
 
         $this->assertEquals(round(51.4643585, 2), round($ret['latitude'], 2));
         $this->assertEquals(round(-0.1135401, 2), round($ret['longitude'], 2));
         $this->assertEquals('GB', $ret['country_code']);
     }
 
-    public function testGeocodeReturnsFalseWhenNothingFound(): void
+    public function testGeocodeUsesTheProvidersCountryCodeRatherThanItsName(): void
     {
-        $empty = json_encode(['status' => 'ZERO_RESULTS', 'results' => []]);
+        // The whole point of reading getCountry()->getCode(): no matching a
+        // display name against our own country list.
+        $this->bindGeocoderReturning([$this->address([
+            'country' => 'Belgique',
+            'countryCode' => 'BE',
+        ])]);
 
-        $this->assertFalse($this->geocoderReturning($empty)->geocode('nowhere at all'));
+        $this->assertEquals('BE', (new \App\Helpers\Geocoder)->geocode('Brussels')['country_code']);
     }
 
-    public function testGeocodeReturnsFalseWhenTheRequestFails(): void
+    public function testGeocodeReturnsFalseWhenNothingFound(): void
     {
-        // file_get_contents returns false on a failed request.  This is the case
-        // that made the old test error with "array offset on value of type bool"
-        // whenever Google was unreachable or the key was unhappy.
-        $this->assertFalse($this->geocoderReturning(false)->geocode('6 Canterbury Crescent'));
+        $this->bindGeocoderReturning([]);
+
+        $this->assertFalse((new \App\Helpers\Geocoder)->geocode('nowhere at all'));
+    }
+
+    public function testGeocodeCopesWithAnAddressCarryingNoCountry(): void
+    {
+        $this->bindGeocoderReturning([$this->address(['country' => null, 'countryCode' => null])]);
+
+        $ret = (new \App\Helpers\Geocoder)->geocode('somewhere');
+
+        $this->assertNull($ret['country_code']);
+        $this->assertEquals(round(51.4643585, 2), round($ret['latitude'], 2));
     }
 
     public function testForcedFailureShortCircuits(): void
     {
-        $this->assertFalse($this->geocoderReturning($this->cannedResponse())->geocode('ForceGeocodeFailure'));
+        $this->bindGeocoderReturning([$this->address()]);
+
+        $this->assertFalse((new \App\Helpers\Geocoder)->geocode('ForceGeocodeFailure'));
     }
 }
