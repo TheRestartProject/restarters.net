@@ -12,17 +12,23 @@ use Tests\TestCase;
 
 class RoleTest extends TestCase
 {
+    /** @story:RoleController::index */
     public function testLoggedOut(): void {
         $this->expectException(AuthenticationException::class);
         $response = $this->get('/role');
     }
 
+    /** @story:RoleController::index */
     public function testNotAdmin(): void {
         $this->loginAsTestUser(Role::RESTARTER);
         $response = $this->get('/role');
         $response->assertRedirect(RouteServiceProvider::HOME);
     }
 
+    /**
+     * @story:RoleController::index
+     * @story:RoleController::edit
+     */
     public function testBasic(): void {
         $this->loginAsTestUser(Role::ADMINISTRATOR);
 

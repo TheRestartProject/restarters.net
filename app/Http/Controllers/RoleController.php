@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Attributes\Feature;
+use App\Attributes\UserStory;
 use Illuminate\View\View;
 use App\Helpers\Fixometer;
 use App\Providers\RouteServiceProvider;
@@ -11,9 +13,11 @@ use App\User;
 use Auth;
 use Illuminate\Http\Request;
 
+#[Feature('Administration', description: 'Platform administration and configuration')]
 class RoleController extends Controller
 {
     //Custom Functions
+    #[UserStory('As an Admin, I can view all roles and their permissions', persona: 'Admin', theme: 'Roles & permissions')]
     public function index()
     {
         $user = User::find(Auth::id());
@@ -46,6 +50,7 @@ class RoleController extends Controller
         return redirect(RouteServiceProvider::HOME);
     }
 
+    #[UserStory('As an Admin, I can edit the permissions assigned to a role', persona: 'Admin', theme: 'Roles & permissions')]
     public function edit($id, Request $request): View
     {
         $user = Auth::user();

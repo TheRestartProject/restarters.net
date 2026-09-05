@@ -12,6 +12,7 @@ use Tests\TestCase;
 
 class SkillsTest extends TestCase
 {
+    /** @story:SkillsController::index */
     public function testIndex(): void {
         $this->loginAsTestUser(Role::RESTARTER);
 
@@ -29,6 +30,10 @@ class SkillsTest extends TestCase
         $response->assertSee('UT1');
     }
 
+    /**
+     * @story:SkillsController::postCreateSkill
+     * @story:SkillsController::index
+     */
     public function testCreate(): void {
         $this->loginAsTestUser(Role::RESTARTER);
 
@@ -48,6 +53,11 @@ class SkillsTest extends TestCase
         $response->assertSee('UT1');
     }
 
+    /**
+     * @story:SkillsController::getEditSkill
+     * @story:SkillsController::postEditSkill
+     * @story:SkillsController::index
+     */
     public function testEdit(): void {
         $this->loginAsTestUser(Role::RESTARTER);
 
@@ -78,6 +88,7 @@ class SkillsTest extends TestCase
         $response->assertSee('UT2');
     }
 
+    /** @story:SkillsController::getDeleteSkill */
     public function testDelete(): void {
         $this->loginAsTestUser(Role::RESTARTER);
 

@@ -8,7 +8,11 @@ use App\User;
 use Auth;
 use Illuminate\Http\Request;
 use Cache;
+use App\Attributes\Feature;
+use App\Attributes\UserStory;
+use App\Attributes\NoStory;
 
+#[Feature('Users', description: 'User accounts, profiles, and authentication')]
 class UserController extends Controller
 {
     /**
@@ -19,6 +23,7 @@ class UserController extends Controller
      *
      * Only Administrators can access this API call.
      */
+    #[UserStory('As an Admin, I can list user audit changes for Zapier integration', persona: 'Admin', theme: 'Data exports')]
     public static function changes(Request $request)
     {
         $authenticatedUser = Auth::user();
@@ -95,6 +100,7 @@ class UserController extends Controller
     /**
      * Get notification counts for a user.
      */
+    #[NoStory(reason: 'Internal notification count endpoint')]
     public function notifications(Request $request, int $id): JsonResponse
     {
         $user = User::findOrFail($id);

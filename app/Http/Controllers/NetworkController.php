@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Attributes\Feature;
+use App\Attributes\UserStory;
 use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
 use App\Group;
@@ -14,11 +16,14 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Lang;
 
+#[Feature('Networks', description: 'Regional network management and coordination')]
 class NetworkController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
+    #[UserStory('As a NetworkCoordinator, I can view the networks I coordinate', persona: 'NetworkCoordinator', theme: 'Browse networks')]
+    #[UserStory('As an Admin, I can view all networks on the platform', persona: 'Admin', theme: 'Browse networks')]
     public function index(): View
     {
         $user = Auth::user();
@@ -46,6 +51,7 @@ class NetworkController extends Controller
     /**
      * Display the specified network.
      */
+    #[UserStory('As a NetworkCoordinator, I can view my network\'s details and statistics', persona: 'NetworkCoordinator', theme: 'Browse networks')]
     public function show(Network $network): View
     {
         $user = Auth::user();
@@ -114,6 +120,7 @@ class NetworkController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
+    #[UserStory('As a NetworkCoordinator, I can access the form to edit my network', persona: 'NetworkCoordinator', theme: 'Manage network details')]
     public function edit(Network $network): View
     {
         $this->authorize('update', $network);
@@ -126,6 +133,7 @@ class NetworkController extends Controller
     /**
      * Update the specified resource in storage.
      */
+    #[UserStory('As a NetworkCoordinator, I can update my network\'s details and logo', persona: 'NetworkCoordinator', theme: 'Manage network details')]
     public function update(Request $request, Network $network): RedirectResponse
     {
         $this->authorize('update', $network);
@@ -166,6 +174,7 @@ class NetworkController extends Controller
     /**
      * Associate groups to the specified network.
      */
+    #[UserStory('As a NetworkCoordinator, I can add groups to my network', persona: 'NetworkCoordinator', theme: 'Network groups & events')]
     public function associateGroup(Request $request, Network $network): RedirectResponse
     {
         $this->authorize('associateGroups', $network);
