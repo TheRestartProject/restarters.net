@@ -10,7 +10,7 @@
     <form action="/profile/edit-password" method="post">
     @csrf
 
-    {{ Form::hidden('id', $user->id) }}
+    <input type="hidden" name="id" value="{{ $user->id }}">
 
     <fieldset class="registration__offset2">
         <div class="form-row">
@@ -53,7 +53,7 @@
     <form action="/profile/edit-language" method="post">
         @csrf
 
-        {{ Form::hidden('id', $user->id) }}
+        <input type="hidden" name="id" value="{{ $user->id }}">
 
         <fieldset class="language">
             <div class="form-row">
@@ -95,7 +95,7 @@
     <form action="/profile/edit-admin-settings" method="post">
         @csrf
 
-        {{ Form::hidden('id', $user->id) }}
+        <input type="hidden" name="id" value="{{ $user->id }}">
 
         <fieldset class="user_role">
         <div class="form-row">
@@ -176,7 +176,7 @@
 <form action="/user/soft-delete" method="post" id="delete-form">
     @csrf
 
-    {{ Form::hidden('id', $user->id) }}
+    <input type="hidden" name="id" value="{{ $user->id }}">
 
     <div class="alert alert-danger" role="alert">
     <div class="row">

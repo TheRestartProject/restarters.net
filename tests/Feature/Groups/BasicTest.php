@@ -53,7 +53,7 @@ class BasicTest extends TestCase
     }
 
 
-    public function tabProvider(): array {
+    public static function tabProvider(): array {
         return [
             ['', 'mine'],
             ['/all', 'all'],

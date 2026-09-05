@@ -93,7 +93,7 @@ class EventStateTest extends TestCase
         self::assertEquals($startingsoon, $initialEvent['startingsoon']);
     }
 
-    public function timeProvider(): array {
+    public static function timeProvider(): array {
         return [
             // Past event
             [ '2000-01-01 12:00', false, true, false, false ],

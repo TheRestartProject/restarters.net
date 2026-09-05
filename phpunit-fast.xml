@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.5/phpunit.xsd"
+         processIsolation="false"
+         bootstrap="tests/bootstrap.php"
+         backupGlobals="false"
+         backupStaticProperties="false"
+         colors="false"
+         cacheDirectory=".phpunit.cache">
+    <testsuites>
+        <testsuite name="Feature">
+            <directory suffix=".php">./tests/Feature</directory>
+            <exclude>./tests/Feature/Admin/Users/WikiLoginTests.php</exclude>
+            <exclude>./tests/Feature/Stats/StatsTestCase.php</exclude>
+            <exclude>./tests/Feature/StyleTest.php</exclude>
+            <exclude>./tests/Feature/Users/Registration/DiscourseAccountCreationTests.php</exclude>
+        </testsuite>
+        <testsuite name="Unit">
+            <directory suffix=".php">./tests/Unit</directory>
+            <exclude>./tests/Unit/NotificationsTest.php</exclude>
+            <exclude>./tests/Unit/CharsetTest.php</exclude>
+            <exclude>./tests/Unit/Events/EventStateTest.php</exclude>
+        </testsuite>
+    </testsuites>
+    <php>
+        <env name="APP_ENV" value="testing"/>
+        <env name="APP_KEY" value="base64:l2TE/w/zY1SPYX59Y6IP/o3IUbA7Alig5Gwln4fbC9M="/>
+        <env name="BCRYPT_ROUNDS" value="4"/>
+        <env name="CACHE_DRIVER" value="array"/>
+        <env name="SESSION_DRIVER" value="array"/>
+        <env name="PULSE_ENABLED" value="false"/>
+        <env name="QUEUE_CONNECTION" value="database"/>
+        <env name="MAIL_MAILER" value="array"/>
+        <env name="DB_CONNECTION" value="mysql_testing"/>
+        <env name="DB_TEST_HOST" value="restarters_db"/>
+        <env name="DB_TEST_DATABASE" value="restarters_db_test"/>
+        <env name="DB_TEST_USERNAME" value="restarters"/>
+        <env name="DB_TEST_PASSWORD" value="s3cr3t"/>
+        <env name="AUDIT_CONSOLE_EVENTS" value="true"/>
+        <env name="CALENDAR_HASH" value="somehash"/>
+        <env name="FEATURE__DISCOURSE_INTEGRATION" value="false"/>
+        <env name="MISC_CATEGORY_ID_POWERED" value="46"/>
+        <env name="MISC_CATEGORY_ID_UNPOWERED" value="47"/>
+        <env name="DEVICE_FIXED" value="1"/>
+        <env name="DEVICE_REPAIRABLE" value="2"/>
+        <env name="DEVICE_END_OF_LIFE" value="3"/>
+    </php>
+</phpunit>
