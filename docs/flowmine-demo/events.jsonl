@@ -1,0 +1,54 @@
+{"ts":"2026-07-10T14:02:01Z","session":"s-A1","source":"client","type":"page_view","page":"group.index","url_path":"/group"}
+{"ts":"2026-07-10T14:02:01Z","session":"s-A1","source":"server","type":"api","route":"GET api/v2/groups/summary","status":200}
+{"ts":"2026-07-10T14:02:02Z","session":"s-A1","source":"server","type":"api","route":"GET api/users/{id}/notifications","status":200}
+{"ts":"2026-07-10T14:02:09Z","session":"s-A1","source":"client","type":"click","page":"group.index","target":"discovery:a[href=/group/create](text=Start a new group)"}
+{"ts":"2026-07-10T14:02:10Z","session":"s-A1","source":"client","type":"page_view","page":"group.create","url_path":"/group/create"}
+{"ts":"2026-07-10T14:02:10Z","session":"s-A1","source":"server","type":"api","route":"GET api/timezones","status":200}
+{"ts":"2026-07-10T14:02:10Z","session":"s-A1","source":"server","type":"api","route":"GET api/v2/groups/names","status":200}
+{"ts":"2026-07-10T14:02:11Z","session":"s-A1","source":"server","type":"api","route":"GET api/users/{id}/notifications","status":200}
+{"ts":"2026-07-10T14:02:25Z","session":"s-A1","source":"client","type":"change","page":"group.create","target":"discovery:input#group_name@GroupName"}
+{"ts":"2026-07-10T14:03:05Z","session":"s-A1","source":"client","type":"change","page":"group.create","target":"discovery:div.ql-editor@RichTextEditor"}
+{"ts":"2026-07-10T14:03:31Z","session":"s-A1","source":"client","type":"change","page":"group.create","target":"discovery:input[placeholder=Enter your address]@GroupLocation"}
+{"ts":"2026-07-10T14:03:44Z","session":"s-A1","source":"client","type":"change","page":"group.create","target":"discovery:input.timezone@GroupTimeZone"}
+{"ts":"2026-07-10T14:04:02Z","session":"s-A1","source":"client","type":"click","page":"group.create","target":"discovery:button.btn-primary(text=Create group)@GroupAddEdit"}
+{"ts":"2026-07-10T14:04:03Z","session":"s-A1","source":"server","type":"api","route":"POST api/v2/groups","status":200,"state_changing":true}
+{"ts":"2026-07-10T14:04:04Z","session":"s-A1","source":"client","type":"page_view","page":"group.edit","url_path":"/group/edit/1234","redirect_of":"POST api/v2/groups"}
+{"ts":"2026-07-11T09:15:20Z","session":"s-A2","source":"client","type":"page_view","page":"group.create","url_path":"/group/create"}
+{"ts":"2026-07-11T09:15:20Z","session":"s-A2","source":"server","type":"api","route":"GET api/timezones","status":200}
+{"ts":"2026-07-11T09:15:20Z","session":"s-A2","source":"server","type":"api","route":"GET api/v2/groups/names","status":200}
+{"ts":"2026-07-11T09:15:52Z","session":"s-A2","source":"client","type":"change","page":"group.create","target":"discovery:input#group_name@GroupName"}
+{"ts":"2026-07-11T09:16:14Z","session":"s-A2","source":"client","type":"change","page":"group.create","target":"discovery:div.ql-editor@RichTextEditor"}
+{"ts":"2026-07-11T09:16:33Z","session":"s-A2","source":"client","type":"change","page":"group.create","target":"discovery:input.timezone@GroupTimeZone"}
+{"ts":"2026-07-11T09:16:50Z","session":"s-A2","source":"client","type":"change","page":"group.create","target":"discovery:input[placeholder=Enter your address]@GroupLocation"}
+{"ts":"2026-07-11T09:17:12Z","session":"s-A2","source":"client","type":"click","page":"group.create","target":"discovery:button.btn-primary(text=Create group)@GroupAddEdit"}
+{"ts":"2026-07-11T09:17:13Z","session":"s-A2","source":"server","type":"api","route":"POST api/v2/groups","status":200,"state_changing":true}
+{"ts":"2026-07-11T09:17:14Z","session":"s-A2","source":"client","type":"page_view","page":"group.edit","url_path":"/group/edit/1235","redirect_of":"POST api/v2/groups"}
+{"ts":"2026-07-09T18:30:11Z","session":"s-B1","source":"client","type":"page_view","page":"user.register","url_path":"/user/register"}
+{"ts":"2026-07-09T18:30:40Z","session":"s-B1","source":"client","type":"change","page":"user.register","target":"discovery:input.styled-checkbox[id^=skill-]"}
+{"ts":"2026-07-09T18:30:48Z","session":"s-B1","source":"client","type":"click","page":"user.register","target":"discovery:button.btn-next(text=Next step)"}
+{"ts":"2026-07-09T18:31:12Z","session":"s-B1","source":"client","type":"change","page":"user.register","target":"discovery:input#registerName"}
+{"ts":"2026-07-09T18:31:30Z","session":"s-B1","source":"client","type":"change","page":"user.register","target":"discovery:input#registeremail"}
+{"ts":"2026-07-09T18:31:31Z","session":"s-B1","source":"server","type":"api","route":"POST register/check-valid-email","status":200}
+{"ts":"2026-07-09T18:31:44Z","session":"s-B1","source":"client","type":"change","page":"user.register","target":"discovery:select#age"}
+{"ts":"2026-07-09T18:31:55Z","session":"s-B1","source":"client","type":"change","page":"user.register","target":"discovery:select#country"}
+{"ts":"2026-07-09T18:32:10Z","session":"s-B1","source":"client","type":"change","page":"user.register","target":"discovery:input#city"}
+{"ts":"2026-07-09T18:32:31Z","session":"s-B1","source":"client","type":"change","page":"user.register","target":"discovery:input#password[type=password]"}
+{"ts":"2026-07-09T18:32:45Z","session":"s-B1","source":"client","type":"change","page":"user.register","target":"discovery:input#password-confirm[type=password]"}
+{"ts":"2026-07-09T18:32:50Z","session":"s-B1","source":"client","type":"click","page":"user.register","target":"discovery:button.btn-next(text=Next step)"}
+{"ts":"2026-07-09T18:33:02Z","session":"s-B1","source":"client","type":"change","page":"user.register","target":"discovery:input#newsletter[type=checkbox]"}
+{"ts":"2026-07-09T18:33:10Z","session":"s-B1","source":"client","type":"click","page":"user.register","target":"discovery:button[type=submit](text=Create account)"}
+{"ts":"2026-07-09T18:33:11Z","session":"s-B1","source":"server","type":"api","route":"POST user/register","status":302,"state_changing":true}
+{"ts":"2026-07-09T18:33:12Z","session":"s-B1","source":"client","type":"page_view","page":"dashboard.index","url_path":"/dashboard","redirect_of":"POST user/register"}
+{"ts":"2026-07-12T11:05:00Z","session":"s-B2","source":"client","type":"page_view","page":"user.register","url_path":"/user/register"}
+{"ts":"2026-07-12T11:05:30Z","session":"s-B2","source":"client","type":"click","page":"user.register","target":"discovery:button.btn-next(text=Next step)"}
+{"ts":"2026-07-12T11:06:00Z","session":"s-B2","source":"client","type":"change","page":"user.register","target":"discovery:input#registerName"}
+{"ts":"2026-07-12T11:06:20Z","session":"s-B2","source":"client","type":"change","page":"user.register","target":"discovery:input#registeremail"}
+{"ts":"2026-07-12T11:06:21Z","session":"s-B2","source":"server","type":"api","route":"POST register/check-valid-email","status":200}
+{"ts":"2026-07-12T11:06:40Z","session":"s-B2","source":"client","type":"change","page":"user.register","target":"discovery:select#age"}
+{"ts":"2026-07-12T11:06:55Z","session":"s-B2","source":"client","type":"change","page":"user.register","target":"discovery:select#country"}
+{"ts":"2026-07-12T11:07:20Z","session":"s-B2","source":"client","type":"change","page":"user.register","target":"discovery:input#password[type=password]"}
+{"ts":"2026-07-12T11:07:35Z","session":"s-B2","source":"client","type":"change","page":"user.register","target":"discovery:input#password-confirm[type=password]"}
+{"ts":"2026-07-12T11:07:40Z","session":"s-B2","source":"client","type":"click","page":"user.register","target":"discovery:button.btn-next(text=Next step)"}
+{"ts":"2026-07-12T11:07:55Z","session":"s-B2","source":"client","type":"click","page":"user.register","target":"discovery:button[type=submit](text=Create account)"}
+{"ts":"2026-07-12T11:07:56Z","session":"s-B2","source":"server","type":"api","route":"POST user/register","status":302,"state_changing":true}
+{"ts":"2026-07-12T11:07:57Z","session":"s-B2","source":"client","type":"page_view","page":"dashboard.index","url_path":"/dashboard","redirect_of":"POST user/register"}
