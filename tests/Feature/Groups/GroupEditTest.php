@@ -131,7 +131,7 @@ class GroupEditTest extends TestCase
         $image = \DB::select("SELECT idimages, path FROM images ORDER BY idimages DESC LIMIT 1");
         $idimages = $image[0]->idimages;
         $path = $image[0]->path;
-        $response = $this->get("/group/image/delete/{$group->idgroups}/$idimages/$path");
+        $response = $this->post("/group/image/delete/{$group->idgroups}/$idimages/$path");
         $response->assertOk();
         self::assertEquals('Thank you, the image has been deleted', $response->getContent());
     }

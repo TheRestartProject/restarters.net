@@ -774,6 +774,15 @@ class Party extends Model implements Auditable
         $this->attributes['event_end_utc'] = $dt->toDateTimeString();
     }
 
+    /**
+     * The event description is Quill-authored HTML which we render unescaped - on a public
+     * page - so it has to be sanitised.  Done in the mutator so every write path is
+     * covered by one rule.
+     */
+    public function setFreeTextAttribute($val) {
+        $this->attributes['free_text'] = is_null($val) ? null : \Stevebauman\Purify\Facades\Purify::clean($val);
+    }
+
     // Mutators for previous event_date/start/end fields.  These are now superceded by the UTC fields and therefore
     // should never be set directly.  Throw exceptions to ensure that they are not.
     public function setEventDateAttribute($val) {

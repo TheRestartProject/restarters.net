@@ -538,6 +538,16 @@ class Group extends Model implements Auditable
         $this->distance = $val;
     }
 
+    /**
+     * The group description is Quill-authored HTML which we render unescaped, so it has to
+     * be sanitised.  Doing it in the mutator rather than in the controllers means every
+     * write path - v2 API, web forms, imports, seeders - is covered by one rule.
+     */
+    public function setFreeTextAttribute($val)
+    {
+        $this->attributes['free_text'] = is_null($val) ? null : \Stevebauman\Purify\Facades\Purify::clean($val);
+    }
+
     public function createDiscourseGroup() {
         // Get the host who created the group.
         $success = false;

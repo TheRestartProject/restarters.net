@@ -168,10 +168,16 @@ exports.createEvent = async function(page, baseURL, idgroups, past) {
   log('Setting event date', { past })
   await page.click('#event_date button')
 
+  // The cell selector below picks a day late in the displayed month, so on the current
+  // month it can land in the past - "Invite volunteers" is gated on the event being
+  // upcoming, and that test failed on 30 July for an event the picker put on 26 July.
+  // Always move a month so the chosen day is unambiguously past or future.
   if (past) {
     log('Setting past date - going back a month')
-    // Go back a month
     await page.locator('[aria-label="Previous month"]').click()
+  } else {
+    log('Setting future date - going forward a month')
+    await page.locator('[aria-label="Next month"]').click()
   }
 
   await page.click('#event_date .b-calendar-grid > .b-calendar-grid-body > .row:last-child .btn:last-child')

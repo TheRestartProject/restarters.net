@@ -6,7 +6,7 @@
 
       <div class="modal-header">
 
-        <h5 id="eventDescriptionLabel">@lang('events.about_event_name_header', ['event' => $formdata->venue])</h5>
+        <h5 id="eventDescriptionLabel">@lang('events.about_event_name_header', ['event' => e($formdata->venue)])</h5>
         @include('partials.cross')
 
       </div>

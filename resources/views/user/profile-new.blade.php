@@ -60,7 +60,7 @@
               @if ($user->biography)
                   {{ $user->biography }}
               @else
-                  <em>@lang('profile.no_bio', ['name' => $user->name])</em>
+                  <em>@lang('profile.no_bio', ['name' => e($user->name)])</em>
               @endif
           </p>
         </div>

@@ -159,8 +159,10 @@ export default {
       return this.$store.getters['groups/get'](this.idgroups)
     },
     translatedHaveLeft() {
+      // The string wraps :name in an <a> and this is rendered with v-html, so the group
+      // name has to be escaped here.
       return this.__('groups.now_unfollowed', {
-        name: this.group.name,
+        name: this.escapeHtml(this.group.name),
         link: '/group/view/' + this.group.id
       })
     }

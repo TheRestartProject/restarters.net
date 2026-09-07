@@ -24,6 +24,14 @@ class GroupTags extends Model
     protected $fillable = ['tag_name', 'description', 'network_id'];
 
     /**
+     * Tag descriptions are rendered with v-html in NetworkPage.vue, so sanitise on write.
+     */
+    public function setDescriptionAttribute($val)
+    {
+        $this->attributes['description'] = is_null($val) ? null : \Stevebauman\Purify\Facades\Purify::clean($val);
+    }
+
+    /**
      * The attributes that should be hidden for arrays.
      *
      * @var array

@@ -13,6 +13,15 @@ class Network extends Model
     use HasFactory;
 
     /**
+     * The network description is rendered with v-html in NetworkPage.vue, so sanitise it
+     * on write for the same reason as Group::setFreeTextAttribute().
+     */
+    public function setDescriptionAttribute($val)
+    {
+        $this->attributes['description'] = is_null($val) ? null : \Stevebauman\Purify\Facades\Purify::clean($val);
+    }
+
+    /**
      * Get tags belonging to this network.
      */
     public function tags(): HasMany

@@ -32,7 +32,9 @@ class OnlineEventsTest extends TestCase
         $group->makeMemberAHost($host);
 
         // act
-        $eventAttributes = Party::factory()->raw(['online' => true]);
+        // PartyFactory creates its own group, so point the event at the group this host
+        // actually hosts - otherwise this is testing cross-group event creation.
+        $eventAttributes = Party::factory()->raw(['online' => true, 'group' => $group->idgroups]);
         $response = $this->post('/api/v2/events?api_token=' . $host->api_token, $this->eventAttributesToAPI($eventAttributes));
         $response->assertSuccessful();
         $idevents = Party::latest()->first()->idevents;
