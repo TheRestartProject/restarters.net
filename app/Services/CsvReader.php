@@ -38,6 +38,27 @@ class CsvReader
         return $rows;
     }
 
+    public function headers(string $path): array
+    {
+        if (!is_readable($path)) {
+            throw new \InvalidArgumentException("CSV file not readable: {$path}");
+        }
+
+        $handle = fopen($path, 'r');
+        if (!$handle) {
+            throw new \RuntimeException("Unable to open CSV file: {$path}");
+        }
+
+        $headers = fgetcsv($handle);
+        fclose($handle);
+
+        if (!$headers) {
+            return [];
+        }
+
+        return array_map(fn ($h) => $this->normaliseHeader((string) $h), $headers);
+    }
+
     protected function normaliseHeader(string $header): string
     {
         $header = trim(mb_strtolower($header));

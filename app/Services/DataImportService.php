@@ -6,6 +6,39 @@ use Carbon\Carbon;
 
 class DataImportService
 {
+    protected array $requiredItemColumns = [
+        'event',
+        'what is it?',
+        'unpowered_category',
+        'powered_category',
+        'weight estimate',
+        'brand',
+        'model',
+        'age',
+        'assessment',
+        'repair status',
+        'next steps (if status = repairable)',
+        'spare parts required?',
+        'main barrier to repair',
+        'notes',
+    ];
+
+    protected array $requiredEventColumns = [
+        'event date',
+        'venue name',
+        'start time',
+        'end time',
+        'timezone',
+        'event link (optional)',
+        'event description',
+        'venue address',
+        'online',
+    ];
+
+    protected array $eventColumnAliases = [
+        'event link (optional)' => ['event link'],
+    ];
+
     protected array $categoryIds = [
         "Games console" => 6,
         "Watch/clock" => 7,
@@ -68,12 +101,20 @@ class DataImportService
         string $apiToken,
         ?string $baseUrl = null,
         bool $dryRun = false,
+        bool $force = false,
     ): array {
         $apiClient = new RestartersApiClient($apiToken, $baseUrl);
 
         $report = $this->newReport();
-        $reportEventIds = [];
 
+        $validation = $this->validateColumns(itemsCsv: $itemsCsv, eventsCsv: $eventsCsv);
+        $report['validation'] = $validation;
+
+        if ($validation['fatal'] && !$force) {
+            throw new \InvalidArgumentException($this->validationMessage($validation));
+        }
+
+        $reportEventIds = [];
         $allEvents = $this->csvReader->read($eventsCsv);
         $allItems = $this->csvReader->read($itemsCsv);
 
@@ -159,10 +200,19 @@ class DataImportService
         string $apiToken,
         ?string $baseUrl = null,
         bool $dryRun = false,
+        bool $force = false,
     ): array {
         $apiClient = new RestartersApiClient($apiToken, $baseUrl);
 
         $report = $this->newReport();
+
+        $validation = $this->validateColumns(itemsCsv: $itemsCsv, itemOnly: true);
+        $report['validation'] = $validation;
+
+        if ($validation['fatal'] && !$force) {
+            throw new \InvalidArgumentException($this->validationMessage($validation));
+        }
+
         $reportKey = "event_id:{$eventId}";
         $report['event_ids'][$reportKey] = $eventId;
         $report['items_per_event'][$reportKey] = $this->emptyItemStats();
@@ -194,6 +244,70 @@ class DataImportService
         }
 
         throw new \RuntimeException("Event {$eventId} was not found in group {$groupId}");
+    }
+
+    public function validateColumns(string $itemsCsv, ?string $eventsCsv = null, bool $itemOnly = false): array
+    {
+        $itemRequired = $itemOnly
+            ? array_values(array_diff($this->requiredItemColumns, ['event']))
+            : $this->requiredItemColumns;
+
+        $validation = [
+            'items' => $this->checkColumns($itemsCsv, $itemRequired),
+            'events' => null,
+            'fatal' => false,
+        ];
+
+        if ($eventsCsv !== null) {
+            $validation['events'] = $this->checkColumns($eventsCsv, $this->requiredEventColumns, $this->eventColumnAliases);
+        }
+
+        $validation['fatal'] = !empty($validation['items']['missing'])
+            || ($validation['events'] !== null && !empty($validation['events']['missing']));
+
+        return $validation;
+    }
+
+    protected function checkColumns(string $csvPath, array $required, array $aliases = []): array
+    {
+        $headers = $this->csvReader->headers($csvPath);
+        $accepted = $required;
+
+        foreach ($aliases as $canonical => $alts) {
+            $accepted = array_merge($accepted, $alts);
+        }
+
+        $unknown = array_values(array_diff($headers, $accepted));
+
+        $missing = [];
+        foreach ($required as $column) {
+            if (in_array($column, $headers, true)) {
+                continue;
+            }
+
+            $aliasPresent = !empty(array_intersect($aliases[$column] ?? [], $headers));
+
+            if (!$aliasPresent) {
+                $missing[] = $column;
+            }
+        }
+
+        return ['missing' => $missing, 'unknown' => $unknown];
+    }
+
+    protected function validationMessage(array $validation): string
+    {
+        $lines = ['Required columns missing:'];
+
+        if ($validation['items']['missing']) {
+            $lines[] = '  items: '.implode(', ', $validation['items']['missing']);
+        }
+
+        if ($validation['events'] !== null && $validation['events']['missing']) {
+            $lines[] = '  events: '.implode(', ', $validation['events']['missing']);
+        }
+
+        return implode(PHP_EOL, $lines);
     }
 
     protected function createOrFindEvent(RestartersApiClient $apiClient, array $event, int $groupId, array &$report): array
@@ -386,7 +500,7 @@ class DataImportService
 
     protected function getAssessment(array $item): string
     {
-        $assessment = trim($item['Assessment'] ?? '');
+        $assessment = trim($item['assessment'] ?? '');
 
         if ($assessment) {
             return rtrim($assessment, '. ') . '.';
