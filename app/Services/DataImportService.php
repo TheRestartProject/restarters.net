@@ -67,6 +67,7 @@ class DataImportService
         int $groupId,
         string $apiToken,
         ?string $baseUrl = null,
+        bool $dryRun = false,
     ): array {
         $apiClient = new RestartersApiClient($apiToken, $baseUrl);
 
@@ -104,18 +105,24 @@ class DataImportService
 
             $eventKey = "{$eventDate} - {$venueName}";
 
-            [$eventId, $eventStatus] = $this->createOrFindEvent($apiClient, $event, $groupId, $report);
-            $report['events'][$eventStatus]++;
+            if ($dryRun) {
+                $report['events']['created']++;
+                $eventId = null;
+            } else {
+                [$eventId, $eventStatus] = $this->createOrFindEvent($apiClient, $event, $groupId, $report);
+                $report['events'][$eventStatus]++;
 
-            if (!$eventId) {
-                $this->recordError($report, 'event_create_failed_no_id', "Event creation failed for {$eventKey}; skipping its items", [
-                    'event_key' => $eventKey,
-                    'operation' => 'process_event',
-                ]);
-                continue;
+                if (!$eventId) {
+                    $this->recordError($report, 'event_create_failed_no_id', "Event creation failed for {$eventKey}; skipping its items", [
+                        'event_key' => $eventKey,
+                        'operation' => 'process_event',
+                    ]);
+                    continue;
+                }
+
+                $reportEventIds[$eventKey] = $eventId;
             }
 
-            $reportEventIds[$eventKey] = $eventId;
             $report['items_per_event'][$eventKey] ??= $this->emptyItemStats();
 
             $itemsForEvent = [];
@@ -134,7 +141,7 @@ class DataImportService
             }
 
             foreach ($itemsForEvent as $item) {
-                $status = $this->createItemForEvent($apiClient, $item, $eventId, $report);
+                $status = $this->createItemForEvent($apiClient, $item, $eventId, $report, $dryRun);
                 $report['items_per_event'][$eventKey][$status]++;
                 $report['items_total'][$status]++;
             }
@@ -151,6 +158,7 @@ class DataImportService
         int $eventId,
         string $apiToken,
         ?string $baseUrl = null,
+        bool $dryRun = false,
     ): array {
         $apiClient = new RestartersApiClient($apiToken, $baseUrl);
 
@@ -159,12 +167,14 @@ class DataImportService
         $report['event_ids'][$reportKey] = $eventId;
         $report['items_per_event'][$reportKey] = $this->emptyItemStats();
 
-        $this->assertEventExistsInGroup($apiClient, $groupId, $eventId);
+        if (!$dryRun) {
+            $this->assertEventExistsInGroup($apiClient, $groupId, $eventId);
+        }
 
         $items = $this->csvReader->read($itemsCsv);
 
         foreach ($items as $item) {
-            $status = $this->createItemForEvent($apiClient, $item, $eventId, $report);
+            $status = $this->createItemForEvent($apiClient, $item, $eventId, $report, $dryRun);
             $report['items_per_event'][$reportKey][$status]++;
             $report['items_total'][$status]++;
         }
@@ -248,7 +258,7 @@ class DataImportService
         return null;
     }
 
-    protected function createItemForEvent(RestartersApiClient $apiClient, array $item, int $eventId, array &$report): string
+    protected function createItemForEvent(RestartersApiClient $apiClient, array $item, ?int $eventId, array &$report, bool $dryRun = false): string
     {
         $itemDesc = $item['what is it?'] ?? '';
         $ctx = [
@@ -262,6 +272,10 @@ class DataImportService
         if (!$payload) {
             $this->recordError($report, 'item_skipped_unknown_category', "Skipping item '{$itemDesc}' due to unknown or missing category", $ctx);
             return 'skipped_unknown_category';
+        }
+
+        if ($dryRun) {
+            return 'created';
         }
 
         $resp = $apiClient->post('/devices', $payload);
@@ -303,7 +317,7 @@ class DataImportService
         return array_filter($payload, fn ($value) => $value !== '' && $value !== null);
     }
 
-    protected function transformItem(array $item, int $eventId): ?array
+    protected function transformItem(array $item, ?int $eventId): ?array
     {
         $poweredCategory = $item['powered_category'] ?? '';
         $unpoweredCategory = $item['unpowered_category'] ?? '';

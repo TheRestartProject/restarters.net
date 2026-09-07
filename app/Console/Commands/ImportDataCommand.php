@@ -13,7 +13,8 @@ class ImportDataCommand extends Command
         {--group-id= : Group ID}
         {--event-id= : Existing event ID for item-only import mode}
         {--api-token= : API token for the target group}
-        {--api-base= : Override API base URL}';
+        {--api-base= : Override API base URL}
+        {--dry-run : Show what would be imported without making any changes}';
 
     protected $description = 'Import event and item data into Restarters';
 
@@ -23,6 +24,7 @@ class ImportDataCommand extends Command
         $eventId = $this->option('event-id');
         $apiToken = (string) $this->option('api-token');
         $apiBase = $this->option('api-base') ?: null;
+        $dryRun = (bool) $this->option('dry-run');
 
         $itemsCsv = $this->argument('itemsCsv');
         $eventsCsv = $this->argument('eventsCsv');
@@ -45,6 +47,7 @@ class ImportDataCommand extends Command
                     eventId: (int) $eventId,
                     apiToken: $apiToken,
                     baseUrl: $apiBase,
+                    dryRun: $dryRun,
                 );
             } else {
                 if (!$eventsCsv) {
@@ -58,6 +61,7 @@ class ImportDataCommand extends Command
                     groupId: $groupId,
                     apiToken: $apiToken,
                     baseUrl: $apiBase,
+                    dryRun: $dryRun,
                 );
             }
 
@@ -74,6 +78,10 @@ class ImportDataCommand extends Command
     {
         $this->newLine();
         $this->line('=== Import report ===');
+
+        if ((bool) $this->option('dry-run')) {
+            $this->line('*** DRY-RUN — no changes were made ***');
+        }
         $this->line('Events created: '.$report['events']['created']);
         $this->line('Events existing: '.$report['events']['existing']);
         $this->line('Events failed: '.$report['events']['failed']);
