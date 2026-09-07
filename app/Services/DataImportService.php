@@ -116,7 +116,7 @@ class DataImportService
 
         $reportEventIds = [];
         $allEvents = $this->csvReader->read($eventsCsv);
-        $allItems = $this->csvReader->read($itemsCsv);
+        $allItems = $this->expandItems($this->csvReader->read($itemsCsv));
 
         if (empty($allEvents)) {
             $this->recordError($report, 'no_events', 'No events found in events CSV', ['operation' => 'main']);
@@ -221,7 +221,7 @@ class DataImportService
             $this->assertEventExistsInGroup($apiClient, $groupId, $eventId);
         }
 
-        $items = $this->csvReader->read($itemsCsv);
+        $items = $this->expandItems($this->csvReader->read($itemsCsv));
 
         foreach ($items as $item) {
             $status = $this->createItemForEvent($apiClient, $item, $eventId, $report, $dryRun);
@@ -542,6 +542,18 @@ class DataImportService
             'skipped_unknown_category' => 0,
             'failed' => 0,
         ];
+    }
+
+    protected function expandItems(array $items): array
+    {
+        $expanded = [];
+        foreach ($items as $item) {
+            $quantity = max(1, (int) ($item['quantity'] ?? 1));
+            for ($i = 0; $i < $quantity; $i++) {
+                $expanded[] = $item;
+            }
+        }
+        return $expanded;
     }
 
     protected function recordError(array &$report, string $type, string $message, array $context = []): void
