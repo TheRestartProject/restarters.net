@@ -164,6 +164,7 @@ class APIv2DeviceTest extends TestCase
             'category' => 11,
             'problem' => 'Test problem',
             'notes' => 'Test notes',
+            'reference' => 'REP1234',
             'brand' => 'Test brand',
             'model' => 'Test model',
             'age' => 1.5,
@@ -203,6 +204,7 @@ class APIv2DeviceTest extends TestCase
         $this->assertEquals(100.00, $json['data']['estimate']);
         $this->assertEquals('Test problem', $json['data']['problem']);
         $this->assertEquals('Test notes', $json['data']['notes']);
+        $this->assertEquals('REP1234', $json['data']['reference']);
         $this->assertEquals($repair_status_str, $json['data']['repair_status']);
 
         if ($parts_provider_str) {

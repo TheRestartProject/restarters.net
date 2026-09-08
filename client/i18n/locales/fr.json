@@ -412,7 +412,9 @@
         "repair_outcome": "Résultat de la réparation?",
         "add_data_group": "Veuillez sélectionner un Repair Café",
         "add_data_event": "Veuillez sélectionner un événement",
-        "add_data_action_button": "Participer à l'événément"
+        "add_data_action_button": "Participer à l'événément",
+        "reference": "Référence",
+        "tooltip_reference": "Vous pouvez éventuellement enregistrer votre propre identifiant de référence pour cet élément, afin de le recouper avec d'autres outils logiciels que vous utilisez."
     },
     "discourse": {
         "number_of_comments": "Nombre de commentaires",

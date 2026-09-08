@@ -75,4 +75,6 @@ return [
   'add_data_group' => 'Please select a group',
   'add_data_event' => 'Please select an event',
   'add_data_action_button' => 'Go to event',
+  'reference' => 'Reference',
+  'tooltip_reference' => 'You can optionally record your own reference ID for this item, to cross-reference it to other software tools you are using.',
 ];
