@@ -1,4 +1,4 @@
-import { DATE_FORMAT, LEAFLET_ATTRIBUTION, LEAFLET_TILES } from '../constants'
+import { DATE_FORMAT, LEAFLET_ATTRIBUTION, leafletTiles } from '../constants'
 
 export default {
   computed: {
@@ -6,7 +6,7 @@ export default {
       return LEAFLET_ATTRIBUTION
     },
     tiles() {
-      return LEAFLET_TILES
+      return leafletTiles()
     }
   }
 }
