@@ -114,7 +114,12 @@ function round(n) {
               :key="device.id"
               :data-testid="`event-device-${device.id}`"
             >
-              <td>{{ device.item_type || '-' }}</td>
+              <td class="device-reference-cell">
+                <span v-if="device.reference" class="device-reference text-muted d-block" :data-testid="`event-device-reference-${device.id}`">
+                  {{ device.reference }}
+                </span>
+                {{ device.item_type || '-' }}
+              </td>
               <td>{{ device.category ? t(device.category.name) : '-' }}</td>
               <td v-if="activeTab === 'powered'">{{ device.brand }}</td>
               <td>{{ parseFloat(device.age) ? device.age : '-' }}</td>
@@ -139,3 +144,13 @@ function round(n) {
     </template>
   </div>
 </template>
+
+<style scoped>
+.device-reference-cell {
+  line-height: normal;
+}
+
+.device-reference {
+  font-size: 60%;
+}
+</style>

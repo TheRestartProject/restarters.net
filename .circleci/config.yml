@@ -305,6 +305,13 @@ jobs:
           command: |
             mkdir -p /tmp/test-results/playwright-client
             docker cp restarters_playwright:/tmp/test-results/. /tmp/test-results/playwright-client/ || echo "No playwright results found"
+
+            # An API 500 shows up here only as "expected 200, received 500";
+            # without Laravel's log there is no way to tell what threw.
+            mkdir -p /tmp/test-results/laravel
+            docker cp restarters:/var/www/storage/logs/. /tmp/test-results/laravel/ 2>/dev/null || echo "No Laravel logs found"
+            echo "--- last Laravel errors ---"
+            grep -hE "production\.(ERROR|CRITICAL)" /tmp/test-results/laravel/*.log 2>/dev/null | tail -20 || true
           when: always
       - store_artifacts:
           path: /tmp/test-results
