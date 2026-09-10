@@ -1,0 +1,46 @@
+<?php
+
+return [
+  'unavailable_audits' => '¡No se han realizado cambios en este dispositivo!',
+  'created' => [
+    'metadata' => 'El :audit_created_at, :user_name creó el registro <strong>:audit_url</strong>',
+    'modified' => [
+      'event' => '<strong>Evento</strong> establecido como "<strong>:new</strong>"',
+      'category' => '<strong>Categoría</strong> establecida como "<strong>:new</strong>"',
+      'category_creation' => '<strong>Creación de categoría</strong> establecida como "<strong>:new</strong>"',
+      'estimate' => '<strong>Estimación</strong> establecida como "<strong>:new</strong>"',
+      'repair_status' => '<strong>Estado de reparación</strong> establecido como "<strong>:new</strong>"',
+      'spare_parts' => '<strong>Piezas de repuesto</strong> establecidas como "<strong>:new</strong>"',
+      'brand' => '<strong>Marca</strong> establecida como "<strong>:new</strong>"',
+      'model' => '<strong>Modelo</strong> establecido como "<strong>:new</strong>"',
+      'age' => '<strong>Antigüedad</strong> establecida como "<strong>:new</strong>"',
+      'problem' => '<strong>Problema</strong> establecido como "<strong>:new</strong>"',
+      'repaired_by' => '<strong>Reparado por</strong> establecido como "<strong>:new</strong>"',
+      'do_it_yourself' => '<strong>Hazlo tú mismo</strong> establecido como "<strong>:new</strong>"',
+      'professional_help' => '<strong>Ayuda profesional</strong> establecida como "<strong>:new</strong>"',
+      'more_time_needed' => '<strong>Se necesita más tiempo</strong> establecido como "<strong>:new</strong>"',
+      'wiki' => '<strong>Wiki</strong> establecida como "<strong>:new</strong>"',
+      'iddevices' => '<strong>ID del dispositivo</strong> establecido como "<strong>:new</strong>"',
+    ],
+  ],
+  'updated' => [
+    'metadata' => 'El :audit_created_at, :user_name actualizó el registro <strong>:audit_url</strong>',
+    'modified' => [
+      'event' => '<strong>Evento</strong> modificado de "<strong>:old</strong>" a "<strong>:new</strong>"',
+      'category' => '<strong>Categoría</strong> modificada de "<strong>:old</strong>" a "<strong>:new</strong>"',
+      'category_creation' => '<strong>Creación de categoría</strong> modificada de "<strong>:old</strong>" a "<strong>:new</strong>"',
+      'estimate' => '<strong>Estimación</strong> modificada de "<strong>:old</strong>" a "<strong>:new</strong>"',
+      'repair_status' => '<strong>Estado de reparación</strong> modificado de "<strong>:old</strong>" a "<strong>:new</strong>"',
+      'spare_parts' => '<strong>Piezas de repuesto</strong> modificadas de "<strong>:old</strong>" a "<strong>:new</strong>"',
+      'brand' => '<strong>Marca</strong> modificada de "<strong>:old</strong>" a "<strong>:new</strong>"',
+      'model' => '<strong>Modelo</strong> modificado de "<strong>:old</strong>" a "<strong>:new</strong>"',
+      'age' => '<strong>Antigüedad</strong> modificada de "<strong>:old</strong>" a "<strong>:new</strong>"',
+      'problem' => '<strong>Problema</strong> modificado de "<strong>:old</strong>" a "<strong>:new</strong>"',
+      'repaired_by' => '<strong>Reparado por</strong> modificado de "<strong>:old</strong>" a "<strong>:new</strong>"',
+      'do_it_yourself' => '<strong>Hazlo tú mismo</strong> modificado de "<strong>:old</strong>" a "<strong>:new</strong>"',
+      'professional_help' => '<strong>Ayuda profesional</strong> modificada de "<strong>:old</strong>" a "<strong>:new</strong>"',
+      'more_time_needed' => '<strong>Se necesita más tiempo</strong> modificado de "<strong>:old</strong>" a "<strong>:new</strong>"',
+      'wiki' => '<strong>Wiki</strong> modificada de "<strong>:old</strong>" a "<strong>:new</strong>"',
+    ],
+  ],
+];

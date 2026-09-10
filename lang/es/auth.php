@@ -1,0 +1,35 @@
+<?php
+
+return [
+  'email_address_validation' => 'Ya existe una cuenta con esta dirección de correo electrónico. ¿Has intentado iniciar sesión?',
+  'login' => 'Iniciar sesión',
+  'delete_account' => 'Eliminar cuenta',
+  'failed' => 'Esta dirección de correo electrónico no está registrada en el sistema o la contraseña es incorrecta.',
+
+  'email_address' => 'Dirección de correo electrónico',
+  'sign_in' => 'Lo recuerdo. Dejarme iniciar sesión',
+  'forgotten_pw' => '¿Has olvidado tu contraseña?',
+  'forgotten_pw_text' => 'Nos pasa a todos. Simplemente introduce tu correo electrónico para recibir un mensaje de restablecimiento de contraseña.',
+  'reset' => 'Restablecer',
+  'password' => 'Contraseña',
+  'repeat_password' => 'Repetir contraseña',
+  'repeat_password_validation' => 'Las contraseñas no coinciden o tienen menos de seis caracteres',
+  'forgot_password' => 'Contraseña olvidada',
+  'change_password' => 'Cambiar contraseña',
+  'change_password_text' => 'Mantén tu cuenta segura y cambia tu contraseña regularmente.',
+  'reset_password' => 'Restablecer contraseña',
+  'create_account' => 'Crear una cuenta',
+  'current_password' => 'Contraseña actual',
+  'new_password' => 'Nueva contraseña',
+  'new_repeat_password' => 'Repetir nueva contraseña',
+  'delete_account_text' => 'Entiendo que al eliminar mi cuenta se suprimirán todos mis datos personales y
+esta acción es permanente.',
+  'save_preferences' => 'Guardar preferencias',
+  'set_preferences' => 'Haz clic aquí para configurar tus preferencias de correo electrónico en nuestra plataforma de debate',
+  'profile_admin' => 'Solo administradores',
+  'profile_admin_text' => 'Aquí los administradores tienen la capacidad de cambiar el rol de un usuario o sus grupos asociados',
+  'user_role' => 'Rol de usuario',
+  'assigned_groups' => 'Asignado a grupos',
+  'save_user' => 'Guardar usuario',
+  'login_before_using_shareable_link' => 'Para completar tu invitación, crea una cuenta a continuación, o si ya tienes una cuenta <a href=":login_url">inicia sesión aquí</a>.',
+];

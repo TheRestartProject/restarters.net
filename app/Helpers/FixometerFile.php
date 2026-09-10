@@ -38,6 +38,10 @@ class FixometerFile extends Model
      * */
     public function upload($file, $type, $reference = null, $referenceType = null, $multiple = false, $profile = false, $ajax = false, $crop = true)
     {
+        if (! config('restarters.features.image_upload')) {
+            throw new \Exception('Image uploads are disabled on this site.');
+        }
+
         $clear = true; // purge pre-existing images from db - this is the default behaviour
 
         if (is_string($file) && isset($_FILES[$file])) {

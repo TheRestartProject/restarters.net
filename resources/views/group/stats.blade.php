@@ -4,22 +4,22 @@
 
   <div id="group-main-stats">
       <div class="col">
-          <h5>participants</h5>
+          <h5>@lang('groups.participants')</h5>
           <span class="largetext"><?php echo $participants; ?></span>
       </div>
 
       <div class="col">
-          <h5>hours volunteered</h5>
+          <h5>@lang('groups.hours_volunteered')</h5>
           <span class="largetext"><?php echo $hours_volunteered; ?></span>
       </div>
 
       <div class="col">
-          <h5>parties thrown</h5>
+          <h5>@lang('groups.parties_thrown')</h5>
           <span class="largetext"><?php echo $parties; ?></span>
       </div>
 
       <div class="col">
-          <h5>waste prevented</h5>
+          <h5>@lang('groups.waste_prevented')</h5>
           <span class="largetext">
               {{ number_format(round($waste_total), 0) }} kg
           </span>
@@ -38,7 +38,7 @@
   <div id="group-main-stats">
       <div class="group-stats-row first-row">
            <div class="col">
-                  <h5>waste prevented</h5>
+                  <h5>@lang('groups.waste_prevented')</h5>
                   <span class="largetext">
                       <?php echo $waste_total; ?> kg
                   </span>
@@ -52,17 +52,17 @@
       </div>
       <div class="group-stats-row second-row">
           <div class="col">
-                  <h5>participants</h5>
+                  <h5>@lang('groups.participants')</h5>
                   <span class="largetext"><?php echo $pax; ?></span>
               </div>
 
               <div class="col">
-                  <h5>hours volunteered</h5>
+                  <h5>@lang('groups.hours_volunteered')</h5>
                   <span class="largetext"><?php echo $hours; ?></span>
               </div>
 
               <div class="col">
-                  <h5>parties thrown</h5>
+                  <h5>@lang('groups.parties_thrown')</h5>
                   <span class="largetext"><?php echo $parties; ?></span>
               </div>
       </div>
@@ -73,12 +73,12 @@
 
   <div id="group-main-stats" class="mini">
       <div class="col">
-          <h5>parties thrown</h5>
+          <h5>@lang('groups.parties_thrown')</h5>
           <span class="largetext"><?php echo $parties; ?></span>
       </div>
 
       <div class="col">
-          <h5>waste prevented</h5>
+          <h5>@lang('groups.waste_prevented')</h5>
           <span class="largetext">
               <?php echo $waste_total; ?> kg
           </span>

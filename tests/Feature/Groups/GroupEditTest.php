@@ -290,4 +290,28 @@ class GroupEditTest extends TestCase
             ],
         ]);
     }
+
+    /** @test */
+    // F005: stored XSS via audited model attributes rendered in the audit-log accordion.
+    public function audit_log_escapes_xss_payload_in_group_fields(): void
+    {
+        $admin = User::factory()->administrator()->create();
+        $this->actingAs($admin);
+
+        $group = Group::factory()->create(['website' => 'https://safe.example.com']);
+
+        // Updating an audited field records an 'updated' audit holding the new value verbatim.
+        $group->website = "<script>alert('XSSPROBE')</script>";
+        $group->save();
+
+        $response = $this->get('/group/edit/' . $group->idgroups);
+        $response->assertStatus(200);
+
+        // The injected <script> must NOT reach the admin's browser unescaped...
+        $response->assertDontSee("<script>alert('XSSPROBE')", false);
+        // ...but the value must still be displayed, HTML-escaped, in the audit log.
+        // (Blade's {{ }} uses ENT_QUOTES, so < > become &lt; &gt; and ' becomes &#039;.)
+        $response->assertSee('&lt;script&gt;alert(', false);
+        $response->assertSee('XSSPROBE', false);
+    }
 }

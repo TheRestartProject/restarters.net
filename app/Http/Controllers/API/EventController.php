@@ -244,8 +244,8 @@ class EventController extends Controller
         // Get the user that the API has been authenticated as.
         $user = auth('api')->user();
 
-        // Emails are sensitive.
-        $showEmails = $user && !Fixometer::userHasEditPartyPermission($idevents, $user->id);
+        // Only show emails to users who have edit permission on this event.
+        $showEmails = $user && Fixometer::userHasEditPartyPermission($idevents, $user->id);
         $volunteers = $party->expandVolunteers($party->allConfirmedVolunteers()->get(), $showEmails);
 
         return response()->json([
@@ -730,7 +730,7 @@ class EventController extends Controller
         }
 
         if (!empty($location)) {
-            $geocoder = new \App\Helpers\Geocoder();
+            $geocoder = app(\App\Helpers\Geocoder::class);
             $geocoded = $geocoder->geocode($location);
 
             if (empty($geocoded)) {

@@ -64,7 +64,8 @@ RUN rm -f .env
 # =============================================================================
 FROM php:8.2-fpm
 
-# yesterday mode adds mariadb-server (co-located DB for restored snapshots).
+# Non-production startup scripts (yesterday, PR previews) add mariadb-server
+# (co-located DB for restored snapshots).
 ARG STARTUP_SCRIPT=startup.sh
 RUN apt-get update && apt-get install -y --no-install-recommends \
     nginx \
@@ -73,10 +74,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     gettext-base \
     redis-server \
     procps \
+    util-linux \
     default-mysql-client \
     rclone \
     libpng-dev libjpeg62-turbo-dev libfreetype6-dev libzip-dev libicu-dev libxml2-dev \
-    && if [ "$STARTUP_SCRIPT" = "yesterday-startup.sh" ]; then apt-get install -y --no-install-recommends default-mysql-server; fi \
+    && if [ "$STARTUP_SCRIPT" != "startup.sh" ]; then apt-get install -y --no-install-recommends default-mysql-server; fi \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install pdo_mysql bcmath zip intl gd exif pcntl \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
@@ -136,7 +138,8 @@ COPY docker/restart-yesterday.sh /usr/local/bin/restart-yesterday.sh
 RUN chmod +x /usr/local/bin/db-backup.sh /usr/local/bin/restart-yesterday.sh
 
 # Set up cron: Laravel scheduler + queue watchdog + hourly DB backup + daily yesterday restart (5am UTC)
-RUN printf '* * * * * cd /var/www && php artisan schedule:run >> /dev/null 2>&1\n* * * * * /usr/local/bin/queue-watchdog.sh\n0 * * * * /usr/local/bin/db-backup.sh\n0 5 * * * /usr/local/bin/restart-yesterday.sh\n' | crontab -
+# flock -n guards the backup so a slow run can never overlap with the next hourly invocation.
+RUN printf '* * * * * cd /var/www && php artisan schedule:run >> /dev/null 2>&1\n* * * * * /usr/local/bin/queue-watchdog.sh\n0 * * * * flock -n /tmp/db-backup.lock /usr/local/bin/db-backup.sh\n0 5 * * * /usr/local/bin/restart-yesterday.sh\n' | crontab -
 
 # Set working directory
 WORKDIR /var/www
@@ -153,10 +156,11 @@ RUN mkdir -p storage/framework/{sessions,views,cache/data} \
     public/uploads \
     && chown -R www-data:www-data storage bootstrap/cache public/uploads
 
-# Copy startup scripts (production + yesterday-restore variant)
+# Copy startup scripts (production + yesterday-restore + PR-preview variants)
 COPY .fly/scripts/startup.sh /usr/local/bin/startup.sh
 COPY docker/yesterday-startup.sh /usr/local/bin/yesterday-startup.sh
-RUN chmod +x /usr/local/bin/startup.sh /usr/local/bin/yesterday-startup.sh && \
+COPY docker/preview-startup.sh /usr/local/bin/preview-startup.sh
+RUN chmod +x /usr/local/bin/startup.sh /usr/local/bin/yesterday-startup.sh /usr/local/bin/preview-startup.sh && \
     cp /usr/local/bin/${STARTUP_SCRIPT} /usr/local/bin/active-startup.sh
 
 EXPOSE 80

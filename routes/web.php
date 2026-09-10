@@ -21,7 +21,6 @@ use App\Http\Controllers\MisccatController;
 use App\Http\Controllers\MobifixController;
 use App\Http\Controllers\MobifixOraController;
 use App\Http\Controllers\NetworkController;
-use App\Http\Controllers\OutboundController;
 use App\Http\Controllers\PartyController;
 use App\Http\Controllers\PrintcatOraController;
 use App\Http\Controllers\RoleController;
@@ -364,9 +363,6 @@ Route::middleware('auth', 'verifyUserConsent', 'ensureAPIToken')->group(function
         Route::get('/network/{id}', [GroupController::class, 'network']);
         Route::get('/delete/{id}', [GroupController::class, 'delete']);
     });
-
-    //Outbound Controller
-    Route::get('/outbound', [OutboundController::class, 'index']);
 
     //Party Controller
     Route::prefix('party')->group(function () {

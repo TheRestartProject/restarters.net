@@ -819,21 +819,34 @@ class Party extends Model implements Auditable
             $volunteer['fullName'] = $volunteer->getFullName();
 
             if ($volunteer->volunteer) {
-                $volunteer['volunteer'] = $volunteer->volunteer;
+                $user = $volunteer->volunteer;
 
-                if (!$showEmails) {
-                    $volunteer['volunteer']['email'] = NULL;
-                }
+                $safeUser = [
+                    'id'     => $user->id,
+                    'name'   => $user->name,
+                    'email'  => $showEmails ? $user->email : null,
+                    'user_skills' => [],
+                ];
 
-                if (! empty($volunteer->volunteer)) {
-                    $volunteer['userSkills'] = $volunteer->volunteer->userSkills->all();
-                    $volunteer['profilePath'] = '/uploads/thumbnail_'.$volunteer->volunteer->getProfile($volunteer->volunteer->id)->path;
+                $volunteer['profilePath'] = '/uploads/thumbnail_'.$user->getProfile($user->id)->path;
 
-                    foreach ($volunteer['userSkills'] as $skill) {
-                        // Force expansion
-                        $skill->skillName->skill_name;
+                foreach ($user->userSkills as $skill) {
+                    // Guard against orphaned FK rows (deleted skill record).
+                    if (!$skill->skillName) {
+                        continue;
                     }
+                    // Emit only the shape the frontend expects: { skill_name: { skill_name: "…" } }
+                    $safeUser['user_skills'][] = [
+                        'skill_name' => ['skill_name' => $skill->skillName->skill_name],
+                    ];
                 }
+
+                // Unset the loaded relation before assigning the safe array.
+                // Eloquent's toArray() merges relationsToArray() LAST, so without this
+                // the full User model from the 'volunteer' HasOne would overwrite $safeUser
+                // when the blade calls json_encode($expanded_attended).
+                $volunteer->unsetRelation('volunteer');
+                $volunteer['volunteer'] = $safeUser;
             }
 
             $ret[] = $volunteer;

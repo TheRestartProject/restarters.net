@@ -1,11 +1,11 @@
 <?php
 
 return [
-  'breakdown_by_country' => 'Breakdown by country',
-  'breakdown_by_city' => 'Breakdown by city',
-  'breakdown_by_country_content' => 'Volunteer hours grouped by volunteer country.',
-  'breakdown_by_city_content' => 'Volunteer hours grouped by the volunteer town/city (note: town/country is optional so may not be set for all volunteers).',
-  'total_hours' => 'Total hours',
-  'country_name' => 'Country name',
-  'town_city_name' => 'Town/city name',
+  'breakdown_by_country' => 'Aufschlüsselung nach Land',
+  'breakdown_by_city' => 'Aufschlüsselung nach Stadt',
+  'breakdown_by_country_content' => 'Freiwilligenstunden gruppiert nach dem Land der Freiwilligen.',
+  'breakdown_by_city_content' => 'Freiwilligenstunden gruppiert nach dem Ort/der Stadt der Freiwilligen (Hinweis: Ort/Stadt ist optional und möglicherweise nicht für alle Freiwilligen angegeben).',
+  'country_name' => 'Ländername',
+  'town_city_name' => 'Ort-/Stadtname',
+  'total_hours' => 'Gesamtstunden',
 ];

@@ -18,7 +18,8 @@
     if ($flyApp) {
         // On Fly: derive branch label by stripping the "restarters-" prefix
         $branch = preg_replace('/^restarters-/', '', $flyApp);
-        $mailpitUrl = 'https://' . $flyApp . '-mail.fly.dev';
+        // PR previews share one Mailpit instance rather than having their own.
+        $mailpitUrl = env('MAILPIT_URL') ?: 'https://' . $flyApp . '-mail.fly.dev';
     } else {
         // Local dev fallback: read from git
         $branch = 'unknown';

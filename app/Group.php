@@ -475,6 +475,13 @@ class Group extends Model implements Auditable
     // If an group is not approved, then we should not push the events to Wordpress.
     public function eventsShouldPushToWordpress()
     {
+        // Central gate for all WordPress publishing: every listener and
+        // scheduled command routes through here, so preview/staging apps
+        // can never post to the live site.
+        if (! config('restarters.features.wordpress_integration')) {
+            return false;
+        }
+
         foreach ($this->networks as $network) {
             if ($network->events_push_to_wordpress) {
                 return true;

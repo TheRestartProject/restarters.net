@@ -1,18 +1,20 @@
 <?php
 
 return [
-  'whatis' => 'German Welcome to the Restarters community',
-  'whatis_content' => '<p>This is a place to grow the community electronics repair movement. The world needs more fixing and more fixing skills to be shared.</p><p>Join in if you would like to:</p><ul>
-                                <li>Learn electronics repair with others</li>
-                                <li>Share your repair skills with others</li>
-                                <li>Organise electronics repair events</li>
-                                <li>View and share the impact of repair events</li>
-                                <li>Document and bring down the barriers to repair</li>
+  'whatis_content' => '<p>Dies ist ein Ort, um die Gemeinschaftsbewegung zur Elektronikreparatur zu wachsen. Die Welt braucht mehr Reparaturen und mehr geteilte Reparaturfähigkeiten.</p><p>Machen Sie mit, wenn Sie möchten:</p><ul>
+                                <li>Elektronikreparatur gemeinsam mit anderen lernen</li>
+                                <li>Ihre Reparaturfähigkeiten mit anderen teilen</li>
+                                <li>Elektronikreparaturveranstaltungen organisieren</li>
+                                <li>Die Wirkung von Reparaturveranstaltungen anzeigen und teilen</li>
+                                <li>Hindernisse bei der Reparatur dokumentieren und abbauen</li>
                             </ul>',
-  'more' => 'Find out more',
-  'stat_1' => 'Items fixed',
-  'stat_2' => 'CO<sub>2</sub>e emissions prevented',
-  'stat_3' => 'Waste prevented',
-  'stat_4' => 'Events held',
-  'login_title' => 'Sign in',
+  'whatis' => 'Willkommen in der Restarters-Community',
+  'more' => 'Mehr erfahren',
+  'stat_1' => 'Reparierte Artikel',
+  'stat_2' => 'Verhinderte CO<sub>2</sub>e-Emissionen',
+  'stat_3' => 'Vermiedener Abfall',
+  'stat_4' => 'Durchgeführte Veranstaltungen',
+  'login_title' => 'Anmelden',
+  'join_title' => 'Restarters beitreten',
+  'join_title_short' => 'Beitreten',
 ];

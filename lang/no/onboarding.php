@@ -1,13 +1,13 @@
 <?php
 
 return [
-  'slide1_heading' => 'Welcome!',
-  'slide1_content' => '<p>Thank you for being a part of our community space.</p><p>And <strong>thank you</strong> for being a beta tester!  With your feedback we can help improve the platform for everyone.</p>',
-  'slide2_heading' => 'Your gateway to community repair',
-  'slide2_content' => '<p>In the community space you can:</p> <ul><li>chat with other Restarters</li><li>join repair groups</li><li>share your repair knowledge</li><li>create and RSVP to events</li><li>log the devices you fix at events</li><li>help bring down the barriers to repair</li><p></p></ul>',
-  'slide3_heading' => 'Let\'s get started!',
-  'slide3_content' => '<p>Your starting point is the <strong>community dashboard</strong>.</p><p>Your dashboard gives you at a glance info on the latest happenings in the community, as well as quick access to common actions.</p><p>A good place to start is the <strong>Getting Started</strong> section.</p>',
-  'finishing_action' => 'To the dashboard',
-  'previous' => 'Previous',
-  'next' => 'Next',
+  'slide1_content' => '<p>Takk for at du ble med i fellesskapsrommet vårt.</p>',
+  'slide2_content' => '<p>I fellesskapsrommet kan du:</p> <ul><li>chatte med andre frivillige</li><li>bli med i reparasjonsgrupper</li><li>dele reparasjonskunnskapen din</li><li>opprette og RSVP til arrangementer</li><li>registrere enhetene du reparerer på arrangementer</li><li>bidra til å fjerne barrierene for reparasjon</li><p></p></ul>',
+  'slide3_content' => '<p>Utgangspunktet ditt er <strong>fellesskapsdashbordet</strong>.</p><p>Dashbordet gir deg et raskt overblikk over det siste som skjer i fellesskapet, samt rask tilgang til vanlige handlinger.</p><p>Et godt sted å starte er seksjonen <strong>Kom i gang</strong>.</p>',
+  'previous' => 'Forrige',
+  'slide1_heading' => 'Velkommen!',
+  'slide2_heading' => 'Din inngang til fellesskapsreparasjon',
+  'slide3_heading' => 'La oss komme i gang!',
+  'finishing_action' => 'Til dashbordet',
+  'next' => 'Neste',
 ];

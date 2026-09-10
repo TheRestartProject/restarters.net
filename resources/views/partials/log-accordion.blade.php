@@ -20,7 +20,7 @@
                             @if(gettype($modified) == 'string')
                             <td>@lang($type.'.'.$audit->event.'.modified.'.$attribute, $modified)</td>
                             @else
-                            <td><?php echo $type.'.'.$audit->event.'.modified.'.$attribute . " " . json_encode($modified) ?></td>
+                            <td>{{ $type.'.'.$audit->event.'.modified.'.$attribute . " " . json_encode($modified) }}</td>
                             @endif
                           </tr>
                       @endforeach

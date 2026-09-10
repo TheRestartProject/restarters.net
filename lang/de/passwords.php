@@ -1,9 +1,11 @@
 <?php
 
 return [
-  'reset' => 'Your password has been reset!',
-  'sent' => 'We have e-mailed your password reset link!',
-  'token' => 'This password reset token is invalid.',
-  'user' => 'We can\'t find a user with that e-mail address.',
-  'password' => 'Passwords must be at least six characters and match the confirmation.',
+  'sent' => 'Wir haben Ihnen einen Link zum Zurücksetzen des Passworts per E-Mail geschickt!',
+  'user' => 'Wir können keinen Benutzer mit dieser E-Mail-Adresse finden.',
+  'invalid' => 'Bitte geben Sie eine gültige E-Mail-Adresse ein.',
+  'recover_title' => 'Kontowiederherstellung',
+  'match' => 'Die Passwörter stimmen nicht überein',
+  'updated' => 'Passwort aktualisiert. Bitte melden Sie sich an, um fortzufahren.',
+  'failed' => 'Das Passwort konnte nicht aktualisiert werden.',
 ];
