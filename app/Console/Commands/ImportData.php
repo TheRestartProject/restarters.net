@@ -5,7 +5,7 @@ namespace App\Console\Commands;
 use App\Services\DataImportService;
 use Illuminate\Console\Command;
 
-class ImportDataCommand extends Command
+class ImportData extends Command
 {
     protected $signature = 'import:data
         {itemsCsv : Path to items CSV}
