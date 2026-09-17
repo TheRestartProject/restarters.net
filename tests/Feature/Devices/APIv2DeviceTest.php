@@ -172,6 +172,7 @@ class APIv2DeviceTest extends TestCase
             'repair_status' => $repair_status_str,
             'parts_provider' => $parts_provider_str,
             'barrier' => $barrierstr,
+            'reference' => 'REP1234'
         ];
 
         if ($parts_provider_str) {
@@ -204,6 +205,7 @@ class APIv2DeviceTest extends TestCase
         $this->assertEquals('Test problem', $json['data']['problem']);
         $this->assertEquals('Test notes', $json['data']['notes']);
         $this->assertEquals($repair_status_str, $json['data']['repair_status']);
+        $this->assertEquals('REP1234', $json['data']['reference']);
 
         if ($parts_provider_str) {
             $this->assertEquals($parts_provider_str, $json['data']['spare_parts']);
