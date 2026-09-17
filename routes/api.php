@@ -129,5 +129,13 @@ Route::prefix('v2')->group(function() {
             Route::patch('{id}', [API\DeviceController::class, 'updateDevicev2']);
             Route::delete('{id}', [API\DeviceController::class, 'deleteDevicev2']);
         });
+
+        // Open Repair Data Standard export.  Administrator only, gated in the
+        // controller the same way UserController::changes is - this is a bulk
+        // export of volunteer-written text across every approved group, and
+        // auth:api alone only establishes who the caller is, not whether they
+        // should have it.  Returns 503 until ORDS_ID_PREFIX and
+        // ORDS_DATA_PROVIDER are set; see config/ords.php for why.
+        Route::get('/repairs', [API\RepairController::class, 'listRepairsv2'])->middleware('auth:api');
     });
 });
