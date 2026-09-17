@@ -18,7 +18,10 @@ use Tests\TestCase;
 
 class OnlineEventsTest extends TestCase
 {
-    /** @test */
+    /**
+     * @test
+     * @story:EventController::createEventv2
+     */
     public function a_host_can_create_an_online_event(): void
     {
         $this->withoutExceptionHandling();

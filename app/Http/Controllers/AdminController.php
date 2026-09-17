@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Attributes\Feature;
+use App\Attributes\NoStory;
+use App\Attributes\UserStory;
 use Illuminate\View\View;
 use App\Device;
 use App\Party;
@@ -9,8 +12,10 @@ use App\Party;
 /**
  * Embedded at https://therestartproject.org/impact
  */
+#[Feature('Platform', description: 'Platform-wide statistics and public impact data')]
 class AdminController extends Controller
 {
+    #[UserStory('As a Guest, I can view the platform\'s global repair impact statistics', persona: 'Guest', theme: 'Landing page')]
     public static function stats($section = 1, $paragraph_only = false): View
     {
         if ($section == 1) {
@@ -24,6 +29,7 @@ class AdminController extends Controller
         return view('admin.stats', $stats);
     }
 
+    #[NoStory(reason: 'Internal stats aggregation helper')]
     public static function getStats1()
     {
         $Device = new Device;
@@ -96,6 +102,7 @@ class AdminController extends Controller
         ];
     }
 
+    #[NoStory(reason: 'Internal stats aggregation helper')]
     public static function getStats2()
     {
         $stats = \App\Helpers\LcaStats::getWasteStats();

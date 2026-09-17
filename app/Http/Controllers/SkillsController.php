@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Attributes\Feature;
+use App\Attributes\UserStory;
 use Illuminate\Http\RedirectResponse;
 use App\Helpers\Fixometer;
 use App\Skills;
@@ -10,8 +12,10 @@ use Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
 
+#[Feature('Administration', description: 'Platform administration and configuration')]
 class SkillsController extends Controller
 {
+    #[UserStory('As an Admin, I can view all repair skills', persona: 'Admin', theme: 'Reference data')]
     public function index()
     {
         if (! Fixometer::hasRole(Auth::user(), 'Administrator')) {
@@ -26,6 +30,7 @@ class SkillsController extends Controller
         ]);
     }
 
+    #[UserStory('As an Admin, I can create a new repair skill', persona: 'Admin', theme: 'Reference data')]
     public function postCreateSkill(Request $request): RedirectResponse
     {
         if (! Fixometer::hasRole(Auth::user(), 'Administrator')) {
@@ -40,6 +45,7 @@ class SkillsController extends Controller
         return Redirect::to('skills/edit/'.$skill->id)->with('success', __('skills.create_success'));
     }
 
+    #[UserStory('As an Admin, I can access the form to edit a repair skill', persona: 'Admin', theme: 'Reference data')]
     public function getEditSkill($id)
     {
         if (! Fixometer::hasRole(Auth::user(), 'Administrator')) {
@@ -54,6 +60,7 @@ class SkillsController extends Controller
         ]);
     }
 
+    #[UserStory('As an Admin, I can update a repair skill', persona: 'Admin', theme: 'Reference data')]
     public function postEditSkill($id, Request $request): RedirectResponse
     {
         if (! Fixometer::hasRole(Auth::user(), 'Administrator')) {
@@ -69,6 +76,7 @@ class SkillsController extends Controller
         return Redirect::back()->with('success', __('skills.update_success'));
     }
 
+    #[UserStory('As an Admin, I can delete a repair skill', persona: 'Admin', theme: 'Reference data')]
     public function getDeleteSkill($id): RedirectResponse
     {
 
