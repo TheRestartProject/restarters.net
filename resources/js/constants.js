@@ -14,6 +14,16 @@ export const TIME_FORMAT = 'HH:MM'
 export const LEAFLET_TILES = 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager_labels_under/{z}/{x}/{y}{r}.png'
 export const LEAFLET_ATTRIBUTION = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="https://carto.com/attribution">CARTO</a>'
 
+// CARTO's raster basemaps require an API key; without one the tiles still load
+// but carry an "API key required" watermark. The key is injected into the page
+// by the Blade layout (see layouts/header.blade.php) rather than compiled in,
+// because the assets are built before the deployed environment's secrets exist.
+export function leafletTiles() {
+  const key = (typeof window !== 'undefined' && window.restarters && window.restarters.cartoApiKey) || ''
+
+  return key ? `${LEAFLET_TILES}?key=${encodeURIComponent(key)}` : LEAFLET_TILES
+}
+
 // These match the string definitions in Device.php
 export const FIXED = 'Fixed'
 export const REPAIRABLE = 'Repairable'

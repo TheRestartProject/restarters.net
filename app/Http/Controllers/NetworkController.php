@@ -136,6 +136,14 @@ class NetworkController extends Controller
                     ->withWarning('Image uploads are disabled on this site.');
             }
 
+            // This is the one upload path that doesn't go through FixometerFile, which
+            // restricts uploads to jpg/png/gif by sniffing the content.  Without a rule
+            // here the extension comes from whatever mime type is detected, so an SVG -
+            // which can carry script and is served from our own origin - would be stored.
+            $request->validate([
+                'network_logo' => 'image|mimes:jpeg,jpg,png,gif|max:5120',
+            ]);
+
             // Determine the correct disk to use (s3 on Fly, public_uploads in dev)
             $disk = config('filesystems.default') === 's3' ? 's3' : 'public_uploads';
 

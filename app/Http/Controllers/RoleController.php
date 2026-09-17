@@ -55,9 +55,8 @@ class RoleController extends Controller
 
             if ($request->getMethod() == 'POST') {
                 $permissions = $request->get('permissions');
-                $formid = (int) substr(strrchr($request->get('formId'), '_'), 1);
 
-                $update = $role->edit($formid, $permissions);
+                $update = $role->edit($id, $permissions);
                 if (! $update) {
                     $response['danger'] = 'Something went wrong. Could <strong>not</strong> update the permissions.';
                     \Sentry\CaptureMessage($response['danger']);

@@ -24,7 +24,7 @@ L.Icon.Default.mergeOptions({
     shadowUrl: markerShadow,
 });
 
-import './constants';
+import { LEAFLET_ATTRIBUTION, leafletTiles } from './constants';
 
 import Vue from 'vue'
 import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
@@ -782,8 +782,8 @@ function initAutocomplete() {
       if( latitude && longitude ){
           let map = L.map('event-map').setView([latitude, longitude], zoom);
 
-          L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager_labels_under/{z}/{x}/{y}{r}.png', {
-              attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, &copy; <a href="https://carto.com/attribution">CARTO</a>'
+          L.tileLayer(leafletTiles(), {
+              attribution: LEAFLET_ATTRIBUTION
           }).addTo(map);
 
           var icon = new L.Icon.Default();
@@ -1083,3 +1083,33 @@ function initAutocomplete() {
 // Start jQuery initialization (called earlier in file)
 // initializeJQuery();
 
+
+
+// Destructive actions are POST-only so that CSRF applies. Links marked
+// data-method="post" are submitted as a form carrying the CSRF token rather than
+// navigated to. Deliberately not a <button type="submit">: these links sit inside other
+// forms, where a nested form is dropped by the browser and an extra submit button would
+// be clicked ahead of the real save button.
+document.addEventListener('click', function (e) {
+  const link = e.target.closest ? e.target.closest('a[data-method="post"]') : null
+
+  if (!link) {
+    return
+  }
+
+  e.preventDefault()
+
+  const meta = document.querySelector('meta[name="csrf-token"]')
+  const form = document.createElement('form')
+  form.method = 'POST'
+  form.action = link.getAttribute('href')
+
+  const token = document.createElement('input')
+  token.type = 'hidden'
+  token.name = '_token'
+  token.value = meta ? meta.getAttribute('content') : ''
+  form.appendChild(token)
+
+  document.body.appendChild(form)
+  form.submit()
+})

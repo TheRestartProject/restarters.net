@@ -422,7 +422,7 @@ class GroupController extends Controller
 
         // Don't log to Sentry - legitimate user error.
         return redirect()->back()->with('warning', __('groups.invite_success_apart_from', [
-            'emails' => rtrim(implode(', ', $not_sent))
+            'emails' => e(rtrim(implode(', ', $not_sent)))
         ]));
     }
 
@@ -511,7 +511,7 @@ class GroupController extends Controller
                 return redirect('/user/forbidden');
             } else {
                 return redirect('/group')->with('success', __('groups.delete_succeeded', [
-                    'name' => $name,
+                    'name' => e($name),
                 ]));
             }
         } else {
@@ -578,7 +578,7 @@ class GroupController extends Controller
             return redirect()
                 ->back()
                 ->with('success', __('groups.now_following', [
-                    'name' => $group->name,
+                    'name' => e($group->name),
                     'link' => url('/group/view/'.$group->idgroups),
                 ]));
         } catch (\Exception $e) {
@@ -591,6 +591,14 @@ class GroupController extends Controller
 
     public function imageUpload(Request $request, $id)
     {
+        // Same rule as ajaxDeleteImage below - uploading replaces the group's existing
+        // image, so it needs the same authority as deleting it.
+        $user = Auth::user();
+
+        if (! Fixometer::hasRole($user, 'Administrator') && ! Fixometer::userHasEditGroupPermission($id, $user->id)) {
+            abort(403);
+        }
+
         try {
             if (isset($_FILES) && ! empty($_FILES)) {
                 $existing_image = Fixometer::hasImage($id, 'groups', true);
