@@ -84,6 +84,7 @@ return [
   'notification_greeting' => 'Hello!',
   'confirm' => 'Confirm',
   'validate_timezone' => 'Please select a valid timezone.',
+  'dragmap' => 'Map marker not quite right?  Feel free to drag around to fix it.',
   'share_this' => 'Share this',
   'download' => 'Download',
   'share_modal_title' => 'Shareable Statistics',
