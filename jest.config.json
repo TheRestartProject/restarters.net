@@ -12,7 +12,8 @@
     },
     "roots": [
         "<rootDir>/resources/js/components",
-        "<rootDir>/resources/js/misc"
+        "<rootDir>/resources/js/misc",
+        "<rootDir>/resources/js/store"
     ],
     "modulePaths": [
         "<rootDir>"
@@ -23,6 +24,8 @@
     "setupFilesAfterEnv": ["<rootDir>/tests/jest.setup.js"],
     "testEnvironment": "jsdom",
     "moduleNameMapper": {
-        "^resources/js/mixins/lang.js$": "<rootDir>/tests/__mocks__/resources/js/mixins/lang.js"
+        "^resources/js/mixins/lang.js$": "<rootDir>/tests/__mocks__/resources/js/mixins/lang.js",
+        "^leaflet-control-geocoder/.*$": "<rootDir>/tests/__mocks__/leaflet-control-geocoder.js",
+        "^vue-awesome/.*$": "<rootDir>/tests/__mocks__/vue-awesome.js"
     }
 }
