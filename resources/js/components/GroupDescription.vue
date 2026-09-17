@@ -45,14 +45,13 @@
 import map from '../mixins/map'
 import group from '../mixins/group'
 import images from '../mixins/images'
-import ExternalLink from './ExternalLink.vue'
 import CollapsibleSection from './CollapsibleSection.vue'
 import ReadMore from './ReadMore.vue'
 import GroupArchivedBadge from "./GroupArchivedBadge.vue";
 import GroupTagsBadges from "./GroupTagsBadges.vue";
 
 export default {
-  components: {GroupArchivedBadge, GroupTagsBadges, ReadMore, CollapsibleSection, ExternalLink},
+  components: {GroupArchivedBadge, GroupTagsBadges, ReadMore, CollapsibleSection},
   mixins: [ map, group, images ],
   props: {
     idgroups: {

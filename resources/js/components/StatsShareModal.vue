@@ -18,7 +18,7 @@
       </div>
       <StatsShare :count="count" :target="target" ref="stats" :painting.sync="painting" size />
     </template>
-    <template slot="modal-footer" slot-scope="{ ok, cancel }">
+    <template slot="modal-footer" slot-scope="{ cancel }">
       <!-- eslint-disable-next-line -->
       <b-button variant="white" @click="cancel" v-html="translatedClose" />
       <!-- eslint-disable-next-line -->
