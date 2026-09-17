@@ -168,10 +168,11 @@ exports.createEvent = async function(page, baseURL, idgroups, past) {
   log('Setting event date', { past })
   await page.click('#event_date button')
 
-  // The cell selector below picks a day late in the displayed month, so on the current
-  // month it can land in the past - "Invite volunteers" is gated on the event being
-  // upcoming, and that test failed on 30 July for an event the picker put on 26 July.
-  // Always move a month so the chosen day is unambiguously past or future.
+  // The click below lands on the first day of the calendar's final week row,
+  // which is near the end of whichever month is on display.  In the current
+  // month that date is in the past for the last few days of every month, which
+  // quietly created a finished event when we asked for a future one, so shift a
+  // month in the direction we want rather than relying on today's position.
   if (past) {
     log('Setting past date - going back a month')
     await page.locator('[aria-label="Previous month"]').click()
@@ -181,6 +182,16 @@ exports.createEvent = async function(page, baseURL, idgroups, past) {
   }
 
   await page.click('#event_date .b-calendar-grid > .b-calendar-grid-body > .row:last-child .btn:last-child')
+
+  // A mis-picked date changes which actions the event offers, which surfaces as
+  // a puzzling timeout much later in whichever test used this helper.  Fail here
+  // instead, saying what went wrong.
+  const chosenDate = await page.locator('input[name="event_date"]').inputValue()
+  const todayDate = await page.evaluate(() => new Date().toISOString().slice(0, 10))
+  if (past ? chosenDate >= todayDate : chosenDate <= todayDate) {
+    throw new Error(`createEvent(past=${past}) picked ${chosenDate}, but today is ${todayDate}`)
+  }
+  log('Event date set', { chosenDate, todayDate, past })
 
   log('Setting event times')
   await page.click('#event_time input[name="start"]')
