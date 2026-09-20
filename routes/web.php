@@ -334,7 +334,7 @@ Route::middleware('auth', 'verifyUserConsent', 'ensureAPIToken')->group(function
         });
         Route::get('/search', [DeviceController::class, 'search']);
         Route::post('/image-upload/{id}', [DeviceController::class, 'imageUpload']);
-        Route::get('/image/delete/{iddevices}/{idxref}', [DeviceController::class, 'deleteImage']);
+        Route::post('/image/delete/{iddevices}/{idxref}', [DeviceController::class, 'deleteImage']);
     });
 
     Route::resource('networks', NetworkController::class)->only([
@@ -355,13 +355,13 @@ Route::middleware('auth', 'verifyUserConsent', 'ensureAPIToken')->group(function
         Route::get('/accept-invite/{id}/{hash}', [GroupController::class, 'confirmInvite']);
         Route::get('/join/{id}', [GroupController::class, 'getJoinGroup']);
         Route::post('/image-upload/{id}', [GroupController::class, 'imageUpload']);
-        Route::get('/image/delete/{idgroups}/{id}/{path}', [GroupController::class, 'ajaxDeleteImage']);
+        Route::post('/image/delete/{idgroups}/{id}/{path}', [GroupController::class, 'ajaxDeleteImage']);
         Route::get('/', [GroupController::class, 'mine'])->name('groups');
         Route::get('/all', [GroupController::class, 'all']);
         Route::get('/mine', [GroupController::class, 'mine']);
         Route::get('/nearby', [GroupController::class, 'nearby']);
         Route::get('/network/{id}', [GroupController::class, 'network']);
-        Route::get('/delete/{id}', [GroupController::class, 'delete']);
+        Route::post('/delete/{id}', [GroupController::class, 'delete']);
     });
 
     //Party Controller
@@ -375,7 +375,6 @@ Route::middleware('auth', 'verifyUserConsent', 'ensureAPIToken')->group(function
         Route::post('/edit/{id}', [PartyController::class, 'edit']);
         Route::get('/duplicate/{id}', [PartyController::class, 'duplicate']);
         Route::post('/delete/{id}', [PartyController::class, 'deleteEvent']);
-        Route::get('/deleteimage', [PartyController::class, 'deleteimage']);
         Route::get('/join/{id}', [PartyController::class, 'getJoinEvent']);
         Route::post('/invite', [PartyController::class, 'postSendInvite']);
         Route::get('/accept-invite/{id}/{hash}', [PartyController::class, 'confirmInvite']);
@@ -384,7 +383,7 @@ Route::middleware('auth', 'verifyUserConsent', 'ensureAPIToken')->group(function
         Route::get('/get-group-emails-with-names/{event_id}', [PartyController::class, 'getGroupEmailsWithNames']);
         Route::post('/update-quantity', [PartyController::class, 'updateQuantity']);
         Route::post('/image-upload/{id}', [PartyController::class, 'imageUpload']);
-        Route::get('/image/delete/{idevents}/{id}/{path}', [PartyController::class, 'deleteImage']);
+        Route::post('/image/delete/{idevents}/{id}/{path}', [PartyController::class, 'deleteImage']);
         Route::get('/contribution/{id}', [PartyController::class, 'getContributions']);
         Route::post('/update-volunteerquantity', [PartyController::class, 'updateVolunteerQuantity']);
     });
@@ -403,7 +402,7 @@ Route::middleware('auth', 'verifyUserConsent', 'ensureAPIToken')->group(function
         Route::post('/create', [BrandsController::class, 'postCreateBrand']);
         Route::get('/edit/{id}', [BrandsController::class, 'getEditBrand']);
         Route::post('/edit/{id}', [BrandsController::class, 'postEditBrand']);
-        Route::get('/delete/{id}', [BrandsController::class, 'getDeleteBrand']);
+        Route::post('/delete/{id}', [BrandsController::class, 'getDeleteBrand']);
     });
 
     //Skills Controller
@@ -412,7 +411,7 @@ Route::middleware('auth', 'verifyUserConsent', 'ensureAPIToken')->group(function
         Route::post('/create', [SkillsController::class, 'postCreateSkill']);
         Route::get('/edit/{id}', [SkillsController::class, 'getEditSkill']);
         Route::post('/edit/{id}', [SkillsController::class, 'postEditSkill']);
-        Route::get('/delete/{id}', [SkillsController::class, 'getDeleteSkill']);
+        Route::post('/delete/{id}', [SkillsController::class, 'getDeleteSkill']);
     });
 
     //GroupTags Controller
@@ -421,7 +420,7 @@ Route::middleware('auth', 'verifyUserConsent', 'ensureAPIToken')->group(function
         Route::post('/create', [GroupTagsController::class, 'postCreateTag']);
         Route::get('/edit/{id}', [GroupTagsController::class, 'getEditTag']);
         Route::post('/edit/{id}', [GroupTagsController::class, 'postEditTag']);
-        Route::get('/delete/{id}', [GroupTagsController::class, 'getDeleteTag']);
+        Route::post('/delete/{id}', [GroupTagsController::class, 'getDeleteTag']);
     });
 });
 
@@ -457,10 +456,6 @@ Route::middleware('ensureAPIToken')->group(function () {
     Route::get('/set-lang/{locale}', [LocaleController::class, 'setLang']);
 
     Route::post('/set-cookie', InformationAlertCookieController::class);
-
-    Route::get('/test/check-auth', function () {
-        return new \App\Services\CheckAuthService;
-    });
 
     Route::prefix('style')->group(function () {
         Route::get('/', [StyleController::class, 'index']);

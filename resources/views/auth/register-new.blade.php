@@ -43,7 +43,7 @@
                   @foreach ($skills[$key] as $skill)
                     <div class="col-6 col-lg-3">
                         <input @if( is_array(old('skills')) && in_array($skill->id, old('skills')) ) checked @endif type="checkbox" name="skills[]" id="skill-{{ $skill->id }}" class="styled-checkbox" value="{{ $skill->id }}">
-                        <label for="skill-{{ $skill->id }}" class="btn btn-checkbox"><span>@lang($skill->skill_name)</span></label>
+                        <label for="skill-{{ $skill->id }}" class="btn btn-checkbox"><span>{{ __($skill->skill_name) }}</span></label>
                     </div>
                   @endforeach
               </div>

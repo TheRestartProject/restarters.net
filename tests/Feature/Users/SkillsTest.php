@@ -87,11 +87,11 @@ class SkillsTest extends TestCase
                                      'description' => 'Planning',
                                  ]);
 
-        $response = $this->get('/skills/delete/' . $skill1->id);
+        $response = $this->post('/skills/delete/' . $skill1->id);
         $response->assertRedirect('/user/forbidden');
 
         $this->loginAsTestUser(Role::ADMINISTRATOR);
-        $response = $this->get('/skills/delete/' . $skill1->id);
+        $response = $this->post('/skills/delete/' . $skill1->id);
         $response->assertSessionHas('success');
     }
 }
