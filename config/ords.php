@@ -22,6 +22,20 @@ return [
     // reason as the prefix: a blank credits the data to nobody.
     'data_provider' => env('ORDS_DATA_PROVIDER', ''),
 
+    // `devices.problem` is volunteer free text. The scrubber removes contact
+    // details and identifiers but cannot remove personal names, which are not
+    // pattern-detectable, and a group name plus an event date narrows the field
+    // further on its own. Off by default: turning the endpoint on and
+    // publishing volunteer free text are two decisions, not one.
+    //
+    // The column is always present in the output either way. ORDS is a
+    // fixed 14-column shape and a consumer reading it positionally would break
+    // if the key disappeared, so `include` empties the value rather than
+    // dropping the field.
+    'problem' => [
+        'include' => env('ORDS_INCLUDE_PROBLEM', false),
+    ],
+
     // Bulk export, so a higher ceiling than the interactive v2 endpoints.
     'pagination' => [
         'default_per_page' => 100,

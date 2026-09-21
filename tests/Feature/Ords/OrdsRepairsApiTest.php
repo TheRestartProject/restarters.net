@@ -31,6 +31,10 @@ class OrdsRepairsApiTest extends TestCase
             // refuses to serve under; tests need a usable namespace.
             'ords.id_prefix' => 'testinstance_',
             'ords.data_provider' => 'Test Repair Org',
+            // Ships off, so the column would be empty in every other test in
+            // this file. The flag's own default is asserted below rather than
+            // here, where it would silence the rest of the suite.
+            'ords.problem.include' => true,
         ]);
     }
 
@@ -803,11 +807,10 @@ class OrdsRepairsApiTest extends TestCase
         $this->assertStringContainsString('https://example.com/p', $problem);
     }
 
-    public function test_problem_is_always_exported_and_always_scrubbed(): void
+    public function test_problem_is_scrubbed_when_included(): void
     {
-        // There is no toggle: the column ships on every export and the scrubber
-        // always runs. Personal names are not pattern-detectable and are not
-        // removed, which is a known limit of the redaction rather than a bug.
+        // Personal names are not pattern-detectable and are not removed, which
+        // is a known limit of the redaction rather than a bug.
         $this->seedRepair(['problem' => 'Reported by jane@example.com, screen cracked']);
 
         $problem = $this->fetchRecords()[0]['problem'];
@@ -815,6 +818,87 @@ class OrdsRepairsApiTest extends TestCase
         $this->assertNotNull($problem);
         $this->assertStringNotContainsString('jane@example.com', $problem);
         $this->assertStringContainsString('screen cracked', $problem);
+    }
+
+    // ------------------------------------------------------- problem toggle
+
+    public function test_problem_is_empty_unless_the_instance_opts_in(): void
+    {
+        config(['ords.problem.include' => false]);
+
+        $this->seedRepair(['problem' => 'Screen cracked']);
+
+        $this->assertNull($this->fetchRecords()[0]['problem']);
+    }
+
+    public function test_problem_column_is_still_present_when_not_included(): void
+    {
+        // ORDS is a fixed 14-column shape. Dropping the key would break a
+        // consumer reading positionally, so opting out empties it instead.
+        config(['ords.problem.include' => false]);
+
+        $this->seedRepair(['problem' => 'Screen cracked']);
+
+        $this->assertArrayHasKey('problem', $this->fetchRecords()[0]);
+    }
+
+    public function test_problem_column_is_written_empty_to_csv_when_not_included(): void
+    {
+        config(['ords.problem.include' => false]);
+
+        $this->seedRepair(['problem' => 'Screen cracked']);
+
+        $rows = $this->fetchCsvRows();
+        $columns = array_combine(OrdsRecordMapper::COLUMNS, $rows[1]);
+
+        // The header still carries the column; only the value goes.
+        $this->assertContains('problem', $rows[0]);
+        $this->assertSame('', $columns['problem']);
+    }
+
+    /**
+     * Guards the code-level fallback rather than the config file's own
+     * `env(..., false)`: with the key absent entirely the mapper still has to
+     * land on "keep it out" rather than reading null as permission.
+     */
+    public function test_a_missing_include_flag_keeps_problem_out(): void
+    {
+        config(['ords.problem' => null]);
+
+        $this->seedRepair(['problem' => 'Screen cracked']);
+
+        $this->assertNull($this->fetchRecords()[0]['problem']);
+    }
+
+    /**
+     * ORDS_INCLUDE_PROBLEM=maybe reaches config() as the string "maybe". A
+     * plain (bool) cast would read that as on and publish the column.
+     */
+    public function test_an_unreadable_include_flag_keeps_problem_out(): void
+    {
+        config(['ords.problem.include' => 'maybe']);
+
+        $this->seedRepair(['problem' => 'Screen cracked']);
+
+        $this->assertNull($this->fetchRecords()[0]['problem']);
+    }
+
+    /** The spellings someone actually writes in a .env file. */
+    public function test_recognised_truthy_spellings_include_problem(): void
+    {
+        // Seeded once: a seedRepair() per iteration would stack extra devices
+        // and fetchRecords()[0] would stop being the row under test.
+        $this->seedRepair(['problem' => 'Screen cracked']);
+
+        foreach (['1', 'true', 'yes', 'on', true] as $value) {
+            config(['ords.problem.include' => $value]);
+
+            $this->assertSame(
+                'Screen cracked',
+                $this->fetchRecords()[0]['problem'],
+                'Expected '.var_export($value, true).' to enable the column'
+            );
+        }
     }
 
     // ------------------------------------------------------------ helpers

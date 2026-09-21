@@ -37,7 +37,7 @@ use Carbon\Carbon;
  *     @OA\Property(property="event_date", type="string", format="date", nullable=true, example="2022-09-18"),
  *     @OA\Property(
  *          property="problem",
- *          description="Volunteer-written description of the fault, with contact details and identifiers redacted. Personal names are not pattern-detectable and are not removed.",
+ *          description="Volunteer-written description of the fault, with contact details and identifiers redacted. Personal names are not pattern-detectable and are not removed. Empty unless the instance sets ORDS_INCLUDE_PROBLEM.",
  *          type="string",
  *          nullable=true,
  *          example="Screen flickers when the lid is moved"
@@ -71,6 +71,8 @@ class OrdsRecordMapper
 
     private readonly string $dataProvider;
 
+    private readonly bool $includeProblem;
+
     /** @var array<string,array{0:string,1:int}> */
     private readonly array $poweredCategories;
 
@@ -96,6 +98,7 @@ class OrdsRecordMapper
     {
         $this->idPrefix = self::configuredIdPrefix();
         $this->dataProvider = self::configuredDataProvider();
+        $this->includeProblem = self::configuredFlag('ords.problem.include', false);
         $this->poweredCategories = config('ords.categories_powered');
         $this->unpoweredCategories = config('ords.categories_unpowered');
         $this->unpoweredFallback = config('ords.categories_unpowered_fallback');
@@ -126,6 +129,27 @@ class OrdsRecordMapper
         $provider = config('ords.data_provider');
 
         return is_string($provider) ? trim($provider) : '';
+    }
+
+    /**
+     * Laravel only casts the literals it recognises, so ORDS_INCLUDE_PROBLEM=on
+     * reaches config() as the string "on" and a plain (bool) cast would make
+     * any non-empty typo truthy. filter_var reads the forms someone actually
+     * writes in a .env ("1", "true", "yes", "on" and their negatives) and
+     * returns null for anything else, which falls back to $default.
+     *
+     * Callers pass the private side as $default, so an unreadable value keeps
+     * free text out rather than publishing it on a typo.
+     */
+    private static function configuredFlag(string $key, bool $default): bool
+    {
+        $value = config($key);
+
+        if (is_bool($value)) {
+            return $value;
+        }
+
+        return filter_var($value, FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE) ?? $default;
     }
 
     public function resetRedactions(): void
@@ -291,12 +315,19 @@ class OrdsRecordMapper
     }
 
     /**
-     * Always emitted and always scrubbed. The scrubber removes contact details
-     * and identifiers but cannot remove personal names, which are not
-     * pattern-detectable; see ProblemTextScrubber.
+     * Null unless `ords.problem.include` is on. The key is still emitted, so
+     * the export keeps its fixed 14-column shape and a consumer reading
+     * positionally sees an empty value rather than a missing field.
+     *
+     * When it is on the scrubber runs, which removes contact details and
+     * identifiers but cannot remove personal names; see ProblemTextScrubber.
      */
     private function problem(Device $device): ?string
     {
+        if (! $this->includeProblem) {
+            return null;
+        }
+
         return $this->scrubbed($device->problem);
     }
 
