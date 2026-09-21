@@ -409,6 +409,7 @@ class RepairController extends Controller
                 'updated_since', 'event_start', 'event_end', 'powered',
             ])),
             'redactions' => $this->mapper->redactionCounts(),
+            'problem' => $this->mapper->problemSettings(),
         ]);
     }
 }

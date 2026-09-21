@@ -10,6 +10,7 @@ use App\Party;
 use App\Services\Ords\OrdsRecordMapper;
 use App\User;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 use Tests\TestCase;
 
 /**
@@ -937,6 +938,26 @@ class OrdsRepairsApiTest extends TestCase
         $this->assertStringNotContainsString(
             'jane@example.com',
             $this->fetchRecords()[0]['problem']
+        );
+    }
+
+    /**
+     * The log is the only trace of an export afterwards, and whether free text
+     * went out unredacted is the part of it that cannot be inferred later from
+     * the row count.
+     */
+    public function test_the_export_log_records_the_problem_settings(): void
+    {
+        Log::spy();
+
+        config(['ords.problem.include' => true, 'ords.problem.scrub' => false]);
+
+        $this->seedRepair(['problem' => 'Screen cracked']);
+        $this->fetchRecords();
+
+        Log::shouldHaveReceived('info')->withArgs(
+            fn (string $message, array $context) => $message === 'ORDS export served'
+                && $context['problem'] === ['include' => true, 'scrub' => false]
         );
     }
 

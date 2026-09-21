@@ -155,6 +155,21 @@ class OrdsRecordMapper
         return filter_var($value, FILTER_VALIDATE_BOOL, FILTER_NULL_ON_FAILURE) ?? $default;
     }
 
+    /**
+     * For the export audit log. Whether free text went out, and whether it was
+     * redacted on the way, is the part of an export a reader cannot infer
+     * afterwards from the row count.
+     *
+     * @return array{include:bool,scrub:bool}
+     */
+    public function problemSettings(): array
+    {
+        return [
+            'include' => $this->includeProblem,
+            'scrub' => $this->scrubProblem,
+        ];
+    }
+
     public function resetRedactions(): void
     {
         $this->scrubber->reset();
