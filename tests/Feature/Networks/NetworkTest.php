@@ -264,10 +264,6 @@ class NetworkTest extends TestCase
         $response = $this->get('/networks/' . $network->id);
         $response->assertSee($coordinator->name);
 
-        // Group should not show on network page yet.
-        $response = $this->get('/group/network/' . $network->id);
-        $response->assertDontSee('&quot;networks&quot;:[' . $network->id . ']');
-
         // Add the group.
         $response = $this->get('/networks/' . $network->id);
         $crawler = new Crawler($response->getContent());
@@ -285,10 +281,21 @@ class NetworkTest extends TestCase
         ]);
         $response->assertRedirect();
 
-        // Group should now show on network page and in encoded list of networks for a group.
+        // /group/network/{id} is retired: coordinators see their groups on the
+        // network page itself (map + list). Old links redirect there.
         $response = $this->get('/group/network/' . $network->id);
-        $response->assertSee($group->name);
-        $response->assertSee('&quot;networks&quot;:[' . $network->id . ']', false);
+        $response->assertRedirect('/networks/' . $network->id);
+
+        // The network page embeds the map/list scoped to this network.
+        $response = $this->get('/networks/' . $network->id);
+        $response->assertSuccessful();
+        $response->assertSee(':network="{&quot;id&quot;:' . $network->id, false);
+
+        // And the group must be in the API data the page will fetch.
+        $response = $this->get('/api/v2/groups/summary');
+        $summary = collect($response->json('data'))->firstWhere('id', $group->idgroups);
+        $this->assertNotNull($summary);
+        $this->assertEquals($network->id, collect($summary['networks'])->first()['id']);
 
         // All networks list visible to admin.
         $this->loginAsTestUser(Role::ADMINISTRATOR);

@@ -61,3 +61,8 @@ export const UNKNOWN_STRINGS = [
     'no model',
     'none'
 ]
+
+export const MIN_MAP_ZOOM = 1
+// 14 was too shallow to read street names or tell close-together pins apart
+// (user feedback on the groups map); CARTO's raster tiles serve up to z18.
+export const MAX_MAP_ZOOM = 18
