@@ -37,7 +37,7 @@ use Carbon\Carbon;
  *     @OA\Property(property="event_date", type="string", format="date", nullable=true, example="2022-09-18"),
  *     @OA\Property(
  *          property="problem",
- *          description="Volunteer-written description of the fault, with contact details and identifiers redacted. Personal names are not pattern-detectable and are not removed. Empty unless the instance sets ORDS_INCLUDE_PROBLEM.",
+ *          description="Volunteer-written description of the fault, with contact details and identifiers redacted. Personal names are not pattern-detectable and are not removed. Empty unless the instance sets ORDS_INCLUDE_PROBLEM, and redacted unless it also sets ORDS_SCRUB_PROBLEM=false.",
  *          type="string",
  *          nullable=true,
  *          example="Screen flickers when the lid is moved"
@@ -73,6 +73,8 @@ class OrdsRecordMapper
 
     private readonly bool $includeProblem;
 
+    private readonly bool $scrubProblem;
+
     /** @var array<string,array{0:string,1:int}> */
     private readonly array $poweredCategories;
 
@@ -99,6 +101,7 @@ class OrdsRecordMapper
         $this->idPrefix = self::configuredIdPrefix();
         $this->dataProvider = self::configuredDataProvider();
         $this->includeProblem = self::configuredFlag('ords.problem.include', false);
+        $this->scrubProblem = self::configuredFlag('ords.problem.scrub', true);
         $this->poweredCategories = config('ords.categories_powered');
         $this->unpoweredCategories = config('ords.categories_unpowered');
         $this->unpoweredFallback = config('ords.categories_unpowered_fallback');
@@ -319,8 +322,10 @@ class OrdsRecordMapper
      * the export keeps its fixed 14-column shape and a consumer reading
      * positionally sees an empty value rather than a missing field.
      *
-     * When it is on the scrubber runs, which removes contact details and
-     * identifiers but cannot remove personal names; see ProblemTextScrubber.
+     * When it is on the scrubber runs unless `ords.problem.scrub` is explicitly
+     * off, in which case the value ships as the volunteer typed it. Scrubbing
+     * removes contact details and identifiers but cannot remove personal
+     * names; see ProblemTextScrubber.
      */
     private function problem(Device $device): ?string
     {
@@ -328,14 +333,17 @@ class OrdsRecordMapper
             return null;
         }
 
-        return $this->scrubbed($device->problem);
+        return $this->scrubProblem
+            ? $this->scrubbed($device->problem)
+            : $this->nullIfBlank($device->problem);
     }
 
     /**
-     * Every volunteer-written column goes through here. `problem` is the
-     * obvious one, but `item_type` and `brand` are typed by hand at an event
-     * with no vocabulary behind them, and owner-identifying text turns up in
-     * both ("Jane's kettle"). All three are published, so all three redact.
+     * `item_type` and `brand` are typed by hand at an event with no vocabulary
+     * behind them, and owner-identifying text turns up in both ("Jane's
+     * kettle"), so both always come through here. `ords.problem.scrub` governs
+     * `problem` alone and does not reach either of them: there is no flag that
+     * publishes raw `item_type` or `brand`.
      */
     private function scrubbed(?string $value): ?string
     {

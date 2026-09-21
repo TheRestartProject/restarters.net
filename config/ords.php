@@ -34,6 +34,13 @@ return [
     // dropping the field.
     'problem' => [
         'include' => env('ORDS_INCLUDE_PROBLEM', false),
+
+        // Only read when `include` is on. Defaults on, and an instance should
+        // have a specific reason to turn it off: with it off the column ships
+        // exactly as the volunteer typed it, HTML and any contact details
+        // included. CSV formula escaping is applied at the writer and is not
+        // affected either way.
+        'scrub' => env('ORDS_SCRUB_PROBLEM', true),
     ],
 
     // Bulk export, so a higher ceiling than the interactive v2 endpoints.

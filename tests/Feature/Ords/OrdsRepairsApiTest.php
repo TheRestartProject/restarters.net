@@ -883,6 +883,63 @@ class OrdsRepairsApiTest extends TestCase
         $this->assertNull($this->fetchRecords()[0]['problem']);
     }
 
+    public function test_problem_ships_raw_when_scrubbing_is_turned_off(): void
+    {
+        config(['ords.problem.scrub' => false]);
+
+        $this->seedRepair(['problem' => '<p>Call jane@example.com</p>']);
+
+        $this->assertSame(
+            '<p>Call jane@example.com</p>',
+            $this->fetchRecords()[0]['problem']
+        );
+    }
+
+    public function test_turning_scrubbing_off_does_not_publish_problem_on_its_own(): void
+    {
+        // `scrub` is only read once `include` has let the column through.
+        config(['ords.problem.include' => false, 'ords.problem.scrub' => false]);
+
+        $this->seedRepair(['problem' => 'Call jane@example.com']);
+
+        $this->assertNull($this->fetchRecords()[0]['problem']);
+    }
+
+    /**
+     * The flag is scoped to `problem`. `item_type` and `brand` are volunteer
+     * free text too and have no opt-out, so they redact either way.
+     */
+    public function test_turning_scrubbing_off_leaves_item_type_and_brand_redacted(): void
+    {
+        config(['ords.problem.scrub' => false]);
+
+        $this->seedRepair([
+            'item_type' => 'kettle jane@example.com',
+            'brand' => 'Bosch jane@example.com',
+        ]);
+
+        $record = $this->fetchRecords()[0];
+
+        $this->assertStringNotContainsString('jane@example.com', $record['partner_product_category']);
+        $this->assertStringNotContainsString('jane@example.com', $record['brand']);
+    }
+
+    /**
+     * Fails closed the other way from `include`: an unreadable value keeps the
+     * scrubber running rather than turning it off.
+     */
+    public function test_an_unreadable_scrub_flag_keeps_scrubbing_on(): void
+    {
+        config(['ords.problem.scrub' => 'maybe']);
+
+        $this->seedRepair(['problem' => 'Call jane@example.com']);
+
+        $this->assertStringNotContainsString(
+            'jane@example.com',
+            $this->fetchRecords()[0]['problem']
+        );
+    }
+
     /** The spellings someone actually writes in a .env file. */
     public function test_recognised_truthy_spellings_include_problem(): void
     {
