@@ -11,10 +11,51 @@ class StubGeocoderTest extends TestCase
      * GEOCODER_STUB is deliberately set, which only CI does and only when it
      * has no key. (The container binding itself can't be asserted here -
      * TestCase binds a GeocoderMock for every test.)
+     *
+     * This reads the config file's default with GEOCODER_STUB unset rather
+     * than the live config, because CI sets it on the key-less runs forked
+     * PRs get - and this test runs there too.
      */
     public function testStubIsOffUnlessDeliberatelyEnabled(): void
     {
-        self::assertFalse((bool) config('restarters.geocoder_stub'));
+        $saved = [getenv('GEOCODER_STUB'), $_ENV['GEOCODER_STUB'] ?? null, $_SERVER['GEOCODER_STUB'] ?? null];
+        putenv('GEOCODER_STUB');
+        unset($_ENV['GEOCODER_STUB'], $_SERVER['GEOCODER_STUB']);
+
+        try {
+            $config = require config_path('restarters.php');
+            self::assertFalse((bool) $config['geocoder_stub']);
+        } finally {
+            if ($saved[0] !== false) {
+                putenv('GEOCODER_STUB=' . $saved[0]);
+            }
+            if ($saved[1] !== null) {
+                $_ENV['GEOCODER_STUB'] = $saved[1];
+            }
+            if ($saved[2] !== null) {
+                $_SERVER['GEOCODER_STUB'] = $saved[2];
+            }
+        }
+    }
+
+    /**
+     * And the switch does turn it on - otherwise the test above proves nothing.
+     */
+    public function testStubCanBeEnabled(): void
+    {
+        $saved = $_SERVER['GEOCODER_STUB'] ?? null;
+        $_SERVER['GEOCODER_STUB'] = 'true';
+
+        try {
+            $config = require config_path('restarters.php');
+            self::assertTrue((bool) $config['geocoder_stub']);
+        } finally {
+            if ($saved === null) {
+                unset($_SERVER['GEOCODER_STUB']);
+            } else {
+                $_SERVER['GEOCODER_STUB'] = $saved;
+            }
+        }
     }
 
     public function testStubStillSatisfiesTheGeocoderContract(): void
