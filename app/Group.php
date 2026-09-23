@@ -148,6 +148,17 @@ class Group extends Model implements Auditable
 
     // Setters
 
+    /**
+     * Keep the legacy `country` column in step with `country_code`.  `country` is still read by external
+     * consumers (e.g. ORA exports, direct DB reporting) so it must be populated as soon as the group is saved,
+     * rather than waiting for the hourly groups:country job.  Countries are stored in English.
+     */
+    public function setCountryCodeAttribute($value)
+    {
+        $this->attributes['country_code'] = $value;
+        $this->attributes['country'] = $value ? (\App\Helpers\Fixometer::getAllCountries('en')[$value] ?? null) : null;
+    }
+
     //Getters
     public function findAll()
     {

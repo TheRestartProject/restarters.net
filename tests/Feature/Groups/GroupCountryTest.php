@@ -29,4 +29,16 @@ class GroupCountryTest extends TestCase
         $group = Group::find($group->idgroups);
         $this->assertEquals('United Kingdom', $group->country);
     }
+
+    public function testCountrySetOnSaveWithoutJob(): void {
+        // A French-speaking host creating a group must still get the English country name stored.
+        app()->setLocale('fr');
+
+        $group = Group::factory()->create(['country_code' => 'BE']);
+        $this->assertEquals('Belgium', Group::find($group->idgroups)->country);
+
+        $group->country_code = 'GB';
+        $group->save();
+        $this->assertEquals('United Kingdom', Group::find($group->idgroups)->country);
+    }
 }
