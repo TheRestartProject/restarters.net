@@ -141,7 +141,7 @@ class EditTest extends TestCase
         self::assertEquals(2, count($ret['images']));
 
         // Delete one
-        $response3 = $this->json('GET', '/device/image/delete/' . $iddevices . '/' . $ret['images'][0]['idxref'], $params);
+        $response3 = $this->json('POST', '/device/image/delete/' . $iddevices . '/' . $ret['images'][0]['idxref'], $params);
         $this->assertTrue($response3->isRedirection());
         $response3->assertSessionHas('message');
         $this->assertEquals('Thank you, the image has been deleted', \Session::get('message'));
@@ -197,7 +197,7 @@ class EditTest extends TestCase
         self::assertEquals(2, count($ret['images']));
 
         // Delete one
-        $response3 = $this->json('GET', '/device/image/delete/' . $iddevices . '/' . $ret['images'][0]['idxref'], $params);
+        $response3 = $this->json('POST', '/device/image/delete/' . $iddevices . '/' . $ret['images'][0]['idxref'], $params);
         $this->assertTrue($response3->isRedirection());
         $response3->assertSessionHas('message');
         $this->assertEquals('Thank you, the image has been deleted', \Session::get('message'));

@@ -90,12 +90,12 @@ class GroupTagsTest extends TestCase
         $tag = GroupTags::factory()->create();
 
         $admin = $this->loginAsTestUser(Role::RESTARTER);
-        $response = $this->get('/tags/delete/' . $tag->id);
+        $response = $this->post('/tags/delete/' . $tag->id);
         $response->assertRedirect('/user/forbidden');
 
         $admin = $this->loginAsTestUser(Role::ADMINISTRATOR);
 
-        $response = $this->get('/tags/delete/' . $tag->id);
+        $response = $this->post('/tags/delete/' . $tag->id);
         $response->assertRedirect();
         $response->assertSessionHas('success');
     }

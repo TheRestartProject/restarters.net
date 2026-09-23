@@ -33,6 +33,21 @@ export default {
                 Sentry.captureMessage("Missing translation " + key)
                 return key
             }
+        },
+        // Translation strings can contain markup, and the translator interpolates
+        // :placeholder values into it without escaping.  Any value that comes from the
+        // database has to be escaped by the caller before it reaches a v-html binding.
+        escapeHtml(value) {
+            if (value === null || value === undefined) {
+                return ''
+            }
+
+            return String(value)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;')
         }
     }
 }
