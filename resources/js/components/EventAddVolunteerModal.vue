@@ -23,7 +23,7 @@
         <small class="after-offset">{{ translatedMessageVolunteerEmailAddress }}</small>
       </div>
     </template>
-    <template slot="modal-footer" slot-scope="{ ok, cancel }">
+    <template slot="modal-footer">
       <!-- eslint-disable-next-line -->
       <b-button variant="primary" @click="submit" v-html="translatedVolunteerAttended" :disabled="disabled" />
     </template>

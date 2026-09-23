@@ -93,7 +93,6 @@
 <script>
 import { END_OF_LIFE, FIXED, REPAIRABLE } from '../constants'
 import moment from 'moment'
-import DeviceModel from './DeviceModel.vue'
 import Vue from 'vue'
 import lineClamp from 'vue-line-clamp'
 import ConfirmModal from './ConfirmModal.vue'
@@ -109,7 +108,7 @@ const bootaxios = axios
 
 export default {
   mixins: [images],
-  components: {EventDevice, ConfirmModal, DeviceModel},
+  components: {EventDevice, ConfirmModal},
   props: {
     isAdmin: {
       type: Boolean,

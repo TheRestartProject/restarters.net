@@ -156,7 +156,6 @@
 <script>
 import moment from 'moment'
 import images from '../mixins/images'
-import InfiniteLoading from 'vue-infinite-loading'
 import GroupEventsScrollTableDateShort from './GroupEventsScrollTableDateShort.vue'
 import GroupEventsScrollTableDateLong from './GroupEventsScrollTableDateLong.vue'
 import GroupEventsScrollTableNumber from './GroupEventsScrollTableNumber.vue'
@@ -173,7 +172,6 @@ export default {
     GroupEventsScrollTableNumber,
     GroupEventsScrollTableDateLong,
     GroupEventsScrollTableDateShort,
-    InfiniteLoading
   },
   props: {
     events: {
