@@ -1074,10 +1074,15 @@ class GroupController extends Controller
             'email' => $email,
         ];
 
+        // Hosts can edit the postcode (area stays admin/coordinator only, below).  Only touch it when sent, so a
+        // partial update doesn't blank it.
+        if ($request->has('postcode')) {
+            $data['postcode'] = $postcode;
+        }
+
         if ($user->hasRole('Administrator') || ($user->hasRole('NetworkCoordinator') && $isCoordinatorForGroup)) {
             // Got permission to update these.
             $data['area'] = $area;
-            $data['postcode'] = $postcode;
             $data['archived_at'] = $archived_at;
         }
 

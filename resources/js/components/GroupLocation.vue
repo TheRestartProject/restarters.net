@@ -24,7 +24,7 @@
     </b-form-group>
     <b-form-group>
       <label for="group_postcode">{{ __('groups.postcode') }}:</label>
-      <b-input id="group_postcode" name="postcode" v-model="currentPostcode" :class="{ hasError: hasError }" :readonly="!canEditPostcode" />
+      <b-input id="group_postcode" name="postcode" v-model="currentPostcode" :class="{ hasError: hasError }" />
       <small>{{ __('groups.groups_postcode_small') }}</small>
     </b-form-group>
   </div>
@@ -74,11 +74,6 @@ export default {
       default: null
     },
     online: {
-      type: Boolean,
-      required: false,
-      default: false
-    },
-    canEditPostcode: {
       type: Boolean,
       required: false,
       default: false
