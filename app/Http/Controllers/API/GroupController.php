@@ -257,6 +257,12 @@ class GroupController extends Controller
      *                   type="object",
      *                   @OA\Property(property="id", type="integer", example=1),
      *                   @OA\Property(property="name", type="string", example="Group Name"),
+     *                   @OA\Property(property="lat", type="number", nullable=true, example=51.5),
+     *                   @OA\Property(property="lng", type="number", nullable=true, example=-0.12),
+     *                   @OA\Property(property="country", type="string", nullable=true, example="United Kingdom"),
+     *                   @OA\Property(property="network_ids", type="array", @OA\Items(type="integer")),
+     *                   @OA\Property(property="tag_ids", type="array", @OA\Items(type="integer")),
+     *                   @OA\Property(property="archived_at", type="string", format="date-time", nullable=true),
      *                )
      *             )
      *          )
@@ -269,26 +275,139 @@ class GroupController extends Controller
             'includeArchived' => ['string', 'in:true,false'],
         ]);
 
-        // We only return the group id and name, for speed.
-        $query = Group::select('idgroups', 'name', 'archived_at');
+        // We only return a small number of attributes, for speed: this index
+        // drives the groups map (positions/tooltips) and the client-side
+        // name/country/network/tag filters, with full rows hydrated on demand
+        // via /groups/summary?ids=.
+        $query = Group::select('idgroups', 'name', 'latitude', 'longitude', 'country_code', 'archived_at');
 
         if (!$request->has('includeArchived') || $request->get('includeArchived') == 'false') {
             $query = $query->whereNull('archived_at');
         }
 
         $groups = $query->get();
+
+        // Two cheap lookups instead of per-group relation loads.
+        $networkIds = \DB::table('group_network')
+            ->whereIn('group_id', $groups->pluck('idgroups'))
+            ->get()
+            ->groupBy('group_id');
+        $tagIds = \DB::table('grouptags_groups')
+            ->whereIn('group', $groups->pluck('idgroups'))
+            ->get()
+            ->groupBy('group');
+
         $ret = [];
 
         foreach ($groups as $group) {
             $ret[] = [
                 'id' => $group->idgroups,
                 'name' => $group->name,
+                'lat' => $group->latitude !== null ? (float) $group->latitude : null,
+                'lng' => $group->longitude !== null ? (float) $group->longitude : null,
+                'country' => \App\Helpers\Fixometer::getCountryFromCountryCode($group->country_code),
+                'network_ids' => $networkIds->has($group->idgroups) ? $networkIds[$group->idgroups]->pluck('network_id')->map(fn ($id) => (int) $id)->all() : [],
+                // The pivot columns are varchars; the API contract is integers.
+                'tag_ids' => $tagIds->has($group->idgroups) ? $tagIds[$group->idgroups]->pluck('group_tag')->map(fn ($id) => (int) $id)->all() : [],
                 'archived_at' => $group->archived_at ? Carbon::parse($group->archived_at)->toIso8601String() : null
             ];
         }
 
         return [
             'data' => $ret
+        ];
+    }
+
+    /**
+     * @OA\Get(
+     *      path="/api/v2/groups/summary",
+     *      operationId="getGroupSummariesv2",
+     *      tags={"Groups"},
+     *      summary="Get list of groups with summary information",
+     *      @OA\Parameter(
+     *          name="archived",
+     *          description="Include archived groups.  Default false.",
+     *          required=false,
+     *          in="query",
+     *          @OA\Schema(
+     *              type="boolean"
+     *          )
+     *      ),
+     *      @OA\Parameter(
+     *          name="includeNextEvent",
+     *          description="Include the next event for the group.  This makes the call slower.  Default false.",
+     *          required=false,
+     *          in="query",
+     *          @OA\Schema(
+     *              type="boolean"
+     *          )
+     *      ),
+     *      @OA\Parameter(
+     *          name="includeCounts",
+     *          description="Include the counts of hosts and restarters.  This makes the call slower.  Default false.",
+     *          required=false,
+     *          in="query",
+     *          @OA\Schema(
+     *              type="boolean"
+     *          )
+     *      ),
+     *      @OA\Parameter(
+     *          name="ids",
+     *          description="Comma-separated group ids.  When present, only these groups are returned (used by the groups list to hydrate the visible rows).  Maximum 200 ids.",
+     *          required=false,
+     *          in="query",
+     *          @OA\Schema(
+     *              type="string"
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(
+     *              @OA\Property(
+     *                property="data",
+     *                title="data",
+     *                description="An array of events",
+     *                type="array",
+     *                @OA\Items(
+     *                    @OA\Schema(
+     *                       ref="#/components/schemas/GroupSummary"
+     *                    ),
+     *                 )
+     *              )
+     *          )
+     *       ),
+     *     )
+     */
+
+    public static function listSummaryv2(Request $request) {
+        $request->validate([
+            'archived' => ['string', 'in:true,false'],
+            'ids' => ['string', 'regex:/^\d+(,\d+)*$/', function ($attribute, $value, $fail) {
+                if (count(explode(',', $value)) > 200) {
+                    $fail('A maximum of 200 ids may be requested at once.');
+                }
+            }],
+        ]);
+
+        // Eager-load everything the GroupSummary resource touches, otherwise
+        // each group lazy-loads its relations and the call scales O(N).
+        $query = Group::with(['networks', 'groupImage.image', 'group_tags']);
+
+        if ($request->get('archived', 'false') !== 'true') {
+            $query = $query->whereNull('archived_at');
+        }
+
+        // The groups list hydrates just its visible rows this way, instead of
+        // paying to serialise every group on page load.
+        if ($request->filled('ids')) {
+            $query = $query->whereIn('idgroups', explode(',', $request->get('ids')));
+        }
+
+        $groups = $query->get();
+
+        return [
+            'data' => \App\Http\Resources\GroupSummaryCollection::make($groups)
         ];
     }
 
