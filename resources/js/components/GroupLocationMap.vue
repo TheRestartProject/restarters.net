@@ -1,19 +1,16 @@
 <template>
   <div>
-    <div class="mb-1">
-      {{ __('partials.dragmap') }}
-    </div>
     <l-map
         class="map"
         ref="group-map"
-        :zoom="11"
-        :center="center"
+        :zoom="16"
+        :center="mapCenter"
         :style="'width: 100%; height: 200px'"
-        @update:center="centerUpdated"
     >
       <l-tile-layer :url="tiles" :attribution="attribution" />
-      <l-marker :lat-lng="center" :interactive="false" />
+      <l-marker :lat-lng="marker" :draggable="true" @dragend="markerDragged" />
     </l-map>
+    <small class="text-muted">{{ __('partials.dragmap') }}</small>
   </div>
 </template>
 <script>
@@ -39,32 +36,35 @@ export default {
   },
   data () {
     return {
-      center: [this.lat, this.lng]
+      // The marker is the group's location; the map can be panned and zoomed
+      // independently without moving it.
+      marker: [this.lat, this.lng],
+      mapCenter: [this.lat, this.lng]
     }
   },
   watch: {
     lat() {
-      this.recentre()
+      this.relocate()
     },
     lng() {
-      this.recentre()
+      this.relocate()
     }
   },
   methods: {
-    centerUpdated(newCenter) {
-      // Fired by Leaflet when a drag finishes. The marker is pinned to the
-      // centre, so tell the parent where the pin now is.
-      this.center = [newCenter.lat, newCenter.lng]
-      this.$emit('update:lat', newCenter.lat)
-      this.$emit('update:lng', newCenter.lng)
+    markerDragged(e) {
+      const pos = e.target.getLatLng()
+      this.marker = [pos.lat, pos.lng]
+      this.$emit('update:lat', pos.lat)
+      this.$emit('update:lng', pos.lng)
     },
-    recentre() {
+    relocate() {
       // A genuinely new position (e.g. a fresh geocode from the location
-      // field) moves the map; the echo of our own drag does not.
+      // field) moves the marker and the map; the echo of our own drag does not.
       if (this.lat !== null && this.lng !== null &&
-          (Math.abs(this.lat - this.center[0]) > EPSILON ||
-           Math.abs(this.lng - this.center[1]) > EPSILON)) {
-        this.center = [this.lat, this.lng]
+          (Math.abs(this.lat - this.marker[0]) > EPSILON ||
+           Math.abs(this.lng - this.marker[1]) > EPSILON)) {
+        this.marker = [this.lat, this.lng]
+        this.mapCenter = [this.lat, this.lng]
       }
     }
   }
