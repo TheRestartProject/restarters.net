@@ -33,8 +33,30 @@ class NetworkStatsTest extends StatsTestCase
 
         $expect = \App\Group::getGroupStatsArrayKeys();
         $expect['parties'] = $expect['parties'] ?? 0;
+        $expect['groups'] = 0;
 
         $this->assertEquals($expect, $network->stats());
+    }
+
+    /** @test */
+    public function network_group_count_excludes_archived_groups_but_impact_includes_them(): void
+    {
+        $network = Network::factory()->create();
+
+        $active = Group::factory()->create();
+        $archived = Group::factory()->create(['archived_at' => '2024-01-01 00:00:00']);
+        $network->addGroup($active);
+        $network->addGroup($archived);
+
+        Party::factory()->moderated()->create([
+            'event_start_utc' => '2000-01-01T10:00:00+00:00',
+            'event_end_utc' => '2000-01-01T13:00:00+00:00',
+            'group' => $archived->idgroups,
+        ]);
+
+        $stats = $network->stats();
+        $this->assertEquals(1, $stats['groups']);
+        $this->assertEquals(1, $stats['parties']);
     }
 
     /** @test */

@@ -23,19 +23,19 @@
       <h2>{{ __('networks.general.impact') }}</h2>
       <div class="stats-grid">
         <div class="stat-box">
-          <div class="stat-value">{{ stats.groups || 0 }}</div>
+          <div class="stat-value">{{ statsLoaded ? (stats.groups || 0) : '…' }}</div>
           <div class="stat-label">{{ __('networks.stats.groups', { count: stats.groups || 0 }) }}</div>
         </div>
         <div class="stat-box">
-          <div class="stat-value">{{ stats.parties || 0 }}</div>
+          <div class="stat-value">{{ statsLoaded ? (stats.parties || 0) : '…' }}</div>
           <div class="stat-label">{{ __('networks.stats.events', { count: stats.parties || 0 }) }}</div>
         </div>
         <div class="stat-box">
-          <div class="stat-value">{{ formatWeight(stats.waste_total) }}</div>
+          <div class="stat-value">{{ statsLoaded ? formatWeight(stats.waste_total) : '…' }}</div>
           <div class="stat-label">{{ __('networks.stats.waste_diverted') }}</div>
         </div>
         <div class="stat-box">
-          <div class="stat-value">{{ formatWeight(stats.co2_total) }}</div>
+          <div class="stat-value">{{ statsLoaded ? formatWeight(stats.co2_total) : '…' }}</div>
           <div class="stat-label">{{ __('networks.stats.co2_prevented') }}</div>
         </div>
       </div>
@@ -234,6 +234,9 @@ export default {
     }
   },
   computed: {
+    statsLoaded() {
+      return !!this.stats && Object.keys(this.stats).length > 0
+    },
     worldBounds() {
       // The inverted whole-world box: GroupMap treats it as "no location", so
       // it frames all the (network-filtered) groups instead.

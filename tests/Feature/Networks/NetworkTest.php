@@ -231,6 +231,7 @@ class NetworkTest extends TestCase
         $response = $this->get("/api/networks/{$network->id}/stats?api_token=1234");
         $stats = json_decode($response->getContent(), true);
         $expectedStats = \App\Group::getGroupStatsArrayKeys();
+        $expectedStats['groups'] = 1;
         $this->assertEquals($expectedStats, $stats);
     }
 
