@@ -14,7 +14,7 @@ class AddReferenceToDevicesTable extends Migration
     public function up()
     {
         Schema::table('devices', function (Blueprint $table) {
-            $table->string('reference')->nullable();
+            $table->string('reference', 255)->nullable();
         });
     }
 

@@ -22,6 +22,7 @@ const OPTIMISTIC_FIELDS = [
   'next_steps',
   'spare_parts',
   'barrier',
+  'reference',
 ]
 
 function optimisticPatch(payload) {

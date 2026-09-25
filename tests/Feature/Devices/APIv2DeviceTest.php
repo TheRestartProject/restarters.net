@@ -146,6 +146,25 @@ class APIv2DeviceTest extends TestCase
         }
     }
 
+    public function testReferenceMaxLengthIsStoredIntact(): void {
+        $this->loginAsTestUser(Role::ADMINISTRATOR);
+        $idEvents = $this->createEvent($this->createGroup(), 'yesterday');
+
+        // The longest reference validation allows must not be truncated by the column.
+        $reference = str_repeat('R', 255);
+        $response = $this->post('/api/v2/devices', [
+            'eventid' => $idEvents,
+            'category' => 11,
+            'problem' => 'Test problem',
+            'reference' => $reference,
+            'repair_status' => 'Fixed',
+        ]);
+        $this->assertTrue($response->isSuccessful());
+        $iddevices = json_decode($response->getContent(), true)['id'];
+
+        $this->assertEquals($reference, \App\Device::findOrFail($iddevices)->reference);
+    }
+
     /**
      * Create a device over the API and check it retrieves as expected.
      *
