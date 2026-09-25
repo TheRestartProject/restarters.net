@@ -873,6 +873,7 @@ class APIv2NetworkTest extends TestCase
         $this->assertArrayHasKey('parties', $json);
         $this->assertArrayHasKey('co2_total', $json);
         $this->assertArrayHasKey('waste_total', $json);
+        $this->assertEquals(1, $json['groups']);
     }
 
     /**

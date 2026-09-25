@@ -55,12 +55,12 @@ class NetworkController extends Controller
         $groupsForAssociating = [];
 
         if ($user->can('associateGroups', $network)) {
-            $groupsForAssociating = $network->groupsNotIn()->sortBy('name');
+            $groupsForAssociating = $network->groupsNotIn();
         }
 
-        // Get network stats
-        $stats = $network->stats();
-        $stats['groups'] = $network->groups->count();
+        // Stats are fetched by the page from the API after it renders.  Calculating them walks every device
+        // of every past event in the network, which is too slow to block the page load on for large networks.
+        $stats = [];
 
         // Determine if user can manage tags (NC for this network or Admin)
         $canManageTags = Fixometer::hasRole($user, 'Administrator') ||

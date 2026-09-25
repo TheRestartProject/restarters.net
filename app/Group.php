@@ -325,7 +325,12 @@ class Group extends Model implements Auditable
             ->with('allDevices')
             ->withCount('allInvited')
             ->whereIn('events.group', $groupIds)
-            ->lazy(200)
+            // lazyById pages on the primary key (WHERE idevents > last) rather than lazy()'s growing
+            // OFFSET, which made MySQL rescan every earlier row for each chunk on large networks.  past()
+            // orders by date, and keyset paging needs the id to be the only sort key or events are skipped
+            // and double-counted - hence reorder().
+            ->reorder()
+            ->lazyById(200, 'events.idevents', 'idevents')
             ->each(function ($event) use (&$statsByGroup, $eEmissionRatio, $uEmissionratio) {
                 $gid = $event->group;
                 if (! isset($statsByGroup[$gid])) {
