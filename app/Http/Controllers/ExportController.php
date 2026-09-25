@@ -103,7 +103,8 @@ class ExportController extends Controller
             iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', __('events.event_date')),
             iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', __('events.stat-7')),
             iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', __('events.stat-6')),
-            iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', ucfirst(__('devices.title_powered')))
+            iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', ucfirst(__('devices.title_powered'))),
+            iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', __('devices.reference')),
         ];
 
         fputcsv($file, $columns);
@@ -143,7 +144,8 @@ class ExportController extends Controller
                     $device->deviceEvent->getFormattedLocalStart('Y-m-d'),
                     $wasteImpact,
                     $co2Diverted,
-                    $device->deviceCategory->powered ? 'Powered' : 'Unpowered'
+                    $device->deviceCategory->powered ? 'Powered' : 'Unpowered',
+                    $device->reference,
                 ]);
             }
         }

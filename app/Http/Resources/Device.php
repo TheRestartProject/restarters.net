@@ -175,6 +175,14 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *           ref="#/components/schemas/Image"
  *         )
  *     ),
+ *     @OA\Property(
+ *         property="reference",
+ *         title="reference",
+ *         description="Your reference for this device.",
+ *         format="string",
+ *         maxLength=255,
+ *         example="REP1234"
+ *     ),
  * )
  */
 
@@ -206,6 +214,7 @@ class Device extends JsonResource
             'problem' => $this->problem,
             'short_problem' => $this->getShortProblem(),
             'notes' => $this->notes,
+            'reference' => $this->reference,
             'created_at' => $this->created_at->toIso8601String(),
             'updated_at' => $this->created_at->toIso8601String(),
         ];

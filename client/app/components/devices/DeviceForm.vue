@@ -121,6 +121,7 @@ const form = reactive({
   estimate: props.device?.estimate ? String(props.device.estimate) : '',
   problem: props.device?.problem || '',
   notes: props.device?.notes || '',
+  reference: props.device?.reference || '',
   repairStatus: props.device?.repair_status || '',
   nextSteps: props.device?.next_steps || '',
   spareParts: props.device?.spare_parts || '',
@@ -347,6 +348,7 @@ function buildPayload() {
     model: form.model,
     problem: form.problem,
     notes: form.notes,
+    reference: form.reference,
     repair_status: form.repairStatus,
     next_steps: showNextSteps.value ? form.nextSteps : '',
     spare_parts: showSpareParts.value ? form.spareParts : '',
@@ -591,6 +593,23 @@ defineExpose({ submit })
             :placeholder="t('devices.model_if_known')"
             :disabled="readonly"
             data-testid="device-form-model"
+          >
+        </BFormGroup>
+
+        <BFormGroup label-for="device-form-reference">
+          <template #label>
+            {{ t('devices.reference') }}:
+            <FieldInfoPopover :content="t('devices.tooltip_reference')" :variant="infoIconVariant" />
+          </template>
+          <input
+            id="device-form-reference"
+            v-model="form.reference"
+            type="text"
+            maxlength="255"
+            autocomplete="off"
+            class="form-control"
+            :disabled="readonly"
+            data-testid="device-form-reference"
           >
         </BFormGroup>
 

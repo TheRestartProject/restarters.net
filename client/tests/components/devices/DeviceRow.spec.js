@@ -67,6 +67,20 @@ describe('components/devices/DeviceRow', () => {
     expect(wrapper.find('[data-testid="event-device-status-1"]').text()).toBe('Fixed')
   })
 
+  // PR #775: groups cross-reference items to their own repair-tracking
+  // software, so the reference has to be readable without opening the row.
+  it('shows the reference above the item type when one is set', () => {
+    const wrapper = mountRow({ device: device({ reference: 'REP1234' }) })
+
+    expect(wrapper.find('[data-testid="event-device-reference-1"]').text()).toBe('REP1234')
+  })
+
+  it('shows nothing where the reference would be when it is unset', () => {
+    const wrapper = mountRow()
+
+    expect(wrapper.find('[data-testid="event-device-reference-1"]').exists()).toBe(false)
+  })
+
   it('hides the brand column when unpowered', () => {
     const wrapper = mountRow({ powered: false })
     expect(wrapper.find('[data-testid="event-device-1"]').text()).not.toContain('Acme')

@@ -119,10 +119,10 @@ describe('components/devices/DeviceForm', () => {
   // each carry an info popover; ours had none. Asserting the count rather
   // than mere presence, because four of the five rendering and one silently
   // missing would still look fine on screen.
-  it('shows an info popover on each of the five documented fields', () => {
+  it('shows an info popover on each of the six documented fields', () => {
     const wrapper = mountForm()
 
-    expect(wrapper.findAll('[data-testid="field-info-toggle"]')).toHaveLength(5)
+    expect(wrapper.findAll('[data-testid="field-info-toggle"]')).toHaveLength(6)
   })
 
   // The item-type help text differs by powered-ness: the examples are
@@ -191,6 +191,42 @@ describe('components/devices/DeviceForm', () => {
       // pre-existing validation ('brand' => 'string' etc., no nullable)
       // 422s on null values - the shape the legacy client always sent.
     })
+  })
+
+  // PR #775 (device reference). Groups cross-reference items to their own
+  // repair-tracking software, so the field has to survive a round trip: it is
+  // free text, optional, and capped at 255 to match the column.
+  it('offers an optional reference field with its tooltip', () => {
+    const wrapper = mountForm()
+    const input = wrapper.find('[data-testid="device-form-reference"]')
+
+    expect(input.exists()).toBe(true)
+    expect(input.attributes('maxlength')).toBe('255')
+    expect(wrapper.findAllComponents({ name: 'FieldInfoPopover' }).map(c => c.props('content')))
+      .toContain(en.devices.tooltip_reference)
+  })
+
+  it('sends the reference when one is given', async () => {
+    store.addDevice = vi.fn().mockResolvedValue({ device: { id: 42 } })
+    const wrapper = mountForm()
+
+    await chooseOption(wrapper, 'device-form-category', '10')
+    await wrapper.find('[data-testid="device-form-reference"]').setValue('REP1234')
+    await wrapper.find('[data-testid="device-form"]').trigger('submit')
+    await wrapper.vm.$nextTick()
+
+    expect(store.addDevice).toHaveBeenCalledWith(5, expect.objectContaining({ reference: 'REP1234' }))
+  })
+
+  it('omits the reference when it is left blank', async () => {
+    store.addDevice = vi.fn().mockResolvedValue({ device: { id: 42 } })
+    const wrapper = mountForm()
+
+    await chooseOption(wrapper, 'device-form-category', '10')
+    await wrapper.find('[data-testid="device-form"]').trigger('submit')
+    await wrapper.vm.$nextTick()
+
+    expect(Object.keys(store.addDevice.mock.calls[0][1])).not.toContain('reference')
   })
 
   it('loops addDevice once per unit of quantity', async () => {
@@ -331,6 +367,12 @@ describe('components/devices/DeviceForm', () => {
       expect(wrapper.find('[data-testid="device-form-category"]').attributes('data-value')).toBe('10')
       expect(wrapper.find('[data-testid="device-form-brand"]').element.value).toBe('Acme')
       expect(wrapper.find('[data-testid="device-form-model"]').element.value).toBe('K1')
+    })
+
+    it('prefills the reference from the device prop', () => {
+      const wrapper = mountForm({ device: editDevice({ reference: 'REP1234' }) })
+
+      expect(wrapper.find('[data-testid="device-form-reference"]').element.value).toBe('REP1234')
     })
 
     it('shows DevicePhotos with the device id and existing images', () => {
