@@ -156,7 +156,22 @@ class Group extends Model implements Auditable
     public function setCountryCodeAttribute($value)
     {
         $this->attributes['country_code'] = $value;
-        $this->attributes['country'] = $value ? (\App\Helpers\Fixometer::getAllCountries('en')[$value] ?? null) : null;
+        $this->attributes['country'] = self::countryNameForCode($value);
+    }
+
+    /**
+     * The English country name stored in the legacy `country` column; '' for an empty or unknown code.  Group
+     * imports have used 'UK' for the United Kingdom, which isn't an ISO code.
+     */
+    public static function countryNameForCode($code): string
+    {
+        if (! $code) {
+            return '';
+        }
+
+        $code = strtoupper($code) === 'UK' ? 'GB' : $code;
+
+        return \App\Helpers\Fixometer::getAllCountries('en')[$code] ?? '';
     }
 
     //Getters

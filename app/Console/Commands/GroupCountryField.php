@@ -3,7 +3,6 @@
 namespace App\Console\Commands;
 
 use App\Group;
-use App\Helpers\Fixometer;
 use Illuminate\Console\Command;
 
 class GroupCountryField extends Command
@@ -30,7 +29,7 @@ class GroupCountryField extends Command
         $groups = Group::all();
 
         foreach ($groups as $group) {
-            $group->country = Fixometer::getCountryFromCountryCode($group->country_code);
+            $group->country = Group::countryNameForCode($group->country_code);
             $group->save();
         }
     }
