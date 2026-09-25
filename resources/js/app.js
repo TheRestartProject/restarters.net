@@ -62,6 +62,7 @@ import CategoriesTable from './components/CategoriesTable.vue'
 import RolesTable from './components/RolesTable.vue'
 import EmailValidation from './components/EmailValidation.vue'
 
+import './moment-locale'
 import lang from './mixins/lang'
 
 import Vuelidate from 'vuelidate'

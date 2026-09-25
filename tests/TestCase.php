@@ -57,55 +57,39 @@ abstract class TestCase extends BaseTestCase
     {
         parent::setUp();
 
+        // DELETE rather than TRUNCATE, and no per-table ALTER TABLE: both are DDL, and with processIsolation this
+        // runs before every test.  Together they cost ~5s per test - most of the suite's CI runtime, which was
+        // pushing the build job past CircleCI's 60 minute limit.  The tables are near-empty so DELETE is quick.
         DB::statement('SET foreign_key_checks=0');
-        Network::truncate();
-        Group::truncate();
-        User::truncate();
-        Audits::truncate();
-        EventsUsers::truncate();
-        UserGroups::truncate();
-        UsersPreferences::truncate();
-        UsersPermissions::truncate();
-        DeviceBarrier::truncate();
-        Device::truncate();
-        Party::truncate();
-        GroupNetwork::truncate();
-        Category::truncate();
-        Brands::truncate();
-        GroupTags::truncate();
-        Xref::truncate();
-        Images::truncate();
-        UsersSkills::truncate();
-        Skills::truncate();
-        Alert::truncate();
-        DB::statement('delete from audits');
+        foreach ([
+            Network::class, Group::class, User::class, Audits::class, EventsUsers::class, UserGroups::class,
+            UsersPreferences::class, UsersPermissions::class, DeviceBarrier::class, Device::class, Party::class,
+            GroupNetwork::class, Category::class, Brands::class, GroupTags::class, Xref::class, Images::class,
+            UsersSkills::class, Skills::class, Alert::class,
+        ] as $model) {
+            // Query builder rather than the model so soft-deleting models are really emptied.
+            DB::table((new $model)->getTable())->delete();
+        }
         DB::delete('delete from user_network');
-        DB::delete('delete from users_preferences');
-        DB::delete('delete from users_permissions');
         DB::delete('delete from grouptags_groups');
         DB::delete('delete from failed_jobs');
-        DB::table('notifications')->truncate();
+        DB::delete('delete from notifications');
         DB::statement('SET foreign_key_checks=1');
 
-        // Set up random auto increment values.  This avoids tests working because everything is 1.
+        // Make sure ids differ between tables.  This avoids tests working because everything is 1.
         //
-        // Some tables (e.g. network) have a tinyint as the ID, so we must be careful not to create values that
-        // overflow this.  Also avoid the magic 29 value, which is a "superhero" user (see ExportController).
-        $tables = DB::select('SHOW TABLES');
-        foreach ($tables as $table)
-        {
-            foreach ($table as $field => $tablename) {
-                try {
-                    do {
-                        $val = rand(1, 100);
-                    } while ($val == 29);
-
-                    // This will throw an exception if the table doesn't have auto increment.
-                    DB::update("ALTER TABLE $tablename AUTO_INCREMENT = " . $val . ";");
-                } catch (\Exception $e) {
-                }
-            }
+        // DELETE leaves auto increment counters where they were, so they drift apart as the suite runs; we only
+        // need to push them apart when they're still low, i.e. just after migrate:fresh.  Starting above 100 also
+        // steers clear of the magic 29, which is a "superhero" user (see ExportController).
+        DB::statement('SET SESSION information_schema_stats_expiry = 0');
+        $counters = DB::select('SELECT TABLE_NAME AS tablename FROM information_schema.TABLES
+            WHERE TABLE_SCHEMA = DATABASE() AND AUTO_INCREMENT IS NOT NULL AND AUTO_INCREMENT <= 100');
+        foreach ($counters as $counter) {
+            DB::update("ALTER TABLE `{$counter->tablename}` AUTO_INCREMENT = " . random_int(101, 200));
         }
+
+        // Network ids end up in users.repair_network, a tinyint, so that counter must not drift: reset it each time.
+        DB::update('ALTER TABLE `networks` AUTO_INCREMENT = ' . random_int(1, 100));
 
         if (!Network::where('name', 'Restarters')->first()) {
             $network = new Network();
