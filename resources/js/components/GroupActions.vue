@@ -110,7 +110,20 @@ export default {
       this.$refs.confirmArchive.show()
     },
     async deleteConfirmed() {
-      window.location = '/group/delete/' + this.idgroups
+      // Deleting is a POST so that it carries a CSRF token - navigating to a GET URL
+      // meant any page could trigger it in an admin's browser.
+      const form = document.createElement('form')
+      form.method = 'POST'
+      form.action = '/group/delete/' + this.idgroups
+
+      const token = document.createElement('input')
+      token.type = 'hidden'
+      token.name = '_token'
+      token.value = this.$store.getters['auth/CSRF']
+      form.appendChild(token)
+
+      document.body.appendChild(form)
+      form.submit()
     },
     async archiveConfirmed() {
       const group = this.group

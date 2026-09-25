@@ -18,7 +18,8 @@
     if ($flyApp) {
         // On Fly: derive branch label by stripping the "restarters-" prefix
         $branch = preg_replace('/^restarters-/', '', $flyApp);
-        $mailpitUrl = 'https://' . $flyApp . '-mail.fly.dev';
+        // PR previews share one Mailpit instance rather than having their own.
+        $mailpitUrl = env('MAILPIT_URL') ?: 'https://' . $flyApp . '-mail.fly.dev';
     } else {
         // Local dev fallback: read from git
         $branch = 'unknown';
@@ -133,7 +134,7 @@
                               @if ( App\Helpers\Fixometer::hasRole(Auth::user(), 'NetworkCoordinator') )
                                   @if (count(Auth::user()->networks) == 1)
                                       @php( $network = Auth::user()->networks->first() )
-                                      <li><a href="{{ route('networks.show', $network->id) }}">@lang('networks.general.particular_network', ['networkName' => $network->name])</a></li>
+                                      <li><a href="{{ route('networks.show', $network->id) }}">@lang('networks.general.particular_network', ['networkName' => e($network->name)])</a></li>
                                   @else
                                       <li><a href="{{ route('networks.index') }}">@lang('networks.general.networks')</a></li>
                                   @endif

@@ -260,7 +260,7 @@ export default {
     async deleteImage({commit, rootGetters}, params) {
       if (params.id && params.idxref) {
         const url = '/device/image/delete/' + params.id + '/' + params.idxref
-        const ret = await axios.get(url, {
+        const ret = await axios.post(url, {}, {
           headers: {
             'X-CSRF-TOKEN': rootGetters['auth/CSRF']
           }

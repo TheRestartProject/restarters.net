@@ -1,0 +1,121 @@
+# Template for per-PR preview apps (restarters-pr-<N>.fly.dev).
+#
+# __PR_NUMBER__ placeholders are substituted by .github/workflows/pr-preview.yml
+# before deploying. Do not deploy this file directly.
+#
+# Each preview runs the PR's code against a local embedded MariaDB restored
+# from the most recent hourly production backup at cold boot. The machine
+# suspends after ~5 min idle (whole-VM snapshot, so the DB stays loaded and
+# resume is sub-second) and is destroyed when the PR closes.
+#
+# Secrets are set once at app creation by the workflow (see docs/fly-deployment.md):
+# a fresh per-app APP_KEY, BASIC_AUTH_PASSWORD, read-only Tigris credentials,
+# and read-only Google Drive credentials for the backup restore.
+
+app = "restarters-pr-__PR_NUMBER__"
+primary_region = "lhr"
+
+[build]
+  dockerfile = "Dockerfile.fly"
+  [build.args]
+    STARTUP_SCRIPT = "preview-startup.sh"
+
+[env]
+  APP_NAME = "Restarters PR #__PR_NUMBER__"
+  APP_ENV = "staging"
+  APP_DEBUG = "false"
+  APP_URL = "https://restarters-pr-__PR_NUMBER__.fly.dev"
+  # Local embedded MariaDB (restored from backup at cold boot; 127.0.0.1 only)
+  DB_CONNECTION = "mysql"
+  DB_HOST = "127.0.0.1"
+  DB_PORT = "3306"
+  DB_DATABASE = "restarters"
+  DB_USERNAME = "restarters"
+  DB_PASSWORD = "restarters_preview"
+  CACHE_DRIVER = "file"
+  SESSION_DRIVER = "file"
+  QUEUE_CONNECTION = "sync"
+  SESSION_DOMAIN = ""
+  LOG_CHANNEL = "stderr"
+  FILESYSTEM_DISK = "s3"
+  AWS_DEFAULT_REGION = "auto"
+  AWS_ENDPOINT = "https://fly.storage.tigris.dev"
+  AWS_USE_PATH_STYLE_ENDPOINT = "true"
+  # Previews must never reach real external services.
+  FEATURE__WIKI_INTEGRATION = "false"
+  FEATURE__DISCOURSE_INTEGRATION = "false"
+  FEATURE__WORDPRESS_INTEGRATION = "false"
+  # Reads come from the shared live bucket; writes are disabled (and the
+  # Tigris credentials are read-only anyway).
+  FEATURE__IMAGE_UPLOAD = "false"
+  SENTRY_ENVIRONMENT = "preview"
+  # Mail goes to the shared Mailpit instance, never to real inboxes.
+  MAIL_MAILER = "smtp"
+  MAIL_HOST = "restarters-dev-mail.internal"
+  MAIL_PORT = "1025"
+  MAIL_ENCRYPTION = ""
+  MAIL_FROM_ADDRESS = "preview@restarters.dev"
+  MAIL_FROM_NAME = "Restarters PR Preview"
+  MAILPIT_URL = "https://restarters-dev-mail.fly.dev"
+  # Show the red branch banner (label derived from FLY_APP_NAME → "PR-<N>").
+  APP_SHOW_BRANCH = "true"
+  BASIC_AUTH_ENABLED = "true"
+  # Table type constants
+  TBL_USERS = "1"
+  TBL_GROUPS = "2"
+  TBL_EVENTS = "3"
+  TBL_DEVICES = "4"
+  TBL_IMAGES = "5"
+  TBL_LINKS = "6"
+  # Device status constants
+  DEVICE_FIXED = "1"
+  DEVICE_REPAIRABLE = "2"
+  DEVICE_DEAD = "3"
+  # Category IDs
+  MISC_CATEGORY_ID = "46"
+  MISC_CATEGORY_ID_POWERED = "46"
+  MISC_CATEGORY_ID_UNPOWERED = "50"
+  # Impact calculation constants
+  DISPLACEMENT_VALUE = "0.5"
+  EMISSION_RATIO_UNPOWERED = "17.70147059"
+  EMISSION_RATIO_POWERED = "32.06679233"
+  # Session
+  SESSION_COOKIE = "restarters_pr_session"
+  SESSION_LIFETIME = "10080"
+  SESSION_TABLE = "laravel_sessions"
+  # Misc
+  L5_SWAGGER_GENERATE_ALWAYS = "false"
+  VITE_MANIFEST_PATH = "public/build/manifest.json"
+
+[http_service]
+  internal_port = 80
+  force_https = true
+  # suspend snapshots the whole VM (needs memory <= 2GB and NO swap - see [[vm]]).
+  # Resume is sub-second with MariaDB still loaded. If Fly discards the
+  # snapshot the machine cold-boots and preview-startup.sh re-restores.
+  auto_stop_machines = "suspend"
+  auto_start_machines = true
+  min_machines_running = 0
+
+[checks]
+  [checks.health]
+    port = 80
+    type = "http"
+    interval = "30s"
+    timeout = "10s"
+    # The warming-page nginx binds port 80 within seconds of boot, so the
+    # check passes long before the DB restore completes. Poll
+    # /_preview_status to know when the site is actually usable.
+    grace_period = "120s"
+    method = "GET"
+    path = "/robots.txt"
+
+# No [mounts]: logs go to stderr, the DB lives on the (ephemeral) rootfs and
+# is re-restored from backup on every cold boot. Nothing to persist.
+
+[[vm]]
+  size = "performance-1x"
+  # 2048MB is the suspend ceiling. Deliberately NO swap_size_mb: machines
+  # with swap cannot suspend (Fly silently falls back to stop, which would
+  # force a full re-restore on every wake).
+  memory = 2048

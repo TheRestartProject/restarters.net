@@ -475,6 +475,13 @@ class Group extends Model implements Auditable
     // If an group is not approved, then we should not push the events to Wordpress.
     public function eventsShouldPushToWordpress()
     {
+        // Central gate for all WordPress publishing: every listener and
+        // scheduled command routes through here, so preview/staging apps
+        // can never post to the live site.
+        if (! config('restarters.features.wordpress_integration')) {
+            return false;
+        }
+
         foreach ($this->networks as $network) {
             if ($network->events_push_to_wordpress) {
                 return true;
@@ -529,6 +536,16 @@ class Group extends Model implements Auditable
     public function setDistanceAttribute($val)
     {
         $this->distance = $val;
+    }
+
+    /**
+     * The group description is Quill-authored HTML which we render unescaped, so it has to
+     * be sanitised.  Doing it in the mutator rather than in the controllers means every
+     * write path - v2 API, web forms, imports, seeders - is covered by one rule.
+     */
+    public function setFreeTextAttribute($val)
+    {
+        $this->attributes['free_text'] = is_null($val) ? null : \Stevebauman\Purify\Facades\Purify::clean($val);
     }
 
     public function createDiscourseGroup() {

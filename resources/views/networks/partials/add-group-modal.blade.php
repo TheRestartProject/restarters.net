@@ -5,7 +5,7 @@
 
     <div class="modal-header">
 
-        <h5 id="addVolunteerEventLabel">@lang('networks.show.add_groups_modal_header', ['name' => $network->name])</h5>
+        <h5 id="addVolunteerEventLabel">@lang('networks.show.add_groups_modal_header', ['name' => e($network->name)])</h5>
         @include('partials.cross')
 
     </div>

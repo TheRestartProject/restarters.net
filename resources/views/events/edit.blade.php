@@ -17,7 +17,7 @@
         <div class="row">
       <div class="col">
         <h1 class="mb-30 mr-30">
-            @lang('events.editing', ['event' => '<a style="color:black; text-decoration:underline" href="/party/view/'. $formdata['idevents'] .'">'. $formdata['venue'] .'</a>'])
+            @lang('events.editing', ['event' => '<a style="color:black; text-decoration:underline" href="/party/view/'. intval($formdata['idevents']) .'">'. e($formdata['venue']) .'</a>'])
         </h1>
       </div>
     </div>
@@ -91,7 +91,7 @@
                         <div id="device-image-{{ $formdata['idevents'] }}" class="dz-image">
                           <a href="/uploads/{{ $image->path }}" data-toggle="lightbox">
                           <img src="/uploads/thumbnail_{{ $image->path }}" alt="placeholder"></a>
-                          <a href="/party/image/delete/{{ $formdata['idevents'] }}/{{{ $image->idimages }}}/{{{ $image->path }}}" data-device-id="{{ $formdata['idevents'] }}" class="dz-remove ajax-delete-image">Remove file</a>
+                          <a href="/party/image/delete/{{ $formdata['idevents'] }}/{{{ $image->idimages }}}/{{{ $image->path }}}" data-method="post" data-device-id="{{ $formdata['idevents'] }}" class="dz-remove ajax-delete-image">Remove file</a>
                         </div>
                       @endforeach
                     @endif
