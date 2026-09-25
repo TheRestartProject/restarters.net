@@ -93,6 +93,109 @@ class GroupEditTest extends TestCase
     }
 
     /** @test */
+    public function partial_update_only_changes_the_fields_sent(): void {
+        $group = Group::factory()->create([
+            'name' => 'Partial Group',
+            'location' => 'Hackney, London',
+            'latitude' => 51.545,
+            'longitude' => -0.0553,
+            'country_code' => 'GB',
+            'free_text' => 'About us',
+            'website' => 'https://example.org',
+            'timezone' => 'Europe/London',
+            'email' => 'group@example.org',
+            'postcode' => 'E8 1AA',
+            'area' => 'London',
+            'network_data' => ['foo' => 'bar'],
+        ]);
+        $event = \App\Party::factory()->create([
+            'group' => $group->idgroups,
+            'event_start_utc' => Carbon::now()->addWeek()->toIso8601String(),
+            'event_end_utc' => Carbon::now()->addWeek()->addHours(2)->toIso8601String(),
+            'timezone' => 'Europe/London',
+        ]);
+
+        $host = User::factory()->host()->create();
+        $group->addVolunteer($host);
+        $group->makeMemberAHost($host);
+        $this->actingAs($host);
+
+        $this->patch('/api/v2/groups/' . $group->idgroups, ['phone' => '999'])->assertSuccessful();
+
+        $group->refresh();
+        $this->assertEquals('999', $group->phone);
+        $this->assertEquals('Partial Group', $group->name);
+        $this->assertEquals('Hackney, London', $group->location);
+        $this->assertEquals(51.545, $group->latitude);
+        $this->assertEquals(-0.0553, $group->longitude);
+        $this->assertEquals('GB', $group->country_code);
+        $this->assertEquals('About us', $group->free_text);
+        $this->assertEquals('https://example.org', $group->website);
+        $this->assertEquals('Europe/London', $group->timezone);
+        $this->assertEquals('group@example.org', $group->email);
+        $this->assertEquals('E8 1AA', $group->postcode);
+        $this->assertEquals('London', $group->area);
+        $this->assertEquals(['foo' => 'bar'], $group->network_data);
+
+        // Not sending the timezone isn't a timezone change: future events keep theirs.
+        $this->assertEquals('Europe/London', $event->fresh()->timezone);
+    }
+
+    /** @test */
+    public function archiving_with_only_the_date_keeps_the_rest_of_the_group(): void {
+        $group = Group::factory()->create([
+            'name' => 'Archive Me',
+            'network_data' => ['foo' => 'bar'],
+        ]);
+
+        $admin = User::factory()->administrator()->create();
+        $this->actingAs($admin);
+
+        // What the Archive group action sends.
+        $this->patch('/api/v2/groups/' . $group->idgroups, [
+            'archived_at' => Carbon::now()->toIso8601String(),
+        ])->assertSuccessful();
+
+        $group->refresh();
+        $this->assertNotNull($group->archived_at);
+        $this->assertEquals('Archive Me', $group->name);
+        $this->assertEquals(['foo' => 'bar'], $group->network_data);
+    }
+
+    /** @test */
+    public function host_can_edit_postcode_but_not_area(): void {
+        $group = Group::factory()->create(['postcode' => 'SW9 7QD', 'area' => 'London']);
+
+        $host = User::factory()->host()->create();
+        $group->addVolunteer($host);
+        $group->makeMemberAHost($host);
+        $this->actingAs($host);
+
+        $response = $this->patch('/api/v2/groups/' . $group->idgroups, [
+            'postcode' => 'E8 1AA',
+            'area' => 'Elsewhere',
+        ]);
+        $response->assertSuccessful();
+
+        $group->refresh();
+        $this->assertEquals('E8 1AA', $group->postcode);
+        $this->assertEquals('London', $group->area);
+
+        // A partial update that doesn't send the postcode leaves it alone.
+        $response = $this->patch('/api/v2/groups/' . $group->idgroups, [
+            'network_data' => ['foo' => 'bar'],
+        ]);
+        $response->assertSuccessful();
+        $this->assertEquals('E8 1AA', $group->refresh()->postcode);
+
+        // Longer than the column.
+        $this->expectException(\Illuminate\Validation\ValidationException::class);
+        $this->patch('/api/v2/groups/' . $group->idgroups, [
+            'postcode' => str_repeat('X', 33),
+        ]);
+    }
+
+    /** @test */
     public function image_upload(): void {
         Storage::fake('avatars');
         $group = Group::factory()->create();

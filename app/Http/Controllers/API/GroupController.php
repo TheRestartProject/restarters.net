@@ -1060,25 +1060,44 @@ class GroupController extends Controller
 
         $old_zone = $group->timezone;
 
-        $data = [
+        // Only update the fields the request sends.  A partial update (e.g. the archive action, or an API client
+        // setting one field) must leave the rest of the group alone rather than blanking it.
+        $fields = [
             'name' => $name,
             'website' => $website,
-            'location' => $location,
-            'latitude' => $latitude,
-            'longitude' => $longitude,
-            'country_code' => $country,
             'free_text' => $description,
             'timezone' => $timezone,
             'phone' => $phone,
             'network_data' => $network_data,
             'email' => $email,
+            'postcode' => $postcode,
+        ];
+        $requestKeys = [
+            'free_text' => 'description',
         ];
 
+        $data = [];
+        foreach ($fields as $column => $value) {
+            if ($request->has($requestKeys[$column] ?? $column)) {
+                $data[$column] = $value;
+            }
+        }
+
+        if ($request->has('location')) {
+            // The coordinates and country come from geocoding the location.
+            $data['location'] = $location;
+            $data['latitude'] = $latitude;
+            $data['longitude'] = $longitude;
+            $data['country_code'] = $country;
+        }
+
         if ($user->hasRole('Administrator') || ($user->hasRole('NetworkCoordinator') && $isCoordinatorForGroup)) {
-            // Got permission to update these.
-            $data['area'] = $area;
-            $data['postcode'] = $postcode;
-            $data['archived_at'] = $archived_at;
+            // Got permission to update these.  Area is admin/coordinator only; hosts can edit the postcode.
+            foreach (['area' => $area, 'archived_at' => $archived_at] as $column => $value) {
+                if ($request->has($column)) {
+                    $data[$column] = $value;
+                }
+            }
         }
 
         if (isset($_FILES) && !empty($_FILES)) {
@@ -1158,7 +1177,7 @@ class GroupController extends Controller
             }
         }
 
-        if ($timezone != $old_zone) {
+        if (array_key_exists('timezone', $data) && $timezone != $old_zone) {
             // The timezone of the group has changed.  Update the zone of any future events.  This happens
             // sometimes when a group is created and events are created before the group is approved (and therefore
             // before the admin has a chance to set the zone on the group.
@@ -1212,6 +1231,7 @@ class GroupController extends Controller
                                    'location' => ['required', 'max:255'],
                                    'description' => ['required'],
                                    'website' => ['nullable', 'url', 'max:255'],
+                                   'postcode' => ['nullable', 'max:32'],
                                ]);
         } else {
             $request->validate([
@@ -1219,6 +1239,7 @@ class GroupController extends Controller
                                    'location' => ['max:255'],
                                    'website' => ['nullable', 'url', 'max:255'],
                                    'archived_at' => ['nullable', 'date'],
+                                   'postcode' => ['nullable', 'max:32'],
                                ]);
         }
 
