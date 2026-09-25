@@ -84,6 +84,7 @@ return [
   'notification_greeting' => 'Hello!',
   'confirm' => 'Confirm',
   'validate_timezone' => 'Please select a valid timezone.',
+  'dragmap' => 'Pin not quite in the right place?  Drag it to the right spot.',
   'share_this' => 'Share this',
   'download' => 'Download',
   'share_modal_title' => 'Shareable Statistics',
