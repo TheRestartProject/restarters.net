@@ -1217,6 +1217,7 @@ class GroupController extends Controller
                                    'location' => ['required', 'max:255'],
                                    'description' => ['required'],
                                    'website' => ['nullable', 'url', 'max:255'],
+                                   'postcode' => ['nullable', 'max:32'],
                                ]);
         } else {
             $request->validate([
@@ -1224,6 +1225,7 @@ class GroupController extends Controller
                                    'location' => ['max:255'],
                                    'website' => ['nullable', 'url', 'max:255'],
                                    'archived_at' => ['nullable', 'date'],
+                                   'postcode' => ['nullable', 'max:32'],
                                ]);
         }
 

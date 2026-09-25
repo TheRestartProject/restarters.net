@@ -117,6 +117,12 @@ class GroupEditTest extends TestCase
         ]);
         $response->assertSuccessful();
         $this->assertEquals('E8 1AA', $group->refresh()->postcode);
+
+        // Longer than the column.
+        $this->expectException(\Illuminate\Validation\ValidationException::class);
+        $this->patch('/api/v2/groups/' . $group->idgroups, [
+            'postcode' => str_repeat('X', 33),
+        ]);
     }
 
     /** @test */
