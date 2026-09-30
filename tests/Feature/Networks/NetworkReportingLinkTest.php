@@ -8,6 +8,13 @@ use Tests\TestCase;
 
 class NetworkReportingLinkTest extends TestCase
 {
+    private const REPORTS = 'https://reports.example.org/dashboard/7';
+
+    private function networkUrl(Network $network, string $suffix = ''): string
+    {
+        return '/networks/' . $network->id . $suffix;
+    }
+
     private function networkData($response): array
     {
         $props = $this->getVueProperties($response);
@@ -24,13 +31,13 @@ class NetworkReportingLinkTest extends TestCase
     public function testNetworkPageCarriesTheReportingUrl(): void
     {
         $network = Network::factory()->create([
-            'reporting_url' => 'https://reports.example.org/dashboard/7',
+            'reporting_url' => self::REPORTS,
         ]);
 
         $this->actingAs(User::factory()->administrator()->create());
 
-        $data = $this->networkData($this->get('/networks/' . $network->id));
-        $this->assertEquals('https://reports.example.org/dashboard/7', $data['reporting_url']);
+        $data = $this->networkData($this->get($this->networkUrl($network)));
+        $this->assertEquals(self::REPORTS, $data['reporting_url']);
     }
 
     public function testNetworkWithoutReportsHasNoReportingUrl(): void
@@ -39,7 +46,7 @@ class NetworkReportingLinkTest extends TestCase
 
         $this->actingAs(User::factory()->administrator()->create());
 
-        $data = $this->networkData($this->get('/networks/' . $network->id));
+        $data = $this->networkData($this->get($this->networkUrl($network)));
         $this->assertNull($data['reporting_url']);
     }
 
@@ -48,16 +55,16 @@ class NetworkReportingLinkTest extends TestCase
         $network = Network::factory()->create();
         $this->actingAs(User::factory()->administrator()->create());
 
-        $this->get('/networks/' . $network->id . '/edit')->assertSee('reporting_url');
+        $this->get($this->networkUrl($network, '/edit'))->assertSee('reporting_url');
 
-        $this->put('/networks/' . $network->id, [
+        $this->put($this->networkUrl($network), [
             'reporting_url' => 'https://reports.example.org/dashboard/9',
         ])->assertRedirect();
 
         $this->assertEquals('https://reports.example.org/dashboard/9', $network->fresh()->reporting_url);
 
         // Blank clears it.
-        $this->put('/networks/' . $network->id, [
+        $this->put($this->networkUrl($network), [
             'reporting_url' => '',
         ])->assertRedirect();
 
@@ -70,7 +77,7 @@ class NetworkReportingLinkTest extends TestCase
         $this->actingAs(User::factory()->administrator()->create());
         $this->withExceptionHandling();
 
-        $this->put('/networks/' . $network->id, [
+        $this->put($this->networkUrl($network), [
             'reporting_url' => 'javascript:alert(1)',
         ])->assertSessionHasErrors('reporting_url');
 
@@ -80,19 +87,19 @@ class NetworkReportingLinkTest extends TestCase
     public function testCoordinatorCannotChangeTheReportingUrl(): void
     {
         $network = Network::factory()->create([
-            'reporting_url' => 'https://reports.example.org/dashboard/7',
+            'reporting_url' => self::REPORTS,
         ]);
 
         $coordinator = User::factory()->networkCoordinator()->create();
         $network->addCoordinator($coordinator);
         $this->actingAs($coordinator);
 
-        $this->get('/networks/' . $network->id . '/edit')->assertDontSee('reporting_url');
+        $this->get($this->networkUrl($network, '/edit'))->assertDontSee('reporting_url');
 
-        $this->put('/networks/' . $network->id, [
+        $this->put($this->networkUrl($network), [
             'reporting_url' => 'https://elsewhere.example.org/',
         ])->assertRedirect();
 
-        $this->assertEquals('https://reports.example.org/dashboard/7', $network->fresh()->reporting_url);
+        $this->assertEquals(self::REPORTS, $network->fresh()->reporting_url);
     }
 }

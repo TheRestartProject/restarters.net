@@ -203,6 +203,68 @@ class ApiController extends Controller
     }
 
     /**
+     * The where clauses for the device list's search filters.
+     */
+    private static function deviceFilters(Request $request): array
+    {
+        $wheres = [];
+
+        // No powered filter means both powered and unpowered items.
+        $powered = $request->input('powered');
+
+        if ($powered === 'true' || $powered === 'false') {
+            $wheres[] = ['categories.powered', '=', $powered === 'true' ? 1 : 0];
+        }
+
+        if ($request->input('category')) {
+            $wheres[] = ['idcategories', '=', $request->input('category')];
+        }
+
+        // Free text searches.
+        $likes = [
+            'brand' => 'devices.brand',
+            'model' => 'devices.model',
+            'item_type' => 'devices.item_type',
+            'comments' => 'devices.problem',
+            'group' => 'groups.name',
+        ];
+
+        foreach ($likes as $param => $column) {
+            if ($request->input($param)) {
+                $wheres[] = [$column, 'LIKE', '%'.$request->input($param).'%'];
+            }
+        }
+
+        if (filter_var($request->input('wiki', false), FILTER_VALIDATE_BOOLEAN)) {
+            $wheres[] = ['devices.wiki', '=', 1];
+        }
+
+        $status = $request->input('status');
+
+        if ($status) {
+            // The client uses the status strings from the rest of the API; accept the underlying numbers too.
+            $statuses = [
+                Device::REPAIR_STATUS_FIXED_STR => Device::REPAIR_STATUS_FIXED,
+                Device::REPAIR_STATUS_REPAIRABLE_STR => Device::REPAIR_STATUS_REPAIRABLE,
+                Device::REPAIR_STATUS_ENDOFLIFE_STR => Device::REPAIR_STATUS_ENDOFLIFE,
+            ];
+
+            $wheres[] = ['repair_status', '=', $statuses[$status] ?? intval($status)];
+        }
+
+        if ($request->input('from_date')) {
+            $wheres[] = ['events.event_start_utc', '>=', Carbon::parse($request->input('from_date'))->startOfDay()];
+        }
+
+        if ($request->input('to_date')) {
+            // The date is inclusive - events on that day count.
+            $wheres[] = ['events.event_start_utc', '<', Carbon::parse($request->input('to_date'))->startOfDay()->addDay()];
+        }
+
+        return $wheres;
+    }
+
+    /**
      * List/search devices.
      */
     public static function getDevices(Request $request, $page, $size): JsonResponse
@@ -211,18 +273,6 @@ class ApiController extends Controller
             'from_date' => 'nullable|date',
             'to_date' => 'nullable|date',
         ]);
-
-        $powered = $request->input('powered');
-        $category = $request->input('category');
-        $brand = $request->input('brand');
-        $model = $request->input('model');
-        $item_type = $request->input('item_type');
-        $status = $request->input('status');
-        $comments = $request->input('comments');
-        $wiki = filter_var($request->input('wiki', false), FILTER_VALIDATE_BOOLEAN);
-        $group = $request->input('group');
-        $from_date = $request->input('from_date');
-        $to_date = $request->input('to_date');
 
         // The client asks to sort by one of its table columns; map those onto database columns.  Anything else
         // gets the default of most recent event first.
@@ -241,60 +291,7 @@ class ApiController extends Controller
         $sortBy = $sortColumns[$request->input('sortBy')] ?? 'events.event_start_utc';
         $sortDesc = strtolower($request->input('sortDesc', 'desc')) === 'asc' ? 'asc' : 'desc';
 
-        $wheres = [];
-
-        // No powered filter means both powered and unpowered items.
-        if ($powered === 'true' || $powered === 'false') {
-            $wheres[] = ['categories.powered', '=', $powered === 'true' ? 1 : 0];
-        }
-
-        if ($category) {
-            $wheres[] = ['idcategories', '=', $category];
-        }
-
-        if ($brand) {
-            $wheres[] = ['devices.brand', 'LIKE', '%'.$brand.'%'];
-        }
-
-        if ($model) {
-            $wheres[] = ['devices.model', 'LIKE', '%'.$model.'%'];
-        }
-
-        if ($item_type) {
-            $wheres[] = ['devices.item_type', 'LIKE', '%'.$item_type.'%'];
-        }
-
-        if ($comments) {
-            $wheres[] = ['devices.problem', 'LIKE', '%'.$comments.'%'];
-        }
-
-        if ($wiki) {
-            $wheres[] = ['devices.wiki', '=', 1];
-        }
-
-        if ($status) {
-            // The client uses the status strings from the rest of the API; accept the underlying numbers too.
-            $statuses = [
-                Device::REPAIR_STATUS_FIXED_STR => Device::REPAIR_STATUS_FIXED,
-                Device::REPAIR_STATUS_REPAIRABLE_STR => Device::REPAIR_STATUS_REPAIRABLE,
-                Device::REPAIR_STATUS_ENDOFLIFE_STR => Device::REPAIR_STATUS_ENDOFLIFE,
-            ];
-
-            $wheres[] = ['repair_status', '=', $statuses[$status] ?? intval($status)];
-        }
-
-        if ($group) {
-            $wheres[] = ['groups.name', 'LIKE', '%'.$group.'%'];
-        }
-
-        if ($from_date) {
-            $wheres[] = ['events.event_start_utc', '>=', Carbon::parse($from_date)->startOfDay()];
-        }
-
-        if ($to_date) {
-            // The date is inclusive - events on that day count.
-            $wheres[] = ['events.event_start_utc', '<', Carbon::parse($to_date)->startOfDay()->addDay()];
-        }
+        $wheres = self::deviceFilters($request);
 
         // Get the items we want for this page.  Select only device columns - the joined tables share column names
         // such as created_at, which would otherwise overwrite the device's own.

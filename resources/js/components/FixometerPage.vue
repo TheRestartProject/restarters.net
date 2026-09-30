@@ -136,20 +136,20 @@ export default {
     }
 
     if (params.has('category')) {
-      this.category = parseInt(params.get('category'))
+      this.category = Number.parseInt(params.get('category'))
       this.startExpandedItems = true
     }
 
     // Older links name the category separately for powered and unpowered items.
     if (params.has('category_powered')) {
       this.powered = true
-      this.category = parseInt(params.get('category_powered'))
+      this.category = Number.parseInt(params.get('category_powered'))
       this.startExpandedItems = true
     }
 
     if (params.has('category_unpowered')) {
       this.powered = false
-      this.category = parseInt(params.get('category_unpowered'))
+      this.category = Number.parseInt(params.get('category_unpowered'))
       this.startExpandedItems = true
     }
 

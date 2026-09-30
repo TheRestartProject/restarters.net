@@ -203,7 +203,7 @@ class Device extends JsonResource
             'id' => intval($this->iddevices),
             'eventid' => intval($this->event),
             'eventtitle' => $event ? $event->title : NULL,
-            'event_date' => $event ? Carbon::parse($event->event_start_utc)->toIso8601String() : NULL,
+            'event_date' => $event ? Carbon::parse($event->event_start_utc)->toIso8601String() : null,
             'groupid' => $event ? intval($event->group) : NULL,
             'groupname' => $group ? $group->name : NULL,
             'category' => intval($this->category),

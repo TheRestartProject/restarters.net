@@ -45,10 +45,10 @@
         </template>
         <template slot="cell(show_details)" slot-scope="row">
           <div class="text-md-right">
-            <span class="pl-0 pl-md-2 pr-2 clickme record-details-toggle" @click="row.toggleDetails" :title="isAdmin ? __('devices.edit_record') : __('devices.view_record')">
-              <b-img v-if="isAdmin" class="icon" :src="imageUrl('/icons/edit_ico_green.svg')" />
-              <b-img v-else class="icon" :src="imageUrl('/icons/info_ico_green.svg')" />
-            </span>
+            <button type="button" class="btn btn-link p-0 pl-md-2 pr-2 record-details-toggle" @click="row.toggleDetails" :title="isAdmin ? __('devices.edit_record') : __('devices.view_record')" :aria-label="isAdmin ? __('devices.edit_record') : __('devices.view_record')">
+              <b-img v-if="isAdmin" class="icon" :src="imageUrl('/icons/edit_ico_green.svg')" alt="" />
+              <b-img v-else class="icon" :src="imageUrl('/icons/info_ico_green.svg')" alt="" />
+            </button>
           </div>
         </template>
         <template slot="row-details" slot-scope="row">
@@ -298,7 +298,11 @@ export default {
       // table's async method of providing data.  The server sorts by the column the table is sorted by; with no
       // column chosen it shows the most recent events first.
       const sortBy = ctx.sortBy || null
-      const sortDesc = ctx.sortBy ? (ctx.sortDesc ? 'DESC' : 'ASC') : 'DESC'
+      let sortDesc = 'DESC'
+
+      if (ctx.sortBy && !ctx.sortDesc) {
+        sortDesc = 'ASC'
+      }
 
       axios.get('/api/devices/' + ctx.currentPage + '/' + ctx.perPage, {
         params: {

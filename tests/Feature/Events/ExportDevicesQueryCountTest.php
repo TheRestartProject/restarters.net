@@ -46,7 +46,7 @@ class ExportDevicesQueryCountTest extends TestCase
     {
         $response = $this->get('/export/devices');
         $header = $response->headers->get('content-disposition');
-        $filename = storage_path('app/exports') . '/' . substr($header, strpos($header, 'filename=') + 9);
+        $filename = storage_path('app/exports') . '/' . basename(substr($header, strpos($header, 'filename=') + 9));
 
         $rows = array_map('str_getcsv', file($filename));
         array_shift($rows);

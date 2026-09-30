@@ -10,6 +10,11 @@ class GroupReportingLinkTest extends TestCase
 {
     private $group;
 
+    private function viewGroup()
+    {
+        return $this->get('/group/view/' . $this->group->idgroups);
+    }
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -39,7 +44,7 @@ class GroupReportingLinkTest extends TestCase
 
         $this->assertEquals(
             'https://reports.example.org/dashboard/3?group_id=' . $this->group->idgroups . '#hide_parameters=group_id',
-            $this->reportingUrl($this->get('/group/view/' . $this->group->idgroups))
+            $this->reportingUrl($this->viewGroup())
         );
     }
 
@@ -51,7 +56,7 @@ class GroupReportingLinkTest extends TestCase
 
         $this->assertStringContainsString(
             'group_id=' . $this->group->idgroups,
-            $this->reportingUrl($this->get('/group/view/' . $this->group->idgroups))
+            $this->reportingUrl($this->viewGroup())
         );
     }
 
@@ -59,7 +64,7 @@ class GroupReportingLinkTest extends TestCase
     {
         $this->actingAs(User::factory()->restarter()->create());
 
-        $this->assertEmpty($this->reportingUrl($this->get('/group/view/' . $this->group->idgroups)));
+        $this->assertEmpty($this->reportingUrl($this->viewGroup()));
     }
 
     public function testNoLinkWhenReportingIsNotConfigured(): void
@@ -68,6 +73,6 @@ class GroupReportingLinkTest extends TestCase
 
         $this->actingAs(User::factory()->administrator()->create());
 
-        $this->assertEmpty($this->reportingUrl($this->get('/group/view/' . $this->group->idgroups)));
+        $this->assertEmpty($this->reportingUrl($this->viewGroup()));
     }
 }
