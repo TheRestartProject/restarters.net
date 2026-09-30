@@ -101,3 +101,20 @@ test('does not offer the tag filter to users who cannot see tags', () => {
   expect(map.props('canManageTags')).toBe(false)
   expect(map.props('availableTags')).toEqual([])
 })
+
+test('links to the network reporting dashboard from the actions menu', () => {
+  const wrapper = makeWrapper({
+    network: { id: 5, name: 'Test Network', coordinators: [], reporting_url: 'https://reports.example.org/dashboard/7' },
+  })
+
+  const link = wrapper.find('a.network-reporting-link')
+  expect(link.exists()).toBe(true)
+  expect(link.attributes('href')).toBe('https://reports.example.org/dashboard/7')
+  expect(link.attributes('target')).toBe('_blank')
+})
+
+test('has no reporting link when the network has no dashboard', () => {
+  const wrapper = makeWrapper()
+
+  expect(wrapper.find('a.network-reporting-link').exists()).toBe(false)
+})

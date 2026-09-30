@@ -9,6 +9,7 @@
         :can-perform-delete="canPerformDelete"
         :can-perform-archive="canPerformArchive"
         :ingroup="ingroup"
+        :reporting-url="reportingUrl || null"
         @left="haveLeft = true"
     />
 
@@ -22,7 +23,13 @@
     </div>
 
     <div class="vue w-100 mt-md-50">
-      <GroupStats :idgroups="idgroups" :stats="groupStats "/>
+      <GroupStats
+          :idgroups="idgroups"
+          :stats="groupStats"
+          :device-stats="deviceStats"
+          :top-devices="topDevices"
+          :reporting-url="reportingUrl || null"
+      />
     </div>
 
     <hr style="color: white; border-top: 1px solid black;" />
@@ -37,16 +44,6 @@
         add-button
     />
 
-    <div class="d-flex flex-wrap flex-md-nowrap pt-4">
-      <div class="w-100 mt-md-50 mr-md-4">
-        <GroupDevicesWorkedOn :idgroups="idgroups" :stats="deviceStats" class="pt-2 dashbord" />
-      </div>
-      <div class="w-100 mt-md-50">
-        <GroupDevicesMostRepaired :idgroups="idgroups" :devices="topDevices" class="pt-2 dashbord mt-4 mt-md-0" />
-      </div>
-    </div>
-
-    <GroupDevicesBreakdown :idgroups="idgroups" :cluster-stats="clusterStats" />
   </div>
 </template>
 <script>
@@ -55,17 +52,11 @@ import GroupDescription from './GroupDescription.vue'
 import GroupVolunteers from './GroupVolunteers.vue'
 import GroupStats from './GroupStats.vue'
 import GroupEvents from './GroupEvents.vue'
-import GroupDevicesWorkedOn from './GroupDevicesWorkedOn.vue'
-import GroupDevicesMostRepaired from './GroupDevicesMostRepaired.vue'
-import GroupDevicesBreakdown from './GroupDevicesBreakdown.vue'
 import AlertBanner from './AlertBanner.vue'
 import auth from '../mixins/auth'
 
 export default {
   components: {
-    GroupDevicesBreakdown,
-    GroupDevicesMostRepaired,
-    GroupDevicesWorkedOn,
     GroupEvents,
     GroupStats,
     GroupVolunteers,
@@ -135,15 +126,16 @@ export default {
       required: true,
       type: Object
     },
-    clusterStats: {
-      type: Object,
-      required: true
-    },
     topDevices: {
       type: Array,
       required: true
     },
     discourseGroup: {
+      type: String,
+      required: false,
+      default: null
+    },
+    reportingUrl: {
       type: String,
       required: false,
       default: null

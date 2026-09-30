@@ -45,9 +45,11 @@ export default {
       required: true
     },
     powered: {
-      // The server might return a number rather than a boolean.
+      // The server might return a number rather than a boolean.  Null offers both powered and unpowered categories,
+      // for searching.
       type: [ Boolean, Number ],
-      required: true
+      required: false,
+      default: null
     },
     iconVariant: {
       type: String,
@@ -88,6 +90,9 @@ export default {
     miscCat() {
       return this.powered ? CATEGORY_MISC_POWERED : CATEGORY_MISC_UNPOWERED
     },
+    anyPower() {
+      return this.powered === null
+    },
     categoryOptions() {
       let ret = []
 
@@ -97,7 +102,9 @@ export default {
         cluster.categories.forEach((c) => {
           // Don't include the misc category - it gets added at the end, which encourages people to read the
           // whole list before selecting it.
-          if (((c.idcategories !== this.miscCat) &&
+          if (this.anyPower ?
+              (c.idcategories !== CATEGORY_MISC_POWERED && c.idcategories !== CATEGORY_MISC_UNPOWERED) :
+              ((c.idcategories !== this.miscCat) &&
               ((this.powered && c.powered) || (!this.powered && !c.powered)))) {
             categories.push({
               name: this.__(c.name),
@@ -116,7 +123,16 @@ export default {
 
       ret.push({
         cluster: '---',
-        categories: [
+        categories: this.anyPower ? [
+          {
+            name: this.__('partials.category_none') + ' (' + this.__('devices.powered') + ')',
+            value: CATEGORY_MISC_POWERED,
+          },
+          {
+            name: this.__('partials.category_none') + ' (' + this.__('devices.unpowered') + ')',
+            value: CATEGORY_MISC_UNPOWERED,
+          }
+        ] : [
           {
             name: this.__('partials.category_none'),
             value: this.miscCat,

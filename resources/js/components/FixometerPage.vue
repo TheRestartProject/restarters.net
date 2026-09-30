@@ -8,9 +8,10 @@
     <div class="d-flex justify-content-between">
       <h2 class>
         {{ __('devices.repair_records') }}
+        <span class="records-total">({{ total.toLocaleString() }})</span>
       </h2>
-      <div v-if="isAdmin">
-        <b-btn variant="primary" href="/export/devices/?">
+      <div>
+        <b-btn variant="primary" href="/export/devices" class="export-devices">
           {{ __('devices.export_device_data') }}
         </b-btn>
       </div>
@@ -18,11 +19,10 @@
     <p>{{ __('devices.search_text') }}</p>
     <div class="fp-layout">
       <FixometerFilters
-          v-show="tabIndex === 0"
           :clusters="clusters"
           :brands="brands"
-          :powered="true"
-          :category.sync="category_powered"
+          :powered.sync="powered"
+          :category.sync="category"
           :brand.sync="brand"
           :model.sync="model"
           :item_type.sync="item_type"
@@ -37,131 +37,24 @@
           @expandItems="startExpandedItems = $event"
           @expandEvents="startExpandedEvents = $event"
       />
-      <FixometerFilters
-          v-show="tabIndex === 1"
+      <FixometerRecordsTable
+          :is-admin="isAdmin"
+          :powered="powered"
           :clusters="clusters"
           :brands="brands"
-          :powered="false"
-          :category.sync="category_unpowered"
-          :brand.sync="brand"
-          :model.sync="model"
-          :item_type.sync="item_type"
-          :comments.sync="comments"
-          :wiki.sync="wiki"
-          :status.sync="status"
-          :group.sync="group"
-          :from_date.sync="from_date"
-          :to_date.sync="to_date"
-          :start-expanded-items="startExpandedItems"
-          :start-expanded-events="startExpandedEvents"
-          @expandItems="startExpandedItems = $event"
-          @expandEvents="startExpandedEvents = $event"
+          :barrier-list="barrierList"
+          :category="category"
+          :brand="brand"
+          :model="model"
+          :item_type="item_type"
+          :comments="comments"
+          :wiki="wiki"
+          :status="status"
+          :group="group"
+          :from_date="from_date"
+          :to_date="to_date"
+          :total.sync="total"
       />
-      <b-tabs class="ourtabs ourtabs-brand w-100 d-none d-md-block" v-model="tabIndex">
-        <b-tab active title-item-class="w-50" title-link-class="smallpad" class="pt-2">
-          <template slot="title">
-            <div>
-              <b>{{ __('devices.title_powered') }}</b>
-              ({{ total_powered.toLocaleString() }})
-            </div>
-          </template>
-          <p class="pl-3" v-html="__('devices.description_powered')" />
-          <FixometerRecordsTable
-              :is-admin="isAdmin"
-              :powered="true"
-              :clusters="clusters"
-              :brands="brands"
-              :barrier-list="barrierList"
-              :category="category_powered"
-              :brand="brand"
-              :model="model"
-              :comments="comments"
-              :wiki="wiki"
-              :status="status"
-              :group="group"
-              :from_date="from_date"
-              :to_date="to_date"
-              :total.sync="total_powered"
-          />
-        </b-tab>
-        <b-tab title-item-class="w-50" title-link-class="smallpad" class="pt-2">
-          <template slot="title">
-            <div>
-              <b>{{ __('devices.title_unpowered') }}</b>
-              ({{ total_unpowered.toLocaleString() }})
-            </div>
-          </template>
-          <p class="pl-3" v-html="__('devices.description_unpowered')" />
-          <FixometerRecordsTable
-              :is-admin="isAdmin"
-              :powered="false"
-              :clusters="clusters"
-              :brands="brands"
-              :barrier-list="barrierList"
-              :category="category_unpowered"
-              :model="model"
-              :item_type="item_type"
-              :comments="comments"
-              :wiki="wiki"
-              :status="status"
-              :group="group"
-              :from_date="from_date"
-              :to_date="to_date"
-              :total.sync="total_unpowered"
-          />
-        </b-tab>
-      </b-tabs>
-    </div>
-    <div class="d-block d-md-none">
-      <CollapsibleSection collapsed :count="impactData.total_powered" heading-level="h6" count-class="small">
-        <template slot="title">
-          {{ __('devices.title_powered') }}
-        </template>
-        <template slot="content">
-          <FixometerRecordsTable
-              :is-admin="isAdmin"
-              :powered="true"
-              :clusters="clusters"
-              :brands="brands"
-              :barrier-list="barrierList"
-              :category="category_powered"
-              :brand="brand"
-              :model="model"
-              :item_type="item_type"
-              :comments="comments"
-              :wiki="wiki"
-              :status="status"
-              :group="group"
-              :from_date="from_date"
-              :to_date="to_date"
-              :total.sync="total_powered"
-          />
-        </template>
-      </CollapsibleSection>
-      <CollapsibleSection collapsed :count="impactData.total_unpowered" heading-level="h6" count-class="small">
-        <template slot="title">
-          {{ __('devices.title_unpowered') }}
-        </template>
-        <template slot="content">
-          <FixometerRecordsTable
-              :is-admin="isAdmin"
-              :powered="false"
-              :clusters="clusters"
-              :brands="brands"
-              :barrier-list="barrierList"
-              :category="category_unpowered"
-              :model="model"
-              :item_type="item_type"
-              :comments="comments"
-              :wiki="wiki"
-              :status="status"
-              :group="group"
-              :from_date="from_date"
-              :to_date="to_date"
-              :total.sync="total_unpowered"
-          />
-        </template>
-      </CollapsibleSection>
     </div>
   </div>
 </template>
@@ -170,13 +63,12 @@ import FixometerHeading from './FixometerHeading.vue'
 import FixometerGlobalImpact from './FixometerGlobalImpact.vue'
 import FixometerRecordsTable from './FixometerRecordsTable.vue'
 import FixometerFilters from './FixometerFilters.vue'
-import CollapsibleSection from './CollapsibleSection.vue'
 import auth from '../mixins/auth'
 import AlertBanner from './AlertBanner.vue'
 
 export default {
   components: {
-    CollapsibleSection, FixometerFilters, FixometerRecordsTable, FixometerGlobalImpact, FixometerHeading, AlertBanner},
+    FixometerFilters, FixometerRecordsTable, FixometerGlobalImpact, FixometerHeading, AlertBanner},
   mixins: [ auth ],
   props: {
     latestData: {
@@ -213,10 +105,8 @@ export default {
   },
   data () {
     return {
-      tabIndex: 0,
-
-      category_powered: null,
-      category_unpowered: null,
+      powered: null,
+      category: null,
       status: null,
       brand: null,
       model: null,
@@ -227,8 +117,7 @@ export default {
       from_date: null,
       to_date: null,
 
-      total_powered: 0,
-      total_unpowered: 0,
+      total: 0,
 
       startExpandedItems: false,
       startExpandedEvents: false,
@@ -241,18 +130,31 @@ export default {
     // We have to list each of these individually for reactivity to notice them.
     const params = (new URL(document.location)).searchParams
 
+    if (params.has('powered')) {
+      this.powered = params.get('powered') === 'true'
+      this.startExpandedItems = true
+    }
+
+    if (params.has('category')) {
+      this.category = parseInt(params.get('category'))
+      this.startExpandedItems = true
+    }
+
+    // Older links name the category separately for powered and unpowered items.
     if (params.has('category_powered')) {
-      this.category_powered = parseInt(params.get('category_powered'))
+      this.powered = true
+      this.category = parseInt(params.get('category_powered'))
       this.startExpandedItems = true
     }
 
     if (params.has('category_unpowered')) {
-      this.category_unpowered = parseInt(params.get('category_unpowered'))
+      this.powered = false
+      this.category = parseInt(params.get('category_unpowered'))
       this.startExpandedItems = true
     }
 
     if (params.has('status')) {
-      this.status = parseInt(params.get('status'))
+      this.status = params.get('status')
       this.startExpandedItems = true
     }
 
@@ -296,8 +198,7 @@ export default {
       this.startExpandedEvents = true
     }
 
-    this.total_powered = this.impactData.total_powered
-    this.total_unpowered = this.impactData.total_unpowered
+    this.total = (this.impactData.total_powered || 0) + (this.impactData.total_unpowered || 0)
 
     this.$store.dispatch('groups/setList', {
       groups: this.userGroups
@@ -320,12 +221,12 @@ export default {
       // We have to list each of these individually for reactivity to notice them.
       let ret = ''
 
-      if (this.category_powered) {
-        ret += 'category_powered=' + encodeURIComponent(this.category_powered) + '&'
+      if (this.powered !== null) {
+        ret += 'powered=' + encodeURIComponent(this.powered) + '&'
       }
 
-      if (this.category_unpowered) {
-        ret += 'category_unpowered=' + encodeURIComponent(this.category_unpowered) + '&'
+      if (this.category) {
+        ret += 'category=' + encodeURIComponent(this.category) + '&'
       }
 
       if (this.status) {

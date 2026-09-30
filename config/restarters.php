@@ -26,6 +26,12 @@ return [
         'api_key' => env('CARTO_API_KEY'),
     ],
 
+    'reporting' => [
+        // The group reporting dashboard, filtered to one group.  {group} is replaced by the group id, e.g.
+        // https://metabase.example.org/public/dashboard/abc?group_id={group}#hide_parameters=group_id
+        'group_url' => env('GROUP_REPORTING_URL'),
+    ],
+
     'xref_types' => [
         'networks' => 7,
     ],

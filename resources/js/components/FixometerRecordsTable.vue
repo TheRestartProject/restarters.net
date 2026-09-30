@@ -19,8 +19,8 @@
             -
           </em>
         </template>
-        <template slot="cell(device_category.name)" slot-scope="data">
-          {{ __(data.item.category.name) }}
+        <template slot="cell(category)" slot-scope="data">
+          {{ data.item.category ? __(data.item.category.name) : '' }}
         </template>
         <template slot="cell(short_problem)" slot-scope="data">
           <div v-line-clamp="3">
@@ -35,44 +35,31 @@
             -
           </em>
         </template>
-        <template slot="cell(item_type)" slot-scope="data">
-          <span v-if="data.item.item_type">
-            {{ data.item.item_type }}
-          </span>
-          <em v-else class="text-muted">
-            -
-          </em>
-        </template>
         <template slot="cell(repair_status)" slot-scope="data">
           <div :class="badgeClass(data)">
             {{ showStatus(data) }}
           </div>
         </template>
-        <template slot="cell(created_at)" slot-scope="data">
+        <template slot="cell(event_date)" slot-scope="data">
           {{ formatDate(data) }}
         </template>
         <template slot="cell(show_details)" slot-scope="row">
-          <div v-if="isAdmin" class="text-md-right">
-            <span class="pl-0 pl-md-2 pr-2 clickme" @click="row.toggleDetails">
-              <b-img class="icon" :src="imageUrl('/icons/edit_ico_green.svg')" />
-            </span>
-            <ConfirmModal :key="'modal-' + row.item.id" ref="confirmDelete" @confirm="deleteConfirmed(row.item)" :message="__('devices.confirm_delete')" />
-          </div>
-          <div v-else class="text-md-right">
-            <span class="pl-0 pl-md-2 pr-2 clickme" @click="row.toggleDetails">
-              <b-img class="icon" :src="imageUrl('/icons/info_ico_green.svg')" />
+          <div class="text-md-right">
+            <span class="pl-0 pl-md-2 pr-2 clickme record-details-toggle" @click="row.toggleDetails" :title="isAdmin ? __('devices.edit_record') : __('devices.view_record')">
+              <b-img v-if="isAdmin" class="icon" :src="imageUrl('/icons/edit_ico_green.svg')" />
+              <b-img v-else class="icon" :src="imageUrl('/icons/info_ico_green.svg')" />
             </span>
           </div>
         </template>
         <template slot="row-details" slot-scope="row">
           <EventDevice
-              :device="row.item"
-              :powered="powered"
+              :id="row.item.id"
+              :powered="Boolean(row.item.category && row.item.category.powered)"
               :add="false"
               :edit="isAdmin"
               :delete-button="true"
               :clusters="clusters"
-              :eventid="row.item.event"
+              :eventid="row.item.eventid"
               :brands="brands"
               :barrier-list="barrierList"
               :cancel-button="false"
@@ -84,7 +71,7 @@
             v-model="currentPage"
             :total-rows="total"
             :per-page="perPage"
-            :aria-controls="'recordstable-' + powered"
+            :aria-controls="tableId"
         ></b-pagination>
       </div>
     </div>
@@ -93,10 +80,8 @@
 <script>
 import { END_OF_LIFE, FIXED, REPAIRABLE } from '../constants'
 import moment from 'moment'
-import DeviceModel from './DeviceModel.vue'
 import Vue from 'vue'
 import lineClamp from 'vue-line-clamp'
-import ConfirmModal from './ConfirmModal.vue'
 import EventDevice from './EventDevice.vue'
 import images from '../mixins/images'
 
@@ -109,7 +94,7 @@ const bootaxios = axios
 
 export default {
   mixins: [images],
-  components: {EventDevice, ConfirmModal, DeviceModel},
+  components: {EventDevice},
   props: {
     isAdmin: {
       type: Boolean,
@@ -117,8 +102,10 @@ export default {
       default: false
     },
     powered: {
+      // Null lists both powered and unpowered items.
       type: Boolean,
-      required: true
+      required: false,
+      default: null
     },
     clusters: {
       type: Array,
@@ -156,7 +143,8 @@ export default {
       default: null
     },
     status: {
-      type: Number,
+      // One of the repair status strings, e.g. 'Fixed'.
+      type: String,
       required: false,
       default: null
     },
@@ -199,10 +187,11 @@ export default {
   },
   computed: {
     tableId() {
-      return 'recordstable-' + this.powered
+      return 'recordstable'
     },
     fields () {
-      let ret = [
+      // The keys of sortable fields are what we ask the server to sort by.
+      return [
         {
           key: 'item_type',
           label: this.__('devices.model_or_type'),
@@ -210,43 +199,53 @@ export default {
           tdClass: 'pl-0 pl-md-3'
         },
         {
-          key: 'device_category.name',
+          key: 'category',
           label: this.__('devices.category'),
           thClass: 'width20 pl-0 pl-md-3',
           tdClass: 'width20 pl-0 pl-md-3',
           sortable: true
+        },
+        {
+          key: 'brand',
+          label: this.__('devices.brand'),
+          sortable: true,
+          thClass: 'd-none d-md-table-cell',
+          tdClass: 'd-none d-md-table-cell'
+        },
+        {
+          key: 'short_problem',
+          label: this.__('devices.assessment'),
+          thClass: 'width10 d-none d-md-table-cell',
+          tdClass: 'width10 d-none d-md-table-cell'
+        },
+        {
+          key: 'groupname',
+          label: this.__('devices.group'),
+          sortable: true,
+          thClass: 'd-none d-md-table-cell',
+          tdClass: 'd-none d-md-table-cell'
+        },
+        {
+          key: 'repair_status',
+          label: this.__('devices.status'),
+          thClass: 'width90px',
+          tdClass: 'width90px',
+          sortable: true
+        },
+        {
+          key: 'event_date',
+          label: this.__('devices.devices_date'),
+          thClass: 'width90px',
+          tdClass: 'width90px',
+          sortable: true
+        },
+        {
+          // Bootstrap tables have a mechanism to show a details row.  This is exactly what we need to show the
+          // view/edit section for a device.
+          key: 'show_details',
+          label: '',
         }
       ]
-
-      if (this.powered) {
-        ret.push({key: 'brand', label: this.__('devices.brand'), sortable: true, thClass: 'd-none d-md-table-cell', tdClass: 'd-none d-md-table-cell'})
-      }
-
-      ret.push({key: 'short_problem', label: this.__('devices.assessment'), thClass: 'width10 d-none d-md-table-cell', tdClass: 'width10 d-none d-md-table-cell'})
-      ret.push({key: 'groupname', label: this.__('devices.group'), sortable: true, thClass: 'd-none d-md-table-cell', tdClass: 'd-none d-md-table-cell'})
-      ret.push({
-        key: 'repair_status',
-        label: this.__('devices.status'),
-        thClass: 'width90px',
-        tdClass: 'width90px',
-        sortable: true
-      })
-      ret.push({
-        key: 'created_at',
-        label: this.__('devices.devices_date'),
-        thClass: 'width90px',
-        tdClass: 'width90px',
-        sortable: true
-      })
-
-      // Bootstrap tables have a mechanism to show a details row.  This is exactly what we need to show the
-      // view/edit section for a device.
-      ret.push({
-        key: 'show_details',
-        label: '',
-      })
-
-      return ret
     },
   },
   watch: {
@@ -296,17 +295,16 @@ export default {
   methods: {
     items (ctx, callback) {
       // We want to take advantage of the paging and sorting features of the table, and therefore we are using the
-      // table's async method of providing data.
-      //
-      // Default sort is descending date order.
-      let sortBy = 'event_start_utc'
-      let sortDesc = ctx.sortBy ? (ctx.sortDesc ? 'DESC' : 'ASC') : 'DESC'
+      // table's async method of providing data.  The server sorts by the column the table is sorted by; with no
+      // column chosen it shows the most recent events first.
+      const sortBy = ctx.sortBy || null
+      const sortDesc = ctx.sortBy ? (ctx.sortDesc ? 'DESC' : 'ASC') : 'DESC'
 
       axios.get('/api/devices/' + ctx.currentPage + '/' + ctx.perPage, {
         params: {
           sortBy: sortBy,
           sortDesc: sortDesc,
-          powered: this.powered,
+          powered: this.powered === null ? undefined : this.powered,
           category: this.category,
           brand: this.brand,
           model: this.model,
@@ -373,16 +371,7 @@ export default {
       }
     },
     formatDate (data) {
-      return new moment(data.item.created_at).format('DD/MM/YYYY')
-    },
-    deleteConfirm() {
-      this.$refs.confirmDelete.show()
-    },
-    async deleteConfirmed(device) {
-      console.log("Delete", device)
-      await this.$store.dispatch('devices/delete', device.id)
-
-      this.$root.$emit('bv::refresh::table', this.tableId)
+      return data.item.event_date ? new moment(data.item.event_date).format('DD/MM/YYYY') : ''
     },
     closed(row) {
       // We have saved/edited the device.  We want to refresh the table to any edited data is updated, and

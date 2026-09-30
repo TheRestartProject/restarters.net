@@ -2,6 +2,8 @@
 
 return [
   'edit' => [
+    'label_reporting_url' => 'Adresse du tableau de bord des rapports',
+    'help_reporting_url' => 'L\'adresse où sont publiés les rapports de ce réseau. Laissez vide si le réseau n\'a pas de rapports.',
     'button_save' => 'Sauver les changements',
     'label_logo' => 'Logo du réseau',
     'add_new_field' => 'Ajouter un nouveau champ',
@@ -9,6 +11,7 @@ return [
     'add_field' => 'Ajouter le champ',
   ],
   'general' => [
+    'view_reports' => 'Voir les rapports',
     'network' => 'Réseau',
     'networks' => 'Réseaux',
     'particular_network' => 'Réseau :networkName',

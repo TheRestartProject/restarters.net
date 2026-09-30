@@ -7,6 +7,7 @@ use App\Device;
 use App\Group;
 use App\Party;
 use App\User;
+use Carbon\Carbon;
 use Auth;
 use DB;
 use Illuminate\Http\Request;
@@ -51,10 +52,10 @@ class ApiController extends Controller
     {
         $result = [];
 
-        $lock = \Cache::lock('homepage_data_lock', 60);
+        $lock = \Cache::lock('homepage_data_v2_lock', 60);
 
-        if (\Cache::has('homepage_data')) {
-            $result = \Cache::get('homepage_data');
+        if (\Cache::has('homepage_data_v2')) {
+            $result = \Cache::get('homepage_data_v2');
         } elseif ($lock->get()) {
             try {
                 $Device = new Device;
@@ -65,6 +66,7 @@ class ApiController extends Controller
                     ->whereNull('deleted_at')
                     ->where('event_end_utc', '<', now())
                     ->selectRaw("
+                        COUNT(*) as events,
                         SUM(pax) as participants,
                         SUM(CASE
                             WHEN cancelled = 1 THEN 3
@@ -76,6 +78,7 @@ class ApiController extends Controller
 
                 $result['participants'] = (int) ($eventStats->participants ?? 0);
                 $result['hours_volunteered'] = (int) ($eventStats->hours_volunteered ?? 0);
+                $result['events'] = (int) ($eventStats->events ?? 0);
 
                 $fixed = $Device->statusCount();
                 $result['items_fixed'] = count($fixed) ? $fixed[0]->counter : 0;
@@ -100,13 +103,13 @@ class ApiController extends Controller
                 $result['unpowered_waste'] = round($result['waste_unpowered']);
                 $result['emissions'] = round($result['co2_total']);
 
-                \Cache::put('homepage_data', $result, 43200);
+                \Cache::put('homepage_data_v2', $result, 43200);
             } finally {
                 $lock->release();
             }
         } else {
             // Another worker is rebuilding — return stale or empty rather than pile on
-            $result = \Cache::get('homepage_data', []);
+            $result = \Cache::get('homepage_data_v2', []);
         }
 
         return response()
@@ -204,9 +207,12 @@ class ApiController extends Controller
      */
     public static function getDevices(Request $request, $page, $size): JsonResponse
     {
+        $request->validate([
+            'from_date' => 'nullable|date',
+            'to_date' => 'nullable|date',
+        ]);
+
         $powered = $request->input('powered');
-        $sortBy = $request->input('sortBy');
-        $sortDesc = $request->input('sortDesc');
         $category = $request->input('category');
         $brand = $request->input('brand');
         $model = $request->input('model');
@@ -218,9 +224,29 @@ class ApiController extends Controller
         $from_date = $request->input('from_date');
         $to_date = $request->input('to_date');
 
-        $wheres = [
-            ['categories.powered', '=', $powered == 'true' ? 1 : 0],
+        // The client asks to sort by one of its table columns; map those onto database columns.  Anything else
+        // gets the default of most recent event first.
+        $sortColumns = [
+            'item_type' => 'devices.item_type',
+            'category' => 'categories.name',
+            'device_category.name' => 'categories.name',
+            'brand' => 'devices.brand',
+            'groupname' => 'groups.name',
+            'repair_status' => 'devices.repair_status',
+            'event_date' => 'events.event_start_utc',
+            'created_at' => 'devices.created_at',
+            'iddevices' => 'devices.iddevices',
         ];
+
+        $sortBy = $sortColumns[$request->input('sortBy')] ?? 'events.event_start_utc';
+        $sortDesc = strtolower($request->input('sortDesc', 'desc')) === 'asc' ? 'asc' : 'desc';
+
+        $wheres = [];
+
+        // No powered filter means both powered and unpowered items.
+        if ($powered === 'true' || $powered === 'false') {
+            $wheres[] = ['categories.powered', '=', $powered === 'true' ? 1 : 0];
+        }
 
         if ($category) {
             $wheres[] = ['idcategories', '=', $category];
@@ -247,7 +273,14 @@ class ApiController extends Controller
         }
 
         if ($status) {
-            $wheres[] = ['repair_status', '=', $status];
+            // The client uses the status strings from the rest of the API; accept the underlying numbers too.
+            $statuses = [
+                Device::REPAIR_STATUS_FIXED_STR => Device::REPAIR_STATUS_FIXED,
+                Device::REPAIR_STATUS_REPAIRABLE_STR => Device::REPAIR_STATUS_REPAIRABLE,
+                Device::REPAIR_STATUS_ENDOFLIFE_STR => Device::REPAIR_STATUS_ENDOFLIFE,
+            ];
+
+            $wheres[] = ['repair_status', '=', $statuses[$status] ?? intval($status)];
         }
 
         if ($group) {
@@ -255,20 +288,25 @@ class ApiController extends Controller
         }
 
         if ($from_date) {
-            $wheres[] = ['events.event_start_utc', '>=', $from_date];
+            $wheres[] = ['events.event_start_utc', '>=', Carbon::parse($from_date)->startOfDay()];
         }
 
         if ($to_date) {
-            $wheres[] = ['events.event_end_utc', '<=', $to_date];
+            // The date is inclusive - events on that day count.
+            $wheres[] = ['events.event_start_utc', '<', Carbon::parse($to_date)->startOfDay()->addDay()];
         }
 
-        // Get the items we want for this page.
+        // Get the items we want for this page.  Select only device columns - the joined tables share column names
+        // such as created_at, which would otherwise overwrite the device's own.
         $query = Device::with(['deviceEvent.theGroup', 'deviceCategory', 'barriers'])
+            ->select('devices.*')
             ->join('events', 'events.idevents', '=', 'devices.event')
             ->join('groups', 'events.group', '=', 'groups.idgroups')
             ->join('categories', 'devices.category', '=', 'categories.idcategories')
+            ->whereNull('events.deleted_at')
             ->where($wheres)
-            ->orderBy($sortBy, $sortDesc);
+            ->orderBy($sortBy, $sortDesc)
+            ->orderBy('devices.iddevices', $sortDesc);
 
         // Get total info across all pages.
         $count = $query->count();

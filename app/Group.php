@@ -471,6 +471,16 @@ class Group extends Model implements Auditable
         return $this->networks->contains($network);
     }
 
+    /**
+     * The group reporting dashboard, filtered to this group, or null if reporting isn't set up.
+     */
+    public function reportingUrl(): ?string
+    {
+        $template = config('restarters.reporting.group_url');
+
+        return $template ? str_replace('{group}', $this->idgroups, $template) : null;
+    }
+
     // If just one of the networks that the group is a member of should push to Wordpress, then we should push.
     // If an group is not approved, then we should not push the events to Wordpress.
     public function eventsShouldPushToWordpress()

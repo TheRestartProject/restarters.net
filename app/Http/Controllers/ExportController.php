@@ -37,19 +37,34 @@ class ExportController extends Controller
         // To not display column if the referring URL is therestartproject.org
         $host = parse_url(\Request::server('HTTP_REFERER'), PHP_URL_HOST);
 
+        $me = auth()->user();
+
+        // Only export devices from events this user can see - the same rules as User::userCanSeeEvent(), but
+        // applied in the query so that we don't have to look up each event and group in turn.
         $all_devices = Device::with([
             'deviceCategory',
-            'deviceEvent',
+            'deviceEvent.theGroup',
         ])
             ->join('events', 'events.idevents', '=', 'devices.event')
             ->join('groups', 'groups.idgroups', '=', 'events.group')
+            ->whereNull('events.deleted_at')
             ->when($idevents != NULL, function($query) use ($idevents) {
                 return $query->where('events.idevents', $idevents);
             })
             ->when($idgroups != NULL, function($query) use ($idgroups) {
                 return $query->where('events.group', $idgroups);
             })
-            ->select('devices.*', 'groups.name AS group_name')->get();
+            ->when(!$me || !$me->hasRole('Administrator'), function($query) use ($me) {
+                $extraGroups = $this->groupsWithUnapprovedEventsVisibleTo($me);
+
+                return $query->where(function($query) use ($extraGroups) {
+                    $query->where(function($query) {
+                        $query->where('events.approved', true)
+                            ->where('groups.approved', true);
+                    })->orWhereIn('events.group', $extraGroups);
+                });
+            })
+            ->select('devices.*', 'groups.name AS group_name');
 
         $displacementFactor = \App\Device::getDisplacementFactor();
         $eEmissionRatio = \App\Helpers\LcaStats::getEmissionRatioPowered();
@@ -75,8 +90,6 @@ class ExportController extends Controller
         $fullpath = $this->exportPath($filename);
         $file = fopen($fullpath, 'w+');
 
-        $me = auth()->user();
-
         // We can't put accented characters into a CSV file, so flatten them.
         // Use //TRANSLIT//IGNORE to handle characters that can't be transliterated on
         // servers with older glibc (e.g. 2.27) and POSIX locale, which lack transliteration
@@ -99,45 +112,42 @@ class ExportController extends Controller
         ];
 
         fputcsv($file, $columns);
-        $party = null;
 
-        foreach ($all_devices as $device) {
+        // Work through the devices in chunks so that the whole dataset isn't held in memory at once.
+        foreach ($all_devices->lazyById(1000, 'devices.iddevices', 'iddevices') as $device) {
             set_time_limit(60);
-            $party = !$party || $party->idevents != $device->event ? Party::findOrFail($device->event) : $party;
 
-            if (User::userCanSeeEvent($me, $party)) {
-                $wasteImpact = 0;
-                $co2Diverted = 0;
+            $wasteImpact = 0;
+            $co2Diverted = 0;
 
-                if ($device->isFixed())
+            if ($device->isFixed())
+            {
+                if ($device->deviceCategory->powered)
                 {
-                    if ($device->deviceCategory->powered)
-                    {
-                        $wasteImpact = $device->eWasteDiverted();
-                        $co2Diverted = $device->eCo2Diverted($eEmissionRatio, $displacementFactor);
-                    } else
-                    {
-                        $wasteImpact = $device->uWasteDiverted();
-                        $co2Diverted = $device->uCo2Diverted($uEmissionratio, $displacementFactor);
-                    }
+                    $wasteImpact = $device->eWasteDiverted();
+                    $co2Diverted = $device->eCo2Diverted($eEmissionRatio, $displacementFactor);
+                } else
+                {
+                    $wasteImpact = $device->uWasteDiverted();
+                    $co2Diverted = $device->uCo2Diverted($uEmissionratio, $displacementFactor);
                 }
-
-                fputcsv($file, $this->csvSafeRow([
-                    $device->item_type,
-                    $device->deviceCategory->name,
-                    $device->brand,
-                    $device->model,
-                    $device->problem,
-                    $device->getRepairStatus(),
-                    $device->getSpareParts(),
-                    $device->deviceEvent->getEventName(),
-                    $device->deviceEvent->theGroup->name,
-                    $device->deviceEvent->getFormattedLocalStart('Y-m-d'),
-                    $wasteImpact,
-                    $co2Diverted,
-                    $device->deviceCategory->powered ? 'Powered' : 'Unpowered'
-                ]));
             }
+
+            fputcsv($file, $this->csvSafeRow([
+                $device->item_type,
+                $device->deviceCategory->name,
+                $device->brand,
+                $device->model,
+                $device->problem,
+                $device->getRepairStatus(),
+                $device->getSpareParts(),
+                $device->deviceEvent->getEventName(),
+                $device->deviceEvent->theGroup->name,
+                $device->deviceEvent->getFormattedLocalStart('Y-m-d'),
+                $wasteImpact,
+                $co2Diverted,
+                $device->deviceCategory->powered ? 'Powered' : 'Unpowered'
+            ]));
         }
 
         fclose($file);
@@ -147,6 +157,37 @@ class ExportController extends Controller
         ];
 
         return Response::download($fullpath, $filename, $headers)->deleteFileAfterSend(true);
+    }
+
+    /**
+     * Groups whose events a user can see even when the event or group isn't approved: those they host, and those in
+     * networks they coordinate.
+     */
+    private function groupsWithUnapprovedEventsVisibleTo($user): array
+    {
+        if (!$user) {
+            return [];
+        }
+
+        $groups = [];
+
+        if ($user->hasRole('Host')) {
+            $groups = UserGroups::where('user', $user->id)
+                ->where('role', \App\Role::HOST)
+                ->pluck('group')
+                ->all();
+        }
+
+        $networks = $user->networks->pluck('id');
+
+        if ($networks->count()) {
+            $groups = array_merge($groups, DB::table('group_network')
+                ->whereIn('network_id', $networks)
+                ->pluck('group_id')
+                ->all());
+        }
+
+        return array_values(array_unique($groups));
     }
 
     /**

@@ -4,6 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use App\Party;
+use Carbon\Carbon;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 /**
@@ -32,6 +33,13 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *            description="Title of the event.  Provided for convenience to avoid extra API calls.",
  *            format="string",
  *            example="Europe/London"
+ *     ),
+ *     @OA\Property(
+ *            property="event_date",
+ *            title="event_date",
+ *            description="When the event started.  Provided for convenience to avoid extra API calls.",
+ *            format="date-time",
+ *            example="2024-03-10T13:00:00+00:00"
  *     ),
  *     @OA\Property(
  *            property="groupid",
@@ -195,6 +203,7 @@ class Device extends JsonResource
             'id' => intval($this->iddevices),
             'eventid' => intval($this->event),
             'eventtitle' => $event ? $event->title : NULL,
+            'event_date' => $event ? Carbon::parse($event->event_start_utc)->toIso8601String() : NULL,
             'groupid' => $event ? intval($event->group) : NULL,
             'groupname' => $group ? $group->name : NULL,
             'category' => intval($this->category),

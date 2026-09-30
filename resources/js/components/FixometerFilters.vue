@@ -21,17 +21,25 @@
       <b-collapse id="collapse-item" v-model="expandedItems">
         <b-card no-body>
           <b-card-body class="p-2">
-            <b-form-group :label="__('devices.category')">
-              <DeviceCategorySelect :category.sync="current_category" :clusters="clusters" :powered="powered" allow-empty />
+            <b-form-group :label="__('devices.powered_or_unpowered')">
+              <b-form-radio-group
+                  v-model="current_powered"
+                  :options="poweredOptions"
+                  class="powered-filter"
+                  stacked
+              />
             </b-form-group>
-            <b-form-group v-if="powered" :label="__('devices.model')">
+            <b-form-group :label="__('devices.category')">
+              <DeviceCategorySelect :key="'category-' + current_powered" :category.sync="current_category" :clusters="clusters" :powered="current_powered" allow-empty />
+            </b-form-group>
+            <b-form-group :label="__('devices.model_or_type')">
+              <DeviceModel :model.sync="current_item_type" />
+            </b-form-group>
+            <b-form-group v-if="current_powered !== false" :label="__('devices.model')">
               <DeviceModel :model.sync="current_model" />
             </b-form-group>
-            <b-form-group  v-if="powered" :label="__('devices.brand')">
+            <b-form-group v-if="current_powered !== false" :label="__('devices.brand')">
               <DeviceBrand :brand.sync="current_brand" :brands="brands" allow-empty suppress-brand-warning />
-            </b-form-group>
-            <b-form-group v-if="!powered" :label="__('devices.model_or_type')">
-              <DeviceModel :model.sync="current_item_type" />
             </b-form-group>
             <div class="w-100 device-select-row">
               <b-form-group :label="__('devices.status')">
@@ -118,8 +126,10 @@ export default {
       default: null
     },
     powered: {
+      // Null means both powered and unpowered items.
       type: Boolean,
-      required: true
+      required: false,
+      default: null
     },
     startExpandedItems: {
       type: Boolean,
@@ -152,7 +162,8 @@ export default {
       default: null
     },
     status: {
-      type: Number,
+      // One of the repair status strings, e.g. 'Fixed'.
+      type: String,
       required: false,
       default: null
     },
@@ -206,6 +217,38 @@ export default {
       set(newVal) {
         this.$emit('update:status', newVal ? newVal.id : null)
       }
+    },
+    current_powered: {
+      get() {
+        return this.powered
+      },
+      set(newVal) {
+        this.$emit('update:powered', newVal)
+
+        // Categories, brands and models belong to one or the other, so start again with those.
+        this.current_category = null
+
+        if (newVal === false) {
+          this.current_brand = null
+          this.current_model = null
+        }
+      }
+    },
+    poweredOptions () {
+      return [
+        {
+          value: null,
+          text: this.__('devices.all_items')
+        },
+        {
+          value: true,
+          text: this.__('devices.powered')
+        },
+        {
+          value: false,
+          text: this.__('devices.unpowered')
+        }
+      ]
     },
     current_comments: {
       get() {

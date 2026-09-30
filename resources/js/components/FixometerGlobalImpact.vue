@@ -20,10 +20,11 @@
 <!--      Image disabled as needs a new version from designer.-->
 <!--      image="/images/CO2_driving.png"-->
 
+      <StatsValue :count="impactData.events || 0" icon="coffee" size="md" title="devices.events_held" class="impact-events" />
       <StatsValue :count="impactData.participants" icon="participants" size="md" title="groups.participants" class="impact-participants" />
-      <StatsValue :count="Math.round(10 * impactData.hours_volunteered / 8766) / 10" :round-to="1" icon="clock" size="md" title="groups.years_volunteered" class="impact-hours-volunteered" />
-      <StatsValue :count="impactData.fixed_powered" icon="powered" size="md" title="devices.powered_items" class="impact-powered" />
-      <StatsValue :count="impactData.fixed_unpowered" icon="unpowered" size="md" title="devices.unpowered_items" class="impact-unpowered" />
+      <StatsValue :count="Math.round(10 * impactData.hours_volunteered / 8766) / 10" :round-to="1" icon="clock" size="md" title="groups.years_of_time_volunteered" class="impact-hours-volunteered" />
+      <StatsValue :count="impactData.fixed_powered" icon="powered" size="md" title="devices.powered_items_fixed" class="impact-powered" />
+      <StatsValue :count="impactData.fixed_unpowered" icon="unpowered" size="md" title="devices.unpowered_items_fixed" class="impact-unpowered" />
     </div>
     <div class="d-flex justify-content-end small mt-3">
       {{ __('partials.impact_estimates') }}
@@ -48,9 +49,6 @@ export default {
     }
   },
   components: {FixometerLatestData, StatsValue},
-  mounted() {
-    console.log('Impact data', this.impactData, Math.round(10 * this.impactData.hours_volunteered / 8766) / 10)
-  }
 }
 </script>
 <style scoped lang="scss">
@@ -76,14 +74,19 @@ export default {
     grid-column: 1 / 3;
   }
 
-  .impact-waste {
+  .impact-co2 {
     grid-row: 2 / 3;
     grid-column: 1 / 3;
   }
 
-  .impact-co2 {
+  .impact-waste {
     grid-row: 3 / 4;
-    grid-column: 1 / 3;
+    grid-column: 1 / 2;
+  }
+
+  .impact-events {
+    grid-row: 3 / 4;
+    grid-column: 2 / 3;
   }
 
   .impact-participants {
@@ -108,7 +111,7 @@ export default {
 
   @include media-breakpoint-up(md) {
     grid-template-rows: 1fr 1fr;
-    grid-template-columns: 2fr 2fr 1fr 1fr;
+    grid-template-columns: 2fr 2fr 1fr 1fr 1fr;
 
     .latest-data {
       grid-row: 1 / 2;
@@ -125,14 +128,19 @@ export default {
       grid-column: 2 / 3;
     }
 
-    .impact-participants {
+    .impact-events {
       grid-row: 1 / 2;
       grid-column: 3 / 4;
     }
 
-    .impact-hours-volunteered {
+    .impact-participants {
       grid-row: 1 / 2;
       grid-column: 4 / 5;
+    }
+
+    .impact-hours-volunteered {
+      grid-row: 1 / 2;
+      grid-column: 5 / 6;
     }
 
     .impact-powered {

@@ -4,6 +4,7 @@ return [
   'networks' => 'Networks',
   'network' => 'Network',
   'general' => [
+    'view_reports' => 'View reports',
     'networks' => 'Networks',
     'network' => 'Network',
     'particular_network' => ':networkName network',
@@ -55,6 +56,8 @@ return [
     'none' => 'None',
   ],
   'edit' => [
+    'label_reporting_url' => 'Reporting dashboard address',
+    'help_reporting_url' => 'Where this network\'s reports are published. Leave blank if the network has no reports.',
     'label_logo' => 'Network logo',
     'button_save' => 'Save changes',
     'add_new_field' => 'Add new field',
