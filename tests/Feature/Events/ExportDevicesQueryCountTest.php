@@ -44,9 +44,9 @@ class ExportDevicesQueryCountTest extends TestCase
 
     private function exportedRows(): array
     {
-        $response = $this->get('/export/devices');
-        $header = $response->headers->get('content-disposition');
-        $filename = storage_path('app/exports') . '/' . basename(substr($header, strpos($header, 'filename=') + 9));
+        // A full export is always written to the same file.
+        $this->get('/export/devices')->assertSuccessful();
+        $filename = storage_path('app/exports/repair-data.csv');
 
         $rows = array_map('str_getcsv', file($filename));
         array_shift($rows);
