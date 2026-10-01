@@ -14,7 +14,16 @@ class SpecsExtract extends Command
 {
     protected $signature = 'specs:extract {--check : Compare against existing manifest instead of writing}';
 
-    protected $description = 'Extract #[Feature] and #[UserStory] attributes into docs/specs/manifest.json';
+    protected $description = 'Extract #[Feature] and #[UserStory] attributes into docs/specs/manifest.json; --check also fails on unannotated public controller methods';
+
+    /** Public controller methods with neither #[UserStory] nor #[NoStory]. */
+    private array $unannotated = [];
+
+    /** Short "Class::method" => list of fully-qualified class names declaring that method. */
+    private array $methodClasses = [];
+
+    /** @story: references that could not be resolved unambiguously. */
+    private array $badStoryRefs = [];
 
     public function handle(): int
     {
@@ -39,6 +48,8 @@ class SpecsExtract extends Command
         if ($this->option('check')) {
             return $this->checkManifest($manifest, $outputPath);
         }
+
+        $this->reportProblems();
 
         if (! is_dir(dirname($outputPath))) {
             mkdir(dirname($outputPath), 0755, true);
@@ -247,8 +258,17 @@ class SpecsExtract extends Command
 
         $classFeature = $visitor->classFeature;
         $shortClass = $visitor->className;
+        $fqcn = ($visitor->namespace ? $visitor->namespace . '\\' : '') . $shortClass;
+        $isController = str_starts_with($filePath, 'app/Http/Controllers/');
 
         foreach ($visitor->methods as $method) {
+            $this->methodClasses["{$shortClass}::{$method['name']}"][] = $fqcn;
+
+            if ($isController && $method['isPublic'] && ! str_starts_with($method['name'], '__')
+                && ! $method['stories'] && $method['noStory'] === null) {
+                $this->unannotated[] = "{$fqcn}::{$method['name']}";
+            }
+
             foreach ($method['stories'] as $story) {
                 $featureName = $story['feature'] ?: ($classFeature ? $classFeature['name'] : 'Uncategorised');
                 $featureDesc = $classFeature ? $classFeature['description'] : '';
@@ -276,6 +296,7 @@ class SpecsExtract extends Command
                     'persona' => $story['persona'],
                     'theme' => $story['theme'] ?: 'General',
                     'method' => "{$shortClass}::{$method['name']}",
+                    'class' => $fqcn,
                     'file' => $filePath,
                     'tests' => [],
                 ];
@@ -294,7 +315,7 @@ class SpecsExtract extends Command
         $storyIndex = [];
         foreach ($features as $featureName => &$feature) {
             foreach ($feature['stories'] as $idx => &$story) {
-                $storyIndex[$story['method']][] = [
+                $storyIndex[$story['class'] . '::' . explode('::', $story['method'])[1]][] = [
                     'feature' => $featureName,
                     'index' => $idx,
                 ];
@@ -323,11 +344,11 @@ class SpecsExtract extends Command
                 $content = file_get_contents($file->getPathname());
                 $relativePath = str_replace(base_path() . '/', '', $file->getPathname());
 
-                preg_match_all('/@story:(\w+::\w+)/', $content, $matches, PREG_SET_ORDER);
+                preg_match_all('/@story:([\w\\\\]+::\w+)/', $content, $matches, PREG_SET_ORDER);
 
                 foreach ($matches as $match) {
-                    $methodRef = $match[1];
-                    if (isset($storyIndex[$methodRef])) {
+                    $methodRef = $this->resolveStoryRef($match[1], $relativePath);
+                    if ($methodRef !== null && isset($storyIndex[$methodRef])) {
                         $testName = $this->extractTestName($content, $match[0], $ext);
 
                         foreach ($storyIndex[$methodRef] as $ref) {
@@ -338,6 +359,56 @@ class SpecsExtract extends Command
                         }
                     }
                 }
+            }
+        }
+    }
+
+    /**
+     * Resolve a "@story:" reference to a fully-qualified "Class::method" key.
+     *
+     * A reference may be fully qualified (App\\Http\\Controllers\\API\\GroupController::list)
+     * or use the short class name (GroupController::list). A short name is only accepted when
+     * exactly one scanned class declares that method; otherwise it is recorded as ambiguous.
+     */
+    private function resolveStoryRef(string $ref, string $testFile): ?string
+    {
+        $ref = ltrim($ref, '\\');
+
+        if (str_contains($ref, '\\')) {
+            [$class, $name] = explode('::', $ref);
+            $short = substr(strrchr('\\' . $class, '\\'), 1);
+            if (! in_array($class, $this->methodClasses["{$short}::{$name}"] ?? [], true)) {
+                $this->badStoryRefs[] = "{$testFile}: @story:{$ref} does not match any controller method";
+                return null;
+            }
+            return $ref;
+        }
+
+        $candidates = array_values(array_unique($this->methodClasses[$ref] ?? []));
+        if (count($candidates) === 1) {
+            return $candidates[0] . '::' . explode('::', $ref)[1];
+        }
+        if (count($candidates) > 1) {
+            $this->badStoryRefs[] = "{$testFile}: @story:{$ref} is ambiguous between "
+                . implode(', ', $candidates) . ' - use the fully-qualified class name';
+        } else {
+            $this->badStoryRefs[] = "{$testFile}: @story:{$ref} does not match any method";
+        }
+        return null;
+    }
+
+    private function reportProblems(): void
+    {
+        if ($this->unannotated) {
+            $this->warn('Public controller methods with neither #[UserStory] nor #[NoStory]:');
+            foreach ($this->unannotated as $m) {
+                $this->line("  - {$m}");
+            }
+        }
+        if ($this->badStoryRefs) {
+            $this->warn('Unresolvable @story: references:');
+            foreach ($this->badStoryRefs as $m) {
+                $this->line("  - {$m}");
             }
         }
     }
@@ -436,6 +507,14 @@ class SpecsExtract extends Command
 
     private function checkManifest(array $manifest, string $outputPath): int
     {
+        $failed = false;
+
+        if ($this->unannotated || $this->badStoryRefs) {
+            $this->reportProblems();
+            $this->error('Annotate every public controller method with #[UserStory] or #[NoStory], and use unambiguous @story: references.');
+            $failed = true;
+        }
+
         if (! file_exists($outputPath)) {
             $this->error('No manifest found at docs/specs/manifest.json. Run specs:extract to generate it.');
             return Command::FAILURE;
@@ -450,10 +529,11 @@ class SpecsExtract extends Command
 
         if ($compareNew === $compareExisting) {
             $this->info('Manifest is up to date.');
-            return Command::SUCCESS;
+        } else {
+            $this->error('Manifest is out of date. Run php artisan specs:extract to update it.');
+            $failed = true;
         }
 
-        $this->error('Manifest is out of date. Run php artisan specs:extract to update it.');
-        return Command::FAILURE;
+        return $failed ? Command::FAILURE : Command::SUCCESS;
     }
 }
