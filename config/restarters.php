@@ -27,9 +27,15 @@ return [
     ],
 
     'reporting' => [
-        // The group reporting dashboard, filtered to one group.  {group} is replaced by the group id, e.g.
-        // https://metabase.example.org/public/dashboard/abc?group_id={group}#hide_parameters=group_id
-        'group_url' => env('GROUP_REPORTING_URL'),
+        // The group reporting dashboard, filtered to one group, one per language - Metabase can only show a
+        // dashboard in another language as a separate dashboard.  {group} is replaced by the group id and
+        // {group_name} by its name, e.g.
+        // https://metabase.example.org/public/dashboard/abc?group_id={group}&group_name={group_name}#hide_parameters=group_id%2Cgroup_name
+        // A group gets the dashboard for its network's language, or English if there isn't one.
+        'group_urls' => [
+            'en' => env('GROUP_REPORTING_URL_EN'),
+            'fr' => env('GROUP_REPORTING_URL_FR'),
+        ],
     ],
 
     'xref_types' => [

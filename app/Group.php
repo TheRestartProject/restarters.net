@@ -473,12 +473,26 @@ class Group extends Model implements Auditable
 
     /**
      * The group reporting dashboard, filtered to this group, or null if reporting isn't set up.
+     *
+     * The dashboard is in the language of the group's network, falling back to English when there's no
+     * dashboard in that language.
      */
     public function reportingUrl(): ?string
     {
-        $template = config('restarters.reporting.group_url');
+        $templates = config('restarters.reporting.group_urls', []);
+        $network = $this->networks->first();
+        $language = $network ? $network->default_language : null;
+        $template = ($language ? ($templates[$language] ?? null) : null) ?: ($templates['en'] ?? null);
 
-        return $template ? str_replace('{group}', $this->idgroups, $template) : null;
+        if (! $template) {
+            return null;
+        }
+
+        return str_replace(
+            ['{group}', '{group_name}'],
+            [$this->idgroups, rawurlencode($this->name)],
+            $template
+        );
     }
 
     // If just one of the networks that the group is a member of should push to Wordpress, then we should push.
