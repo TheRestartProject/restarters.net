@@ -481,6 +481,8 @@ class NetworkController extends Controller
      *      ),
      *     )
      */
+    #[UserStory('As a Guest, I can list a network\'s group tags via the API', persona: 'Guest', theme: 'Network tags')]
+    #[UserStory('As a ThirdParty, I can retrieve a network\'s group tags to display on my platform', persona: 'ThirdParty', theme: 'Network tags')]
     public function getNetworkTagsv2(Request $request, $id)
     {
         $network = Network::findOrFail($id);
@@ -543,6 +545,8 @@ class NetworkController extends Controller
      *      ),
      *     )
      */
+    #[UserStory('As a Guest, I can view a network\'s impact statistics via the API, optionally for one group tag', persona: 'Guest', theme: 'Network stats')]
+    #[UserStory('As a ThirdParty, I can retrieve a network\'s impact statistics to display on my platform', persona: 'ThirdParty', theme: 'Network stats')]
     public function getNetworkStatsv2(Request $request, $id): JsonResponse
     {
         $network = Network::findOrFail($id);
@@ -618,6 +622,8 @@ class NetworkController extends Controller
      *      ),
      *     )
      */
+    #[UserStory('As a NetworkCoordinator, I can create a group tag for my network via the API', persona: 'NetworkCoordinator', theme: 'Network tags')]
+    #[UserStory('As an Admin, I can create a group tag for any network via the API', persona: 'Admin', theme: 'Network tags')]
     public function createNetworkTagv2(Request $request, $id)
     {
         $network = Network::findOrFail($id);
@@ -714,6 +720,8 @@ class NetworkController extends Controller
      *      ),
      *     )
      */
+    #[UserStory('As a NetworkCoordinator, I can edit a group tag belonging to my network via the API', persona: 'NetworkCoordinator', theme: 'Network tags')]
+    #[UserStory('As an Admin, I can edit a group tag belonging to any network via the API', persona: 'Admin', theme: 'Network tags')]
     public function updateNetworkTagv2(Request $request, $id, $tagId)
     {
         $network = Network::findOrFail($id);
@@ -804,6 +812,8 @@ class NetworkController extends Controller
      *      ),
      *     )
      */
+    #[UserStory('As a NetworkCoordinator, I can delete a group tag belonging to my network via the API', persona: 'NetworkCoordinator', theme: 'Network tags')]
+    #[UserStory('As an Admin, I can delete a group tag belonging to any network via the API', persona: 'Admin', theme: 'Network tags')]
     public function deleteNetworkTagv2(Request $request, $id, $tagId)
     {
         $network = Network::findOrFail($id);

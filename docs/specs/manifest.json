@@ -1,5 +1,5 @@
 {
-    "generatedAt": "2026-04-16T20:39:33Z",
+    "generatedAt": "2026-10-01T16:49:25Z",
     "features": {
         "Administration": {
             "description": "Platform administration and configuration",
@@ -7,6 +7,7 @@
                 "app/Http/Controllers/CategoryController.php",
                 "app/Http/Controllers/RoleController.php",
                 "app/Http/Controllers/BrandsController.php",
+                "app/Http/Controllers/PreviewDeployController.php",
                 "app/Http/Controllers/GroupTagsController.php",
                 "app/Http/Controllers/API/AlertController.php",
                 "app/Http/Controllers/SkillsController.php"
@@ -17,6 +18,7 @@
                     "persona": "Admin",
                     "theme": "Platform alerts",
                     "method": "AlertController::addAlertv2",
+                    "class": "App\\Http\\Controllers\\API\\AlertController",
                     "file": "app/Http/Controllers/API/AlertController.php",
                     "tests": [
                         {
@@ -30,6 +32,7 @@
                     "persona": "Admin",
                     "theme": "Platform alerts",
                     "method": "AlertController::updateAlertv2",
+                    "class": "App\\Http\\Controllers\\API\\AlertController",
                     "file": "app/Http/Controllers/API/AlertController.php",
                     "tests": [
                         {
@@ -43,6 +46,7 @@
                     "persona": "Admin",
                     "theme": "Reference data",
                     "method": "BrandsController::getDeleteBrand",
+                    "class": "App\\Http\\Controllers\\BrandsController",
                     "file": "app/Http/Controllers/BrandsController.php",
                     "tests": [
                         {
@@ -60,6 +64,7 @@
                     "persona": "Admin",
                     "theme": "Reference data",
                     "method": "BrandsController::getEditBrand",
+                    "class": "App\\Http\\Controllers\\BrandsController",
                     "file": "app/Http/Controllers/BrandsController.php",
                     "tests": [
                         {
@@ -77,6 +82,7 @@
                     "persona": "Admin",
                     "theme": "Reference data",
                     "method": "BrandsController::index",
+                    "class": "App\\Http\\Controllers\\BrandsController",
                     "file": "app/Http/Controllers/BrandsController.php",
                     "tests": [
                         {
@@ -94,6 +100,7 @@
                     "persona": "Admin",
                     "theme": "Reference data",
                     "method": "BrandsController::postCreateBrand",
+                    "class": "App\\Http\\Controllers\\BrandsController",
                     "file": "app/Http/Controllers/BrandsController.php",
                     "tests": [
                         {
@@ -111,6 +118,7 @@
                     "persona": "Admin",
                     "theme": "Reference data",
                     "method": "BrandsController::postEditBrand",
+                    "class": "App\\Http\\Controllers\\BrandsController",
                     "file": "app/Http/Controllers/BrandsController.php",
                     "tests": [
                         {
@@ -128,6 +136,7 @@
                     "persona": "Admin",
                     "theme": "Reference data",
                     "method": "CategoryController::getEditCategory",
+                    "class": "App\\Http\\Controllers\\CategoryController",
                     "file": "app/Http/Controllers/CategoryController.php",
                     "tests": [
                         {
@@ -145,6 +154,7 @@
                     "persona": "Admin",
                     "theme": "Reference data",
                     "method": "CategoryController::index",
+                    "class": "App\\Http\\Controllers\\CategoryController",
                     "file": "app/Http/Controllers/CategoryController.php",
                     "tests": [
                         {
@@ -158,6 +168,7 @@
                     "persona": "Admin",
                     "theme": "Reference data",
                     "method": "CategoryController::postEditCategory",
+                    "class": "App\\Http\\Controllers\\CategoryController",
                     "file": "app/Http/Controllers/CategoryController.php",
                     "tests": [
                         {
@@ -175,6 +186,7 @@
                     "persona": "Admin",
                     "theme": "Reference data",
                     "method": "GroupTagsController::getDeleteTag",
+                    "class": "App\\Http\\Controllers\\GroupTagsController",
                     "file": "app/Http/Controllers/GroupTagsController.php",
                     "tests": [
                         {
@@ -188,6 +200,7 @@
                     "persona": "Admin",
                     "theme": "Reference data",
                     "method": "GroupTagsController::getEditTag",
+                    "class": "App\\Http\\Controllers\\GroupTagsController",
                     "file": "app/Http/Controllers/GroupTagsController.php",
                     "tests": [
                         {
@@ -201,6 +214,7 @@
                     "persona": "Admin",
                     "theme": "Reference data",
                     "method": "GroupTagsController::index",
+                    "class": "App\\Http\\Controllers\\GroupTagsController",
                     "file": "app/Http/Controllers/GroupTagsController.php",
                     "tests": [
                         {
@@ -214,6 +228,7 @@
                     "persona": "Admin",
                     "theme": "Reference data",
                     "method": "GroupTagsController::postCreateTag",
+                    "class": "App\\Http\\Controllers\\GroupTagsController",
                     "file": "app/Http/Controllers/GroupTagsController.php",
                     "tests": [
                         {
@@ -227,6 +242,7 @@
                     "persona": "Admin",
                     "theme": "Reference data",
                     "method": "GroupTagsController::postEditTag",
+                    "class": "App\\Http\\Controllers\\GroupTagsController",
                     "file": "app/Http/Controllers/GroupTagsController.php",
                     "tests": [
                         {
@@ -236,10 +252,29 @@
                     ]
                 },
                 {
+                    "story": "As an Admin, I can trigger a preview deploy of a chosen branch",
+                    "persona": "Admin",
+                    "theme": "Preview deploys",
+                    "method": "PreviewDeployController::deploy",
+                    "class": "App\\Http\\Controllers\\PreviewDeployController",
+                    "file": "app/Http/Controllers/PreviewDeployController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As an Admin, I can see the open pull requests that can be deployed to the preview site",
+                    "persona": "Admin",
+                    "theme": "Preview deploys",
+                    "method": "PreviewDeployController::show",
+                    "class": "App\\Http\\Controllers\\PreviewDeployController",
+                    "file": "app/Http/Controllers/PreviewDeployController.php",
+                    "tests": []
+                },
+                {
                     "story": "As an Admin, I can edit the permissions assigned to a role",
                     "persona": "Admin",
                     "theme": "Roles & permissions",
                     "method": "RoleController::edit",
+                    "class": "App\\Http\\Controllers\\RoleController",
                     "file": "app/Http/Controllers/RoleController.php",
                     "tests": [
                         {
@@ -253,6 +288,7 @@
                     "persona": "Admin",
                     "theme": "Roles & permissions",
                     "method": "RoleController::index",
+                    "class": "App\\Http\\Controllers\\RoleController",
                     "file": "app/Http/Controllers/RoleController.php",
                     "tests": [
                         {
@@ -274,6 +310,7 @@
                     "persona": "Admin",
                     "theme": "Reference data",
                     "method": "SkillsController::getDeleteSkill",
+                    "class": "App\\Http\\Controllers\\SkillsController",
                     "file": "app/Http/Controllers/SkillsController.php",
                     "tests": [
                         {
@@ -287,6 +324,7 @@
                     "persona": "Admin",
                     "theme": "Reference data",
                     "method": "SkillsController::getEditSkill",
+                    "class": "App\\Http\\Controllers\\SkillsController",
                     "file": "app/Http/Controllers/SkillsController.php",
                     "tests": [
                         {
@@ -300,6 +338,7 @@
                     "persona": "Admin",
                     "theme": "Reference data",
                     "method": "SkillsController::index",
+                    "class": "App\\Http\\Controllers\\SkillsController",
                     "file": "app/Http/Controllers/SkillsController.php",
                     "tests": [
                         {
@@ -321,6 +360,7 @@
                     "persona": "Admin",
                     "theme": "Reference data",
                     "method": "SkillsController::postCreateSkill",
+                    "class": "App\\Http\\Controllers\\SkillsController",
                     "file": "app/Http/Controllers/SkillsController.php",
                     "tests": [
                         {
@@ -334,6 +374,7 @@
                     "persona": "Admin",
                     "theme": "Reference data",
                     "method": "SkillsController::postEditSkill",
+                    "class": "App\\Http\\Controllers\\SkillsController",
                     "file": "app/Http/Controllers/SkillsController.php",
                     "tests": [
                         {
@@ -347,6 +388,7 @@
                     "persona": "Guest",
                     "theme": "Platform alerts",
                     "method": "AlertController::listAlertsv2",
+                    "class": "App\\Http\\Controllers\\API\\AlertController",
                     "file": "app/Http/Controllers/API/AlertController.php",
                     "tests": [
                         {
@@ -360,7 +402,7 @@
                     ]
                 }
             ],
-            "storyCount": 23,
+            "storyCount": 25,
             "personas": [
                 "Admin",
                 "Guest"
@@ -377,6 +419,7 @@
                     "persona": "Host",
                     "theme": "Host dashboard",
                     "method": "DashboardController::getHostDash",
+                    "class": "App\\Http\\Controllers\\DashboardController",
                     "file": "app/Http/Controllers/DashboardController.php",
                     "tests": []
                 },
@@ -385,6 +428,7 @@
                     "persona": "Restarter",
                     "theme": "Personal dashboard",
                     "method": "DashboardController::index",
+                    "class": "App\\Http\\Controllers\\DashboardController",
                     "file": "app/Http/Controllers/DashboardController.php",
                     "tests": [
                         {
@@ -417,6 +461,7 @@
                     "persona": "Guest",
                     "theme": "Get device details",
                     "method": "DeviceController::getDevicev2",
+                    "class": "App\\Http\\Controllers\\API\\DeviceController",
                     "file": "app/Http/Controllers/API/DeviceController.php",
                     "tests": [
                         {
@@ -434,6 +479,7 @@
                     "persona": "Guest",
                     "theme": "Browse & search devices",
                     "method": "ItemController::listItemsv2",
+                    "class": "App\\Http\\Controllers\\API\\ItemController",
                     "file": "app/Http/Controllers/API/ItemController.php",
                     "tests": [
                         {
@@ -447,6 +493,7 @@
                     "persona": "Host",
                     "theme": "Delete devices",
                     "method": "DeviceController::deleteDevicev2",
+                    "class": "App\\Http\\Controllers\\API\\DeviceController",
                     "file": "app/Http/Controllers/API/DeviceController.php",
                     "tests": [
                         {
@@ -460,6 +507,7 @@
                     "persona": "Restarter",
                     "theme": "Log & edit repairs",
                     "method": "DeviceController::createDevicev2",
+                    "class": "App\\Http\\Controllers\\API\\DeviceController",
                     "file": "app/Http/Controllers/API/DeviceController.php",
                     "tests": [
                         {
@@ -521,6 +569,7 @@
                     "persona": "Restarter",
                     "theme": "Device photos",
                     "method": "DeviceController::deleteImage",
+                    "class": "App\\Http\\Controllers\\DeviceController",
                     "file": "app/Http/Controllers/DeviceController.php",
                     "tests": [
                         {
@@ -538,6 +587,7 @@
                     "persona": "Restarter",
                     "theme": "Device photos",
                     "method": "DeviceController::imageUpload",
+                    "class": "App\\Http\\Controllers\\DeviceController",
                     "file": "app/Http/Controllers/DeviceController.php",
                     "tests": [
                         {
@@ -555,6 +605,7 @@
                     "persona": "Restarter",
                     "theme": "Browse & search devices",
                     "method": "DeviceController::index",
+                    "class": "App\\Http\\Controllers\\DeviceController",
                     "file": "app/Http/Controllers/DeviceController.php",
                     "tests": [
                         {
@@ -568,6 +619,7 @@
                     "persona": "Restarter",
                     "theme": "Log & edit repairs",
                     "method": "DeviceController::updateDevicev2",
+                    "class": "App\\Http\\Controllers\\API\\DeviceController",
                     "file": "app/Http/Controllers/API/DeviceController.php",
                     "tests": [
                         {
@@ -601,6 +653,7 @@
                     "persona": "ThirdParty",
                     "theme": "Get device details",
                     "method": "DeviceController::getDevicev2",
+                    "class": "App\\Http\\Controllers\\API\\DeviceController",
                     "file": "app/Http/Controllers/API/DeviceController.php",
                     "tests": [
                         {
@@ -635,6 +688,7 @@
                     "persona": "Admin",
                     "theme": "Create & manage events",
                     "method": "EventController::moderateEventsv2",
+                    "class": "App\\Http\\Controllers\\API\\EventController",
                     "file": "app/Http/Controllers/API/EventController.php",
                     "tests": [
                         {
@@ -648,6 +702,7 @@
                     "persona": "Guest",
                     "theme": "Calendar feeds",
                     "method": "CalendarEventsController::allEventsByArea",
+                    "class": "App\\Http\\Controllers\\CalendarEventsController",
                     "file": "app/Http/Controllers/CalendarEventsController.php",
                     "tests": [
                         {
@@ -661,6 +716,7 @@
                     "persona": "Guest",
                     "theme": "Calendar feeds",
                     "method": "CalendarEventsController::allEventsByGroup",
+                    "class": "App\\Http\\Controllers\\CalendarEventsController",
                     "file": "app/Http/Controllers/CalendarEventsController.php",
                     "tests": [
                         {
@@ -674,6 +730,7 @@
                     "persona": "Guest",
                     "theme": "Calendar feeds",
                     "method": "CalendarEventsController::allEventsByNetwork",
+                    "class": "App\\Http\\Controllers\\CalendarEventsController",
                     "file": "app/Http/Controllers/CalendarEventsController.php",
                     "tests": [
                         {
@@ -687,6 +744,7 @@
                     "persona": "Guest",
                     "theme": "Find & browse events",
                     "method": "EventController::getEventv2",
+                    "class": "App\\Http\\Controllers\\API\\EventController",
                     "file": "app/Http/Controllers/API/EventController.php",
                     "tests": [
                         {
@@ -712,6 +770,7 @@
                     "persona": "Guest",
                     "theme": "Attendance & volunteers",
                     "method": "EventController::listVolunteers",
+                    "class": "App\\Http\\Controllers\\API\\EventController",
                     "file": "app/Http/Controllers/API/EventController.php",
                     "tests": [
                         {
@@ -725,6 +784,7 @@
                     "persona": "Guest",
                     "theme": "Invitations",
                     "method": "PartyController::confirmCodeInvite",
+                    "class": "App\\Http\\Controllers\\PartyController",
                     "file": "app/Http/Controllers/PartyController.php",
                     "tests": [
                         {
@@ -738,6 +798,7 @@
                     "persona": "Guest",
                     "theme": "Stats & data",
                     "method": "PartyController::stats",
+                    "class": "App\\Http\\Controllers\\PartyController",
                     "file": "app/Http/Controllers/PartyController.php",
                     "tests": [
                         {
@@ -751,6 +812,7 @@
                     "persona": "Guest",
                     "theme": "Find & browse events",
                     "method": "PartyController::view",
+                    "class": "App\\Http\\Controllers\\PartyController",
                     "file": "app/Http/Controllers/PartyController.php",
                     "tests": [
                         {
@@ -804,6 +866,7 @@
                     "persona": "Host",
                     "theme": "Attendance & volunteers",
                     "method": "EventController::addVolunteer",
+                    "class": "App\\Http\\Controllers\\API\\EventController",
                     "file": "app/Http/Controllers/API/EventController.php",
                     "tests": [
                         {
@@ -825,6 +888,7 @@
                     "persona": "Host",
                     "theme": "Create & manage events",
                     "method": "EventController::createEventv2",
+                    "class": "App\\Http\\Controllers\\API\\EventController",
                     "file": "app/Http/Controllers/API/EventController.php",
                     "tests": [
                         {
@@ -914,6 +978,7 @@
                     "persona": "Host",
                     "theme": "Create & manage events",
                     "method": "EventController::updateEventv2",
+                    "class": "App\\Http\\Controllers\\API\\EventController",
                     "file": "app/Http/Controllers/API/EventController.php",
                     "tests": [
                         {
@@ -955,27 +1020,7 @@
                     "persona": "Host",
                     "theme": "Create & manage events",
                     "method": "PartyController::create",
-                    "file": "app/Http/Controllers/PartyController.php",
-                    "tests": [
-                        {
-                            "file": "tests/Feature/Events/CreateEventTest.php",
-                            "test": "(unknown test)"
-                        },
-                        {
-                            "file": "tests/Feature/Events/CreateEventTest.php",
-                            "test": "(unknown test)"
-                        },
-                        {
-                            "file": "tests/Feature/Events/CreateEventTest.php",
-                            "test": "(unknown test)"
-                        }
-                    ]
-                },
-                {
-                    "story": "As a Host, I can create an online event without a physical location",
-                    "persona": "Host",
-                    "theme": "Create & manage events",
-                    "method": "PartyController::create",
+                    "class": "App\\Http\\Controllers\\PartyController",
                     "file": "app/Http/Controllers/PartyController.php",
                     "tests": [
                         {
@@ -997,6 +1042,7 @@
                     "persona": "Host",
                     "theme": "Create & manage events",
                     "method": "PartyController::deleteEvent",
+                    "class": "App\\Http\\Controllers\\PartyController",
                     "file": "app/Http/Controllers/PartyController.php",
                     "tests": [
                         {
@@ -1014,6 +1060,7 @@
                     "persona": "Host",
                     "theme": "Create & manage events",
                     "method": "PartyController::duplicate",
+                    "class": "App\\Http\\Controllers\\PartyController",
                     "file": "app/Http/Controllers/PartyController.php",
                     "tests": [
                         {
@@ -1027,6 +1074,7 @@
                     "persona": "Host",
                     "theme": "Create & manage events",
                     "method": "PartyController::edit",
+                    "class": "App\\Http\\Controllers\\PartyController",
                     "file": "app/Http/Controllers/PartyController.php",
                     "tests": [
                         {
@@ -1044,6 +1092,7 @@
                     "persona": "Host",
                     "theme": "Devices & repairs",
                     "method": "PartyController::getContributions",
+                    "class": "App\\Http\\Controllers\\PartyController",
                     "file": "app/Http/Controllers/PartyController.php",
                     "tests": [
                         {
@@ -1061,6 +1110,7 @@
                     "persona": "Host",
                     "theme": "Invitations",
                     "method": "PartyController::getGroupEmailsWithNames",
+                    "class": "App\\Http\\Controllers\\PartyController",
                     "file": "app/Http/Controllers/PartyController.php",
                     "tests": [
                         {
@@ -1078,6 +1128,7 @@
                     "persona": "Host",
                     "theme": "Invitations",
                     "method": "PartyController::postSendInvite",
+                    "class": "App\\Http\\Controllers\\PartyController",
                     "file": "app/Http/Controllers/PartyController.php",
                     "tests": [
                         {
@@ -1119,6 +1170,7 @@
                     "persona": "Host",
                     "theme": "Attendance & volunteers",
                     "method": "PartyController::removeVolunteer",
+                    "class": "App\\Http\\Controllers\\PartyController",
                     "file": "app/Http/Controllers/PartyController.php",
                     "tests": [
                         {
@@ -1136,6 +1188,7 @@
                     "persona": "Host",
                     "theme": "Attendance & volunteers",
                     "method": "PartyController::updateQuantity",
+                    "class": "App\\Http\\Controllers\\PartyController",
                     "file": "app/Http/Controllers/PartyController.php",
                     "tests": [
                         {
@@ -1149,6 +1202,7 @@
                     "persona": "Host",
                     "theme": "Attendance & volunteers",
                     "method": "PartyController::updateVolunteerQuantity",
+                    "class": "App\\Http\\Controllers\\PartyController",
                     "file": "app/Http/Controllers/PartyController.php",
                     "tests": [
                         {
@@ -1162,6 +1216,7 @@
                     "persona": "NetworkCoordinator",
                     "theme": "Find & browse events",
                     "method": "EventController::getEventsByUsersNetworks",
+                    "class": "App\\Http\\Controllers\\API\\EventController",
                     "file": "app/Http/Controllers/API/EventController.php",
                     "tests": [
                         {
@@ -1179,6 +1234,7 @@
                     "persona": "NetworkCoordinator",
                     "theme": "Create & manage events",
                     "method": "EventController::moderateEventsv2",
+                    "class": "App\\Http\\Controllers\\API\\EventController",
                     "file": "app/Http/Controllers/API/EventController.php",
                     "tests": [
                         {
@@ -1192,6 +1248,7 @@
                     "persona": "NetworkCoordinator",
                     "theme": "Create & manage events",
                     "method": "PartyController::edit",
+                    "class": "App\\Http\\Controllers\\PartyController",
                     "file": "app/Http/Controllers/PartyController.php",
                     "tests": [
                         {
@@ -1209,6 +1266,7 @@
                     "persona": "Restarter",
                     "theme": "Calendar feeds",
                     "method": "CalendarEventsController::allEventsByUser",
+                    "class": "App\\Http\\Controllers\\CalendarEventsController",
                     "file": "app/Http/Controllers/CalendarEventsController.php",
                     "tests": [
                         {
@@ -1238,6 +1296,7 @@
                     "persona": "Restarter",
                     "theme": "Invitations",
                     "method": "PartyController::cancelInvite",
+                    "class": "App\\Http\\Controllers\\PartyController",
                     "file": "app/Http/Controllers/PartyController.php",
                     "tests": [
                         {
@@ -1251,6 +1310,7 @@
                     "persona": "Restarter",
                     "theme": "Invitations",
                     "method": "PartyController::confirmInvite",
+                    "class": "App\\Http\\Controllers\\PartyController",
                     "file": "app/Http/Controllers/PartyController.php",
                     "tests": [
                         {
@@ -1272,6 +1332,7 @@
                     "persona": "Restarter",
                     "theme": "Photos & media",
                     "method": "PartyController::deleteImage",
+                    "class": "App\\Http\\Controllers\\PartyController",
                     "file": "app/Http/Controllers/PartyController.php",
                     "tests": [
                         {
@@ -1285,6 +1346,7 @@
                     "persona": "Restarter",
                     "theme": "Attendance & volunteers",
                     "method": "PartyController::getJoinEvent",
+                    "class": "App\\Http\\Controllers\\PartyController",
                     "file": "app/Http/Controllers/PartyController.php",
                     "tests": [
                         {
@@ -1310,6 +1372,7 @@
                     "persona": "Restarter",
                     "theme": "Photos & media",
                     "method": "PartyController::imageUpload",
+                    "class": "App\\Http\\Controllers\\PartyController",
                     "file": "app/Http/Controllers/PartyController.php",
                     "tests": [
                         {
@@ -1323,6 +1386,7 @@
                     "persona": "Restarter",
                     "theme": "Find & browse events",
                     "method": "PartyController::index",
+                    "class": "App\\Http\\Controllers\\PartyController",
                     "file": "app/Http/Controllers/PartyController.php",
                     "tests": [
                         {
@@ -1344,10 +1408,20 @@
                     ]
                 },
                 {
+                    "story": "As a ThirdParty holding the shared calendar secret, I can subscribe to every event on the platform as an iCal feed",
+                    "persona": "ThirdParty",
+                    "theme": "Calendar feeds",
+                    "method": "CalendarEventsController::allEvents",
+                    "class": "App\\Http\\Controllers\\CalendarEventsController",
+                    "file": "app/Http/Controllers/CalendarEventsController.php",
+                    "tests": []
+                },
+                {
                     "story": "As a ThirdParty, I can retrieve event details to display on my platform",
                     "persona": "ThirdParty",
                     "theme": "Find & browse events",
                     "method": "EventController::getEventv2",
+                    "class": "App\\Http\\Controllers\\API\\EventController",
                     "file": "app/Http/Controllers/API/EventController.php",
                     "tests": [
                         {
@@ -1373,6 +1447,7 @@
                     "persona": "ThirdParty",
                     "theme": "Attendance & volunteers",
                     "method": "EventController::listVolunteers",
+                    "class": "App\\Http\\Controllers\\API\\EventController",
                     "file": "app/Http/Controllers/API/EventController.php",
                     "tests": [
                         {
@@ -1405,6 +1480,7 @@
                     "persona": "Admin",
                     "theme": "Create & manage groups",
                     "method": "GroupController::delete",
+                    "class": "App\\Http\\Controllers\\GroupController",
                     "file": "app/Http/Controllers/GroupController.php",
                     "tests": [
                         {
@@ -1430,6 +1506,7 @@
                     "persona": "Admin",
                     "theme": "Admin & integrations",
                     "method": "GroupController::getGroupChanges",
+                    "class": "App\\Http\\Controllers\\API\\GroupController",
                     "file": "app/Http/Controllers/API/GroupController.php",
                     "tests": [
                         {
@@ -1447,6 +1524,7 @@
                     "persona": "Admin",
                     "theme": "Create & manage groups",
                     "method": "GroupController::moderateGroupsv2",
+                    "class": "App\\Http\\Controllers\\API\\GroupController",
                     "file": "app/Http/Controllers/API/GroupController.php",
                     "tests": [
                         {
@@ -1464,6 +1542,7 @@
                     "persona": "Admin",
                     "theme": "Admin & integrations",
                     "method": "UserGroupsController::changes",
+                    "class": "App\\Http\\Controllers\\API\\UserGroupsController",
                     "file": "app/Http/Controllers/API/UserGroupsController.php",
                     "tests": [
                         {
@@ -1481,6 +1560,7 @@
                     "persona": "Guest",
                     "theme": "Group invitations",
                     "method": "GroupController::confirmCodeInvite",
+                    "class": "App\\Http\\Controllers\\GroupController",
                     "file": "app/Http/Controllers/GroupController.php",
                     "tests": [
                         {
@@ -1494,6 +1574,7 @@
                     "persona": "Guest",
                     "theme": "Events for group",
                     "method": "GroupController::getEventsForGroupv2",
+                    "class": "App\\Http\\Controllers\\API\\GroupController",
                     "file": "app/Http/Controllers/API/GroupController.php",
                     "tests": [
                         {
@@ -1515,6 +1596,7 @@
                     "persona": "Guest",
                     "theme": "Find & browse groups",
                     "method": "GroupController::getGroupv2",
+                    "class": "App\\Http\\Controllers\\API\\GroupController",
                     "file": "app/Http/Controllers/API/GroupController.php",
                     "tests": [
                         {
@@ -1548,6 +1630,7 @@
                     "persona": "Guest",
                     "theme": "Manage volunteers",
                     "method": "GroupController::getVolunteersForGroupv2",
+                    "class": "App\\Http\\Controllers\\API\\GroupController",
                     "file": "app/Http/Controllers/API/GroupController.php",
                     "tests": [
                         {
@@ -1565,6 +1648,7 @@
                     "persona": "Guest",
                     "theme": "Find & browse groups",
                     "method": "GroupController::listNamesv2",
+                    "class": "App\\Http\\Controllers\\API\\GroupController",
                     "file": "app/Http/Controllers/API/GroupController.php",
                     "tests": [
                         {
@@ -1578,10 +1662,20 @@
                     ]
                 },
                 {
+                    "story": "As a Guest, I can list summaries of groups (optionally only chosen ids) via the API",
+                    "persona": "Guest",
+                    "theme": "Browse groups",
+                    "method": "GroupController::listSummaryv2",
+                    "class": "App\\Http\\Controllers\\API\\GroupController",
+                    "file": "app/Http/Controllers/API/GroupController.php",
+                    "tests": []
+                },
+                {
                     "story": "As a Guest, I can get a list of group tags via the API",
                     "persona": "Guest",
                     "theme": "Find & browse groups",
                     "method": "GroupController::listTagsv2",
+                    "class": "App\\Http\\Controllers\\API\\GroupController",
                     "file": "app/Http/Controllers/API/GroupController.php",
                     "tests": [
                         {
@@ -1595,6 +1689,7 @@
                     "persona": "Guest",
                     "theme": "Stats & data",
                     "method": "GroupController::stats",
+                    "class": "App\\Http\\Controllers\\GroupController",
                     "file": "app/Http/Controllers/GroupController.php",
                     "tests": [
                         {
@@ -1608,6 +1703,7 @@
                     "persona": "Host",
                     "theme": "Photos & branding",
                     "method": "GroupController::ajaxDeleteImage",
+                    "class": "App\\Http\\Controllers\\GroupController",
                     "file": "app/Http/Controllers/GroupController.php",
                     "tests": [
                         {
@@ -1621,6 +1717,7 @@
                     "persona": "Host",
                     "theme": "Manage volunteers",
                     "method": "GroupController::deleteVolunteerForGroupv2",
+                    "class": "App\\Http\\Controllers\\API\\GroupController",
                     "file": "app/Http/Controllers/API/GroupController.php",
                     "tests": [
                         {
@@ -1642,6 +1739,7 @@
                     "persona": "Host",
                     "theme": "Create & manage groups",
                     "method": "GroupController::edit",
+                    "class": "App\\Http\\Controllers\\GroupController",
                     "file": "app/Http/Controllers/GroupController.php",
                     "tests": [
                         {
@@ -1667,6 +1765,7 @@
                     "persona": "Host",
                     "theme": "Photos & branding",
                     "method": "GroupController::imageUpload",
+                    "class": "App\\Http\\Controllers\\GroupController",
                     "file": "app/Http/Controllers/GroupController.php",
                     "tests": [
                         {
@@ -1680,6 +1779,7 @@
                     "persona": "Host",
                     "theme": "Manage volunteers",
                     "method": "GroupController::patchVolunteerForGroupv2",
+                    "class": "App\\Http\\Controllers\\API\\GroupController",
                     "file": "app/Http/Controllers/API/GroupController.php",
                     "tests": [
                         {
@@ -1701,6 +1801,7 @@
                     "persona": "Host",
                     "theme": "Group invitations",
                     "method": "GroupController::postSendInvite",
+                    "class": "App\\Http\\Controllers\\GroupController",
                     "file": "app/Http/Controllers/GroupController.php",
                     "tests": [
                         {
@@ -1718,6 +1819,7 @@
                     "persona": "Host",
                     "theme": "Create & manage groups",
                     "method": "GroupController::updateGroupv2",
+                    "class": "App\\Http\\Controllers\\API\\GroupController",
                     "file": "app/Http/Controllers/API/GroupController.php",
                     "tests": [
                         {
@@ -1759,6 +1861,7 @@
                     "persona": "NetworkCoordinator",
                     "theme": "Network membership",
                     "method": "GroupController::getGroupsByUsersNetworks",
+                    "class": "App\\Http\\Controllers\\API\\GroupController",
                     "file": "app/Http/Controllers/API/GroupController.php",
                     "tests": [
                         {
@@ -1776,6 +1879,7 @@
                     "persona": "NetworkCoordinator",
                     "theme": "Create & manage groups",
                     "method": "GroupController::moderateGroupsv2",
+                    "class": "App\\Http\\Controllers\\API\\GroupController",
                     "file": "app/Http/Controllers/API/GroupController.php",
                     "tests": [
                         {
@@ -1793,6 +1897,7 @@
                     "persona": "Restarter",
                     "theme": "Find & browse groups",
                     "method": "GroupController::all",
+                    "class": "App\\Http\\Controllers\\GroupController",
                     "file": "app/Http/Controllers/GroupController.php",
                     "tests": [
                         {
@@ -1806,6 +1911,7 @@
                     "persona": "Restarter",
                     "theme": "Group invitations",
                     "method": "GroupController::confirmInvite",
+                    "class": "App\\Http\\Controllers\\GroupController",
                     "file": "app/Http/Controllers/GroupController.php",
                     "tests": [
                         {
@@ -1819,6 +1925,7 @@
                     "persona": "Restarter",
                     "theme": "Create & manage groups",
                     "method": "GroupController::create",
+                    "class": "App\\Http\\Controllers\\GroupController",
                     "file": "app/Http/Controllers/GroupController.php",
                     "tests": [
                         {
@@ -1844,6 +1951,7 @@
                     "persona": "Restarter",
                     "theme": "Create & manage groups",
                     "method": "GroupController::createGroupv2",
+                    "class": "App\\Http\\Controllers\\API\\GroupController",
                     "file": "app/Http/Controllers/API/GroupController.php",
                     "tests": [
                         {
@@ -1905,6 +2013,7 @@
                     "persona": "Restarter",
                     "theme": "Find & browse groups",
                     "method": "GroupController::getGroupList",
+                    "class": "App\\Http\\Controllers\\API\\GroupController",
                     "file": "app/Http/Controllers/API/GroupController.php",
                     "tests": [
                         {
@@ -1918,6 +2027,7 @@
                     "persona": "Restarter",
                     "theme": "Manage volunteers",
                     "method": "GroupController::getJoinGroup",
+                    "class": "App\\Http\\Controllers\\GroupController",
                     "file": "app/Http/Controllers/GroupController.php",
                     "tests": [
                         {
@@ -1931,6 +2041,7 @@
                     "persona": "Restarter",
                     "theme": "Find & browse groups",
                     "method": "GroupController::mine",
+                    "class": "App\\Http\\Controllers\\GroupController",
                     "file": "app/Http/Controllers/GroupController.php",
                     "tests": [
                         {
@@ -1944,6 +2055,7 @@
                     "persona": "Restarter",
                     "theme": "Find & browse groups",
                     "method": "GroupController::nearby",
+                    "class": "App\\Http\\Controllers\\GroupController",
                     "file": "app/Http/Controllers/GroupController.php",
                     "tests": [
                         {
@@ -1957,6 +2069,7 @@
                     "persona": "Restarter",
                     "theme": "Find & browse groups",
                     "method": "GroupController::network",
+                    "class": "App\\Http\\Controllers\\GroupController",
                     "file": "app/Http/Controllers/GroupController.php",
                     "tests": [
                         {
@@ -1970,6 +2083,7 @@
                     "persona": "Restarter",
                     "theme": "Find & browse groups",
                     "method": "GroupController::view",
+                    "class": "App\\Http\\Controllers\\GroupController",
                     "file": "app/Http/Controllers/GroupController.php",
                     "tests": [
                         {
@@ -2011,6 +2125,7 @@
                     "persona": "Restarter",
                     "theme": "Manage volunteers",
                     "method": "UserGroupsController::leave",
+                    "class": "App\\Http\\Controllers\\API\\UserGroupsController",
                     "file": "app/Http/Controllers/API/UserGroupsController.php",
                     "tests": [
                         {
@@ -2028,6 +2143,7 @@
                     "persona": "ThirdParty",
                     "theme": "Events for group",
                     "method": "GroupController::getEventsForGroupv2",
+                    "class": "App\\Http\\Controllers\\API\\GroupController",
                     "file": "app/Http/Controllers/API/GroupController.php",
                     "tests": [
                         {
@@ -2049,6 +2165,7 @@
                     "persona": "ThirdParty",
                     "theme": "Find & browse groups",
                     "method": "GroupController::getGroupv2",
+                    "class": "App\\Http\\Controllers\\API\\GroupController",
                     "file": "app/Http/Controllers/API/GroupController.php",
                     "tests": [
                         {
@@ -2082,6 +2199,7 @@
                     "persona": "ThirdParty",
                     "theme": "Manage volunteers",
                     "method": "GroupController::getVolunteersForGroupv2",
+                    "class": "App\\Http\\Controllers\\API\\GroupController",
                     "file": "app/Http/Controllers/API/GroupController.php",
                     "tests": [
                         {
@@ -2099,6 +2217,7 @@
                     "persona": "ThirdParty",
                     "theme": "Find & browse groups",
                     "method": "GroupController::listNamesv2",
+                    "class": "App\\Http\\Controllers\\API\\GroupController",
                     "file": "app/Http/Controllers/API/GroupController.php",
                     "tests": [
                         {
@@ -2112,10 +2231,20 @@
                     ]
                 },
                 {
+                    "story": "As a ThirdParty, I can retrieve group summaries to display on my platform",
+                    "persona": "ThirdParty",
+                    "theme": "Browse groups",
+                    "method": "GroupController::listSummaryv2",
+                    "class": "App\\Http\\Controllers\\API\\GroupController",
+                    "file": "app/Http/Controllers/API/GroupController.php",
+                    "tests": []
+                },
+                {
                     "story": "As a ThirdParty, I can retrieve group tags to categorise groups on my platform",
                     "persona": "ThirdParty",
                     "theme": "Find & browse groups",
                     "method": "GroupController::listTagsv2",
+                    "class": "App\\Http\\Controllers\\API\\GroupController",
                     "file": "app/Http/Controllers/API/GroupController.php",
                     "tests": [
                         {
@@ -2125,7 +2254,7 @@
                     ]
                 }
             ],
-            "storyCount": 36,
+            "storyCount": 38,
             "personas": [
                 "Admin",
                 "Guest",
@@ -2143,10 +2272,29 @@
             ],
             "stories": [
                 {
+                    "story": "As an Admin, I can create a group tag for any network via the API",
+                    "persona": "Admin",
+                    "theme": "Network tags",
+                    "method": "NetworkController::createNetworkTagv2",
+                    "class": "App\\Http\\Controllers\\API\\NetworkController",
+                    "file": "app/Http/Controllers/API/NetworkController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As an Admin, I can delete a group tag belonging to any network via the API",
+                    "persona": "Admin",
+                    "theme": "Network tags",
+                    "method": "NetworkController::deleteNetworkTagv2",
+                    "class": "App\\Http\\Controllers\\API\\NetworkController",
+                    "file": "app/Http/Controllers/API/NetworkController.php",
+                    "tests": []
+                },
+                {
                     "story": "As an Admin, I can view all networks on the platform",
                     "persona": "Admin",
                     "theme": "Browse networks",
                     "method": "NetworkController::index",
+                    "class": "App\\Http\\Controllers\\NetworkController",
                     "file": "app/Http/Controllers/NetworkController.php",
                     "tests": [
                         {
@@ -2156,10 +2304,20 @@
                     ]
                 },
                 {
+                    "story": "As an Admin, I can edit a group tag belonging to any network via the API",
+                    "persona": "Admin",
+                    "theme": "Network tags",
+                    "method": "NetworkController::updateNetworkTagv2",
+                    "class": "App\\Http\\Controllers\\API\\NetworkController",
+                    "file": "app/Http/Controllers/API/NetworkController.php",
+                    "tests": []
+                },
+                {
                     "story": "As a Guest, I can list events for a network via the API",
                     "persona": "Guest",
                     "theme": "Network groups & events",
                     "method": "NetworkController::getNetworkEventsv2",
+                    "class": "App\\Http\\Controllers\\API\\NetworkController",
                     "file": "app/Http/Controllers/API/NetworkController.php",
                     "tests": [
                         {
@@ -2177,6 +2335,7 @@
                     "persona": "Guest",
                     "theme": "Network groups & events",
                     "method": "NetworkController::getNetworkGroupsv2",
+                    "class": "App\\Http\\Controllers\\API\\NetworkController",
                     "file": "app/Http/Controllers/API/NetworkController.php",
                     "tests": [
                         {
@@ -2186,10 +2345,29 @@
                     ]
                 },
                 {
+                    "story": "As a Guest, I can view a network's impact statistics via the API, optionally for one group tag",
+                    "persona": "Guest",
+                    "theme": "Network stats",
+                    "method": "NetworkController::getNetworkStatsv2",
+                    "class": "App\\Http\\Controllers\\API\\NetworkController",
+                    "file": "app/Http/Controllers/API/NetworkController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Guest, I can list a network's group tags via the API",
+                    "persona": "Guest",
+                    "theme": "Network tags",
+                    "method": "NetworkController::getNetworkTagsv2",
+                    "class": "App\\Http\\Controllers\\API\\NetworkController",
+                    "file": "app/Http/Controllers/API/NetworkController.php",
+                    "tests": []
+                },
+                {
                     "story": "As a Guest, I can list all networks via the API",
                     "persona": "Guest",
                     "theme": "Browse networks",
                     "method": "NetworkController::getNetworksv2",
+                    "class": "App\\Http\\Controllers\\API\\NetworkController",
                     "file": "app/Http/Controllers/API/NetworkController.php",
                     "tests": [
                         {
@@ -2207,6 +2385,7 @@
                     "persona": "Guest",
                     "theme": "Browse networks",
                     "method": "NetworkController::getNetworkv2",
+                    "class": "App\\Http\\Controllers\\API\\NetworkController",
                     "file": "app/Http/Controllers/API/NetworkController.php",
                     "tests": [
                         {
@@ -2220,6 +2399,7 @@
                     "persona": "NetworkCoordinator",
                     "theme": "Network groups & events",
                     "method": "NetworkController::associateGroup",
+                    "class": "App\\Http\\Controllers\\NetworkController",
                     "file": "app/Http/Controllers/NetworkController.php",
                     "tests": [
                         {
@@ -2237,10 +2417,29 @@
                     ]
                 },
                 {
+                    "story": "As a NetworkCoordinator, I can create a group tag for my network via the API",
+                    "persona": "NetworkCoordinator",
+                    "theme": "Network tags",
+                    "method": "NetworkController::createNetworkTagv2",
+                    "class": "App\\Http\\Controllers\\API\\NetworkController",
+                    "file": "app/Http/Controllers/API/NetworkController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a NetworkCoordinator, I can delete a group tag belonging to my network via the API",
+                    "persona": "NetworkCoordinator",
+                    "theme": "Network tags",
+                    "method": "NetworkController::deleteNetworkTagv2",
+                    "class": "App\\Http\\Controllers\\API\\NetworkController",
+                    "file": "app/Http/Controllers/API/NetworkController.php",
+                    "tests": []
+                },
+                {
                     "story": "As a NetworkCoordinator, I can access the form to edit my network",
                     "persona": "NetworkCoordinator",
                     "theme": "Manage network details",
                     "method": "NetworkController::edit",
+                    "class": "App\\Http\\Controllers\\NetworkController",
                     "file": "app/Http/Controllers/NetworkController.php",
                     "tests": [
                         {
@@ -2254,6 +2453,7 @@
                     "persona": "NetworkCoordinator",
                     "theme": "Browse networks",
                     "method": "NetworkController::index",
+                    "class": "App\\Http\\Controllers\\NetworkController",
                     "file": "app/Http/Controllers/NetworkController.php",
                     "tests": [
                         {
@@ -2267,6 +2467,7 @@
                     "persona": "NetworkCoordinator",
                     "theme": "Browse networks",
                     "method": "NetworkController::show",
+                    "class": "App\\Http\\Controllers\\NetworkController",
                     "file": "app/Http/Controllers/NetworkController.php",
                     "tests": [
                         {
@@ -2280,6 +2481,7 @@
                     "persona": "NetworkCoordinator",
                     "theme": "Network stats",
                     "method": "NetworkController::stats",
+                    "class": "App\\Http\\Controllers\\API\\NetworkController",
                     "file": "app/Http/Controllers/API/NetworkController.php",
                     "tests": [
                         {
@@ -2293,6 +2495,7 @@
                     "persona": "NetworkCoordinator",
                     "theme": "Manage network details",
                     "method": "NetworkController::update",
+                    "class": "App\\Http\\Controllers\\NetworkController",
                     "file": "app/Http/Controllers/NetworkController.php",
                     "tests": [
                         {
@@ -2302,10 +2505,20 @@
                     ]
                 },
                 {
+                    "story": "As a NetworkCoordinator, I can edit a group tag belonging to my network via the API",
+                    "persona": "NetworkCoordinator",
+                    "theme": "Network tags",
+                    "method": "NetworkController::updateNetworkTagv2",
+                    "class": "App\\Http\\Controllers\\API\\NetworkController",
+                    "file": "app/Http/Controllers/API/NetworkController.php",
+                    "tests": []
+                },
+                {
                     "story": "As a ThirdParty, I can retrieve events for a network to display on my platform",
                     "persona": "ThirdParty",
                     "theme": "Network groups & events",
                     "method": "NetworkController::getNetworkEventsv2",
+                    "class": "App\\Http\\Controllers\\API\\NetworkController",
                     "file": "app/Http/Controllers/API/NetworkController.php",
                     "tests": [
                         {
@@ -2323,6 +2536,7 @@
                     "persona": "ThirdParty",
                     "theme": "Network groups & events",
                     "method": "NetworkController::getNetworkGroupsv2",
+                    "class": "App\\Http\\Controllers\\API\\NetworkController",
                     "file": "app/Http/Controllers/API/NetworkController.php",
                     "tests": [
                         {
@@ -2332,10 +2546,29 @@
                     ]
                 },
                 {
+                    "story": "As a ThirdParty, I can retrieve a network's impact statistics to display on my platform",
+                    "persona": "ThirdParty",
+                    "theme": "Network stats",
+                    "method": "NetworkController::getNetworkStatsv2",
+                    "class": "App\\Http\\Controllers\\API\\NetworkController",
+                    "file": "app/Http/Controllers/API/NetworkController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a ThirdParty, I can retrieve a network's group tags to display on my platform",
+                    "persona": "ThirdParty",
+                    "theme": "Network tags",
+                    "method": "NetworkController::getNetworkTagsv2",
+                    "class": "App\\Http\\Controllers\\API\\NetworkController",
+                    "file": "app/Http/Controllers/API/NetworkController.php",
+                    "tests": []
+                },
+                {
                     "story": "As a ThirdParty, I can retrieve all networks to display on my platform",
                     "persona": "ThirdParty",
                     "theme": "Browse networks",
                     "method": "NetworkController::getNetworksv2",
+                    "class": "App\\Http\\Controllers\\API\\NetworkController",
                     "file": "app/Http/Controllers/API/NetworkController.php",
                     "tests": [
                         {
@@ -2353,6 +2586,7 @@
                     "persona": "ThirdParty",
                     "theme": "Browse networks",
                     "method": "NetworkController::getNetworkv2",
+                    "class": "App\\Http\\Controllers\\API\\NetworkController",
                     "file": "app/Http/Controllers/API/NetworkController.php",
                     "tests": [
                         {
@@ -2362,7 +2596,7 @@
                     ]
                 }
             ],
-            "storyCount": 15,
+            "storyCount": 25,
             "personas": [
                 "Admin",
                 "Guest",
@@ -2376,6 +2610,7 @@
                 "app/Http/Controllers/OutboundController.php",
                 "app/Http/Controllers/InformationAlertCookieController.php",
                 "app/Http/Controllers/ApiController.php",
+                "app/Http/Controllers/API/RepairController.php",
                 "app/Http/Controllers/API/DiscourseController.php",
                 "app/Http/Controllers/HomeController.php",
                 "app/Http/Controllers/LocaleController.php",
@@ -2388,6 +2623,7 @@
                     "persona": "Admin",
                     "theme": "Platform impact stats",
                     "method": "ApiController::getUserList",
+                    "class": "App\\Http\\Controllers\\ApiController",
                     "file": "app/Http/Controllers/ApiController.php",
                     "tests": [
                         {
@@ -2397,10 +2633,20 @@
                     ]
                 },
                 {
+                    "story": "As an Admin, I can export approved repair records in the Open Repair Data Standard format as JSON or CSV",
+                    "persona": "Admin",
+                    "theme": "Data exports",
+                    "method": "RepairController::listRepairsv2",
+                    "class": "App\\Http\\Controllers\\API\\RepairController",
+                    "file": "app/Http/Controllers/API/RepairController.php",
+                    "tests": []
+                },
+                {
                     "story": "As a Guest, I can view the platform's global repair impact statistics",
                     "persona": "Guest",
                     "theme": "Landing page",
                     "method": "AdminController::stats",
+                    "class": "App\\Http\\Controllers\\AdminController",
                     "file": "app/Http/Controllers/AdminController.php",
                     "tests": [
                         {
@@ -2414,6 +2660,7 @@
                     "persona": "Guest",
                     "theme": "Data exports",
                     "method": "ApiController::getDevices",
+                    "class": "App\\Http\\Controllers\\ApiController",
                     "file": "app/Http/Controllers/ApiController.php",
                     "tests": [
                         {
@@ -2427,6 +2674,7 @@
                     "persona": "Guest",
                     "theme": "Platform impact stats",
                     "method": "ApiController::groupStats",
+                    "class": "App\\Http\\Controllers\\ApiController",
                     "file": "app/Http/Controllers/ApiController.php",
                     "tests": [
                         {
@@ -2444,6 +2692,7 @@
                     "persona": "Guest",
                     "theme": "Platform impact stats",
                     "method": "ApiController::homepage_data",
+                    "class": "App\\Http\\Controllers\\ApiController",
                     "file": "app/Http/Controllers/ApiController.php",
                     "tests": []
                 },
@@ -2452,6 +2701,7 @@
                     "persona": "Guest",
                     "theme": "Platform impact stats",
                     "method": "ApiController::partyStats",
+                    "class": "App\\Http\\Controllers\\ApiController",
                     "file": "app/Http/Controllers/ApiController.php",
                     "tests": [
                         {
@@ -2465,6 +2715,7 @@
                     "persona": "Guest",
                     "theme": "Discussion integration",
                     "method": "DiscourseController::discussionTopics",
+                    "class": "App\\Http\\Controllers\\API\\DiscourseController",
                     "file": "app/Http/Controllers/API/DiscourseController.php",
                     "tests": [
                         {
@@ -2474,10 +2725,93 @@
                     ]
                 },
                 {
+                    "story": "As a Guest, I can export all device records as CSV",
+                    "persona": "Guest",
+                    "theme": "Data exports",
+                    "method": "ExportController::devices",
+                    "class": "App\\Http\\Controllers\\ExportController",
+                    "file": "app/Http/Controllers/ExportController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Events/ExportTest.php",
+                            "test": "(unknown test)"
+                        },
+                        {
+                            "file": "tests/Feature/Fixometer/BasicTest.php",
+                            "test": "(unknown test)"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a Guest, I can export device data from an event as CSV",
+                    "persona": "Guest",
+                    "theme": "Data exports",
+                    "method": "ExportController::devicesEvent",
+                    "class": "App\\Http\\Controllers\\ExportController",
+                    "file": "app/Http/Controllers/ExportController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Events/ExportTest.php",
+                            "test": "(unknown test)"
+                        },
+                        {
+                            "file": "tests/Feature/Events/ExportTest.php",
+                            "test": "(unknown test)"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a Guest, I can export device data from a group as CSV",
+                    "persona": "Guest",
+                    "theme": "Data exports",
+                    "method": "ExportController::devicesGroup",
+                    "class": "App\\Http\\Controllers\\ExportController",
+                    "file": "app/Http/Controllers/ExportController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Events/ExportTest.php",
+                            "test": "(unknown test)"
+                        },
+                        {
+                            "file": "tests/Feature/Events/ExportTest.php",
+                            "test": "(unknown test)"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a Guest, I can export a group's event summary as CSV",
+                    "persona": "Guest",
+                    "theme": "Data exports",
+                    "method": "ExportController::groupEvents",
+                    "class": "App\\Http\\Controllers\\ExportController",
+                    "file": "app/Http/Controllers/ExportController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Events/ExportTest.php",
+                            "test": "(unknown test)"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a Guest, I can export a network's event summary as CSV",
+                    "persona": "Guest",
+                    "theme": "Data exports",
+                    "method": "ExportController::networkEvents",
+                    "class": "App\\Http\\Controllers\\ExportController",
+                    "file": "app/Http/Controllers/ExportController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Events/ExportTest.php",
+                            "test": "(unknown test)"
+                        }
+                    ]
+                },
+                {
                     "story": "As a Guest, I can view the landing page with platform impact statistics",
                     "persona": "Guest",
                     "theme": "Landing page",
                     "method": "HomeController::index",
+                    "class": "App\\Http\\Controllers\\HomeController",
                     "file": "app/Http/Controllers/HomeController.php",
                     "tests": [
                         {
@@ -2495,6 +2829,7 @@
                     "persona": "Guest",
                     "theme": "Cookie alerts",
                     "method": "InformationAlertCookieController::__invoke",
+                    "class": "App\\Http\\Controllers\\InformationAlertCookieController",
                     "file": "app/Http/Controllers/InformationAlertCookieController.php",
                     "tests": []
                 },
@@ -2503,6 +2838,7 @@
                     "persona": "Guest",
                     "theme": "Language preferences",
                     "method": "LocaleController::setLang",
+                    "class": "App\\Http\\Controllers\\LocaleController",
                     "file": "app/Http/Controllers/LocaleController.php",
                     "tests": [
                         {
@@ -2520,6 +2856,7 @@
                     "persona": "Guest",
                     "theme": "Embeddable widgets",
                     "method": "OutboundController::info",
+                    "class": "App\\Http\\Controllers\\OutboundController",
                     "file": "app/Http/Controllers/OutboundController.php",
                     "tests": [
                         {
@@ -2533,23 +2870,11 @@
                     ]
                 },
                 {
-                    "story": "As a NetworkCoordinator, I can export my network's event summary as CSV",
-                    "persona": "NetworkCoordinator",
-                    "theme": "Data exports",
-                    "method": "ExportController::networkEvents",
-                    "file": "app/Http/Controllers/ExportController.php",
-                    "tests": [
-                        {
-                            "file": "tests/Feature/Events/ExportTest.php",
-                            "test": "(unknown test)"
-                        }
-                    ]
-                },
-                {
                     "story": "As a Restarter, I can retrieve my own profile information via the API",
                     "persona": "Restarter",
                     "theme": "Platform impact stats",
                     "method": "ApiController::getUserInfo",
+                    "class": "App\\Http\\Controllers\\ApiController",
                     "file": "app/Http/Controllers/ApiController.php",
                     "tests": [
                         {
@@ -2559,74 +2884,11 @@
                     ]
                 },
                 {
-                    "story": "As a Restarter, I can export all device records as CSV",
-                    "persona": "Restarter",
-                    "theme": "Data exports",
-                    "method": "ExportController::devices",
-                    "file": "app/Http/Controllers/ExportController.php",
-                    "tests": [
-                        {
-                            "file": "tests/Feature/Events/ExportTest.php",
-                            "test": "(unknown test)"
-                        },
-                        {
-                            "file": "tests/Feature/Fixometer/BasicTest.php",
-                            "test": "(unknown test)"
-                        }
-                    ]
-                },
-                {
-                    "story": "As a Restarter, I can export device data from an event as CSV",
-                    "persona": "Restarter",
-                    "theme": "Data exports",
-                    "method": "ExportController::devicesEvent",
-                    "file": "app/Http/Controllers/ExportController.php",
-                    "tests": [
-                        {
-                            "file": "tests/Feature/Events/ExportTest.php",
-                            "test": "(unknown test)"
-                        },
-                        {
-                            "file": "tests/Feature/Events/ExportTest.php",
-                            "test": "(unknown test)"
-                        }
-                    ]
-                },
-                {
-                    "story": "As a Restarter, I can export device data from a group as CSV",
-                    "persona": "Restarter",
-                    "theme": "Data exports",
-                    "method": "ExportController::devicesGroup",
-                    "file": "app/Http/Controllers/ExportController.php",
-                    "tests": [
-                        {
-                            "file": "tests/Feature/Events/ExportTest.php",
-                            "test": "(unknown test)"
-                        },
-                        {
-                            "file": "tests/Feature/Events/ExportTest.php",
-                            "test": "(unknown test)"
-                        }
-                    ]
-                },
-                {
-                    "story": "As a Restarter, I can export a group's event summary as CSV",
-                    "persona": "Restarter",
-                    "theme": "Data exports",
-                    "method": "ExportController::groupEvents",
-                    "file": "app/Http/Controllers/ExportController.php",
-                    "tests": [
-                        {
-                            "file": "tests/Feature/Events/ExportTest.php",
-                            "test": "(unknown test)"
-                        }
-                    ]
-                },
-                {
                     "story": "As a ThirdParty, I can search and retrieve device records via the API",
                     "persona": "ThirdParty",
                     "theme": "Data exports",
                     "method": "ApiController::getDevices",
+                    "class": "App\\Http\\Controllers\\ApiController",
                     "file": "app/Http/Controllers/ApiController.php",
                     "tests": [
                         {
@@ -2640,6 +2902,7 @@
                     "persona": "ThirdParty",
                     "theme": "Platform impact stats",
                     "method": "ApiController::groupStats",
+                    "class": "App\\Http\\Controllers\\ApiController",
                     "file": "app/Http/Controllers/ApiController.php",
                     "tests": [
                         {
@@ -2657,6 +2920,7 @@
                     "persona": "ThirdParty",
                     "theme": "Platform impact stats",
                     "method": "ApiController::homepage_data",
+                    "class": "App\\Http\\Controllers\\ApiController",
                     "file": "app/Http/Controllers/ApiController.php",
                     "tests": []
                 },
@@ -2665,6 +2929,7 @@
                     "persona": "ThirdParty",
                     "theme": "Platform impact stats",
                     "method": "ApiController::partyStats",
+                    "class": "App\\Http\\Controllers\\ApiController",
                     "file": "app/Http/Controllers/ApiController.php",
                     "tests": [
                         {
@@ -2674,10 +2939,93 @@
                     ]
                 },
                 {
+                    "story": "As a ThirdParty, I can export all device records as CSV, for example for the download-dataset page on therestartproject.org",
+                    "persona": "ThirdParty",
+                    "theme": "Data exports",
+                    "method": "ExportController::devices",
+                    "class": "App\\Http\\Controllers\\ExportController",
+                    "file": "app/Http/Controllers/ExportController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Events/ExportTest.php",
+                            "test": "(unknown test)"
+                        },
+                        {
+                            "file": "tests/Feature/Fixometer/BasicTest.php",
+                            "test": "(unknown test)"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a ThirdParty, I can export device data from an event as CSV, for example for the download-dataset page on therestartproject.org",
+                    "persona": "ThirdParty",
+                    "theme": "Data exports",
+                    "method": "ExportController::devicesEvent",
+                    "class": "App\\Http\\Controllers\\ExportController",
+                    "file": "app/Http/Controllers/ExportController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Events/ExportTest.php",
+                            "test": "(unknown test)"
+                        },
+                        {
+                            "file": "tests/Feature/Events/ExportTest.php",
+                            "test": "(unknown test)"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a ThirdParty, I can export device data from a group as CSV, for example for the download-dataset page on therestartproject.org",
+                    "persona": "ThirdParty",
+                    "theme": "Data exports",
+                    "method": "ExportController::devicesGroup",
+                    "class": "App\\Http\\Controllers\\ExportController",
+                    "file": "app/Http/Controllers/ExportController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Events/ExportTest.php",
+                            "test": "(unknown test)"
+                        },
+                        {
+                            "file": "tests/Feature/Events/ExportTest.php",
+                            "test": "(unknown test)"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a ThirdParty, I can export a group's event summary as CSV, for example for the download-dataset page on therestartproject.org",
+                    "persona": "ThirdParty",
+                    "theme": "Data exports",
+                    "method": "ExportController::groupEvents",
+                    "class": "App\\Http\\Controllers\\ExportController",
+                    "file": "app/Http/Controllers/ExportController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Events/ExportTest.php",
+                            "test": "(unknown test)"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a ThirdParty, I can export a network's event summary as CSV, for example for the download-dataset page on therestartproject.org",
+                    "persona": "ThirdParty",
+                    "theme": "Data exports",
+                    "method": "ExportController::networkEvents",
+                    "class": "App\\Http\\Controllers\\ExportController",
+                    "file": "app/Http/Controllers/ExportController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Events/ExportTest.php",
+                            "test": "(unknown test)"
+                        }
+                    ]
+                },
+                {
                     "story": "As a ThirdParty, I can embed CO2 impact widgets for events and groups on my platform",
                     "persona": "ThirdParty",
                     "theme": "Embeddable widgets",
                     "method": "OutboundController::info",
+                    "class": "App\\Http\\Controllers\\OutboundController",
                     "file": "app/Http/Controllers/OutboundController.php",
                     "tests": [
                         {
@@ -2691,11 +3039,10 @@
                     ]
                 }
             ],
-            "storyCount": 22,
+            "storyCount": 28,
             "personas": [
                 "Admin",
                 "Guest",
-                "NetworkCoordinator",
                 "Restarter",
                 "ThirdParty"
             ]
@@ -2713,6 +3060,7 @@
                     "persona": "Admin",
                     "theme": "Admin user management",
                     "method": "UserController::all",
+                    "class": "App\\Http\\Controllers\\UserController",
                     "file": "app/Http/Controllers/UserController.php",
                     "tests": [
                         {
@@ -2738,6 +3086,7 @@
                     "persona": "Admin",
                     "theme": "Data exports",
                     "method": "UserController::changes",
+                    "class": "App\\Http\\Controllers\\API\\UserController",
                     "file": "app/Http/Controllers/API/UserController.php",
                     "tests": [
                         {
@@ -2755,6 +3104,7 @@
                     "persona": "Admin",
                     "theme": "Admin user management",
                     "method": "UserController::create",
+                    "class": "App\\Http\\Controllers\\UserController",
                     "file": "app/Http/Controllers/UserController.php",
                     "tests": [
                         {
@@ -2768,6 +3118,7 @@
                     "persona": "Admin",
                     "theme": "Admin user management",
                     "method": "UserController::edit",
+                    "class": "App\\Http\\Controllers\\UserController",
                     "file": "app/Http/Controllers/UserController.php",
                     "tests": [
                         {
@@ -2789,6 +3140,7 @@
                     "persona": "Admin",
                     "theme": "Admin user management",
                     "method": "UserController::postAdminEdit",
+                    "class": "App\\Http\\Controllers\\UserController",
                     "file": "app/Http/Controllers/UserController.php",
                     "tests": [
                         {
@@ -2802,23 +3154,11 @@
                     ]
                 },
                 {
-                    "story": "As an Admin, I can change a user's Repair Directory role",
-                    "persona": "Admin",
-                    "theme": "Admin user management",
-                    "method": "UserController::postProfileRepairDirectory",
-                    "file": "app/Http/Controllers/UserController.php",
-                    "tests": [
-                        {
-                            "file": "tests/Feature/Users/ProfileTest.php",
-                            "test": "(unknown test)"
-                        }
-                    ]
-                },
-                {
                     "story": "As an Admin, I can delete a user's account",
                     "persona": "Admin",
                     "theme": "Admin user management",
                     "method": "UserController::postSoftDeleteUser",
+                    "class": "App\\Http\\Controllers\\UserController",
                     "file": "app/Http/Controllers/UserController.php",
                     "tests": [
                         {
@@ -2832,6 +3172,7 @@
                     "persona": "Admin",
                     "theme": "Admin user management",
                     "method": "UserController::search",
+                    "class": "App\\Http\\Controllers\\UserController",
                     "file": "app/Http/Controllers/UserController.php",
                     "tests": [
                         {
@@ -2849,6 +3190,7 @@
                     "persona": "Guest",
                     "theme": "Authentication",
                     "method": "LoginController::login",
+                    "class": "App\\Http\\Controllers\\Auth\\LoginController",
                     "file": "app/Http/Controllers/Auth/LoginController.php",
                     "tests": [
                         {
@@ -2878,6 +3220,7 @@
                     "persona": "Guest",
                     "theme": "Authentication",
                     "method": "LoginController::showLoginForm",
+                    "class": "App\\Http\\Controllers\\Auth\\LoginController",
                     "file": "app/Http/Controllers/Auth/LoginController.php",
                     "tests": [
                         {
@@ -2891,6 +3234,7 @@
                     "persona": "Guest",
                     "theme": "Registration & onboarding",
                     "method": "UserController::getRegister",
+                    "class": "App\\Http\\Controllers\\UserController",
                     "file": "app/Http/Controllers/UserController.php",
                     "tests": [
                         {
@@ -2904,6 +3248,7 @@
                     "persona": "Guest",
                     "theme": "Registration & onboarding",
                     "method": "UserController::postRegister",
+                    "class": "App\\Http\\Controllers\\UserController",
                     "file": "app/Http/Controllers/UserController.php",
                     "tests": [
                         {
@@ -2917,6 +3262,7 @@
                     "persona": "Guest",
                     "theme": "Authentication",
                     "method": "UserController::recover",
+                    "class": "App\\Http\\Controllers\\UserController",
                     "file": "app/Http/Controllers/UserController.php",
                     "tests": [
                         {
@@ -2942,6 +3288,7 @@
                     "persona": "Guest",
                     "theme": "Authentication",
                     "method": "UserController::reset",
+                    "class": "App\\Http\\Controllers\\UserController",
                     "file": "app/Http/Controllers/UserController.php",
                     "tests": [
                         {
@@ -2955,10 +3302,25 @@
                     ]
                 },
                 {
+                    "story": "As a Repair Directory SuperAdmin or RegionalAdmin, I can change a user's Repair Directory role",
+                    "persona": "RepairDirectoryAdmin",
+                    "theme": "Admin user management",
+                    "method": "UserController::postProfileRepairDirectory",
+                    "class": "App\\Http\\Controllers\\UserController",
+                    "file": "app/Http/Controllers/UserController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Users/ProfileTest.php",
+                            "test": "(unknown test)"
+                        }
+                    ]
+                },
+                {
                     "story": "As a Restarter, I can view my notifications",
                     "persona": "Restarter",
                     "theme": "Notifications",
                     "method": "UserController::getNotifications",
+                    "class": "App\\Http\\Controllers\\UserController",
                     "file": "app/Http/Controllers/UserController.php",
                     "tests": [
                         {
@@ -2972,6 +3334,7 @@
                     "persona": "Restarter",
                     "theme": "Registration & onboarding",
                     "method": "UserController::getOnboardingComplete",
+                    "class": "App\\Http\\Controllers\\UserController",
                     "file": "app/Http/Controllers/UserController.php",
                     "tests": [
                         {
@@ -2985,6 +3348,7 @@
                     "persona": "Restarter",
                     "theme": "Profile management",
                     "method": "UserController::getProfileEdit",
+                    "class": "App\\Http\\Controllers\\UserController",
                     "file": "app/Http/Controllers/UserController.php",
                     "tests": [
                         {
@@ -2998,6 +3362,7 @@
                     "persona": "Restarter",
                     "theme": "Profile management",
                     "method": "UserController::index",
+                    "class": "App\\Http\\Controllers\\UserController",
                     "file": "app/Http/Controllers/UserController.php",
                     "tests": [
                         {
@@ -3011,6 +3376,7 @@
                     "persona": "Restarter",
                     "theme": "Authentication",
                     "method": "UserController::logout",
+                    "class": "App\\Http\\Controllers\\UserController",
                     "file": "app/Http/Controllers/UserController.php",
                     "tests": [
                         {
@@ -3024,6 +3390,7 @@
                     "persona": "Restarter",
                     "theme": "Profile management",
                     "method": "UserController::postProfileInfoEdit",
+                    "class": "App\\Http\\Controllers\\UserController",
                     "file": "app/Http/Controllers/UserController.php",
                     "tests": [
                         {
@@ -3041,6 +3408,7 @@
                     "persona": "Restarter",
                     "theme": "Profile management",
                     "method": "UserController::postProfilePasswordEdit",
+                    "class": "App\\Http\\Controllers\\UserController",
                     "file": "app/Http/Controllers/UserController.php",
                     "tests": [
                         {
@@ -3058,6 +3426,7 @@
                     "persona": "Restarter",
                     "theme": "Profile management",
                     "method": "UserController::postProfilePictureEdit",
+                    "class": "App\\Http\\Controllers\\UserController",
                     "file": "app/Http/Controllers/UserController.php",
                     "tests": [
                         {
@@ -3071,6 +3440,7 @@
                     "persona": "Restarter",
                     "theme": "Profile management",
                     "method": "UserController::postProfilePreferencesEdit",
+                    "class": "App\\Http\\Controllers\\UserController",
                     "file": "app/Http/Controllers/UserController.php",
                     "tests": [
                         {
@@ -3084,6 +3454,7 @@
                     "persona": "Restarter",
                     "theme": "Profile management",
                     "method": "UserController::postProfileTagsEdit",
+                    "class": "App\\Http\\Controllers\\UserController",
                     "file": "app/Http/Controllers/UserController.php",
                     "tests": [
                         {
@@ -3097,6 +3468,7 @@
                     "persona": "Restarter",
                     "theme": "Account management",
                     "method": "UserController::postSoftDeleteUser",
+                    "class": "App\\Http\\Controllers\\UserController",
                     "file": "app/Http/Controllers/UserController.php",
                     "tests": [
                         {
@@ -3110,6 +3482,7 @@
                     "persona": "Restarter",
                     "theme": "Language preferences",
                     "method": "UserController::storeLanguage",
+                    "class": "App\\Http\\Controllers\\UserController",
                     "file": "app/Http/Controllers/UserController.php",
                     "tests": [
                         {
@@ -3123,6 +3496,7 @@
             "personas": [
                 "Admin",
                 "Guest",
+                "RepairDirectoryAdmin",
                 "Restarter"
             ]
         }
@@ -3137,7 +3511,7 @@
                 "Platform",
                 "Users"
             ],
-            "storyCount": 37
+            "storyCount": 42
         },
         "Guest": {
             "features": [
@@ -3149,7 +3523,7 @@
                 "Platform",
                 "Users"
             ],
-            "storyCount": 38
+            "storyCount": 46
         },
         "Host": {
             "features": [
@@ -3158,16 +3532,21 @@
                 "Events",
                 "Groups"
             ],
-            "storyCount": 23
+            "storyCount": 22
         },
         "NetworkCoordinator": {
             "features": [
                 "Events",
                 "Groups",
-                "Networks",
-                "Platform"
+                "Networks"
             ],
-            "storyCount": 12
+            "storyCount": 14
+        },
+        "RepairDirectoryAdmin": {
+            "features": [
+                "Users"
+            ],
+            "storyCount": 1
         },
         "Restarter": {
             "features": [
@@ -3178,7 +3557,7 @@
                 "Platform",
                 "Users"
             ],
-            "storyCount": 41
+            "storyCount": 37
         },
         "ThirdParty": {
             "features": [
@@ -3188,11 +3567,11 @@
                 "Networks",
                 "Platform"
             ],
-            "storyCount": 17
+            "storyCount": 26
         }
     },
     "coverage": {
-        "annotatedStories": 168,
-        "storiesWithTests": 164
+        "annotatedStories": 188,
+        "storiesWithTests": 168
     }
 }

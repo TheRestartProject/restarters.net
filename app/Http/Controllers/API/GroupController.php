@@ -391,6 +391,8 @@ class GroupController extends Controller
      *     )
      */
 
+    #[UserStory('As a Guest, I can list summaries of groups (optionally only chosen ids) via the API', persona: 'Guest', theme: 'Browse groups')]
+    #[UserStory('As a ThirdParty, I can retrieve group summaries to display on my platform', persona: 'ThirdParty', theme: 'Browse groups')]
     public static function listSummaryv2(Request $request) {
         $request->validate([
             'archived' => ['string', 'in:true,false'],
