@@ -32,6 +32,19 @@
                         </div>
                     </div>
 
+                    @if ($canEditReportingUrl)
+                    <div class="form-group row">
+                        <div class="col">
+                            <label for="reporting_url">@lang('networks.edit.label_reporting_url'):</label>
+                            <input id="reporting_url" name="reporting_url" type="url" class="form-control @error('reporting_url') is-invalid @enderror" value="{{ old('reporting_url', $network->reporting_url) }}" />
+                            @error('reporting_url')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                            <small class="form-text text-muted">@lang('networks.edit.help_reporting_url')</small>
+                        </div>
+                    </div>
+                    @endif
+
                     <div class="button-group row row-compressed-xs">
                         <div class="col-lg-12 d-flex align-items-center justify-content-end">
                             <button type="submit" class="btn btn-primary btn-create">@lang('networks.edit.button_save')</button>

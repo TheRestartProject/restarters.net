@@ -207,6 +207,9 @@ class Device extends Model implements Auditable
         return DB::select($sql, ['group' => $group]);
     }
 
+    /**
+     * The most common categories, powered and unpowered, leaving out the "None of the above" ones.
+     */
     public function findMostSeen($status = null, $cluster = null, $group = null)
     {
         $sql = 'SELECT COUNT(`d`.`category`) AS `counter`, `c`.`name` FROM `'.$this->table.'` AS `d`
@@ -214,7 +217,7 @@ class Device extends Model implements Auditable
                     ON `d`.`event` = `e`.`idevents`
                 INNER JOIN `categories` AS `c`
                     ON `d`.`category` = `c`.`idcategories`
-                WHERE 1=1 and `c`.`powered` = 1 AND `c`.`idcategories` <> '.env('MISC_CATEGORY_ID_POWERED');
+                WHERE `c`.`idcategories` NOT IN ('.(int) env('MISC_CATEGORY_ID_POWERED').', '.(int) env('MISC_CATEGORY_ID_UNPOWERED').')';
 
         if (! is_null($status) && is_numeric($status)) {
             $sql .= ' AND `d`.`repair_status` = :status ';

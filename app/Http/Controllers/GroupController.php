@@ -192,66 +192,6 @@ class GroupController extends Controller
 
         $Device->ofThisGroup($group->idgroups);
 
-        $counts = $Device->countByClustersYearStatus($group->idgroups);
-        $template = [
-            0 => [
-                'counter' => 0,
-                'repair_status' => 1,
-            ],
-            1 => [
-                'counter' => 0,
-                'repair_status' => 2,
-            ],
-            2 => [
-                'counter' => 0,
-                'repair_status' => 3,
-            ],
-            'total' => 0
-        ];
-
-        $clusters = [
-            'all' => [
-                1 => $template,
-                2 => $template,
-                3 => $template,
-                4 => $template,
-            ]
-        ];
-
-        foreach ($counts as $count) {
-            $year = $count->year;
-            $cluster = $count->cluster;
-            $repair_status = $count->repair_status;
-            $counter = $count->counter;
-
-            if ($repair_status && $cluster) {
-                if (array_key_exists($cluster, $clusters['all'])) {
-                    $clusters['all'][$cluster][$repair_status - 1]['counter'] += $counter;
-                    $clusters['all'][$cluster]['total'] += $counter;
-
-                    if (!array_key_exists($year, $clusters)) {
-                        $clusters[$year] = [
-                            1 => $template,
-                            2 => $template,
-                            3 => $template,
-                            4 => $template,
-                        ];
-                    }
-
-                    $clusters[$year][$cluster][$repair_status - 1]['counter'] += $counter;
-                    $clusters[$year][$cluster]['total'] += $counter;
-                }
-            }
-        }
-
-        // most/least stats for clusters
-        $mostleast = [];
-        for ($i = 1; $i <= 4; $i++) {
-            $mostleast[$i]['most_seen'] = $Device->findMostSeen(null, $i, $group->idgroups);
-            $mostleast[$i]['most_repaired'] = $Device->findMostSeen(1, $i, $group->idgroups);
-            $mostleast[$i]['least_repaired'] = $Device->findMostSeen(3, $i, $group->idgroups);
-        }
-
         if (! isset($response)) {
             $response = null;
         }
@@ -319,8 +259,6 @@ class GroupController extends Controller
             'group_device_count_status' => $Device->statusCount($group->idgroups),
             'group_stats' => $groupStats,
             'expanded_events' => $expanded_events,
-            'clusters' => $clusters,
-            'mostleast' => $mostleast,
             'top' => $Device->findMostSeen(1, null, $group->idgroups),
             'user' => $user,
             'upcoming_events' => $upcoming_events,

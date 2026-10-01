@@ -14,6 +14,9 @@
         <b-dropdown-item  data-toggle="modal" data-target="#group-share-stats" v-if="canedit">
           {{ __('groups.share_group_stats') }}
         </b-dropdown-item>
+        <b-dropdown-item v-if="reportingUrl" :href="reportingUrl" target="_blank" rel="noopener" link-class="group-reporting-action">
+          {{ __('groups.view_reports') }}
+        </b-dropdown-item>
         <b-dropdown-item :href="'/export/devices/group/' + idgroups">
           {{ __('devices.export_group_data') }}
         </b-dropdown-item>
@@ -44,6 +47,9 @@
         </b-dropdown-item>
         <b-dropdown-item  data-toggle="modal" data-target="#group-share-stats">
           {{ __('groups.share_group_stats') }}
+        </b-dropdown-item>
+        <b-dropdown-item v-if="reportingUrl" :href="reportingUrl" target="_blank" rel="noopener" link-class="group-reporting-action">
+          {{ __('groups.view_reports') }}
         </b-dropdown-item>
         <b-dropdown-item data-toggle="modal" @click="leaveGroup" v-if="ingroup">
           {{ __('groups.leave_group_button') }}
@@ -85,6 +91,11 @@ export default {
       type: Boolean,
       required: false,
       default: false
+    },
+    reportingUrl: {
+      type: String,
+      required: false,
+      default: null
     },
   },
   computed: {
