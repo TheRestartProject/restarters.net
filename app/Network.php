@@ -88,13 +88,17 @@ class Network extends Model
 
     public function groupsNotIn()
     {
-        $networkGroupsIds = $this->groups()->pluck('idgroups')->toArray();
+        $networkGroupsIds = $this->groups()->withoutGlobalScopes()->without(['networks', 'group_tags'])->pluck('groups.idgroups')->toArray();
 
-        if (empty($networkGroupsIds)) {
-            return Group::orderBy('name')->get();
+        // Only the id and name are needed (for the "add groups" picker).  Skip the member-count global scopes
+        // and the networks/tags eager loads, which are expensive across every group on the platform.
+        $query = Group::withoutGlobalScopes()->without(['networks', 'group_tags'])->select(['idgroups', 'name'])->orderBy('name');
+
+        if (! empty($networkGroupsIds)) {
+            $query->whereNotIn('idgroups', $networkGroupsIds);
         }
 
-        return Group::whereNotIn('idgroups', $networkGroupsIds)->orderBy('name')->get();
+        return $query->get();
     }
 
     public function stats()
@@ -102,7 +106,11 @@ class Network extends Model
         $eEmissionRatio = \App\Helpers\LcaStats::getEmissionRatioPowered();
         $uEmissionratio = \App\Helpers\LcaStats::getEmissionRatioUnpowered();
 
-        $allStats = \App\Group::bulkGroupStats($this->groups, $eEmissionRatio, $uEmissionratio);
+        // Impact stats include archived groups (their past events still count); the group tally does not.
+        $groups = $this->groups()->withoutGlobalScopes()->without(['networks', 'group_tags'])
+            ->get(['groups.idgroups', 'groups.archived_at']);
+
+        $allStats = \App\Group::bulkGroupStats($groups, $eEmissionRatio, $uEmissionratio);
 
         $stats = \App\Group::getGroupStatsArrayKeys();
 
@@ -113,6 +121,7 @@ class Network extends Model
         }
 
         $stats['parties'] = $stats['parties'] ?? 0;
+        $stats['groups'] = $groups->whereNull('archived_at')->count();
 
         return $stats;
     }
