@@ -8,7 +8,7 @@
         <b-card no-body class="p-3 flex-grow-1 border-0">
           <h3 class="mt-2 mb-4">{{ __('devices.title_items') }}</h3>
           <DeviceType class="mb-2" :type.sync="currentDevice.item_type"
-                      :icon-variant="add ? 'black' : 'brand'" :disabled="disabled"
+                      :icon-variant="iconVariant" :disabled="disabled"
                       :suppress-type-warning="suppressTypeWarning" :powered="powered"
                       :unknown.sync="unknownItemType"
                       :auto-focus="add"
@@ -20,11 +20,11 @@
             }"
             :category.sync="currentDevice.category" :clusters="clusters" :powered="powered" :key="currentDevice.item_type"
             @open="suggested = false"
-            :icon-variant="add ? 'black' : 'brand'" :disabled="disabled"
+            :icon-variant="iconVariant" :disabled="disabled"
           />
           <DeviceBrand class="mb-2" :brand.sync="currentDevice.brand" :brands="brands" :disabled="disabled"
                        :suppress-brand-warning="suppressBrandWarning"/>
-          <DeviceModel class="mb-2" :model.sync="currentDevice.model" :icon-variant="add ? 'black' : 'brand'"
+          <DeviceModel class="mb-2" :model.sync="currentDevice.model" :icon-variant="iconVariant"
                        :disabled="disabled"/>
           <DeviceAge :age.sync="currentDevice.age" :disabled="disabled"/>
           <DeviceWeight v-if="showWeight" :weight.sync="currentDevice.estimate" :disabled="disabled" :required="weightRequired" />
@@ -43,9 +43,9 @@
       <div class="bl d-flex flex-column botwhite">
         <b-card no-body class="p-3 flex-grow-1 border-0">
           <h3 class="mt-2 mb-4">{{ __('devices.title_assessment') }}</h3>
-          <DeviceProblem :problem.sync="currentDevice.problem" class="mb-4" :icon-variant="add ? 'black' : 'brand'"
+          <DeviceProblem :problem.sync="currentDevice.problem" class="mb-4" :icon-variant="iconVariant"
                          :disabled="disabled"/>
-          <DeviceNotes :notes.sync="currentDevice.notes" class="mb-4" :icon-variant="add ? 'black' : 'brand'"
+          <DeviceNotes :notes.sync="currentDevice.notes" class="mb-4" :icon-variant="iconVariant"
                        :disabled="disabled"/>
         </b-card>
       </div>
@@ -117,6 +117,12 @@ export default {
   },
   mixins: [event],
   props: {
+    showInfo: {
+      // The info icons explain what to enter, so they're no use when just viewing a record.
+      type: Boolean,
+      required: false,
+      default: true
+    },
     id: {
       type: Number,
       required: false,
@@ -201,6 +207,13 @@ export default {
     }
   },
   computed: {
+    iconVariant() {
+      if (!this.showInfo) {
+        return 'none'
+      }
+
+      return this.add ? 'black' : 'brand'
+    },
     device() {
       return this.id ? this.$store.getters['devices/byId'](this.id) : null
     },

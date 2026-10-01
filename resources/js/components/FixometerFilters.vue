@@ -22,27 +22,41 @@
         <b-card no-body>
           <b-card-body class="p-2">
             <b-form-group :label="__('devices.powered_or_unpowered')">
-              <b-form-radio-group
-                  v-model="current_powered"
+              <multiselect
+                  v-model="current_powered_option"
                   :options="poweredOptions"
+                  track-by="text"
+                  label="text"
+                  :multiple="false"
+                  :allow-empty="false"
+                  selectLabel=""
+                  deselect-label=""
+                  selectedLabel=""
+                  :taggable="false"
+                  :searchable="false"
                   class="powered-filter"
-                  stacked
               />
             </b-form-group>
             <b-form-group :label="__('devices.category')">
-              <DeviceCategorySelect :key="'category-' + current_powered" :category.sync="current_category" :clusters="clusters" :powered="current_powered" allow-empty />
+              <DeviceCategorySelect :key="'category-' + current_powered" :category.sync="current_category" :clusters="clusters" :powered="current_powered" icon-variant="none" allow-empty />
             </b-form-group>
             <b-form-group :label="__('devices.model_or_type')">
-              <DeviceModel :model.sync="current_item_type" />
+              <DeviceModel :model.sync="current_item_type" :placeholder="__('devices.item_type')" icon-variant="none" class="item-filter" />
             </b-form-group>
-            <b-form-group v-if="current_powered !== false" :label="__('devices.model')">
-              <DeviceModel :model.sync="current_model" />
-            </b-form-group>
-            <b-form-group v-if="current_powered !== false" :label="__('devices.brand')">
+            <b-form-group :label="__('devices.brand')">
               <DeviceBrand :brand.sync="current_brand" :brands="brands" allow-empty suppress-brand-warning />
             </b-form-group>
+            <b-form-group :label="__('devices.model')">
+              <DeviceModel :model.sync="current_model" icon-variant="none" class="model-filter" />
+            </b-form-group>
             <div class="w-100 device-select-row">
-              <b-form-group :label="__('devices.status')">
+              <b-form-group :label="__('devices.search_assessment_comments')">
+                <b-input v-model="current_comments" />
+              </b-form-group>
+              <div />
+            </div>
+            <div class="w-100 device-select-row">
+              <b-form-group :label="__('devices.repair_status')">
                 <multiselect
                     v-model="current_status"
                     :options="statusOptions"
@@ -55,12 +69,6 @@
                     :taggable="false"
                     :selectedLabel="__('partials.remove')"
                 />
-              </b-form-group>
-              <div />
-            </div>
-            <div class="w-100 device-select-row">
-              <b-form-group :label="__('devices.search_assessment_comments')">
-                <b-input v-model="current_comments" />
               </b-form-group>
               <div />
             </div>
@@ -225,20 +233,23 @@ export default {
       set(newVal) {
         this.$emit('update:powered', newVal)
 
-        // Categories, brands and models belong to one or the other, so start again with those.
+        // Categories belong to one or the other, so start again with the category.
         this.current_category = null
-
-        if (newVal === false) {
-          this.current_brand = null
-          this.current_model = null
-        }
+      }
+    },
+    current_powered_option: {
+      get() {
+        return this.poweredOptions.find(o => o.value === this.current_powered)
+      },
+      set(newVal) {
+        this.current_powered = newVal ? newVal.value : null
       }
     },
     poweredOptions () {
       return [
         {
           value: null,
-          text: this.__('devices.all_items')
+          text: this.__('devices.both')
         },
         {
           value: true,

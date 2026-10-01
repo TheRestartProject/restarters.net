@@ -1,6 +1,5 @@
 <template>
-  <div>
-    <p class="text-brand small pl-3">{{ __('devices.table_intro') }}</p>
+  <div class="records bg-white">
     <div class="pl-md-3 pr-md-3">
       <b-table
           ref="table"
@@ -41,7 +40,10 @@
           </div>
         </template>
         <template slot="cell(event_date)" slot-scope="data">
-          {{ formatDate(data) }}
+          <a v-if="data.item.eventid" :href="eventUrl(data.item)" class="record-event-link" :title="__('devices.view_event_for_repair')">
+            {{ formatDate(data) }}
+          </a>
+          <span v-else>{{ formatDate(data) }}</span>
         </template>
         <template slot="cell(show_details)" slot-scope="row">
           <div class="text-md-right">
@@ -63,6 +65,7 @@
               :brands="brands"
               :barrier-list="barrierList"
               :cancel-button="false"
+              :show-info="false"
               @close="closed(row)" />
         </template>
       </b-table>
@@ -219,18 +222,18 @@ export default {
           tdClass: 'width10 d-none d-md-table-cell'
         },
         {
-          key: 'groupname',
-          label: this.__('devices.group'),
-          sortable: true,
-          thClass: 'd-none d-md-table-cell',
-          tdClass: 'd-none d-md-table-cell'
-        },
-        {
           key: 'repair_status',
           label: this.__('devices.status'),
           thClass: 'width90px',
           tdClass: 'width90px',
           sortable: true
+        },
+        {
+          key: 'groupname',
+          label: this.__('devices.group'),
+          sortable: true,
+          thClass: 'd-none d-md-table-cell',
+          tdClass: 'd-none d-md-table-cell'
         },
         {
           key: 'event_date',
@@ -373,6 +376,10 @@ export default {
         default:
           return null
       }
+    },
+    eventUrl (item) {
+      // Straight to the items on the event's page.
+      return '/party/view/' + item.eventid + '#devices-section'
     },
     formatDate (data) {
       return data.item.event_date ? new moment(data.item.event_date).format('DD/MM/YYYY') : ''

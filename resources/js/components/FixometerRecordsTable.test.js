@@ -13,7 +13,7 @@ jest.mock('axios')
 // right record.
 jest.mock('./EventDevice.vue', () => ({
   name: 'EventDevice',
-  props: ['id', 'eventid', 'powered', 'edit'],
+  props: ['id', 'eventid', 'powered', 'edit', 'showInfo'],
   template: '<div class="event-device-stub" />',
 }))
 
@@ -130,4 +130,36 @@ test('shows the event date for each record', async () => {
   const wrapper = await makeWrapper()
 
   expect(wrapper.text()).toContain('10/03/2024')
+})
+
+test('the event date takes you to the items on that event', async () => {
+  const wrapper = await makeWrapper()
+
+  const link = wrapper.find('a.record-event-link')
+  expect(link.text()).toBe('10/03/2024')
+  expect(link.attributes('href')).toBe('/party/view/4#devices-section')
+})
+
+test('shows status before group', async () => {
+  const wrapper = await makeWrapper()
+
+  const keys = wrapper.vm.fields.map(f => f.key)
+  expect(keys.indexOf('repair_status')).toBeLessThan(keys.indexOf('groupname'))
+})
+
+// The info icons explain what to type in when recording a repair; viewing one
+// later they just get in the way.
+test('expanded records have no info icons', async () => {
+  const wrapper = await makeWrapper()
+
+  await wrapper.findAll('.record-details-toggle').at(0).trigger('click')
+  await flush()
+
+  expect(wrapper.findComponent(eventDeviceStub).props('showInfo')).toBe(false)
+})
+
+test('has no how-to-use-the-table text', async () => {
+  const wrapper = await makeWrapper()
+
+  expect(wrapper.text()).not.toContain('devices.table_intro')
 })
