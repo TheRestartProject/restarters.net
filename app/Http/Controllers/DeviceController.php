@@ -72,6 +72,19 @@ class DeviceController extends Controller
     #[UserStory('As a Restarter, I can upload photos of devices I\'ve worked on', persona: 'Restarter', theme: 'Device photos')]
     public function imageUpload(Request $request, $id)
     {
+        // Same rule as deleteImage below.  Only an existing device can be checked - a
+        // device that hasn't been created yet has no event to authorise against, which
+        // is the accepted tradeoff already documented there.
+        if ($id > 0) {
+            $user = Auth::user();
+            $event_id = Device::findOrFail($id)->event;
+            $in_event = EventsUsers::where('event', $event_id)->where('user', $user->id)->first();
+
+            if (! Fixometer::hasRole($user, 'Administrator') && ! is_object($in_event)) {
+                abort(403);
+            }
+        }
+
         try {
             $images = [];
 

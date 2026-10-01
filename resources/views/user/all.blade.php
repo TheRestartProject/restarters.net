@@ -98,7 +98,7 @@
                     @if (isset($role) && $r->idroles == $role)
                       <option value="{{ $r->idroles }}" selected>{{ $r->role }}</option>
                     @else
-                      <option value="{{ $r->idroles }}">@lang($r->role)</option>
+                      <option value="{{ $r->idroles }}">{{ __($r->role) }}</option>
                     @endif
                   @endforeach
                 </select>
@@ -181,7 +181,7 @@
                         </span>
                       </td>
                       <td>
-                          @lang($u->role)
+                          {{ __($u->role) }}
                       </td>
                       <td class="d-none d-sm-table-cell">
                         @if (!empty($u->location))

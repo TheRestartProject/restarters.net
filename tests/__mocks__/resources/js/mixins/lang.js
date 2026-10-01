@@ -43,6 +43,20 @@ export default {
                 console.error("Missing translation " + key)
                 return key
             }
+        },
+        // Keep in step with the real mixin - components that interpolate database values
+        // into a v-html binding call this.
+        escapeHtml(value) {
+            if (value === null || value === undefined) {
+                return ''
+            }
+
+            return String(value)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;')
         }
     }
 }

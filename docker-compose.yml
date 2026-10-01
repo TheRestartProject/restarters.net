@@ -135,6 +135,8 @@ services:
     volumes:
       - dbdata:/var/lib/mysql
       - ./mysql/my.cnf:/etc/mysql/my.cnf
+      # Run once when the data volume is first created - see the file for why.
+      - ./mysql/init:/docker-entrypoint-initdb.d:ro
     networks:
       - app-network
 

@@ -148,6 +148,32 @@ class Group extends Model implements Auditable
 
     // Setters
 
+    /**
+     * Keep the legacy `country` column in step with `country_code`.  `country` is still read by external
+     * consumers (e.g. ORA exports, direct DB reporting) so it must be populated as soon as the group is saved,
+     * rather than waiting for the hourly groups:country job.  Countries are stored in English.
+     */
+    public function setCountryCodeAttribute($value)
+    {
+        $this->attributes['country_code'] = $value;
+        $this->attributes['country'] = self::countryNameForCode($value);
+    }
+
+    /**
+     * The English country name stored in the legacy `country` column; '' for an empty or unknown code.  Group
+     * imports have used 'UK' for the United Kingdom, which isn't an ISO code.
+     */
+    public static function countryNameForCode($code): string
+    {
+        if (! $code) {
+            return '';
+        }
+
+        $code = strtoupper($code) === 'UK' ? 'GB' : $code;
+
+        return \App\Helpers\Fixometer::getAllCountries('en')[$code] ?? '';
+    }
+
     //Getters
     public function findAll()
     {
@@ -536,6 +562,16 @@ class Group extends Model implements Auditable
     public function setDistanceAttribute($val)
     {
         $this->distance = $val;
+    }
+
+    /**
+     * The group description is Quill-authored HTML which we render unescaped, so it has to
+     * be sanitised.  Doing it in the mutator rather than in the controllers means every
+     * write path - v2 API, web forms, imports, seeders - is covered by one rule.
+     */
+    public function setFreeTextAttribute($val)
+    {
+        $this->attributes['free_text'] = is_null($val) ? null : \Stevebauman\Purify\Facades\Purify::clean($val);
     }
 
     public function createDiscourseGroup() {

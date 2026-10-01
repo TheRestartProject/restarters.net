@@ -121,7 +121,7 @@ class CalendarEventsController extends Controller
     #[NoStory(reason: 'All-events calendar feed requiring environment secret')]
     public function allEvents(Request $request, $env_hash)
     {
-        if ($env_hash != env('CALENDAR_HASH')) {
+        if ($env_hash !== env('CALENDAR_HASH')) {
             return abort(404);
         }
 
