@@ -90,7 +90,12 @@
         </div>
       </template>
     </b-table>
-    <infinite-loading @infinite="loadMore">
+    <div v-if="showMoreButton" class="text-center mt-2">
+      <b-btn v-if="show < filteredItems.length" variant="link" class="groups-show-more" @click="show += pageSize">
+        {{ __('groups.show_more_groups', { shown: itemsToShow.length, total: filteredItems.length }) }}
+      </b-btn>
+    </div>
+    <infinite-loading v-else @infinite="loadMore">
       <span slot="no-results" />
       <span slot="no-more" />
     </infinite-loading>
@@ -114,6 +119,12 @@ export default {
   components: {GroupArchivedBadge, GroupsTableFilters, InfiniteLoading},
   mixins: [images],
   props: {
+    showMoreButton: {
+      // Grow the list with a button rather than as you scroll, for pages with more below the list.
+      type: Boolean,
+      required: false,
+      default: false
+    },
     groupids: {
       type: Array,
       required: true

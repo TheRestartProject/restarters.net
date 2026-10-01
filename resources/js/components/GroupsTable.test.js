@@ -320,3 +320,39 @@ describe('GroupsTable distance column', () => {
     expect(wrapper.vm.itemsToShow.map(g => g.name)).toEqual(['Zed Near', 'Alpha Far', 'Mid Nowhere'])
   })
 })
+
+// On a page with more below the list - a network's tags, say - an infinite
+// scroll keeps pushing that out of reach as you scroll towards it (#918). A
+// button grows the list only when asked.
+describe('GroupsTable show more button', () => {
+  const many = Array.from({ length: 60 }, (_, i) => ({
+    ...group,
+    id: i + 1,
+    name: 'Group ' + String(i + 1).padStart(3, '0'),
+  }))
+
+  test('uses a button rather than an infinite scroll', async () => {
+    const wrapper = mountTable(many, { showMoreButton: true })
+
+    expect(wrapper.findComponent({ name: 'infinite-loading' }).exists()).toBe(false)
+
+    const button = wrapper.find('.groups-show-more')
+    expect(button.exists()).toBe(true)
+
+    const before = wrapper.vm.itemsToShow.length
+    await button.trigger('click')
+    expect(wrapper.vm.itemsToShow.length).toBe(before + wrapper.vm.pageSize)
+  })
+
+  test('has no button once every group is shown', async () => {
+    const wrapper = mountTable(many.slice(0, 10), { showMoreButton: true })
+
+    expect(wrapper.find('.groups-show-more').exists()).toBe(false)
+  })
+
+  test('scrolls infinitely by default', () => {
+    const wrapper = mountTable(many)
+
+    expect(wrapper.find('.groups-show-more').exists()).toBe(false)
+  })
+})
