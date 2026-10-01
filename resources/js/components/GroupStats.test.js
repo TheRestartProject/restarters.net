@@ -53,3 +53,36 @@ test('has no reports link otherwise', () => {
 
   expect(wrapper.find('a.group-reporting-link').exists()).toBe(false)
 })
+
+test('can show just the headline figures', () => {
+  const wrapper = makeWrapper({ part: 'headline', reportingUrl: 'https://reports.example.org/d/3' })
+
+  expect(wrapper.find('.stub-facts').exists()).toBe(true)
+  expect(wrapper.find('.stub-worked-on').exists()).toBe(false)
+  // The reports link goes with the items, wherever they are.
+  expect(wrapper.find('a.group-reporting-link').exists()).toBe(false)
+})
+
+test('can show just the items', () => {
+  const wrapper = makeWrapper({ part: 'items', reportingUrl: 'https://reports.example.org/d/3' })
+
+  expect(wrapper.find('.stub-facts').exists()).toBe(false)
+  expect(wrapper.find('.stub-most-repaired').exists()).toBe(true)
+  expect(wrapper.find('a.group-reporting-link').exists()).toBe(true)
+})
+
+test('the compact arrangement leaves out the note on what the impact excludes', () => {
+  const wrapper = mount(GroupStats, {
+    localVue,
+    propsData: { idgroups: 3, stats: {}, deviceStats: {}, topDevices: [], compact: true },
+    stubs: {
+      GroupStatsFacts: true,
+      StatsImpact: { name: 'StatsImpact', props: ['showNotIncluded'], template: '<div />' },
+      GroupDevicesWorkedOn: true,
+      GroupDevicesMostRepaired: true,
+    },
+  })
+
+  expect(wrapper.find('.stats-compact').exists()).toBe(true)
+  expect(wrapper.findComponent({ name: 'StatsImpact' }).props('showNotIncluded')).toBe(false)
+})

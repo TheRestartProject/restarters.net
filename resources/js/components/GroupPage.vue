@@ -22,13 +22,15 @@
       </div>
     </div>
 
-    <div class="vue w-100 mt-md-50">
+    <div v-if="statsLayout !== 'after'" class="vue w-100 mt-md-50 stats-before-events">
       <GroupStats
           :idgroups="idgroups"
           :stats="groupStats"
           :device-stats="deviceStats"
           :top-devices="topDevices"
           :reporting-url="reportingUrl || null"
+          :part="statsLayout === 'split' ? 'headline' : 'all'"
+          :compact="statsLayout === 'compact'"
       />
     </div>
 
@@ -44,6 +46,17 @@
         add-button
     />
 
+    <div v-if="statsLayout === 'after' || statsLayout === 'split'" class="vue w-100 mt-md-50 stats-after-events">
+      <GroupStats
+          :idgroups="idgroups"
+          :stats="groupStats"
+          :device-stats="deviceStats"
+          :top-devices="topDevices"
+          :reporting-url="reportingUrl || null"
+          :part="statsLayout === 'split' ? 'items' : 'all'"
+      />
+    </div>
+
   </div>
 </template>
 <script>
@@ -54,6 +67,14 @@ import GroupStats from './GroupStats.vue'
 import GroupEvents from './GroupEvents.vue'
 import AlertBanner from './AlertBanner.vue'
 import auth from '../mixins/auth'
+
+// Where the stats go, while we choose between them (#922):
+// - compact: all of them before the events, achievements over impact beside items worked on over most repaired
+// - after: all of them after the events
+// - split: achievements and impact before the events, items worked on and most repaired after
+// ?stats_layout= on the page address picks one, so they can be compared.
+const STATS_LAYOUTS = ['compact', 'after', 'split']
+const DEFAULT_STATS_LAYOUT = 'compact'
 
 export default {
   components: {
@@ -147,6 +168,19 @@ export default {
     }
   },
   computed: {
+    statsLayout() {
+      try {
+        const asked = new URLSearchParams(window.location.search).get('stats_layout')
+
+        if (STATS_LAYOUTS.includes(asked)) {
+          return asked
+        }
+      } catch (e) {
+        // No usable address; use the default.
+      }
+
+      return DEFAULT_STATS_LAYOUT
+    },
     group() {
       return this.$store.getters['groups/get'](this.idgroups)
     },
