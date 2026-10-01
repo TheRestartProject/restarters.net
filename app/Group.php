@@ -501,14 +501,19 @@ class Group extends Model implements Auditable
      * The group reporting dashboard, filtered to this group, or null if reporting isn't set up.
      *
      * The dashboard is in the language of the group's network, falling back to English when there's no
-     * dashboard in that language.
+     * dashboard in that language or its base language.
      */
     public function reportingUrl(): ?string
     {
         $templates = config('restarters.reporting.group_urls', []);
         $network = $this->networks->first();
         $language = $network ? $network->default_language : null;
-        $template = ($language ? ($templates[$language] ?? null) : null) ?: ($templates['en'] ?? null);
+
+        // A regional language (e.g. Repair Together's fr-BE) uses the dashboard for its base language.
+        $base = $language ? explode('-', $language)[0] : null;
+        $template = ($language ? ($templates[$language] ?? null) : null)
+            ?: ($base ? ($templates[$base] ?? null) : null)
+            ?: ($templates['en'] ?? null);
 
         if (! $template) {
             return null;

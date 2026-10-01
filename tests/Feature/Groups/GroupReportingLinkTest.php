@@ -98,6 +98,12 @@ class GroupReportingLinkTest extends TestCase
         $this->assertStringContainsString('/dashboard/3?', $this->groupInNetworkWithLanguage('en')->reportingUrl());
     }
 
+    public function testBelgianFrenchNetworkGetsTheFrenchReports(): void
+    {
+        // Repair Together's network language is fr-BE.
+        $this->assertStringContainsString('/dashboard/4?', $this->groupInNetworkWithLanguage('fr-BE')->reportingUrl());
+    }
+
     public function testOtherLanguagesFallBackToEnglish(): void
     {
         $this->assertStringContainsString('/dashboard/3?', $this->groupInNetworkWithLanguage('de')->reportingUrl());
