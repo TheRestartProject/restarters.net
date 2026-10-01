@@ -34,6 +34,7 @@ const groupMapStub = {
     showFilters: { type: Boolean, default: false },
     canManageTags: { type: Boolean, default: false },
     availableTags: { type: Array, default: () => [] },
+    showMoreButton: { type: Boolean, default: false },
     networks: { type: Array, default: null },
   },
   template: '<div class="stub-map" />',
@@ -100,4 +101,12 @@ test('does not offer the tag filter to users who cannot see tags', () => {
   const map = wrapper.findComponent(groupMapStub)
   expect(map.props('canManageTags')).toBe(false)
   expect(map.props('availableTags')).toEqual([])
+})
+
+// The tags section sits below the groups, so the list mustn't keep growing as
+// you scroll towards it (#918).
+test('grows the group list with a button, not as you scroll', () => {
+  const wrapper = makeWrapper()
+
+  expect(wrapper.findComponent(groupMapStub).props('showMoreButton')).toBe(true)
 })
