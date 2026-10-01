@@ -36,6 +36,8 @@ return [
             'en' => env('GROUP_REPORTING_URL_EN'),
             'fr' => env('GROUP_REPORTING_URL_FR'),
         ],
+        // Further reports on all the repair data, linked from the Fixometer page.  No link if unset.
+        'fixometer_url' => env('FIXOMETER_REPORTING_URL'),
     ],
 
     'xref_types' => [

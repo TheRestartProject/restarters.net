@@ -2,7 +2,7 @@
   <div class="mb-2">
     <AlertBanner />
     <FixometerHeading />
-    <FixometerGlobalImpact :latest-data="latestData" :impact-data="impactData" class="mt-4" />
+    <FixometerGlobalImpact :latest-data="latestData" :impact-data="impactData" :reporting-url="reportingUrl" class="mt-4" />
     <hr class="mt-md-50 hr-dashed">
 
     <div class="d-flex justify-content-between">
@@ -78,6 +78,11 @@ export default {
     impactData: {
       type: Object,
       required: true
+    },
+    reportingUrl: {
+      type: String,
+      required: false,
+      default: null
     },
     clusters: {
       type: Array,

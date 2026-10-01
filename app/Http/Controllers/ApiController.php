@@ -52,25 +52,27 @@ class ApiController extends Controller
     {
         $result = [];
 
-        $lock = \Cache::lock('homepage_data_v2_lock', 60);
+        $lock = \Cache::lock('homepage_data_v3_lock', 60);
 
-        if (\Cache::has('homepage_data_v2')) {
-            $result = \Cache::get('homepage_data_v2');
+        if (\Cache::has('homepage_data_v3')) {
+            $result = \Cache::get('homepage_data_v3');
         } elseif ($lock->get()) {
             try {
                 $Device = new Device;
 
                 // Aggregate participants and hours in SQL — avoids loading 18k+ event rows into PHP.
                 // hoursVolunteered() formula: cancelled→3, volunteers>0→9+volunteers*ceil(minutes/60), else→21
+                // Events held leaves out cancelled events and those of groups that aren't approved.
                 $eventStats = DB::table('events')
-                    ->whereNull('deleted_at')
-                    ->where('event_end_utc', '<', now())
+                    ->leftJoin('groups', 'groups.idgroups', '=', 'events.group')
+                    ->whereNull('events.deleted_at')
+                    ->where('events.event_end_utc', '<', now())
                     ->selectRaw("
-                        COUNT(*) as events,
-                        SUM(pax) as participants,
+                        SUM(CASE WHEN events.cancelled = 0 AND groups.approved = 1 THEN 1 ELSE 0 END) as events,
+                        SUM(events.pax) as participants,
                         SUM(CASE
-                            WHEN cancelled = 1 THEN 3
-                            WHEN volunteers > 0 THEN 9 + volunteers * CEIL(TIMESTAMPDIFF(MINUTE, event_start_utc, event_end_utc) / 60)
+                            WHEN events.cancelled = 1 THEN 3
+                            WHEN events.volunteers > 0 THEN 9 + events.volunteers * CEIL(TIMESTAMPDIFF(MINUTE, events.event_start_utc, events.event_end_utc) / 60)
                             ELSE 21
                         END) as hours_volunteered
                     ")
@@ -96,6 +98,7 @@ class ApiController extends Controller
                 $result['fixed_unpowered'] = $devices->fixedUnpoweredCount();
                 $result['total_powered'] = $devices->poweredCount();
                 $result['total_unpowered'] = $devices->unpoweredCount();
+                $result['total_items'] = $result['total_powered'] + $result['total_unpowered'];
 
                 // for backward compatibility (don't break therestartproject.org)
                 $result['weights'] = round($result['waste_total']);
@@ -103,13 +106,13 @@ class ApiController extends Controller
                 $result['unpowered_waste'] = round($result['waste_unpowered']);
                 $result['emissions'] = round($result['co2_total']);
 
-                \Cache::put('homepage_data_v2', $result, 43200);
+                \Cache::put('homepage_data_v3', $result, 43200);
             } finally {
                 $lock->release();
             }
         } else {
             // Another worker is rebuilding — return stale or empty rather than pile on
-            $result = \Cache::get('homepage_data_v2', []);
+            $result = \Cache::get('homepage_data_v3', []);
         }
 
         return response()

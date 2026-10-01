@@ -81,6 +81,7 @@ return [
   'powered_items_fixed' => 'powered items fixed',
   'unpowered_items_fixed' => 'unpowered items fixed',
   'events_held' => 'events held',
+  'items_seen' => 'items seen',
   'powered_or_unpowered' => 'Powered or unpowered',
   'all_items' => 'All items',
   'powered' => 'Powered',

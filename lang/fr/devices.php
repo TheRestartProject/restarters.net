@@ -81,6 +81,7 @@ return [
   'powered_items_fixed' => 'appareils électriques réparés',
   'unpowered_items_fixed' => 'objets non électriques réparés',
   'events_held' => 'événements organisés',
+  'items_seen' => 'objets vus',
   'powered_or_unpowered' => 'Électrique ou non électrique',
   'all_items' => 'Tous les objets',
   'powered' => 'Électrique',
