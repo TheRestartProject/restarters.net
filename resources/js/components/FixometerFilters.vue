@@ -351,6 +351,11 @@ export default {
 @import 'bootstrap/scss/variables';
 @import 'bootstrap/scss/mixins/_breakpoints';
 
+// The device inputs leave a column for an info icon, which the filters don't show, so let them fill the width.
+::v-deep .device-select-row {
+  grid-template-columns: auto;
+}
+
 .border {
   border: 1px solid $brand-light !important;
   box-shadow: 5px 5px 0 0 $brand-light;
