@@ -220,7 +220,7 @@ class UserController extends Controller
         return redirect()->back()->with('error', __('profile.password_old_mismatch'));
     }
 
-    #[UserStory('As an Admin, I can change a user\'s Repair Directory role', persona: 'Admin', theme: 'Admin user management')]
+    #[UserStory('As a Repair Directory SuperAdmin or RegionalAdmin, I can change a user\'s Repair Directory role', persona: 'RepairDirectoryAdmin', theme: 'Admin user management')]
     public function postProfileRepairDirectory(Request $request): RedirectResponse
     {
         $rules = [

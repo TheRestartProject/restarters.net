@@ -118,7 +118,7 @@ class CalendarEventsController extends Controller
         $this->exportCalendar($events);
     }
 
-    #[NoStory(reason: 'All-events calendar feed requiring environment secret')]
+    #[UserStory('As a ThirdParty holding the shared calendar secret, I can subscribe to every event on the platform as an iCal feed', persona: 'ThirdParty', theme: 'Calendar feeds')]
     public function allEvents(Request $request, $env_hash)
     {
         if ($env_hash !== env('CALENDAR_HASH')) {

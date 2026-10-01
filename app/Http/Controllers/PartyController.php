@@ -205,7 +205,6 @@ class PartyController extends Controller
     }
 
     #[UserStory('As a Host, I can access the form to create a new event for my group', persona: 'Host', theme: 'Create & manage events')]
-    #[UserStory('As a Host, I can create an online event without a physical location', persona: 'Host', theme: 'Create & manage events')]
     public function create(Request $request, $group_id = null): View
     {
         $user = Auth::user();

@@ -191,7 +191,7 @@ class DeviceController extends Controller {
         $event = Party::findOrFail($eventid);
 
         if (!Fixometer::userHasEditEventsDevicesPermission($eventid, $user->id)) {
-            // Only hosts can add devices to events.
+            // Hosts, network coordinators, admins and confirmed attendees of the event can add devices.
             abort(403);
         }
 
@@ -382,7 +382,7 @@ class DeviceController extends Controller {
         // the database just by naming their own event here - deleteDevicev2 below already
         // derives the event from the record for this reason.
         if (!Fixometer::userHasEditEventsDevicesPermission($device->event, $user->id)) {
-            // Only hosts can edit devices on events.
+            // Hosts, network coordinators, admins and confirmed attendees of the event can edit its devices.
             abort(403);
         }
 
@@ -466,7 +466,7 @@ class DeviceController extends Controller {
         $eventid = $device->event;
 
         if (!Fixometer::userHasEditEventsDevicesPermission($device->event, $user->id)) {
-            // Only hosts can delete devices for events.
+            // Hosts, network coordinators, admins and confirmed attendees of the event can delete its devices.
             abort(403);
         }
 
