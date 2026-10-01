@@ -39,36 +39,8 @@ class ExportController extends Controller
 
         $me = auth()->user();
 
-        // Only export devices from events this user can see - the same rules as User::userCanSeeEvent(), but
-        // applied in the query so that we don't have to look up each event and group in turn.
-        $all_devices = Device::with([
-            'deviceCategory',
-            'deviceEvent.theGroup',
-        ])
-            ->join('events', 'events.idevents', '=', 'devices.event')
-            ->join('groups', 'groups.idgroups', '=', 'events.group')
-            ->whereNull('events.deleted_at')
-            ->when($idevents != NULL, function($query) use ($idevents) {
-                return $query->where('events.idevents', $idevents);
-            })
-            ->when($idgroups != NULL, function($query) use ($idgroups) {
-                return $query->where('events.group', $idgroups);
-            })
-            ->when(!$me || !$me->hasRole('Administrator'), function($query) use ($me) {
-                $extraGroups = $this->groupsWithUnapprovedEventsVisibleTo($me);
-
-                return $query->where(function($query) use ($extraGroups) {
-                    $query->where(function($query) {
-                        $query->where('events.approved', true)
-                            ->where('groups.approved', true);
-                    })->orWhereIn('events.group', $extraGroups);
-                });
-            })
-            ->select('devices.*', 'groups.name AS group_name');
-
-        $displacementFactor = \App\Device::getDisplacementFactor();
-        $eEmissionRatio = \App\Helpers\LcaStats::getEmissionRatioPowered();
-        $uEmissionratio = \App\Helpers\LcaStats::getEmissionRatioUnpowered();
+        $export = app(\App\Services\RepairDataExport::class);
+        $all_devices = $export->query($me, $idevents, $idgroups);
 
         // Create CSV
         $filename = 'repair-data';
@@ -90,65 +62,7 @@ class ExportController extends Controller
         $fullpath = $this->exportPath($filename);
         $file = fopen($fullpath, 'w+');
 
-        // We can't put accented characters into a CSV file, so flatten them.
-        // Use //TRANSLIT//IGNORE to handle characters that can't be transliterated on
-        // servers with older glibc (e.g. 2.27) and POSIX locale, which lack transliteration
-        // tables for certain Unicode characters like emdash (—). Without //IGNORE, iconv
-        // throws "Detected an illegal character in input string" on such systems.
-        $columns = [
-            iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', __('devices.item_type_short')),
-            iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', __('devices.category')),
-            iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', __('devices.brand')),
-            iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', __('devices.model')),
-            iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', __('devices.title_assessment')),
-            iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', __('devices.repair_status')),
-            iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', __('devices.spare_parts')),
-            iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', __('events.event')),
-            iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', __('groups.group')),
-            iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', __('events.event_date')),
-            iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', __('events.stat-7')),
-            iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', __('events.stat-6')),
-            iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', ucfirst(__('devices.title_powered')))
-        ];
-
-        fputcsv($file, $columns);
-
-        // Work through the devices in chunks so that the whole dataset isn't held in memory at once.
-        foreach ($all_devices->lazyById(1000, 'devices.iddevices', 'iddevices') as $device) {
-            set_time_limit(60);
-
-            $wasteImpact = 0;
-            $co2Diverted = 0;
-
-            if ($device->isFixed())
-            {
-                if ($device->deviceCategory->powered)
-                {
-                    $wasteImpact = $device->eWasteDiverted();
-                    $co2Diverted = $device->eCo2Diverted($eEmissionRatio, $displacementFactor);
-                } else
-                {
-                    $wasteImpact = $device->uWasteDiverted();
-                    $co2Diverted = $device->uCo2Diverted($uEmissionratio, $displacementFactor);
-                }
-            }
-
-            fputcsv($file, $this->csvSafeRow([
-                $device->item_type,
-                $device->deviceCategory->name,
-                $device->brand,
-                $device->model,
-                $device->problem,
-                $device->getRepairStatus(),
-                $device->getSpareParts(),
-                $device->deviceEvent->getEventName(),
-                $device->deviceEvent->theGroup->name,
-                $device->deviceEvent->getFormattedLocalStart('Y-m-d'),
-                $wasteImpact,
-                $co2Diverted,
-                $device->deviceCategory->powered ? 'Powered' : 'Unpowered'
-            ]));
-        }
+        $export->write($all_devices, $file);
 
         fclose($file);
 
@@ -157,37 +71,6 @@ class ExportController extends Controller
         ];
 
         return Response::download($fullpath, $filename, $headers)->deleteFileAfterSend(true);
-    }
-
-    /**
-     * Groups whose events a user can see even when the event or group isn't approved: those they host, and those in
-     * networks they coordinate.
-     */
-    private function groupsWithUnapprovedEventsVisibleTo($user): array
-    {
-        if (!$user) {
-            return [];
-        }
-
-        $groups = [];
-
-        if ($user->hasRole('Host')) {
-            $groups = UserGroups::where('user', $user->id)
-                ->where('role', \App\Role::HOST)
-                ->pluck('group')
-                ->all();
-        }
-
-        $networks = $user->networks->pluck('id');
-
-        if ($networks->count()) {
-            $groups = array_merge($groups, DB::table('group_network')
-                ->whereIn('network_id', $networks)
-                ->pluck('group_id')
-                ->all());
-        }
-
-        return array_values(array_unique($groups));
     }
 
     /**
@@ -267,7 +150,7 @@ class ExportController extends Controller
         fputcsv($file, $headers);
 
         foreach ($PartyArray as $d) {
-            fputcsv($file, $this->csvSafeRow($d));
+            fputcsv($file, \App\Services\RepairDataExport::csvSafeRow($d));
         }
         fclose($file);
 
@@ -292,20 +175,5 @@ class ExportController extends Controller
         }
 
         return $dir . DIRECTORY_SEPARATOR . $filename;
-    }
-
-    /**
-     * Spreadsheets treat a cell starting with =, +, - or @ as a formula, so prefix those
-     * with an apostrophe.  Device fields are free text entered at events.
-     */
-    private function csvSafeRow(array $row)
-    {
-        return array_map(function ($value) {
-            if (is_string($value) && $value !== '' && in_array($value[0], ['=', '+', '-', '@'], true)) {
-                return "'" . $value;
-            }
-
-            return $value;
-        }, $row);
     }
 }

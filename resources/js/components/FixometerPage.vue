@@ -11,7 +11,7 @@
         <span class="records-total">({{ total.toLocaleString() }})</span>
       </h2>
       <div>
-        <b-btn variant="primary" href="/export/devices" class="export-devices">
+        <b-btn variant="primary" :href="downloadUrl" class="export-devices">
           {{ __('devices.export_device_data') }}
         </b-btn>
       </div>
@@ -90,6 +90,12 @@ export default {
       type: String,
       required: false,
       default: null
+    },
+    downloadUrl: {
+      // The full repair data, usually built overnight.
+      type: String,
+      required: false,
+      default: '/export/devices'
     },
     clusters: {
       type: Array,

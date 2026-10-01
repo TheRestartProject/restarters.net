@@ -19,6 +19,7 @@
                     :latest-data="{{ json_encode($most_recent_finished_event, JSON_INVALID_UTF8_IGNORE) }}"
                     :impact-data="{{ json_encode($impact_data, JSON_INVALID_UTF8_IGNORE) }}"
                     reporting-url="{{ config('restarters.reporting.fixometer_url') }}"
+                    download-url="{{ $download_url }}"
                     :clusters="{{ json_encode($clusters, JSON_INVALID_UTF8_IGNORE) }}"
                     :brands="{{ json_encode($brands, JSON_INVALID_UTF8_IGNORE) }}"
                     :barrier-list="{{ json_encode($barriers, JSON_INVALID_UTF8_IGNORE) }}"
