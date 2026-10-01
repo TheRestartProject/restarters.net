@@ -40,6 +40,11 @@
           <div class="stat-label">{{ __('networks.stats.co2_prevented') }}</div>
         </div>
       </div>
+      <p v-if="network.reporting_url" class="mt-3 mb-0 text-right">
+        <a :href="network.reporting_url" target="_blank" rel="noopener" class="network-reporting-inline">
+          {{ __('networks.general.see_network_reports') }}
+        </a>
+      </p>
     </div>
 
     <!-- About (moved from column layout) -->

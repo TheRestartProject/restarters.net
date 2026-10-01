@@ -12,6 +12,7 @@ return [
   ],
   'general' => [
     'view_reports' => 'Voir les rapports',
+    'see_network_reports' => 'En savoir plus dans les rapports de votre réseau',
     'network' => 'Réseau',
     'networks' => 'Réseaux',
     'particular_network' => 'Réseau :networkName',

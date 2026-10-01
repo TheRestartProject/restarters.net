@@ -5,6 +5,7 @@ return [
   'network' => 'Network',
   'general' => [
     'view_reports' => 'View reports',
+    'see_network_reports' => 'See more in your network\'s reports',
     'networks' => 'Networks',
     'network' => 'Network',
     'particular_network' => ':networkName network',

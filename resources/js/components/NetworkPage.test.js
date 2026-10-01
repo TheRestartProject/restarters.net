@@ -117,4 +117,19 @@ test('has no reporting link when the network has no dashboard', () => {
   const wrapper = makeWrapper()
 
   expect(wrapper.find('a.network-reporting-link').exists()).toBe(false)
+  expect(wrapper.find('a.network-reporting-inline').exists()).toBe(false)
+})
+
+// The same "see more" link the group page has, where people are already
+// looking at the network's figures.
+test('links to the network reports from under the impact figures', () => {
+  const wrapper = makeWrapper({
+    network: { id: 5, name: 'Test Network', coordinators: [], reporting_url: 'https://reports.example.org/dashboard/7' },
+  })
+
+  const link = wrapper.find('.network-stats a.network-reporting-inline')
+  expect(link.exists()).toBe(true)
+  expect(link.attributes('href')).toBe('https://reports.example.org/dashboard/7')
+  expect(link.attributes('target')).toBe('_blank')
+  expect(link.text()).toBe('networks.general.see_network_reports')
 })
