@@ -1,15 +1,15 @@
 {
-    "generatedAt": "2026-10-01T16:49:25Z",
+    "generatedAt": "2026-10-01T17:09:09Z",
     "features": {
         "Administration": {
             "description": "Platform administration and configuration",
             "sources": [
-                "app/Http/Controllers/CategoryController.php",
-                "app/Http/Controllers/RoleController.php",
-                "app/Http/Controllers/BrandsController.php",
-                "app/Http/Controllers/PreviewDeployController.php",
-                "app/Http/Controllers/GroupTagsController.php",
                 "app/Http/Controllers/API/AlertController.php",
+                "app/Http/Controllers/BrandsController.php",
+                "app/Http/Controllers/CategoryController.php",
+                "app/Http/Controllers/GroupTagsController.php",
+                "app/Http/Controllers/PreviewDeployController.php",
+                "app/Http/Controllers/RoleController.php",
                 "app/Http/Controllers/SkillsController.php"
             ],
             "stories": [
@@ -451,8 +451,8 @@
         "Devices": {
             "description": "Repair device tracking and impact measurement",
             "sources": [
-                "app/Http/Controllers/API/ItemController.php",
                 "app/Http/Controllers/API/DeviceController.php",
+                "app/Http/Controllers/API/ItemController.php",
                 "app/Http/Controllers/DeviceController.php"
             ],
             "stories": [
@@ -511,39 +511,7 @@
                     "file": "app/Http/Controllers/API/DeviceController.php",
                     "tests": [
                         {
-                            "file": "tests/Feature/Devices/NullEstimateProblemTest.php",
-                            "test": "(unknown test)"
-                        },
-                        {
-                            "file": "tests/Feature/Devices/SparePartsTest.php",
-                            "test": "(unknown test)"
-                        },
-                        {
-                            "file": "tests/Feature/Devices/SparePartsTest.php",
-                            "test": "(unknown test)"
-                        },
-                        {
-                            "file": "tests/Feature/Devices/SparePartsTest.php",
-                            "test": "(unknown test)"
-                        },
-                        {
-                            "file": "tests/Feature/Devices/SparePartsTest.php",
-                            "test": "(unknown test)"
-                        },
-                        {
-                            "file": "tests/Feature/Devices/SparePartsTest.php",
-                            "test": "(unknown test)"
-                        },
-                        {
-                            "file": "tests/Feature/Devices/NullProblemTest.php",
-                            "test": "(unknown test)"
-                        },
-                        {
-                            "file": "tests/Feature/Devices/NullAgeProblemTest.php",
-                            "test": "(unknown test)"
-                        },
-                        {
-                            "file": "tests/Feature/Devices/TooManyMiscTest.php",
+                            "file": "tests/Feature/Devices/APIv2DeviceTest.php",
                             "test": "(unknown test)"
                         },
                         {
@@ -551,15 +519,47 @@
                             "test": "(unknown test)"
                         },
                         {
-                            "file": "tests/Feature/Devices/APIv2DeviceTest.php",
-                            "test": "(unknown test)"
-                        },
-                        {
                             "file": "tests/Feature/Devices/EditTest.php",
                             "test": "(unknown test)"
                         },
                         {
                             "file": "tests/Feature/Devices/EditTest.php",
+                            "test": "(unknown test)"
+                        },
+                        {
+                            "file": "tests/Feature/Devices/NullAgeProblemTest.php",
+                            "test": "(unknown test)"
+                        },
+                        {
+                            "file": "tests/Feature/Devices/NullEstimateProblemTest.php",
+                            "test": "(unknown test)"
+                        },
+                        {
+                            "file": "tests/Feature/Devices/NullProblemTest.php",
+                            "test": "(unknown test)"
+                        },
+                        {
+                            "file": "tests/Feature/Devices/SparePartsTest.php",
+                            "test": "(unknown test)"
+                        },
+                        {
+                            "file": "tests/Feature/Devices/SparePartsTest.php",
+                            "test": "(unknown test)"
+                        },
+                        {
+                            "file": "tests/Feature/Devices/SparePartsTest.php",
+                            "test": "(unknown test)"
+                        },
+                        {
+                            "file": "tests/Feature/Devices/SparePartsTest.php",
+                            "test": "(unknown test)"
+                        },
+                        {
+                            "file": "tests/Feature/Devices/SparePartsTest.php",
+                            "test": "(unknown test)"
+                        },
+                        {
+                            "file": "tests/Feature/Devices/TooManyMiscTest.php",
                             "test": "(unknown test)"
                         }
                     ]
@@ -623,14 +623,6 @@
                     "file": "app/Http/Controllers/API/DeviceController.php",
                     "tests": [
                         {
-                            "file": "tests/Feature/Devices/NullEstimateProblemTest.php",
-                            "test": "(unknown test)"
-                        },
-                        {
-                            "file": "tests/Feature/Devices/NullAgeProblemTest.php",
-                            "test": "(unknown test)"
-                        },
-                        {
                             "file": "tests/Feature/Devices/CategoryTest.php",
                             "test": "(unknown test)"
                         },
@@ -644,6 +636,14 @@
                         },
                         {
                             "file": "tests/Feature/Devices/EditTest.php",
+                            "test": "(unknown test)"
+                        },
+                        {
+                            "file": "tests/Feature/Devices/NullAgeProblemTest.php",
+                            "test": "(unknown test)"
+                        },
+                        {
+                            "file": "tests/Feature/Devices/NullEstimateProblemTest.php",
                             "test": "(unknown test)"
                         }
                     ]
@@ -678,9 +678,9 @@
         "Events": {
             "description": "Community repair event management",
             "sources": [
-                "app/Http/Controllers/PartyController.php",
                 "app/Http/Controllers/API/EventController.php",
-                "app/Http/Controllers/CalendarEventsController.php"
+                "app/Http/Controllers/CalendarEventsController.php",
+                "app/Http/Controllers/PartyController.php"
             ],
             "stories": [
                 {
@@ -820,6 +820,10 @@
                             "test": "(unknown test)"
                         },
                         {
+                            "file": "tests/Feature/Events/CreateEventTest.php",
+                            "test": "(unknown test)"
+                        },
+                        {
                             "file": "tests/Feature/Events/DeleteEventTest.php",
                             "test": "(unknown test)"
                         },
@@ -844,19 +848,15 @@
                             "test": "(unknown test)"
                         },
                         {
-                            "file": "tests/Feature/Events/CreateEventTest.php",
-                            "test": "(unknown test)"
-                        },
-                        {
                             "file": "tests/Feature/Stats/EventStatsTest.php",
                             "test": "(unknown test)"
                         },
                         {
-                            "file": "tests/Unit/Events/EventStateTest.php",
+                            "file": "tests/Unit/CharsetTest.php",
                             "test": "(unknown test)"
                         },
                         {
-                            "file": "tests/Unit/CharsetTest.php",
+                            "file": "tests/Unit/Events/EventStateTest.php",
                             "test": "(unknown test)"
                         }
                     ]
@@ -892,71 +892,71 @@
                     "file": "app/Http/Controllers/API/EventController.php",
                     "tests": [
                         {
+                            "file": "tests/Feature/Events/APIv2EventTest.php",
+                            "test": "(unknown test)"
+                        },
+                        {
+                            "file": "tests/Feature/Events/APIv2EventTest.php",
+                            "test": "(unknown test)"
+                        },
+                        {
+                            "file": "tests/Feature/Events/APIv2EventTest.php",
+                            "test": "(unknown test)"
+                        },
+                        {
+                            "file": "tests/Feature/Events/CreateEventTest.php",
+                            "test": "(unknown test)"
+                        },
+                        {
+                            "file": "tests/Feature/Events/CreateEventTest.php",
+                            "test": "(unknown test)"
+                        },
+                        {
+                            "file": "tests/Feature/Events/CreateEventTest.php",
+                            "test": "(unknown test)"
+                        },
+                        {
+                            "file": "tests/Feature/Events/CreateEventTest.php",
+                            "test": "(unknown test)"
+                        },
+                        {
+                            "file": "tests/Feature/Events/CreateEventTest.php",
+                            "test": "(unknown test)"
+                        },
+                        {
+                            "file": "tests/Feature/Events/CreateEventTest.php",
+                            "test": "(unknown test)"
+                        },
+                        {
+                            "file": "tests/Feature/Events/CreateEventTest.php",
+                            "test": "(unknown test)"
+                        },
+                        {
+                            "file": "tests/Feature/Events/CreateEventTest.php",
+                            "test": "(unknown test)"
+                        },
+                        {
+                            "file": "tests/Feature/Events/CreateEventTest.php",
+                            "test": "(unknown test)"
+                        },
+                        {
+                            "file": "tests/Feature/Events/CreateEventTest.php",
+                            "test": "(unknown test)"
+                        },
+                        {
+                            "file": "tests/Feature/Events/CreateEventTest.php",
+                            "test": "(unknown test)"
+                        },
+                        {
+                            "file": "tests/Feature/Events/CreateEventTest.php",
+                            "test": "(unknown test)"
+                        },
+                        {
+                            "file": "tests/Feature/Events/CreateEventTest.php",
+                            "test": "(unknown test)"
+                        },
+                        {
                             "file": "tests/Feature/Events/OnlineEventsTest.php",
-                            "test": "(unknown test)"
-                        },
-                        {
-                            "file": "tests/Feature/Events/APIv2EventTest.php",
-                            "test": "(unknown test)"
-                        },
-                        {
-                            "file": "tests/Feature/Events/APIv2EventTest.php",
-                            "test": "(unknown test)"
-                        },
-                        {
-                            "file": "tests/Feature/Events/APIv2EventTest.php",
-                            "test": "(unknown test)"
-                        },
-                        {
-                            "file": "tests/Feature/Events/CreateEventTest.php",
-                            "test": "(unknown test)"
-                        },
-                        {
-                            "file": "tests/Feature/Events/CreateEventTest.php",
-                            "test": "(unknown test)"
-                        },
-                        {
-                            "file": "tests/Feature/Events/CreateEventTest.php",
-                            "test": "(unknown test)"
-                        },
-                        {
-                            "file": "tests/Feature/Events/CreateEventTest.php",
-                            "test": "(unknown test)"
-                        },
-                        {
-                            "file": "tests/Feature/Events/CreateEventTest.php",
-                            "test": "(unknown test)"
-                        },
-                        {
-                            "file": "tests/Feature/Events/CreateEventTest.php",
-                            "test": "(unknown test)"
-                        },
-                        {
-                            "file": "tests/Feature/Events/CreateEventTest.php",
-                            "test": "(unknown test)"
-                        },
-                        {
-                            "file": "tests/Feature/Events/CreateEventTest.php",
-                            "test": "(unknown test)"
-                        },
-                        {
-                            "file": "tests/Feature/Events/CreateEventTest.php",
-                            "test": "(unknown test)"
-                        },
-                        {
-                            "file": "tests/Feature/Events/CreateEventTest.php",
-                            "test": "(unknown test)"
-                        },
-                        {
-                            "file": "tests/Feature/Events/CreateEventTest.php",
-                            "test": "(unknown test)"
-                        },
-                        {
-                            "file": "tests/Feature/Events/CreateEventTest.php",
-                            "test": "(unknown test)"
-                        },
-                        {
-                            "file": "tests/Feature/Events/CreateEventTest.php",
                             "test": "(unknown test)"
                         },
                         {
@@ -982,31 +982,31 @@
                     "file": "app/Http/Controllers/API/EventController.php",
                     "tests": [
                         {
+                            "file": "tests/Feature/Dashboard/BasicTest.php",
+                            "test": "(unknown test)"
+                        },
+                        {
                             "file": "tests/Feature/Events/APIv2EventTest.php",
                             "test": "(unknown test)"
                         },
                         {
                             "file": "tests/Feature/Events/APIv2EventTest.php",
+                            "test": "(unknown test)"
+                        },
+                        {
+                            "file": "tests/Feature/Events/CreateEventTest.php",
+                            "test": "(unknown test)"
+                        },
+                        {
+                            "file": "tests/Feature/Events/CreateEventTest.php",
+                            "test": "(unknown test)"
+                        },
+                        {
+                            "file": "tests/Feature/Events/CreateEventTest.php",
                             "test": "(unknown test)"
                         },
                         {
                             "file": "tests/Feature/Events/InviteEventTest.php",
-                            "test": "(unknown test)"
-                        },
-                        {
-                            "file": "tests/Feature/Events/CreateEventTest.php",
-                            "test": "(unknown test)"
-                        },
-                        {
-                            "file": "tests/Feature/Events/CreateEventTest.php",
-                            "test": "(unknown test)"
-                        },
-                        {
-                            "file": "tests/Feature/Events/CreateEventTest.php",
-                            "test": "(unknown test)"
-                        },
-                        {
-                            "file": "tests/Feature/Dashboard/BasicTest.php",
                             "test": "(unknown test)"
                         },
                         {
@@ -1078,11 +1078,11 @@
                     "file": "app/Http/Controllers/PartyController.php",
                     "tests": [
                         {
-                            "file": "tests/Feature/Events/DeleteEventTest.php",
+                            "file": "tests/Feature/Events/CreateEventTest.php",
                             "test": "(unknown test)"
                         },
                         {
-                            "file": "tests/Feature/Events/CreateEventTest.php",
+                            "file": "tests/Feature/Events/DeleteEventTest.php",
                             "test": "(unknown test)"
                         }
                     ]
@@ -1252,11 +1252,11 @@
                     "file": "app/Http/Controllers/PartyController.php",
                     "tests": [
                         {
-                            "file": "tests/Feature/Events/DeleteEventTest.php",
+                            "file": "tests/Feature/Events/CreateEventTest.php",
                             "test": "(unknown test)"
                         },
                         {
-                            "file": "tests/Feature/Events/CreateEventTest.php",
+                            "file": "tests/Feature/Events/DeleteEventTest.php",
                             "test": "(unknown test)"
                         }
                     ]
@@ -1390,7 +1390,7 @@
                     "file": "app/Http/Controllers/PartyController.php",
                     "tests": [
                         {
-                            "file": "tests/Feature/Events/InviteEventTest.php",
+                            "file": "tests/Feature/Dashboard/BasicTest.php",
                             "test": "(unknown test)"
                         },
                         {
@@ -1398,7 +1398,7 @@
                             "test": "(unknown test)"
                         },
                         {
-                            "file": "tests/Feature/Dashboard/BasicTest.php",
+                            "file": "tests/Feature/Events/InviteEventTest.php",
                             "test": "(unknown test)"
                         },
                         {
@@ -1470,8 +1470,8 @@
         "Groups": {
             "description": "Community repair group management and membership",
             "sources": [
-                "app/Http/Controllers/API/UserGroupsController.php",
                 "app/Http/Controllers/API/GroupController.php",
+                "app/Http/Controllers/API/UserGroupsController.php",
                 "app/Http/Controllers/GroupController.php"
             ],
             "stories": [
@@ -1823,6 +1823,14 @@
                     "file": "app/Http/Controllers/API/GroupController.php",
                     "tests": [
                         {
+                            "file": "tests/Feature/Groups/APIv2GroupTest.php",
+                            "test": "(unknown test)"
+                        },
+                        {
+                            "file": "tests/Feature/Groups/APIv2GroupTest.php",
+                            "test": "(unknown test)"
+                        },
+                        {
                             "file": "tests/Feature/Groups/GroupCreateTest.php",
                             "test": "(unknown test)"
                         },
@@ -1836,14 +1844,6 @@
                         },
                         {
                             "file": "tests/Feature/Groups/GroupEditTest.php",
-                            "test": "(unknown test)"
-                        },
-                        {
-                            "file": "tests/Feature/Groups/APIv2GroupTest.php",
-                            "test": "(unknown test)"
-                        },
-                        {
-                            "file": "tests/Feature/Groups/APIv2GroupTest.php",
                             "test": "(unknown test)"
                         },
                         {
@@ -1955,15 +1955,43 @@
                     "file": "app/Http/Controllers/API/GroupController.php",
                     "tests": [
                         {
-                            "file": "tests/Feature/Zapier/ZapierNetworkTests.php",
-                            "test": "(unknown test)"
-                        },
-                        {
-                            "file": "tests/Feature/Zapier/ZapierNetworkTests.php",
-                            "test": "(unknown test)"
-                        },
-                        {
                             "file": "tests/Feature/Events/APIv2EventTest.php",
+                            "test": "(unknown test)"
+                        },
+                        {
+                            "file": "tests/Feature/Groups/APIv2GroupTest.php",
+                            "test": "(unknown test)"
+                        },
+                        {
+                            "file": "tests/Feature/Groups/APIv2GroupTest.php",
+                            "test": "(unknown test)"
+                        },
+                        {
+                            "file": "tests/Feature/Groups/APIv2GroupTest.php",
+                            "test": "(unknown test)"
+                        },
+                        {
+                            "file": "tests/Feature/Groups/APIv2GroupTest.php",
+                            "test": "(unknown test)"
+                        },
+                        {
+                            "file": "tests/Feature/Groups/APIv2GroupTest.php",
+                            "test": "(unknown test)"
+                        },
+                        {
+                            "file": "tests/Feature/Groups/APIv2GroupTest.php",
+                            "test": "(unknown test)"
+                        },
+                        {
+                            "file": "tests/Feature/Groups/APIv2GroupTest.php",
+                            "test": "(unknown test)"
+                        },
+                        {
+                            "file": "tests/Feature/Groups/APIv2GroupTest.php",
+                            "test": "(unknown test)"
+                        },
+                        {
+                            "file": "tests/Feature/Groups/APIv2GroupTest.php",
                             "test": "(unknown test)"
                         },
                         {
@@ -1971,39 +1999,11 @@
                             "test": "(unknown test)"
                         },
                         {
-                            "file": "tests/Feature/Groups/APIv2GroupTest.php",
+                            "file": "tests/Feature/Zapier/ZapierNetworkTests.php",
                             "test": "(unknown test)"
                         },
                         {
-                            "file": "tests/Feature/Groups/APIv2GroupTest.php",
-                            "test": "(unknown test)"
-                        },
-                        {
-                            "file": "tests/Feature/Groups/APIv2GroupTest.php",
-                            "test": "(unknown test)"
-                        },
-                        {
-                            "file": "tests/Feature/Groups/APIv2GroupTest.php",
-                            "test": "(unknown test)"
-                        },
-                        {
-                            "file": "tests/Feature/Groups/APIv2GroupTest.php",
-                            "test": "(unknown test)"
-                        },
-                        {
-                            "file": "tests/Feature/Groups/APIv2GroupTest.php",
-                            "test": "(unknown test)"
-                        },
-                        {
-                            "file": "tests/Feature/Groups/APIv2GroupTest.php",
-                            "test": "(unknown test)"
-                        },
-                        {
-                            "file": "tests/Feature/Groups/APIv2GroupTest.php",
-                            "test": "(unknown test)"
-                        },
-                        {
-                            "file": "tests/Feature/Groups/APIv2GroupTest.php",
+                            "file": "tests/Feature/Zapier/ZapierNetworkTests.php",
                             "test": "(unknown test)"
                         }
                     ]
@@ -2087,35 +2087,35 @@
                     "file": "app/Http/Controllers/GroupController.php",
                     "tests": [
                         {
+                            "file": "tests/Feature/Groups/GroupViewTest.php",
+                            "test": "(unknown test)"
+                        },
+                        {
+                            "file": "tests/Feature/Groups/GroupViewTest.php",
+                            "test": "(unknown test)"
+                        },
+                        {
+                            "file": "tests/Feature/Groups/GroupViewTest.php",
+                            "test": "(unknown test)"
+                        },
+                        {
+                            "file": "tests/Feature/Groups/GroupViewTest.php",
+                            "test": "(unknown test)"
+                        },
+                        {
+                            "file": "tests/Feature/Groups/GroupViewTest.php",
+                            "test": "(unknown test)"
+                        },
+                        {
+                            "file": "tests/Feature/Groups/InviteGroupTest.php",
+                            "test": "(unknown test)"
+                        },
+                        {
+                            "file": "tests/Feature/Groups/InviteGroupTest.php",
+                            "test": "(unknown test)"
+                        },
+                        {
                             "file": "tests/Feature/Stats/EventStatsTest.php",
-                            "test": "(unknown test)"
-                        },
-                        {
-                            "file": "tests/Feature/Groups/InviteGroupTest.php",
-                            "test": "(unknown test)"
-                        },
-                        {
-                            "file": "tests/Feature/Groups/InviteGroupTest.php",
-                            "test": "(unknown test)"
-                        },
-                        {
-                            "file": "tests/Feature/Groups/GroupViewTest.php",
-                            "test": "(unknown test)"
-                        },
-                        {
-                            "file": "tests/Feature/Groups/GroupViewTest.php",
-                            "test": "(unknown test)"
-                        },
-                        {
-                            "file": "tests/Feature/Groups/GroupViewTest.php",
-                            "test": "(unknown test)"
-                        },
-                        {
-                            "file": "tests/Feature/Groups/GroupViewTest.php",
-                            "test": "(unknown test)"
-                        },
-                        {
-                            "file": "tests/Feature/Groups/GroupViewTest.php",
                             "test": "(unknown test)"
                         }
                     ]
@@ -2267,8 +2267,8 @@
         "Networks": {
             "description": "Regional network management and coordination",
             "sources": [
-                "app/Http/Controllers/NetworkController.php",
-                "app/Http/Controllers/API/NetworkController.php"
+                "app/Http/Controllers/API/NetworkController.php",
+                "app/Http/Controllers/NetworkController.php"
             ],
             "stories": [
                 {
@@ -2607,15 +2607,15 @@
         "Platform": {
             "description": "Platform-wide statistics and public impact data",
             "sources": [
-                "app/Http/Controllers/OutboundController.php",
-                "app/Http/Controllers/InformationAlertCookieController.php",
-                "app/Http/Controllers/ApiController.php",
-                "app/Http/Controllers/API/RepairController.php",
                 "app/Http/Controllers/API/DiscourseController.php",
-                "app/Http/Controllers/HomeController.php",
-                "app/Http/Controllers/LocaleController.php",
+                "app/Http/Controllers/API/RepairController.php",
+                "app/Http/Controllers/AdminController.php",
+                "app/Http/Controllers/ApiController.php",
                 "app/Http/Controllers/ExportController.php",
-                "app/Http/Controllers/AdminController.php"
+                "app/Http/Controllers/HomeController.php",
+                "app/Http/Controllers/InformationAlertCookieController.php",
+                "app/Http/Controllers/LocaleController.php",
+                "app/Http/Controllers/OutboundController.php"
             ],
             "stories": [
                 {
@@ -2842,12 +2842,12 @@
                     "file": "app/Http/Controllers/LocaleController.php",
                     "tests": [
                         {
-                            "file": "tests/Feature/Users/EditLanguageSettingsTest.php",
-                            "test": "(unknown test)"
-                        },
-                        {
                             "file": "tests/Feature/Dashboard/LanguageSwitcherTest.php",
                             "test": "PHPUnit"
+                        },
+                        {
+                            "file": "tests/Feature/Users/EditLanguageSettingsTest.php",
+                            "test": "(unknown test)"
                         }
                     ]
                 },
@@ -3050,9 +3050,9 @@
         "Users": {
             "description": "User accounts, profiles, and authentication",
             "sources": [
-                "app/Http/Controllers/UserController.php",
+                "app/Http/Controllers/API/UserController.php",
                 "app/Http/Controllers/Auth/LoginController.php",
-                "app/Http/Controllers/API/UserController.php"
+                "app/Http/Controllers/UserController.php"
             ],
             "stories": [
                 {
@@ -3064,19 +3064,19 @@
                     "file": "app/Http/Controllers/UserController.php",
                     "tests": [
                         {
+                            "file": "tests/Feature/Admin/Users/ViewUsersTest.php",
+                            "test": "(unknown test)"
+                        },
+                        {
+                            "file": "tests/Feature/Admin/Users/ViewUsersTest.php",
+                            "test": "(unknown test)"
+                        },
+                        {
+                            "file": "tests/Feature/Admin/Users/ViewUsersTest.php",
+                            "test": "(unknown test)"
+                        },
+                        {
                             "file": "tests/Feature/Users/UserAdminTest.php",
-                            "test": "(unknown test)"
-                        },
-                        {
-                            "file": "tests/Feature/Admin/Users/ViewUsersTest.php",
-                            "test": "(unknown test)"
-                        },
-                        {
-                            "file": "tests/Feature/Admin/Users/ViewUsersTest.php",
-                            "test": "(unknown test)"
-                        },
-                        {
-                            "file": "tests/Feature/Admin/Users/ViewUsersTest.php",
                             "test": "(unknown test)"
                         }
                     ]
@@ -3194,23 +3194,23 @@
                     "file": "app/Http/Controllers/Auth/LoginController.php",
                     "tests": [
                         {
+                            "file": "tests/Feature/Admin/Users/WikiLoginTests.php",
+                            "test": "(unknown test)"
+                        },
+                        {
+                            "file": "tests/Feature/Admin/Users/WikiLoginTests.php",
+                            "test": "(unknown test)"
+                        },
+                        {
+                            "file": "tests/Feature/Admin/Users/WikiLoginTests.php",
+                            "test": "(unknown test)"
+                        },
+                        {
+                            "file": "tests/Feature/Admin/Users/WikiLoginTests.php",
+                            "test": "(unknown test)"
+                        },
+                        {
                             "file": "tests/Feature/Users/RecoverTest.php",
-                            "test": "(unknown test)"
-                        },
-                        {
-                            "file": "tests/Feature/Admin/Users/WikiLoginTests.php",
-                            "test": "(unknown test)"
-                        },
-                        {
-                            "file": "tests/Feature/Admin/Users/WikiLoginTests.php",
-                            "test": "(unknown test)"
-                        },
-                        {
-                            "file": "tests/Feature/Admin/Users/WikiLoginTests.php",
-                            "test": "(unknown test)"
-                        },
-                        {
-                            "file": "tests/Feature/Admin/Users/WikiLoginTests.php",
                             "test": "(unknown test)"
                         }
                     ]
@@ -3412,11 +3412,11 @@
                     "file": "app/Http/Controllers/UserController.php",
                     "tests": [
                         {
-                            "file": "tests/Feature/Users/ProfileTest.php",
+                            "file": "tests/Feature/Admin/Users/WikiLoginTests.php",
                             "test": "(unknown test)"
                         },
                         {
-                            "file": "tests/Feature/Admin/Users/WikiLoginTests.php",
+                            "file": "tests/Feature/Users/ProfileTest.php",
                             "test": "(unknown test)"
                         }
                     ]

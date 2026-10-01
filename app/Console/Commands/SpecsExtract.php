@@ -83,7 +83,7 @@ class SpecsExtract extends Command
             new RecursiveDirectoryIterator($appPath, RecursiveDirectoryIterator::SKIP_DOTS)
         );
 
-        foreach ($iterator as $file) {
+        foreach ($this->sortedFiles($iterator) as $file) {
             if ($file->getExtension() !== 'php') {
                 continue;
             }
@@ -111,6 +111,17 @@ class SpecsExtract extends Command
             usort($feature['stories'], fn ($a, $b) => strcmp($a['persona'], $b['persona']) ?: strcmp($a['method'], $b['method']));
             sort($feature['personas']);
         }
+    }
+
+    /**
+     * Directory iteration order is filesystem dependent; sort so the manifest is identical everywhere.
+     */
+    private function sortedFiles(\Traversable $iterator): array
+    {
+        $files = iterator_to_array($iterator, false);
+        usort($files, fn ($a, $b) => strcmp(str_replace('\\', '/', $a->getPathname()), str_replace('\\', '/', $b->getPathname())));
+
+        return $files;
     }
 
     private function extractFromAst(array $ast, string $filePath, array &$features): void
@@ -335,7 +346,7 @@ class SpecsExtract extends Command
                 new RecursiveDirectoryIterator($dir, RecursiveDirectoryIterator::SKIP_DOTS)
             );
 
-            foreach ($iterator as $file) {
+            foreach ($this->sortedFiles($iterator) as $file) {
                 $ext = $file->getExtension();
                 if (! in_array($ext, ['php', 'js', 'ts'])) {
                     continue;
