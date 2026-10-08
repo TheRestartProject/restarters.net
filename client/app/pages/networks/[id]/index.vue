@@ -10,6 +10,7 @@ import AssociateGroupsModal from '~/components/networks/AssociateGroupsModal.vue
 import NetworkGroupsModerationTable from '~/components/networks/NetworkGroupsModerationTable.vue'
 import NetworkEventsModerationTable from '~/components/networks/NetworkEventsModerationTable.vue'
 import NetworkTagsManager from '~/components/networks/NetworkTagsManager.vue'
+import NetworkGroupsMapList from '~/components/networks/NetworkGroupsMapList.vue'
 
 // /networks/{id} - resources/views/networks/show.blade.php +
 // resources/js/components/NetworkPage.vue (design.md §6.2 Phase E task E1).
@@ -84,19 +85,15 @@ function stripHtml(value) {
   return String(value).replace(/<[^>]*>/g, '')
 }
 
-const groupRows = computed(() =>
-  networksStore.groups.data.map((g) => ({
-    id: g.id,
-    name: g.name,
-    archivedAt: g.archived_at,
-    location: g.location,
-    hosts: g.hosts,
-    restarters: g.restarters,
-    nextEvent: g.next_event,
-  }))
-)
-
-const groupsCount = computed(() => (networksStore.groups.loading ? null : networksStore.groups.data.length))
+// The tally comes from the network's own stats (App\Network::stats()), which
+// counts only non-archived groups. Until they arrive, fall back to the
+// non-archived rows of the groups list.
+const groupsCount = computed(() => {
+  const fromStats = network.value?.stats?.groups
+  if (fromStats !== undefined && fromStats !== null) return fromStats
+  if (networksStore.groups.loading) return null
+  return networksStore.groups.data.filter((g) => !g.archived_at).length
+})
 
 // Mirrors app/Network.php#groupsNotIn() exactly (parity-v2/networks.md gap
 // #9): every group not already in the network, archived or not - archived
@@ -164,15 +161,11 @@ function retry() {
             {{ network.website }}
           </a>
         </div>
-        <!-- NetworkPage.vue:13-18: the dropdown itself is gated on being
-             logged in, only its add-groups item on canAssociateGroups. Its
-             first item, "View groups", targets /group/network/{id} in develop;
-             here it points at /group/all?network=, which
-             GroupsTableFilters seeds its network filter from. -->
+        <!-- NetworkPage.vue: the dropdown itself is gated on being logged
+             in, only its add-groups item on canAssociateGroups. develop
+             dropped its "View groups" item when the Groups section became an
+             inline map and list. -->
         <BDropdown variant="primary" placement="bottom-end" :text="t('networks.general.actions')" data-testid="network-show-actions">
-          <BDropdownItem :to="`/group/all?network=${network.id}`" data-testid="network-show-view-groups">
-            {{ t('networks.show.view_groups_menuitem') }}
-          </BDropdownItem>
           <BDropdownItem v-if="canManage" data-testid="network-show-add-groups" @click="showAssociateModal = true">
             {{ t('networks.show.add_groups_menuitem') }}
           </BDropdownItem>
@@ -240,17 +233,11 @@ function retry() {
         </section>
       </template>
 
-      <!-- NetworkPage.vue:80-86 - a count sentence and a link out to the
-           groups list filtered to this network, not an inline groups
-           browser. -->
+      <!-- NetworkPage.vue: a map and filterable list of the network's
+           groups, starting zoomed out so every group is in view. -->
       <section class="groups-section mb-4">
         <h2>{{ t('networks.general.groups') }}</h2>
-        <div class="groups-info border p-3" data-testid="network-show-groups-info">
-          {{ t('networks.show.groups_count', { count: groupRows.length, name: network.name }, groupRows.length) }}
-          <NuxtLink :to="`/group/all?network=${network.id}`" data-testid="network-show-groups-link">
-            {{ t('networks.show.view_groups_link') }}
-          </NuxtLink>
-        </div>
+        <NetworkGroupsMapList :network-id="id" :can-manage-tags="canManage" />
       </section>
 
       <!-- NetworkPage.vue wraps the tags-management section in a
