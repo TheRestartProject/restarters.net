@@ -112,6 +112,7 @@ return [
   'distance' => 'Distance',
   'search_name_placeholder' => 'Search by name',
   'leave_group_button' => 'Unfollow group',
+  'leave_group_button_mobile' => 'Unfollow',
   'leave_group_confirm' => 'Please confirm that you want to unfollow this group.',
   'join_group_button_mobile' => 'Follow',
   'create_groups_mobile2' => 'Add new',

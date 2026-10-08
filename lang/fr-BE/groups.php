@@ -108,6 +108,7 @@ return [
   'goto_group' => 'Aller au Repair Café',
   'distance' => 'Distance',
   'leave_group_button' => 'Ne plus suivre ce Repair Café',
+  'leave_group_button_mobile' => 'Ne plus suivre',
   'leave_group_confirm' => 'Veuillez confirmer que vous ne voulez plus suivre ce Repair Café',
   'join_group_button_mobile' => 'Suivre',
   'create_groups_mobile2' => 'Ajouter nouveau',
