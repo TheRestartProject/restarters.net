@@ -355,12 +355,12 @@ class SpecsExtract extends Command
                 $content = file_get_contents($file->getPathname());
                 $relativePath = str_replace(base_path() . '/', '', $file->getPathname());
 
-                preg_match_all('/@story:([\w\\\\]+::\w+)/', $content, $matches, PREG_SET_ORDER);
+                preg_match_all('/@story:([\w\\\\]+::\w+)/', $content, $matches, PREG_SET_ORDER | PREG_OFFSET_CAPTURE);
 
                 foreach ($matches as $match) {
-                    $methodRef = $this->resolveStoryRef($match[1], $relativePath);
+                    $methodRef = $this->resolveStoryRef($match[1][0], $relativePath);
                     if ($methodRef !== null && isset($storyIndex[$methodRef])) {
-                        $testName = $this->extractTestName($content, $match[0], $ext);
+                        $testName = $this->extractTestName($content, $match[0][1], $ext);
 
                         foreach ($storyIndex[$methodRef] as $ref) {
                             $features[$ref['feature']]['stories'][$ref['index']]['tests'][] = [
@@ -424,29 +424,22 @@ class SpecsExtract extends Command
         }
     }
 
-    private function extractTestName(string $content, string $storyRef, string $ext): string
+    /**
+     * The @story: tag sits in the docblock (PHP) or comment (JS) just before the test it
+     * belongs to, so the test's name is the first declaration after the tag.
+     */
+    private function extractTestName(string $content, int $offset, string $ext): string
     {
-        $lines = explode("\n", $content);
-        foreach ($lines as $line) {
-            if (str_contains($line, $storyRef)) {
-                if ($ext === 'php') {
-                    if (preg_match('/function\s+(\w+)/', $line, $m)) {
-                        return $m[1];
-                    }
-                    // Check previous lines for function declaration
-                    $lineIdx = array_search($line, $lines);
-                    for ($i = $lineIdx; $i >= max(0, $lineIdx - 5); $i--) {
-                        if (preg_match('/function\s+(\w+)/', $lines[$i], $m)) {
-                            return $m[1];
-                        }
-                    }
-                } else {
-                    if (preg_match("/(?:test|it)\s*\(\s*['\"](.+?)['\"]/", $line, $m)) {
-                        return $m[1];
-                    }
-                }
+        $after = substr($content, $offset);
+
+        if ($ext === 'php') {
+            if (preg_match('/function\s+(\w+)\s*\(/', $after, $m)) {
+                return $m[1];
             }
+        } elseif (preg_match("/(?:test|it)\s*\(\s*['\"](.+?)['\"]/", $after, $m)) {
+            return $m[1];
         }
+
         return '(unknown test)';
     }
 
