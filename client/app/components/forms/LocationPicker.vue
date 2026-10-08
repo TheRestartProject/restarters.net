@@ -223,6 +223,7 @@ function onLngInput(event) {
         class="form-control"
         :value="postcode"
         :readonly="!canEditPostcode"
+        maxlength="32"
         data-testid="location-picker-postcode"
         @input="onPostcodeInput"
       >

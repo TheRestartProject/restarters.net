@@ -395,7 +395,6 @@ defineExpose({ submit })
         v-model:lng="form.lng"
         class="group-form-location"
         :has-error="!!fieldError('location')"
-        :can-edit-postcode="canModerate"
       />
 
       <div v-if="hasLocationPreview" class="group-form-locationmap mb-3" data-testid="group-form-map-preview">
