@@ -301,6 +301,22 @@ describe('pages/group/view/[id]', () => {
       expect(banner.text()).toContain(BASE_GROUP.name)
     })
 
+    // The banner is rendered with v-html and the string wraps the name in an
+    // <a>, so a group called with markup must stay text (develop #899).
+    it('escapes the group name in the unfollowed banner', async () => {
+      groupsStore.current.data = { ...BASE_GROUP, name: 'Evil <img src=x onerror=alert(1)>' }
+      groupsStore.memberIds = [5]
+      groupsStore.leave = vi.fn().mockResolvedValue()
+
+      const wrapper = mountPage()
+      await wrapper.find('[data-testid="group-actions-leave"]').trigger('click')
+      await flushPromises()
+
+      const banner = wrapper.find('[data-testid="group-view-unfollowed"]')
+      expect(banner.find('img').exists()).toBe(false)
+      expect(banner.text()).toContain('Evil <img src=x onerror=alert(1)>')
+    })
+
     it('does not confirm when leaving failed', async () => {
       groupsStore.current.data = BASE_GROUP
       groupsStore.memberIds = [5]
