@@ -1,5 +1,5 @@
 {
-    "generatedAt": "2026-10-01T17:09:09Z",
+    "generatedAt": "2026-10-08T14:23:25Z",
     "features": {
         "Administration": {
             "description": "Platform administration and configuration",
@@ -1832,6 +1832,10 @@
                         },
                         {
                             "file": "tests/Feature/Groups/GroupCreateTest.php",
+                            "test": "(unknown test)"
+                        },
+                        {
+                            "file": "tests/Feature/Groups/GroupEditTest.php",
                             "test": "(unknown test)"
                         },
                         {

@@ -1101,10 +1101,15 @@ class GroupController extends Controller
             'email' => $email,
         ];
 
+        // Hosts can edit the postcode (area stays admin/coordinator only, below).  Only touch it when sent, so a
+        // partial update doesn't blank it.
+        if ($request->has('postcode')) {
+            $data['postcode'] = $postcode;
+        }
+
         if ($user->hasRole('Administrator') || ($user->hasRole('NetworkCoordinator') && $isCoordinatorForGroup)) {
             // Got permission to update these.
             $data['area'] = $area;
-            $data['postcode'] = $postcode;
             $data['archived_at'] = $archived_at;
         }
 
@@ -1239,6 +1244,7 @@ class GroupController extends Controller
                                    'location' => ['required', 'max:255'],
                                    'description' => ['required'],
                                    'website' => ['nullable', 'url', 'max:255'],
+                                   'postcode' => ['nullable', 'max:32'],
                                ]);
         } else {
             $request->validate([
@@ -1246,6 +1252,7 @@ class GroupController extends Controller
                                    'location' => ['max:255'],
                                    'website' => ['nullable', 'url', 'max:255'],
                                    'archived_at' => ['nullable', 'date'],
+                                   'postcode' => ['nullable', 'max:32'],
                                ]);
         }
 
