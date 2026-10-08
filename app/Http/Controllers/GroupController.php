@@ -58,7 +58,6 @@ class GroupController extends Controller
         } else {
             $all_group_tags = collect([]);
         }
-        $networks = Network::all();
 
         // Look for groups we have joined, not just been invited to.  We have to explicitly test on deleted_at because
         // the normal filtering out of soft deletes won't happen for joins.
@@ -82,6 +81,19 @@ class GroupController extends Controller
         if ($user->latitude || $user->longitude || $user->country_code) {
             // We pass a high limit to the groups nearby; there is a distance limit which will normally kick in first.
             $nearby_groups = $user->groupsNearby(1000);
+
+            if (empty($nearby_groups) && $user->country_code) {
+                // groupsNearby() needs coordinates, which a user who has only set their country doesn't have.  We
+                // can still open the map on something better than the whole world by framing the groups in their
+                // country.  If there aren't any then we leave the bounding box alone, which the map reads as "no
+                // location" and falls back to showing every group.
+                $nearby_groups = Group::whereNull('archived_at')
+                    ->where('approved', true)
+                    ->where('country_code', $user->country_code)
+                    ->whereNotNull('latitude')
+                    ->whereNotNull('longitude')
+                    ->get();
+            }
 
             // Now find the lat/lng bounding box which contains these groups.
             foreach ($nearby_groups as $group) {
@@ -108,7 +120,6 @@ class GroupController extends Controller
             'your_lng' => $user->longitude,
             'tab' => (!$tab || $tab === 'mine') ? 'mine' : 'other',
             'network' => $network,
-            'networks' => $networks,
             'all_group_tags' => $all_group_tags,
         ]);
     }
@@ -411,7 +422,7 @@ class GroupController extends Controller
 
         // Don't log to Sentry - legitimate user error.
         return redirect()->back()->with('warning', __('groups.invite_success_apart_from', [
-            'emails' => rtrim(implode(', ', $not_sent))
+            'emails' => e(rtrim(implode(', ', $not_sent)))
         ]));
     }
 
@@ -508,7 +519,7 @@ class GroupController extends Controller
                 return redirect('/user/forbidden');
             } else {
                 return redirect('/group')->with('success', __('groups.delete_succeeded', [
-                    'name' => $name,
+                    'name' => e($name),
                 ]));
             }
         } else {
@@ -575,7 +586,7 @@ class GroupController extends Controller
             return redirect()
                 ->back()
                 ->with('success', __('groups.now_following', [
-                    'name' => $group->name,
+                    'name' => e($group->name),
                     'link' => url('/group/view/'.$group->idgroups),
                 ]));
         } catch (\Exception $e) {
@@ -588,6 +599,14 @@ class GroupController extends Controller
 
     public function imageUpload(Request $request, $id)
     {
+        // Same rule as ajaxDeleteImage below - uploading replaces the group's existing
+        // image, so it needs the same authority as deleting it.
+        $user = Auth::user();
+
+        if (! Fixometer::hasRole($user, 'Administrator') && ! Fixometer::userHasEditGroupPermission($id, $user->id)) {
+            abort(403);
+        }
+
         try {
             if (isset($_FILES) && ! empty($_FILES)) {
                 $existing_image = Fixometer::hasImage($id, 'groups', true);

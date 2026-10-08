@@ -140,13 +140,13 @@ class GroupSummary extends JsonResource
         if ($request->get('includeNextEvent', false)) {
             // Get next approved event for group.  We cache all upcoming events to speed up the case where we
             // are fetching many groups.
+            //
+            // Only approved events count, matching Group::getNextUpcomingEvent() which the group's own page uses.
+            // Without this an event still awaiting moderation would be advertised as the group's next event on
+            // the public map while the group's page ignored it.
             if (Cache::has('future_approved_events')) {
                 $upcoming = Cache::get('future_approved_events');
             } else {
-                // approved only: the base intent (Group::getNextUpcomingEvent filters
-                // where approved=true), which this bulk-cached rewrite had dropped -
-                // an unapproved, not-yet-public event could surface as a group's
-                // next event on the map/summary (RES-1995 / PR 887).
                 $future = \App\Party::future()->where('approved', true)->get();
 
                 // Can't serialise the whole event, and we only need a few fields.

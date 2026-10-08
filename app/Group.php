@@ -148,6 +148,32 @@ class Group extends Model implements Auditable
 
     // Setters
 
+    /**
+     * Keep the legacy `country` column in step with `country_code`.  `country` is still read by external
+     * consumers (e.g. ORA exports, direct DB reporting) so it must be populated as soon as the group is saved,
+     * rather than waiting for the hourly groups:country job.  Countries are stored in English.
+     */
+    public function setCountryCodeAttribute($value)
+    {
+        $this->attributes['country_code'] = $value;
+        $this->attributes['country'] = self::countryNameForCode($value);
+    }
+
+    /**
+     * The English country name stored in the legacy `country` column; '' for an empty or unknown code.  Group
+     * imports have used 'UK' for the United Kingdom, which isn't an ISO code.
+     */
+    public static function countryNameForCode($code): string
+    {
+        if (! $code) {
+            return '';
+        }
+
+        $code = strtoupper($code) === 'UK' ? 'GB' : $code;
+
+        return \App\Helpers\Fixometer::getAllCountries('en')[$code] ?? '';
+    }
+
     //Getters
     public function findAll()
     {
@@ -325,7 +351,12 @@ class Group extends Model implements Auditable
             ->with('allDevices')
             ->withCount('allInvited')
             ->whereIn('events.group', $groupIds)
-            ->lazy(200)
+            // lazyById pages on the primary key (WHERE idevents > last) rather than lazy()'s growing
+            // OFFSET, which made MySQL rescan every earlier row for each chunk on large networks.  past()
+            // orders by date, and keyset paging needs the id to be the only sort key or events are skipped
+            // and double-counted - hence reorder().
+            ->reorder()
+            ->lazyById(200, 'events.idevents', 'idevents')
             ->each(function ($event) use (&$statsByGroup, $eEmissionRatio, $uEmissionratio) {
                 $gid = $event->group;
                 if (! isset($statsByGroup[$gid])) {
@@ -568,6 +599,16 @@ class Group extends Model implements Auditable
     public function setDistanceAttribute($val)
     {
         $this->distance = $val;
+    }
+
+    /**
+     * The group description is Quill-authored HTML which we render unescaped, so it has to
+     * be sanitised.  Doing it in the mutator rather than in the controllers means every
+     * write path - v2 API, web forms, imports, seeders - is covered by one rule.
+     */
+    public function setFreeTextAttribute($val)
+    {
+        $this->attributes['free_text'] = is_null($val) ? null : \Stevebauman\Purify\Facades\Purify::clean($val);
     }
 
     public function createDiscourseGroup() {

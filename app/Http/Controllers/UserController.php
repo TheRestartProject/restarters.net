@@ -195,10 +195,11 @@ class UserController extends Controller
             $user->setPassword(Hash::make($request->input('new-password')));
             $user->save();
 
-            $user->update([
-            'recovery' => substr(bin2hex(openssl_random_pseudo_bytes(32)), 0, 24),
-            'recovery_expires' => strftime('%Y-%m-%d %X', time() + (24 * 60 * 60)),
-            ]);
+            // Changing your password used to mint a fresh 24 hour recovery token as a side
+            // effect, which left a live password-reset code on every account that had ever
+            // changed its password.  Rotate the API token instead, so a token stolen before
+            // the change stops working.
+            $user->rotateAPIToken();
 
             event(new PasswordChanged($user, $oldPassword));
 
@@ -281,7 +282,7 @@ class UserController extends Controller
 
         if (Auth::id() !== $user_id) {
             return redirect('user/all')->with('danger', __('profile.soft_deleted', [
-                'name' => $old_user_name
+                'name' => e($old_user_name)
             ]));
         } else {
             return redirect('login');
