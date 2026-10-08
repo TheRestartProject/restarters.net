@@ -62,6 +62,8 @@ class DeviceController extends Controller
             'clusters' => $clusters,
             'barriers' => \App\Helpers\Fixometer::allBarriers(),
             'brands' => $brands,
+            // The nightly file if it's there; a new machine won't have it until the hourly build has run.
+            'download_url' => file_exists(\App\Console\Commands\ExportRepairData::path()) ? '/exports/repair-data.csv' : '/export/devices',
         ]);
     }
 

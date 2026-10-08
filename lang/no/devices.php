@@ -62,7 +62,6 @@ return [
   'status' => 'Status',
   'spare_parts' => 'Reservedeler',
   'latest_data' => 'Siste data',
-  'table_intro' => 'Trykk på «i»-ikonene for detaljer. Klikk på en kolonneoverskrift for å sortere etter den kolonnen – klikk igjen for omvendt sorteringsrekkefølge.',
   'assessment' => 'Vurdering',
   'item_and_repair_info' => 'Gjenstand og reparasjonsinfo',
   'search_assessment_comments' => 'Vurdering',

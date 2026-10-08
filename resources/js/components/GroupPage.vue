@@ -9,6 +9,7 @@
         :can-perform-delete="canPerformDelete"
         :can-perform-archive="canPerformArchive"
         :ingroup="ingroup"
+        :reporting-url="reportingUrl || null"
         @left="haveLeft = true"
     />
 
@@ -21,8 +22,16 @@
       </div>
     </div>
 
-    <div class="vue w-100 mt-md-50">
-      <GroupStats :idgroups="idgroups" :stats="groupStats "/>
+    <div v-if="statsLayout !== 'after'" class="vue w-100 mt-md-50 stats-before-events">
+      <GroupStats
+          :idgroups="idgroups"
+          :stats="groupStats"
+          :device-stats="deviceStats"
+          :top-devices="topDevices"
+          :reporting-url="reportingUrl || null"
+          :part="statsLayout === 'split' ? 'headline' : 'all'"
+          :compact="statsLayout === 'compact'"
+      />
     </div>
 
     <hr style="color: white; border-top: 1px solid black;" />
@@ -37,16 +46,17 @@
         add-button
     />
 
-    <div class="d-flex flex-wrap flex-md-nowrap pt-4">
-      <div class="w-100 mt-md-50 mr-md-4">
-        <GroupDevicesWorkedOn :idgroups="idgroups" :stats="deviceStats" class="pt-2 dashbord" />
-      </div>
-      <div class="w-100 mt-md-50">
-        <GroupDevicesMostRepaired :idgroups="idgroups" :devices="topDevices" class="pt-2 dashbord mt-4 mt-md-0" />
-      </div>
+    <div v-if="statsLayout === 'after' || statsLayout === 'split'" class="vue w-100 mt-md-50 stats-after-events">
+      <GroupStats
+          :idgroups="idgroups"
+          :stats="groupStats"
+          :device-stats="deviceStats"
+          :top-devices="topDevices"
+          :reporting-url="reportingUrl || null"
+          :part="statsLayout === 'split' ? 'items' : 'all'"
+      />
     </div>
 
-    <GroupDevicesBreakdown :idgroups="idgroups" :cluster-stats="clusterStats" />
   </div>
 </template>
 <script>
@@ -55,17 +65,19 @@ import GroupDescription from './GroupDescription.vue'
 import GroupVolunteers from './GroupVolunteers.vue'
 import GroupStats from './GroupStats.vue'
 import GroupEvents from './GroupEvents.vue'
-import GroupDevicesWorkedOn from './GroupDevicesWorkedOn.vue'
-import GroupDevicesMostRepaired from './GroupDevicesMostRepaired.vue'
-import GroupDevicesBreakdown from './GroupDevicesBreakdown.vue'
 import AlertBanner from './AlertBanner.vue'
 import auth from '../mixins/auth'
 
+// Where the stats go, while we choose between them (#922):
+// - compact: all of them before the events, achievements over impact beside items worked on over most repaired
+// - after: all of them after the events
+// - split: achievements and impact before the events, items worked on and most repaired after
+// ?stats_layout= on the page address picks one, so they can be compared.
+const STATS_LAYOUTS = ['compact', 'after', 'split']
+const DEFAULT_STATS_LAYOUT = 'compact'
+
 export default {
   components: {
-    GroupDevicesBreakdown,
-    GroupDevicesMostRepaired,
-    GroupDevicesWorkedOn,
     GroupEvents,
     GroupStats,
     GroupVolunteers,
@@ -135,15 +147,16 @@ export default {
       required: true,
       type: Object
     },
-    clusterStats: {
-      type: Object,
-      required: true
-    },
     topDevices: {
       type: Array,
       required: true
     },
     discourseGroup: {
+      type: String,
+      required: false,
+      default: null
+    },
+    reportingUrl: {
       type: String,
       required: false,
       default: null
@@ -155,6 +168,19 @@ export default {
     }
   },
   computed: {
+    statsLayout() {
+      try {
+        const asked = new URLSearchParams(window.location.search).get('stats_layout')
+
+        if (STATS_LAYOUTS.includes(asked)) {
+          return asked
+        }
+      } catch (e) {
+        // No usable address; use the default.
+      }
+
+      return DEFAULT_STATS_LAYOUT
+    },
     group() {
       return this.$store.getters['groups/get'](this.idgroups)
     },
