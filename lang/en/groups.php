@@ -181,4 +181,5 @@ Learn how to use this group here: :help.',
   'search_nothing_found' => 'Nothing found.',
   'goto_group' => 'Go to group',
   'next_event' => 'Next event',
+  'show_all_groups' => 'Show all :total groups',
 ];
