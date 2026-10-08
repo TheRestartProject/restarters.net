@@ -1060,19 +1060,35 @@ class GroupController extends Controller
 
         $old_zone = $group->timezone;
 
-        $data = [
+        // Only update the fields the request sends.  A partial update (e.g. the archive action, or an API client
+        // setting one field) must leave the rest of the group alone rather than blanking it.
+        $fields = [
             'name' => $name,
             'website' => $website,
-            'location' => $location,
-            'latitude' => $latitude,
-            'longitude' => $longitude,
-            'country_code' => $country,
             'free_text' => $description,
             'timezone' => $timezone,
             'phone' => $phone,
             'network_data' => $network_data,
             'email' => $email,
         ];
+        $requestKeys = [
+            'free_text' => 'description',
+        ];
+
+        $data = [];
+        foreach ($fields as $column => $value) {
+            if ($request->has($requestKeys[$column] ?? $column)) {
+                $data[$column] = $value;
+            }
+        }
+
+        if ($request->has('location')) {
+            // The coordinates and country come from geocoding the location.
+            $data['location'] = $location;
+            $data['latitude'] = $latitude;
+            $data['longitude'] = $longitude;
+            $data['country_code'] = $country;
+        }
 
         // Hosts can edit the postcode (area stays admin/coordinator only, below).  Only touch it when sent, so a
         // partial update doesn't blank it.
@@ -1082,8 +1098,11 @@ class GroupController extends Controller
 
         if ($user->hasRole('Administrator') || ($user->hasRole('NetworkCoordinator') && $isCoordinatorForGroup)) {
             // Got permission to update these.
-            $data['area'] = $area;
-            $data['archived_at'] = $archived_at;
+            foreach (['area' => $area, 'archived_at' => $archived_at] as $column => $value) {
+                if ($request->has($column)) {
+                    $data[$column] = $value;
+                }
+            }
         }
 
         if (isset($_FILES) && !empty($_FILES)) {
@@ -1163,7 +1182,7 @@ class GroupController extends Controller
             }
         }
 
-        if ($timezone != $old_zone) {
+        if (array_key_exists('timezone', $data) && $timezone != $old_zone) {
             // The timezone of the group has changed.  Update the zone of any future events.  This happens
             // sometimes when a group is created and events are created before the group is approved (and therefore
             // before the admin has a chance to set the zone on the group.
