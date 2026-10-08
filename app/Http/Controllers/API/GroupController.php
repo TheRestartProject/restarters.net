@@ -1195,8 +1195,9 @@ class GroupController extends Controller
      *                ),
      *                @OA\Property(
      *                   property="postcode",
-     *                   description="Administrator/network-coordinator only.",
+     *                   description="Administrators, network coordinators and hosts of the group. At most 32 characters.",
      *                   type="string",
+     *                   maxLength=32,
      *                   nullable=true
      *                ),
      *                @OA\Property(
