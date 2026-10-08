@@ -1218,6 +1218,8 @@ class GroupController extends Controller
                                    'description' => ['required'],
                                    'website' => ['nullable', 'url', 'max:255'],
                                    'postcode' => ['nullable', 'max:32'],
+                                   'lat' => ['nullable', 'numeric', 'between:-90,90', 'required_with:lng'],
+                                   'lng' => ['nullable', 'numeric', 'between:-180,180', 'required_with:lat'],
                                ]);
         } else {
             $request->validate([
@@ -1226,6 +1228,8 @@ class GroupController extends Controller
                                    'website' => ['nullable', 'url', 'max:255'],
                                    'archived_at' => ['nullable', 'date'],
                                    'postcode' => ['nullable', 'max:32'],
+                                   'lat' => ['nullable', 'numeric', 'between:-90,90', 'required_with:lng'],
+                                   'lng' => ['nullable', 'numeric', 'between:-180,180', 'required_with:lat'],
                                ]);
         }
 
@@ -1249,6 +1253,12 @@ class GroupController extends Controller
             throw ValidationException::withMessages(['location ' => __('partials.validate_timezone')]);
         }
 
+        // The add/edit page shows a draggable map, so the client can send explicit
+        // coordinates that take precedence over geocoding the location text.
+        $clientLat = $request->input('lat');
+        $clientLng = $request->input('lng');
+        $hasClientCoords = $clientLat !== null && $clientLng !== null;
+
         if (!empty($location)) {
             // Skip geocoding when the location string hasn't changed — avoids unnecessary API calls
             // and prevents failures when editing other fields (e.g. group icon) in environments
@@ -1264,16 +1274,25 @@ class GroupController extends Controller
                 $geocoded = $geocoder->geocode($location);
 
                 if (empty($geocoded)) {
-                    throw ValidationException::withMessages(['location ' => __('groups.geocode_failed')]);
+                    // With an explicit pin we can still place the group; without
+                    // one, an ungeocodable location is fatal as before.
+                    if (!$hasClientCoords) {
+                        throw ValidationException::withMessages(['location ' => __('groups.geocode_failed')]);
+                    }
+                } else {
+                    $latitude = $geocoded['latitude'];
+                    $longitude = $geocoded['longitude'];
+
+                    // Note that the country returned by the geocoder is already in English, which is what we need for the
+                    // value in the database.
+                    $country_code = $geocoded['country_code'] ?? null;
                 }
-
-                $latitude = $geocoded['latitude'];
-                $longitude = $geocoded['longitude'];
-
-                // Note that the country returned by the geocoder is already in English, which is what we need for the
-                // value in the database.
-                $country_code = $geocoded['country_code'] ?? null;
             }
+        }
+
+        if ($hasClientCoords) {
+            $latitude = (float) $clientLat;
+            $longitude = (float) $clientLng;
         }
 
         return [
