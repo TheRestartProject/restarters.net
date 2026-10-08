@@ -29,4 +29,28 @@ class GroupCountryTest extends TestCase
         $group = Group::find($group->idgroups);
         $this->assertEquals('United Kingdom', $group->country);
     }
+
+    public function testCountrySetOnSaveWithoutJob(): void {
+        // fr-BE has its own country names (e.g. 'Belgique'); the stored value must still be English.
+        app()->setLocale('fr-BE');
+
+        $group = Group::factory()->create(['country_code' => 'BE']);
+        $this->assertEquals('Belgium', Group::find($group->idgroups)->country);
+
+        $group->country_code = 'GB';
+        $group->save();
+        $this->assertEquals('United Kingdom', Group::find($group->idgroups)->country);
+    }
+
+    public function testUnknownAndLegacyCodes(): void {
+        $this->assertEquals('United Kingdom', Group::countryNameForCode('UK'));
+        $this->assertEquals('', Group::countryNameForCode('ZZ'));
+        $this->assertEquals('', Group::countryNameForCode(null));
+
+        // The model and the hourly job agree, so the column doesn't flip between values.
+        $group = Group::factory()->create(['country_code' => 'ZZ']);
+        $this->assertEquals('', Group::find($group->idgroups)->country);
+        $this->artisan('groups:country');
+        $this->assertEquals('', Group::find($group->idgroups)->country);
+    }
 }

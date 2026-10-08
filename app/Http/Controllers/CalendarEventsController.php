@@ -112,7 +112,7 @@ class CalendarEventsController extends Controller
 
     public function allEvents(Request $request, $env_hash)
     {
-        if ($env_hash != env('CALENDAR_HASH')) {
+        if ($env_hash !== env('CALENDAR_HASH')) {
             return abort(404);
         }
 

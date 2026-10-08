@@ -131,7 +131,7 @@ class BasicTest extends TestCase
 
         // Bit hacky, but grab the file that was created.  Can't find a way to do this in Laravel easily, though it's
         // probably possible using mocking.
-        $filename = base_path() . DIRECTORY_SEPARATOR . 'public' . DIRECTORY_SEPARATOR . 'repair-data.csv';
+        $filename = storage_path('app' . DIRECTORY_SEPARATOR . 'exports') . DIRECTORY_SEPARATOR . 'repair-data.csv';
         $fh = fopen($filename, 'r');
 
         # Skip headers.

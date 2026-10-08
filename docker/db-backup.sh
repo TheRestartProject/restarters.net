@@ -65,7 +65,7 @@ if ! rclone copy "$BACKUP_FILE" "gdrive:" \
     --retries=2 --low-level-retries=3 \
     --drive-chunk-size=64M \
     --log-file="$LOG" \
-    --log-level=INFO 2>>"$LOG"; then
+    --log-level=NOTICE 2>>"$LOG"; then
     echo "$(date -u '+%Y-%m-%d %H:%M:%S UTC'): ERROR - rclone upload failed" >> "$LOG"
     rm -f "$BACKUP_FILE"
     exit 1

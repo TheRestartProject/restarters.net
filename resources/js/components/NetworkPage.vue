@@ -12,7 +12,6 @@
       </div>
       <div class="network-actions" v-if="isLoggedIn">
         <b-dropdown right variant="primary" :text="__('networks.general.actions')">
-          <b-dropdown-item :href="'/group/network/' + network.id">{{ __('networks.show.view_groups_menuitem') }}</b-dropdown-item>
           <b-dropdown-item v-if="canAssociateGroups" @click="showAddGroupModal">{{ __('networks.show.add_groups_menuitem') }}</b-dropdown-item>
           <b-dropdown-item :href="'/export/networks/' + network.id + '/events'">{{ __('groups.export_event_list') }}</b-dropdown-item>
         </b-dropdown>
@@ -24,19 +23,19 @@
       <h2>{{ __('networks.general.impact') }}</h2>
       <div class="stats-grid">
         <div class="stat-box">
-          <div class="stat-value">{{ stats.groups || 0 }}</div>
+          <div class="stat-value">{{ statsLoaded ? (stats.groups || 0) : statsPlaceholder }}</div>
           <div class="stat-label">{{ __('networks.stats.groups', { count: stats.groups || 0 }) }}</div>
         </div>
         <div class="stat-box">
-          <div class="stat-value">{{ stats.parties || 0 }}</div>
+          <div class="stat-value">{{ statsLoaded ? (stats.parties || 0) : statsPlaceholder }}</div>
           <div class="stat-label">{{ __('networks.stats.events', { count: stats.parties || 0 }) }}</div>
         </div>
         <div class="stat-box">
-          <div class="stat-value">{{ formatWeight(stats.waste_total) }}</div>
+          <div class="stat-value">{{ statsLoaded ? formatWeight(stats.waste_total) : statsPlaceholder }}</div>
           <div class="stat-label">{{ __('networks.stats.waste_diverted') }}</div>
         </div>
         <div class="stat-box">
-          <div class="stat-value">{{ formatWeight(stats.co2_total) }}</div>
+          <div class="stat-value">{{ statsLoaded ? formatWeight(stats.co2_total) : statsPlaceholder }}</div>
           <div class="stat-label">{{ __('networks.stats.co2_prevented') }}</div>
         </div>
       </div>
@@ -76,13 +75,17 @@
       <div v-if="eventsModerationEmpty" class="text-muted">{{ __('networks.show.none') }}</div>
     </section>
 
-    <!-- Groups -->
+    <!-- Groups: map + list of the groups in this network, starting zoomed out
+         so every group in the network is in view. -->
     <section class="groups-section mb-4">
       <h2>{{ __('networks.general.groups') }}</h2>
-      <div class="groups-info border p-3">
-        {{ __('networks.show.groups_count', { count: stats.groups || 0, name: network.name }) }}
-        <a :href="'/group/network/' + network.id">{{ __('networks.show.view_groups_link') }}</a>
-      </div>
+      <GroupMapAndList
+          :initial-bounds="worldBounds"
+          :network="network.id"
+          show-filters
+          :can-manage-tags="canManageTags"
+          :available-tags="groupFilterTags"
+      />
     </section>
 
     <div class="row">
@@ -171,10 +174,11 @@
 import axios from 'axios'
 import GroupsRequiringModeration from './GroupsRequiringModeration.vue'
 import EventsRequiringModeration from './EventsRequiringModeration.vue'
+import GroupMapAndList from './GroupMapAndList.vue'
 import images from '../mixins/images'
 
 export default {
-  components: { GroupsRequiringModeration, EventsRequiringModeration },
+  components: { GroupsRequiringModeration, EventsRequiringModeration, GroupMapAndList },
   mixins: [images],
   props: {
     network: {
@@ -215,6 +219,7 @@ export default {
   data() {
     return {
       stats: this.initialStats,
+      statsFailed: false,
       tags: this.initialTags,
       newTagName: '',
       newTagDescription: '',
@@ -230,6 +235,23 @@ export default {
     }
   },
   computed: {
+    statsLoaded() {
+      return !!this.stats && Object.keys(this.stats).length > 0
+    },
+    statsPlaceholder() {
+      // Loading, or a dash if the stats request failed rather than an ellipsis forever.
+      return this.statsFailed ? '–' : '…'
+    },
+    worldBounds() {
+      // The inverted whole-world box: GroupMap treats it as "no location", so
+      // it frames all the (network-filtered) groups instead.
+      return [[90, 180], [-90, -180]]
+    },
+    groupFilterTags() {
+      // The network tags API uses `name`; the group tag filter multiselect
+      // labels by `tag_name`. Provide both.
+      return this.tags.map(t => ({ ...t, tag_name: t.name }))
+    },
     truncatedDescription() {
       if (!this.network.description) return ''
       const stripped = this.network.description.replace(/<[^>]*>/g, '')
@@ -349,6 +371,7 @@ export default {
         this.stats = response.data
       } catch (error) {
         console.error('Failed to fetch network stats:', error)
+        this.statsFailed = true
       }
     }
 
@@ -427,12 +450,6 @@ export default {
       font-weight: 500;
       white-space: nowrap;
     }
-  }
-}
-
-.groups-section {
-  .groups-info {
-    background: $white;
   }
 }
 

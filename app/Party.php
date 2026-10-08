@@ -213,7 +213,13 @@ class Party extends Model implements Auditable
     public function scopeFuture($query) {
         // A future event is an event where the start time is greater than now.
         $query = $query->undeleted();
-        $query = $query->where('event_start_utc', '>', date('Y-m-d H:i:s'))->orderBy('event_start_utc','ASC');
+        // undeleted() has already applied an ORDER BY event_start_utc DESC, and
+        // orderBy() appends rather than replaces.  Without the reorder() we end up
+        // with "ORDER BY event_start_utc DESC, event_start_utc ASC", where the DESC
+        // wins - so a caller asking for the *next* event would get the one furthest
+        // in the future.  scopeFutureForUser() does the same.
+        $query = $query->where('event_start_utc', '>', date('Y-m-d H:i:s'))
+            ->reorder()->orderBy('event_start_utc','ASC');
         return $query;
     }
 
@@ -772,6 +778,15 @@ class Party extends Model implements Auditable
         $dt = Carbon::parse($val);
         $dt->setTimezone('UTC');
         $this->attributes['event_end_utc'] = $dt->toDateTimeString();
+    }
+
+    /**
+     * The event description is Quill-authored HTML which we render unescaped - on a public
+     * page - so it has to be sanitised.  Done in the mutator so every write path is
+     * covered by one rule.
+     */
+    public function setFreeTextAttribute($val) {
+        $this->attributes['free_text'] = is_null($val) ? null : \Stevebauman\Purify\Facades\Purify::clean($val);
     }
 
     // Mutators for previous event_date/start/end fields.  These are now superceded by the UTC fields and therefore

@@ -368,9 +368,19 @@ class DeviceController extends Controller {
             ) = $this->validateDeviceParams($request,false);
 
         $event = Party::findOrFail($eventid);
+        $device = Device::findOrFail($iddevices);
 
-        if (!Fixometer::userHasEditEventsDevicesPermission($eventid, $user->id)) {
-            // Only hosts can add devices to events.
+        // Authorise against the event the device actually belongs to.  Checking only the
+        // eventid from the request body would let a host of any event edit any device in
+        // the database just by naming their own event here - deleteDevicev2 below already
+        // derives the event from the record for this reason.
+        if (!Fixometer::userHasEditEventsDevicesPermission($device->event, $user->id)) {
+            // Only hosts can edit devices on events.
+            abort(403);
+        }
+
+        // Moving a device to a different event needs rights on the destination too.
+        if ($eventid != $device->event && !Fixometer::userHasEditEventsDevicesPermission($eventid, $user->id)) {
             abort(403);
         }
 
@@ -393,7 +403,6 @@ class DeviceController extends Controller {
             'repaired_by' => $user->id,
         ];
 
-        $device = Device::findOrFail($iddevices);
         $device->update($data);
 
         event(new DeviceCreatedOrUpdated($device));
