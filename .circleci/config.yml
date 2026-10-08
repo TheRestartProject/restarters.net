@@ -48,12 +48,12 @@ jobs:
             echo "MAPBOX_TOKEN=$MAPBOX_TOKEN" >> .env
 
             # CircleCI does not give project environment variables to jobs built
-            # from forked pull requests, so those runs have no geocoding key.
+            # from forked pull requests, so those runs have no Mapbox token.
             # Without this every group creation 422s on geocode_failed and the
             # whole Playwright suite fails at its first createGroup(), which
             # reads as the contributor having broken something.
-            if [ -z "$GOOGLE_API_CONSOLE_KEY" ]; then
-              echo "No geocoding key available - using the stub geocoder."
+            if [ -z "$MAPBOX_TOKEN" ]; then
+              echo "No Mapbox token available - using the stub geocoder."
               echo "GEOCODER_STUB=true" >> .env
             fi
 

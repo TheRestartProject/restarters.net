@@ -8,7 +8,7 @@ class GeocoderTest extends TestCase
 {
     /**
      * Geocoder::geocode() resolves the provider chain out of the container, so a
-     * test binds its own in place of the real Mapbox/GeoPlugin pair. Nothing here
+     * test binds its own in place of the real Mapbox provider. Nothing here
      * touches the network: these tests are about how we read a provider's answer,
      * not whether Mapbox is up.
      */
@@ -18,7 +18,7 @@ class GeocoderTest extends TestCase
 
         // instance(), not bind(): geocoder-laravel registers a singleton, and by
         // the time a test runs it may already be resolved - in which case bind()
-        // is ignored and the real Mapbox chain answers. That failure looks like a
+        // is ignored and the real Mapbox provider answers. That failure looks like a
         // wrong country code rather than a network call, so it is worth being
         // explicit about.
         $fake = new class($collection)
@@ -51,8 +51,29 @@ class GeocoderTest extends TestCase
 
         // Both keys: geocoder-laravel binds the string 'geocoder' through to
         // ProviderAndDumperAggregator, which is itself a singleton, so replacing
-        // only the string leaves the real chain reachable - and a test that
+        // only the string leaves the real provider reachable - and a test that
         // "passes" then is really talking to Mapbox.
+        $this->app->instance('geocoder', $fake);
+        $this->app->instance(\Geocoder\Laravel\ProviderAndDumperAggregator::class, $fake);
+    }
+
+    private function bindGeocoderThrowing(\Throwable $e): void
+    {
+        $fake = new class($e)
+            {
+                private $e;
+
+                public function __construct($e)
+                {
+                    $this->e = $e;
+                }
+
+                public function geocodeQuery($query)
+                {
+                    throw $this->e;
+                }
+            };
+
         $this->app->instance('geocoder', $fake);
         $this->app->instance(\Geocoder\Laravel\ProviderAndDumperAggregator::class, $fake);
     }
@@ -106,6 +127,16 @@ class GeocoderTest extends TestCase
 
         $this->assertNull($ret['country_code']);
         $this->assertEquals(round(51.4643585, 2), round($ret['latitude'], 2));
+    }
+
+    public function testGeocodeReturnsFalseWhenTheProviderFails(): void
+    {
+        // With no fallback provider there is no chain to swallow a bad token or
+        // an unreachable Mapbox: the helper has to, so the caller gets a failed
+        // geocode (a validation message) rather than a 500.
+        $this->bindGeocoderThrowing(new \Geocoder\Exception\InvalidCredentials('Invalid token'));
+
+        $this->assertFalse((new \App\Helpers\Geocoder)->geocode('6 Canterbury Crescent'));
     }
 
     public function testForcedFailureShortCircuits(): void

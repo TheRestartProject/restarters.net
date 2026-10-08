@@ -101,9 +101,9 @@ abstract class TestCase extends BaseTestCase
         $this->withoutExceptionHandling();
         app('honeypot')->disable();
 
-        // Bind a deterministic geocoder so the suite never makes live calls to the
-        // Google Maps Geocoding API (rate-limited / intermittently failing, which
-        // made any geocoding test flaky). Tests that need the geocode-failure path
+        // Bind a deterministic geocoder so the suite never makes live calls to
+        // Mapbox (rate-limited / intermittently failing, which made any geocoding
+        // test flaky). Tests that need the geocode-failure path
         // bind their own failing mock in setUp(), overriding this.
         $this->app->bind(Geocoder::class, function () {
             return new GeocoderMock();

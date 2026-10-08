@@ -6,7 +6,6 @@ use App\Role;
 use App\User;
 use DB;
 use Hash;
-use Illuminate\Support\Facades\Config;
 use Mockery;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Tests\TestCase;
@@ -49,14 +48,9 @@ class AccountCreationTest extends TestCase
     {
         $userAttributes = $this->userAttributes();
 
-        // Specify an invalid city and force geocoding to fail by invalidating the Google key.
-        $good = Config::get('GOOGLE_API_CONSOLE_KEY');
-        Config::set('GOOGLE_API_CONSOLE_KEY', 'zzz');
-
+        // A city the test geocoder doesn't know, so geocoding fails.
         $userAttributes['city'] = 'zzzzzzz';
         $response = $this->post('/user/register/', $userAttributes);
-
-        Config::set('GOOGLE_API_CONSOLE_KEY', $good);
 
         $response->assertStatus(302);
         $response->assertRedirect('dashboard');

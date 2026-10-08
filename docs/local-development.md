@@ -167,19 +167,18 @@ task docker:test:playwright-autocomplete
 
 ### Prerequisites for Testing
 
-Before running tests, you need to configure the Google API key for geocoding functionality:
+Geocoding (turning an address into coordinates when a group, event or profile is saved) uses Mapbox. The PHPUnit suite binds a deterministic fake geocoder, so it needs no token; the Playwright suite runs against the real application, so it does:
 
-1. **Set Google API Key**: Add a valid Google Maps API key to your `.env` file:
+1. **Set the Mapbox token**: Add a Mapbox access token to your `.env` file:
    ```bash
-   GOOGLE_API_CONSOLE_KEY=your_actual_google_api_key_here
+   MAPBOX_TOKEN=your_actual_mapbox_token_here
    ```
+   Or set `GEOCODER_STUB=true` to answer from a fixed table of places instead, as CI does on forked pull requests, which get no secrets.
 
-2. **API Key Requirements**: The key must have the following APIs enabled:
-   - Geocoding API
-   - Maps JavaScript API (for location validation)
+2. **Google API key**: the maps and the address autocomplete in the browser still use Google, so `GOOGLE_API_CONSOLE_KEY` is needed for those pages to look right, but not for geocoding.
 
 > [!WARNING]
-> Without a valid `GOOGLE_API_CONSOLE_KEY`, tests that create groups or events will fail with location validation errors.
+> Without a valid `MAPBOX_TOKEN` (or `GEOCODER_STUB=true`), Playwright tests that create groups or events will fail with location validation errors.
 
 > [!NOTE]
 > The PHPUnit task will automatically upload coverage to Coveralls if the `COVERALLS_REPO_TOKEN` environment variable is set.
