@@ -1,7 +1,0 @@
-$positions : top, bottom, left, right;
-
-@each $position in $positions {
-  .#{$position}-0 {
-    #{$position}: 0;
-  }
-}

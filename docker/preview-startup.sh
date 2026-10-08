@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-# Startup script for per-PR preview apps (see fly.pr.toml).
+# Startup script for every preview app - per-PR previews and the develop
+# branch's restarters-dev alike (see fly.preview.toml).
 #
 # Cold-boot sequence (rootfs is always fresh — Fly resets it on every start):
 #   1. Serve a static "warming up" page on port 80 immediately, so the Fly
@@ -85,11 +86,12 @@ http {
     server {
         listen 80 default_server;
         listen [::]:80 default_server;
-        # Matches the main nginx-fly.conf. Without it nginx sends no charset,
-        # and browsers guess a legacy encoding for the warming page's UTF-8
-        # em-dash (mojibake).
-        charset utf-8;
         root /tmp/warming;
+
+        # Matches the main nginx-fly.conf. Without it nginx sends no charset,
+        # so the holding page's em-dash renders as mojibake even in browsers
+        # that would otherwise sniff UTF-8.
+        charset utf-8;
 
         location = /robots.txt { }
         location = /_preview_status {

@@ -22,7 +22,6 @@ class BasicTest extends TestCase
         parent::setUp();
         $this->loginAsTestUser(Role::ADMINISTRATOR);
         $this->idgroups = $this->createGroup();
-        $this->get('/logout');
     }
 
     /**
@@ -47,29 +46,21 @@ class BasicTest extends TestCase
         $this->assertEquals($city, $user->location);
         $this->actingAs($user);
 
-        $response = $this->get('/dashboard');
+        // The /dashboard Blade page is retired under the Nuxt cutover; the
+        // SPA fetches its data from /api/v2/dashboard instead (see
+        // DashboardController@indexv2). The v2 endpoints authenticate via the
+        // token guard (auth:sanctum,api), so pass the user's api_token
+        // explicitly rather than relying on the session actingAs guard.
+        $response = $this->get('/api/v2/dashboard?api_token='.$user->api_token);
+        $response->assertSuccessful();
+        $data = $response->json('data');
 
-        $props = $this->assertVueProperties($response, [
-            [],
-            [
-                'administrator' => 'false',
-                'host' => 'false',
-                'restarter' => 'true',
-                'network-coordinator' => 'false',
-                'location' => "$city",
-                ':your-groups' => '[]',
-                ':upcoming-events' => '[]',
-                'see-all-topics-link' => env('DISCOURSE_URL').'/latest',
-                ':is-logged-in' => 'true',
-                'discourse-base-url' => env('DISCOURSE_URL'),
-            ],
-        ]);
-
-        $this->assertEquals($nearbyGroupCount, count(json_decode($props[1][':nearby-groups'], true)));
-        $this->assertEquals($nearbyGroupCount, count(json_decode($props[1][':new-groups'], true)));
+        $this->assertEquals(! is_null($lat), $data['has_location']);
+        $this->assertEquals($nearbyGroupCount, count($data['nearby_groups']));
+        $this->assertEquals($nearbyGroupCount, count($data['new_nearby_groups']));
 
         // Test Discourse API call which will be made by the Vue client.
-        $response = $this->get('/api/talk/topics');
+        $response = $this->get('/api/talk/topics?api_token='.$user->api_token);
         $response->assertSuccessful();
         $ret = json_decode($response->getContent(), TRUE);
         self::assertEquals('success', $ret['success']);
@@ -87,6 +78,15 @@ class BasicTest extends TestCase
     }
 
     public function testUpcomingEvents(): void {
+        // The /dashboard and /party Blade pages, and the /group/join/{id}
+        // and /group/invite web routes, are all retired under the Nuxt
+        // cutover. The business logic under test here — an unapproved
+        // event doesn't count as "upcoming" for a member, an approved one
+        // does, and a merely-invited (not yet joined) user doesn't see it
+        // either — is real backend behaviour, so it's repointed to the
+        // live equivalents: /api/v2/dashboard for the dashboard data,
+        // POST /api/v2/groups/{id}/members/me for joining, and
+        // POST /api/v2/groups/{id}/invites for inviting.
         $host = User::factory()->restarter()->create();
 
         // Create an event.
@@ -102,19 +102,17 @@ class BasicTest extends TestCase
 
         // Join the group - as a Restarter.
         $this->actingAs($host);
-        $this->get('/group/join/' . $this->idgroups);
+        $this->post('/api/v2/groups/' . $this->idgroups . '/members/me?api_token=' . $host->api_token)
+            ->assertSuccessful();
 
         // Should not show in upcoming as not yet approved.
-        $response1 = $this->get('/dashboard');
-        $response1->assertDontSeeText('A test event');
+        $response1 = $this->get('/api/v2/dashboard');
+        $response1->assertSuccessful();
+        $upcomingEvents = $response1->json('data.upcoming_events');
+        $this->assertFalse(collect($upcomingEvents)->contains('id', $event->idevents));
 
         // Admin approves the event.
         $this->loginAsTestUser(Role::ADMINISTRATOR);
-
-        $response1b = $this->get('/party/edit/'.$event->idevents);
-
-        $props = $this->getVueProperties($response1b);
-        $this->assertEquals($event->idevents, json_decode($props[1][':idevents'], TRUE));
 
         $eventData = $event->getAttributes();
         $eventData['id'] = $event->idevents;
@@ -124,31 +122,12 @@ class BasicTest extends TestCase
         $this->artisan("queue:work --stop-when-empty");
         $this->artisan("queue:work --stop-when-empty");
 
-        // Should now show as an upcoming event, both on dashboard page and events page.
+        // Should now show as an upcoming event on the dashboard.
         $this->actingAs($host);
-        $response2 = $this->get('/dashboard');
-
-        $props = $this->assertVueProperties($response2, [
-            [],
-            [
-                ':is-logged-in' => 'true'
-            ]
-        ]);
-        $upcomingEvents = json_decode($props[1][':upcoming-events'], TRUE);
-        $this->assertEquals($event->idevents, $upcomingEvents[0]['idevents']);
-        $this->assertEquals(true, $upcomingEvents[0]['approved']);
-
-        $response3 = $this->get('/party');
-
-        $props = $this->assertVueProperties($response3, [
-            [],
-            [
-                ':canedit' => 'false'
-            ]
-        ]);
-        $initialEvents = json_decode($props[1][':initial-events'], TRUE);
-        $this->assertEquals($event->idevents, $initialEvents[0]['idevents']);
-        $this->assertEquals(true, $initialEvents[0]['approved']);
+        $response2 = $this->get('/api/v2/dashboard');
+        $response2->assertSuccessful();
+        $upcomingEvents = $response2->json('data.upcoming_events');
+        $this->assertEquals($event->idevents, $upcomingEvents[0]['id']);
 
         // Invite a second host to the group.
         $host2 = User::factory()->restarter()->create([
@@ -156,42 +135,22 @@ class BasicTest extends TestCase
             'latitude' => 51.5073509,
             'longitude' => -0.1277583
         ]);
-        $this->loginAsTestUser(Role::ADMINISTRATOR);
+        $admin2 = $this->loginAsTestUser(Role::ADMINISTRATOR);
 
-        $response4 = $this->post('/group/invite', [
-            'group_name' => 'Test Group',
-            'group_id' => $this->idgroups,
-            'manual_invite_box' => $host2->email,
-            'message_to_restarters' => 'Join us, but not in a creepy zombie way',
+        $response4 = $this->post('/api/v2/groups/' . $this->idgroups . '/invites?api_token=' . $admin2->api_token, [
+            'emails' => [$host2->email],
+            'message' => 'Join us, but not in a creepy zombie way',
         ]);
 
-        $response4->assertSessionHas('success');
+        $response4->assertSuccessful();
+        $this->assertEquals(1, $response4->json('data.invites_sent'));
 
-        // Should not show in upcoming as not yet a member, but should show in nearby.
-        $this->get('/logout');
+        // Should not show in upcoming as not yet a confirmed member.
         $this->actingAs($host2);
 
-        $response5 = $this->get('/dashboard');
-        $props = $this->assertVueProperties($response5, [
-            [],
-            [
-                ':is-logged-in' => 'true'
-            ]
-        ]);
-        $upcomingEvents = json_decode($props[1][':upcoming-events'], TRUE);
+        $response5 = $this->get('/api/v2/dashboard');
+        $response5->assertSuccessful();
+        $upcomingEvents = $response5->json('data.upcoming_events');
         $this->assertEquals(0, count($upcomingEvents));
-
-        $response6 = $this->get('/party');
-
-        $props = $this->assertVueProperties($response6, [
-            [],
-            [
-                ':canedit' => 'false'
-            ]
-        ]);
-        $initialEvents = json_decode($props[1][':initial-events'], TRUE);
-        $this->assertEquals($event->idevents, $initialEvents[0]['idevents']);
-        $this->assertTrue($initialEvents[0]['nearby']);
-        $this->assertEquals(true, $initialEvents[0]['approved']);
     }
 }

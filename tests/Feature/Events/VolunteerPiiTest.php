@@ -58,24 +58,29 @@ class VolunteerPiiTest extends TestCase
         return [$event, $volunteer];
     }
 
-    public function testEventPageDoesNotLeakVolunteerCredentials(): void
+    public function testEventApiDoesNotLeakVolunteerCredentials(): void
     {
         [$event, $volunteer] = $this->makeEventWithVolunteer();
 
-        // Anonymous GET — this is the attack surface.
-        $response = $this->get('/party/view/' . $event->idevents);
-        $response->assertSuccessful();
-        $html = $response->getContent();
+        // The anonymous attack surface moved from the (removed) Blade event
+        // page to the public event API: GET /api/v2/events/{id} and its
+        // /attendees list are both reachable without auth (see routes/api.php).
+        foreach (["/api/v2/events/{$event->idevents}", "/api/v2/events/{$event->idevents}/attendees"] as $uri) {
+            $response = $this->get($uri);
+            $response->assertSuccessful();
+            $body = $response->getContent();
 
-        // Sensitive fields must not appear anywhere in the page.
-        $this->assertStringNotContainsString($this->apiToken,     $html, 'api_token must not appear in event page HTML');
-        $this->assertStringNotContainsString($this->calendarHash, $html, 'calendar_hash must not appear in event page HTML');
-        $this->assertStringNotContainsString($this->recovery,     $html, 'recovery token must not appear in event page HTML');
-        $this->assertStringNotContainsString((string) $this->latitude,  $html, 'latitude must not appear in event page HTML');
-        $this->assertStringNotContainsString((string) $this->longitude, $html, 'longitude must not appear in event page HTML');
+            $this->assertStringNotContainsString($this->apiToken,           $body, "api_token must not appear in $uri");
+            $this->assertStringNotContainsString($this->calendarHash,       $body, "calendar_hash must not appear in $uri");
+            $this->assertStringNotContainsString($this->recovery,           $body, "recovery token must not appear in $uri");
+            $this->assertStringNotContainsString((string) $this->latitude,  $body, "latitude must not appear in $uri");
+            $this->assertStringNotContainsString((string) $this->longitude, $body, "longitude must not appear in $uri");
+        }
 
-        // Sanity: volunteer's name must still be present (attendee list is not broken).
-        $this->assertStringContainsString($volunteer->name, $html, 'Volunteer name must still appear on event page');
+        // Sanity: the volunteer's name is still exposed (the attendee list
+        // itself is not broken by the PII scrubbing).
+        $attendees = $this->get("/api/v2/events/{$event->idevents}/attendees");
+        $this->assertStringContainsString($volunteer->name, $attendees->getContent(), 'Volunteer name must still appear in the attendees API');
     }
 
     public function testUserModelHiddenFieldsExcludeCredentials(): void

@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -199,6 +200,17 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *          title="updated_at",
  *          description="The last change to this network.  This includes changes which affect the stats.",
  *          format="date-time",
+ *     ),
+ *     @OA\Property(
+ *          property="coordinators",
+ *          title="coordinators",
+ *          description="The coordinators of this network.",
+ *          type="array",
+ *          @OA\Items(
+ *              @OA\Property(property="id", type="integer"),
+ *              @OA\Property(property="name", type="string"),
+ *              @OA\Property(property="avatar_url", type="string", nullable=true)
+ *          )
  *     )
  * )
  */
@@ -220,7 +232,22 @@ class Network extends JsonResource
             'default_language' => $this->default_language,
             'stats' => $this->resource->stats(),
             'timezone' => $this->resource->timezone,
-            'full' => true
+            'full' => true,
+            // Legacy NetworkController@show built this the same way (User::
+            // getProfile() thumbnail lookup) for the "Network Coordinators"
+            // section on resources/js/components/NetworkPage.vue - this
+            // Resource had never carried it, so the Nuxt page dropped the
+            // section entirely (docs/nuxt-migration/api-gaps.md Phase E).
+            'coordinators' => $this->coordinators->map(function ($coordinator) use ($request) {
+                $profile = User::getProfile($coordinator->id);
+                $avatarUrl = ($profile && $profile->path) ? ($request->root() . '/uploads/thumbnail_' . $profile->path) : null;
+
+                return [
+                    'id' => (int) $coordinator->id,
+                    'name' => $coordinator->name,
+                    'avatar_url' => $avatarUrl,
+                ];
+            })->values(),
         ];
     }
 }

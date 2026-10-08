@@ -21,9 +21,11 @@
 #
 # Options:
 #   --app APP                Target Fly app for --secrets and --db (default: restarters).
-#                            Use e.g. restarters-dev for the dev environment. The DB app
-#                            is derived automatically as APP-db (e.g. restarters-dev-db).
+#                            The DB app is derived automatically as APP-db.
 #                            Has no effect on --images (Tigris bucket is shared across apps).
+#                            NOT usable against preview apps (restarters-dev, restarters-pr-*):
+#                            they run an embedded MariaDB restored from the hourly production
+#                            backup, so there is no APP-db app and nothing to migrate into.
 #   --secrets                Set Fly secrets from .env onto the target app
 #   --db                     Migrate the database into the target app's DB
 #   --images                 Sync images from public/uploads/ to the shared Tigris bucket
@@ -87,7 +89,7 @@ if [[ "$DO_SECRETS" = false && "$DO_DB" = false && "$DO_IMAGES" = false ]]; then
     usage
 fi
 
-# Derive DB app from the target app name (restarters → restarters-db, restarters-dev → restarters-dev-db)
+# Derive DB app from the target app name (restarters → restarters-db)
 FLY_DB_APP="${FLY_APP}-db"
 
 # ─── Helper functions ─────────────────────────────────────────────────────────

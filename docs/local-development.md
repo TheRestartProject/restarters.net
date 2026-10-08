@@ -9,7 +9,7 @@ This guide will help you set up a local development environment for the Restarte
 3. **Setup environment**: `cp .env.docker .env`
 4. **Start services**: `task docker:up-core` (or `task docker:up-all` for full environment)
 5. **Wait for setup**: `task docker:wait-for-services-core`
-6. **Access application**: http://localhost:8001
+6. **Access application**: http://localhost:8004 (Nuxt SPA; the Laravel API is on http://localhost:8001)
 
 <details>
 <summary>Prerequisites and Windows Setup</summary>
@@ -130,9 +130,11 @@ task docker:logs
 
 Once setup is complete:
 
-- **Main application**: http://localhost:8001
+- **Main application (Nuxt SPA, restarters_client)**: http://localhost:8004
   - Admin: `jane@bloggs.net`
   - Password: `passw0rd`
+- **Laravel API**: http://localhost:8001 (serves /api/v2, the embeddable
+  stats widgets, and deep-link redirectors — no user-facing pages)
 - **PHPMyAdmin**: http://localhost:8002 (debug profile only)
   - Host: `restarters_db`
   - User: `root`
@@ -155,14 +157,11 @@ The project includes unified task commands that ensure consistent test execution
 # Run PHPUnit tests (includes coverage and CI integration)
 task docker:test:phpunit
 
-# Run Jest JavaScript tests
-task docker:test:jest
+# Run client (Nuxt) unit tests
+task docker:test:vitest
 
-# Run Playwright end-to-end tests
-task docker:test:playwright
-
-# Run Playwright autocomplete tests (requires special setup data)
-task docker:test:playwright-autocomplete
+# Run client Playwright end-to-end tests
+task docker:test:playwright:client
 ```
 
 ### Prerequisites for Testing

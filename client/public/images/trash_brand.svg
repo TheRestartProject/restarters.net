@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" id="trash_ico" width="25.658" height="25" viewBox="0 0 25.658 25">
+    <defs>
+        <style>
+            .cls-2{fill:#0392a6;fill-rule:evenodd}
+        </style>
+    </defs>
+    <path id="Rectangle_56" fill="none" d="M0 0H25.658V25H0z" data-name="Rectangle 56"/>
+    <g id="Layer" transform="translate(2.146 1.057)">
+        <g id="Vrstva_104" data-name="Vrstva 104">
+            <path id="Path_115" d="M8.286 17.761a.976.976 0 0 0 1.309.211l2.49-2.462 2.49 2.462a.976.976 0 0 0 1.309-.211.941.941 0 0 0 .215-1.289L13.6 14.02l2.5-2.451a.941.941 0 0 0-.215-1.289.976.976 0 0 0-1.309-.211l-2.49 2.462L9.6 10.069a.976.976 0 0 0-1.309.211.941.941 0 0 0-.215 1.289l2.5 2.451-2.5 2.451a.941.941 0 0 0 .21 1.29z" class="cls-2" data-name="Path 115" transform="translate(-1.568 -.496)"/>
+            <path id="Path_116" d="M22.175 1H3.288A1.278 1.278 0 0 0 2 2.268v3.8A1.278 1.278 0 0 0 3.288 7.34h.858v13.736a3.2 3.2 0 0 0 3.219 3.17H18.1a3.2 3.2 0 0 0 3.219-3.17V7.34h.858a1.278 1.278 0 0 0 1.288-1.268v-3.8A1.278 1.278 0 0 0 22.175 1zm-3 20.076a1.065 1.065 0 0 1-1.075 1.056H7.366a1.065 1.065 0 0 1-1.073-1.057V7.34H19.17zm2.141-15.85H4.146V3.113h17.17z" class="cls-2" data-name="Path 116" transform="translate(-2 -1)"/>
+        </g>
+    </g>
+</svg>

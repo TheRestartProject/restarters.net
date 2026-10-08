@@ -95,6 +95,13 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *          format="date-time",
  *     ),
  *     @OA\Property(
+ *          property="stats",
+ *          title="stats",
+ *          description="An array of statistics about the activity of an event.  See Event.stats for the full field list.",
+ *          format="object",
+ *          ref="#/components/schemas/Event/properties/stats"
+ *     ),
+ *     @OA\Property(
  *          property="summary",
  *          title="summary",
  *          description="Indicates that this is a summary result, not full group information.",
@@ -128,6 +135,7 @@ class PartySummary extends JsonResource
             'lng' => $this->longitude,
             'group' => \App\Http\Resources\GroupSummary::make($this->theGroup),
             'updated_at' => $this->updated_at->toIso8601String(),
+            'stats' => $this->resource->getEventStats(),
             'summary' => true
         ];
     }

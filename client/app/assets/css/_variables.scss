@@ -1,0 +1,94 @@
+// Brand tokens
+// ============
+// Seeded from resources/global/css/_variables.scss — the umbrella brand
+// layer shared with the Wiki skin (see docs/nuxt-migration/findings/styles.md).
+// Deliberately NOT seeded from resources/sass/_variables.scss (the legacy,
+// Fixometer-only palette with a different $brand-blue), except for $blue
+// itself (see below) which has no resources/global/css equivalent at all.
+
+// CRITICAL: Bootstrap 4's default $blue is #007bff. Nothing in the current
+// resources/sass or resources/global/css trees ever declares $blue — every
+// use (nav links, footer h3/links, #navigation a) silently inherits it from
+// Bootstrap's own variable. Bootstrap 5's default $blue is #0d6efd, a
+// visibly different shade. Pinning it explicitly here, BEFORE Bootstrap's
+// variables are imported (see _bootstrap.scss), keeps every one of those
+// call sites rendering the colour that's live in production today.
+$blue: #007bff;
+
+$focus1: #0062cc;
+$brand: #0394a6;
+$black: #222;
+// develop's _variables.scss:11 - the multiselect highlight/selected fill.
+$brand-muted: #6c757d;
+$white: #fff;
+$brand-light: #4aaebc;
+$brand-danger: #dc3545;
+$brand-placeholder: #6c757d;
+$brand-grey: #f5f7fa;
+$brand-grey-darker: #dce3ec;
+// develop's _variables.scss - the near-black used for panel shadows.
+$brand-black: #222;
+
+$brand-orange: #ffbe5f;
+// Legacy Fixometer brand blue, used only by the .panel__blue content panel
+// (see _panels.scss). Kept as a token rather than a literal so the panel
+// variants read consistently against $brand / $brand-orange.
+$brand-blue: #0faca8;
+
+// The official brand orange and brand red (per user feedback on the groups
+// map, 2026-08-19). Distinct tokens from $brand-orange above, which is the
+// softer legacy tint some ported partials still depend on. $brand-red is
+// also the hex the navbar's notification badge hardcodes.
+$brand-orange-official: #f18f01;
+$brand-red: #f45b69;
+
+// Groups-map palette (components/groups/GroupMap.vue): the cluster-bubble
+// tier ramp - more saturated for larger clusters, ending at the official
+// brand orange - and the pin state fills.
+$map-cluster-small: #fff396;
+$map-cluster-medium: #ffd16a;
+$map-cluster-large: $brand-orange-official;
+$map-pin-yours: #21a453;
+$map-pin-hover: $brand-red;
+
+// Present in the source file but not consumed by anything ported into this
+// stylesheet yet; kept for parity so a later page/component partial that
+// needs it doesn't have to reintroduce it.
+$shadow: 5px;
+
+// Fonts
+// $font-family-third is a legacy alias for $font-family-sans-serif kept by
+// the source stylesheet (both resolve to Asap) — carried over verbatim
+// since a lot of the ported component partials below reference it by name.
+$font-family-sans-serif: 'Asap', sans-serif;
+$font-family-third: 'Asap', sans-serif;
+$font-family-second: 'Open Sans', sans-serif;
+
+// Bootstrap 5 scalar overrides
+// =============================
+// These MUST be plain assignments (not !default) made before
+// bootstrap/scss/variables is imported (see _bootstrap.scss) — Sass only
+// honours a later `!default` when the variable is still unset, so
+// declaring these first is what makes the brand palette win over
+// Bootstrap's own defaults rather than the other way round.
+$primary: $brand;
+$warning: $brand-orange;
+$info: #d0dae6;
+$success: #3fce97;
+$danger: $brand-danger;
+$body-bg: $brand-grey;
+
+// Container widths: the legacy site was built on Bootstrap 4, whose largest
+// .container max-width was 1140px (xl). Bootstrap 5 added an xxl breakpoint with
+// a 1320px container, which made every .container noticeably wider than the
+// legacy site on large screens (the parity capture showed the login/register
+// panels ~110px wider each side than old-dev). Cap xxl back to 1140px so the
+// content width matches the legacy layout. Defined before `@import 'bootstrap'`
+// so it wins over Bootstrap's !default map.
+$container-max-widths: (
+  sm: 540px,
+  md: 720px,
+  lg: 960px,
+  xl: 1140px,
+  xxl: 1140px,
+);

@@ -25,9 +25,9 @@ task docker:run:artisan -- migrate         # Run artisan command
 task docker:shell                          # Open shell in container
 
 # Testing
-task docker:test:phpunit      # Run PHP tests
-task docker:test:jest         # Run JS tests
-task docker:test:playwright   # Run e2e tests
+task docker:test:phpunit             # Run PHP tests
+task docker:test:vitest              # Run client (Nuxt) unit tests
+task docker:test:playwright:client   # Run client e2e tests
 
 # Vite dev server (HMR)
 task docker:vite:start        # Start Vite in background
@@ -74,11 +74,9 @@ task docker:shell        # Open shell in container
 task docker:run:artisan -- migrate  # Run artisan commands
 task docker:run:bash -- "command"   # Run bash commands
 
-# Run Vite for HMR (hot module replacement)
-task docker:run:bash -- "npm run dev"
-
 # The application will be available at:
-# - Restarters: http://localhost:8001 (Admin: jane@bloggs.net / passw0rd)
+# - Frontend (Nuxt SPA, restarters_client): http://localhost:8004 (Admin: jane@bloggs.net / passw0rd)
+# - Laravel API: http://localhost:8001
 # - phpMyAdmin: http://localhost:8002 (Host: restarters_db, User: root, Pass: s3cr3t)
 # - Mailhog: http://localhost:8025
 # - Discourse: http://localhost:8003
@@ -89,11 +87,13 @@ task docker:run:bash -- "npm run dev"
 # Install PHP dependencies
 composer install
 
-# Install and build frontend assets
-npm install
-npm run dev          # Development build
-npm run watch        # Watch for changes
-npm run production   # Production build
+# Frontend (Nuxt SPA) — the restarters_client container runs the dev server;
+# for local tooling outside Docker:
+cd client && npm install && npm run dev
+
+# Widget/wiki assets still built by Laravel-side Vite (rarely needed):
+npm install --legacy-peer-deps
+npm run build
 
 # Laravel commands
 php artisan migrate            # Run database migrations
@@ -121,11 +121,11 @@ export DB_TEST_HOST=restarters_db
 # Run specific test method
 ./vendor/bin/phpunit --filter testMethodName
 
-# Run JavaScript tests
-npm run jest
+# Run client unit tests (from client/)
+cd client && npx vitest run
 
-# Run Playwright end-to-end tests
-npm test
+# Run client Playwright end-to-end tests
+task docker:test:playwright:client
 ```
 
 ### Code Quality
@@ -168,11 +168,14 @@ npm test
 - JSON columns for flexible network_data storage
 
 ### Frontend Stack
-- **Vue 2** components for interactive features
-- **Laravel Mix** for asset compilation
-- **Bootstrap 4** for styling
-- **SCSS** for styles in `resources/sass/`
-- Multiple build targets: main app, global styles, wiki styles
+- **Nuxt 4 SPA in `client/`** — Vue 3, Pinia, bootstrap-vue-next (Bootstrap 5),
+  @nuxtjs/i18n, Vitest; talks to Laravel exclusively via `/api/v2`
+- Laravel serves no user-facing pages (see `tests/Feature/ApiOnlyRouteSurfaceTest.php`
+  for the pinned web-route surface): only the embeddable stats widgets and the
+  MediaWiki skin assets are still built here (Vite, `resources/global` +
+  `resources/wiki`, jQuery/Bootstrap 4 only)
+- Client translations are exported from `lang/*.php` via
+  `php artisan translations:export-client` (checked in CI)
 
 ### Permission System
 - Role-based permissions via custom `app/Role.php` and `app/Permissions.php`

@@ -1,0 +1,79 @@
+// Bootstrap 5 import, with brand variable overrides spliced in.
+//
+// This is Bootstrap's own scss/bootstrap.scss import stack, unrolled by
+// hand (mirroring the pattern already used by
+// resources/global/css/bootstrap.scss for BS4) so we can inject one thing
+// in the middle: merging the brand's named spacer scale into Bootstrap's
+// own 0-5 rem spacer scale straight after Bootstrap's variables exist, but
+// before bootstrap/scss/maps and bootstrap/scss/utilities consume
+// $spacers to generate the .p-*/.m-*/.gap-* utility classes. Every scalar
+// colour/font override (e.g. $primary, $blue, $body-bg) lives in
+// _variables.scss and is imported by restarters.scss before this file, so
+// bootstrap/scss/variables' `!default` assignments already see them set.
+@import 'bootstrap/scss/functions';
+@import 'bootstrap/scss/variables';
+@import 'bootstrap/scss/variables-dark';
+
+// Named spacer scale, ported from resources/global/css/_variables.scss's
+// $spacers map (10px-60px). Merged on top of Bootstrap's default map
+// (rather than replacing it outright, as the BS4 source implicitly did)
+// so both scales' utilities exist: .p-3 (Bootstrap's rem scale) AND .p-40
+// (the brand's px scale) both compile.
+$spacers: map-merge(
+  $spacers,
+  (
+    10: 10px,
+    15: 15px,
+    20: 20px,
+    25: 25px,
+    30: 30px,
+    35: 35px,
+    40: 40px,
+    45: 45px,
+    50: 50px,
+    60: 60px,
+  )
+);
+
+@import 'bootstrap/scss/maps';
+@import 'bootstrap/scss/mixins';
+@import 'bootstrap/scss/utilities';
+
+// Layout & components
+@import 'bootstrap/scss/root';
+@import 'bootstrap/scss/reboot';
+@import 'bootstrap/scss/type';
+@import 'bootstrap/scss/images';
+@import 'bootstrap/scss/containers';
+@import 'bootstrap/scss/grid';
+@import 'bootstrap/scss/tables';
+@import 'bootstrap/scss/forms';
+@import 'bootstrap/scss/buttons';
+@import 'bootstrap/scss/transitions';
+@import 'bootstrap/scss/dropdown';
+@import 'bootstrap/scss/button-group';
+@import 'bootstrap/scss/nav';
+@import 'bootstrap/scss/navbar';
+@import 'bootstrap/scss/card';
+@import 'bootstrap/scss/accordion';
+@import 'bootstrap/scss/breadcrumb';
+@import 'bootstrap/scss/pagination';
+@import 'bootstrap/scss/badge';
+@import 'bootstrap/scss/alert';
+@import 'bootstrap/scss/progress';
+@import 'bootstrap/scss/list-group';
+@import 'bootstrap/scss/close';
+@import 'bootstrap/scss/toasts';
+@import 'bootstrap/scss/modal';
+@import 'bootstrap/scss/tooltip';
+@import 'bootstrap/scss/popover';
+@import 'bootstrap/scss/carousel';
+@import 'bootstrap/scss/spinners';
+@import 'bootstrap/scss/offcanvas';
+@import 'bootstrap/scss/placeholders';
+
+// Helpers
+@import 'bootstrap/scss/helpers';
+
+// Utilities
+@import 'bootstrap/scss/utilities/api';

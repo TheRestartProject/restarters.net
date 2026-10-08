@@ -171,6 +171,21 @@ tasks:
     cmds:
       - docker exec -it restarters php artisan "{{ .CLI_ARGS }}"
 
+  docker:swagger:generate:
+    desc: Regenerate the OpenAPI (Swagger) spec from the @OA annotations.
+    summary: |
+      Regenerate storage/api-docs/api-docs.json from the @OA annotations under app/.
+      The spec is a gitignored build artifact; CI regenerates it before the PHPUnit
+      and Playwright jobs. Run this after editing any @OA annotation.
+    cmds:
+      - docker exec restarters php artisan l5-swagger:generate
+
+  docker:swagger:lint:
+    desc: Regenerate the OpenAPI spec and check document-level integrity (dangling refs, security schemes, duplicate operationIds).
+    cmds:
+      - docker exec restarters php artisan l5-swagger:generate
+      - docker exec restarters php tools/openapi-lint.php
+
   docker:vite:
     desc: Start Vite dev server with HMR in the container.
     summary: |
@@ -219,74 +234,151 @@ tasks:
     cmds:
       - mkdir -p /tmp/test-results/phpunit
       - |
-        if [ -z "$CIRCLECI" ]; then
-          echo "Resetting test database and running migrations..."
-          docker exec restarters bash -c "php artisan migrate:fresh --seed --database=mysql_testing --force"
-        else
-          echo "Running on CircleCI - skipping database reset (handled by CI setup)"
-        fi
-      - docker exec -e COVERALLS_REPO_TOKEN="$COVERALLS_REPO_TOKEN" restarters bash -c "export XDEBUG_MODE=coverage; ./vendor/bin/phpunit -d memory_limit=1024M --bootstrap vendor/autoload.php --coverage-clover tests/clover.xml --log-junit /tmp/phpunit-results.xml --configuration ./phpunit.xml --teamcity {{ .CLI_ARGS }}"
+        # Always reset the test DB here (CI included). CI used to skip this,
+        # relying on the container-startup migrate:fresh — but that runs with
+        # no `set -e`, so a startup migration failure silently left the CI
+        # test DB missing the newest tables (seen 2026-07-16: sso_tickets
+        # absent while every earlier table existed). Explicit reset right
+        # before phpunit is deterministic and matches local behaviour.
+        echo "Resetting test database and running migrations..."
+        docker exec restarters bash -c "php artisan migrate:fresh --seed --database=mysql_testing --force"
       - |
-        if [ ! -z "$COVERALLS_REPO_TOKEN" ]; then
+        # Coverage only where it's consumed: Coveralls tracks develop. The
+        # CircleCI plan caps jobs at 60 minutes and the develop build already
+        # takes ~54 — coverage-instrumented runs of the grown suite on feature
+        # branches blew the cap (three kills at exactly 60.0 min, mid-test).
+        # NOTE (pre-merge cliff, tracked in plan G1): once this branch merges,
+        # develop's suite grows too — the build job needs a split or a plan
+        # bump before then.
+        if [ -n "$COVERALLS_REPO_TOKEN" ] && { [ -z "$CIRCLE_BRANCH" ] || [ "$CIRCLE_BRANCH" = "develop" ]; }; then
+          docker exec -e COVERALLS_REPO_TOKEN="$COVERALLS_REPO_TOKEN" restarters bash -c "export XDEBUG_MODE=coverage; ./vendor/bin/phpunit -d memory_limit=1024M --bootstrap vendor/autoload.php --coverage-clover tests/clover.xml --log-junit /tmp/phpunit-results.xml --configuration ./phpunit.xml --teamcity {{ .CLI_ARGS }}"
+        else
+          docker exec restarters bash -c "export XDEBUG_MODE=off; ./vendor/bin/phpunit -d memory_limit=1024M --bootstrap vendor/autoload.php --log-junit /tmp/phpunit-results.xml --configuration ./phpunit.xml --teamcity {{ .CLI_ARGS }}"
+        fi
+      - |
+        # Mirror the generation gate above: no clover.xml is produced on
+        # non-develop CI branches, so there is nothing to upload there.
+        if [ -n "$COVERALLS_REPO_TOKEN" ] && { [ -z "$CIRCLE_BRANCH" ] || [ "$CIRCLE_BRANCH" = "develop" ]; }; then
           echo "Uploading coverage to Coveralls..."
           docker exec -e COVERALLS_REPO_TOKEN="$COVERALLS_REPO_TOKEN" restarters bash -c "./upload-coverage.sh tests/clover.xml"
         else
           echo "COVERALLS_REPO_TOKEN not set, skipping coverage upload"
         fi
 
-  docker:test:jest:
-    desc: Run Jest tests in the core application container.
-    summary: |
-      Run Jest tests with JUnit output for CI integration.
-      This ensures consistency between local development and CI environments.
-
+  docker:client:logs:
+    desc: Tail the Nuxt client container logs.
     cmds:
-      - mkdir -p /tmp/test-results/jest
-      - docker exec restarters bash -c "npm i jest-junit; JEST_JUNIT_OUTPUT_DIR=/tmp/test-results npm run jest -- --testResultsProcessor=jest-junit"
+      - docker logs --follow restarters_client
 
-  docker:test:playwright:
-    desc: Run Playwright tests in dedicated playwright container.
-    summary: |
-      Run Playwright end-to-end tests using a dedicated playwright container.
-      This ensures proper isolation and reliable network access to the application.
-
-      The command includes:
-      - Environment variables for test configuration
-      - HTML report generation
-      - Proper test isolation
-
+  docker:client:restart:
+    desc: Restart the Nuxt client container (e.g. after changing client env vars).
     cmds:
-      - mkdir -p /tmp/test-results/playwright
+      - "{{.DOCKER_CMD}} --profile core restart restarters_client"
+
+  docker:test:vitest:
+    desc: Run the client Vitest suite in the client container.
+    summary: |
+      Runs the Nuxt client's unit tests with JUnit output for CI integration.
+    cmds:
+      - mkdir -p /tmp/test-results/vitest
+      - docker exec restarters_client npx vitest run --reporter=default --reporter=junit --outputFile=test-results/vitest.xml
+      - cp client/test-results/vitest.xml /tmp/test-results/vitest/results.xml
+
+  playwright:seed-data:
+    desc: Seed the fixed users/network/group the Playwright suites depend on.
+    internal: true
+    cmds:
       - docker exec restarters bash -c "php artisan cache:clear"
       - docker exec restarters bash -c "echo \"DB::statement('SET foreign_key_checks=0'); App\\\\Device::truncate(); DB::statement('SET foreign_key_checks=1');\" | php artisan tinker" || true
       - docker exec restarters bash -c "echo \"\\\$u=App\\\\User::firstOrCreate(['email'=>'jane@bloggs.net'], ['name'=>'Jane Bloggs','password'=>Hash::make('passw0rd'),'consent_past_data'=>'2021-01-01','consent_future_data'=>'2021-01-01','consent_gdpr'=>'2021-01-01']);\\\$u->role=2;\\\$u->save();\" | php artisan tinker" || true
       - |
         # Create test data for group tags tests (NC user, host user, network, group)
         docker exec restarters php artisan tinker --execute='$nc = App\User::firstOrCreate(["email"=>"nc@test.net"], ["name"=>"NC User","password"=>Hash::make("passw0rd"),"consent_past_data"=>"2021-01-01","consent_future_data"=>"2021-01-01","consent_gdpr"=>"2021-01-01"]); $nc->role=6; $nc->save(); $host = App\User::firstOrCreate(["email"=>"host@test.net"], ["name"=>"Host User","password"=>Hash::make("passw0rd"),"consent_past_data"=>"2021-01-01","consent_future_data"=>"2021-01-01","consent_gdpr"=>"2021-01-01"]); $host->role=3; $host->save(); $network = App\Network::where("name","Test London")->first(); if (!$network) { $network = new App\Network(); $network->name="Test London"; $network->shortname="testlondon"; $network->description="Test network"; $network->default_language="en"; $network->save(); } DB::table("user_network")->insertOrIgnore(["user_id"=>$nc->id,"network_id"=>$network->id]); $group = App\Group::firstOrCreate(["name"=>"Tag Test Group"], ["website"=>"https://test.example.com","location"=>"London","area"=>"London","postcode"=>"SW1A 1AA","latitude"=>51.5,"longitude"=>-0.1,"free_text"=>"Test group","approved"=>true]); DB::table("group_network")->insertOrIgnore(["group_id"=>$group->idgroups,"network_id"=>$network->id]); DB::table("users_groups")->insertOrIgnore(["user"=>$host->id,"group"=>$group->idgroups,"role"=>3,"status"=>1]); echo "Group tags test data: NC=".$nc->id." Host=".$host->id." Network=".$network->id." Group=".$group->idgroups;' || true
-      - docker exec restarters bash -c "sed -i 's/.throttle:api.,//g' /var/www/app/Http/Kernel.php"
       - docker exec restarters bash -c "sed -i 's/APP_DEBUG=.*$/APP_DEBUG=false/g' /var/www/.env"
       - docker exec restarters bash -c "sed -i 's/QUEUE_CONNECTION=.*/QUEUE_CONNECTION=sync/g' /var/www/.env"
       - docker exec restarters bash -c "sed -i 's/MAIL_MAILER=.*/MAIL_MAILER=log/g' /var/www/.env"
+
+  docker:test:playwright:client:
+    desc: Run the client Playwright suite against the Nuxt container.
+    summary: |
+      End-to-end tests for the Nuxt SPA (client/e2e, playwright.client.config.js).
+      The browser loads the SPA from the restarters_client container and the SPA
+      calls the Laravel API via www.example.com:8001 (host-gateway).
+    cmds:
+      - mkdir -p /tmp/test-results/playwright
+      - task: playwright:seed-data
       - |
-        # Stop Vite dev server and build assets for production
-        echo "Stopping Vite dev server and building assets..."
-        docker exec restarters bash -c "ps aux | grep 'node.*vite' | grep -v grep | awk '{print \$2}' | xargs -r kill || true"
-        docker exec restarters bash -c "rm -f /var/www/public/hot && npm run build"
-      - |
-        # Ensure Playwright browsers are installed (handles version mismatches)
-        echo "Installing Playwright browsers..."
-        docker exec restarters_playwright bash -c "npx playwright install chromium"
+        # Relax the auth-endpoint rate limit for test bursts (named limiter
+        # reads AUTH_RATE_LIMIT; .env edits are the established pattern here).
+        docker exec restarters bash -c "grep -q '^AUTH_RATE_LIMIT' /var/www/.env && sed -i 's/^AUTH_RATE_LIMIT=.*/AUTH_RATE_LIMIT=1000/' /var/www/.env || echo 'AUTH_RATE_LIMIT=1000' >> /var/www/.env; php artisan config:clear"
+      - docker exec restarters_playwright bash -c "npx playwright install chromium"
       - |
         docker exec restarters_playwright bash -c "
           export PLAYWRIGHT_TEST=true
-          export PLAYWRIGHT_DEBUG=true
-          export PWTEST_SKIP_TEST_OUTPUT=0
-          export DEBUG=playwright
-          export PLAYWRIGHT_BASE_URL=http://restarters_nginx
+          export PLAYWRIGHT_BASE_URL=http://restarters_client:3000
+          export PLAYWRIGHT_API_URL=http://www.example.com:8001
           export PW_TEST_HTML_REPORT_OPEN=never
           export FORCE_COLOR=1
-          stdbuf -oL -eL npx playwright test --reporter=html
+          stdbuf -oL -eL npx playwright test --config=playwright.client.config.js --reporter=html {{ .CLI_ARGS }}
         "
+
+  parity:capture:
+    desc: Capture matched dev-vs-live screenshot pairs for visual parity diffing.
+    summary: |
+      Drives BOTH LOCAL DEV systems through the same page list at desktop +
+      mobile, writing matched pairs to
+      parity-shots/<viewport>/<slug>__{new,old}.png so they can be diffed
+      side by side. The systematic replacement for eyeballing pages one at a time.
+
+        new = the Nuxt SPA under development  (restarters_client:3000, :8004)
+        old = the legacy Blade app from origin/develop
+              (restarters_legacy_nginx, host :8005)
+
+      Both run against the SAME seeded database with the same test login, so
+      every difference is a real difference rather than production-vs-test-data
+      noise - and because neither is production, non-read-only flows
+      (create/edit wizards) can be exercised safely. No production credentials
+      are involved anywhere.
+
+      To stand up the legacy instance see
+      docs/nuxt-migration/findings/parity-audit.md.
+
+      Uses its own config (playwright.parity.config.js, testDir client/parity)
+      so the CI suite never runs it.
+    cmds:
+      - mkdir -p parity-shots/desktop parity-shots/mobile
+      # Same preconditions as docker:test:playwright:client - without the seeded
+      # users the dev login has no account to log in as, and the auth rate limit
+      # rejects the repeated logins this harness performs.
+      - task: playwright:seed-data
+      # Adds what seed-data does not (an event, a default 'restarters' network
+      # for CheckForRepairNetwork) and publishes parity-fixtures.json, which
+      # capture.spec.js reads to build the detail-page URLs. Must run every
+      # time: migrate:fresh renumbers ids, and a stale id silently renders as
+      # a 404 on both systems, which then compares as a false match.
+      # NB `php artisan tinker <file>` exits 1 here even when the script runs
+      # perfectly (psysh quirk - a trivial echo script exits 1 too), so its
+      # exit code carries no information. Assert on the script's own end
+      # marker instead. `< /dev/null` is required or tinker waits on stdin
+      # forever.
+      - |
+        docker exec restarters bash -c "php artisan tinker parity-fixtures.php < /dev/null" 2>&1 \
+          | grep -q 'FIXTURES .* END' \
+          || { echo 'parity-fixtures.php did not complete - detail-page ids unavailable'; exit 1; }
+      - |
+        docker exec restarters bash -c "grep -q '^AUTH_RATE_LIMIT' /var/www/.env && sed -i 's/^AUTH_RATE_LIMIT=.*/AUTH_RATE_LIMIT=1000/' /var/www/.env || echo 'AUTH_RATE_LIMIT=1000' >> /var/www/.env; php artisan config:clear"
+      - docker exec restarters_playwright bash -c "npx playwright install chromium"
+      - |
+        docker exec \
+          -e PARITY_NEW_BASE="${PARITY_NEW_BASE:-http://restarters_client:3000}" \
+          -e PARITY_OLD_BASE="${PARITY_OLD_BASE:-http://restarters_legacy_nginx}" \
+          -e PARITY_EMAIL="${PARITY_EMAIL:-jane@bloggs.net}" \
+          -e PARITY_PASSWORD="${PARITY_PASSWORD:-passw0rd}" \
+          restarters_playwright bash -c "
+            export PW_TEST_HTML_REPORT_OPEN=never
+            export FORCE_COLOR=1
+            stdbuf -oL -eL npx playwright test --config=playwright.parity.config.js --reporter=list {{ .CLI_ARGS }}
+          "
 
   docker:wait-for-services-*:
     desc: Wait for Docker services to be ready and responding for a given profile (Usage - task docker:wait-for-services-[core|debug|discourse|all])

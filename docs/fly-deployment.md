@@ -8,15 +8,24 @@ How the application is built, run, and deployed on Fly.io.
 
 | App | Config | URL | Branch |
 |---|---|---|---|
-| `restarters-dev` | `fly.dev.toml` | `restarters-dev.fly.dev` | `develop` |
-| `restarters-dev-mail` | `fly-mailpit.toml` | `restarters-dev-mail.fly.dev` | `develop` |
+| `restarters-dev` | `fly.preview.toml` (template) | `restarters-dev.fly.dev` (sleeps when idle) | `develop` |
+| `restarters-pr-<N>` | `fly.preview.toml` (template) | `restarters-pr-<N>.fly.dev` (sleeps when idle) | any PR labeled `preview` |
+| `restarters-dev-mail` | `fly-mailpit.toml` | `restarters-dev-mail.fly.dev` | — |
 | `restarters` | `fly.toml` | `restarters.net` | `production` |
 | `restarters-db` | `fly-mysql.toml` | internal only | — |
 | `restarters-pma` | `fly-pma.toml` | via `flyctl proxy` only | — |
 | `restarters-yesterday` | `fly-yesterday.toml` | `yesterday.restarters.net` (sleeps when idle) | — |
-| `restarters-pr-<N>` | `fly.pr.toml` (template) | `restarters-pr-<N>.fly.dev` (sleeps when idle) | any PR labeled `preview` |
 
-All apps run in the `lhr` (London) region. The DB is on a private 6PN network (`restarters-db.internal`) — only reachable by other apps in the same Fly organisation, not from the public internet.
+**`develop` is deployed as a preview like any other branch.** `restarters-dev`
+and the per-PR apps share one config template, one startup script, one
+disposable database restored from the latest hourly production backup, and one
+teardown mechanism — suspend on idle, wake on the next request. The only
+develop-specific things are the app name and the fact that the app is
+long-lived rather than destroyed when a PR closes. There is no
+nightly stop job and no separate dev database app; both were retired when
+develop became a preview branch.
+
+All apps run in the `lhr` (London) region. The production DB is on a private 6PN network (`restarters-db.internal`) — only reachable by other apps in the same Fly organisation, not from the public internet. Preview apps (including `restarters-dev`) never touch it: they run their own embedded MariaDB on `127.0.0.1`.
 
 ---
 
@@ -39,7 +48,7 @@ Two-stage build:
 - PHP extensions: `pdo_mysql bcmath zip intl gd exif`
 - Creates `public/uploads/` directory (gitignored, so not present in source)
 - No Node or Composer in the final image
-- Build arg `STARTUP_SCRIPT` selects the startup script (`startup.sh` for production, `yesterday-startup.sh` for yesterday)
+- Build arg `STARTUP_SCRIPT` selects the startup script (`startup.sh` for production, `preview-startup.sh` for previews including `restarters-dev`, `yesterday-startup.sh` for yesterday)
 
 The build runs on Fly's remote builders (`fly deploy --remote-only`). No local Docker required.
 
@@ -83,7 +92,7 @@ Runs as root before supervisord starts:
 
 ## Configuration
 
-Non-secret config lives in `fly.toml` (production) and `fly.dev.toml` (dev). Secrets are stored in Fly's secret store and injected as environment variables at runtime.
+Non-secret config lives in `fly.toml` (production) and `fly.preview.toml` (every preview, `restarters-dev` included). Secrets are stored in Fly's secret store and injected as environment variables at runtime.
 
 ```bash
 flyctl secrets list --app restarters-dev   # see what's set
@@ -103,29 +112,26 @@ Dev/staging apps must not reach real external services. `fly-migrate.sh --secret
 
 When `--secrets` runs against a non-production app it also **unsets** any production-only secrets that are already present, cleaning up any that were set by older script runs.
 
-The `fly.dev.toml` sets `MAIL_MAILER = "smtp"` pointing at the paired Mailpit instance (`restarters-dev-mail.internal:1025`). Emails land in Mailpit's inbox, not real inboxes. This is safe only while no `MAIL_MAILER` Fly secret overrides it — the isolation above guarantees that.
+`fly.preview.toml` sets `MAIL_MAILER = "smtp"` pointing at the shared Mailpit instance (`restarters-dev-mail.internal:1025`). Emails land in Mailpit's inbox, not real inboxes. This is safe only while no `MAIL_MAILER` Fly secret overrides it — the isolation above guarantees that.
 
-**Email in dev — Mailpit:** Each non-production app has a paired Mailpit instance named `${FLY_APP}-mail` (e.g. `restarters-dev-mail`). `fly.dev.toml` points SMTP at `restarters-dev-mail.internal:1025`. Mailpit's SMTP port is only reachable from other apps in the same Fly org via private 6PN networking — it is not publicly exposed. The web UI runs on port 8025.
+**Email in previews — Mailpit:** One shared Mailpit instance, `restarters-dev-mail`, serves `restarters-dev` and every PR preview; `fly.preview.toml` points SMTP at `restarters-dev-mail.internal:1025`. Mailpit's SMTP port is only reachable from other apps in the same Fly org via private 6PN networking — it is not publicly exposed. The web UI runs on port 8025.
 
 ```bash
 # Deploy Mailpit for dev
 flyctl deploy --config fly-mailpit.toml --remote-only
-
-# Deploy for a PR branch
-flyctl deploy --config fly-mailpit.toml --app restarters-pr-123-mail --remote-only
 
 # Open the web UI
 flyctl proxy 8025:8025 --app restarters-dev-mail
 # then http://localhost:8025
 ```
 
-Email sent from dev or a PR branch lands in that branch's Mailpit inbox, not in real users' inboxes.
+Email sent from `restarters-dev` or any PR preview lands in the shared Mailpit inbox, not in real users' inboxes.
 
 ---
 
 ## File Storage (Tigris)
 
-Uploaded files are stored in a shared Tigris S3-compatible bucket. All Fly apps (`restarters`, `restarters-dev`, etc.) read from and write to the same bucket — there is no per-environment image storage. nginx proxies all `/uploads/*` requests to the bucket; the PHP app never serves these files directly.
+Uploaded files are stored in a shared Tigris S3-compatible bucket. All Fly apps read from the same bucket — there is no per-environment image storage. Only production writes to it: preview apps (`restarters-dev`, `restarters-pr-*`) hold a read-only key and set `FEATURE__IMAGE_UPLOAD=false`. nginx proxies all `/uploads/*` requests to the bucket; the PHP app never serves these files directly.
 
 - **Reads:** nginx → Tigris (30-day cache headers)
 - **Writes:** Laravel S3 filesystem driver (`FILESYSTEM_DISK=s3`)
@@ -138,17 +144,32 @@ Uploaded files are stored in a shared Tigris S3-compatible bucket. All Fly apps 
 ### Manual
 
 ```bash
-flyctl deploy --config fly.dev.toml --remote-only   # deploy to dev
 flyctl deploy --config fly.toml --remote-only        # deploy to production
 ```
 
 This triggers a remote build on Fly's infrastructure and deploys with zero downtime (rolling replacement of machines).
 
+`fly.preview.toml` is a template and cannot be deployed directly — its
+placeholders must be substituted first. To deploy `restarters-dev` by hand,
+run the same substitution CircleCI does:
+
+```bash
+sed -e "s|__APP_NAME__|restarters-dev|g" \
+    -e "s|__APP_TITLE__|Restarters develop|g" \
+    -e "s|__BASE_URL__|https://restarters-dev.fly.dev|g" \
+    -e "s|__SENTRY_ENV__|dev|g" \
+    fly.preview.toml > fly.develop.generated.toml
+flyctl deploy --config fly.develop.generated.toml --app restarters-dev --remote-only --ha=false
+```
+
+Deploy from a clean git worktree: a dirty tree makes the build context huge
+because `.dockerignore` is not honoured for untracked files.
+
 ### Automated (CircleCI)
 
 Both environments auto-deploy via CircleCI (`.circleci/config.yml`):
 
-- **`develop` branch** → tests pass → `flyctl deploy --config fly.dev.toml --remote-only` → `restarters-dev`
+- **`develop` branch** → tests pass → preview deploy to `restarters-dev` (the substitution above), then polls `/_preview_status` and fails the build unless the restore and the branch's migrations both succeed
 - **`production` branch** → `flyctl deploy --app restarters --remote-only` → `restarters.net`
 
 The `production` branch deploy runs without waiting for tests (it is triggered by a merge from `master`, which already passed CI). `FLY_API_TOKEN` is set in CircleCI project settings.
@@ -157,14 +178,17 @@ The `production` branch deploy runs without waiting for tests (it is triggered b
 
 ---
 
-## PR Previews
+## Previews
 
 Operating guide and concrete setup record: `preview-environments.md` in this
 folder. Technical design below.
 
 Any PR can be deployed as a self-contained test site at
 `https://restarters-pr-<N>.fly.dev`, running the PR's code against a copy of
-the live database.
+the live database. `develop` gets exactly the same treatment permanently, at
+`https://restarters-dev.fly.dev` — everything in this section applies to it too,
+except that it deploys from CircleCI without a label or an approval (the code
+is already merged and reviewed) and is never destroyed.
 
 ### Using it
 
@@ -172,7 +196,7 @@ the live database.
    manually with the PR number). Every push to a labeled PR redeploys.
 2. Each deploy waits for approval (GitHub Environment `preview`). **Before
    approving, glance at the PR's diff to `.github/workflows/`,
-   `fly.pr.toml`, `Dockerfile.fly` and `docker/*.sh`** — the deploy runs the
+   `fly.preview.toml`, `Dockerfile.fly` and `docker/*.sh`** — the deploy runs the
    PR's own code with the preview credentials.
 3. The workflow comments on the PR with the URL and the restore/migration
    result. The site is behind the usual cookie gate.
@@ -195,7 +219,7 @@ the live database.
 - The machine **suspends** after ~5 min idle (whole-VM snapshot; MariaDB
   stays loaded) and resumes sub-second on the next request. If Fly discards
   the snapshot, the next visitor gets the warming page while the machine
-  cold-boots and re-restores. This is why `fly.pr.toml` has no
+  cold-boots and re-restores. This is why `fly.preview.toml` has no
   `swap_size_mb`: swap disables suspend.
 - Cost: ~$0.09/hour only while someone is browsing; rootfs storage only
   (well under $1/month) while suspended; nothing once destroyed.
@@ -233,7 +257,7 @@ Previews hold **no production-capable credentials**:
 3. **Repository variable** `FLY_ORG` = the Fly organisation slug.
 4. **`FLY_PREVIEW_SECRETS`** (env-file format, one `KEY=value` per line) in
    the `preview` environment — start from the annotated template
-   `fly.pr-secrets.example.env` in the repo root:
+   `fly.preview-secrets.example.env` in the repo root:
    - `BASIC_AUTH_PASSWORD` — a fresh value (the old committed one is public
      in git history; rotate, don't reuse)
    - `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` / `AWS_BUCKET` — a
@@ -330,7 +354,7 @@ flyctl secrets set --app restarters-yesterday KEY=VALUE ...
 
 ### App health
 
-Fly's built-in health check polls `GET /robots.txt` every 15s (configured in `fly.dev.toml` / `fly.toml`). A machine is replaced if the check fails repeatedly. This covers the case where nginx or php-fpm has died.
+Fly's built-in health check polls `GET /robots.txt` (every 15s in `fly.toml`, every 30s in `fly.preview.toml`). A machine is replaced if the check fails repeatedly. This covers the case where nginx or php-fpm has died.
 
 **TODO:** Set up an external uptime monitor (e.g. Better Uptime, UptimeRobot) that alerts on HTTP failures from outside Fly's network.
 

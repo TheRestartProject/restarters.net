@@ -60,12 +60,13 @@ flyctl ssh console --app restarters-dev
 ## Deploy
 
 ```bash
-# Deploy dev (normally triggered by CI on develop branch)
-flyctl deploy --config fly.dev.toml --remote-only
-
 # Deploy production
 flyctl deploy --config fly.toml --remote-only
 ```
+
+restarters-dev.fly.dev is a preview, deployed by CI on every green `develop` build.
+`fly.preview.toml` is a template, so a manual deploy needs the placeholders
+substituting first — see `fly-deployment.md` → *Deployment* → *Manual*.
 
 ---
 

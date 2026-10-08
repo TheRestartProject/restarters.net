@@ -2,8 +2,8 @@
 
 return [
   'edit' => [
-    'button_save' => 'Sauver les changements',
     'label_logo' => 'Logo du réseau',
+    'button_save' => 'Sauver les changements',
     'add_new_field' => 'Ajouter un nouveau champ',
     'new_field_name' => 'Nouveau nom de champ',
     'add_field' => 'Ajouter le champ',
@@ -23,6 +23,11 @@ return [
     'events' => '{1} Événement|[0,*] Événements',
     'waste_diverted' => 'Déchets évités',
     'co2_prevented' => 'CO2 évité',
+  ],
+  'moderation' => [
+    'groups_title' => 'Repair Cafés à modérer',
+    'events_title' => 'Evénements à approuver',
+    'group_requires_moderation' => 'Repair Café a besoin de modération',
   ],
   'tags' => [
     'title' => 'Etiquettes du Repair Café',

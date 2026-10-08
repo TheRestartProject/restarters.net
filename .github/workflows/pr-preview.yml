@@ -3,7 +3,7 @@
 # Deploy:  label a PR with 'preview' (or re-push while labeled, or run this
 #          workflow manually with a PR number). Every deploy waits for
 #          approval via the 'preview' GitHub Environment — approvers should
-#          glance at the PR's diff to .github/workflows/, fly.pr.toml,
+#          glance at the PR's diff to .github/workflows/, fly.preview.toml,
 #          Dockerfile.fly and docker/*.sh before approving, since the deploy
 #          runs the PR's own code.
 # Cleanup: a 6-hourly sweep destroys apps whose PR is closed or no longer
@@ -116,7 +116,7 @@ jobs:
       - name: Overlay preview infra files from develop if still missing
         run: |
           git fetch origin develop --depth=1
-          for f in fly.pr.toml docker/preview-startup.sh; do
+          for f in fly.preview.toml docker/preview-startup.sh; do
             if [ ! -f "$f" ]; then
               echo "Branch lacks $f - taking it from develop"
               git show origin/develop:"$f" > "$f"
@@ -153,7 +153,7 @@ jobs:
           else
             flyctl apps create "$APP" --org "$FLY_ORG"
             # Shared read-only credentials (Tigris RO, Drive RO, gate password...)
-            # Strip comments/blank lines so the fly.pr-secrets.example.env
+            # Strip comments/blank lines so the fly.preview-secrets.example.env
             # template can be filled in and pasted as-is.
             echo "$FLY_PREVIEW_SECRETS" | grep -vE '^\s*(#|$)' \
               | flyctl secrets import --app "$APP" --stage
@@ -171,8 +171,14 @@ jobs:
           PR="${{ steps.pr.outputs.number }}"
           # Shown on the cookie-gate login page so testers know which PR this is.
           flyctl secrets set PREVIEW_PR_TITLE="$PR_TITLE" --app "$APP" --stage
-          sed "s/__PR_NUMBER__/$PR/g" fly.pr.toml > fly.pr.generated.toml
-          flyctl deploy --config fly.pr.generated.toml --app "$APP" \
+          # fly.preview.toml is shared with the develop deploy in
+          # .circleci/config.yml; keep the two substitution lists in step.
+          sed -e "s|__APP_NAME__|$APP|g" \
+              -e "s|__APP_TITLE__|Restarters PR #$PR|g" \
+              -e "s|__BASE_URL__|https://$APP.fly.dev|g" \
+              -e "s|__SENTRY_ENV__|preview|g" \
+              fly.preview.toml > fly.preview.generated.toml
+          flyctl deploy --config fly.preview.generated.toml --app "$APP" \
             --remote-only --ha=false
           # --ha=false has a history of not reliably keeping one machine.
           flyctl scale count 1 --app "$APP" --yes

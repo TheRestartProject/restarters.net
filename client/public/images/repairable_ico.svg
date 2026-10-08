@@ -1,0 +1,15 @@
+<svg id="repairable_ico" xmlns="http://www.w3.org/2000/svg" width="45" height="45" viewBox="0 0 45 45">
+  <rect id="Rectangle_136" data-name="Rectangle 136" width="45" height="45" fill="none"/>
+  <g id="Layer" transform="translate(1.875 1.875)">
+    <g id="Vrstva_7" data-name="Vrstva 7">
+      <g id="Vrstva_345" data-name="Vrstva 345">
+        <g id="Vrstva_346" data-name="Vrstva 346">
+          <path id="Path_263" data-name="Path 263" d="M21.625,1A20.625,20.625,0,1,0,42.25,21.625,20.625,20.625,0,0,0,21.625,1Zm0,37.5A16.875,16.875,0,1,1,38.5,21.625,16.875,16.875,0,0,1,21.625,38.5Z" transform="translate(-1 -1)"/>
+          <path id="Path_264" data-name="Path 264" d="M21.125,15H9.875a1.875,1.875,0,0,0,0,3.75h11.25a1.875,1.875,0,0,0,0-3.75Z" transform="translate(5.125 11.25)"/>
+          <path id="Path_265" data-name="Path 265" d="M10.578,11.75H10.8a1.012,1.012,0,0,1,.938.656,1.881,1.881,0,1,0,3.525-1.312A4.781,4.781,0,0,0,10.8,8h-.225a4.781,4.781,0,0,0-4.462,3.094A1.881,1.881,0,1,0,9.64,12.406,1.013,1.013,0,0,1,10.578,11.75Z" transform="translate(3.372 5.125)"/>
+          <path id="Path_266" data-name="Path 266" d="M17.8,8h-.225a4.781,4.781,0,0,0-4.463,3.094,1.881,1.881,0,1,0,3.525,1.312,1.013,1.013,0,0,1,.938-.656H17.8a1.012,1.012,0,0,1,.938.656,1.881,1.881,0,0,0,3.525-1.312A4.781,4.781,0,0,0,17.8,8Z" transform="translate(9.497 5.125)"/>
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>

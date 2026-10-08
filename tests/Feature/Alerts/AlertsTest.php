@@ -89,6 +89,30 @@ class AlertsTest extends TestCase
         }
     }
 
+    public function testCreateInvalidatesTheAlertsCache(): void
+    {
+        $user = $this->loginAsTestUser(Role::ADMINISTRATOR);
+        $tokenstr = "?api_token={$user->api_token}";
+
+        // Populate the 2h listAlertsv2 cache with the current (empty) list.
+        $this->get('/api/v2/alerts' . $tokenstr)->assertSuccessful();
+
+        $this->put('/api/v2/alerts' . $tokenstr, [
+            'title' => 'Cache alert',
+            'html' => '<p>Cache alert</p>',
+            'start' => '2001-01-01T00:00:00Z',
+            'end' => '2038-01-01T02:00:00Z',
+        ])->assertSuccessful();
+
+        // The new alert must appear immediately - previously addAlertv2 never
+        // forgot the cache key, so a freshly-created alert stayed hidden for up to 2h.
+        $response = $this->get('/api/v2/alerts' . $tokenstr);
+        $response->assertSuccessful();
+        $json = json_decode($response->getContent(), true);
+        self::assertEquals(1, count($json['data']));
+        self::assertEquals('Cache alert', $json['data'][0]['title']);
+    }
+
     public function roleProvider(): array {
         return [
             [ Role::GUSET, FALSE ],

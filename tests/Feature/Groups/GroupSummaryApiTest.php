@@ -111,6 +111,29 @@ class GroupSummaryApiTest extends TestCase
         $this->assertEquals($tag->id, $ga['group_tags_full'][0]['id']);
     }
 
+    public function testNextEventExcludesUnapprovedEvents(): void
+    {
+        // A group's next_event must be its next APPROVED upcoming event.
+        // Group::getNextUpcomingEvent filters approved=true; the bulk-cached
+        // summary rewrite had dropped that filter, so a pending-moderation event
+        // could surface as a group's public next event (RES-1995 / PR 887).
+        $group = Group::factory()->create(['name' => 'Approved Filter Group']);
+        Party::factory()->create([
+            'group' => $group->idgroups,
+            'event_start_utc' => Carbon::now()->addDays(2)->toIso8601String(),
+            'event_end_utc' => Carbon::now()->addDays(2)->addHours(2)->toIso8601String(),
+            'approved' => false,
+        ]);
+        \Cache::forget('future_approved_events');
+
+        $response = $this->get('/api/v2/groups/summary?ids=' . $group->idgroups
+            . '&includeNextEvent=true&includeCounts=true');
+        $response->assertSuccessful();
+
+        $summary = collect($response->json('data'))->firstWhere('id', $group->idgroups);
+        $this->assertNull($summary['next_event'] ?? null);
+    }
+
     public function testIdsParamRejectsMoreThanTwoHundred(): void
     {
         $this->expectException(\Illuminate\Validation\ValidationException::class);

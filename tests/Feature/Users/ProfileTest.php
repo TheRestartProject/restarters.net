@@ -2,199 +2,42 @@
 
 namespace Tests\Feature;
 
-use App\Role;
+use App\Policies\UserPolicy;
 use App\User;
-use DB;
-use Illuminate\Auth\AuthenticationException;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Tests\TestCase;
-use Illuminate\Support\Facades\Hash;
 
 class ProfileTest extends TestCase
 {
-    public function testProfilePage(): void
-    {
-        $user = User::factory()->restarter()->create();
-
-        // When logged out should throw an exception.
-        try {
-            $response = $this->get('/profile');
-            $this->assertFalse(true);
-        } catch (AuthenticationException $e) {
-            // Success case.
-        }
-
-        // When logged in should be able to see.
-        // TODO I'm not convinced that viewing /profile is ever reachable, though /profile/id is.
-        $this->actingAs($user);
-
-        $response = $this->get('/profile');
-        $response->assertSee(__('profile.my_skills'));
-
-        // ...and also by id.
-        $response = $this->get('/profile/'.$user->id);
-        $response->assertSee(__('profile.my_skills'));
-    }
-
     public function testEdit(): void
     {
-        $GLOBALS['_FILES'] = [];
+        // POST /user/edit/{id} is dead (Nuxt cutover); there is no v2 API equivalent for an
+        // admin editing ANOTHER user's basic profile fields (name/email) - updateMyProfilev2
+        // only ever operates on Auth::user() (see APIv2UserProfileTest). The permission matrix
+        // itself (self yes, admin yes, everyone else no - including the F002 account-takeover
+        // fix restricting hosts) is still live logic in UserPolicy::update(), so assert
+        // against that directly instead of going through the removed route.
         $user1 = User::factory()->restarter()->create();
         $user2 = User::factory()->restarter()->create();
         $host = User::factory()->host()->create();
         $nc = User::factory()->networkCoordinator()->create();
         $admin = User::factory()->administrator()->create();
 
-        $editdata = [
-            'id' => $user1->id,
-            'name' => 'Test',
-            'groups' => [],
-            'email' => 'test@bloggs.net',
-        ];
+        $policy = new UserPolicy();
 
-        // When logged out should throw an exception.
-        try {
-            $response = $this->post('/user/edit/'.$user1->id, $editdata);
-            $this->assertFalse(true);
-        } catch (AuthenticationException $e) {
-            // Success case.
-        }
+        // As yourself - allowed.
+        $this->assertTrue($policy->update($user1, $user1));
 
-        // Let the framework render authorization failures as HTTP 403 responses.
-        $this->withExceptionHandling();
+        // A restarter acting on another restarter - forbidden.
+        $this->assertFalse($policy->update($user2, $user1));
 
-        // As yourself - returns an empty response.
-        $this->actingAs($user1);
-        $response = $this->post('/user/edit/'.$user1->id, $editdata);
-        $this->assertEquals('', $response->getContent());
+        // A host acting on an unrelated restarter - forbidden (F002 account-takeover fix).
+        $this->assertFalse($policy->update($host, $user1));
 
-        // A restarter acting on another restarter - should be unauthorized.
-        $this->actingAs($user2);
-        $this->post('/user/edit/'.$user1->id, $editdata)->assertStatus(403);
+        // A network coordinator acting on a restarter - forbidden.
+        $this->assertFalse($policy->update($nc, $user1));
 
-        // A host acting on an unrelated restarter - should be unauthorized (F002 account-takeover fix).
-        $this->actingAs($host);
-        $this->post('/user/edit/'.$user1->id, $editdata)->assertStatus(403);
-
-        // A network coordinator acting on a restarter - should be unauthorized.
-        $this->actingAs($nc);
-        $this->post('/user/edit/'.$user1->id, $editdata)->assertStatus(403);
-
-        // An administrator acting on a restarter - can.
-        $this->actingAs($admin);
-        $response = $this->post('/user/edit/'.$user1->id, $editdata);
-        $response->assertSee('Edit User');
-    }
-
-    public function testEditBadPassword(): void
-    {
-        $GLOBALS['_FILES'] = [];
-        $user1 = User::factory()->restarter()->create();
-        // An administrator is authorised to edit the user, so reaches the password-mismatch path.
-        $admin = User::factory()->administrator()->create();
-
-        $editdata = [
-            'id' => $user1->id,
-            'name' => 'Test',
-            'groups' => [],
-            'email' => 'test@bloggs.net',
-            'new-password' => 'test1',
-            'password-confirm' => 'test2',
-        ];
-
-        $this->actingAs($admin);
-        $response = $this->post('/user/edit/'.$user1->id, $editdata);
-
-        $response->assertSee('The passwords are not identical!');
-    }
-
-    public function testBadMediaWikiId(): void
-    {
-        $this->expectException(NotFoundHttpException::class);
-        $this->get('/user/thumbnail?wiki_username=invalid');
-    }
-
-    public function testChangePassword(): void {
-        $user = User::factory()->restarter()->create();
-        $user->setPassword(Hash::make('secret1'));
-
-        $this->actingAs($user);
-
-        $response = $this->post('/profile/edit-password', ['current-password' => 'secret', 'new-password' => 'f00', 'new-password-repeat' => 'f00']);
-        $this->assertTrue($response->isRedirection());
-        $this->assertEquals(__('profile.password_old_mismatch'), \Session::get('error'));
-
-        $response = $this->post('/profile/edit-password', ['current-password' => 'secret', 'new-password' => 'f00', 'new-password-repeat' => 'f01']);
-        $this->assertTrue($response->isRedirection());
-        $this->assertEquals(__('profile.password_new_mismatch'), \Session::get('error'));
-
-        $response = $this->post('/profile/edit-password', ['current-password' => 'secret1', 'new-password' => 'f00', 'new-password-repeat' => 'f00']);
-        $this->assertTrue($response->isRedirection());
-        $this->assertEquals(__('profile.password_changed'), \Session::get('message'));
-    }
-
-    public function testRepairDirectoryRole(): void {
-        $user = User::factory()->restarter()->create();
-        $admin = User::factory()->administrator()->create([
-            'repairdir_role' => Role::REPAIR_DIRECTORY_SUPERADMIN
-        ]);
-
-        $this->actingAs($admin);
-
-        $response = $this->post('/profile/edit-repair-directory', [
-            'id' => $user->id,
-            'role' => Role::REPAIR_DIRECTORY_EDITOR
-        ]);
-        $this->assertTrue($response->isRedirection());
-        $this->assertEquals(__('profile.profile_updated'), \Session::get('message'));
-    }
-
-    public function testLanguage(): void {
-        $user = User::factory()->restarter()->create();
-        $this->actingAs($user);
-
-        $response = $this->post('/profile/edit-language', [
-            'id' => $user->id,
-            'user_language' => 'fr'
-        ]);
-        $this->assertTrue($response->isRedirection());
-        $this->assertEquals(__('profile.language_updated'), \Session::get('message'));
-    }
-
-    /**
-     * @dataProvider invitesProvider
-     */
-    public function testInvites($admin, $invites): void {
-        $user = User::factory()->restarter()->create();
-
-        $params = [];
-
-        if ($invites) {
-            $params['invites'] = $invites;
-        }
-
-        if ($admin) {
-            $this->loginAsTestUser(Role::ADMINISTRATOR);
-            $params['id'] = $user->id;
-        } else {
-            $this->actingAs($user);
-        }
-
-        $response = $this->post('/profile/edit-preferences', $params);
-        $this->assertTrue($response->isRedirection());
-        $this->assertEquals(__('profile.preferences_updated'), \Session::get('message'));
-
-        $user->refresh();
-        $this->assertEquals($invites, $user->invites);
-    }
-
-    public function invitesProvider(): array {
-        return [
-            [ FALSE, 0 ],
-            [ FALSE, 1 ],
-            [ TRUE, 0 ],
-            [ TRUE, 1 ],
-        ];
+        // An administrator acting on a restarter - allowed.
+        $this->assertTrue($policy->update($admin, $user1));
     }
 
     public function testAPI(): void {

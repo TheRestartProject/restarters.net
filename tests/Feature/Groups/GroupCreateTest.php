@@ -6,12 +6,9 @@ use App\Group;
 use App\GroupTags;
 use App\Network;
 use App\Notifications\GroupConfirmed;
-use App\Party;
 use App\Role;
 use App\User;
-use Carbon\Carbon;
 use Illuminate\Validation\ValidationException;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Tests\TestCase;
 use Illuminate\Support\Facades\Notification;
 
@@ -23,9 +20,6 @@ class GroupCreateTest extends TestCase
                                                                       'api_token' => '1234',
                                                                   ]);
         $this->actingAs($user);
-
-        $response = $this->get('/group/create');
-        $response->assertStatus(200);
 
         $idgroups = $this->createGroup();
         $this->assertNotNull($idgroups);
@@ -46,19 +40,7 @@ class GroupCreateTest extends TestCase
         $user = $this->loginAsTestUser(Role::RESTARTER);
         $this->assertFalse($user->hasRole(Role::HOST));
 
-        // Should see create button.
-        $response = $this->get('/group');
-        $response->assertSuccessful();
-        $props = $this->assertVueProperties($response, [
-            [],
-            [
-                ':can-create' => 'true',
-            ],
-        ]);
-
         // Should be able to create a group.
-        $response = $this->get('/group/create');
-        $response->assertSuccessful();
         $idgroups = $this->createGroup();
         $this->assertNotNull($idgroups);
         $user->refresh();
@@ -128,18 +110,6 @@ class GroupCreateTest extends TestCase
             $network->addCoordinator($actas);
         }
 
-        // Vue component should exist for group to be moderated, though the component itself fetches the group info
-        // so it won't show as props.
-        $response = $this->get('/group');
-        $response->assertSuccessful();
-
-        $props = $this->assertVueProperties($response, [
-            [],
-            [
-                'VueComponent' => 'groupsrequiringmoderation'
-            ],
-        ]);
-
         // Log in as someone else with the same role so that the GroupConfirmed notification gets sent.
         $actas2 = User::factory()->$role()->create();
 
@@ -194,67 +164,5 @@ class GroupCreateTest extends TestCase
             $this->assertTrue($group->group_tags->contains($networkTag));
             $this->assertTrue($group->group_tags->contains($otherNetworkTag));
         }
-    }
-
-    public function testEventVisibility(): void {
-        // Create a network.
-        $network = Network::factory()->create();
-
-        // Create an unapproved group in that network.
-        $admin1 = User::factory()->administrator()->create();
-        $this->actingAs($admin1);
-        $idgroups = $this->createGroup('Test Group', 'https://therestartproject.org', 'London', 'Some text.', true, false);
-        $group = Group::find($idgroups);
-        $network->addGroup($group);
-
-        // Create a host for the group.
-        $host = User::factory()->host()->create();
-        $group->addVolunteer($host);
-        $group->makeMemberAHost($host);
-        $this->actingAs($host);
-
-        // Create an event on this as yet unapproved group.
-        $eventAttributes = Party::factory()->raw();
-        $eventAttributes['group'] = $idgroups;
-        $eventAttributes['link'] = 'https://therestartproject.org/';
-        $eventAttributes['event_start_utc'] = Carbon::parse('1pm tomorrow')->toIso8601String();
-        $eventAttributes['event_end_utc'] = Carbon::parse('3pm tomorrow')->toIso8601String();
-
-        $response = $this->post('/api/v2/events?api_token=' . $host->api_token, $this->eventAttributesToAPI($eventAttributes));
-        $response->assertSuccessful();
-        $event = Party::latest()->first();
-        $this->assertEquals($host->id, $event->user_id);
-
-        // The event should be visible to the host.
-        $this->get('/party/view/'.$event->idevents)->assertSee($eventAttributes['venue']);
-        $this->get('/party')->assertSee($eventAttributes['venue']);
-
-        // ...and on the page for this group's events.
-        $this->get('/party/group/' . $idgroups)->assertSee($eventAttributes['venue']);
-
-        // And to a network coordinator
-        $coordinator = User::factory()->networkCoordinator()->create();
-        $network->addCoordinator($coordinator);
-        $this->actingAs($coordinator);
-        $this->get('/party/view/'.$event->idevents)->assertSee($eventAttributes['venue']);
-        $this->get('/party')->assertSee($eventAttributes['venue']);
-
-        // This event should not be visible to a Restarter, as the group is not yet approved.
-        $restarter = User::factory()->restarter()->create();
-        $this->actingAs($restarter);
-        try {
-            $this->get('/party/view/'.$event->idevents)->assertDontSee(e($eventAttributes['venue']));
-            $this->assertTrue(false);
-        } catch (NotFoundHttpException $e) {}
-
-        $this->get('/party')->assertDontSee($eventAttributes['venue']);
-
-        // Now approve the group.
-        $group->approved = true;
-        $group->save();
-
-        // Should now be visible.
-        $this->get('/party/view/'.$event->idevents)->assertSee($eventAttributes['venue']);
-        $this->get('/party')->assertSee($eventAttributes['venue']);
     }
 }

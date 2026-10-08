@@ -6,8 +6,8 @@ return [
   'biography' => 'Biography',
   'no_bio' => ':name has not yet entered a biography.',
   'edit_user' => 'Edit user',
-  'change_photo' => 'Change my photo',
   'profile_picture' => 'Profile picture',
+  'change_photo' => 'Change my photo',
   'skills_updated' => 'Skills updated!',
   'notifications' => 'Notifications',
   'language_panel_title' => 'Language settings',
@@ -15,6 +15,7 @@ return [
   'language_updated' => 'Language preference updated',
   'page_title' => 'Profile & Preferences',
   'profile' => 'Profile',
+  'other_profile' => ':name\'s profile',
   'account' => 'Account',
   'email_preferences' => 'Email preferences',
   'calendars' => [

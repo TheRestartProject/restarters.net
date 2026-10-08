@@ -74,23 +74,17 @@ class EventStateTest extends TestCase
      * @dataProvider timeProvider
      */
     public function testStatesOnViewPage($date, $upcoming, $finished, $inprogress, $startingsoon): void {
-
+        // The Blade /party/view/{id} page is gone post-cutover; it only ever surfaced
+        // these state flags (previously computed by PartyController::expandEvent() and
+        // passed as Vue props) by calling straight through to these Party model methods.
+        // Assert directly on the model rather than round-tripping through a dead page.
         $idevents = $this->createEvent($this->group->idgroups, $date);
+        $event = Party::findOrFail($idevents);
 
-        $response = $this->get('/party/view/' . $idevents);
-        $props = $this->assertVueProperties($response, [
-            [],
-            [
-                ':idevents' => $idevents
-            ]
-        ]);
-
-        $initialEvent = json_decode($props[1][':initial-event'], TRUE);
-
-        self::assertEquals($upcoming, $initialEvent['upcoming']);
-        self::assertEquals($finished, $initialEvent['finished']);
-        self::assertEquals($inprogress, $initialEvent['inprogress']);
-        self::assertEquals($startingsoon, $initialEvent['startingsoon']);
+        self::assertEquals($upcoming, $event->isUpcoming());
+        self::assertEquals($finished, $event->hasFinished());
+        self::assertEquals($inprogress, $event->isInProgress());
+        self::assertEquals($startingsoon, $event->isStartingSoon());
     }
 
     public function timeProvider(): array {

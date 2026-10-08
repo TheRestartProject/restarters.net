@@ -11,7 +11,43 @@ class OutboundController extends Controller
 {
     /** type can be either party or group
      * id is id of group or party to display.
-     * */
+     *
+     * @OA\Get(
+     *      path="/api/outbound/info/{type}/{id}/{format}",
+     *      operationId="outboundInfo",
+     *      tags={"Outbound"},
+     *      summary="Get CO2-impact stats for a group/event, formatted for embeddable share widgets",
+     *      description="Public endpoint, no authentication required. Used from external share plugins/widgets (e.g. group and event share buttons on third-party sites) to render CO2-saving comparisons (equivalent to driving/watching TV/manufacturing cars or sofas). When called under /api/*, returns JSON; when called outside the API prefix it instead renders a Blade view (outbound.info or visualisations) - only the API/JSON behaviour is relevant to this spec. Returns 404 if id is not numeric, or if the group/party cannot be found.",
+     *      @OA\Parameter(
+     *          name="type", in="path", required=true,
+     *          description="Which kind of entity id refers to.",
+     *          @OA\Schema(type="string", enum={"party","group"})
+     *      ),
+     *      @OA\Parameter(
+     *          name="id", in="path", required=true,
+     *          description="Numeric ID of the party (event) or group to report on.",
+     *          @OA\Schema(type="integer")
+     *      ),
+     *      @OA\Parameter(
+     *          name="format", in="path", required=false,
+     *          description="Output shape. 'fixometer' (default) returns a car/TV comparison plus a manufacturing comparison. 'consume', 'manufacture' and 'leaf' return a single title/measure/equal_to comparison sized for a specific widget.",
+     *          @OA\Schema(type="string", enum={"fixometer","consume","manufacture","leaf"}, default="fixometer")
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation. Shape depends on format: 'fixometer' returns {info, co2}; all other formats return {format, co2, title, measure, equal_to}.",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="info", type="object", description="Only present when format=fixometer.", nullable=true),
+     *              @OA\Property(property="format", type="string", nullable=true, description="Echoes the requested format; only present when format is not fixometer."),
+     *              @OA\Property(property="co2", type="number", description="Total CO2 (kg) saved by the group/event."),
+     *              @OA\Property(property="title", type="string", nullable=true),
+     *              @OA\Property(property="measure", type="string", nullable=true),
+     *              @OA\Property(property="equal_to", nullable=true, description="Numeric or formatted-string comparison value, depending on format.")
+     *          )
+     *      ),
+     *      @OA\Response(response=404, description="id is not numeric, or the referenced party/group does not exist.")
+     * )
+     */
     public static function info($type, $id, $format = 'fixometer', $return = 'view')
     {
 

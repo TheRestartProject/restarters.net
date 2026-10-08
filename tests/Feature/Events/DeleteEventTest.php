@@ -9,7 +9,6 @@ use App\Helpers\Geocoder;
 use App\Listeners\DeleteEventFromWordPress;
 use App\Network;
 use App\Notifications\DeleteEventFromWordpressFailed;
-use App\Notifications\EventRepairs;
 use App\Notifications\NotifyRestartersOfNewEvent;
 use App\Party;
 use App\Preferences;
@@ -59,8 +58,8 @@ class DeleteEventTest extends TestCase
         // Add a volunteer so that we get some stats.
         $user = User::factory()->restarter()->create();
         $this->actingAs($user);
-        $response = $this->get('/party/join/'.$event->idevents);
-        $this->assertTrue($response->isRedirection());
+        $response = $this->post('/api/v2/events/'.$event->idevents.'/attendees/me?api_token='.$user->api_token);
+        $response->assertSuccessful();
 
         // Get group stats.
         $this->actingAs($admin);
@@ -69,8 +68,8 @@ class DeleteEventTest extends TestCase
         $this->assertEquals(21, $stats['num_hours_volunteered']);
 
         // Now delete the event.
-        $response = $this->post('/party/delete/'.$event->idevents);
-        $response->assertRedirect('/party/');
+        $response = $this->delete('/api/v2/events/'.$event->idevents.'?api_token=1234');
+        $response->assertSuccessful();
         $this->assertSoftDeleted('events', ['idevents' => $event['idevents']]);
         Event::assertDispatched(\App\Events\EventDeleted::class);
 
@@ -116,34 +115,14 @@ class DeleteEventTest extends TestCase
         $event = Party::factory()->create(['group' => $group->idgroups]);
         $event->save();
 
-        // View the event
-        $response = $this->get("/party/view/{$event->idevents}");
-        $props = $this->assertVueProperties($response, [
-            [],
-            [
-                ':idevents' => $event->idevents
-            ]
-        ]);
-        $initialEvent = json_decode($props[1][':initial-event'], TRUE);
-        $this->assertEquals($event->venue, $initialEvent['venue']);
-        $this->assertFalse($initialEvent['approved']);
-
         // Now delete the event.
-        $response = $this->post('/party/delete/'.$event->idevents);
-        $response->assertRedirect('/party/');
+        $response = $this->delete('/api/v2/events/'.$event->idevents.'?api_token='.$host->api_token);
+        $response->assertSuccessful();
         $this->assertSoftDeleted('events', ['idevents' => $event['idevents']]);
 
-        // View page should fail.
+        // A deleted event should no longer be retrievable.
         try {
-            $response = $this->get('/party/view/'.$event->idevents);
-            $this->assertTrue(false, "Failed to throw exception");
-        } catch (NotFoundHttpException $e) {
-            $this->assertTrue(true);
-        }
-
-        // Edit also.
-        try {
-            $response2 = $this->get('/party/edit/'.$event->idevents);
+            $this->get('/api/v2/events/'.$event->idevents);
             $this->assertTrue(false, "Failed to throw exception");
         } catch (ModelNotFoundException $e) {
             $this->assertTrue(true);
@@ -225,141 +204,4 @@ class DeleteEventTest extends TestCase
         );
     }
 
-    public function provider(): array
-    {
-        // We return:
-        // - role
-        // - past/future
-        // - (for past) whether to add a device
-        // - whether the delete flag should show
-        return [
-            [
-                'Administrator', 'Past', false, true,
-            ],
-            [
-                'Administrator', 'Past', true, false,
-            ],
-            [
-                'Administrator', 'Future', false, true,
-            ],
-            [
-                'NetworkCoordinator', 'Past', false, true,
-            ],
-            [
-                'NetworkCoordinator', 'Past', true, false,
-            ],
-            [
-                'NetworkCoordinator', 'Future', false, true,
-            ],
-            [
-                'Host', 'Past', false, true,
-            ],
-            [
-                'Host', 'Past', true, false,
-            ],
-            [
-                'Host', 'Future', false, true,
-            ],
-            [
-                'Restarter', 'Past', false, false,
-            ],
-            [
-                'Restarter', 'Future', false, false,
-            ],
-        ];
-    }
-
-    /**
-     * @test
-     * @dataProvider provider
-     */
-    public function candelete_flag($role, $pastFuture, $addDevice, $canDelete): void
-    {
-        $this->loginAsTestUser(Role::ADMINISTRATOR);
-        $id = $this->createGroup();
-        $group = Group::findOrFail($id);
-
-        $network = Network::factory()->create([
-           'events_push_to_wordpress' => false,
-        ]);
-        $network->addGroup($group);
-
-        $this->assertNotNull($id);
-        $idevents = $this->createEvent($id, $pastFuture == 'Past' ? 'yesterday' : 'tomorrow');
-
-        if ($addDevice) {
-            $this->createDevice($idevents, 'misc');
-        }
-
-        $user = User::factory()->{lcfirst($role)}()->create();
-
-        if ($role == 'NetworkCoordinator') {
-            $network->addCoordinator($user);
-        }
-
-        if ($role == 'Host') {
-            $group->addVolunteer($user);
-            $group->makeMemberAHost($user);
-        }
-
-        $this->actingAs($user);
-
-        $response = $this->get("/party/view/$idevents");
-
-        $this->assertVueProperties($response, [
-            [],
-            [
-                ':candelete' => $canDelete ? 'true' : 'false',
-            ],
-        ]);
-    }
-
-
-    /**
-     * @test
-     */
-    public function request_review(): void
-    {
-        Notification::fake();
-
-        $admin = User::factory()->administrator()->create();
-        $this->actingAs($admin);
-        $id = $this->createGroup();
-        $group = Group::find($id);
-
-        $network = Network::factory()->create([
-                                                       'events_push_to_wordpress' => false,
-                                                   ]);
-        $network->addGroup($group);
-
-        $this->assertNotNull($id);
-        $idevents = $this->createEvent($id, '1981-01-01');
-
-        // Add a restarter who is attending.
-        $this->get('/logout');
-        $user = User::factory()->restarter()->create();
-        $this->actingAs($user);
-
-        // Join.  Should get redirected, and also prompted to follow the group (which we haven't).
-        $response = $this->get('/party/join/'. $idevents);
-        $this->assertTrue($response->isRedirection());
-        $response->assertSessionHas('prompt-follow-group');
-
-        // Restarter can't trigger contribution ask.
-        $response = $this->get("/party/contribution/$idevents");
-        $response->assertSessionHas('warning');
-
-        // Admin can.
-        $this->get('/logout');
-        $this->actingAs($admin);
-
-        $response = $this->get("/party/contribution/$idevents");
-        $response->assertSessionHas('success');
-
-        // Should trigger a notification to the restarter.
-        Notification::assertSentTo(
-            $user,
-            EventRepairs::class
-        );
-    }
 }

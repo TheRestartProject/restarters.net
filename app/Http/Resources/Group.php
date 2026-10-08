@@ -41,6 +41,14 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *          example="/mid_1597853610178a4b76e4d666b2a7b32ee75d8a24c706f1cbf213970.png"
  *     ),
  *     @OA\Property(
+ *          property="image_idxref",
+ *          title="image_idxref",
+ *          description="The xref id linking the image to the group - pass as {idimages} to DELETE /api/v2/groups/{id}/images/{idimages} to remove it. Null when the group has no image.",
+ *          format="int64",
+ *          nullable=true,
+ *          example=1
+ *     ),
+ *     @OA\Property(
  *          property="phone",
  *          title="phone",
  *          description="An optional phone number to contact the group.",
@@ -97,6 +105,12 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *         property="approved",
  *         title="hosts",
  *         description="Whether the group has been approved",
+ *         type="boolean",
+ *     ),
+ *     @OA\Property(
+ *         property="auto_approve",
+ *         title="auto_approve",
+ *         description="Whether events created for this group are automatically approved (true iff every network the group belongs to has auto_approve_events set). Drives which 'before you submit' copy the event form shows.",
  *         type="boolean",
  *     ),
  *     @OA\Property(
@@ -260,6 +274,72 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *          title="archived_at",
  *          description="If present, this group has been archived and is no longer active.",
  *          format="date-time",
+ *     ),
+ *     @OA\Property(
+ *          property="discourse_group",
+ *          title="discourse_group",
+ *          description="The slug of this group's linked Discourse group, if any. Combine with the session config's discourse_url as {discourse_url}/g/{discourse_group} to link to the group's conversation. Null if the group has no linked Discourse group.",
+ *          format="string",
+ *          nullable=true,
+ *          example="fixers-united"
+ *     ),
+ *     @OA\Property(
+ *          property="shareable_link",
+ *          title="shareable_link",
+ *          description="A link that can be shared to let people join this group directly, without an email invite.",
+ *          format="string",
+ *          example="https://app.restarters.net/group/invite/abc123"
+ *     ),
+ *     @OA\Property(
+ *          property="has_pending_invite",
+ *          title="has_pending_invite",
+ *          description="The caller's outstanding invitation hash for this group, or null when there is none or the caller is anonymous. Use it to build /group/accept-invite/{group}/{hash}.",
+ *          format="string",
+ *          nullable=true,
+ *          example="a1b2c3d4"
+ *     ),
+ *     @OA\Property(
+ *          property="is_member",
+ *          title="is_member",
+ *          description="Whether the currently authenticated user is a confirmed member of this group. null when there is no authenticated user.",
+ *          type="boolean",
+ *          nullable=true
+ *     ),
+ *     @OA\Property(
+ *          property="permissions",
+ *          title="permissions",
+ *          description="UI show/hide permission flags for the currently authenticated user (only present on the single-group endpoint).  These are for UI purposes only - the edit/delete/archive endpoints enforce their own authorization independently.  When there is no authenticated user, every flag is false.",
+ *          format="object",
+ *          @OA\Property(
+ *              property="can_edit",
+ *              title="can_edit",
+ *              description="Whether the user can see group editing controls (administrator, network coordinator for the group, or host of the group).",
+ *              type="boolean",
+ *          ),
+ *          @OA\Property(
+ *              property="can_demote",
+ *              title="can_demote",
+ *              description="Whether the user can demote/manage volunteer roles (administrator or network coordinator for the group).",
+ *              type="boolean",
+ *          ),
+ *          @OA\Property(
+ *              property="can_see_delete",
+ *              title="can_see_delete",
+ *              description="Whether the user can see the delete-group control (administrator only).",
+ *              type="boolean",
+ *          ),
+ *          @OA\Property(
+ *              property="can_perform_delete",
+ *              title="can_perform_delete",
+ *              description="Whether the group can actually be deleted by this user (can_see_delete and the group has no events with devices).",
+ *              type="boolean",
+ *          ),
+ *          @OA\Property(
+ *              property="can_perform_archive",
+ *              title="can_perform_archive",
+ *              description="Whether the user can archive the group (administrator or network coordinator for the group).",
+ *              type="boolean",
+ *          ),
  *     )
  * )
 */
@@ -291,6 +371,11 @@ class Group extends JsonResource
             'id' => $this->idgroups,
             'name' => $this->name,
             'image' => $this->groupImage && is_object($this->groupImage) && is_object($this->groupImage->image) ? $this->groupImage->image->path : null,
+            // groupImage() is a HasOne onto Xref itself (App\Group::groupImage()), so its own
+            // idxref is exactly the id DELETE /api/v2/groups/{id}/images/{idimages} expects -
+            // mirrors the Image resource's 'idxref' field used for the same purpose on
+            // devices/events (see app/Http/Resources/Image.php).
+            'image_idxref' => $this->groupImage && is_object($this->groupImage) ? $this->groupImage->idxref : null,
             'website' => $this->website,
             'phone' => $this->phone,
             'description' => $this->free_text,
@@ -301,14 +386,44 @@ class Group extends JsonResource
             'tags' => new TagCollection($this->resource->getFilteredTagsForUser()),
             'timezone' => $this->timezone,
             'approved' => $this->approved ? true : false,
+            // getAutoApproveAttribute() (App\Group) is already in the model's $appends, but
+            // toArray() here is hand-built rather than delegating to it, so it needs pulling in
+            // explicitly. EventForm.vue needs this to pick the right "before you submit" copy.
+            'auto_approve' => (bool) $this->resource->auto_approve,
             'network_data' => $networkData,
             'full' => true,
             'email' => $this->email,
-            'archived_at' => $this->archived_at ? Carbon::parse($this->archived_at)->toIso8601String() : null
+            'archived_at' => $this->archived_at ? Carbon::parse($this->archived_at)->toIso8601String() : null,
+            'discourse_group' => $this->discourse_group,
         ];
 
         $ret['hosts'] = $this->resource->all_confirmed_hosts_count;
         $ret['restarters'] = $this->resource->all_confirmed_restarters_count;
+
+        $ret['shareable_link'] = $this->resource->shareable_link;
+
+        // Same auth-resolution order as API\GroupController::getGroupv2() (this endpoint is not
+        // behind auth:api, so the request may be anonymous, session-authenticated, or bearer/API
+        // token authenticated).
+        $user = \Illuminate\Support\Facades\Auth::user()
+            ?? auth('sanctum')->user()
+            ?? auth('api')->user();
+        $ret['is_member'] = $user ? $this->resource->isVolunteer($user->id) : null;
+
+        // group/view.blade.php shows a banner when the caller has an
+        // outstanding invitation to this group, so someone who navigates here
+        // directly - rather than through the emailed link - can still accept.
+        // The value is the users_groups.status column, which doubles as the
+        // invite hash in /group/accept-invite/{group}/{hash}; a joined member
+        // has status '1'. Only ever the caller's own invite, and absent
+        // entirely when there isn't one.
+        $ret['has_pending_invite'] = $user
+            ? (\App\UserGroups::where('group', $this->idgroups)
+                ->where('user', $user->id)
+                ->where('status', '<>', '1')
+                ->whereNotNull('status')
+                ->value('status') ?: null)
+            : null;
 
         // Get next approved event for group
         $nextevent = \App\Group::find($this->idgroups)->getNextUpcomingEvent();

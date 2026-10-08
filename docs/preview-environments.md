@@ -1,4 +1,4 @@
-# PR preview environments
+# Preview environments
 
 Label a pull request with `preview` and approve the workflow run: you get a
 self-contained copy of the site at `https://restarters-pr-<N>.fly.dev`,
@@ -7,7 +7,16 @@ of the live database. An idle preview costs pennies a month (its stored disk
 image only, roughly 20–30p); once the PR closes it is destroyed and costs
 nothing.
 
-Technical design detail lives in `fly-deployment.md` → *PR Previews*. This
+**`develop` is a preview too.** `https://restarters-dev.fly.dev` is the same thing,
+permanently: same config template, same startup script, same disposable
+database, same suspend-on-idle teardown. It differs only in that CircleCI
+deploys it automatically on every green build of `develop` — no label, no
+approval, since the code is already merged — and that it is never destroyed.
+Everything below about warming pages, disposable data, mail and image uploads
+applies to it unchanged. There is no longer a nightly stop job or a separate
+dev database app: idling is handled by suspend, exactly as for a PR.
+
+Technical design detail lives in `fly-deployment.md` → *Previews*. This
 file is the operating guide plus the record of the concrete setup.
 
 ## Architecture at a glance
@@ -18,7 +27,7 @@ file is the operating guide plus the record of the concrete setup.
         ▼
   GitHub Actions "PR preview" run
         │  waits at: Review deployments → preview → Approve
-        │  (approver checks the PR's diff to .github/workflows/, fly.pr.toml,
+        │  (approver checks the PR's diff to .github/workflows/, fly.preview.toml,
         │   Dockerfile.fly, docker/*.sh — the run executes the PR's own code)
         ▼
   Build: PR merged with base (refs/pull/N/merge), Dockerfile.fly, remote builder
@@ -57,7 +66,7 @@ from the command line.
    reviewers also get a "Deployment review required" email linking straight
    to it. Open the run, then *Review deployments → tick `preview` →
    Approve and deploy*. Before approving, glance at the PR's diff to
-   `.github/workflows/`, `fly.pr.toml`, `Dockerfile.fly` and `docker/*.sh` —
+   `.github/workflows/`, `fly.preview.toml`, `Dockerfile.fly` and `docker/*.sh` —
    approval runs the PR's own code with the preview credentials.
 3. **Wait for the PR comment**: around ten minutes later (build plus cold
    boot) the workflow posts/updates a comment on the PR with the preview URL
@@ -88,6 +97,33 @@ What to expect:
   against real data — usually a signal to rebase; check
   `flyctl logs --app restarters-pr-<N>`.
 
+## The develop preview (restarters-dev.fly.dev)
+
+Nothing to start and nothing to clean up. Every green CircleCI build of
+`develop` redeploys `restarters-dev` from the same `fly.preview.toml`, and the
+deploy job then polls `/_preview_status` and **fails the build** if the restore
+or the branch's migrations failed — so a migration that breaks against real
+production data is caught on `develop`, not in production.
+
+```
+  merge to develop ──► CircleCI: build + build-client + e2e-client
+        │                        (all must pass)
+        ▼
+  deploy-fly-dev: substitute fly.preview.toml → deploy restarters-dev
+        ▼
+  COLD BOOT (about 5–8 minutes, same sequence as a PR preview)
+        ▼
+  READY at https://restarters-dev.fly.dev
+        ├─ ~5 min idle ──► SUSPEND ──► next request resumes, sub-second
+        └─ next develop merge ──► redeploy, fresh backup
+```
+
+Differences from a PR preview, in full: no `preview` label, no approval gate,
+and the app is long-lived instead of swept. The database is just as disposable — **every merge to
+`develop` resets it to a fresh copy of production**, so anything
+you set up there is gone at the next merge. Its secrets were set once, by
+hand, from `fly.preview-secrets.example.env`.
+
 ## Handy commands
 
 ```bash
@@ -96,6 +132,10 @@ flyctl ssh console --app restarters-pr-<N>          # shell on the preview
 curl https://restarters-pr-<N>.fly.dev/_preview_status   # boot status JSON
 flyctl apps destroy restarters-pr-<N> --yes         # manual teardown
 ```
+
+The same commands work for the develop preview with `--app restarters-dev`
+(minus the destroy — it is meant to stay). Its status endpoint is
+<https://restarters-dev.fly.dev/_preview_status>.
 
 The cleanup sweep also runs on demand: *Actions → PR preview → Run workflow*
 with the PR number left **empty**.
@@ -132,8 +172,9 @@ flyctl machine start <machine-id> -a restarters-pr-<N>
 | Restore identity | `restarters-preview-restore@restarters-previews.iam.gserviceaccount.com` (GCP project `restarters-previews`, owned by edward@therestartproject.org; Drive API enabled). Needs **Viewer** on the backups folder — never anything stronger, so previews can never delete backups — and the shared drive must allow viewers to download (see Troubleshooting). |
 | Tigris (image store) | a dedicated **read-only** access key for `restarters-uploads` — the real enforcement behind the disabled-uploads flag |
 | Label | `preview` |
+| `restarters-dev` | the develop preview. Holds the same secret set as `FLY_PREVIEW_SECRETS`, set once by hand rather than by the workflow. Deployed by CircleCI's `deploy-fly-dev` job using CircleCI's own `FLY_API_TOKEN`, not the GitHub org token. |
 
-Secrets template: `fly.pr-secrets.example.env` in the repo root. To rotate or
+Secrets template: `fly.preview-secrets.example.env` in the repo root. To rotate or
 complete the secrets:
 
 ```bash
