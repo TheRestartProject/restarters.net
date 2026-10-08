@@ -184,5 +184,5 @@ Apprenez à utiliser ce groupe ici : :help.',
   'search_nothing_found' => 'Aucun résultat.',
   'goto_group' => 'Aller au Repair Café',
   'next_event' => 'Prochain événement',
-  'show_more_groups' => 'Afficher plus de groupes (:shown sur :total)',
+  'show_all_groups' => 'Afficher les :total groupes',
 ];

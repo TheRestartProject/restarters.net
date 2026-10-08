@@ -85,7 +85,7 @@
           show-filters
           :can-manage-tags="canManageTags"
           :available-tags="groupFilterTags"
-          show-more-button
+          show-all-button
       />
     </section>
 

@@ -323,36 +323,38 @@ describe('GroupsTable distance column', () => {
 
 // On a page with more below the list - a network's tags, say - an infinite
 // scroll keeps pushing that out of reach as you scroll towards it (#918). A
-// button grows the list only when asked.
-describe('GroupsTable show more button', () => {
+// button shows the rest of the list only when asked, all in one go: nobody
+// wants to reveal a long list a page at a time.
+describe('GroupsTable show all button', () => {
   const many = Array.from({ length: 60 }, (_, i) => ({
     ...group,
     id: i + 1,
     name: 'Group ' + String(i + 1).padStart(3, '0'),
   }))
 
-  test('uses a button rather than an infinite scroll', async () => {
-    const wrapper = mountTable(many, { showMoreButton: true })
+  test('shows every group at once rather than scrolling infinitely', async () => {
+    const wrapper = mountTable(many, { showAllButton: true })
 
     expect(wrapper.findComponent({ name: 'infinite-loading' }).exists()).toBe(false)
+    expect(wrapper.vm.itemsToShow.length).toBe(wrapper.vm.pageSize)
 
-    const button = wrapper.find('.groups-show-more')
+    const button = wrapper.find('.groups-show-all')
     expect(button.exists()).toBe(true)
 
-    const before = wrapper.vm.itemsToShow.length
     await button.trigger('click')
-    expect(wrapper.vm.itemsToShow.length).toBe(before + wrapper.vm.pageSize)
+    expect(wrapper.vm.itemsToShow.length).toBe(many.length)
+    expect(wrapper.find('.groups-show-all').exists()).toBe(false)
   })
 
-  test('has no button once every group is shown', async () => {
-    const wrapper = mountTable(many.slice(0, 10), { showMoreButton: true })
+  test('has no button when every group already fits on one page', () => {
+    const wrapper = mountTable(many.slice(0, 10), { showAllButton: true })
 
-    expect(wrapper.find('.groups-show-more').exists()).toBe(false)
+    expect(wrapper.find('.groups-show-all').exists()).toBe(false)
   })
 
   test('scrolls infinitely by default', () => {
     const wrapper = mountTable(many)
 
-    expect(wrapper.find('.groups-show-more').exists()).toBe(false)
+    expect(wrapper.find('.groups-show-all').exists()).toBe(false)
   })
 })

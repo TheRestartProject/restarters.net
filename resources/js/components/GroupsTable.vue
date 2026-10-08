@@ -90,9 +90,9 @@
         </div>
       </template>
     </b-table>
-    <div v-if="showMoreButton" class="text-center mt-2">
-      <b-btn v-if="show < filteredItems.length" variant="link" class="groups-show-more" @click="show += pageSize">
-        {{ __('groups.show_more_groups', { shown: itemsToShow.length, total: filteredItems.length }) }}
+    <div v-if="showAllButton" class="text-center mt-2">
+      <b-btn v-if="show < filteredItems.length" variant="link" class="groups-show-all" @click="show = Infinity">
+        {{ __('groups.show_all_groups', { total: filteredItems.length }) }}
       </b-btn>
     </div>
     <infinite-loading v-else @infinite="loadMore">
@@ -119,8 +119,9 @@ export default {
   components: {GroupArchivedBadge, GroupsTableFilters, InfiniteLoading},
   mixins: [images],
   props: {
-    showMoreButton: {
-      // Grow the list with a button rather than as you scroll, for pages with more below the list.
+    showAllButton: {
+      // Show one page of groups and a button that reveals the rest, rather than
+      // growing the list as you scroll, for pages with more below the list.
       type: Boolean,
       required: false,
       default: false

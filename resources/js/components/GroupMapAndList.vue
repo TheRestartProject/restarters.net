@@ -36,7 +36,7 @@
           @update:filters="filtersChanged"
           :all-group-tags="availableTags"
           :show-tags="canManageTags"
-          :show-more-button="showMoreButton"
+          :show-all-button="showAllButton"
       />
     </div>
   </div>
@@ -59,7 +59,7 @@ export default {
     VIcon,
   },
   props: {
-    showMoreButton: {
+    showAllButton: {
       // See GroupsTable.
       type: Boolean,
       required: false,
