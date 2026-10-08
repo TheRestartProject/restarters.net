@@ -13,6 +13,7 @@ class StatsTestCase extends TestCase
 {
     protected $_displacementFactor;
     protected $_ratioUnpowered;
+    protected $_ratioPowered;
     protected $_idUnpoweredMisc;
     protected $_idPoweredMisc;
     protected $_idUnpoweredNonMisc;

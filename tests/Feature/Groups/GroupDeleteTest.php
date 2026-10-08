@@ -22,14 +22,14 @@ class GroupDeleteTest extends TestCase
             $user = \App\User::factory()->{lcfirst($role)}()->create();
             $this->actingAs($user);
             $this->followingRedirects();
-            $response = $this->get("/group/delete/$id");
+            $response = $this->post("/group/delete/$id");
             $this->assertStringContainsString('Sorry, but you do not have the permissions to perform that action', $response->getContent());
         }
 
         $user = \App\User::factory()->administrator()->create();
         $this->actingAs($user);
         $this->followingRedirects();
-        $response = $this->get("/group/delete/$id");
+        $response = $this->post("/group/delete/$id");
         $this->assertStringContainsString(__('groups.delete_succeeded', [
             'name' => $name,
         ]), $response->getContent());
@@ -49,7 +49,7 @@ class GroupDeleteTest extends TestCase
         $user = \App\User::factory()->administrator()->create();
         $this->actingAs($user);
         $this->followingRedirects();
-        $response = $this->get("/group/delete/$id");
+        $response = $this->post("/group/delete/$id");
         $this->assertStringContainsString(__('groups.delete_succeeded', [
             'name' => $name,
         ]), $response->getContent());
@@ -68,13 +68,13 @@ class GroupDeleteTest extends TestCase
         $user = \App\User::factory()->administrator()->create();
         $this->actingAs($user);
         $this->followingRedirects();
-        $response = $this->get("/group/delete/$id");
+        $response = $this->post("/group/delete/$id");
         $this->assertStringContainsString('Sorry, but you do not have the permissions to perform that action.', $response->getContent());
 
         // Delete the event - still shouldn't be deletable as a device exists.
         Party::find($idevents)->delete();
 
-        $response = $this->get("/group/delete/$id");
+        $response = $this->post("/group/delete/$id");
         $response->assertRedirect('/user/forbidden');
     }
 
@@ -93,7 +93,7 @@ class GroupDeleteTest extends TestCase
 
         // Should
         $event->delete();
-        $response = $this->get("/group/delete/$id");
+        $response = $this->post("/group/delete/$id");
         $response->assertRedirect();
         $response->assertSessionHas('success');
     }

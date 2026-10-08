@@ -46,7 +46,9 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->singleton(Geocoder::class, function () {
-            return new Geocoder();
+            return config('restarters.geocoder_stub')
+                ? new \App\Helpers\StubGeocoder()
+                : new Geocoder();
         });
 
         // Override the existing translator with our own robust one.

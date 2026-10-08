@@ -93,6 +93,39 @@ class GroupEditTest extends TestCase
     }
 
     /** @test */
+    public function host_can_edit_postcode_but_not_area(): void {
+        $group = Group::factory()->create(['postcode' => 'SW9 7QD', 'area' => 'London']);
+
+        $host = User::factory()->host()->create();
+        $group->addVolunteer($host);
+        $group->makeMemberAHost($host);
+        $this->actingAs($host);
+
+        $response = $this->patch('/api/v2/groups/' . $group->idgroups, [
+            'postcode' => 'E8 1AA',
+            'area' => 'Elsewhere',
+        ]);
+        $response->assertSuccessful();
+
+        $group->refresh();
+        $this->assertEquals('E8 1AA', $group->postcode);
+        $this->assertEquals('London', $group->area);
+
+        // A partial update that doesn't send the postcode leaves it alone.
+        $response = $this->patch('/api/v2/groups/' . $group->idgroups, [
+            'network_data' => ['foo' => 'bar'],
+        ]);
+        $response->assertSuccessful();
+        $this->assertEquals('E8 1AA', $group->refresh()->postcode);
+
+        // Longer than the column.
+        $this->expectException(\Illuminate\Validation\ValidationException::class);
+        $this->patch('/api/v2/groups/' . $group->idgroups, [
+            'postcode' => str_repeat('X', 33),
+        ]);
+    }
+
+    /** @test */
     public function image_upload(): void {
         Storage::fake('avatars');
         $group = Group::factory()->create();
@@ -131,7 +164,7 @@ class GroupEditTest extends TestCase
         $image = \DB::select("SELECT idimages, path FROM images ORDER BY idimages DESC LIMIT 1");
         $idimages = $image[0]->idimages;
         $path = $image[0]->path;
-        $response = $this->get("/group/image/delete/{$group->idgroups}/$idimages/$path");
+        $response = $this->post("/group/image/delete/{$group->idgroups}/$idimages/$path");
         $response->assertOk();
         self::assertEquals('Thank you, the image has been deleted', $response->getContent());
     }

@@ -5,7 +5,13 @@
           <div class="card-header p-0" id="heading{{{ $audit->id }}}">
             <h5 class="mb-0">
               <button class="btn btn-link text-left" type="button" data-toggle="collapse" data-target="#collapse{{{ $audit->id }}}" aria-expanded="true" aria-controls="collapse{{{ $audit->id }}}">
-                  @lang($type.'.'.$audit->event.'.metadata', $audit->getMetadata())
+                  {{-- @lang() compiles to an unescaped echo and the translator does not escape
+                       its replacements, while the metadata strings wrap them in markup.  Two of
+                       the values are attacker-controlled: user_name is a display name, and
+                       audit_url is the request URL including its query string.  Escape the
+                       values rather than the string, so the markup in the string survives. --}}
+                  @php($metadata = collect($audit->getMetadata())->map(fn ($v) => is_null($v) ? '' : e(is_scalar($v) ? (string) $v : json_encode($v)))->all())
+                  @lang($type.'.'.$audit->event.'.metadata', $metadata)
               </button>
             </h5>
           </div>
@@ -18,7 +24,7 @@
                             {{-- Some updated data is an array. --}}
                             @php($modified['new'] = is_array($modified['new']) ? json_encode($modified['new']) : $modified['new'])
                             @if(gettype($modified) == 'string')
-                            <td>@lang($type.'.'.$audit->event.'.modified.'.$attribute, $modified)</td>
+                            <td>@lang($type.'.'.$audit->event.'.modified.'.$attribute, ['old' => e($modified), 'new' => e($modified)])</td>
                             @else
                             <td>{{ $type.'.'.$audit->event.'.modified.'.$attribute . " " . json_encode($modified) }}</td>
                             @endif

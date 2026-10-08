@@ -103,12 +103,12 @@
             <label for="tags[]">@lang('general.your_repair_skills'):</label>
             <select id="tags" name="tags[]" class="form-control" multiple size="10">
                 @foreach( App\Helpers\Fixometer::skillCategories() as $key => $skill_category )
-                    <optgroup label="@lang($skill_category)">
+                    <optgroup label="{{ __($skill_category) }}">
                     @foreach ($skills[$key] as $skill)
                         @if ( !empty($user_skills) && in_array($skill->id, $user_skills))
-                        <option value="{{ $skill->id }}" selected>@lang($skill->skill_name)</option>
+                        <option value="{{ $skill->id }}" selected>{{ __($skill->skill_name) }}</option>
                         @else
-                        <option value="{{ $skill->id }}">@lang($skill->skill_name)</option>
+                        <option value="{{ $skill->id }}">{{ __($skill->skill_name) }}</option>
                         @endif
                     @endforeach
                     </optgroup>

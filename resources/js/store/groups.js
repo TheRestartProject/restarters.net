@@ -10,6 +10,8 @@ function newToOld(e) {
   // new API completely, we can then migrate the Vue components to use the new field names and retire this function.
   // Similar code in event and device store.
   let ret = {
+    // Keep both id styles: components (e.g. GroupsTable) match rows on `id`.
+    id: e.id,
     idgroups: e.id,
     name: e.name,
     location: e.location,
@@ -31,11 +33,19 @@ function getLocale() {
   return el.innerText.trim()
 }
 
+// Module-scoped map of in-flight `groups/fetch` promises, keyed by
+// `${id}|${includeStats}`. Used by the action to de-dup concurrent callers.
+const inFlight = new Map()
+
 export default {
   namespaced: true,
   state: {
     // List of groups indexed by group id.  Use object rather than array so that it's sparse.
     list: {},
+
+    // Ids with a full-row fetch in flight, so watchers firing repeatedly
+    // don't duplicate hydration calls.
+    hydrating: {},
 
     // Groups requiring moderation.
     moderate: {},
@@ -62,8 +72,17 @@ export default {
     }
   },
   mutations: {
+    setHydrating(state, params) {
+      params.ids.forEach(id => {
+        if (params.value) {
+          Vue.set(state.hydrating, id, true)
+        } else {
+          Vue.delete(state.hydrating, id)
+        }
+      })
+    },
     set(state, params) {
-      Vue.set(state.list, params.idgroups, params)
+      Vue.set(state.list, params.id || params.idgroups, params)
     },
     setList(state, params) {
       let list = {}
@@ -123,21 +142,82 @@ export default {
         commit('set', group)
       }
     },
-    async getModerationRequired({commit, rootGetters}, params) {
+    async getModerationRequired({commit, rootGetters, state}, params) {
       const apiToken = rootGetters['auth/apiToken']
 
       let ret = await axios.get('/api/v2/moderate/groups?api_token=' + apiToken + '&locale=' + getLocale())
 
       if (ret && ret.data) {
         commit('setModerate', ret.data)
+
+        // GroupsTable renders its rows from the list store, so moderation
+        // groups must be there too. Don't clobber a richer entry (e.g. from
+        // the summary fetch).
+        ret.data.forEach(e => {
+          if (!state.list[e.id]) {
+            commit('set', newToOld(e))
+          }
+        })
       }
     },
-    async list({commit}) {
-      let ret = await axios.get('/api/v2/groups/names?locale=' + getLocale())
-      if (ret && ret.data) {
+    async list({commit}, params) {
+      // The names index is enough to draw the map and run the client-side
+      // filters; the table hydrates the rows it actually shows via
+      // hydrate(). Archived groups are included: the list badges them, as
+      // the old server-rendered page did.
+      const url = '/api/v2/groups/names?locale=' + getLocale() +
+        (params && params.details ? '&includeArchived=true' : '')
+
+      let ret = await axios.get(url)
+
+      if (ret) {
         commit('setList', {
-          groups: ret.data.data
+          groups: ret.data.data.map(g => ({
+            id: g.id,
+            name: g.name,
+            lat: g.lat,
+            lng: g.lng,
+            location: {
+              location: null,
+              country: g.country,
+              lat: g.lat,
+              lng: g.lng,
+            },
+            networks: g.network_ids || [],
+            group_tags_full: (g.tag_ids || []).map(id => ({ id })),
+            archived_at: g.archived_at,
+          }))
         })
+      }
+    },
+    async hydrate({commit, state}, params) {
+      // Fetch full rows (image, location text, counts, next event, tag names)
+      // for just the given ids - one batched call per visible page of the
+      // list, instead of serialising every group up front.
+      const ids = params.ids.filter(id => {
+        const g = state.list[id]
+        return (!g || !g.summary) && !state.hydrating[id]
+      })
+
+      if (!ids.length) {
+        return
+      }
+
+      commit('setHydrating', { ids, value: true })
+
+      try {
+        // The API caps ids at 200 per call.
+        for (let i = 0; i < ids.length; i += 200) {
+          const chunk = ids.slice(i, i + 200)
+          const ret = await axios.get('/api/v2/groups/summary?locale=' + getLocale() +
+            '&includeNextEvent=true&includeCounts=true&archived=true&ids=' + chunk.join(','))
+
+          if (ret && ret.data) {
+            ret.data.data.forEach(g => commit('set', g))
+          }
+        }
+      } finally {
+        commit('setHydrating', { ids, value: false })
       }
     },
     async listTags({commit, rootGetters}) {
@@ -213,14 +293,38 @@ export default {
       return id
     },
     async fetch({ rootGetters, commit }, params) {
+      // De-dup concurrent fetches for the same (id, includeStats) so callers
+      // like GroupsPage's mounted loop don't fire N parallel requests when
+      // the user has many groups. The cache key includes includeStats because
+      // the two responses have different shapes.
+      const key = params.id + '|' + (params.hasOwnProperty('includeStats') ? String(params.includeStats) : '')
+      if (inFlight.has(key)) {
+        return inFlight.get(key)
+      }
+
+      const request = (async () => {
+        try {
+          let url = '/api/v2/groups/' + params.id + '?api_token=' + rootGetters['auth/apiToken'] + '&locale=' + getLocale()
+
+          if (params.hasOwnProperty('includeStats')) {
+             url += '&includeStats=' + params.includeStats
+          }
+
+          let ret = await axios.get(url)
+
+          commit('set', ret.data.data)
+
+          return ret.data.data
+        } catch (e) {
+          console.error("Group fetch failed", e)
+        }
+      })()
+
+      inFlight.set(key, request)
       try {
-        let ret = await axios.get('/api/v2/groups/' + params.id + '?api_token=' + rootGetters['auth/apiToken'] + '&locale=' + getLocale())
-
-        commit('set', ret.data.data)
-
-        return ret.data.data
-      } catch (e) {
-        console.error("Group fetch failed", e)
+        return await request
+      } finally {
+        inFlight.delete(key)
       }
     }
   },

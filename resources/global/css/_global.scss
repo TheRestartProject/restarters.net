@@ -142,3 +142,109 @@ h2 {
   width: 1rem;
   height: 1rem;
 }
+
+.fa-spin {
+  animation-name: spin;
+  animation-duration: 4s;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+@keyframes spin {
+  0%  {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+// Group map markers: only the stock blue Leaflet marker image ships in
+// public/images, so recolour it for the "your group" and hover states.
+// The stock marker is blue (hue ~207deg): +273deg lands on green, +153deg on red.
+.group-marker-yours {
+  filter: hue-rotate(273deg);
+}
+
+.group-marker-hover {
+  filter: hue-rotate(153deg) saturate(1.5);
+}
+
+// Cluster bubble on the groups map. This class replaces Leaflet's own
+// .leaflet-div-icon, which would otherwise draw a white box with a grey border
+// behind the circle.
+.group-cluster {
+  border-radius: 50%;
+  border: 2px solid #000;
+  background-color: #fff;
+  color: #000;
+  text-align: center;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+// The bubble tells you how many groups it holds: bigger and more saturated
+// for larger clusters. Sizes are set by GroupMap.clusterIcon's iconSize so
+// Leaflet's positioning agrees with them; the tint ramps pale yellow ->
+// amber -> brand orange (#F18F01) while keeping the black border and count.
+.group-cluster--small {
+  width: 36px;
+  height: 36px;
+  background-color: #fff396;
+}
+
+.group-cluster--medium {
+  width: 46px;
+  height: 46px;
+  background-color: #ffd16a;
+}
+
+.group-cluster--large {
+  width: 56px;
+  height: 56px;
+  background-color: #f18f01;
+}
+
+// The map pin shares the cluster's restart style: black border, white
+// inner. The SVG comes from GroupMarker.vue; the states recolour its fill.
+.group-pin {
+  background: transparent;
+  border: none;
+}
+
+.group-pin svg path {
+  fill: #fff;
+  stroke: #000;
+  stroke-width: 2;
+}
+
+.group-pin svg circle {
+  fill: #000;
+}
+
+// Green for groups you follow, brand red (#F45B69) on hover - the same
+// signals the old hue-rotated stock pin gave.
+.group-pin--yours svg path {
+  fill: #21a453;
+}
+
+.group-pin--hover svg path {
+  fill: #f45b69;
+}
+
+.group-cluster__count {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  // The count sits inside a Leaflet pane, outside the body's font cascade.
+  font-family: $font-family-sans-serif; // Asap
+  font-size: 16px;
+  line-height: 1;
+}
+
+// The bubble is a fixed size whatever the count, so shrink four-figure numbers
+// rather than letting them spill outside the circle.
+.group-cluster__count--wide {
+  font-size: 12px;
+}

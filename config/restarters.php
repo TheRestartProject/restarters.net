@@ -31,4 +31,9 @@ return [
     ],
 
     'support_email_address' => env('SUPPORT_EMAIL_ADDRESS'),
+
+    // Answer geocoding from a fixed table instead of calling Google. Set by CI
+    // when no API key is available (forked pull requests get no project
+    // environment variables), never in production.
+    'geocoder_stub' => env('GEOCODER_STUB', false),
 ];

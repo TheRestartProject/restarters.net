@@ -21,9 +21,7 @@
   </div>
 </template>
 <script>
-import DashboardEvent from './DashboardEvent.vue'
 export default {
-  components: {DashboardEvent},
   props: {
     start: {
       required: false,

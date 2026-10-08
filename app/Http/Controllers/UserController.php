@@ -197,10 +197,11 @@ class UserController extends Controller
             $user->setPassword(Hash::make($request->input('new-password')));
             $user->save();
 
-            $user->update([
-            'recovery' => substr(bin2hex(openssl_random_pseudo_bytes(32)), 0, 24),
-            'recovery_expires' => strftime('%Y-%m-%d %X', time() + (24 * 60 * 60)),
-            ]);
+            // Changing your password used to mint a fresh 24 hour recovery token as a side
+            // effect, which left a live password-reset code on every account that had ever
+            // changed its password.  Rotate the API token instead, so a token stolen before
+            // the change stops working.
+            $user->rotateAPIToken();
 
             event(new PasswordChanged($user, $oldPassword));
 
@@ -283,7 +284,7 @@ class UserController extends Controller
 
         if (Auth::id() !== $user_id) {
             return redirect('user/all')->with('danger', __('profile.soft_deleted', [
-                'name' => $old_user_name
+                'name' => e($old_user_name)
             ]));
         } else {
             return redirect('login');
@@ -451,12 +452,17 @@ class UserController extends Controller
         $User = new User;
         $user = null;
 
-        $recovery = $request->recovery;
+        $recovery = $request->input('recovery');
 
-        if (!$recovery) {
+        // Only a plain, non-empty string can be a recovery code.  Anything else - an array
+        // in particular - must be rejected before it reaches the query.  filter_var()
+        // returns false for an array, Laravel binds false as the integer 0, and MySQL
+        // then compares the VARCHAR column to 0 numerically, which coerces every
+        // non-numeric token in the table to 0 and matches a real user's live code.
+        if (!is_string($recovery) || $recovery === '') {
+            $recovery = null;
             $valid_code = false;
         } else {
-            $recovery = filter_var($recovery, FILTER_SANITIZE_STRING);
             $user = $User->where('recovery', '=', $recovery)->first();
 
             if (is_object($user) && strtotime($user->recovery_expires) > time()) {
@@ -483,11 +489,19 @@ class UserController extends Controller
                 $email = $user->email;
                 $oldPassword = $user->password;
 
+                // Spend the recovery code as part of the same update, so a link can't be
+                // replayed for the rest of its 24 hour window.
                 $update = $user->update([
                     'password' => Hash::make($pwd),
+                    'recovery' => null,
+                    'recovery_expires' => null,
                 ]);
 
                 if ($update) {
+                    // A password reset is the remedy for a compromised account, so it has to
+                    // invalidate the API token too - otherwise a stolen token outlives it.
+                    $user->rotateAPIToken();
+
                     event(new PasswordChanged($user, $oldPassword));
                     return redirect('login')->with('success', __('passwords.updated'));
                 } else {

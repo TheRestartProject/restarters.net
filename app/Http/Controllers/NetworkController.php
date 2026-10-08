@@ -55,12 +55,12 @@ class NetworkController extends Controller
         $groupsForAssociating = [];
 
         if ($user->can('associateGroups', $network)) {
-            $groupsForAssociating = $network->groupsNotIn()->sortBy('name');
+            $groupsForAssociating = $network->groupsNotIn();
         }
 
-        // Get network stats
-        $stats = $network->stats();
-        $stats['groups'] = $network->groups->count();
+        // Stats are fetched by the page from the API after it renders.  Calculating them walks every device
+        // of every past event in the network, which is too slow to block the page load on for large networks.
+        $stats = [];
 
         // Determine if user can manage tags (NC for this network or Admin)
         $canManageTags = Fixometer::hasRole($user, 'Administrator') ||
@@ -135,6 +135,14 @@ class NetworkController extends Controller
                 return redirect()->route('networks.edit', [$network])
                     ->withWarning('Image uploads are disabled on this site.');
             }
+
+            // This is the one upload path that doesn't go through FixometerFile, which
+            // restricts uploads to jpg/png/gif by sniffing the content.  Without a rule
+            // here the extension comes from whatever mime type is detected, so an SVG -
+            // which can carry script and is served from our own origin - would be stored.
+            $request->validate([
+                'network_logo' => 'image|mimes:jpeg,jpg,png,gif|max:5120',
+            ]);
 
             // Determine the correct disk to use (s3 on Fly, public_uploads in dev)
             $disk = config('filesystems.default') === 's3' ? 's3' : 'public_uploads';
