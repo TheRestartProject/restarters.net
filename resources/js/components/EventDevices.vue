@@ -127,14 +127,12 @@
 <script>
 import event from '../mixins/event'
 import images from '../mixins/images'
-import ExternalLink from './ExternalLink.vue'
 import CollapsibleSection from './CollapsibleSection.vue'
 import EventDeviceList from './EventDeviceList.vue'
-import EventDeviceSummary from './EventDeviceSummary.vue'
 import EventDevice from './EventDevice.vue'
 
 export default {
-  components: {EventDevice, EventDeviceSummary, EventDeviceList, CollapsibleSection, ExternalLink},
+  components: {EventDevice, EventDeviceList, CollapsibleSection},
   mixins: [ event, images ],
   props: {
     idevents: {

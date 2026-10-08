@@ -53,7 +53,6 @@
           :lat.sync="lat"
           :lng.sync="lng"
           :postcode.sync="postcode"
-          :can-edit-postcode="canApprove"
           class="group-location"
           :has-error="$v.location.$error"
           ref="location"
