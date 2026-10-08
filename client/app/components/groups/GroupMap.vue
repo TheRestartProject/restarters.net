@@ -29,16 +29,13 @@ const leafletTiles = useLeafletTiles()
 // comment) plus a Photon place-search box. resources/js/components/
 // GroupMap.vue (+ GroupMarker.vue for the icon/hover rules) is the
 // functional spec; see that file and useGroupMapGeometry.js for what's
-// ported 1:1 vs simplified. Two deliberate deviations, both because this
-// branch has no v2 endpoint yet to source them from (api-gaps.md-style
-// gap, not fixed here):
-//  - `initialBounds`: legacy's GroupController::nearby() scans the user's
-//    own nearby groups server-side for a bounding box. No v2 endpoint
-//    exposes that (nor does GET /api/v2/session carry the user's lat/lng),
-//    so the caller (pages/group/map.vue) always passes null, which
-//    computeHasLocation treats as "no location" - the map frames every
-//    group on first paint instead of centring into the user's own area.
-//    Panning/zooming/search behave identically once loaded.
+// ported 1:1 vs simplified. Deliberate deviations:
+//  - Where the map opens: legacy's GroupController::nearby()/mine() worked
+//    out a bounding box server-side. Here the page (pages/group/map.vue)
+//    derives the same three cases from the profile and the names index:
+//    `yourLat`/`yourLng` (the user's own point: frame the five nearest
+//    groups), `initialBounds` (a box round the groups in their country when
+//    that's all they've set), or neither (frame every group).
 //  - Marker click: opens develop's GroupInfoModal (next event + Go to group,
 //    PR 887 / RES-1995). Markers here are plain Leaflet layers (imperative,
 //    for clustering - vue-leaflet has no cluster-aware child component), so a
@@ -78,9 +75,34 @@ const props = defineProps({
     type: Number,
     default: null,
   },
+  // The user's own point (profile lat/lng). When set the map opens on the five
+  // groups nearest it; a box round their country (initialBounds) would land
+  // somewhere arbitrary in the middle of it, so it only applies without one.
+  yourLat: {
+    type: Number,
+    default: null,
+  },
+  yourLng: {
+    type: Number,
+    default: null,
+  },
+  // Shown in the place-search box, so it is clear the map has already been
+  // searched for the user rather than looking untouched.
+  yourArea: {
+    type: String,
+    default: '',
+  },
+  // Bumped by the parent when the user changes a filter, to ask the map to
+  // frame what it is now showing. Watching the group list instead would move
+  // the map whenever rows are hydrated, yanking it from wherever the user had
+  // panned to.
+  frameRequest: {
+    type: Number,
+    default: 0,
+  },
 })
 
-const emit = defineEmits(['update:groupIdsInBounds', 'update:hoveredId', 'select', 'searched'])
+const emit = defineEmits(['update:groupIdsInBounds', 'update:hoveredId', 'select', 'searched', 'update:centre'])
 
 const { t } = useI18n()
 
@@ -96,6 +118,9 @@ const mapOptions = {
 
 const mappableGroups = computed(() => filterMappableGroups(props.groups, props.network))
 const hasLocationValue = computed(() => computeHasLocation(props.initialBounds))
+const hasUserPoint = computed(
+  () => props.yourLat !== null && props.yourLng !== null && !isNaN(+props.yourLat) && !isNaN(+props.yourLng)
+)
 
 const containerEl = ref(null)
 let mapObject = null
@@ -120,6 +145,8 @@ function buildIcon(className) {
     iconSize: [30, 42],
     iconAnchor: [15, 42],
     popupAnchor: [0, -42],
+    // Measured from the anchor (the tip), so the tooltip clears the pin head.
+    tooltipAnchor: [0, -42],
     className,
   })
 }
@@ -141,8 +168,11 @@ function clusterIcon(cluster) {
     size = 46
   }
 
+  // Four-figure counts shrink rather than spilling out of the fixed-size bubble.
+  const wide = count >= 1000 ? ' group-cluster__count--wide' : ''
+
   return L.divIcon({
-    html: `<div class="group-cluster__count">${count}</div>`,
+    html: `<div class="group-cluster__count${wide}">${count}</div>`,
     className: `group-cluster group-cluster--${tier}`,
     iconSize: [size, size],
     iconAnchor: [size / 2, size / 2],
@@ -162,10 +192,14 @@ function rebuildMarkers() {
   // Nudged copies for display only - bounds reporting and zoom framing
   // (idle/zoomToGroups) stay on the groups' real coordinates.
   const markers = separateIdenticalLocations(mappableGroups.value).map((group) => {
+    const label = `${group.name} - ${t('groups.marker_title')}`
     const marker = L.marker([group.lat, group.lng], {
-      title: `${group.name} - ${t('groups.marker_title')}`,
+      alt: label,
       icon: iconFor(group.id),
     })
+    // A Leaflet tooltip, not the native `title` attribute: `title` appears on
+    // the browser's own ~1s delay, which can't be tuned.
+    marker.bindTooltip(label, { direction: 'top', opacity: 0.95 })
     // Imperative Leaflet marker -> Vue: a click emits `select` with the id,
     // which the page turns into a GroupInfoModal (next event + Go to group),
     // replacing develop's marker popup with PR 887's modal (RES-1995).
@@ -184,8 +218,21 @@ function idle() {
 
   const bounds = mapObject.getBounds()
   emit('update:groupIdsInBounds', idsInBounds(mappableGroups.value, bounds))
+  emit('update:centre', mapObject.getCenter())
 
   zoomToGroups()
+}
+
+// A filter is an explicit request to see something, so take the map there
+// even if the user has panned somewhere else.
+function frameShownGroups() {
+  if (!mapObject) return
+
+  const box = boundingBoxFor(mappableGroups.value)
+  if (!box) return
+
+  const bounds = L.latLngBounds([box.minLat, box.minLng], [box.maxLat, box.maxLng])
+  if (bounds.isValid()) mapObject.fitBounds(bounds.pad(0.1))
 }
 
 function zoomToGroups() {
@@ -199,7 +246,20 @@ function zoomToGroups() {
   }
   zoomedToGroups = true
 
-  const framed = hasLocationValue.value ? nearestGroups(mappableGroups.value, mapObject.getCenter(), 5) : mappableGroups.value
+  // A box round the user's country: show the country as we were given it.
+  // Zooming to the groups nearest its centre would land somewhere arbitrary
+  // in the middle of the country, near nobody in particular.
+  if (!hasUserPoint.value && hasLocationValue.value) {
+    mapObject.fitBounds(props.initialBounds)
+    return
+  }
+
+  // Frame the five groups closest to the user themselves, not the middle of a
+  // bounding box, which would drift away from where they are. With no
+  // location at all, frame every group rather than the whole world.
+  const framed = hasUserPoint.value
+    ? nearestGroups(mappableGroups.value, { lat: +props.yourLat, lng: +props.yourLng }, 5)
+    : mappableGroups.value
 
   const box = boundingBoxFor(framed)
   if (!box) return
@@ -251,7 +311,10 @@ function onReady(mapInstance) {
 
   try {
     const photonOptions = {
-      nameProperties: ['name', 'street', 'suburb', 'hamlet', 'town', 'city'],
+      // Photon returns several places sharing a name - London in England, in
+      // Ontario, in Kentucky - and the state and country are the only things
+      // that tell them apart in the dropdown.
+      nameProperties: ['name', 'street', 'suburb', 'hamlet', 'town', 'city', 'state', 'country'],
       serviceUrl: 'https://photon.komoot.io/api/',
     }
 
@@ -275,7 +338,12 @@ function onReady(mapInstance) {
       if (e?.geocode?.bbox) {
         // Empty the query box so the dropdown closes.
         control.setQuery('')
-        mapInstance.flyToBounds(e.geocode.bbox)
+        // fitBounds, not flyToBounds: the fly animation arcs out and back,
+        // dropping two zoom levels below the destination on a long journey and
+        // taking about three seconds over it. Once a place has been picked
+        // there is nothing to be learned from watching the trip.
+        moved = true
+        mapInstance.fitBounds(e.geocode.bbox)
         // Where the search landed, so the page's distance column can anchor
         // to the searched place instead of the user's own location.
         const centre = e.geocode.bbox.getCenter()
@@ -284,6 +352,10 @@ function onReady(mapInstance) {
     })
 
     control.addTo(mapInstance)
+
+    // We have already centred the map on the user's area, so show that area in
+    // the search box too.
+    if (props.yourArea) control.setQuery(props.yourArea)
   } catch (e) {
     // Matches the legacy component's own defensive catch here - usually
     // caused by Leaflet control DOM quirks, not worth failing the map over.
@@ -298,6 +370,10 @@ watch(
   (newVal, oldVal) => {
     rebuildMarkers()
 
+    // A filter changes what is drawn without moving the map, so the list that
+    // follows the viewport must be told what is now in view.
+    if (mapObject) emit('update:groupIdsInBounds', idsInBounds(newVal, mapObject.getBounds()))
+
     const hadGroups = oldVal && oldVal.length
     const hasGroups = newVal && newVal.length
     if (!hadGroups && hasGroups) {
@@ -305,6 +381,11 @@ watch(
     }
   },
   { immediate: true }
+)
+
+watch(
+  () => props.frameRequest,
+  () => frameShownGroups()
 )
 
 watch(
@@ -433,5 +514,11 @@ onBeforeUnmount(() => {
   font-family: $font-family-sans-serif; // Asap
   font-size: 16px;
   line-height: 1;
+}
+
+// The bubble is a fixed size whatever the count, so shrink four-figure numbers
+// rather than letting them spill outside the circle.
+:deep(.group-cluster__count--wide) {
+  font-size: 12px;
 }
 </style>

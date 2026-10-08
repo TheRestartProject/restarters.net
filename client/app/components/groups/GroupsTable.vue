@@ -6,6 +6,7 @@ import { useGroupRole } from '../../composables/useGroupRole.js'
 import { useUploadedImageUrl } from '../../composables/useUploadedImageUrl.js'
 import GroupJoinButton from './GroupJoinButton.vue'
 import GroupsTableFilters from './GroupsTableFilters.vue'
+import { matchesGroupFilters } from '../../utils/groupFilter.js'
 
 // Sortable groups table shared by /group (mine), /group/nearby, /group/all
 // and /group/map (resources/js/components/GroupsTable.vue is the functional
@@ -24,7 +25,7 @@ const props = defineProps({
   },
   optionalColumns: {
     type: Object,
-    default: () => ({ location: true, hosts: true, restarters: true, next_event: true }),
+    default: () => ({ location: true, next_event: true }),
   },
   showRole: {
     type: Boolean,
@@ -37,9 +38,12 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  // Develop's list has no per-row follow button ("the follow button on every
+  // row invites following groups you haven't read about"): following belongs
+  // on the group's own page. Opt in for any page that wants one.
   showJoin: {
     type: Boolean,
-    default: true,
+    default: false,
   },
   // GroupsTable.vue's `approve` (develop): swaps the join column for an amber
   // "requires moderation" cell linking to the group's edit page. develop's
@@ -75,7 +79,7 @@ const props = defineProps({
   },
 })
 
-const emit = defineEmits(['update:hoveredId'])
+const emit = defineEmits(['update:hoveredId', 'update:filters'])
 
 const { t, locale } = useI18n()
 const { roleLabelKey, roleVariant } = useGroupRole()
@@ -90,33 +94,17 @@ function imageSrc(row) {
 const sortKey = ref(props.initialSortKey)
 const sortDesc = ref(false)
 
-const filters = ref({ name: '', location: '', country: '', tags: [], network: '' })
+const filters = ref({ name: '', tags: [] })
 
 function matchesFilters(row) {
-  const f = filters.value
-  const has = (haystack, needle) =>
-    !needle || String(haystack || '').toLowerCase().includes(needle.toLowerCase())
+  return matchesGroupFilters(row, filters.value)
+}
 
-  // Network dropdown filters by id (row.networkIds - the names-index's
-  // network_ids, available immediately rather than waiting on per-row
-  // hydration - see pages/group/all.vue's `rows` computed), not by matching
-  // display text.
-  const matchesId = (ids, needle) => !needle || (Array.isArray(ids) && ids.map(String).includes(String(needle)))
-
-  // Tag filter is multi-select (legacy's vue-multiselect :multiple="true" -
-  // GroupsTableFilters.vue), so `needle` is an array of tag ids; a row
-  // matches if it has any tag in common (legacy's filteredGroups: "Tag in
-  // common?" - tagsInCommon.length > 0), not all of them.
-  const matchesTags = (ids, needles) =>
-    !needles?.length || (Array.isArray(ids) && needles.some((n) => ids.map(String).includes(String(n))))
-
-  return (
-    has(row.name, f.name) &&
-    has(row.location?.location, f.location) &&
-    has(row.location?.country, f.country) &&
-    matchesTags(row.tagIds, f.tags) &&
-    matchesId(row.networkIds, f.network)
-  )
+// Tell the page, so filtering moves the map's pins rather than only shortening
+// the list underneath them.
+function onFilters(value) {
+  filters.value = value
+  emit('update:filters', value)
 }
 
 const filteredGroups = computed(() => (props.showFilters ? props.groups.filter(matchesFilters) : props.groups))
@@ -164,12 +152,19 @@ const sortedGroups = computed(() => {
       case 'distance':
         // Unplaceable groups sit last whichever way the column is sorted.
         if (a.distance == null || b.distance == null) {
-          return compareNullableNumber(a.distance, b.distance)
+          result = compareNullableNumber(a.distance, b.distance)
+          return result !== 0 ? result : (a.name || '').localeCompare(b.name || '')
         }
         result = a.distance - b.distance
         break
       default:
         result = (a.name || '').localeCompare(b.name || '')
+    }
+
+    // Equal (or both unplaceable) rows fall back to name order, so the order
+    // is stable and predictable whatever the primary column.
+    if (result === 0 && sortKey.value !== 'name') {
+      return (a.name || '').localeCompare(b.name || '')
     }
 
     return result * dir
@@ -213,9 +208,8 @@ function sortCaretClass(key) {
   <div data-testid="groups-table">
     <GroupsTableFilters
       v-if="showFilters"
-      :groups="groups"
       :show-tags="showTags"
-      @update:filters="filters = $event"
+      @update:filters="onFilters"
     />
     <table class="table groups-table">
       <thead>
