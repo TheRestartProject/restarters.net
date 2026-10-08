@@ -95,7 +95,7 @@
         {{ __('groups.show_all_groups', { total: filteredItems.length }) }}
       </b-btn>
     </div>
-    <infinite-loading v-else @infinite="loadMore">
+    <infinite-loading v-else :identifier="infiniteId" @infinite="loadMore">
       <span slot="no-results" />
       <span slot="no-more" />
     </infinite-loading>
@@ -192,7 +192,8 @@ export default {
       searchName: null,
       searchTags: null,
       searchShow: false,
-      show: PAGE_SIZE
+      show: PAGE_SIZE,
+      infiniteId: 0
     }
   },
   computed: {
@@ -293,6 +294,15 @@ export default {
 
       if (!same) {
         this.show = PAGE_SIZE
+        this.infiniteId++
+      }
+    },
+    'items.length'(newVal, oldVal) {
+      // Groups can arrive after the scroller has decided there are no more -
+      // "Your groups" fetches each one separately - and once it has finished
+      // it never asks again. Restart it so the late arrivals can be scrolled to.
+      if (newVal > oldVal) {
+        this.infiniteId++
       }
     },
     activeFilters: {
