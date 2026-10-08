@@ -14,13 +14,10 @@ use Tests\TestCase;
  *  1. Rich-text description fields (`free_text`) rendered as raw HTML. These are
  *     Quill-authored, so they cannot simply be escaped — they are sanitised on
  *     write instead.
- *  2. Blade's @lang(), which compiles to an unescaped echo, fed user-controlled
- *     replacement values. The audit-log accordion's metadata line is the residual
- *     half of the previously-reported audit-log XSS.
- *  3. Flash messages rendered with {!! !!} whose translation strings interpolate
- *     user-controlled names into HTML.
- *
- * Written before the fixes; these should fail on the unpatched code.
+ *  2. Translation strings rendered unescaped (the SPA's v-html), fed user-controlled
+ *     replacement values. The audit-log endpoints are the server-side half; the
+ *     client escapes the group name it puts in the "unfollowed" banner (covered in
+ *     client/tests/pages/group/view.spec.js).
  */
 class StoredXssHardeningTest extends TestCase
 {
@@ -90,23 +87,23 @@ class StoredXssHardeningTest extends TestCase
     }
 
     // -------------------------------------------------------------------------
-    // 2. @lang() sinks
+    // 2. Translation strings rendered unescaped
     // -------------------------------------------------------------------------
 
     /**
-     * The residual half of F005. The reported line (the modified-values cell) was
-     * escaped, but the accordion header renders
-     * `@lang('group-audits.updated.metadata', $audit->getMetadata())` — and that
-     * translation string interpolates :user_name into HTML.
+     * The audit endpoints return the log lines as HTML for the SPA's log tab to render with v-html.
+     * The translation strings wrap their :placeholders in markup and the translator does not escape
+     * its replacements, so the values have to be escaped before they are substituted: :user_name is a
+     * display name, and the old/new values are whatever was typed into the group or event.
      *
      * @test
      */
-    public function audit_log_escapes_the_name_of_the_user_who_made_the_change(): void
+    public function group_audit_log_escapes_the_user_name_and_the_changed_values(): void
     {
         $host = User::factory()->host()->create(['name' => 'Harmless Host']);
         $this->actingAs($host);
 
-        $group = Group::factory()->create(['approved' => true, 'website' => 'https://safe.example.com']);
+        $group = Group::factory()->create(['approved' => true, 'name' => 'Safe name']);
         \App\UserGroups::create([
             'user' => $host->id,
             'group' => $group->idgroups,
@@ -114,27 +111,32 @@ class StoredXssHardeningTest extends TestCase
             'role' => Role::HOST,
         ]);
 
-        // Make an audited change so there is an audit row attributed to this user.
-        $group->website = 'https://changed.example.com';
+        // An audited change whose new value is the payload.
+        $group->name = $this->imgPayload;
         $group->save();
 
-        // The attacker's display name is the payload. getMetadata() resolves the
-        // name at render time, so setting it after the edit is equivalent.
+        // getMetadata() resolves the user's name at render time, so setting it after the edit is
+        // equivalent to the attacker having it all along.
         $host->name = $this->payload;
         $host->save();
 
         $admin = User::factory()->administrator()->create();
         $this->actingAs($admin);
 
-        $response = $this->get('/group/edit/' . $group->idgroups);
+        $response = $this->getJson('/api/v2/groups/' . $group->idgroups . '/audits');
         $response->assertStatus(200);
 
-        $response->assertDontSee('<script>alert("XSSPROBE")', false);
-        $response->assertSee('&lt;script&gt;', false);
+        $body = $response->getContent();
+        $this->assertStringNotContainsString('<script>alert', $body);
+        $this->assertStringNotContainsString('<img src=x', $body);
+        $this->assertStringContainsString('&lt;script&gt;', $body);
+        $this->assertStringContainsString('&lt;img', $body);
+        // ...while the markup of the translation string itself survives.
+        $this->assertStringContainsString('<strong>', $body);
     }
 
     /** @test */
-    public function audit_log_escapes_the_request_url(): void
+    public function group_audit_log_escapes_the_request_url(): void
     {
         $host = User::factory()->host()->create();
         $this->actingAs($host);
@@ -147,7 +149,7 @@ class StoredXssHardeningTest extends TestCase
             'role' => Role::HOST,
         ]);
 
-        // The audit URL resolver records the full request URL, query string included.
+        // The audit URL resolver records the request URL; the path is attacker-influenced too.
         $this->patch('/api/v2/groups/' . $group->idgroups . '?x=' . urlencode($this->imgPayload), [
             'description' => '<p>A harmless edit.</p>',
         ]);
@@ -155,63 +157,41 @@ class StoredXssHardeningTest extends TestCase
         $admin = User::factory()->administrator()->create();
         $this->actingAs($admin);
 
-        $response = $this->get('/group/edit/' . $group->idgroups);
+        $response = $this->getJson('/api/v2/groups/' . $group->idgroups . '/audits');
         $response->assertStatus(200);
-        $response->assertDontSee('<img src=x', false);
+        $this->assertStringNotContainsString('<img src=x', $response->getContent());
     }
 
     /** @test */
-    public function profile_page_escapes_the_users_name_in_the_no_bio_message(): void
+    public function event_audit_log_escapes_the_user_name_and_the_changed_values(): void
     {
-        $attacker = User::factory()->restarter()->create([
-            'name' => $this->payload,
-            'biography' => null,
-        ]);
-        $viewer = User::factory()->administrator()->create();
+        $host = User::factory()->host()->create(['name' => 'Harmless Host']);
+        $this->actingAs($host);
 
-        $this->actingAs($viewer);
-
-        $response = $this->get('/profile/' . $attacker->id);
-        $response->assertStatus(200);
-
-        $response->assertDontSee('<script>alert("XSSPROBE")', false);
-    }
-
-    // -------------------------------------------------------------------------
-    // 3. Flash messages
-    // -------------------------------------------------------------------------
-
-    /**
-     * `groups.now_following` is 'You are now following <a href=":link">:name</a>!'
-     * and is rendered with {!! !!}, so a malicious group name executes in the
-     * browser of any user who follows that group.
-     *
-     * @test
-     */
-    public function following_a_group_escapes_the_group_name_in_the_flash_message(): void
-    {
-        $host = User::factory()->host()->create();
-        $group = Group::factory()->create([
-            'approved' => true,
-            'name' => 'Evil ' . $this->imgPayload,
-        ]);
+        $group = Group::factory()->create(['approved' => true]);
         \App\UserGroups::create([
             'user' => $host->id,
             'group' => $group->idgroups,
             'status' => 1,
             'role' => Role::HOST,
         ]);
+        $event = Party::factory()->create(['group' => $group->idgroups, 'venue' => 'Safe venue']);
 
-        $victim = User::factory()->restarter()->create();
-        $this->actingAs($victim);
+        $event->venue = $this->imgPayload;
+        $event->save();
 
-        $this->get('/group/join/' . $group->idgroups);
+        $host->name = $this->payload;
+        $host->save();
 
-        $response = $this->followingRedirects()->get('/group/view/' . $group->idgroups);
+        $admin = User::factory()->administrator()->create();
+        $this->actingAs($admin);
 
-        // Escaping only rewrites < > and quotes, so assert on the raw tag opening: the
-        // literal "onerror=alert" text survives escaping and would false-pass.
-        $response->assertDontSee('<img src=x', false);
+        $response = $this->getJson('/api/v2/events/' . $event->idevents . '/audits');
+        $response->assertStatus(200);
+
+        $body = $response->getContent();
+        $this->assertStringNotContainsString('<script>alert', $body);
+        $this->assertStringNotContainsString('<img src=x', $body);
     }
 
     /**

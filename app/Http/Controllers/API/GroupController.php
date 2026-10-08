@@ -931,7 +931,9 @@ class GroupController extends Controller
 
                 foreach ($audit->getModified() as $attribute => $modified) {
                     $key = 'group-audits.'.$audit->event.'.modified.'.$attribute;
-                    $line = __($key, $modified);
+                    // Both the old and new values are user-entered (a group name, an event description) and
+                    // the line is rendered unescaped by the client.
+                    $line = __($key, \App\Helpers\Fixometer::escapeTranslationValues(is_array($modified) ? $modified : []));
 
                     if ($line !== $key) {
                         $changes[] = $line;
@@ -955,7 +957,8 @@ class GroupController extends Controller
                 }
 
                 $headingKey = 'group-audits.'.$audit->event.'.metadata';
-                $heading = __($headingKey, $metadata);
+                // user_name is a display name and audit_url comes from the request, so escape the values.
+                $heading = __($headingKey, \App\Helpers\Fixometer::escapeTranslationValues($metadata));
 
                 return [
                     'id' => $audit->id,
