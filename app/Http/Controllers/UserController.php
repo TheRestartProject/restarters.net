@@ -414,7 +414,11 @@ class UserController extends Controller
         $frontend = rtrim(config('restarters.frontend_url'), '/');
         $recovery = $request->query('recovery');
 
-        return redirect($frontend.'/user/reset'.($recovery ? '?recovery='.urlencode($recovery) : ''));
+        // Only a plain, non-empty string can be a recovery code.  An array (?recovery[]=1) would make
+        // urlencode() throw, and is never a code the SPA could use.
+        $recovery = is_string($recovery) && $recovery !== '' ? $recovery : null;
+
+        return redirect($frontend.'/user/reset'.($recovery !== null ? '?recovery='.urlencode($recovery) : ''));
     }
 
     public function all()

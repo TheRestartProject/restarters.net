@@ -376,12 +376,20 @@ class AuthController extends Controller
         $oldPassword = $user->password;
         $user->update([
             'password' => Hash::make($request->input('password')),
-            // Rotate the recovery token so the just-used reset link cannot be
-            // replayed within its 24h window (an intercepted/forwarded link
-            // must be single-use). Mirrors UserController::updateMyPasswordv2.
-            'recovery' => Fixometer::generateHash(),
-            'recovery_expires' => strftime('%Y-%m-%d %X', time() + (24 * 60 * 60)),
+            // Spend the recovery code as part of the same update, so the
+            // just-used reset link cannot be replayed within its 24h window
+            // (an intercepted/forwarded link must be single-use) and no live
+            // reset code is left behind on the account.
+            'recovery' => null,
+            'recovery_expires' => null,
         ]);
+
+        // A password reset is the remedy for a compromised account, so it has
+        // to invalidate the bearer credentials too - otherwise a token stolen
+        // before the reset outlives it. The user signs in again with the new
+        // password.
+        $user->rotateAPIToken();
+        $user->tokens()->delete();
 
         event(new PasswordChanged($user, $oldPassword));
 
