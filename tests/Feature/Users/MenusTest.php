@@ -14,7 +14,7 @@ use Tests\TestCase;
 
 class MenusTest extends TestCase
 {
-    public function provider()
+    public static function provider()
     {
         return [
             [

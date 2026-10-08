@@ -1,0 +1,42 @@
+--- a/src/functions.php
++++ b/src/functions.php
+@@ -21,7 +21,7 @@
+  *
+  * @deprecated queue will be removed in guzzlehttp/promises:2.0. Use Utils::queue instead.
+  */
+-function queue(TaskQueueInterface $assign = null)
++function queue(?TaskQueueInterface $assign = null)
+ {
+     return Utils::queue($assign);
+ }
+@@ -259,8 +259,8 @@
+  */
+ function each(
+     $iterable,
+-    callable $onFulfilled = null,
+-    callable $onRejected = null
++    ?callable $onFulfilled = null,
++    ?callable $onRejected = null
+ ) {
+     return Each::of($iterable, $onFulfilled, $onRejected);
+ }
+@@ -285,8 +285,8 @@
+ function each_limit(
+     $iterable,
+     $concurrency,
+-    callable $onFulfilled = null,
+-    callable $onRejected = null
++    ?callable $onFulfilled = null,
++    ?callable $onRejected = null
+ ) {
+     return Each::ofLimit($iterable, $concurrency, $onFulfilled, $onRejected);
+ }
+@@ -307,7 +307,7 @@
+ function each_limit_all(
+     $iterable,
+     $concurrency,
+-    callable $onFulfilled = null
++    ?callable $onFulfilled = null
+ ) {
+     return Each::ofLimitAll($iterable, $concurrency, $onFulfilled);
+ }

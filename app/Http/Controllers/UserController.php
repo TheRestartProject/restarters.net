@@ -1031,6 +1031,8 @@ class UserController extends Controller
         if (Auth::attempt($credentials)) {
             return redirect()->intended($redirectTo);
         }
+
+        return redirect($redirectTo);
     }
 
     public function getOnboardingComplete()
