@@ -17,7 +17,11 @@ use Illuminate\Support\Facades\Storage;
 
 class GroupEditTest extends TestCase
 {
-    /** @test */
+    /**
+     * @test
+     * @story:GroupController::edit
+     * @story:GroupController::updateGroupv2
+     */
     public function group_tags_retained_after_edited_by_host(): void
     {
         $this->withoutExceptionHandling();
@@ -58,6 +62,7 @@ class GroupEditTest extends TestCase
         ]);
     }
 
+    /** @story:GroupController::edit */
     public function testEditGroupAsRestarter(): void {
         $group = Group::factory()->create();
 
@@ -66,7 +71,10 @@ class GroupEditTest extends TestCase
         $this->get('/group/edit/' . $group->idgroups);
     }
 
-    /** @test */
+    /**
+     * @test
+     * @story:GroupController::updateGroupv2
+     */
     public function invalid_location(): void
     {
         $this->withoutExceptionHandling();
@@ -92,7 +100,10 @@ class GroupEditTest extends TestCase
         ]);
     }
 
-    /** @test */
+    /**
+     * @test
+     * @story:GroupController::updateGroupv2
+     */
     public function host_can_edit_postcode_but_not_area(): void {
         $group = Group::factory()->create(['postcode' => 'SW9 7QD', 'area' => 'London']);
 
@@ -125,7 +136,11 @@ class GroupEditTest extends TestCase
         ]);
     }
 
-    /** @test */
+    /**
+     * @test
+     * @story:GroupController::imageUpload
+     * @story:GroupController::ajaxDeleteImage
+     */
     public function image_upload(): void {
         Storage::fake('avatars');
         $group = Group::factory()->create();
@@ -261,7 +276,11 @@ class GroupEditTest extends TestCase
         self::assertTrue($found);
     }
 
-    /** @test */
+    /**
+     * @test
+     * @story:GroupController::edit
+     * @story:GroupController::updateGroupv2
+     */
     public function edit_email(): void
     {
         $this->withoutExceptionHandling();
@@ -295,6 +314,7 @@ class GroupEditTest extends TestCase
         $this->assertEquals('info@test.com', $group->email);
     }
 
+    /** @story:GroupController::edit */
     public function testEditAsNetworkCoordinator(): void {
         $network = Network::factory()->create();
         $coordinator = User::factory()->restarter()->create();

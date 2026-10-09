@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Attributes\NoStory;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 use Auth;
@@ -12,11 +13,13 @@ class StyleController extends Controller
     /**
      * Nothing to see here.
      */
+    #[NoStory(reason: 'Developer style guide, not a user-facing feature')]
     public function index(Request $request): RedirectResponse
     {
         return redirect()->action([\App\Http\Controllers\HomeController::class, 'index']);
     }
 
+    #[NoStory(reason: 'Developer style guide, not a user-facing feature')]
     public function guide(Request $request)
     {
         if (! Auth::check()) {
@@ -26,6 +29,7 @@ class StyleController extends Controller
         return view('test.styles', []);
     }
 
+    #[NoStory(reason: 'Developer style guide, not a user-facing feature')]
     public function find(Request $request): View
     {
         $result = $this->findClassElements();

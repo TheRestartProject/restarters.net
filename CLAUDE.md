@@ -208,6 +208,20 @@ npm test
 - Event-driven architecture with model observers
 - Only translate fr and fr-BE
 
+## Living Specifications
+
+When modifying PHP controller or service methods:
+- Maintain `#[UserStory]` and `#[Feature]` attributes (in `app/Attributes/`)
+- Add `#[UserStory]` to new public methods that represent user-facing functionality
+- Add `#[NoStory]` to methods that intentionally have no user story
+- Update the story text if you change what a method does
+- When adding or modifying tests, include `@story:ClassName::method` references
+- Run `php artisan specs:extract` after annotation changes and commit the updated manifest
+- Every public controller method needs `#[UserStory]` or `#[NoStory]`; `php artisan specs:extract --check` (run in CI) fails otherwise, and when the manifest is stale
+- `@story:` refs in tests may use `ShortClass::method` only when that method name is unique across controllers; otherwise use the fully-qualified class (`App\Http\Controllers\API\GroupController::method`)
+- Update the narrative in `docs/specs/narratives/` if feature coverage has changed
+- Preserve human-written prose in narratives -- update structure and counts, not wording
+
 ## Development Warnings
 - Don't try to test changes when you're running on Windows.
 

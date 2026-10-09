@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Attributes\Feature;
+use App\Attributes\UserStory;
 use Illuminate\Http\JsonResponse;
 use Cookie;
 use Illuminate\Http\Request;
 
+#[Feature('Platform', description: 'Platform-wide statistics and public impact data')]
 class InformationAlertCookieController extends Controller
 {
     protected $minute;
@@ -28,6 +31,7 @@ class InformationAlertCookieController extends Controller
      *
      * @param  int  $id
      */
+    #[UserStory('As a Guest, I can dismiss an information alert banner', persona: 'Guest', theme: 'Cookie alerts')]
     public function __invoke(Request $request): JsonResponse
     {
         if (! $request->has('dismissable_id')) {

@@ -18,6 +18,11 @@ use function PHPUnit\Framework\assertEquals;
 
 class APIv2EventTest extends TestCase
 {
+    /**
+     * @story:GroupController::getEventsForGroupv2
+     * @story:EventController::getEventv2
+     * @story:EventController::moderateEventsv2
+     */
     public function testGetEventsForGroup(): void {
         $user = User::factory()->administrator()->create([
                                                                           'api_token' => '1234',
@@ -78,6 +83,11 @@ class APIv2EventTest extends TestCase
         self::assertFalse($json[1]['approved']);
     }
 
+    /**
+     * @story:GroupController::getEventsForGroupv2
+     * @story:EventController::getEventv2
+     * @story:NetworkController::getNetworkEventsv2
+     */
     public function testGetEventsForUnapprovedGroup(): void {
         $user = User::factory()->administrator()->create([
                                                                           'api_token' => '1234',
@@ -110,6 +120,10 @@ class APIv2EventTest extends TestCase
         $response->assertSuccessful();
     }
 
+    /**
+     * @story:EventController::getEventv2
+     * @story:EventController::getEventsByUsersNetworks
+     */
     public function testMaxUpdatedAt(): void {
         $user = User::factory()->administrator()->create([
             'api_token' => '1234',
@@ -160,6 +174,8 @@ class APIv2EventTest extends TestCase
     /**
      * @param $role
      * @dataProvider roleProvider
+     * @story:GroupController::createGroupv2
+     * @story:EventController::createEventv2
      */
     public function testCreateLoggedOutUsingKey($role): void {
         switch ($role) {
@@ -215,6 +231,7 @@ class APIv2EventTest extends TestCase
         ];
     }
 
+    /** @story:EventController::updateEventv2 */
     public function testEditForbidden(): void {
         $user1 = User::factory()->host()->create([
             'api_token' => '1234',
@@ -243,6 +260,7 @@ class APIv2EventTest extends TestCase
         $this->patch('/api/v2/events/'.$id1, $this->eventAttributesToAPI($eventData));
     }
 
+    /** @story:EventController::createEventv2 */
     public function testCreateEventGeocodeFailure(): void
     {
         $user = User::factory()->host()->create();
@@ -282,6 +300,7 @@ class APIv2EventTest extends TestCase
         ]);
     }
 
+    /** @story:EventController::createEventv2 */
     public function testCreateEventInvalidTimezone(): void
     {
         $user = User::factory()->host()->create();
@@ -321,6 +340,7 @@ class APIv2EventTest extends TestCase
         ]);
     }
 
+    /** @story:EventController::getEventv2 */
     public function testEmptyNetworkData(): void {
         $user = User::factory()->administrator()->create([
             'api_token' => '1234',
@@ -340,6 +360,7 @@ class APIv2EventTest extends TestCase
         assertEquals(null, $json['data']['network_data']);
     }
 
+    /** @story:EventController::updateEventv2 */
     public function testNetworkCoordinatorCanApprove(): void {
         $network = Network::factory()->create();
         $group = Group::factory()->create();
