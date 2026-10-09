@@ -3,17 +3,17 @@
 namespace App\Helpers;
 
 /**
- * A Geocoder that answers from a fixed table instead of calling Google.
+ * A Geocoder that answers from a fixed table instead of calling Mapbox.
  *
  * CircleCI does not pass project environment variables to jobs built from
- * forked pull requests, so GOOGLE_API_CONSOLE_KEY is empty on those runs.
+ * forked pull requests, so MAPBOX_TOKEN is empty on those runs.
  * Every geocode then returns false, group creation 422s on
  * groups.geocode_failed, and the whole Playwright suite fails at its first
  * createGroup() - which looks exactly like the contributor having broken
  * something. This stub keeps those runs meaningful, and keeps the suite off
- * the live Google API generally.
+ * the live Mapbox API generally.
  *
- * Only used when GEOCODER_STUB is set, which CI does when there is no key.
+ * Only used when GEOCODER_STUB is set, which CI does when there is no token.
  */
 class StubGeocoder extends Geocoder
 {
