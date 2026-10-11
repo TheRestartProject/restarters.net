@@ -2,10 +2,14 @@
 
 return [
 
-    // An empty string (a blank secret on previews) is not a valid DSN and makes
-    // Sentry throw while an exception is being reported, hiding the original
-    // error. Treat it as "no DSN", which disables reporting.
-    'dsn' => env('SENTRY_LARAVEL_DSN', env('SENTRY_DSN')) ?: null,
+    // Only a real http(s) DSN is passed on. A blank or whitespace secret (as an
+    // older preview app can carry) is not a valid DSN and makes Sentry throw
+    // InvalidOptionsException while the app boots or reports an exception,
+    // hiding the original error. Anything else means "no DSN", which disables
+    // reporting.
+    'dsn' => preg_match('#^https?://#', trim((string) env('SENTRY_LARAVEL_DSN', env('SENTRY_DSN'))))
+        ? trim((string) env('SENTRY_LARAVEL_DSN', env('SENTRY_DSN')))
+        : null,
 
     // capture release as git sha
     // 'release' => trim(exec('git --git-dir ' . base_path('.git') . ' log --pretty="%h" -n1 HEAD')),
