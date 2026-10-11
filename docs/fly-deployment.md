@@ -201,6 +201,28 @@ is already merged and reviewed) and is never destroyed.
 3. The workflow comments on the PR with the URL and the restore/migration
    result. The site is behind the usual cookie gate.
 
+### Setting an environment variable on previews
+
+Three places, depending on who should get the value:
+
+- **Every preview, not secret** (feature flags, URLs that are fine in git):
+  add it under `[env]` in `fly.pr.toml`. It lands on each preview's next
+  deploy, so re-push or re-run the workflow for previews that already exist.
+- **One preview only**: `flyctl secrets set KEY=value --app restarters-pr-<N>`.
+  This restarts that machine (it re-restores the database) and the value
+  survives later deploys of the same PR; it goes when the app is destroyed.
+- **Every preview, secret or account-specific** (API keys, dashboard links
+  that shouldn't be in the repo): add the line to the `FLY_PREVIEW_SECRETS`
+  environment secret (`gh secret set FLY_PREVIEW_SECRETS --env preview <
+  file`, see `fly.pr-secrets.example.env`). The workflow only imports it on
+  a preview's **first** deploy, so previews that already exist need the
+  per-app command above as well.
+
+For example, the group and Fixometer reporting links (`GROUP_REPORTING_URL_EN`,
+`GROUP_REPORTING_URL_FR`, `FIXOMETER_REPORTING_URL`) are unset on previews
+until they're added one of these ways; without them the pages simply show no
+reporting link.
+
 ### How it works
 
 - The deploy builds the PR's **merge result** with its base branch (like CI
