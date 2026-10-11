@@ -2,7 +2,10 @@
 
 return [
 
-    'dsn' => env('SENTRY_LARAVEL_DSN', env('SENTRY_DSN')),
+    // An empty string (a blank secret on previews) is not a valid DSN and makes
+    // Sentry throw while an exception is being reported, hiding the original
+    // error. Treat it as "no DSN", which disables reporting.
+    'dsn' => env('SENTRY_LARAVEL_DSN', env('SENTRY_DSN')) ?: null,
 
     // capture release as git sha
     // 'release' => trim(exec('git --git-dir ' . base_path('.git') . ' log --pretty="%h" -n1 HEAD')),
