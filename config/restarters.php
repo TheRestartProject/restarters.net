@@ -26,6 +26,20 @@ return [
         'api_key' => env('CARTO_API_KEY'),
     ],
 
+    'reporting' => [
+        // The group reporting dashboard, filtered to one group, one per language - Metabase can only show a
+        // dashboard in another language as a separate dashboard.  {group} is replaced by the group id and
+        // {group_name} by its name, e.g.
+        // https://metabase.example.org/public/dashboard/abc?group_id={group}&group_name={group_name}#hide_parameters=group_id%2Cgroup_name
+        // A group gets the dashboard for its network's language, or English if there isn't one.
+        'group_urls' => [
+            'en' => env('GROUP_REPORTING_URL_EN'),
+            'fr' => env('GROUP_REPORTING_URL_FR'),
+        ],
+        // Further reports on all the repair data, linked from the Fixometer page.  No link if unset.
+        'fixometer_url' => env('FIXOMETER_REPORTING_URL'),
+    ],
+
     'xref_types' => [
         'networks' => 7,
     ],
