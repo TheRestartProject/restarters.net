@@ -5,6 +5,7 @@ import { useI18n } from 'vue-i18n'
 import { useGroupsStore } from '~/stores/groups.js'
 import { useSessionStore } from '~/stores/session.js'
 import { useUploadedImageUrl } from '~/composables/useUploadedImageUrl.js'
+import { escapeHtml } from '~/utils/escapeHtml.js'
 import GroupActions from '~/components/groups/GroupActions.vue'
 import GroupStats from '~/components/groups/GroupStats.vue'
 import GroupDevicesSummary from '~/components/groups/GroupDevicesSummary.vue'
@@ -193,7 +194,8 @@ async function onJoin() {
 const haveLeft = ref(false)
 
 const unfollowedMessage = computed(() =>
-  t('groups.now_unfollowed', { name: group.value?.name ?? '', link: `/group/view/${id.value}` })
+  // The group name is user-entered and this string is rendered with v-html.
+  t('groups.now_unfollowed', { name: escapeHtml(group.value?.name ?? ''), link: `/group/view/${id.value}` })
 )
 
 async function onLeave() {

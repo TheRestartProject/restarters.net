@@ -81,13 +81,16 @@ describe('pages/group/index (mine)', () => {
     expect(empty.html()).toContain('/group/nearby')
   })
 
-  it('renders a row per group with a leave button', () => {
+  // Develop's list has no per-row follow button (ece9aed10e): following belongs
+  // on the group's own page.
+  it('renders a row per group with no follow or unfollow button', () => {
     groupsStore.mine.data = [{ id: 1, name: 'Fixers United', role: 3, archived: false, image_url: null }]
 
     const wrapper = mountPage()
 
     expect(wrapper.find('[data-testid="group-row-1"]').exists()).toBe(true)
-    expect(wrapper.find('[data-testid="group-leave-1"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="group-leave-1"]').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="group-join-1"]').exists()).toBe(false)
   })
 
   it('shows an archived badge for archived groups', () => {

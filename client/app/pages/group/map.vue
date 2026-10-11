@@ -1,10 +1,11 @@
 <script setup>
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useGroupsStore } from '~/stores/groups.js'
 import { useProfileStore } from '~/stores/profile.js'
 import { useAuth } from '~/composables/useAuth.js'
 import { haversineKm } from '~/composables/useGroupMapGeometry.js'
+import { matchesGroupFilters } from '~/utils/groupFilter.js'
 import GroupsTabsNav from '~/components/groups/GroupsTabsNav.vue'
 import GroupsTable from '~/components/groups/GroupsTable.vue'
 import GroupMap from '~/components/groups/GroupMap.vue'
@@ -72,24 +73,93 @@ const selectedGroup = computed(() => {
   const entry = mapGroups.value.find((g) => g.id === selectedGroupId.value)
   return entry ? { id: entry.id, name: entry.name, image: null, location: null, nextEvent: null } : null
 })
-const search = ref('')
+// What the user has typed or picked in the filter bar (the list's own bar
+// reports it). Applied to every group, not just the ones in view, so that
+// filtering moves the map rather than only shortening the list under it.
+const filters = ref(null)
 
-const loading = computed(() => groupsStore.namesLoading)
+// Bumped (after the typing stops) to ask the map to frame what the filter now
+// matches. Immediately would lurch the map around on every keystroke.
+const REFRAME_DEBOUNCE_MS = 500
+const frameRequest = ref(0)
+let frameTimer = null
 
-// The map always shows every non-archived group (subject to its own
-// network filter, unused on this generic page) - only the list below is
-// further narrowed by the current viewport and the search box.
-const mapGroups = computed(() => groupsStore.names.filter((g) => !g.archived_at))
+function onFilters(value) {
+  filters.value = value
 
-const effectiveGroupIds = computed(() => {
-  const base = groupIdsInBounds.value !== null ? groupIdsInBounds.value : mapGroups.value.map((g) => g.id)
+  if (frameTimer) clearTimeout(frameTimer)
+  frameTimer = setTimeout(() => {
+    frameTimer = null
+    frameRequest.value++
+  }, REFRAME_DEBOUNCE_MS)
+}
 
-  const term = search.value.trim().toLowerCase()
-  if (!term) return base
-
-  const byId = new Map(mapGroups.value.map((g) => [g.id, g]))
-  return base.filter((id) => (byId.get(id)?.name || '').toLowerCase().includes(term))
+onBeforeUnmount(() => {
+  // Don't wake up and touch a component that has gone away.
+  if (frameTimer) clearTimeout(frameTimer)
 })
+
+// Tag filtering is for the people who can see tags at all - the same people
+// who get the moderation queue.
+const canManageTags = showModeration
+
+// The profile fetch is best effort, but the map frames itself once, on its
+// first sight of the groups - so wait for it to settle before drawing the map,
+// or the user's own area would be missed whenever the groups arrived first.
+const profileSettled = ref(false)
+const loading = computed(() => groupsStore.namesLoading || !profileSettled.value)
+
+// Archived groups are included, as develop's list does: the list badges them
+// rather than hiding them, as the old server-rendered page did.
+const allGroups = computed(() => groupsStore.names)
+
+// What the map draws: everything the filter allows, wherever it is - so a
+// search can take you to a group you can't currently see. (The map applies its
+// own network filter.)
+const mapGroups = computed(() =>
+  allGroups.value.filter((g) => matchesGroupFilters({ name: g.name, tagIds: g.tag_ids }, filters.value))
+)
+
+// Where the map is centred, which orders the list by what is nearest when
+// there's no better anchor.
+const centre = ref(null)
+
+// A user with a town is framed on the groups nearest them; one who has only
+// set a country gets a box round the groups in it (develop did this server
+// side in GroupController::mine); anyone else gets every group in view.
+const yourPoint = computed(() => {
+  const p = profileStore.info.data
+  return p && p.lat != null && p.lng != null && !isNaN(+p.lat) && !isNaN(+p.lng) ? { lat: +p.lat, lng: +p.lng } : null
+})
+
+const yourArea = computed(() => profileStore.info.data?.location || '')
+
+const countryBounds = computed(() => {
+  const p = profileStore.info.data
+  if (yourPoint.value || !p || !p.country_code) return null
+
+  // The names index carries the country as a name, in the same locale as the
+  // profile's country options.
+  const name = (p.countries || []).find((c) => c.code === p.country_code)?.name
+  if (!name) return null
+
+  const inCountry = allGroups.value.filter(
+    (g) => !g.archived_at && g.country === name && g.lat != null && g.lng != null && !isNaN(+g.lat) && !isNaN(+g.lng)
+  )
+  if (!inCountry.length) return null
+
+  const lats = inCountry.map((g) => +g.lat)
+  const lngs = inCountry.map((g) => +g.lng)
+
+  return [
+    [Math.min(...lats), Math.min(...lngs)],
+    [Math.max(...lats), Math.max(...lngs)],
+  ]
+})
+
+const effectiveGroupIds = computed(() =>
+  groupIdsInBounds.value !== null ? groupIdsInBounds.value : mapGroups.value.map((g) => g.id)
+)
 
 // Rows for the list panel: names-index fields first, then whatever
 // fetchSummaries has hydrated for this id (location/hosts/restarters/next
@@ -109,9 +179,14 @@ const rows = computed(() =>
       restarters: summary?.restarters ?? null,
       nextEvent: summary?.next_event ?? null,
       isMember: groupsStore.isMember(id),
+      // The filter bar's criteria, from the names index (available
+      // immediately rather than waiting on per-row hydration).
+      tagIds: entry?.tag_ids ?? [],
       // Real km from the reference point (null hides the cell) - the names
-      // index carries every group's lat/lng, so no hydration needed.
-      distance: haversineKm(referencePoint.value, entry ?? null),
+      // index carries every group's lat/lng, so no hydration needed. With no
+      // anchor the list still opens nearest-the-middle-of-the-map first, but
+      // the column stays hidden.
+      distance: haversineKm(referencePoint.value ?? centre.value, entry ?? null),
     }
   })
 )
@@ -127,17 +202,22 @@ watch(
 )
 
 function retry() {
-  groupsStore.fetchNames()
+  groupsStore.fetchNames({ includeArchived: 'true' })
 }
 
 onMounted(() => {
-  groupsStore.fetchNames()
+  groupsStore.fetchNames({ includeArchived: 'true' })
   // Best-effort seed for GroupMap's "your groups" pin colour - same
   // memberIds gap as /group/all (stores/groups.js's class doc comment).
   groupsStore.fetchMine().catch(() => {})
   // Best-effort anchor for the distance column; without it (guest profile
   // fetch failure, or no location set) the column just stays hidden.
-  profileStore.fetchProfileInfo().catch(() => {})
+  profileStore
+    .fetchProfileInfo()
+    .catch(() => {})
+    .finally(() => {
+      profileSettled.value = true
+    })
 })
 </script>
 
@@ -180,24 +260,18 @@ onMounted(() => {
         :groups="mapGroups"
         :network="networkFilter"
         :your-group-ids="groupsStore.memberIds"
+        :initial-bounds="countryBounds"
+        :your-lat="yourPoint ? yourPoint.lat : null"
+        :your-lng="yourPoint ? yourPoint.lng : null"
+        :your-area="yourArea"
+        :frame-request="frameRequest"
         @update:group-ids-in-bounds="groupIdsInBounds = $event"
+        @update:centre="centre = $event"
         @select="selectedGroupId = $event"
         @searched="searchedPoint = $event"
       />
 
       <GroupInfoModal :group="selectedGroup" @close="selectedGroupId = null" />
-
-      <div class="d-flex flex-wrap gap-3 align-items-center my-3">
-        <input
-          v-model="search"
-          type="search"
-          class="form-control"
-          style="max-width: 20rem"
-          :placeholder="t('groups.search_name_placeholder')"
-          :aria-label="t('groups.search_name_placeholder')"
-          data-testid="group-map-search"
-        >
-      </div>
 
       <p data-testid="group-map-count">
         <!-- Wording and zero-state from PR 887 (RES-1995 map of groups):
@@ -215,9 +289,13 @@ onMounted(() => {
            default order either way (all-null distances fall back stably). -->
       <GroupsTable
         v-model:hovered-id="hoveredId"
+        class="mt-3"
         :groups="rows"
-        :optional-columns="{ location: true, hosts: true, restarters: true, next_event: true, distance: referencePoint !== null }"
+        show-filters
+        :show-tags="canManageTags"
+        :optional-columns="{ location: true, next_event: true, distance: referencePoint !== null }"
         initial-sort-key="distance"
+        @update:filters="onFilters"
       />
     </template>
   </div>

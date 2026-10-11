@@ -14,10 +14,20 @@ class Geocoder
         return config('GOOGLE_API_CONSOLE_KEY') ?? env('GOOGLE_API_CONSOLE_KEY');
     }
 
+    /**
+     * Fetch a URL.  Separated out so that tests can exercise the parsing below
+     * without calling Google, which makes them depend on the network, the key
+     * and the quota all being healthy.
+     */
+    protected function fetch($url)
+    {
+        return file_get_contents($url);
+    }
+
     public function geocode($location)
     {
         if ($location != 'ForceGeocodeFailure') {
-            $json = file_get_contents('https://maps.googleapis.com/maps/api/geocode/json?address='.urlencode($location).'&key='.$this->googleKey());
+            $json = $this->fetch('https://maps.googleapis.com/maps/api/geocode/json?address='.urlencode($location).'&key='.$this->googleKey());
 
             if ($json) {
                 $res = json_decode($json);
@@ -48,7 +58,7 @@ class Geocoder
 
     public function reverseGeocode($lat, $lng)
     {
-        $json = file_get_contents("https://maps.googleapis.com/maps/api/geocode/json?latlng=$lat,$lng&key=".$this->googleKey());
+        $json = $this->fetch("https://maps.googleapis.com/maps/api/geocode/json?latlng=$lat,$lng&key=".$this->googleKey());
 
         $decoded = json_decode($json)->results[0];
 

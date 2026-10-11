@@ -66,8 +66,8 @@ test.describe('group map', () => {
       'Search for a place...'
     )
 
-    // The list's own name filter.
-    await expect(page.getByTestId('group-map-search')).toBeVisible()
+    // The list's own name filter (develop's filter bar: name, and tags for those who can see them).
+    await expect(page.getByTestId('groups-table-filter-name')).toBeVisible()
   })
 
   test('the search box filters the list down to matching groups', async ({ page }) => {
@@ -88,7 +88,7 @@ test.describe('group map', () => {
 
     await expect(mapList.getByTestId(`group-row-link-${groupId}`)).toBeVisible()
 
-    await page.getByTestId('group-map-search').fill('Tag Test Group')
+    await page.getByTestId('groups-table-filter-name').fill('Tag Test Group')
 
     await expect(mapList.getByTestId(`group-row-link-${groupId}`)).toBeVisible()
     // Every remaining row's link text should contain the search term.

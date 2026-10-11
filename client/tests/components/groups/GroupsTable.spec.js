@@ -4,7 +4,6 @@ import { createI18n } from 'vue-i18n'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import GroupsTable from '../../../app/components/groups/GroupsTable.vue'
 import { useGroupsStore } from '../../../app/stores/groups.js'
-import { useNetworksStore } from '../../../app/stores/networks.js'
 import en from '../../../i18n/locales/en.json'
 import clientEn from '../../../i18n/locales/client-en.json'
 
@@ -26,6 +25,8 @@ function mountComponent(props = {}) {
     },
   })
 }
+
+const ALL_COLUMNS = { location: true, hosts: true, restarters: true, next_event: true }
 
 const rows = [
   { id: 1, name: 'Zeta Fixers', hosts: 2, restarters: 10, nextEvent: { start: '2026-08-01T10:00:00Z' } },
@@ -78,7 +79,6 @@ describe('components/groups/GroupsTable', () => {
   // tag options straight from the shared stores rather than via props.
   beforeEach(() => {
     setActivePinia(createPinia())
-    useNetworksStore().fetchList = vi.fn().mockResolvedValue([])
     useGroupsStore().fetchTags = vi.fn().mockResolvedValue([])
   })
 
@@ -113,8 +113,8 @@ describe('components/groups/GroupsTable', () => {
     expect(names).toEqual(['group-row-1', 'group-row-3', 'group-row-2'])
   })
 
-  it('sorts by hosts numerically, with null hosts last', async () => {
-    const wrapper = mountComponent({ groups: rows })
+  it('sorts by hosts numerically, with null hosts last (opt-in column)', async () => {
+    const wrapper = mountComponent({ groups: rows, optionalColumns: ALL_COLUMNS })
 
     await wrapper.find('[data-testid="groups-table-sort-hosts"]').trigger('click')
 
@@ -236,27 +236,20 @@ describe('components/groups/GroupsTable', () => {
       expect(wrapper.find('[data-testid="group-row-1"]').exists()).toBe(false)
     })
 
-    it('filters rows by location and country', async () => {
+    // Develop cut the bar to name and tags (ece9aed10e): no location,
+    // country or network field.
+    it('has no location, country or network filter', () => {
       const wrapper = mountComponent({ groups: filterableRows, showFilters: true })
-      await wrapper.find('[data-testid="groups-table-filters-toggle"]').trigger('click')
-      await wrapper.find('[data-testid="groups-table-filter-country"]').setValue('UK')
-
-      expect(wrapper.find('[data-testid="group-row-1"]').exists()).toBe(true)
-      expect(wrapper.find('[data-testid="group-row-2"]').exists()).toBe(false)
+      for (const field of ['location', 'country', 'network']) {
+        expect(wrapper.find(`[data-testid="groups-table-filter-${field}"]`).exists()).toBe(false)
+      }
     })
 
-    it('filters rows by network', async () => {
-      useNetworksStore().list.data = [
-        { id: 10, name: 'Network A' },
-        { id: 11, name: 'Network B' },
-      ]
-
+    it('tells the page the criteria so the map can follow the list', async () => {
       const wrapper = mountComponent({ groups: filterableRows, showFilters: true })
-      await wrapper.find('[data-testid="groups-table-filters-toggle"]').trigger('click')
-      await wrapper.find('[data-testid="groups-table-filter-network"]').setValue('11')
+      await wrapper.find('[data-testid="groups-table-filter-name"]').setValue('paris')
 
-      expect(wrapper.find('[data-testid="group-row-2"]').exists()).toBe(true)
-      expect(wrapper.find('[data-testid="group-row-1"]').exists()).toBe(false)
+      expect(wrapper.emitted('update:filters').at(-1)[0]).toMatchObject({ name: 'paris', tags: [] })
     })
 
     it('hides the tag filter unless showTags is set', () => {
@@ -283,24 +276,25 @@ describe('components/groups/GroupsTable', () => {
       expect(wrapper.find('[data-testid="group-row-1"]').exists()).toBe(false)
     })
 
-    // Multiple tags selected match any row with at least one of them in
-    // common (legacy's filteredGroups: "Tag in common?" -
-    // tagsInCommon.length > 0), not only rows matching every selected tag.
-    it('matches rows with any of several selected tags in common', async () => {
+    // Develop (groupFilter.js): every selected tag must be present, so
+    // choosing more tags narrows the results rather than widening them.
+    it('requires every selected tag to be present', async () => {
       useGroupsStore().tags.data = [
         { id: 5, name: 'electronics' },
         { id: 6, name: 'textiles' },
       ]
+      const rowsWithBoth = [...filterableRows, { id: 3, name: 'Both', tagIds: [5, 6] }]
 
-      const wrapper = mountComponent({ groups: filterableRows, showFilters: true, showTags: true })
+      const wrapper = mountComponent({ groups: rowsWithBoth, showFilters: true, showTags: true })
       await wrapper.find('[data-testid="groups-table-filters-toggle"]').trigger('click')
       await wrapper.find('[data-testid="groups-table-filter-tags-search"]').trigger('focus')
       await wrapper.find('[data-testid="groups-table-filter-tags-option-5"]').trigger('mousedown')
       await wrapper.find('[data-testid="groups-table-filter-tags-search"]').trigger('focus')
       await wrapper.find('[data-testid="groups-table-filter-tags-option-6"]').trigger('mousedown')
 
-      expect(wrapper.find('[data-testid="group-row-1"]').exists()).toBe(true)
-      expect(wrapper.find('[data-testid="group-row-2"]').exists()).toBe(true)
+      expect(wrapper.find('[data-testid="group-row-3"]').exists()).toBe(true)
+      expect(wrapper.find('[data-testid="group-row-1"]').exists()).toBe(false)
+      expect(wrapper.find('[data-testid="group-row-2"]').exists()).toBe(false)
     })
   })
 
@@ -320,7 +314,7 @@ describe('components/groups/GroupsTable', () => {
     })
 
     it('marks the optional data columns hidden below md, when shown at all', () => {
-      const wrapper = mountComponent({ groups: rows })
+      const wrapper = mountComponent({ groups: rows, optionalColumns: ALL_COLUMNS })
 
       expect(wrapper.find('[data-testid="group-row-hosts-1"]').classes()).toContain('hidecell')
       expect(wrapper.find('[data-testid="group-row-restarters-1"]').classes()).toContain('hidecell')
@@ -421,5 +415,43 @@ describe('distance column', () => {
     const names = wrapper.findAll('tbody tr td a').map((a) => a.text())
     // Toggled to descending; nulls stay pinned last by compareNullableNumber.
     expect(names[0]).toBe('Alpha Far')
+  })
+})
+
+describe('components/groups/GroupsTable (develop list rules)', () => {
+  // Develop's list shows image, name, location, next event (and distance):
+  // host and restarter counts "have never helped anyone pick a group", and the
+  // per-row follow button moved to the group's own page.
+  it('shows no host or restarter columns and no join button by default', () => {
+    const wrapper = mountComponent({ groups: rows })
+
+    expect(wrapper.find('[data-testid="groups-table-sort-hosts"]').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="groups-table-sort-restarters"]').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="stub-join-1"]').exists()).toBe(false)
+  })
+
+  it('breaks distance ties by name, with unplaceable groups last', () => {
+    const wrapper = mountComponent({
+      groups: [
+        { id: 1, name: 'Zulu', distance: null },
+        { id: 2, name: 'Bravo', distance: 5 },
+        { id: 3, name: 'Alpha', distance: 5 },
+        { id: 4, name: 'Mike', distance: 1 },
+        { id: 5, name: 'Echo', distance: null },
+      ],
+      initialSortKey: 'distance',
+    })
+
+    const order = wrapper.findAll('tbody tr').map((tr) => tr.attributes('data-testid'))
+    expect(order).toEqual(['group-row-4', 'group-row-3', 'group-row-2', 'group-row-5', 'group-row-1'])
+  })
+
+  it('keeps the archived badge apart from the group name', () => {
+    const wrapper = mountComponent({ groups: [{ id: 1, name: 'Old Group', archivedAt: '2025-01-01' }] })
+
+    const link = wrapper.find('[data-testid="group-row-link-1"]')
+    const badge = wrapper.find('[data-testid="group-row-archived-1"]')
+    expect(link.text()).toBe('Old Group')
+    expect(link.element.contains(badge.element)).toBe(false)
   })
 })

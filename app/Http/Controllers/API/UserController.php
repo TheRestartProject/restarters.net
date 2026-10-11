@@ -1581,10 +1581,15 @@ class UserController extends Controller
         $target->setPassword(Hash::make($validated['new_password']));
         $target->save();
 
-        $target->update([
-            'recovery' => Fixometer::generateHash(),
-            'recovery_expires' => strftime('%Y-%m-%d %X', time() + (24 * 60 * 60)),
-        ]);
+        // Changing a password must not mint a 24 hour recovery token as a side
+        // effect: that left a live password-reset code on every account that had
+        // ever changed its password. Replace the bearer credentials instead, so
+        // a token stolen before the change stops working. The caller's own
+        // token is kept when they change their own password, so they stay
+        // signed in.
+        $target->rotateAPIToken();
+        $keep = $isSelf ? $actor->currentAccessToken()?->id : null;
+        $target->tokens()->when($keep, fn ($q) => $q->where('id', '!=', $keep))->delete();
 
         event(new PasswordChanged($target, $oldPassword));
     }

@@ -131,7 +131,7 @@ class ExportController extends Controller
                     }
                 }
 
-                fputcsv($file, [
+                fputcsv($file, $this->csvSafeRow([
                     $device->item_type,
                     $device->deviceCategory->name,
                     $device->brand,
@@ -146,7 +146,7 @@ class ExportController extends Controller
                     $co2Diverted,
                     $device->deviceCategory->powered ? 'Powered' : 'Unpowered',
                     $device->reference,
-                ]);
+                ]));
             }
         }
 
@@ -258,7 +258,7 @@ class ExportController extends Controller
         fputcsv($file, $headers);
 
         foreach ($PartyArray as $d) {
-            fputcsv($file, $d);
+            fputcsv($file, $this->csvSafeRow($d));
         }
         fclose($file);
 
@@ -267,5 +267,20 @@ class ExportController extends Controller
         ];
 
         return Response::download($path, $filename, $headers)->deleteFileAfterSend(true);
+    }
+
+    /**
+     * Spreadsheets treat a cell starting with =, +, - or @ as a formula, so prefix those
+     * with an apostrophe.  Device fields are free text entered at events.
+     */
+    private function csvSafeRow(array $row)
+    {
+        return array_map(function ($value) {
+            if (is_string($value) && $value !== '' && in_array($value[0], ['=', '+', '-', '@'], true)) {
+                return "'" . $value;
+            }
+
+            return $value;
+        }, $row);
     }
 }

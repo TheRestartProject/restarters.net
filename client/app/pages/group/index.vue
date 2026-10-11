@@ -24,8 +24,9 @@ const { hasRole } = useAuth()
 const showModeration = computed(() => hasRole('Administrator') || hasRole('NetworkCoordinator'))
 
 // Rows come from the uncapped GET /api/v2/users/me/groups, which carries
-// location/hosts/restarters/next_event, so develop's full column set
-// renders.
+// location/next_event. Develop's list is image, name, location and next event:
+// no host/restarter counts and no per-row follow button (following belongs on
+// the group's own page).
 const rows = computed(() =>
   groupsStore.mine.data.map((group) => ({
     id: group.id,
@@ -91,7 +92,7 @@ onMounted(() => {
         <div v-else data-testid="group-mine-table">
           <GroupsTable
             :groups="rows"
-            :optional-columns="{ location: true, hosts: true, restarters: true, next_event: true }"
+            :optional-columns="{ location: true, next_event: true }"
           />
         </div>
       </template>

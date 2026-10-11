@@ -10,6 +10,7 @@ import en from '../../../i18n/locales/en.json'
 // doesn't provide - mock it so onReady's geocoder wiring is verifiable
 // without one. Keeps `geocoders.Photon` as a spyable constructor too.
 const geocoderInstances = []
+const photonInstances = []
 vi.mock('leaflet-control-geocoder', () => {
   class FakeGeocoder {
     constructor(options) {
@@ -35,6 +36,7 @@ vi.mock('leaflet-control-geocoder', () => {
     constructor(options) {
       this.type = 'photon'
       this.options = options
+      photonInstances.push(this)
     }
   }
 
@@ -74,6 +76,7 @@ function fakeLeafletMap({ size = { x: 688, y: 400 }, bounds } = {}) {
     invalidateSize: vi.fn(),
     fitBounds: vi.fn(),
     flyToBounds: vi.fn(),
+    flyTo: vi.fn(),
     getSize: () => size,
     getBounds: () => bounds ?? L.latLngBounds([50, -1], [52, 1]),
     getZoom: () => 5,
@@ -97,6 +100,7 @@ describe('components/groups/GroupMap', () => {
 
   beforeEach(() => {
     geocoderInstances.length = 0
+    photonInstances.length = 0
     fakeClusterGroup = {
       addLayer: vi.fn(),
       clearLayers: vi.fn(),
@@ -308,7 +312,7 @@ describe('components/groups/GroupMap', () => {
       expect(geocoderInstances[0].addTo).toHaveBeenCalledWith(map)
     })
 
-    it('flies to the selected result\'s bounding box and clears the query', async () => {
+    it('goes to the selected result\'s bounding box without the fly animation, and clears the query', async () => {
       const wrapper = mountMap()
       const map = fakeLeafletMap()
       await wrapper.findComponent(LMapStub).vm.$emit('ready', map)
@@ -318,7 +322,10 @@ describe('components/groups/GroupMap', () => {
       control.fire('markgeocode', { geocode: { bbox } })
 
       expect(control.setQuery).toHaveBeenCalledWith('')
-      expect(map.flyToBounds).toHaveBeenCalledWith(bbox)
+      // fitBounds, not flyToBounds: the fly arcs out and back over about three
+      // seconds, with nothing to be learned from watching the trip.
+      expect(map.fitBounds).toHaveBeenCalledWith(bbox)
+      expect(map.flyToBounds).not.toHaveBeenCalled()
     })
 
     // The distance column in the list below anchors to the searched place,
@@ -333,6 +340,174 @@ describe('components/groups/GroupMap', () => {
       const [[point]] = wrapper.emitted('searched')
       expect(point.lat).toBeCloseTo(51.485, 2)
       expect(point.lng).toBeCloseTo(-0.09, 2)
+    })
+  })
+
+  describe('place search', () => {
+    // Photon returns several places sharing a name (London in England, in
+    // Ontario, in Kentucky); state and country tell them apart in the dropdown.
+    it('shows state and country in the dropdown to tell same-named places apart', async () => {
+      const wrapper = mountMap()
+      await wrapper.findComponent(LMapStub).vm.$emit('ready', fakeLeafletMap())
+
+      expect(photonInstances).toHaveLength(2)
+      for (const photon of photonInstances) {
+        expect(photon.options.nameProperties).toEqual(expect.arrayContaining(['state', 'country']))
+      }
+    })
+
+    it('presets the search box with the user\'s own area, so the map reads as searched for them', async () => {
+      const wrapper = mountMap({ yourArea: 'Brixton, London' })
+      await wrapper.findComponent(LMapStub).vm.$emit('ready', fakeLeafletMap())
+
+      expect(geocoderInstances[0].setQuery).toHaveBeenCalledWith('Brixton, London')
+    })
+
+    it('leaves the search box empty without an area', async () => {
+      const wrapper = mountMap()
+      await wrapper.findComponent(LMapStub).vm.$emit('ready', fakeLeafletMap())
+
+      expect(geocoderInstances[0].setQuery).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('where the map opens', () => {
+    const groups = [
+      { id: 1, name: 'Near', lat: 51.5, lng: -0.1 },
+      { id: 2, name: 'Far', lat: 60, lng: 10 },
+    ]
+
+    it('frames the groups nearest the user\'s own point', async () => {
+      const wrapper = mountMap({ groups, yourLat: 60, yourLng: 10 })
+      const map = fakeLeafletMap()
+      await wrapper.findComponent(LMapStub).vm.$emit('ready', map)
+
+      // Both groups are within the nearest five, so both are framed; the box
+      // is of groups, not of the map's own centre.
+      const [bounds] = map.fitBounds.mock.calls[0]
+      expect(bounds.getSouth()).toBeLessThan(51.5)
+      expect(bounds.getNorth()).toBeGreaterThan(60)
+    })
+
+    it('frames only the five nearest groups to the user', async () => {
+      const many = [
+        ...Array.from({ length: 5 }, (_, i) => ({ id: i + 1, name: `Close ${i}`, lat: 51 + i * 0.01, lng: 0 })),
+        { id: 99, name: 'Far away', lat: -40, lng: 170 },
+      ]
+      const wrapper = mountMap({ groups: many, yourLat: 51, yourLng: 0 })
+      const map = fakeLeafletMap()
+      await wrapper.findComponent(LMapStub).vm.$emit('ready', map)
+
+      const [bounds] = map.fitBounds.mock.calls[0]
+      expect(bounds.getSouth()).toBeGreaterThan(40)
+    })
+
+    it('shows a user\'s country as given, rather than zooming to groups near its centre', async () => {
+      const box = [[50, -6], [58, 2]]
+      const wrapper = mountMap({ groups, initialBounds: box })
+      const map = fakeLeafletMap()
+      await wrapper.findComponent(LMapStub).vm.$emit('ready', map)
+
+      expect(map.fitBounds).toHaveBeenCalledWith(box)
+    })
+
+    it('prefers the user\'s point over a box round their country', async () => {
+      const box = [[50, -6], [58, 2]]
+      const wrapper = mountMap({ groups, initialBounds: box, yourLat: 51.5, yourLng: -0.1 })
+      const map = fakeLeafletMap()
+      await wrapper.findComponent(LMapStub).vm.$emit('ready', map)
+
+      expect(map.fitBounds).not.toHaveBeenCalledWith(box)
+    })
+
+    it('frames every group when there is no location at all', async () => {
+      const wrapper = mountMap({ groups })
+      const map = fakeLeafletMap()
+      await wrapper.findComponent(LMapStub).vm.$emit('ready', map)
+
+      const [bounds] = map.fitBounds.mock.calls[0]
+      expect(bounds.getNorth()).toBeGreaterThanOrEqual(60)
+    })
+  })
+
+  describe('filtering', () => {
+    it('reports the groups in view again when the groups drawn change', async () => {
+      const wrapper = mountMap({
+        groups: [
+          { id: 1, name: 'In view', lat: 51, lng: 0 },
+          { id: 2, name: 'Also in view', lat: 51.2, lng: 0.2 },
+        ],
+      })
+      await wrapper.findComponent(LMapStub).vm.$emit('ready', fakeLeafletMap())
+      expect(wrapper.emitted('update:groupIdsInBounds').at(-1)).toEqual([[1, 2]])
+
+      await wrapper.setProps({ groups: [{ id: 2, name: 'Also in view', lat: 51.2, lng: 0.2 }] })
+
+      expect(wrapper.emitted('update:groupIdsInBounds').at(-1)).toEqual([[2]])
+    })
+
+    it('frames what is now shown when asked to, even after the user has panned', async () => {
+      const wrapper = mountMap({
+        groups: [
+          { id: 1, name: 'A', lat: 51, lng: 0 },
+          { id: 2, name: 'B', lat: 53, lng: 2 },
+        ],
+      })
+      const map = fakeLeafletMap()
+      await wrapper.findComponent(LMapStub).vm.$emit('ready', map)
+      await wrapper.findComponent(LMapStub).vm.$emit('dragend')
+      map.fitBounds.mockClear()
+
+      await wrapper.setProps({ frameRequest: 1 })
+
+      expect(map.fitBounds).toHaveBeenCalledTimes(1)
+      const [bounds] = map.fitBounds.mock.calls[0]
+      expect(bounds.getSouth()).toBeLessThan(51)
+      expect(bounds.getNorth()).toBeGreaterThan(53)
+    })
+
+    it('does not move the map just because the groups changed', async () => {
+      const wrapper = mountMap({ groups: [{ id: 1, name: 'A', lat: 51, lng: 0 }] })
+      const map = fakeLeafletMap()
+      await wrapper.findComponent(LMapStub).vm.$emit('ready', map)
+      map.fitBounds.mockClear()
+
+      await wrapper.setProps({ groups: [{ id: 1, name: 'A', lat: 51, lng: 0 }, { id: 2, name: 'B', lat: 55, lng: 3 }] })
+
+      expect(map.fitBounds).not.toHaveBeenCalled()
+    })
+
+    it('tells the page where the map is centred, so the list can order by what is in front of the user', async () => {
+      const wrapper = mountMap({ groups: [{ id: 1, name: 'A', lat: 51, lng: 0 }] })
+      await wrapper.findComponent(LMapStub).vm.$emit('ready', fakeLeafletMap())
+
+      expect(wrapper.emitted('update:centre').at(-1)).toEqual([{ lat: 51, lng: 0 }])
+    })
+  })
+
+  describe('marker labels', () => {
+    // A Leaflet tooltip appears as soon as the pointer reaches the pin; the
+    // native `title` waits on the browser's own ~1s delay.
+    it('uses an instant tooltip rather than the native title', async () => {
+      const wrapper = mountMap({ groups: [{ id: 7, name: 'Label Me', lat: 51, lng: 0 }] })
+      await wrapper.findComponent(LMapStub).vm.$emit('ready', fakeLeafletMap())
+
+      const marker = fakeClusterGroup.addLayers.mock.calls[0][0][0]
+      expect(marker.options.title).toBeFalsy()
+      expect(marker.options.alt).toContain('Label Me')
+      expect(marker.getTooltip().getContent()).toContain('Label Me')
+      expect(marker.options.icon.options.tooltipAnchor).toEqual([0, -42])
+    })
+  })
+
+  describe('cluster bubbles', () => {
+    it('shrinks four-figure counts so they stay inside the bubble', async () => {
+      const wrapper = mountMap({ groups: [{ id: 1, name: 'A', lat: 51, lng: 0 }] })
+      await wrapper.findComponent(LMapStub).vm.$emit('ready', fakeLeafletMap())
+
+      const { iconCreateFunction } = L.markerClusterGroup.mock.calls[0][0]
+      expect(iconCreateFunction({ getChildCount: () => 1200 }).options.html).toContain('group-cluster__count--wide')
+      expect(iconCreateFunction({ getChildCount: () => 999 }).options.html).not.toContain('--wide')
     })
   })
 

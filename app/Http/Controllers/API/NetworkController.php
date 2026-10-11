@@ -57,6 +57,9 @@ class NetworkController extends Controller
             }
         }
 
+        // Same shape as Network::stats(): the group tally excludes archived groups.
+        $stats['groups'] = $groups->whereNull('archived_at')->count();
+
         return $stats;
     }
 

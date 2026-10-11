@@ -300,9 +300,11 @@ describe('components/groups/GroupForm', () => {
       expect(wrapper.find('[data-testid="group-form-image-error"]').text()).toBe('boom')
     })
 
-    it('keeps the postcode read-only, regardless of role (gap 12: no `|| creating` override)', () => {
-      const wrapper = mountForm({ isAdmin: true })
-      expect(wrapper.find('[data-testid="location-picker-input"]').attributes('data-can-edit-postcode')).toBe('false')
+    // develop #917: the postcode is editable by everyone who can edit the
+    // group, on create as well (GroupLocation.vue lost :readonly).
+    it('leaves the postcode editable on create, whatever the role', () => {
+      const wrapper = mountForm({ isAdmin: false })
+      expect(wrapper.find('[data-testid="location-picker-input"]').attributes('data-can-edit-postcode')).toBeUndefined()
     })
 
     it('shows the groups_approval_text next to the submit button, not in a page header (gap 9)', () => {
@@ -482,9 +484,9 @@ describe('components/groups/GroupForm', () => {
       expect(wrapper.find('[data-testid="group-form-image-error"]').exists()).toBe(true)
     })
 
-    it('allows postcode edits for moderators (gap 12)', () => {
-      const wrapper = mountForm({ groupId: 5, initialGroup: GROUP, permissions: { can_demote: true } })
-      expect(wrapper.find('[data-testid="location-picker-input"]').attributes('data-can-edit-postcode')).toBe('true')
+    it('leaves the postcode editable for a host who is not a moderator (develop #917)', () => {
+      const wrapper = mountForm({ groupId: 5, initialGroup: GROUP, permissions: {} })
+      expect(wrapper.find('[data-testid="location-picker-input"]').attributes('data-can-edit-postcode')).toBeUndefined()
     })
   })
 

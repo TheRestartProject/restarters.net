@@ -53,4 +53,9 @@ return [
         'mailpit_url' => env('MAILPIT_URL'),
         'community_test' => (bool) env('APP_SHOW_COMMUNITY_TEST', false),
     ],
+
+    // Answer geocoding from a fixed table instead of calling Google. Set by CI
+    // when no API key is available (forked pull requests get no project
+    // environment variables), never in production.
+    'geocoder_stub' => env('GEOCODER_STUB', false),
 ];

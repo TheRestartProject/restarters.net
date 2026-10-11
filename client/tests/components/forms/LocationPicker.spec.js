@@ -122,4 +122,11 @@ describe('components/forms/LocationPicker', () => {
     const unlocked = mountPicker({ location: '', canEditPostcode: true })
     expect(unlocked.find('[data-testid="location-picker-postcode"]').attributes('readonly')).toBeUndefined()
   })
+
+  // groups.postcode is a varchar(32); the API rejects longer values.
+  it('limits the postcode input to the column size', () => {
+    vi.stubGlobal('useNuxtApp', () => ({ $api: undefined }))
+    const w = mountPicker({ location: '' })
+    expect(w.find('[data-testid="location-picker-postcode"]').attributes('maxlength')).toBe('32')
+  })
 })

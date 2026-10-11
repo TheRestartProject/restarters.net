@@ -931,7 +931,9 @@ class GroupController extends Controller
 
                 foreach ($audit->getModified() as $attribute => $modified) {
                     $key = 'group-audits.'.$audit->event.'.modified.'.$attribute;
-                    $line = __($key, $modified);
+                    // Both the old and new values are user-entered (a group name, an event description) and
+                    // the line is rendered unescaped by the client.
+                    $line = __($key, \App\Helpers\Fixometer::escapeTranslationValues(is_array($modified) ? $modified : []));
 
                     if ($line !== $key) {
                         $changes[] = $line;
@@ -955,7 +957,8 @@ class GroupController extends Controller
                 }
 
                 $headingKey = 'group-audits.'.$audit->event.'.metadata';
-                $heading = __($headingKey, $metadata);
+                // user_name is a display name and audit_url comes from the request, so escape the values.
+                $heading = __($headingKey, \App\Helpers\Fixometer::escapeTranslationValues($metadata));
 
                 return [
                     'id' => $audit->id,
@@ -1192,8 +1195,9 @@ class GroupController extends Controller
      *                ),
      *                @OA\Property(
      *                   property="postcode",
-     *                   description="Administrator/network-coordinator only.",
+     *                   description="Administrators, network coordinators and hosts of the group. At most 32 characters.",
      *                   type="string",
+     *                   maxLength=32,
      *                   nullable=true
      *                ),
      *                @OA\Property(
@@ -1267,10 +1271,15 @@ class GroupController extends Controller
             'email' => $email,
         ];
 
+        // Hosts can edit the postcode (area stays admin/coordinator only, below).  Only touch it when sent, so a
+        // partial update doesn't blank it.
+        if ($request->has('postcode')) {
+            $data['postcode'] = $postcode;
+        }
+
         if ($user->hasRole('Administrator') || ($user->hasRole('NetworkCoordinator') && $isCoordinatorForGroup)) {
             // Got permission to update these.
             $data['area'] = $area;
-            $data['postcode'] = $postcode;
             $data['archived_at'] = $archived_at;
         }
 
@@ -1424,6 +1433,7 @@ class GroupController extends Controller
                                    'location' => ['required', 'max:255'],
                                    'description' => ['required'],
                                    'website' => ['nullable', 'url', 'max:255'],
+                                   'postcode' => ['nullable', 'max:32'],
                                ]);
         } else {
             $request->validate([
@@ -1431,6 +1441,7 @@ class GroupController extends Controller
                                    'location' => ['max:255'],
                                    'website' => ['nullable', 'url', 'max:255'],
                                    'archived_at' => ['nullable', 'date'],
+                                   'postcode' => ['nullable', 'max:32'],
                                ]);
         }
 

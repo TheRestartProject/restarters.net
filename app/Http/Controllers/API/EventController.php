@@ -571,7 +571,9 @@ class EventController extends Controller
 
                 foreach ($audit->getModified() as $attribute => $modified) {
                     $key = 'event-audits.'.$audit->event.'.modified.'.$attribute;
-                    $line = __($key, $modified);
+                    // Both the old and new values are user-entered (a group name, an event description) and
+                    // the line is rendered unescaped by the client.
+                    $line = __($key, \App\Helpers\Fixometer::escapeTranslationValues(is_array($modified) ? $modified : []));
 
                     // An attribute with no lang entry returns the key itself -
                     // skip it rather than showing a raw key to the user, which
@@ -598,7 +600,8 @@ class EventController extends Controller
                 }
 
                 $headingKey = 'event-audits.'.$audit->event.'.metadata';
-                $heading = __($headingKey, $metadata);
+                // user_name is a display name and audit_url comes from the request, so escape the values.
+                $heading = __($headingKey, \App\Helpers\Fixometer::escapeTranslationValues($metadata));
 
                 return [
                     'id' => $audit->id,
@@ -763,7 +766,16 @@ class EventController extends Controller
         $autoapprove = $group->auto_approve;
 
         if (!Fixometer::userCanCreateEvents($user)) {
-            // TODO: This doesn't check that they are a host of this particular group.
+            abort(403);
+        }
+
+        // Being a host of *some* group is not enough - the event has to be on a group you
+        // have authority over.  Without this, any host could attach events to any group,
+        // and because event visibility is inherited from the group's approved flag those
+        // events go public with no moderation.  Admins are covered by
+        // userHasEditGroupPermission; network coordinators are checked separately because
+        // their authority comes from the group's networks rather than users_groups.
+        if (!Fixometer::userHasEditGroupPermission($groupid, $user->id) && !$user->isCoordinatorForGroup($group)) {
             abort(403);
         }
 

@@ -40,6 +40,10 @@ const NetworkEventsModerationTableStub = {
   props: ['networkId'],
   template: '<div data-testid="stub-network-events-moderation-table" :data-network-id="networkId" />',
 }
+const NetworkGroupsMapListStub = {
+  props: ['networkId', 'canManageTags'],
+  template: '<div data-testid="stub-network-groups-map-list" :data-network-id="networkId" :data-can-manage-tags="String(canManageTags)" />',
+}
 const GroupsTableStub = {
   props: ['groups', 'showJoin'],
   template: '<div data-testid="stub-groups-table" :data-row-count="groups.length" />',
@@ -58,6 +62,7 @@ const GLOBAL_STUBS = {
   NetworkGroupsModerationTable: NetworkGroupsModerationTableStub,
   NetworkEventsModerationTable: NetworkEventsModerationTableStub,
   GroupsTable: GroupsTableStub,
+  NetworkGroupsMapList: NetworkGroupsMapListStub,
 }
 
 function setLoggedInUser(user) {
@@ -105,7 +110,7 @@ const NETWORK = {
   logo: null,
   website: 'https://example.com',
   description: '<p>A description.</p>',
-  stats: { parties: 3, co2_total: 100, waste_total: 50, participants: 10, hours_volunteered: 20, fixed_powered: 1, fixed_unpowered: 1 },
+  stats: { groups: 7, parties: 3, co2_total: 100, waste_total: 50, participants: 10, hours_volunteered: 20, fixed_powered: 1, fixed_unpowered: 1 },
 }
 
 async function flushPromises() {
@@ -189,19 +194,43 @@ describe('pages/networks/[id]', () => {
       await flushPromises()
 
       expect(wrapper.find('[data-testid="network-show-name"]').text()).toBe('Test London')
-      expect(wrapper.find('[data-testid="stub-network-stats"]').attributes('data-groups-count')).toBe('1')
+      expect(wrapper.find('[data-testid="stub-network-stats"]').attributes('data-groups-count')).toBe('7')
     })
 
-    // NetworkPage.vue:80-86 - a count sentence and a link to the groups list
-    // filtered to this network, NOT an inline groups table. The table this
-    // used to assert was a divergence from develop.
-    it('renders a group-count sentence linking to the filtered groups list', async () => {
+    it('falls back to the non-archived groups in the list when stats carry no group tally', async () => {
+      networksStore.fetchCurrent = vi.fn().mockImplementation(async () => {
+        networksStore.current.data = { ...NETWORK, stats: { parties: 3 } }
+      })
+      networksStore.fetchGroups = vi.fn().mockImplementation(async () => {
+        networksStore.groups.data = [
+          { id: 9, name: 'Live', archived_at: null },
+          { id: 10, name: 'Gone', archived_at: '2024-01-01T00:00:00+00:00' },
+        ]
+      })
       const wrapper = mountPage()
       await flushPromises()
 
-      expect(wrapper.find('[data-testid="network-show-groups-info"]').text()).toContain('Test London')
-      expect(wrapper.find('[data-testid="network-show-groups-link"]').attributes('href')).toBe('/group/all?network=1')
-      expect(wrapper.find('[data-testid="stub-groups-table"]').exists()).toBe(false)
+      expect(wrapper.find('[data-testid="stub-network-stats"]').attributes('data-groups-count')).toBe('1')
+    })
+
+    // develop's NetworkPage.vue embeds a map and filterable list of the
+    // network's groups (it dropped the count sentence and "View groups").
+    it('renders the network groups map and list, with the tag filter for managers', async () => {
+      const wrapper = mountPage()
+      await flushPromises()
+
+      const embed = wrapper.find('[data-testid="stub-network-groups-map-list"]')
+      expect(embed.attributes('data-network-id')).toBe('1')
+      expect(embed.attributes('data-can-manage-tags')).toBe('true')
+      expect(wrapper.find('[data-testid="network-show-groups-info"]').exists()).toBe(false)
+    })
+
+    it('has no View groups item in the actions menu', async () => {
+      const wrapper = mountPage()
+      await flushPromises()
+
+      expect(wrapper.find('[data-testid="network-show-view-groups"]').exists()).toBe(false)
+      expect(wrapper.find('[data-testid="network-show-add-groups"]').exists()).toBe(true)
     })
 
     it('does not render the coordinators section when the network has none', async () => {

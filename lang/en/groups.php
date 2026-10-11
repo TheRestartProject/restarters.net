@@ -109,6 +109,7 @@ return [
   'group_count_none' => 'If you can\'t see any here yet, why not <a href="/group/nearby">find a group</a> near you?',
   'next_event' => 'Next event',
   'goto_group' => 'Go to group',
+  'distance' => 'Distance',
   'search_name_placeholder' => 'Search by name',
   'leave_group_button' => 'Unfollow group',
   'leave_group_button_mobile' => 'Unfollow',

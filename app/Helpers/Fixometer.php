@@ -766,4 +766,23 @@ class Fixometer
 
         return $random;
     }
+
+    /**
+     * Make values safe to substitute into a translation string that is rendered unescaped.
+     *
+     * The translator does not escape its :placeholder replacements, while many of our strings wrap
+     * those placeholders in markup (and the SPA renders them with v-html).  Escape the values rather
+     * than the string, so the markup in the string survives.  Non-scalar values (an updated JSON
+     * column, say) are flattened to JSON first, and null becomes an empty string.
+     */
+    public static function escapeTranslationValues(array $values): array
+    {
+        return array_map(function ($value) {
+            if (is_null($value)) {
+                return '';
+            }
+
+            return e(is_scalar($value) ? (string) $value : json_encode($value));
+        }, $values);
+    }
 }
