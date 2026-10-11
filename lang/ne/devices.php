@@ -62,7 +62,6 @@ return [
   'status' => 'Status',
   'spare_parts' => 'Reserveonderdelen',
   'latest_data' => 'Meest recente gegevens',
-  'table_intro' => 'Klik op de \'i\'-pictogrammen voor details. Klik op een kolomkop om op die kolom te sorteren - klik nogmaals om de sorteervolgorde om te keren.',
   'assessment' => 'Beoordeling',
   'item_and_repair_info' => 'Item- en reparatie-informatie',
   'search_assessment_comments' => 'Beoordeling',

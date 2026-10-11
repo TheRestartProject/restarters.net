@@ -238,7 +238,7 @@ export default {
       try {
         const formData = new FormData()
 
-        for (var key in params) {
+        for (const key in params) {
           if (params[key]) {
             formData.append(key, params[key]);
           }
@@ -267,7 +267,7 @@ export default {
       try {
         const formData = new FormData()
 
-        for (var key in params) {
+        for (const key in params) {
           if (params[key] !== null && params[key] !== undefined) {
             formData.append(key, params[key]);
           }

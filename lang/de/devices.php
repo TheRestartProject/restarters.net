@@ -62,7 +62,6 @@ return [
   'status' => 'Status',
   'spare_parts' => 'Ersatzteile',
   'latest_data' => 'Neueste Daten',
-  'table_intro' => 'Klicken Sie auf die „i"-Symbole für Details. Klicken Sie auf einen Spaltenkopf, um nach dieser Spalte zu sortieren – erneut klicken, um die Sortierreihenfolge umzukehren.',
   'assessment' => 'Beurteilung',
   'item_and_repair_info' => 'Artikel- und Reparaturinfo',
   'search_assessment_comments' => 'Beurteilung',

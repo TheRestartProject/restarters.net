@@ -62,7 +62,6 @@ return [
   'status' => 'Estado',
   'spare_parts' => 'Piezas de repuesto',
   'latest_data' => 'Últimos datos',
-  'table_intro' => 'Pulsa los iconos «i» para ver los detalles. Haz clic en el encabezado de una columna para ordenar por esa columna; vuelve a hacer clic para invertir el orden.',
   'assessment' => 'Evaluación',
   'item_and_repair_info' => 'Info del artículo y la reparación',
   'search_assessment_comments' => 'Evaluación',

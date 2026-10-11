@@ -3,7 +3,7 @@
     <vue-typeahead-bootstrap ref="typeahead" v-model="currentType" :maxMatches="5" :data="suggestions"
                              :minMatchingChars="1" size="lg" :inputClass="'marg form-control-lg theinput-' + uid" :disabled="disabled"
                              :placeholder="__('devices.item_type')" @hit="emit"/>
-    <div v-b-popover.html.left="translatedTooltip" class="ml-3 mt-2">
+    <div v-if="iconVariant !== 'none'" v-b-popover.html.left="translatedTooltip" class="ml-3 mt-2">
       <b-img class="icon clickable" :src="imageUrl('/icons/info_ico_black.svg')" v-if="iconVariant === 'black'"/>
       <b-img class="icon clickable" :src="imageUrl('/icons/info_ico_green.svg')" v-else/>
     </div>
