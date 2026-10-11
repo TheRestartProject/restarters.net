@@ -227,7 +227,7 @@ if [ "$RESTORE_OK" = "true" ]; then
         # quote database rows, so their first line is safe to publish.
         PHP_ERR=""
         if [ -z "$SQL_STATE" ]; then
-            PHP_ERR=$(grep -m1 -iE 'not found|undefined|fatal|exception|error|cannot|must be|unable|missing' "$MIGRATE_OUT" | cut -c1-160)
+            PHP_ERR=$(grep -viE 'dsn|OptionsResolver|sentry' "$MIGRATE_OUT" | grep -m1 -iE 'not found|undefined|fatal|exception|error|cannot|must be|unable|missing' | cut -c1-160)
         fi
         MIGRATE_DETAIL="${PHP_ERR:+$PHP_ERR - }migrate failed at ${FAILED_MIGRATION:-unknown} ${EXC_CLASS} ${SQL_STATE} ${SQL_CODE:+driver $SQL_CODE} - see machine logs"
         MIGRATE_DETAIL=$(echo "$MIGRATE_DETAIL" | tr "\\\\" . | tr -cd 'A-Za-z0-9_ .:()[]/-' | tr -s ' ')
