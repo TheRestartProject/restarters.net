@@ -4,7 +4,6 @@ import { createI18n } from 'vue-i18n'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import FixometerPage from '../../app/pages/fixometer.vue'
 import { useFixometerStore } from '../../app/stores/fixometer.js'
-import { useAuthStore } from '../../app/stores/auth.js'
 import en from '../../i18n/locales/en.json'
 import clientEn from '../../i18n/locales/client-en.json'
 

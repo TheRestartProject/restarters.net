@@ -15,6 +15,18 @@ class NetworkReportingLinkTest extends TestCase
         return '/api/v2/networks/' . $network->id;
     }
 
+    private function patchAs(?User $user, Network $network, array $data)
+    {
+        $url = $this->networkUrl($network);
+
+        if ($user) {
+            $this->actingAs($user);
+            $url .= '?api_token=' . $user->api_token;
+        }
+
+        return $this->patchJson($url, $data);
+    }
+
     public function testNetworkCarriesTheReportingUrl(): void
     {
         $network = Network::factory()->create([
@@ -38,16 +50,16 @@ class NetworkReportingLinkTest extends TestCase
     public function testAdministratorCanSetTheReportingUrl(): void
     {
         $network = Network::factory()->create();
-        $this->actingAs(User::factory()->administrator()->create());
+        $admin = User::factory()->administrator()->create(['api_token' => 'nrl-admin']);
 
-        $this->patchJson($this->networkUrl($network), [
+        $this->patchAs($admin, $network, [
             'reporting_url' => 'https://reports.example.org/dashboard/9',
         ])->assertSuccessful()->assertJsonPath('data.reporting_url', 'https://reports.example.org/dashboard/9');
 
         $this->assertEquals('https://reports.example.org/dashboard/9', $network->fresh()->reporting_url);
 
         // Blank clears it.
-        $this->patchJson($this->networkUrl($network), [
+        $this->patchAs($admin, $network, [
             'reporting_url' => '',
         ])->assertSuccessful();
 
@@ -57,9 +69,9 @@ class NetworkReportingLinkTest extends TestCase
     public function testReportingUrlMustBeAWebAddress(): void
     {
         $network = Network::factory()->create();
-        $this->actingAs(User::factory()->administrator()->create());
+        $admin = User::factory()->administrator()->create(['api_token' => 'nrl-admin']);
 
-        $this->patchJson($this->networkUrl($network), [
+        $this->patchAs($admin, $network, [
             'reporting_url' => 'javascript:alert(1)',
         ])->assertStatus(422)->assertJsonValidationErrors('reporting_url');
 
@@ -72,11 +84,10 @@ class NetworkReportingLinkTest extends TestCase
             'reporting_url' => self::REPORTS,
         ]);
 
-        $coordinator = User::factory()->networkCoordinator()->create();
+        $coordinator = User::factory()->networkCoordinator()->create(['api_token' => 'nrl-coord']);
         $network->addCoordinator($coordinator);
-        $this->actingAs($coordinator);
 
-        $this->patchJson($this->networkUrl($network), [
+        $this->patchAs($coordinator, $network, [
             'reporting_url' => 'https://elsewhere.example.org/',
         ])->assertForbidden();
 
@@ -87,7 +98,7 @@ class NetworkReportingLinkTest extends TestCase
     {
         $network = Network::factory()->create(['reporting_url' => self::REPORTS]);
 
-        $this->patchJson($this->networkUrl($network), ['reporting_url' => 'https://elsewhere.example.org/'])
+        $this->patchAs(null, $network, ['reporting_url' => 'https://elsewhere.example.org/'])
             ->assertUnauthorized();
 
         $this->assertEquals(self::REPORTS, $network->fresh()->reporting_url);
