@@ -85,6 +85,17 @@ export const useNetworksStore = defineStore('networks', {
       return data
     },
 
+    // Save network settings (just the reporting dashboard address today) and
+    // reflect them on the loaded network.
+    async update(id, payload) {
+      const { $api } = useNuxtApp()
+      const { data } = await $api.network.update(id, payload)
+      if (this.current.data && this.current.data.id === id) {
+        this.current.data = { ...this.current.data, reporting_url: data.reporting_url ?? null }
+      }
+      return data
+    },
+
     async fetchGroups(id, params) {
       const { $api } = useNuxtApp()
 

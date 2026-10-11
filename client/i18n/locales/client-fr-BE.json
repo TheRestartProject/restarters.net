@@ -215,7 +215,8 @@
       "stats_unavailable": "Les statistiques ne sont pas disponibles pour ce réseau pour le moment.",
       "tags_load_error": "Désolé, nous n'avons pas pu charger les tags de ce réseau.",
       "editing": "Modification de {name}",
-      "edit_forbidden": "Vous n'avez pas la permission de modifier ce réseau."
+      "edit_forbidden": "Vous n'avez pas la permission de modifier ce réseau.",
+      "reporting_url_error": "Désolé, nous n'avons pas pu enregistrer cette adresse. Elle doit être une adresse web commençant par http:// ou https://."
     },
     "notifications": {
       "discourse_aria": "Notifications Talk",

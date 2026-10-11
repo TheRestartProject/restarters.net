@@ -1,7 +1,6 @@
 <?php
 
 return [
-  'search_location_placeholder' => 'Search by location',
   'search_country_placeholder' => 'Filter by country',
   'search_tags_placeholder' => 'Filter by tags',
   'show_filters' => 'Show filters',
@@ -89,7 +88,6 @@ return [
   'remove_volunteer' => 'Remove Volunteer',
   'remove_host_role' => 'Remove Host role',
   'make_host' => 'Make Host',
-  'no_unpowered_stats' => 'At the moment, these stats are only displayed for powered items. We hope to include unpowered items soon.',
   'group_actions' => 'Group actions',
   'share_group_stats' => 'Share group stats',
   'share_stats_header' => 'Share your stats',
@@ -112,8 +110,6 @@ return [
   'repairable_items' => 'Repairable items',
   'end_of_life_items' => 'End-of-life items',
   'create_groups_mobile2' => 'Add new',
-  'groups_title1_mobile' => 'Yours',
-  'groups_title2_mobile' => 'Find',
   'no_groups_mine' => '<b>If you can\'t see any here yet, why not <a href="/group/nearby">follow your nearest group</a> to hear about their upcoming repair events?</b>',
   'no_groups_nearest_no_location' => '<b><p>You do not currently have a town/city set.  You can set one in <a href="/profile/edit">your profile</a>.</p><p>You can also <a href="/group/all">view all groups</a>.</p></b>',
   'group_count' => 'There is <b>:count group</b>.|There are <b>:count groups</b>.',
@@ -121,7 +117,6 @@ return [
   'group_count_none' => 'If you can\'t see any here yet, why not <a href="/group/nearby">find a group</a> near you?',
   'next_event' => 'Next event',
   'goto_group' => 'Go to group',
-  'distance' => 'Distance',
   'search_name_placeholder' => 'Search by name',
   'leave_group_button' => 'Unfollow group',
   'leave_group_button_mobile' => 'Unfollow',
@@ -206,7 +201,4 @@ Learn how to use this group here: :help.',
   'years_of_time_volunteered' => 'years of time volunteered',
   'see_group_reports' => 'See more in your group\'s reports',
   'view_reports' => 'View reports',
-  'show_all_groups' => 'Show all :total groups',
-  'years_volunteered' => 'years volunteered',
-  'device_breakdown' => 'Device breakdown',
 ];

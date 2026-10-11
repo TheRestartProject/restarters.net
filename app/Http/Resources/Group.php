@@ -410,6 +410,18 @@ class Group extends JsonResource
             ?? auth('api')->user();
         $ret['is_member'] = $user ? $this->resource->isVolunteer($user->id) : null;
 
+        // The group's reporting dashboard is for people who belong to the group or look after it
+        // (administrators, the network coordinator, hosts), not for the general public.  Null when
+        // reporting isn't set up.
+        $ret['reporting_url'] = null;
+
+        if ($user && ($ret['is_member']
+                || \App\Helpers\Fixometer::hasRole($user, 'Administrator')
+                || $user->isCoordinatorForGroup($this->resource)
+                || \App\Helpers\Fixometer::userHasEditGroupPermission($this->idgroups, $user->id))) {
+            $ret['reporting_url'] = $this->resource->reportingUrl();
+        }
+
         // group/view.blade.php shows a banner when the caller has an
         // outstanding invitation to this group, so someone who navigates here
         // directly - rather than through the emailed link - can still accept.

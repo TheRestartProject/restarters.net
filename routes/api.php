@@ -236,6 +236,7 @@ Route::prefix('v2')->middleware(\App\Http\Middleware\VerifyUserConsentApi::class
                 Route::post('{id}/tags', [API\NetworkController::class, 'createNetworkTagv2']);
                 Route::put('{id}/tags/{tagId}', [API\NetworkController::class, 'updateNetworkTagv2']);
                 Route::delete('{id}/tags/{tagId}', [API\NetworkController::class, 'deleteNetworkTagv2']);
+                Route::patch('{id}', [API\NetworkController::class, 'updateNetworkv2']);
                 Route::post('{id}/logo', [API\NetworkController::class, 'uploadLogov2']);
                 Route::post('{id}/groups', [API\NetworkController::class, 'associateGroupsv2']);
             });

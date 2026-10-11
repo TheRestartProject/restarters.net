@@ -159,6 +159,15 @@ class ApiController extends Controller
             $result = \Cache::get('homepage_data_v3', []);
         }
 
+        // Not cached with the figures: the downloadable file appears whenever the hourly build first runs.
+        // The Fixometer offers the file if it's there, and a live export otherwise.
+        $result['download_url'] = file_exists(\App\Console\Commands\ExportRepairData::path())
+            ? '/exports/repair-data.csv'
+            : '/export/devices';
+
+        // Further reports on all the repair data, if this install has any.
+        $result['reporting_url'] = config('restarters.reporting.fixometer_url') ?: null;
+
         return response()
             ->json($result, 200);
     }

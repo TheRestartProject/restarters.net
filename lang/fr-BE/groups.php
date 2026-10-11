@@ -1,7 +1,6 @@
 <?php
 
 return [
-  'search_location_placeholder' => 'Rechercher par localisation',
   'search_country_placeholder' => 'Filtrer par pays',
   'search_tags_placeholder' => 'Filtrer par tag',
   'show_filters' => 'Afficher les filtres',
@@ -60,7 +59,6 @@ return [
   'about' => 'A propos',
   'read_more' => 'Lire plus',
   'read_less' => '<img class="icon" src="/images/minus-icon.svg" style="width: 20px;" /> LIRE MOINS',
-  'device_breakdown' => 'Panne de l\'appareil',
   'export_event_list' => 'Télécharger le bilan',
   'calendar_copy_title' => 'Accéder à tous les événements dans votre calendrier',
   'calendar_copy_description' => 'Ajouter tous les futurs  événements :group à votre calendrier Google/Outlook/Yahoo/Apple avec le lien suivant:',
@@ -107,7 +105,6 @@ return [
   'group_count_none' => 'Si vous ne pouvez encore en voir aucun ici, pourquoi ne pas <a href="/group/nearby">trouver un Repair Café</a> près de chez vous?',
   'next_event' => 'Prochain événement',
   'goto_group' => 'Aller au Repair Café',
-  'distance' => 'Distance',
   'leave_group_button' => 'Ne plus suivre ce Repair Café',
   'leave_group_button_mobile' => 'Ne plus suivre',
   'leave_group_confirm' => 'Veuillez confirmer que vous ne voulez plus suivre ce Repair Café',
@@ -116,10 +113,8 @@ return [
   'now_following' => 'Vous suivez maintenant  <a href=":link">:name</a>!',
   'no_groups_mine' => '<b>Si vous ne pouvez encore en voir aucun ici, pourquoi ne pas <a href="/group/nearby">suivre le Repair Café le plus proche</a> pour être informé de ses futurs événements?</b>',
   'no_groups_nearest_no_location' => '<b><p>Vous n\'avez  pas défini de village/ville. Vous pouvez en ajouter un.e dans <a href="/profile/edit">votre profil</a>.</p><p>Vous pouvez aussi <a href="/group/all">voir tous les Repair Cafés</a>.</p></b>',
-  'no_unpowered_stats' => 'Pour l\'instant, ces statistiques sont seulement affichées pour les appareils électriques. Nous espérons pouvoir inclure les appareils non-électriques sous peu.',
   'no_groups_nearest_with_location' => '<b><p>Il n\'y a apparemment pas encore de Repair Cafés listé proche de chez vous.</p><p>Voulez-vous créer ou ajouter un Repair Café?  Regardez comment faire dans <a href="https://talk.restarters.net/t/how-to-power-up-community-repair-with-restarters-net/1228/2">nos ressources</a>.</p></b>',
   'search_country_placeholder' => 'Filtrer par pays',
-  'search_location_placeholder' => 'Rechercher par localisation',
   'search_name_placeholder' => 'Rechercher par nom',
   'all' => 'Tous',
   'nearby' => 'Proche',
@@ -197,6 +192,4 @@ Apprenez à utiliser ce groupe ici : :help.',
   'years_of_time_volunteered' => 'années de temps de bénévolat',
   'see_group_reports' => 'En savoir plus dans les rapports de votre groupe',
   'view_reports' => 'Voir les rapports',
-  'show_all_groups' => 'Afficher les :total groupes',
-  'years_volunteered' => 'années de bénévolat',
 ];

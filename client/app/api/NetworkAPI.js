@@ -69,4 +69,11 @@ export default class NetworkAPI extends BaseAPI {
   uploadLogo(id, uploadKey) {
     return this.$post(`/api/v2/networks/${id}/logo`, { upload_key: uploadKey })
   }
+
+  // PATCH /api/v2/networks/{id} - set the reporting dashboard address
+  // (NetworkController::updateNetworkv2). Administrator only; a blank
+  // reporting_url clears it.
+  update(id, payload) {
+    return this.$patch(`/api/v2/networks/${id}`, payload)
+  }
 }

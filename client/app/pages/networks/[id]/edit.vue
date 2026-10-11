@@ -35,14 +35,38 @@ const isAdministrator = computed(() => hasRole('Administrator'))
 const isCoordinatorHere = computed(() => (sessionStore.user?.networks || []).some((n) => n.id === id.value))
 const canManage = computed(() => isAdministrator.value || isCoordinatorHere.value)
 
+// The reporting dashboard address is set up by administrators alongside the
+// dashboard itself, so coordinators don't get the field (develop #919).
+const reportingUrl = ref('')
+const reportingError = ref('')
+const reportingSaved = ref(false)
+const reportingSaving = ref(false)
+
 const logoError = ref('')
 const logoSaved = ref(false)
 
 useHead({ title: computed(() => (network.value ? network.value.name : '')) })
 
 onMounted(() => {
-  networksStore.fetchCurrent(id.value).catch(() => {})
+  networksStore.fetchCurrent(id.value)
+    .then(() => { reportingUrl.value = network.value?.reporting_url || '' })
+    .catch(() => {})
 })
+
+async function saveReportingUrl() {
+  reportingError.value = ''
+  reportingSaved.value = false
+  reportingSaving.value = true
+
+  try {
+    await networksStore.update(id.value, { reporting_url: reportingUrl.value.trim() })
+    reportingSaved.value = true
+  } catch {
+    reportingError.value = t('client.networks.reporting_url_error')
+  } finally {
+    reportingSaving.value = false
+  }
+}
 
 async function onLogoUploaded({ uploadKey }) {
   logoError.value = ''
@@ -92,6 +116,30 @@ async function onLogoUploaded({ uploadKey }) {
           {{ t('networks.edit.button_save') }}
         </BAlert>
       </div>
+
+      <form v-if="isAdministrator" class="mt-4" data-testid="network-edit-reporting" @submit.prevent="saveReportingUrl">
+        <label class="form-label" for="network-reporting-url">{{ t('networks.edit.label_reporting_url') }}:</label>
+        <input
+          id="network-reporting-url"
+          v-model="reportingUrl"
+          type="url"
+          class="form-control"
+          :class="{ 'is-invalid': reportingError }"
+          data-testid="network-edit-reporting-url"
+        >
+        <div v-if="reportingError" class="invalid-feedback d-block" data-testid="network-edit-reporting-error">
+          {{ reportingError }}
+        </div>
+        <small class="form-text text-muted">{{ t('networks.edit.help_reporting_url') }}</small>
+        <BAlert v-if="reportingSaved" :model-value="true" variant="success" class="mt-2" data-testid="network-edit-reporting-saved">
+          {{ t('networks.edit.button_save') }}
+        </BAlert>
+        <div class="mt-2">
+          <BButton type="submit" variant="primary" :disabled="reportingSaving" data-testid="network-edit-reporting-save">
+            {{ t('networks.edit.button_save') }}
+          </BButton>
+        </div>
+      </form>
 
       <div class="d-flex justify-content-end mt-4">
         <NuxtLink :to="`/networks/${id}`" class="btn btn-primary" data-testid="network-edit-done">

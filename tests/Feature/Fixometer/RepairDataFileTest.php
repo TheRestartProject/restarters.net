@@ -105,15 +105,20 @@ class RepairDataFileTest extends TestCase
         $this->addDevice();
         $this->build();
 
-        $this->loginAsTestUser();
-        $this->get('/fixometer')->assertSee('/exports/repair-data.csv', false);
+        $this->get('/api/homepage_data')->assertJsonPath('download_url', '/exports/repair-data.csv');
     }
 
     public function testFixometerFallsBackToALiveExportBeforeTheFileIsBuilt(): void
     {
-        $this->loginAsTestUser();
-        $this->get('/fixometer')
-            ->assertDontSee('/exports/repair-data.csv', false)
-            ->assertSee('/export/devices', false);
+        $this->get('/api/homepage_data')->assertJsonPath('download_url', '/export/devices');
+    }
+
+    public function testFixometerLinksToFurtherReportsOnlyWhenConfigured(): void
+    {
+        config(['restarters.reporting.fixometer_url' => 'https://reports.example.org/all']);
+        $this->get('/api/homepage_data')->assertJsonPath('reporting_url', 'https://reports.example.org/all');
+
+        config(['restarters.reporting.fixometer_url' => null]);
+        $this->get('/api/homepage_data')->assertJsonPath('reporting_url', null);
     }
 }

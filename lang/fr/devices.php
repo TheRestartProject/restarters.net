@@ -81,11 +81,6 @@ return [
   'unpowered_items_fixed' => 'objets non électriques réparés',
   'events_held' => 'événements organisés',
   'items_seen' => 'objets vus',
-  'powered_or_unpowered' => 'Électrique ou non électrique',
-  'both' => 'Les deux',
-  'view_event_for_repair' => 'Voir l\'événement de cette réparation',
   'powered' => 'Électrique',
   'unpowered' => 'Non électrique',
-  'view_record' => 'Voir les détails de cette réparation',
-  'edit_record' => 'Voir et modifier les détails de cette réparation',
 ];
