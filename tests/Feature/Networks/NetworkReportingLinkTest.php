@@ -70,6 +70,7 @@ class NetworkReportingLinkTest extends TestCase
     {
         $network = Network::factory()->create();
         $admin = User::factory()->administrator()->create(['api_token' => 'nrl-admin']);
+        $this->withExceptionHandling();
 
         $this->patchAs($admin, $network, [
             'reporting_url' => 'javascript:alert(1)',
@@ -97,6 +98,7 @@ class NetworkReportingLinkTest extends TestCase
     public function testAnonymousCannotChangeTheReportingUrl(): void
     {
         $network = Network::factory()->create(['reporting_url' => self::REPORTS]);
+        $this->withExceptionHandling();
 
         $this->patchAs(null, $network, ['reporting_url' => 'https://elsewhere.example.org/'])
             ->assertUnauthorized();

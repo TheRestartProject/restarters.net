@@ -904,7 +904,7 @@ class NetworkController extends Controller
             $network->save();
         }
 
-        return response()->json(\App\Http\Resources\Network::make($network->fresh())->resolve($request));
+        return response()->json(['data' => ['id' => $network->id, 'reporting_url' => $network->reporting_url]]);
     }
 
     /**
