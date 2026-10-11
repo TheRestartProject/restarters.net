@@ -100,4 +100,5 @@ return [
   'share_modal_planting_around' => "planter environ",
   'share_modal_hectares' => "hectare d’arbres.*|hectares d’arbres.*",
   'impact_estimates' => 'Les chiffres relatifs à l\'impact sont des estimations basées sur les données saisies par les groupes dans Restarters.net.',
+  'see_further_reports' => 'Voir plus d\'analyses dans nos rapports détaillés.',
 ];

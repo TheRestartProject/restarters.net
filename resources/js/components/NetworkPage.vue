@@ -13,6 +13,7 @@
       <div class="network-actions" v-if="isLoggedIn">
         <b-dropdown right variant="primary" :text="__('networks.general.actions')">
           <b-dropdown-item v-if="canAssociateGroups" @click="showAddGroupModal">{{ __('networks.show.add_groups_menuitem') }}</b-dropdown-item>
+          <b-dropdown-item v-if="network.reporting_url" :href="network.reporting_url" target="_blank" rel="noopener" link-class="network-reporting-link">{{ __('networks.general.view_reports') }}</b-dropdown-item>
           <b-dropdown-item :href="'/export/networks/' + network.id + '/events'">{{ __('groups.export_event_list') }}</b-dropdown-item>
         </b-dropdown>
       </div>
@@ -39,6 +40,11 @@
           <div class="stat-label">{{ __('networks.stats.co2_prevented') }}</div>
         </div>
       </div>
+      <p v-if="network.reporting_url" class="mt-3 mb-0 text-right">
+        <a :href="network.reporting_url" target="_blank" rel="noopener" class="network-reporting-inline">
+          {{ __('networks.general.see_network_reports') }}
+        </a>
+      </p>
     </div>
 
     <!-- About (moved from column layout) -->

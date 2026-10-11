@@ -87,6 +87,7 @@ class NetworkController extends Controller
             'name' => $network->name,
             'description' => $network->description,
             'website' => $network->website,
+            'reporting_url' => $network->reporting_url,
             'logo' => $network->sizedLogo('_x100'),
             'coordinators' => $network->coordinators->map(function ($c) {
                 $profile = $c->getProfile($c->id);
@@ -120,6 +121,7 @@ class NetworkController extends Controller
 
         return view('networks.edit', [
             'network' => $network,
+            'canEditReportingUrl' => Fixometer::hasRole(Auth::user(), 'Administrator'),
         ]);
     }
 
@@ -129,6 +131,16 @@ class NetworkController extends Controller
     public function update(Request $request, Network $network): RedirectResponse
     {
         $this->authorize('update', $network);
+
+        // The reporting dashboard address is set up by administrators alongside the dashboard itself.
+        if (Fixometer::hasRole(Auth::user(), 'Administrator') && $request->has('reporting_url')) {
+            $request->validate([
+                'reporting_url' => 'nullable|url:https,http|max:2048',
+            ]);
+
+            $network->reporting_url = $request->input('reporting_url') ?: null;
+            $network->save();
+        }
 
         if ($request->hasFile('network_logo')) {
             if (! config('restarters.features.image_upload')) {

@@ -1,7 +1,7 @@
 <template>
   <div class="w-100 device-select-row">
-    <b-input v-model="mValue" :placeholder="__('devices.model_if_known')" size="lg" class="marg" :disabled="disabled" />
-    <div v-b-popover.html.left="__('devices.tooltip_model')" class="ml-3 mt-2">
+    <b-input v-model="mValue" :placeholder="placeholder || __('devices.model_if_known')" size="lg" class="marg" :disabled="disabled" />
+    <div v-if="iconVariant !== 'none'" v-b-popover.html.left="__('devices.tooltip_model')" class="ml-3 mt-2">
       <b-img class="icon clickable" :src="imageUrl('/icons/info_ico_black.svg')" v-if="iconVariant === 'black'" />
       <b-img class="icon clickable" :src="imageUrl('/icons/info_ico_green.svg')" v-else="iconVariant === 'brand'" />
     </div>
@@ -21,9 +21,15 @@ export default {
       default: null
     },
     iconVariant: {
+      // 'black', 'brand', or 'none' for no info icon.
       type: String,
       required: false,
       default: 'black'
+    },
+    placeholder: {
+      type: String,
+      required: false,
+      default: null
     },
     disabled: {
       type: Boolean,

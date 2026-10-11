@@ -62,7 +62,6 @@ return [
   'status' => 'Stato',
   'spare_parts' => 'Parti di ricambio',
   'latest_data' => 'Dati più recenti',
-  'table_intro' => 'Premi le icone \'i\' per i dettagli. Clicca l\'intestazione di una colonna per ordinare per quella colonna - clicca di nuovo per invertire l\'ordine.',
   'assessment' => 'Valutazione',
   'item_and_repair_info' => 'Informazioni oggetto e riparazione',
   'search_assessment_comments' => 'Valutazione',
