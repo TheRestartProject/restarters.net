@@ -198,4 +198,5 @@ Apprenez à utiliser ce groupe ici : :help.',
   'see_group_reports' => 'En savoir plus dans les rapports de votre groupe',
   'view_reports' => 'Voir les rapports',
   'show_all_groups' => 'Afficher les :total groupes',
+  'years_volunteered' => 'années de bénévolat',
 ];

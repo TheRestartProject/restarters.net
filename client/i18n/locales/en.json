@@ -1019,7 +1019,7 @@
         "create_groups_mobile2": "Add new",
         "groups_title1_mobile": "Yours",
         "groups_title2_mobile": "Find",
-        "no_groups_mine": "<b>If you can't see any here yet, why not <a href=\"/group/other\">find a group near you</a>?</b>",
+        "no_groups_mine": "<b>If you can't see any here yet, why not <a href=\"/group/nearby\">follow your nearest group</a> to hear about their upcoming repair events?</b>",
         "no_groups_nearest_no_location": "<b><p>You do not currently have a town/city set.  You can set one in <a href=\"/profile/edit\">your profile</a>.</p><p>You can also <a href=\"/group/all\">view all groups</a>.</p></b>",
         "group_count": "There is <b>{count} group</b>.|There are <b>{count} groups</b>.",
         "group_count_map": "There is <b>{count} group</b> in this area.  Search and zoom to find more.|There are <b>{count} groups</b> in this area.  Search and zoom to find more.",
@@ -1094,7 +1094,9 @@
         "years_of_time_volunteered": "years of time volunteered",
         "see_group_reports": "See more in your group's reports",
         "view_reports": "View reports",
-        "show_all_groups": "Show all {total} groups"
+        "show_all_groups": "Show all {total} groups",
+        "years_volunteered": "years volunteered",
+        "device_breakdown": "Device breakdown"
     },
     "landing": {
         "title": "Welcome to Restarters!",
