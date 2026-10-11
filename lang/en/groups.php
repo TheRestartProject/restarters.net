@@ -189,4 +189,7 @@ Learn how to use this group here: :help.',
   // predates them.
   'create_event_first' => 'Please first create an event in order to add repair data.',
   'follow_group_first' => 'Repair data is added to community repair events. Please first follow a group and then choose an event in order to add repair data.',
+  'goto_group' => 'Go to group',
+  'next_event' => 'Next event',
+  'show_all_groups' => 'Show all :total groups',
 ];

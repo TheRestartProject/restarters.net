@@ -188,4 +188,7 @@ Apprenez à utiliser ce groupe ici : :help.',
   // values.
   'create_event_first' => 'Veuillez d\'abord créer un événement afin d\'ajouter des données de réparation.',
   'follow_group_first' => 'Les données de réparation sont ajoutées aux événements de réparation de la communauté. Veuillez d\'abord suivre un Repair Café, puis choisir un événement afin d\'ajouter des données de réparation.',
+  'goto_group' => 'Aller au Repair Café',
+  'next_event' => 'Prochain événement',
+  'show_all_groups' => 'Afficher les :total groupes',
 ];
