@@ -223,8 +223,14 @@ if [ "$RESTORE_OK" = "true" ]; then
         SQL_STATE=$(grep -oE 'SQLSTATE\[[0-9A-Z]+\]' "$MIGRATE_OUT" | head -1)
         SQL_CODE=$(grep -oE 'SQLSTATE\[[0-9A-Z]+\]: [^:]+: [0-9]{3,5}' "$MIGRATE_OUT" | head -1 | grep -oE '[0-9]{3,5}$')
         EXC_CLASS=$(grep -oE '^ +([A-Za-z]+\\)+[A-Za-z]*(Exception|Error)' "$MIGRATE_OUT" | head -1 | tr -d ' ' | sed 's/\\/./g')
-        MIGRATE_DETAIL="migrate failed at ${FAILED_MIGRATION:-unknown} ${EXC_CLASS} ${SQL_STATE} ${SQL_CODE:+driver $SQL_CODE} - see machine logs"
-        MIGRATE_DETAIL=$(echo "$MIGRATE_DETAIL" | tr -cd 'A-Za-z0-9_ .[]-' | tr -s ' ')
+        # Errors with no SQLSTATE (class not found, bad config, PHP fatal) cannot
+        # quote database rows, so their first line is safe to publish.
+        PHP_ERR=""
+        if [ -z "$SQL_STATE" ]; then
+            PHP_ERR=$(grep -m1 -iE 'not found|undefined|fatal|exception|error|cannot|must be|unable|missing' "$MIGRATE_OUT" | cut -c1-160)
+        fi
+        MIGRATE_DETAIL="${PHP_ERR:+$PHP_ERR - }migrate failed at ${FAILED_MIGRATION:-unknown} ${EXC_CLASS} ${SQL_STATE} ${SQL_CODE:+driver $SQL_CODE} - see machine logs"
+        MIGRATE_DETAIL=$(echo "$MIGRATE_DETAIL" | tr "\\\\" . | tr -cd 'A-Za-z0-9_ .:()[]/-' | tr -s ' ')
     fi
     rm -f "$MIGRATE_OUT"
     timeout 30 php /var/www/artisan translations:import 2>/dev/null || true
