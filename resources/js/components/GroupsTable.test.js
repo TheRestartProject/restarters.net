@@ -204,7 +204,51 @@ describe('GroupsTable paging', () => {
 
     expect(wrapper.vm.show).toBe(before + wrapper.vm.pageSize)
   })
+
+  // "Your groups" fetches each group separately, so the scroller can run out
+  // of rows and give up before most of them have arrived. The groups that
+  // turn up afterwards must still be reachable by scrolling (#928).
+  test('keeps scrolling through groups that arrive after it ran out', async () => {
+    const store = new Vuex.Store({
+      modules: {
+        groups: {
+          namespaced: true,
+          state: { list: {} },
+          getters: { list: state => Object.values(state.list), get: state => id => state.list[id] },
+          mutations: { add: (state, g) => Vue.set(state.list, g.id, g) },
+          actions: { fetch: () => Promise.resolve(), hydrate: () => Promise.resolve() },
+        },
+      },
+    })
+    const wrapper = mount(GroupsTable, {
+      localVue,
+      store,
+      propsData: { groupids: many.map(g => g.id) },
+      stubs: { GroupsTableFilters: true, GroupArchivedBadge: true, InfiniteLoading: true, 'b-img-lazy': true },
+    })
+
+    // Only the first few have loaded when the scroller first checks.
+    many.slice(0, 5).forEach(g => store.commit('groups/add', g))
+    await wrapper.vm.$nextTick()
+    let completed = false
+    wrapper.vm.loadMore({ loaded: () => {}, complete: () => { completed = true } })
+    expect(completed).toBe(true)
+
+    const before = wrapper.findComponent(InfiniteLoadingStub()).attributes('identifier')
+    many.forEach(g => store.commit('groups/add', g))
+    await wrapper.vm.$nextTick()
+    await wrapper.vm.$nextTick()
+
+    // The scroller is restarted, and the next scroll brings in more rows.
+    expect(wrapper.findComponent(InfiniteLoadingStub()).attributes('identifier')).not.toBe(before)
+    wrapper.vm.loadMore({ loaded: () => {}, complete: () => {} })
+    expect(wrapper.vm.itemsToShow.length).toBe(50)
+  })
 })
+
+function InfiniteLoadingStub() {
+  return { name: 'infinite-loading' }
+}
 
 describe('GroupsTable distance sort', () => {
   // Someone looking at a map wants the groups they can see, nearest first.
@@ -318,5 +362,43 @@ describe('GroupsTable distance column', () => {
     // Alphabetical order would put Alpha Far first - nearest-first must win.
     const wrapper = mountTable([far, nowhere, near], { referencePoint: reference })
     expect(wrapper.vm.itemsToShow.map(g => g.name)).toEqual(['Zed Near', 'Alpha Far', 'Mid Nowhere'])
+  })
+})
+
+// On a page with more below the list - a network's tags, say - an infinite
+// scroll keeps pushing that out of reach as you scroll towards it (#918). A
+// button shows the rest of the list only when asked, all in one go: nobody
+// wants to reveal a long list a page at a time.
+describe('GroupsTable show all button', () => {
+  const many = Array.from({ length: 60 }, (_, i) => ({
+    ...group,
+    id: i + 1,
+    name: 'Group ' + String(i + 1).padStart(3, '0'),
+  }))
+
+  test('shows every group at once rather than scrolling infinitely', async () => {
+    const wrapper = mountTable(many, { showAllButton: true })
+
+    expect(wrapper.findComponent({ name: 'infinite-loading' }).exists()).toBe(false)
+    expect(wrapper.vm.itemsToShow.length).toBe(wrapper.vm.pageSize)
+
+    const button = wrapper.find('.groups-show-all')
+    expect(button.exists()).toBe(true)
+
+    await button.trigger('click')
+    expect(wrapper.vm.itemsToShow.length).toBe(many.length)
+    expect(wrapper.find('.groups-show-all').exists()).toBe(false)
+  })
+
+  test('has no button when every group already fits on one page', () => {
+    const wrapper = mountTable(many.slice(0, 10), { showAllButton: true })
+
+    expect(wrapper.find('.groups-show-all').exists()).toBe(false)
+  })
+
+  test('scrolls infinitely by default', () => {
+    const wrapper = mountTable(many)
+
+    expect(wrapper.find('.groups-show-all').exists()).toBe(false)
   })
 })

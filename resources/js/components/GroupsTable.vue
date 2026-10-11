@@ -90,7 +90,12 @@
         </div>
       </template>
     </b-table>
-    <infinite-loading @infinite="loadMore">
+    <div v-if="showAllButton" class="text-center mt-2">
+      <b-btn v-if="show < filteredItems.length" variant="link" class="groups-show-all" @click="show = Infinity">
+        {{ __('groups.show_all_groups', { total: filteredItems.length }) }}
+      </b-btn>
+    </div>
+    <infinite-loading v-else :identifier="infiniteId" @infinite="loadMore">
       <span slot="no-results" />
       <span slot="no-more" />
     </infinite-loading>
@@ -114,6 +119,13 @@ export default {
   components: {GroupArchivedBadge, GroupsTableFilters, InfiniteLoading},
   mixins: [images],
   props: {
+    showAllButton: {
+      // Show one page of groups and a button that reveals the rest, rather than
+      // growing the list as you scroll, for pages with more below the list.
+      type: Boolean,
+      required: false,
+      default: false
+    },
     groupids: {
       type: Array,
       required: true
@@ -180,7 +192,8 @@ export default {
       searchName: null,
       searchTags: null,
       searchShow: false,
-      show: PAGE_SIZE
+      show: PAGE_SIZE,
+      infiniteId: 0
     }
   },
   computed: {
@@ -281,6 +294,15 @@ export default {
 
       if (!same) {
         this.show = PAGE_SIZE
+        this.infiniteId++
+      }
+    },
+    'items.length'(newVal, oldVal) {
+      // Groups can arrive after the scroller has decided there are no more -
+      // "Your groups" fetches each one separately - and once it has finished
+      // it never asks again. Restart it so the late arrivals can be scrolled to.
+      if (newVal > oldVal) {
+        this.infiniteId++
       }
     },
     activeFilters: {

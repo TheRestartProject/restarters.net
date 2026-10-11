@@ -181,4 +181,5 @@ Learn how to use this group here: :help.',
   'years_of_time_volunteered' => 'years of time volunteered',
   'see_group_reports' => 'See more in your group\'s reports',
   'view_reports' => 'View reports',
+  'show_all_groups' => 'Show all :total groups',
 ];

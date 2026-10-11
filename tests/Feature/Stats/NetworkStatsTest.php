@@ -8,6 +8,7 @@ use App\Group;
 use App\Network;
 use App\Party;
 use App\User;
+use Carbon\Carbon;
 use Tests\Feature\Stats\StatsTestCase;
 
 /**
@@ -33,8 +34,59 @@ class NetworkStatsTest extends StatsTestCase
 
         $expect = \App\Group::getGroupStatsArrayKeys();
         $expect['parties'] = $expect['parties'] ?? 0;
+        $expect['groups'] = 0;
 
         $this->assertEquals($expect, $network->stats());
+    }
+
+    /** @test */
+    public function network_stats_count_every_event_once_across_chunks(): void
+    {
+        // More events than one lazyById chunk (200), with dates running opposite to ids, so any ordering other
+        // than by id would make chunks overlap or skip events.
+        $network = Network::factory()->create();
+        $group1 = Group::factory()->create();
+        $group2 = Group::factory()->create();
+        $network->addGroup($group1);
+        $network->addGroup($group2);
+
+        $count = 450;
+        $expectedVolunteers = 0;
+        for ($i = 1; $i <= $count; $i++) {
+            $start = Carbon::parse('2020-01-01 10:00:00')->addDays($i);
+            Party::factory()->moderated()->create([
+                'group' => $i % 2 ? $group1->idgroups : $group2->idgroups,
+                'event_start_utc' => $start->toIso8601String(),
+                'event_end_utc' => $start->copy()->addHours(3)->toIso8601String(),
+                'volunteers' => $i,
+            ]);
+            $expectedVolunteers += $i;
+        }
+
+        $stats = $network->stats();
+        $this->assertEquals($count, $stats['parties']);
+        $this->assertEquals($expectedVolunteers, $stats['volunteers']);
+    }
+
+    /** @test */
+    public function network_group_count_excludes_archived_groups_but_impact_includes_them(): void
+    {
+        $network = Network::factory()->create();
+
+        $active = Group::factory()->create();
+        $archived = Group::factory()->create(['archived_at' => '2024-01-01 00:00:00']);
+        $network->addGroup($active);
+        $network->addGroup($archived);
+
+        Party::factory()->moderated()->create([
+            'event_start_utc' => '2000-01-01T10:00:00+00:00',
+            'event_end_utc' => '2000-01-01T13:00:00+00:00',
+            'group' => $archived->idgroups,
+        ]);
+
+        $stats = $network->stats();
+        $this->assertEquals(1, $stats['groups']);
+        $this->assertEquals(1, $stats['parties']);
     }
 
     /** @test */

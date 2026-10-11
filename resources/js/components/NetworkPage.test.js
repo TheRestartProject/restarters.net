@@ -34,6 +34,7 @@ const groupMapStub = {
     showFilters: { type: Boolean, default: false },
     canManageTags: { type: Boolean, default: false },
     availableTags: { type: Array, default: () => [] },
+    showAllButton: { type: Boolean, default: false },
     networks: { type: Array, default: null },
   },
   template: '<div class="stub-map" />',
@@ -132,4 +133,12 @@ test('links to the network reports from under the impact figures', () => {
   expect(link.attributes('href')).toBe('https://reports.example.org/dashboard/7')
   expect(link.attributes('target')).toBe('_blank')
   expect(link.text()).toBe('networks.general.see_network_reports')
+})
+
+// The tags section sits below the groups, so the list mustn't keep growing as
+// you scroll towards it (#918).
+test('shows a page of groups and a button for the rest, not an infinite scroll', () => {
+  const wrapper = makeWrapper()
+
+  expect(wrapper.findComponent(groupMapStub).props('showAllButton')).toBe(true)
 })
