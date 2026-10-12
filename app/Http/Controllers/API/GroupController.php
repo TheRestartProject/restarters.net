@@ -1206,9 +1206,10 @@ class GroupController extends Controller
                 Notification::send($creator, new GroupConfirmed($group));
             }
 
-            // Notify nearest users.
-            if (! is_null($latitude) && ! is_null($longitude)) {
-                $restarters_nearby = User::nearbyRestarters($latitude, $longitude, 25)
+            // Notify nearest users.  Use the group's saved position: an approval that doesn't resend the location
+            // has none in the request.
+            if (! is_null($group->latitude) && ! is_null($group->longitude)) {
+                $restarters_nearby = User::nearbyRestarters($group->latitude, $group->longitude, 25)
                     ->orderBy('name', 'ASC')
                     ->get();
 
