@@ -4,7 +4,6 @@ import { createI18n } from 'vue-i18n'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import FixometerPage from '../../app/pages/fixometer.vue'
 import { useFixometerStore } from '../../app/stores/fixometer.js'
-import { useAuthStore } from '../../app/stores/auth.js'
 import en from '../../i18n/locales/en.json'
 import clientEn from '../../i18n/locales/client-en.json'
 
@@ -104,25 +103,46 @@ describe('pages/fixometer', () => {
     expect(wrapper.find('[data-testid="add-data-modal-stub"]').exists()).toBe(true)
   })
 
-  it('only shows the "Download all data" export link for Administrators, as a solid primary button', async () => {
+  it('offers everyone the repair data download, the built file when there is one', async () => {
+    fixometerStore.impactData.data = {
+      participants: 5, hours_volunteered: 100, waste_total: 100, co2_total: 100,
+      download_url: '/exports/repair-data.csv',
+    }
+    fixometerStore.impactData.loaded = true
+
+    const wrapper = mountPage()
+    await flushPromises()
+
+    const exportLink = wrapper.find('[data-testid="fixometer-export-devices"]')
+    expect(exportLink.exists()).toBe(true)
+    expect(exportLink.attributes('href')).toBe('/exports/repair-data.csv')
+    expect(exportLink.classes()).toContain('btn-primary')
+    expect(exportLink.classes()).not.toContain('btn-outline-primary')
+  })
+
+  it('falls back to the live export when the data has no download url', async () => {
     fixometerStore.impactData.data = { participants: 5, hours_volunteered: 100, waste_total: 100, co2_total: 100 }
     fixometerStore.impactData.loaded = true
 
     const wrapper = mountPage()
     await flushPromises()
-    expect(wrapper.find('[data-testid="fixometer-export-devices"]').exists()).toBe(false)
 
-    const authStore = useAuthStore()
-    authStore.token = 'a-token'
-    authStore.user = { id: 1, role_name: 'Administrator' }
+    expect(wrapper.find('[data-testid="fixometer-export-devices"]').attributes('href')).toBe('/export/devices')
+  })
+
+  it('links to further reports when the install has them', async () => {
+    fixometerStore.impactData.data = {
+      participants: 5, hours_volunteered: 100, waste_total: 100, co2_total: 100,
+      reporting_url: 'https://reports.example.org/all',
+    }
+    fixometerStore.impactData.loaded = true
+
+    const wrapper = mountPage()
     await flushPromises()
 
-    const exportLink = wrapper.find('[data-testid="fixometer-export-devices"]')
-    expect(exportLink.exists()).toBe(true)
-    expect(exportLink.attributes('href')).toBe('/export/devices')
-    // Gap fix (LOW): legacy's export button is variant="primary" (solid),
-    // not the outline style a prior version used.
-    expect(exportLink.classes()).toContain('btn-primary')
-    expect(exportLink.classes()).not.toContain('btn-outline-primary')
+    const link = wrapper.find('[data-testid="impact-stats-reporting-link"]')
+    expect(link.exists()).toBe(true)
+    expect(link.attributes('href')).toBe('https://reports.example.org/all')
+    expect(link.attributes('target')).toBe('_blank')
   })
 })

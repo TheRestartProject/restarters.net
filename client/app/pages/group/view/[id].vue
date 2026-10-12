@@ -9,7 +9,6 @@ import { escapeHtml } from '~/utils/escapeHtml.js'
 import GroupActions from '~/components/groups/GroupActions.vue'
 import GroupStats from '~/components/groups/GroupStats.vue'
 import GroupDevicesSummary from '~/components/groups/GroupDevicesSummary.vue'
-import GroupDevicesBreakdown from '~/components/groups/GroupDevicesBreakdown.vue'
 import GroupVolunteers from '~/components/groups/GroupVolunteers.vue'
 import GroupEventsList from '~/components/groups/GroupEventsList.vue'
 import GroupInviteModal from '~/components/groups/GroupInviteModal.vue'
@@ -32,6 +31,20 @@ const sessionStore = useSessionStore()
 
 const id = computed(() => Number(route.params.id))
 
+// Where the stats go, while we choose between them (develop #922):
+// - compact: all of them before the events, achievements over impact beside
+//   items worked on over most repaired
+// - after: all of them after the events
+// - split: achievements and impact before the events, items worked on and
+//   most repaired after
+// ?stats_layout= on the page address picks one, so they can be compared.
+const STATS_LAYOUTS = ['compact', 'after', 'split']
+const statsLayout = computed(() => {
+  const asked = Array.isArray(route.query.stats_layout) ? route.query.stats_layout[0] : route.query.stats_layout
+
+  return STATS_LAYOUTS.includes(asked) ? asked : 'compact'
+})
+
 const group = computed(() => groupsStore.current.data)
 const permissions = computed(() => group.value?.permissions || {})
 const canedit = computed(() => !!permissions.value.can_edit)
@@ -51,6 +64,9 @@ const canPerformDelete = computed(() => !!permissions.value.can_perform_delete)
 const isMember = computed(() => group.value?.is_member ?? groupsStore.isMember(id.value))
 // GroupEvents.vue's showCalendar: Auth::check() && (isVolunteer OR
 // Administrator) - approximated here with the flags already on hand.
+// The group's reporting dashboard: only sent to members and the people who look after the group.
+const reportingUrl = computed(() => group.value?.reporting_url || null)
+
 const showCalendar = computed(() => isMember.value || canedit.value || canPerformArchive.value)
 
 const { uploadedImageUrl } = useUploadedImageUrl()
@@ -314,6 +330,7 @@ onMounted(() => {
               :can-perform-archive="canPerformArchive"
               :can-see-delete="canSeeDelete"
               :can-perform-delete="canPerformDelete"
+              :reporting-url="reportingUrl"
               :archived="!!group.archived_at"
               @invite="showInvite = true"
               @share-stats="showShareStats = true"
@@ -432,16 +449,25 @@ onMounted(() => {
         </div>
       </div>
 
-      <!-- GroupStatsFacts + StatsImpact only here; GroupPage.vue puts Events
-           immediately after, then devices-worked-on/most-repaired/breakdown
-           further down (parity gap 13). -->
+      <!-- Stats placement follows ?stats_layout= (see statsLayout above). -->
+      <div v-if="statsLayout === 'compact'" class="stats-compact stats-before-events" data-testid="group-stats-layout-compact">
+        <GroupStats
+          compact
+          :stats="groupsStore.stats.data"
+          :loading="groupsStore.stats.loading"
+          :error="!!groupsStore.stats.error"
+          @share-stats="showShareImage = true"
+        />
+        <GroupDevicesSummary compact :stats="groupsStore.stats.data" />
+      </div>
       <GroupStats
+        v-else-if="statsLayout === 'split'"
+        class="stats-before-events"
         :stats="groupsStore.stats.data"
         :loading="groupsStore.stats.loading"
         :error="!!groupsStore.stats.error"
         @share-stats="showShareImage = true"
       />
-
       <hr>
 
       <GroupEventsList
@@ -453,11 +479,24 @@ onMounted(() => {
         :show-calendar="showCalendar"
       />
 
-      <div class="d-flex flex-wrap pt-4">
+      <div v-if="statsLayout === 'after'" class="stats-after-events" data-testid="group-stats-layout-after">
+        <GroupStats
+          :stats="groupsStore.stats.data"
+          :loading="groupsStore.stats.loading"
+          :error="!!groupsStore.stats.error"
+          @share-stats="showShareImage = true"
+        />
+      </div>
+
+      <div v-if="statsLayout !== 'compact'" class="d-flex flex-wrap pt-4 stats-after-events">
         <GroupDevicesSummary :stats="groupsStore.stats.data" class="w-100" />
       </div>
 
-      <GroupDevicesBreakdown :cluster-stats="groupsStore.stats.data?.cluster_stats" />
+      <p v-if="reportingUrl" class="mt-3 mb-0 text-end">
+        <a :href="reportingUrl" target="_blank" rel="noopener" class="group-reporting-link" data-testid="group-view-reports-link">
+          {{ t('groups.see_group_reports') }}
+        </a>
+      </p>
 
       <GroupInviteModal :show="showInvite" :group-id="id" :shareable-link="group?.shareable_link || ''" @close="showInvite = false" />
       <GroupShareStatsModal
@@ -476,6 +515,30 @@ onMounted(() => {
 </template>
 
 <style scoped>
+/* Compact stats layout (develop #922): achievements over impact on the left,
+   items worked on over most repaired on the right. GroupStats and
+   GroupDevicesSummary render their sections straight into this grid. */
+.stats-compact {
+  display: grid;
+  grid-template-columns: 1fr;
+  margin-bottom: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .stats-compact {
+    column-gap: 1.5rem;
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      'facts worked-on'
+      'impact most-repaired';
+  }
+
+  .stats-compact :deep(.stats-facts) { grid-area: facts; }
+  .stats-compact :deep(.stats-impact) { grid-area: impact; }
+  .stats-compact :deep(.stats-worked-on) { grid-area: worked-on; }
+  .stats-compact :deep(.stats-most-repaired) { grid-area: most-repaired; }
+}
+
 /* Match develop's GroupHeading.vue: the group heading image is restricted to
    67px wide (height auto) instead of rendering at its full uploaded size. */
 /* GroupHeading.vue:12 - `align-self-start` on the image itself. Without it

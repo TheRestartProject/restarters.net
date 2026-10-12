@@ -32,6 +32,12 @@ defineProps({
     type: Boolean,
     default: false,
   },
+  // The group's reporting dashboard, for members and the people who look
+  // after the group (GroupResource's reporting_url). No item when null.
+  reportingUrl: {
+    type: String,
+    default: null,
+  },
   archived: {
     type: Boolean,
     default: false,
@@ -77,6 +83,16 @@ const { t } = useI18n()
       <BDropdownItem data-testid="group-actions-share-stats" @click="emit('share-stats')">
         {{ t('groups.share_group_stats') }}
       </BDropdownItem>
+      <BDropdownItem
+        v-if="reportingUrl"
+        :href="reportingUrl"
+        target="_blank"
+        rel="noopener"
+        link-class="group-reporting-action"
+        data-testid="group-actions-reports"
+      >
+        {{ t('groups.view_reports') }}
+      </BDropdownItem>
       <BDropdownItem :href="`/export/devices/group/${groupId}`" data-testid="group-actions-export">
         {{ t('groups.export_group_data') }}
       </BDropdownItem>
@@ -112,6 +128,16 @@ const { t } = useI18n()
       </BDropdownItem>
       <BDropdownItem data-testid="group-actions-share-stats" @click="emit('share-stats')">
         {{ t('groups.share_group_stats') }}
+      </BDropdownItem>
+      <BDropdownItem
+        v-if="reportingUrl"
+        :href="reportingUrl"
+        target="_blank"
+        rel="noopener"
+        link-class="group-reporting-action"
+        data-testid="group-actions-reports"
+      >
+        {{ t('groups.view_reports') }}
       </BDropdownItem>
       <BDropdownItem v-if="isMember" data-testid="group-actions-leave" @click="emit('leave')">
         {{ t('groups.leave_group_button') }}

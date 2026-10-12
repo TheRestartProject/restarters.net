@@ -92,4 +92,21 @@ describe('components/groups/GroupActions', () => {
       expect(wrapper.find('[data-testid="group-actions-share-stats"]').exists()).toBe(true)
     })
   })
+
+  describe('reports link', () => {
+    it('links to the group reports from the editor and member menus when given an address', () => {
+      for (const props of [{ canedit: true }, { canedit: false, isMember: true }]) {
+        const link = mountComponent({ ...props, reportingUrl: 'https://reports.example.org/3' })
+          .find('[data-testid="group-actions-reports"]')
+
+        expect(link.attributes('href')).toBe('https://reports.example.org/3')
+        expect(link.attributes('target')).toBe('_blank')
+      }
+    })
+
+    it('has no reports item without an address', () => {
+      expect(mountComponent({ canedit: true }).find('[data-testid="group-actions-reports"]').exists()).toBe(false)
+      expect(mountComponent({ isMember: true }).find('[data-testid="group-actions-reports"]').exists()).toBe(false)
+    })
+  })
 })

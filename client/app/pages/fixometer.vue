@@ -2,7 +2,6 @@
 import { onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useFixometerStore } from '~/stores/fixometer.js'
-import { useAuth } from '~/composables/useAuth.js'
 import ImpactStats from '~/components/fixometer/ImpactStats.vue'
 import DevicesSearchTable from '~/components/fixometer/DevicesSearchTable.vue'
 import AddDataModal from '~/components/fixometer/AddDataModal.vue'
@@ -40,7 +39,6 @@ const { t } = useI18n()
 useHead({ title: t('devices.fixometer') })
 
 const fixometerStore = useFixometerStore()
-const { hasRole } = useAuth()
 
 // Gap fix (HIGH): FixometerHeading.vue's "Add Data" button is unconditional
 // (rendered even logged-out) and opens AddDataModal.vue, an in-page group/
@@ -101,6 +99,7 @@ onMounted(() => {
         :loading="fixometerStore.impactData.loading"
         :latest-data="fixometerStore.latestRepaired.data"
         :latest-loading="fixometerStore.latestRepaired.loading"
+        :reporting-url="fixometerStore.impactData.data?.reporting_url || null"
         class="mb-4"
       />
 
@@ -110,17 +109,12 @@ onMounted(() => {
           <p>{{ t('devices.search_text') }}</p>
         </div>
         <div class="d-flex gap-2">
-          <!-- FixometerPage.vue: v-if="isAdmin" - export/devices is a public,
-               anonymous-access web route (routes/web.php - "also called from
-               https://therestartproject.org/download-dataset"), but the
-               legacy button itself is Administrator-gated, so this matches
-               that rather than the route's own (looser) access. No separate
-               "browse records" link/button here - legacy's FixometerPage.vue
-               header row has only this one button; browsing IS the
-               DevicesSearchTable embedded directly below, not a route away. -->
+          <!-- Everyone can download the repair data (develop #923): the
+               file built overnight when there is one, else the live export
+               (homepage_data's download_url). The export is filtered by what
+               the caller may see, so it is safe to offer to all. -->
           <a
-            v-if="hasRole('Administrator')"
-            href="/export/devices"
+            :href="fixometerStore.impactData.data?.download_url || '/export/devices'"
             class="btn btn-primary"
             data-testid="fixometer-export-devices"
           >

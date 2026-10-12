@@ -33,6 +33,12 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  // Further reports on the data, if this install has any: the
+  // homepage_data body's reporting_url. No link when null.
+  reportingUrl: {
+    type: String,
+    default: null,
+  },
   // GET /api/v2/stats/latest-repaired-event, passed straight through to the
   // "Latest Data" grid card. FixometerLatestData.vue was nested inside
   // FixometerGlobalImpact.vue's own grid in the legacy app; LatestRepairs.vue
@@ -67,7 +73,7 @@ const yearsVolunteered = computed(() => Math.round((10 * (props.impactData?.hour
          the real layout at every breakpoint without hard-coding a height. -->
     <div v-if="loading" class="stat-grid placeholder-glow" data-testid="impact-stats-loading">
       <span
-        v-for="area in ['latest', 'waste', 'co2', 'participants', 'years', 'powered', 'unpowered']"
+        v-for="area in ['latest', 'waste', 'co2', 'events', 'participants', 'years', 'items', 'powered', 'unpowered']"
         :key="area"
         class="placeholder"
         :class="`stat-grid__${area}`"
@@ -99,6 +105,12 @@ const yearsVolunteered = computed(() => Math.round((10 * (props.impactData?.hour
           </div>
         </div>
 
+        <div class="stat-card stat-grid__events" data-testid="impact-stat-events">
+          <img src="/images/coffee.svg" class="stat-card__icon" alt="">
+          <div class="stat-card__count">{{ (impactData.events ?? 0).toLocaleString() }}</div>
+          <div class="stat-card__label">{{ t('devices.events_held') }}</div>
+        </div>
+
         <div class="stat-card stat-grid__participants" data-testid="impact-stat-participants">
           <img src="/images/participants.svg" class="stat-card__icon" alt="">
           <div class="stat-card__count">{{ (impactData.participants ?? 0).toLocaleString() }}</div>
@@ -108,23 +120,39 @@ const yearsVolunteered = computed(() => Math.round((10 * (props.impactData?.hour
         <div class="stat-card stat-grid__years" data-testid="impact-stat-years-volunteered">
           <img src="/images/clock.svg" class="stat-card__icon" alt="">
           <div class="stat-card__count">{{ yearsVolunteered }}</div>
-          <div class="stat-card__label">{{ t('groups.years_volunteered') }}</div>
+          <div class="stat-card__label">{{ t('groups.years_of_time_volunteered') }}</div>
+        </div>
+
+        <div class="stat-card stat-grid__items" data-testid="impact-stat-items-seen">
+          <img src="/images/drill.svg" class="stat-card__icon" alt="">
+          <div class="stat-card__count">{{ (impactData.total_items ?? 0).toLocaleString() }}</div>
+          <div class="stat-card__label">{{ t('devices.items_seen') }}</div>
         </div>
 
         <div class="stat-card stat-grid__powered" data-testid="impact-stat-powered">
           <img src="/images/powered.svg" class="stat-card__icon" alt="">
           <div class="stat-card__count">{{ (impactData.fixed_powered ?? 0).toLocaleString() }}</div>
-          <div class="stat-card__label">{{ t('devices.powered_items') }}</div>
+          <div class="stat-card__label">{{ t('devices.powered_items_fixed') }}</div>
         </div>
 
         <div class="stat-card stat-grid__unpowered" data-testid="impact-stat-unpowered">
           <img src="/images/unpowered.svg" class="stat-card__icon" alt="">
           <div class="stat-card__count">{{ (impactData.fixed_unpowered ?? 0).toLocaleString() }}</div>
-          <div class="stat-card__label">{{ t('devices.unpowered_items') }}</div>
+          <div class="stat-card__label">{{ t('devices.unpowered_items_fixed') }}</div>
         </div>
       </div>
 
-      <p class="small text-muted mt-3">{{ t('partials.impact_estimates') }}</p>
+      <p class="small text-muted mt-3">
+        {{ t('partials.impact_estimates') }}
+        <a
+          v-if="reportingUrl"
+          :href="reportingUrl"
+          target="_blank"
+          rel="noopener"
+          class="fixometer-reporting-link"
+          data-testid="impact-stats-reporting-link"
+        >{{ t('partials.see_further_reports') }}</a>
+      </p>
     </template>
   </div>
 </template>
@@ -148,9 +176,10 @@ const yearsVolunteered = computed(() => Math.round((10 * (props.impactData?.hour
   grid-template-columns: 1fr 1fr;
   grid-template-areas:
     'latest latest'
-    'waste waste'
     'co2 co2'
+    'waste events'
     'participants years'
+    'items items'
     'powered unpowered';
 }
 
@@ -162,6 +191,12 @@ const yearsVolunteered = computed(() => Math.round((10 * (props.impactData?.hour
 }
 .stat-grid__co2 {
   grid-area: co2;
+}
+.stat-grid__events {
+  grid-area: events;
+}
+.stat-grid__items {
+  grid-area: items;
 }
 .stat-grid__participants {
   grid-area: participants;
@@ -180,11 +215,11 @@ const yearsVolunteered = computed(() => Math.round((10 * (props.impactData?.hour
 // grid where the co2 card spans both rows next to the latest-data/waste column.
 @media (min-width: 768px) {
   .stat-grid {
-    grid-template-columns: 2fr 2fr 1fr 1fr;
+    grid-template-columns: 2fr 2fr 1fr 1fr 1fr;
     grid-template-rows: auto auto;
     grid-template-areas:
-      'latest co2 participants years'
-      'waste co2 powered unpowered';
+      'latest co2 events participants years'
+      'waste co2 items powered unpowered';
   }
 }
 

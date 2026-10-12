@@ -653,13 +653,8 @@
         "unpowered_items_fixed": "unpowered items fixed",
         "events_held": "events held",
         "items_seen": "items seen",
-        "powered_or_unpowered": "Powered or unpowered",
-        "both": "Both",
-        "view_event_for_repair": "View the event for this repair",
         "powered": "Powered",
-        "unpowered": "Unpowered",
-        "view_record": "See the details of this repair",
-        "edit_record": "See and edit the details of this repair"
+        "unpowered": "Unpowered"
     },
     "discourse": {
         "number_of_comments": "Number of comments",
@@ -847,9 +842,6 @@
     },
     "general": {
         "general": "General",
-        "help_feedback_url": "https://talk.restarters.net/c/help",
-        "faq_url": "https://therestartproject.org/faq",
-        "restartproject_url": "https://therestartproject.org",
         "email_alerts_pref2": "I would like to receive email notifications about events or groups near me",
         "profile": "Your profile",
         "profile_content": "Please share some information about yourself, so you can connect with other organisers and fixers, and so we can understand the community better",
@@ -865,9 +857,6 @@
         "email_alerts_text": "Please choose what kind of email updates you would like to receive. You can change these at any time. Our Privacy Policy is available <a href=\"https://therestartproject.org/data-and-privacy-policy/fixometer/\" rel=\"noopener noreferrer\" target=\"_blank\">here</a>",
         "menu_discourse": "Talk",
         "menu_wiki": "Wiki",
-        "menu_help_feedback": "Help & Feedback",
-        "menu_faq": "FAQs",
-        "therestartproject": "The Restart Project",
         "calendar_feed_help_url": "/t/fixometer-how-to-subscribe-to-a-calendar",
         "menu_fixometer": "Fixometer",
         "menu_events": "Events",
@@ -916,7 +905,6 @@
         "delete_error": "Could not delete group tag."
     },
     "groups": {
-        "search_location_placeholder": "Search by location",
         "search_country_placeholder": "Filter by country",
         "search_tags_placeholder": "Filter by tags",
         "show_filters": "Show filters",
@@ -1001,7 +989,6 @@
         "remove_volunteer": "Remove Volunteer",
         "remove_host_role": "Remove Host role",
         "make_host": "Make Host",
-        "no_unpowered_stats": "At the moment, these stats are only displayed for powered items. We hope to include unpowered items soon.",
         "group_actions": "Group actions",
         "share_group_stats": "Share group stats",
         "share_stats_header": "Share your stats",
@@ -1019,8 +1006,6 @@
         "repairable_items": "Repairable items",
         "end_of_life_items": "End-of-life items",
         "create_groups_mobile2": "Add new",
-        "groups_title1_mobile": "Yours",
-        "groups_title2_mobile": "Find",
         "no_groups_mine": "<b>If you can't see any here yet, why not <a href=\"/group/nearby\">follow your nearest group</a> to hear about their upcoming repair events?</b>",
         "no_groups_nearest_no_location": "<b><p>You do not currently have a town/city set.  You can set one in <a href=\"/profile/edit\">your profile</a>.</p><p>You can also <a href=\"/group/all\">view all groups</a>.</p></b>",
         "group_count": "There is <b>{count} group</b>.|There are <b>{count} groups</b>.",
@@ -1028,7 +1013,6 @@
         "group_count_none": "If you can't see any here yet, why not <a href=\"/group/nearby\">find a group</a> near you?",
         "next_event": "Next event",
         "goto_group": "Go to group",
-        "distance": "Distance",
         "search_name_placeholder": "Search by name",
         "leave_group_button": "Unfollow group",
         "leave_group_button_mobile": "Unfollow",
@@ -1095,10 +1079,7 @@
         "follow_group_first": "Repair data is added to community repair events. Please first follow a group and then choose an event in order to add repair data.",
         "years_of_time_volunteered": "years of time volunteered",
         "see_group_reports": "See more in your group's reports",
-        "view_reports": "View reports",
-        "show_all_groups": "Show all {total} groups",
-        "years_volunteered": "years volunteered",
-        "device_breakdown": "Device breakdown"
+        "view_reports": "View reports"
     },
     "landing": {
         "title": "Welcome to Restarters!",

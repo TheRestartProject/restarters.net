@@ -228,6 +228,7 @@ class Network extends JsonResource
             'logo' => $this->logo ? ($request->root() . '/uploads/' . $this->logo) : null,
             'description' => $this->description,
             'website' => $this->website,
+            'reporting_url' => $this->reporting_url,
             'shortname' => $this->shortname,
             'default_language' => $this->default_language,
             'stats' => $this->resource->stats(),

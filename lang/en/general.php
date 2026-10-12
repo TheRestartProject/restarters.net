@@ -2,9 +2,6 @@
 
 return [
   'general' => 'General',
-  'help_feedback_url' => 'https://talk.restarters.net/c/help',
-  'faq_url' => 'https://therestartproject.org/faq',
-  'restartproject_url' => 'https://therestartproject.org',
   'email_alerts_pref2' => 'I would like to receive email notifications about events or groups near me',
   'profile' => 'Your profile',
   'profile_content' => 'Please share some information about yourself, so you can connect with other organisers and fixers, and so we can understand the community better',
@@ -20,9 +17,6 @@ return [
   'email_alerts_text' => 'Please choose what kind of email updates you would like to receive. You can change these at any time. Our Privacy Policy is available <a href="https://therestartproject.org/data-and-privacy-policy/fixometer/" rel="noopener noreferrer" target="_blank">here</a>',
   'menu_discourse' => 'Talk',
   'menu_wiki' => 'Wiki',
-  'menu_help_feedback' => 'Help & Feedback',
-  'menu_faq' => 'FAQs',
-  'therestartproject' => 'The Restart Project',
   'calendar_feed_help_url' => '/t/fixometer-how-to-subscribe-to-a-calendar',
   'menu_fixometer' => 'Fixometer',
   'menu_events' => 'Events',

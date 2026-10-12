@@ -864,6 +864,50 @@ class NetworkController extends Controller
     }
 
     /**
+     * @OA\Patch(
+     *      path="/api/v2/networks/{id}",
+     *      operationId="updateNetwork",
+     *      tags={"Networks"},
+     *      summary="Update network settings",
+     *      description="Sets the address of the network's reporting dashboard.  Administrators only; a blank value clears it.",
+     *      @OA\Parameter(name="id", description="Network id", required=true, in="path", @OA\Schema(type="integer")),
+     *      @OA\RequestBody(
+     *          @OA\JsonContent(@OA\Property(property="reporting_url", type="string", nullable=true))
+     *      ),
+     *      @OA\Response(response=200, description="Successful operation"),
+     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated"),
+     *      @OA\Response(response=403, description="Not an administrator"),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound"),
+     * )
+     */
+    public function updateNetworkv2(Request $request, $id): JsonResponse
+    {
+        $network = Network::findOrFail($id);
+        $user = Auth::user();
+
+        if (! $user) {
+            return response()->json(['message' => 'Unauthenticated'], 401);
+        }
+
+        // The reporting dashboard address is set up by administrators alongside the dashboard itself, so a
+        // network coordinator can see it but not change it.
+        if (! $user->hasRole('Administrator')) {
+            return response()->json(['message' => 'You do not have permission to edit this network'], 403);
+        }
+
+        $validated = $request->validate([
+            'reporting_url' => 'nullable|url:https,http|max:2048',
+        ]);
+
+        if (array_key_exists('reporting_url', $validated)) {
+            $network->reporting_url = $validated['reporting_url'] ?: null;
+            $network->save();
+        }
+
+        return response()->json(['data' => ['id' => $network->id, 'reporting_url' => $network->reporting_url]]);
+    }
+
+    /**
      * @OA\Post(
      *      path="/api/v2/networks/{id}/logo",
      *      operationId="uploadNetworkLogo",

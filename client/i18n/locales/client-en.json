@@ -215,7 +215,8 @@
       "stats_unavailable": "Stats are not available for this network right now.",
       "tags_load_error": "Sorry, we couldn't load this network's tags.",
       "editing": "Editing {name}",
-      "edit_forbidden": "You do not have permission to edit this network."
+      "edit_forbidden": "You do not have permission to edit this network.",
+      "reporting_url_error": "Sorry, we couldn't save that address. It needs to be a web address starting http:// or https://."
     },
     "notifications": {
       "discourse_aria": "Talk notifications",

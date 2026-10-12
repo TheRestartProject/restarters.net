@@ -13,6 +13,12 @@ const props = defineProps({
     type: Object,
     default: null,
   },
+  // Placed in the page's compact grid: add no box of our own and let the two
+  // sections be its grid items (see GroupStats.vue's compact prop).
+  compact: {
+    type: Boolean,
+    default: false,
+  },
 })
 
 const { t } = useI18n()
@@ -57,8 +63,8 @@ function printableCount(value) {
 </script>
 
 <template>
-  <div class="devices-summary__row">
-    <section v-if="deviceStats" data-testid="group-stats-devices">
+  <div class="devices-summary__row" :class="{ 'devices-summary__row--bare': compact }">
+    <section v-if="deviceStats" class="stats-worked-on" data-testid="group-stats-devices">
       <h2 class="mt-2 mb-2">{{ t('groups.total_devices') }}</h2>
       <div class="stat-cards">
         <div
@@ -75,7 +81,7 @@ function printableCount(value) {
       </div>
     </section>
 
-    <section data-testid="group-stats-top-devices">
+    <section class="stats-most-repaired" data-testid="group-stats-top-devices">
       <h2 class="mt-2 mb-2">{{ t('groups.most_repaired_devices') }}</h2>
       <!-- GroupDevicesMostRepaired.vue's `.d-none.d-md-block`: the staggered
            2nd/1st/3rd podium is desktop-only. -->
@@ -124,6 +130,10 @@ function printableCount(value) {
   flex-wrap: wrap;
   gap: 1.5rem;
   margin-bottom: 1.5rem;
+}
+
+.devices-summary__row--bare {
+  display: contents;
 }
 
 .devices-summary__row > section {

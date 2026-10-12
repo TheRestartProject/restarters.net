@@ -306,6 +306,38 @@ describe('pages/networks/[id]', () => {
       expect(link.attributes('href')).toBe('/export/networks/1/events')
     })
 
+    describe('reports link (develop #919)', () => {
+      function withReportingUrl(reportingUrl) {
+        networksStore.fetchCurrent = vi.fn().mockImplementation(async () => {
+          networksStore.current.data = { ...NETWORK, reporting_url: reportingUrl }
+        })
+      }
+
+      it('links to the network reports from the actions menu and from under the impact figures', async () => {
+        withReportingUrl('https://reports.example.org/dashboard/7')
+        const wrapper = mountPage()
+        await flushPromises()
+
+        const menu = wrapper.find('[data-testid="network-show-reports"]')
+        expect(menu.attributes('href')).toBe('https://reports.example.org/dashboard/7')
+        expect(menu.attributes('target')).toBe('_blank')
+
+        const inline = wrapper.find('[data-testid="network-show-reports-link"]')
+        expect(inline.attributes('href')).toBe('https://reports.example.org/dashboard/7')
+        expect(inline.attributes('target')).toBe('_blank')
+        expect(inline.attributes('rel')).toContain('noopener')
+      })
+
+      it('has no reports link when the network has no dashboard', async () => {
+        withReportingUrl(null)
+        const wrapper = mountPage()
+        await flushPromises()
+
+        expect(wrapper.find('[data-testid="network-show-reports"]').exists()).toBe(false)
+        expect(wrapper.find('[data-testid="network-show-reports-link"]').exists()).toBe(false)
+      })
+    })
+
     it('opens the associate-groups modal with candidates excluding only groups already in the network (archived groups stay selectable, matching Network::groupsNotIn())', async () => {
       groupsStore.names = [
         { id: 9, name: 'Tag Test Group', archived_at: null },

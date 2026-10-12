@@ -81,11 +81,6 @@ return [
   'unpowered_items_fixed' => 'unpowered items fixed',
   'events_held' => 'events held',
   'items_seen' => 'items seen',
-  'powered_or_unpowered' => 'Powered or unpowered',
-  'both' => 'Both',
-  'view_event_for_repair' => 'View the event for this repair',
   'powered' => 'Powered',
   'unpowered' => 'Unpowered',
-  'view_record' => 'See the details of this repair',
-  'edit_record' => 'See and edit the details of this repair',
 ];

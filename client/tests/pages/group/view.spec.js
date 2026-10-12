@@ -470,4 +470,91 @@ describe('pages/group/view/[id]', () => {
     expect(wrapper.find('[data-testid="stats-share-image-modal"]').exists()).toBe(true)
     expect(wrapper.find('[data-testid="group-share-stats-modal"]').exists()).toBe(false)
   })
+
+  describe('stats layout (#922)', () => {
+    const STATS = {
+      group_stats: { parties: 3, participants: 20, hours_volunteered: 9, co2_total: 600, waste_total: 12, dead_devices: 0, repairable_devices: 0, no_weight: 0 },
+      device_stats: { fixed: 4, repairable: 1, dead: 2 },
+      top_devices: [{ name: 'Kettle', counter: 3 }],
+    }
+
+    function layout(query) {
+      vi.stubGlobal('useRoute', () => ({ params: { id: '5' }, query, fullPath: '/group/view/5' }))
+      groupsStore.current.data = BASE_GROUP
+      groupsStore.stats.data = STATS
+
+      return mountPage()
+    }
+
+    // The order of the page's sections, by the test ids they carry.
+    function order(wrapper) {
+      const ids = ['group-stats-facts', 'group-stats-devices', 'group-events-list']
+      const html = wrapper.html()
+
+      return ids
+        .map((id) => [id, html.indexOf(`data-testid="${id}"`)])
+        .filter(([, at]) => at >= 0)
+        .sort((a, b) => a[1] - b[1])
+        .map(([id]) => id)
+    }
+
+    it('puts all the stats before the events by default (compact)', () => {
+      const wrapper = layout({})
+
+      expect(wrapper.find('[data-testid="group-stats-layout-compact"]').exists()).toBe(true)
+      expect(order(wrapper).slice(0, 2).sort()).toEqual(['group-stats-devices', 'group-stats-facts'])
+    })
+
+    it('ignores an unknown layout', () => {
+      expect(layout({ stats_layout: 'sideways' }).find('[data-testid="group-stats-layout-compact"]').exists()).toBe(true)
+    })
+
+    it('puts all the stats after the events with ?stats_layout=after', () => {
+      const wrapper = layout({ stats_layout: 'after' })
+
+      expect(wrapper.find('[data-testid="group-stats-layout-compact"]').exists()).toBe(false)
+      expect(wrapper.find('[data-testid="group-stats-layout-after"]').exists()).toBe(true)
+      expect(wrapper.findAll('.stats-before-events')).toHaveLength(0)
+    })
+
+    it('splits them around the events with ?stats_layout=split', () => {
+      const wrapper = layout({ stats_layout: 'split' })
+
+      expect(wrapper.find('.stats-before-events [data-testid="group-stats-facts"]').exists()).toBe(true)
+      expect(wrapper.find('.stats-before-events [data-testid="group-stats-devices"]').exists()).toBe(false)
+      expect(wrapper.find('.stats-after-events [data-testid="group-stats-devices"]').exists()).toBe(true)
+    })
+
+    it('leaves out the "not counting" note in the compact layout only', () => {
+      const stats = { ...STATS, group_stats: { ...STATS.group_stats, dead_devices: 2, repairable_devices: 1, no_weight: 1 } }
+
+      for (const [query, shown] of [[{}, false], [{ stats_layout: 'after' }, true]]) {
+        vi.stubGlobal('useRoute', () => ({ params: { id: '5' }, query, fullPath: '/group/view/5' }))
+        groupsStore.current.data = BASE_GROUP
+        groupsStore.stats.data = stats
+
+        expect(mountPage().find('[data-testid="group-stats-not-counting"]').exists()).toBe(shown)
+      }
+    })
+  })
+
+  describe('reports link', () => {
+    it('links to the group reports from the stats and the actions menu when the group has them', () => {
+      groupsStore.current.data = { ...BASE_GROUP, reporting_url: 'https://reports.example.org/3?group_id=5' }
+
+      const wrapper = mountPage()
+
+      expect(wrapper.find('[data-testid="group-view-reports-link"]').attributes('href')).toBe('https://reports.example.org/3?group_id=5')
+      expect(wrapper.find('[data-testid="group-actions-reports"]').attributes('href')).toBe('https://reports.example.org/3?group_id=5')
+    })
+
+    it('has no reports link when the viewer is not sent one', () => {
+      groupsStore.current.data = { ...BASE_GROUP, reporting_url: null }
+
+      const wrapper = mountPage()
+
+      expect(wrapper.find('[data-testid="group-view-reports-link"]').exists()).toBe(false)
+      expect(wrapper.find('[data-testid="group-actions-reports"]').exists()).toBe(false)
+    })
+  })
 })

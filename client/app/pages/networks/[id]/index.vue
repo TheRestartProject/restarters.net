@@ -169,6 +169,16 @@ function retry() {
           <BDropdownItem v-if="canManage" data-testid="network-show-add-groups" @click="showAssociateModal = true">
             {{ t('networks.show.add_groups_menuitem') }}
           </BDropdownItem>
+          <BDropdownItem
+            v-if="network.reporting_url"
+            :href="network.reporting_url"
+            target="_blank"
+            rel="noopener"
+            link-class="network-reporting-link"
+            data-testid="network-show-reports"
+          >
+            {{ t('networks.general.view_reports') }}
+          </BDropdownItem>
           <BDropdownItem :href="`/export/networks/${network.id}/events`" data-testid="network-show-export-events">
             {{ t('groups.export_event_list') }}
           </BDropdownItem>
@@ -178,6 +188,15 @@ function retry() {
       <section class="mb-4">
         <h2>{{ t('networks.general.impact') }}</h2>
         <NetworkStats :stats="network.stats" :groups-count="groupsCount" />
+        <p v-if="network.reporting_url" class="mt-3 mb-0 text-end">
+          <a
+            :href="network.reporting_url"
+            target="_blank"
+            rel="noopener"
+            class="network-reporting-inline"
+            data-testid="network-show-reports-link"
+          >{{ t('networks.general.see_network_reports') }}</a>
+        </p>
       </section>
 
       <section v-if="network.description" class="mb-4">

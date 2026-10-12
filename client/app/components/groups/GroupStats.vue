@@ -24,6 +24,14 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  // Compact layout (?stats_layout=compact, the default): the page lays the
+  // facts, impact, items and most-repaired panels out in one grid, so this
+  // component renders its two sections straight into that grid (bare) and
+  // leaves out the "not counting" caveat, as develop does (#922).
+  compact: {
+    type: Boolean,
+    default: false,
+  },
 })
 
 const emit = defineEmits(['share-stats'])
@@ -96,7 +104,7 @@ const notCounting = computed(() => {
 </script>
 
 <template>
-  <div data-testid="group-stats">
+  <div data-testid="group-stats" :class="{ 'group-stats--bare': compact }">
     <div v-if="loading" data-testid="group-stats-loading">
       <div class="placeholder-glow">
         <span class="placeholder col-12" style="height: 4rem" />
@@ -108,8 +116,8 @@ const notCounting = computed(() => {
     </div>
 
     <template v-else>
-      <div class="group-stats__row">
-        <section v-if="groupStats" class="group-stats__col" data-testid="group-stats-facts">
+      <div class="group-stats__row" :class="{ 'group-stats__row--bare': compact }">
+        <section v-if="groupStats" class="group-stats__col stats-facts" data-testid="group-stats-facts">
           <h2 class="mt-2 mb-2">{{ t('groups.group_facts') }}</h2>
           <div class="stat-cards stat-cards--facts">
             <div
@@ -126,7 +134,7 @@ const notCounting = computed(() => {
           </div>
         </section>
 
-        <section v-if="groupStats" class="group-stats__col" data-testid="group-stats-impact">
+        <section v-if="groupStats" class="group-stats__col stats-impact" data-testid="group-stats-impact">
           <h2>
             {{ t('groups.environmental_impact') }}
             <button ref="infoButton" type="button" class="info-toggle" data-testid="group-stats-impact-info">
@@ -160,7 +168,7 @@ const notCounting = computed(() => {
           </div>
           <!-- StatsImpact.vue's .impact-notincluded-content: brand-teal
                ($brand-light/#4aaebc), not Bootstrap's generic muted grey. -->
-          <p v-if="notCounting" class="small not-counting mt-2" data-testid="group-stats-not-counting">
+          <p v-if="notCounting && !compact" class="small not-counting mt-2" data-testid="group-stats-not-counting">
             {{ notCounting }}
           </p>
         </section>
@@ -180,6 +188,13 @@ const notCounting = computed(() => {
 .group-stats__col {
   flex: 1 1 320px;
   min-width: 0;
+}
+
+// Compact layout: the page's grid places the sections, so this row and its
+// wrapper add no box of their own.
+.group-stats--bare,
+.group-stats__row--bare {
+  display: contents;
 }
 
 .stat-cards {

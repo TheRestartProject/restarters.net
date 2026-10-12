@@ -74,4 +74,19 @@ describe('components/fixometer/ImpactStats', () => {
     const wrapperZero = mountComponent({ impactData: impactData({ co2_total: 0 }) })
     expect(wrapperZero.find('[data-testid="impact-stat-co2-equivalent"]').exists()).toBe(false)
   })
+
+  it('renders events held and items seen', () => {
+    const wrapper = mountComponent({ impactData: impactData({ events: 1234, total_items: 56789 }) })
+    expect(wrapper.find('[data-testid="impact-stat-events"]').text()).toContain('1,234')
+    expect(wrapper.find('[data-testid="impact-stat-items-seen"]').text()).toContain('56,789')
+  })
+
+  it('links to further reports only when given an address', () => {
+    expect(mountComponent({ impactData: impactData() }).find('[data-testid="impact-stats-reporting-link"]').exists()).toBe(false)
+
+    const link = mountComponent({ impactData: impactData(), reportingUrl: 'https://reports.example.org/all' })
+      .find('[data-testid="impact-stats-reporting-link"]')
+    expect(link.attributes('href')).toBe('https://reports.example.org/all')
+    expect(link.attributes('rel')).toContain('noopener')
+  })
 })
