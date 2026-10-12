@@ -57,6 +57,14 @@ describe('components/events/EventDevicesReadOnly', () => {
     expect(wrapper.find('[data-testid="event-device-1"]').exists()).toBe(false)
   })
 
+  // PR #775: the read-only table is the same listing as DeviceRow.vue's, so
+  // the reference has to be visible here too rather than only when editing.
+  it('shows a device reference when one is set', () => {
+    const wrapper = mountComponent({ devices: [device({ id: 1, reference: 'REP1234' })] })
+
+    expect(wrapper.find('[data-testid="event-device-reference-1"]').text()).toBe('REP1234')
+  })
+
   it('shows the empty state when a tab has no devices', () => {
     const wrapper = mountComponent({ devices: [] })
     expect(wrapper.find('[data-testid="event-devices-empty"]').exists()).toBe(true)

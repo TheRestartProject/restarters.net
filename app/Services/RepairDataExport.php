@@ -71,6 +71,7 @@ class RepairDataExport
             iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', __('events.stat-7')),
             iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', __('events.stat-6')),
             iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', ucfirst(__('devices.title_powered'))),
+            iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', __('devices.reference')),
         ];
 
         fputcsv($file, $columns);
@@ -106,6 +107,7 @@ class RepairDataExport
                 $wasteImpact,
                 $co2Diverted,
                 $device->deviceCategory->powered ? 'Powered' : 'Unpowered',
+                $device->reference,
             ]));
         }
     }

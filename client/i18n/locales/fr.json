@@ -414,6 +414,8 @@
         "model_if_known": "Modèle (si connu)",
         "repair_outcome": "Résultat de la réparation?",
         "add_data_action_button": "Participer à l'événément",
+        "reference": "Référence",
+        "tooltip_reference": "Vous pouvez éventuellement enregistrer votre propre identifiant de référence pour cet élément, afin de le recouper avec d'autres outils logiciels que vous utilisez.",
         "powered_items_fixed": "appareils électriques réparés",
         "unpowered_items_fixed": "objets non électriques réparés",
         "events_held": "événements organisés",

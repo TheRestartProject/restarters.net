@@ -83,7 +83,12 @@ async function confirmDelete() {
 
 <template>
   <tr v-if="!editing" :data-testid="`event-device-${device.id}`">
-    <td>{{ device.item_type || '-' }}</td>
+    <td class="device-reference-cell">
+      <span v-if="device.reference" class="device-reference text-muted d-block" :data-testid="`event-device-reference-${device.id}`">
+        {{ device.reference }}
+      </span>
+      {{ device.item_type || '-' }}
+    </td>
     <td>{{ device.category ? t(device.category.name) : '-' }}</td>
     <!-- Gap fix (MEDIUM): legacy hides Brand/Age/Assessment/Status/Spare-parts
          below md (EventDeviceList.vue's `d-none d-md-table-cell` fields). -->
@@ -176,5 +181,13 @@ async function confirmDelete() {
   font-size: small;
   line-height: 2;
   text-transform: uppercase;
+}
+
+.device-reference-cell {
+  line-height: normal;
+}
+
+.device-reference {
+  font-size: 60%;
 }
 </style>
