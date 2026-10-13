@@ -1,7 +1,5 @@
 <?php
 
-use Geocoder\Provider\Chain\Chain;
-use Geocoder\Provider\GeoPlugin\GeoPlugin;
 use Geocoder\Provider\Mapbox\Mapbox;
 use Http\Client\Curl\Client;
 
@@ -43,24 +41,20 @@ return [
     | Providers
     |---------------------------------------------------------------------------
     |
-    | Here you may specify any number of providers that should be used to
-    | perform geocaching operations. The `chain` provider is special,
-    | in that it can contain multiple providers that will be run in
-    | the sequence listed, should the previous provider fail. By
-    | default the first provider listed will be used, but you
-    | can explicitly call subsequently listed providers by
-    | alias: `app('geocoder')->using('google_maps')`.
+    | Mapbox is the only geocoder. There is deliberately no fallback provider:
+    | the address geocoder in App\Helpers\Geocoder and the reverse geocoder in
+    | App\Console\Commands\SetPlaceNetworkData both need a provider that
+    | understands street addresses, and a chain that fell through to an
+    | IP-address geocoder could never place one. If Mapbox can't answer, the
+    | geocode fails and the caller says so.
     |
     | Please consult the official Geocoder documentation for more info.
     | https://github.com/geocoder-php/Geocoder#providers
     |
     */
     'providers' => [
-        Chain::class => [
-            Mapbox::class => [
-                env('MAPBOX_TOKEN'),
-            ],
-            GeoPlugin::class  => [],
+        Mapbox::class => [
+            env('MAPBOX_TOKEN'),
         ],
     ],
 

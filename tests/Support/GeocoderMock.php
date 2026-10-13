@@ -7,10 +7,10 @@ use App\Helpers\Geocoder;
 /**
  * Deterministic, location-aware Geocoder for the test suite.
  *
- * The real Geocoder makes a live HTTP call to the Google Maps Geocoding API, which is
+ * The real Geocoder makes a live HTTP call to the Mapbox Geocoding API, which is
  * rate-limited and non-deterministic. Tests that geocode a location were at the mercy
- * of Google's responses — e.g. APIv2GroupTest::testLocales flipped between Belgium and
- * the United Kingdom, and the "bad location" tests only passed while Google happened to
+ * of the provider's responses — e.g. APIv2GroupTest::testLocales flipped between Belgium and
+ * the United Kingdom, and the "bad location" tests only passed while the provider happened to
  * reject the gibberish string.
  *
  * This fake is bound globally in Tests\TestCase::setUp() so no test hits the live API.
