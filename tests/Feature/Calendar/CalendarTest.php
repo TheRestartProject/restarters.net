@@ -93,6 +93,7 @@ class CalendarTest extends TestCase
         ]);
     }
 
+    /** @story:CalendarEventsController::allEventsByUser */
     public function testByUser(): void {
         // Valid hash.
         $response = $this->get('/calendar/user/' . $this->host->calendar_hash);
@@ -107,6 +108,7 @@ class CalendarTest extends TestCase
         $response = $this->get('/calendar/user/' . $this->host->calendar_hash . '1');
     }
 
+    /** @story:CalendarEventsController::allEventsByGroup */
     public function testByGroup(): void {
         // One event.
         $response = $this->get('/calendar/group/' . $this->group->idgroups);
@@ -120,6 +122,7 @@ class CalendarTest extends TestCase
         $response = $this->get('/calendar/group/' . $this->group2->idgroups);
     }
 
+    /** @story:CalendarEventsController::allEventsByNetwork */
     public function testByNetwork(): void {
         // One event.
         $response = $this->get('/calendar/network/' . $this->network->id);
@@ -134,6 +137,7 @@ class CalendarTest extends TestCase
         $response = $this->get('/calendar/network/' . $network->id);
     }
 
+    /** @story:CalendarEventsController::allEventsByArea */
     public function testByArea(): void {
         // One event.
         $response = $this->get('/calendar/group-area/London');
@@ -159,6 +163,7 @@ class CalendarTest extends TestCase
         $response = $this->get('/calendar/all-events/' . env('CALENDAR_HASH') . '1');
     }
 
+    /** @story:CalendarEventsController::allEventsByUser */
     public function testCancelled(): void {
         $this->event->cancelled = 1;
         $this->event->save();
@@ -167,6 +172,7 @@ class CalendarTest extends TestCase
         $this->expectOutputRegex('/CANCELLED/');
     }
 
+    /** @story:CalendarEventsController::allEventsByUser */
     public function testEventNotApproved(): void {
         $this->event->approved = false;
         $this->event->save();
@@ -175,6 +181,7 @@ class CalendarTest extends TestCase
         $this->expectOutputRegex('/TENTATIVE/');
     }
 
+    /** @story:CalendarEventsController::allEventsByUser */
     public function testGroupNotApproved(): void {
         $this->group->approved = false;
         $this->group->save();
@@ -183,6 +190,7 @@ class CalendarTest extends TestCase
         $this->expectOutputRegex('/TENTATIVE/');
     }
 
+    /** @story:CalendarEventsController::allEventsByUser */
     public function testEventNotVisible(): void {
         $host = User::factory()->create([
                                             'latitude' => 50.64,

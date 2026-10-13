@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Attributes\UserStory;
+use App\Attributes\Feature;
 use App\Helpers\Fixometer;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -9,11 +11,13 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\View\View;
 
+#[Feature('Administration', description: 'Platform administration and configuration')]
 class PreviewDeployController extends Controller
 {
     private const REPO = 'TheRestartProject/restarters.net';
     private const WORKFLOW = 'preview-deploy.yml';
 
+    #[UserStory('As an Admin, I can see the open pull requests that can be deployed to the preview site', persona: 'Admin', theme: 'Preview deploys')]
     public function show(): View|RedirectResponse
     {
         if (! Fixometer::hasRole(Auth::user(), 'Administrator')) {
@@ -48,6 +52,7 @@ class PreviewDeployController extends Controller
         return view('admin.preview-deploy', compact('prs', 'error'));
     }
 
+    #[UserStory('As an Admin, I can trigger a preview deploy of a chosen branch', persona: 'Admin', theme: 'Preview deploys')]
     public function deploy(Request $request): RedirectResponse
     {
         if (! Fixometer::hasRole(Auth::user(), 'Administrator')) {

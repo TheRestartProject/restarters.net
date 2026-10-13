@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Hash;
 
 class ProfileTest extends TestCase
 {
+    /** @story:UserController::index */
     public function testProfilePage(): void
     {
         $user = User::factory()->restarter()->create();
@@ -36,6 +37,7 @@ class ProfileTest extends TestCase
         $response->assertSee(__('profile.my_skills'));
     }
 
+    /** @story:UserController::edit */
     public function testEdit(): void
     {
         $GLOBALS['_FILES'] = [];
@@ -86,6 +88,7 @@ class ProfileTest extends TestCase
         $response->assertSee('Edit User');
     }
 
+    /** @story:UserController::edit */
     public function testEditBadPassword(): void
     {
         $GLOBALS['_FILES'] = [];
@@ -114,6 +117,7 @@ class ProfileTest extends TestCase
         $this->get('/user/thumbnail?wiki_username=invalid');
     }
 
+    /** @story:UserController::postProfilePasswordEdit */
     public function testChangePassword(): void {
         $user = User::factory()->restarter()->create();
         $user->setPassword(Hash::make('secret1'));
@@ -133,6 +137,7 @@ class ProfileTest extends TestCase
         $this->assertEquals(__('profile.password_changed'), \Session::get('message'));
     }
 
+    /** @story:UserController::postProfileRepairDirectory */
     public function testRepairDirectoryRole(): void {
         $user = User::factory()->restarter()->create();
         $admin = User::factory()->administrator()->create([
@@ -149,6 +154,7 @@ class ProfileTest extends TestCase
         $this->assertEquals(__('profile.profile_updated'), \Session::get('message'));
     }
 
+    /** @story:UserController::storeLanguage */
     public function testLanguage(): void {
         $user = User::factory()->restarter()->create();
         $this->actingAs($user);
@@ -163,6 +169,7 @@ class ProfileTest extends TestCase
 
     /**
      * @dataProvider invitesProvider
+     * @story:UserController::postProfilePreferencesEdit
      */
     public function testInvites($admin, $invites): void {
         $user = User::factory()->restarter()->create();
@@ -197,6 +204,10 @@ class ProfileTest extends TestCase
         ];
     }
 
+    /**
+     * @story:ApiController::getUserInfo
+     * @story:ApiController::getUserList
+     */
     public function testAPI(): void {
         $user = User::factory()->administrator()->create([
                                                                       'api_token' => '1234',
