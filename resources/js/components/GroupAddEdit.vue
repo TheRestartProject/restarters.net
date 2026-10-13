@@ -58,11 +58,10 @@
           ref="location"
       />
       <GroupLocationMap
-          :lat="lat"
-          :lng="lng"
+          :lat.sync="lat"
+          :lng.sync="lng"
           class="group-locationmap"
           ref="locationmap"
-          :id="lat + ',' + lng"
           v-if="lat || lng"
       />
       <GroupTimeZone
@@ -482,7 +481,11 @@ export default {
               timezone: this.timezone,
               phone: this.phone,
               image: this.image,
-              network_data: JSON.stringify(this.networkData)
+              network_data: JSON.stringify(this.networkData),
+              // Strings, not numbers: the store skips falsy values when
+              // building FormData, which would drop a 0 coordinate.
+              lat: this.lat !== null ? String(this.lat) : null,
+              lng: this.lng !== null ? String(this.lng) : null,
             }
             const id = await this.$store.dispatch('groups/create', payload)
 
@@ -515,6 +518,8 @@ export default {
                 tags: JSON.stringify((this.tagList || []).map(n => n.id)),
                 network_data: JSON.stringify(this.networkData),
                 archived_at: this.archived_at,
+                lat: this.lat !== null ? String(this.lat) : null,
+                lng: this.lng !== null ? String(this.lng) : null,
               }
 
               console.log('Edit', JSON.stringify(payload))
