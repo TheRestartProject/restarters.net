@@ -72,6 +72,8 @@ class EventStateTest extends TestCase
 
     /**
      * @dataProvider timeProvider
+     * @story:EventController::createEventv2
+     * @story:PartyController::view
      */
     public function testStatesOnViewPage($date, $upcoming, $finished, $inprogress, $startingsoon): void {
         // The Blade /party/view/{id} page is gone post-cutover; it only ever surfaced

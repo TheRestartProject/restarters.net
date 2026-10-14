@@ -204,6 +204,11 @@ jobs:
               sleep 5
             done
 
+      # Fail fast if a controller method lacks a #[UserStory]/#[NoStory] annotation or the specs manifest is stale
+      - run:
+          name: Check living specs
+          command: docker exec restarters php artisan specs:extract --check
+
       # Run PHPUnit tests
       - run:
           name: Run PHPUnit tests

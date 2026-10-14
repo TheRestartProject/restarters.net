@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Attributes\Feature;
+use App\Attributes\NoStory;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Response;
 
+#[Feature('Platform', description: 'Platform-wide statistics and public impact data')]
 class StatsShareImageController extends Controller
 {
     // Filenames client/app/composables/useStatsShareImage.js's CO2e -> image
@@ -41,6 +44,7 @@ class StatsShareImageController extends Controller
      *      @OA\Response(response=404, description="Unknown, invalid, or missing filename")
      * )
      */
+    #[NoStory(reason: 'Serves decoration images for the canvas-painted social-share image')]
     public function shareImagev2(string $filename): Response
     {
         if (! preg_match(self::ALLOWED_PATTERN, $filename)) {

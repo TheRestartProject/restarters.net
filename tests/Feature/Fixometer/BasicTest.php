@@ -16,6 +16,7 @@ class BasicTest extends TestCase
     // client-side in the SPA, backed by /api/devices and friends, which
     // have their own coverage (see DeviceApiQueryTest).
 
+    /** @story:ExportController::devices */
     public function testExport(): void {
         $this->loginAsTestUser(Role::ADMINISTRATOR);
 

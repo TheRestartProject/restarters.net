@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Attributes\NoStory;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
@@ -27,6 +28,7 @@ class MapsProxyController extends Controller
      *      @OA\Response(response=422, description="Validation failure")
      * )
      */
+    #[NoStory(reason: 'Server-side proxy for Google Places so the API key stays private; used by location pickers')]
     public function autocomplete(Request $request): JsonResponse
     {
         $request->validate(['input' => 'required|string']);
@@ -53,6 +55,7 @@ class MapsProxyController extends Controller
      *      @OA\Response(response=422, description="Validation failure")
      * )
      */
+    #[NoStory(reason: 'Server-side proxy for Google Places so the API key stays private; used by location pickers')]
     public function placeDetails(Request $request): JsonResponse
     {
         $request->validate(['place_id' => 'required|string']);

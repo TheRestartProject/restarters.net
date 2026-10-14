@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Attributes\Feature;
+use App\Attributes\UserStory;
+use App\Attributes\NoStory;
 use App\Audits;
 use App\Device;
 use App\Events\EventDeleted;
@@ -28,6 +31,7 @@ use Illuminate\Validation\ValidationException;
  * GET-mutation routes on App\Http\Controllers\PartyController. Mirrors
  * App\Http\Controllers\API\GroupMembershipController's shape for the events side.
  */
+#[Feature('Events', description: 'Community repair event management')]
 class EventAttendanceController extends Controller
 {
     /**
@@ -53,6 +57,7 @@ class EventAttendanceController extends Controller
      *      @OA\Response(response=404, ref="#/components/responses/NotFound")
      * )
      */
+    #[UserStory('As a Restarter, I can RSVP to an event', persona: 'Restarter', theme: 'Attendance & volunteers')]
     public function rsvpv2(Request $request, $idevents): JsonResponse
     {
         $user = $request->user();
@@ -129,6 +134,7 @@ class EventAttendanceController extends Controller
      *      @OA\Response(response=403, ref="#/components/responses/Forbidden")
      * )
      */
+    #[UserStory('As a Restarter, I can cancel my RSVP or decline an invitation to an event', persona: 'Restarter', theme: 'Attendance & volunteers')]
     public function cancelRsvpv2(Request $request, $idevents): JsonResponse
     {
         $user = $request->user();
@@ -164,6 +170,7 @@ class EventAttendanceController extends Controller
      *      @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
      */
+    #[UserStory('As a Host, I can make an event volunteer a host, or remove their host role', persona: 'Host', theme: 'Attendance & volunteers')]
     public function patchVolunteerv2(Request $request, $idevents, $iduser): JsonResponse
     {
         $user = $request->user();
@@ -205,6 +212,7 @@ class EventAttendanceController extends Controller
      * Port of PartyController::getContributions (the old "Request review" modal
      * on the event page linking to GET /party/contribution/{id}).
      */
+    #[UserStory('As a Host, I can ask attendees to review the repairs at my event', persona: 'Host', theme: 'Create & manage events')]
     public function requestReviewv2(Request $request, $idevents): JsonResponse
     {
         $user = $request->user();
@@ -252,6 +260,7 @@ class EventAttendanceController extends Controller
      *      @OA\Response(response=404, ref="#/components/responses/NotFound")
      * )
      */
+    #[UserStory('As a Host, I can remove a volunteer from my event', persona: 'Host', theme: 'Attendance & volunteers')]
     public function deleteVolunteerv2(Request $request, $idevents, $idevents_users): JsonResponse
     {
         $user = $request->user();
@@ -303,6 +312,7 @@ class EventAttendanceController extends Controller
      *      @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
      */
+    #[UserStory('As a Host, I can invite people to my event by email', persona: 'Host', theme: 'Invitations')]
     public function invitesv2(Request $request, $idevents): JsonResponse
     {
         $user = $request->user();
@@ -421,6 +431,7 @@ class EventAttendanceController extends Controller
      *      @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
      */
+    #[UserStory('As a Host, I can add photos to my event', persona: 'Host', theme: 'Create & manage events')]
     public function uploadImagev2(Request $request, $idevents): JsonResponse
     {
         $user = $request->user();
@@ -481,6 +492,7 @@ class EventAttendanceController extends Controller
      *      @OA\Response(response=404, ref="#/components/responses/NotFound")
      * )
      */
+    #[UserStory('As a Host, I can remove a photo from my event', persona: 'Host', theme: 'Create & manage events')]
     public function deleteImagev2(Request $request, $idevents, $idimages): JsonResponse
     {
         $user = $request->user();
@@ -523,6 +535,7 @@ class EventAttendanceController extends Controller
      * file path on success; throws a 422 ValidationException (and cleans up the cache/file)
      * otherwise. Mirrors GroupMembershipController::uploadImagev2's inline validation.
      */
+    #[NoStory(reason: 'Helper that validates a completed tus upload key; not a route')]
     public static function validatedTusFilePath(string $uploadKey, string $translationFile): string
     {
         $cache = Tus::buildCache();
@@ -585,6 +598,7 @@ class EventAttendanceController extends Controller
      *      @OA\Response(response=404, ref="#/components/responses/NotFound")
      * )
      */
+    #[UserStory('As a Host, I can delete my event', persona: 'Host', theme: 'Create & manage events')]
     public function deleteEventv2(Request $request, $idevents): JsonResponse
     {
         $user = $request->user();

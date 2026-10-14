@@ -25,7 +25,7 @@ const { LMapStub, LTileLayerStub, LMarkerStub } = vi.hoisted(() => ({
   },
   LMarkerStub: {
     name: 'LMarker',
-    props: ['latLng', 'icon'],
+    props: ['latLng', 'icon', 'draggable'],
     template: '<div class="stub-lmarker" />',
   },
 }))
@@ -395,6 +395,9 @@ describe('components/groups/GroupForm', () => {
         postcode: 'AB1 2CD',
         timezone: 'Europe/London',
         network_data: JSON.stringify({ dummy: 'value' }),
+        // Sent as strings so a 0 coordinate survives the form-data builder.
+        lat: '1',
+        lng: '2',
       })
       expect(wrapper.emitted('updated')).toEqual([[5]])
       expect(wrapper.find('[data-testid="group-form-networks"]').exists()).toBe(false)
@@ -496,7 +499,7 @@ describe('components/groups/GroupForm', () => {
       expect(wrapper.find('[data-testid="group-form-map-preview"]').exists()).toBe(false)
     })
 
-    it('shows a marker at the geocoded lat/lng once set, zoomed to 11 (matching GroupLocationMap.vue)', () => {
+    it('shows a draggable marker at the geocoded lat/lng once set, zoomed to 16 (matching GroupLocationMap.vue)', () => {
       const wrapper = mountForm({
         groupId: 5,
         initialGroup: { location: { location: 'Anytown', lat: 1, lng: 2 } },
@@ -505,11 +508,26 @@ describe('components/groups/GroupForm', () => {
       expect(preview.exists()).toBe(true)
 
       const map = wrapper.findComponent(LMapStub)
-      expect(map.props('zoom')).toBe(11)
+      expect(map.props('zoom')).toBe(16)
 
       const marker = wrapper.findComponent(LMarkerStub)
       expect(marker.exists()).toBe(true)
       expect(marker.props('latLng')).toEqual([1, 2])
+      expect(marker.props('draggable')).toBe(true)
+      expect(wrapper.find('[data-testid="group-form-map-hint"]').text()).toContain('Drag it')
+    })
+
+    it('dragging the marker moves the pin but not the map centre, and the new position is submitted', async () => {
+      const wrapper = mountForm({
+        groupId: 5,
+        initialGroup: { location: { location: 'Anytown', lat: 1, lng: 2 } },
+      })
+
+      wrapper.findComponent(LMarkerStub).vm.$emit('dragend', { target: { getLatLng: () => ({ lat: 3.5, lng: 0 }) } })
+      await wrapper.vm.$nextTick()
+
+      expect(wrapper.findComponent(LMarkerStub).props('latLng')).toEqual([3.5, 0])
+      expect(wrapper.findComponent(LMapStub).props('center')).toEqual([1, 2])
     })
   })
 })

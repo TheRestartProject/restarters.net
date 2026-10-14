@@ -14,9 +14,13 @@ use Auth;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Attributes\Feature;
+use App\Attributes\UserStory;
 
+#[Feature('Networks', description: 'Regional network management and coordination')]
 class NetworkController extends Controller
 {
+    #[UserStory('As a NetworkCoordinator, I can view my network\'s statistics via the API', persona: 'NetworkCoordinator', theme: 'Network stats')]
     public function stats(Request $request, Network $network): JsonResponse
     {
         if (! Auth::user()->can('view', $network)) {
@@ -88,6 +92,8 @@ class NetworkController extends Controller
      *     )
      */
 
+    #[UserStory('As a Guest, I can list all networks via the API', persona: 'Guest', theme: 'Browse networks')]
+    #[UserStory('As a ThirdParty, I can retrieve all networks to display on my platform', persona: 'ThirdParty', theme: 'Browse networks')]
     public function getNetworksv2()
     {
         $networks = Network::all();
@@ -125,6 +131,8 @@ class NetworkController extends Controller
      *     )
      */
 
+    #[UserStory('As a Guest, I can view network details via the API', persona: 'Guest', theme: 'Browse networks')]
+    #[UserStory('As a ThirdParty, I can retrieve network details via the API', persona: 'ThirdParty', theme: 'Browse networks')]
     public function getNetworkv2($id)
     {
         $network = Network::findOrFail($id);
@@ -238,6 +246,8 @@ class NetworkController extends Controller
      *     )
      */
 
+    #[UserStory('As a Guest, I can list groups for a network via the API', persona: 'Guest', theme: 'Network groups & events')]
+    #[UserStory('As a ThirdParty, I can retrieve groups for a network to display on my platform', persona: 'ThirdParty', theme: 'Network groups & events')]
     public function getNetworkGroupsv2(Request $request, $id)
     {
         $network = Network::findOrFail($id);
@@ -374,6 +384,8 @@ class NetworkController extends Controller
      *     )
      */
 
+    #[UserStory('As a Guest, I can list events for a network via the API', persona: 'Guest', theme: 'Network groups & events')]
+    #[UserStory('As a ThirdParty, I can retrieve events for a network to display on my platform', persona: 'ThirdParty', theme: 'Network groups & events')]
     public function getNetworkEventsv2(Request $request, $id)
     {
         Network::findOrFail($id);
@@ -475,6 +487,8 @@ class NetworkController extends Controller
      *      @OA\Response(response=404, ref="#/components/responses/NotFound"),
      *     )
      */
+    #[UserStory('As a Guest, I can list a network\'s group tags via the API', persona: 'Guest', theme: 'Network tags')]
+    #[UserStory('As a ThirdParty, I can retrieve a network\'s group tags to display on my platform', persona: 'ThirdParty', theme: 'Network tags')]
     public function getNetworkTagsv2(Request $request, $id)
     {
         $network = Network::findOrFail($id);
@@ -540,6 +554,8 @@ class NetworkController extends Controller
      *      @OA\Response(response=404, ref="#/components/responses/NotFound"),
      *     )
      */
+    #[UserStory('As a Guest, I can view a network\'s impact statistics via the API, optionally for one group tag', persona: 'Guest', theme: 'Network stats')]
+    #[UserStory('As a ThirdParty, I can retrieve a network\'s impact statistics to display on my platform', persona: 'ThirdParty', theme: 'Network stats')]
     public function getNetworkStatsv2(Request $request, $id): JsonResponse
     {
         $network = Network::findOrFail($id);
@@ -603,6 +619,8 @@ class NetworkController extends Controller
      *      @OA\Response(response=422, ref="#/components/responses/ValidationError"),
      *     )
      */
+    #[UserStory('As a NetworkCoordinator, I can create a group tag for my network via the API', persona: 'NetworkCoordinator', theme: 'Network tags')]
+    #[UserStory('As an Admin, I can create a group tag for any network via the API', persona: 'Admin', theme: 'Network tags')]
     public function createNetworkTagv2(Request $request, $id)
     {
         $network = Network::findOrFail($id);
@@ -693,6 +711,8 @@ class NetworkController extends Controller
      *      @OA\Response(response=422, ref="#/components/responses/ValidationError"),
      *     )
      */
+    #[UserStory('As a NetworkCoordinator, I can edit a group tag belonging to my network via the API', persona: 'NetworkCoordinator', theme: 'Network tags')]
+    #[UserStory('As an Admin, I can edit a group tag belonging to any network via the API', persona: 'Admin', theme: 'Network tags')]
     public function updateNetworkTagv2(Request $request, $id, $tagId)
     {
         $network = Network::findOrFail($id);
@@ -777,6 +797,8 @@ class NetworkController extends Controller
      *      @OA\Response(response=404, ref="#/components/responses/NotFound"),
      *     )
      */
+    #[UserStory('As a NetworkCoordinator, I can delete a group tag belonging to my network via the API', persona: 'NetworkCoordinator', theme: 'Network tags')]
+    #[UserStory('As an Admin, I can delete a group tag belonging to any network via the API', persona: 'Admin', theme: 'Network tags')]
     public function deleteNetworkTagv2(Request $request, $id, $tagId)
     {
         $network = Network::findOrFail($id);
@@ -833,6 +855,7 @@ class NetworkController extends Controller
      *
      * Port of NetworkController::associateGroup (the old session+CSRF web form).
      */
+    #[UserStory('As a NetworkCoordinator, I can add groups to my network', persona: 'NetworkCoordinator', theme: 'Network management')]
     public function associateGroupsv2(Request $request, $id): JsonResponse
     {
         $network = Network::findOrFail($id);
@@ -880,6 +903,7 @@ class NetworkController extends Controller
      *      @OA\Response(response=404, ref="#/components/responses/NotFound"),
      * )
      */
+    #[UserStory('As a NetworkCoordinator, I can edit my network\'s settings', persona: 'NetworkCoordinator', theme: 'Network management')]
     public function updateNetworkv2(Request $request, $id): JsonResponse
     {
         $network = Network::findOrFail($id);
@@ -940,6 +964,7 @@ class NetworkController extends Controller
      * network->logo. The SPA uploads the file via tus first, then calls this
      * with the resulting upload_key.
      */
+    #[UserStory('As a NetworkCoordinator, I can upload a logo for my network', persona: 'NetworkCoordinator', theme: 'Network management')]
     public function uploadLogov2(Request $request, $id): JsonResponse
     {
         $network = Network::findOrFail($id);

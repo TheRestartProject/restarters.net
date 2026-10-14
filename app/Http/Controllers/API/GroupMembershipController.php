@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Attributes\Feature;
+use App\Attributes\UserStory;
 use App\Device;
 use App\EventsUsers;
 use App\Events\UserFollowedGroup;
@@ -27,6 +29,7 @@ use Illuminate\Validation\ValidationException;
  * archive, stats and image upload/delete. Replaces the equivalent Blade
  * GET-mutation routes on App\Http\Controllers\GroupController.
  */
+#[Feature('Groups', description: 'Community repair group management and membership')]
 class GroupMembershipController extends Controller
 {
     /**
@@ -51,6 +54,7 @@ class GroupMembershipController extends Controller
      *      @OA\Response(response=404, ref="#/components/responses/NotFound")
      * )
      */
+    #[UserStory('As a Restarter, I can join a group', persona: 'Restarter', theme: 'Group membership')]
     public function joinv2(Request $request, $id): JsonResponse
     {
         $user = $request->user();
@@ -115,6 +119,7 @@ class GroupMembershipController extends Controller
      *      @OA\Response(response=403, ref="#/components/responses/Forbidden")
      * )
      */
+    #[UserStory('As a Restarter, I can leave a group', persona: 'Restarter', theme: 'Group membership')]
     public function leavev2(Request $request, $id): JsonResponse
     {
         $user = $request->user();
@@ -154,6 +159,7 @@ class GroupMembershipController extends Controller
      *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated")
      * )
      */
+    #[UserStory('As a Restarter, I can find groups near my location', persona: 'Restarter', theme: 'Find & browse groups')]
     public function nearbyv2(Request $request): JsonResponse
     {
         $user = $request->user();
@@ -198,6 +204,7 @@ class GroupMembershipController extends Controller
      *      @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
      */
+    #[UserStory('As a Host, I can invite people to my group by email', persona: 'Host', theme: 'Group invitations')]
     public function invitesv2(Request $request, $id): JsonResponse
     {
         $user = $request->user();
@@ -306,6 +313,7 @@ class GroupMembershipController extends Controller
      *      @OA\Response(response=404, ref="#/components/responses/NotFound")
      * )
      */
+    #[UserStory('As an Admin, I can archive a group', persona: 'Admin', theme: 'Create & manage groups')]
     public function archivev2(Request $request, $id): JsonResponse
     {
         $user = $request->user();
@@ -353,6 +361,7 @@ class GroupMembershipController extends Controller
      *      @OA\Response(response=404, ref="#/components/responses/NotFound")
      * )
      */
+    #[UserStory('As an Admin, I can permanently delete a group that has no events', persona: 'Admin', theme: 'Create & manage groups')]
     public function deletePermanentlyv2(Request $request, $id): JsonResponse
     {
         $user = $request->user();
@@ -418,6 +427,7 @@ class GroupMembershipController extends Controller
      *      @OA\Response(response=404, ref="#/components/responses/NotFound")
      * )
      */
+    #[UserStory('As a Guest, I can see the impact statistics for a group', persona: 'Guest', theme: 'Find & browse groups')]
     public function statsv2(Request $request, $id): JsonResponse
     {
         $group = Group::findOrFail($id);
@@ -534,6 +544,7 @@ class GroupMembershipController extends Controller
      *      @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
      */
+    #[UserStory('As a Host, I can add an image to my group', persona: 'Host', theme: 'Create & manage groups')]
     public function uploadImagev2(Request $request, $id): JsonResponse
     {
         $user = $request->user();
@@ -626,6 +637,7 @@ class GroupMembershipController extends Controller
      *      @OA\Response(response=404, ref="#/components/responses/NotFound")
      * )
      */
+    #[UserStory('As a Host, I can remove an image from my group', persona: 'Host', theme: 'Create & manage groups')]
     public function deleteImagev2(Request $request, $id, $idimages): JsonResponse
     {
         $user = $request->user();

@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Attributes\Feature;
+use App\Attributes\UserStory;
 use App\Device;
 use App\Group;
 use App\Party;
 use Request;
 
+#[Feature('Platform', description: 'Platform-wide statistics and public impact data')]
 class OutboundController extends Controller
 {
     /** type can be either party or group
@@ -48,6 +51,8 @@ class OutboundController extends Controller
      *      @OA\Response(response=404, description="id is not numeric, or the referenced party/group does not exist.")
      * )
      */
+    #[UserStory('As a Guest, I can view embeddable CO2 impact visualisations for events and groups', persona: 'Guest', theme: 'Embeddable widgets')]
+    #[UserStory('As a ThirdParty, I can embed CO2 impact widgets for events and groups on my platform', persona: 'ThirdParty', theme: 'Embeddable widgets')]
     public static function info($type, $id, $format = 'fixometer', $return = 'view')
     {
 

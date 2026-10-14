@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Attributes\Feature;
+use App\Attributes\UserStory;
 use App\Group;
 use App\Http\Controllers\Controller;
 use App\Party;
@@ -13,6 +15,7 @@ use Illuminate\Http\Request;
  * The SPA's replacement for DashboardController@index's Blade props: one call
  * returning the current user's groups, nearby groups, and upcoming events.
  */
+#[Feature('Dashboard', description: 'Personal dashboard for logged-in users')]
 class DashboardController extends Controller
 {
     /**
@@ -70,6 +73,7 @@ class DashboardController extends Controller
      *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated")
      * )
      */
+    #[UserStory('As a Restarter, I can see my dashboard with my groups, upcoming events and impact', persona: 'Restarter', theme: 'Dashboard')]
     public function indexv2(Request $request): JsonResponse
     {
         $user = $request->user();

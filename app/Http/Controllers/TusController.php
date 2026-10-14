@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Attributes\Feature;
+use App\Attributes\NoStory;
 use App\Helpers\Tus;
 use Symfony\Component\HttpFoundation\Response;
 
+#[Feature('Platform', description: 'Platform-wide statistics and public impact data')]
 class TusController extends Controller
 {
     /**
@@ -78,6 +81,7 @@ class TusController extends Controller
      *      @OA\Response(response=204, description="No content; capabilities are returned via Tus-Resumable/Tus-Version/Tus-Extension/Tus-Max-Size response headers.")
      * )
      */
+    #[NoStory(reason: 'Resumable-upload (tus) protocol endpoint used by the photo uploaders')]
     public function serve(): Response
     {
         $server = Tus::buildServer();

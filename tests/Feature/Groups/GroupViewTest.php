@@ -13,6 +13,7 @@ use Tests\TestCase;
 
 class GroupViewTest extends TestCase
 {
+    /** @story:GroupController::view */
     public function testBasic(): void
     {
         // Check we can create a group and view it.
@@ -56,6 +57,11 @@ class GroupViewTest extends TestCase
         $this->assertEquals($canPerformDelete, $permissions['can_perform_delete']);
     }
 
+    /**
+     * @story:GroupController::view
+     * @story:ApiController::getDevices
+     * @story:OutboundController::info
+     */
     public function testCanDelete(): void
     {
         $this->loginAsTestUser(Role::ADMINISTRATOR);
@@ -104,6 +110,7 @@ class GroupViewTest extends TestCase
         }
     }
 
+    /** @story:GroupController::view */
     public function testInProgressVisible(): void {
         $this->loginAsTestUser(Role::ADMINISTRATOR);
         $id = $this->createGroup();

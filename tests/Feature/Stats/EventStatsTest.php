@@ -17,7 +17,11 @@ class EventStatsTest extends StatsTestCase
         $this->assertEquals($expect, $event->getEventStats());
     }
 
-    /** @test */
+    /**
+     * @test
+     * @story:AdminController::stats
+     * @story:PartyController::stats
+     */
     public function event_stats_with_both_powered_and_unpowered_devices(): void
     {
         $this->_setupCategoriesWithUnpoweredWeights();

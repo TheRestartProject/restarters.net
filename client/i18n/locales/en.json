@@ -1344,6 +1344,7 @@
         "remove": "remove",
         "notification_greeting": "Hello!",
         "validate_timezone": "Please select a valid timezone.",
+        "dragmap": "Pin not quite in the right place?  Drag it to the right spot.",
         "share_modal_title": "Shareable Statistics",
         "share_modal_weve_saved": "We've saved",
         "share_modal_of_co2": "of CO2e",

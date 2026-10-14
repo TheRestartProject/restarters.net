@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { LMap, LMarker, LTileLayer } from '@vue-leaflet/vue-leaflet'
 import 'leaflet/dist/leaflet.css'
@@ -78,13 +78,41 @@ const form = reactive({
   tagIds: (props.initialGroup?.tags || []).map((tg) => tg.id),
 })
 
-// Small static preview of the geocoded location, once LocationPicker has
-// set lat/lng - ports develop's GroupLocationMap.vue (200px single-marker
-// map at zoom 11; shown once `lat || lng`). Reuses GroupMap.vue's
-// global-Leaflet setup so this map and the full group-finder map share one
-// Leaflet instance.
+// Map of the geocoded location, shown once LocationPicker has set lat/lng -
+// ports develop's GroupLocationMap.vue (200px map at zoom 16 with a
+// draggable marker, so the host can fine-tune the pin; shown once
+// `lat || lng`). Reuses GroupMap.vue's global-Leaflet setup so this map and
+// the full group-finder map share one Leaflet instance.
 const hasLocationPreview = computed(() => form.lat !== null && form.lat !== undefined && form.lng !== null && form.lng !== undefined)
 const previewCenter = computed(() => [form.lat, form.lng])
+
+// The marker is the group's location (form.lat/lng); the map can be panned
+// and zoomed independently without moving it. Dragging updates the form but
+// must not re-centre the map, so the map centre only follows a genuinely new
+// position (e.g. a fresh geocode from the location field), never the echo of
+// our own drag. Below EPSILON two coordinates are "the same place".
+const LOCATION_EPSILON = 1e-7
+const mapCenter = ref([form.lat, form.lng])
+const lastDragged = ref(null)
+
+function onMarkerDragged(e) {
+  const pos = e.target.getLatLng()
+  lastDragged.value = [pos.lat, pos.lng]
+  form.lat = pos.lat
+  form.lng = pos.lng
+}
+
+watch(() => [form.lat, form.lng], ([lat, lng]) => {
+  if (lat === null || lat === undefined || lng === null || lng === undefined) {
+    return
+  }
+  const d = lastDragged.value
+  if (d && Math.abs(lat - d[0]) <= LOCATION_EPSILON && Math.abs(lng - d[1]) <= LOCATION_EPSILON) {
+    return
+  }
+  mapCenter.value = [lat, lng]
+})
+
 const previewIcon = L.icon({
   iconUrl: markerIconUrl,
   iconRetinaUrl: markerIcon2xUrl,
@@ -254,6 +282,14 @@ async function submit() {
     timezone: form.timezone || null,
   }
 
+  // Strings, not numbers: the form-data builder skips falsy values, which
+  // would drop a 0 coordinate. The server prefers these over geocoding the
+  // location text, which is how a dragged pin is kept.
+  if (form.lat !== null && form.lat !== undefined && form.lng !== null && form.lng !== undefined) {
+    payload.lat = String(form.lat)
+    payload.lng = String(form.lng)
+  }
+
   // Always sent, including when blank. PATCH only writes fields the request
   // actually carries, so omitting a blank postcode would leave the stored one
   // untouched and make it unclearable. groups.postcode is NOT NULL and
@@ -399,14 +435,15 @@ defineExpose({ submit })
 
       <div v-if="hasLocationPreview" class="group-form-locationmap mb-3" data-testid="group-form-map-preview">
         <LMap
-          :zoom="11"
-          :center="previewCenter"
+          :zoom="16"
+          :center="mapCenter"
           use-global-leaflet
           style="width: 100%; height: 200px"
         >
           <LTileLayer :url="leafletTiles" :attribution="LEAFLET_ATTRIBUTION" />
-          <LMarker :lat-lng="previewCenter" :icon="previewIcon" />
+          <LMarker :lat-lng="previewCenter" :icon="previewIcon" :draggable="true" @dragend="onMarkerDragged" />
         </LMap>
+        <small class="text-muted" data-testid="group-form-map-hint">{{ t('partials.dragmap') }}</small>
       </div>
 
       <BFormGroup class="group-form-timezone" :label="`${t('groups.timezone')}:`" label-for="group-form-timezone">

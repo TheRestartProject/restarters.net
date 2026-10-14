@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Attributes\Feature;
+use App\Attributes\UserStory;
 use App\Category;
 use App\Helpers\Fixometer;
 use App\Http\Controllers\Controller;
@@ -13,6 +15,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
+#[Feature('Administration', description: 'Platform administration and configuration')]
 class CategoryController extends Controller
 {
     /**
@@ -31,6 +34,7 @@ class CategoryController extends Controller
      *      )
      * )
      */
+    #[UserStory('As an Admin, I can view all device categories', persona: 'Admin', theme: 'Reference data')]
     public function listCategoriesv2()
     {
         $categories = $this->categoriesWithClusterName()
@@ -55,6 +59,7 @@ class CategoryController extends Controller
      *      @OA\Response(response=404, ref="#/components/responses/NotFound")
      * )
      */
+    #[UserStory('As an Admin, I can view a device category', persona: 'Admin', theme: 'Reference data')]
     public function getCategoryv2($id)
     {
         $category = $this->categoriesWithClusterName()
@@ -96,6 +101,7 @@ class CategoryController extends Controller
      *      @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
      */
+    #[UserStory('As an Admin, I can edit a device category', persona: 'Admin', theme: 'Reference data')]
     public function updateCategoryv2(Request $request, $id)
     {
         if ($resp = $this->requireAdministrator()) {
@@ -145,6 +151,7 @@ class CategoryController extends Controller
      *      )
      * )
      */
+    #[UserStory('As a Restarter, I can see the category clusters used to group repair data', persona: 'Restarter', theme: 'Reference data')]
     public function listCategoryClustersv2(): JsonResponse
     {
         $rows = DB::select('SELECT idclusters AS id, name FROM clusters ORDER BY idclusters ASC');

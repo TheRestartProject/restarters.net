@@ -30,6 +30,11 @@ class EditTest extends TestCase
         $this->withoutExceptionHandling();
     }
 
+    /**
+     * @story:DeviceController::createDevicev2
+     * @story:DeviceController::updateDevicev2
+     * @story:DeviceController::deleteDevicev2
+     */
     public function testEdit(): void
     {
         $iddevices = $this->createDevice($this->event->idevents, 'misc');
@@ -56,6 +61,10 @@ class EditTest extends TestCase
         $this->deleteDevice($iddevices);
     }
 
+    /**
+     * @story:DeviceController::createDevicev2
+     * @story:DeviceController::updateDevicev2
+     */
     public function testEditAsNetworkCoordinator(): void
     {
         $network = Network::factory()->create();

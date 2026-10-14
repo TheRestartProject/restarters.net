@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Attributes\Feature;
+use App\Attributes\UserStory;
 use App\GroupTags;
 use App\Helpers\Fixometer;
 use App\Http\Controllers\Controller;
@@ -12,6 +14,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
+#[Feature('Administration', description: 'Platform administration and configuration')]
 class GroupTagController extends Controller
 {
     /**
@@ -30,6 +33,7 @@ class GroupTagController extends Controller
      *      )
      * )
      */
+    #[UserStory('As an Admin, I can view all group tags', persona: 'Admin', theme: 'Reference data')]
     public function listGroupTagsv2()
     {
         $tags = GroupTags::global()->orderBy('tag_name', 'asc')->get();
@@ -53,6 +57,7 @@ class GroupTagController extends Controller
      *      @OA\Response(response=404, ref="#/components/responses/NotFound")
      * )
      */
+    #[UserStory('As an Admin, I can view a group tag', persona: 'Admin', theme: 'Reference data')]
     public function getGroupTagv2($id)
     {
         $tag = $this->findGlobalOrFail($id);
@@ -86,6 +91,7 @@ class GroupTagController extends Controller
      *      @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
      */
+    #[UserStory('As an Admin, I can create a new group tag', persona: 'Admin', theme: 'Reference data')]
     public function createGroupTagv2(Request $request): JsonResponse
     {
         if ($resp = $this->requireAdministrator()) {
@@ -131,6 +137,7 @@ class GroupTagController extends Controller
      *      @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
      */
+    #[UserStory('As an Admin, I can update a group tag', persona: 'Admin', theme: 'Reference data')]
     public function updateGroupTagv2(Request $request, $id)
     {
         if ($resp = $this->requireAdministrator()) {
@@ -164,6 +171,7 @@ class GroupTagController extends Controller
      *      @OA\Response(response=404, ref="#/components/responses/NotFound")
      * )
      */
+    #[UserStory('As an Admin, I can delete a group tag', persona: 'Admin', theme: 'Reference data')]
     public function deleteGroupTagv2($id)
     {
         if ($resp = $this->requireAdministrator()) {

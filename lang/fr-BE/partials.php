@@ -47,6 +47,7 @@ return [
   'notification_greeting' => 'Bonjour !',
   'notification_footer' => 'Si vous souhaitez ne plus recevoir ces courriels, veuillez consulter <a href=":url">vos préférences</a> sur votre compte.',
   'validate_timezone' => 'Veuillez sélectionner un fuseau horaire valide.',
+  'dragmap' => 'Le repère n\'est pas tout à fait au bon endroit ? Faites-le glisser pour le corriger.',
   'share_modal_title' => 'Statistiques à partager',
   'share_modal_weve_saved' => "Nous avons économisé",
   'share_modal_of_co2' => 'de CO2e',

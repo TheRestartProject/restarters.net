@@ -17,6 +17,11 @@ use Auth;
 
 class InviteGroupTest extends TestCase
 {
+    /**
+     * @story:GroupController::postSendInvite
+     * @story:GroupController::view
+     * @story:GroupController::confirmInvite
+     */
     public function testInvite(): void
     {
         Notification::fake();
@@ -163,6 +168,10 @@ class InviteGroupTest extends TestCase
         );
     }
 
+    /**
+     * @story:GroupController::view
+     * @story:GroupController::confirmCodeInvite
+     */
     public function testInviteViaLink(): void {
         $group = Group::factory()->create();
 
@@ -190,6 +199,7 @@ class InviteGroupTest extends TestCase
 
     /**
      * @dataProvider invalidEmailProvider
+     * @story:GroupController::postSendInvite
      */
     public function testInviteInvalidEmail($email, $valid): void
     {

@@ -22,7 +22,10 @@ use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use App\Attributes\Feature;
+use App\Attributes\UserStory;
 
+#[Feature('Devices', description: 'Repair device tracking and impact measurement')]
 class DeviceController extends Controller {
     /**
      * @OA\Get(
@@ -55,6 +58,8 @@ class DeviceController extends Controller {
      *     )
      */
 
+    #[UserStory('As a Guest, I can view device details via the API', persona: 'Guest', theme: 'Get device details')]
+    #[UserStory('As a ThirdParty, I can retrieve device repair data via the API', persona: 'ThirdParty', theme: 'Get device details')]
     public function getDevicev2(Request $request, $iddevices)
     {
         $device = Device::findOrFail($iddevices);
@@ -169,6 +174,7 @@ class DeviceController extends Controller {
      *      @OA\Response(response=422, ref="#/components/responses/ValidationError")
      *  )
      */
+    #[UserStory('As a Restarter, I can log a device repair at an event I attended', persona: 'Restarter', theme: 'Log & edit repairs')]
     public function createDevicev2(Request $request)
     {
         $user = $this->getUser();
@@ -198,7 +204,7 @@ class DeviceController extends Controller {
         $event = Party::findOrFail($eventid);
 
         if (!Fixometer::userHasEditEventsDevicesPermission($eventid, $user->id)) {
-            // Only hosts can add devices to events.
+            // Hosts, network coordinators, admins and confirmed attendees of the event can add devices.
             abort(403);
         }
 
@@ -381,6 +387,7 @@ class DeviceController extends Controller {
      *      @OA\Response(response=422, ref="#/components/responses/ValidationError")
      *  )
      */
+    #[UserStory('As a Restarter, I can update a device repair record at an event I attended', persona: 'Restarter', theme: 'Log & edit repairs')]
     public function updateDevicev2(Request $request, $iddevices): JsonResponse
     {
         $user = $this->getUser();
@@ -411,7 +418,7 @@ class DeviceController extends Controller {
         // the database just by naming their own event here - deleteDevicev2 below already
         // derives the event from the record for this reason.
         if (!Fixometer::userHasEditEventsDevicesPermission($device->event, $user->id)) {
-            // Only hosts can edit devices on events.
+            // Hosts, network coordinators, admins and confirmed attendees of the event can edit its devices.
             abort(403);
         }
 
@@ -511,6 +518,7 @@ class DeviceController extends Controller {
      *     )
      */
 
+    #[UserStory('As a Host, I can delete a device record from my event', persona: 'Host', theme: 'Delete devices')]
     public function deleteDevicev2(Request $request, $iddevices): JsonResponse
     {
         $user = $this->getUser();
@@ -519,7 +527,7 @@ class DeviceController extends Controller {
         $eventid = $device->event;
 
         if (!Fixometer::userHasEditEventsDevicesPermission($device->event, $user->id)) {
-            // Only hosts can delete devices for events.
+            // Hosts, network coordinators, admins and confirmed attendees of the event can delete its devices.
             abort(403);
         }
 
@@ -691,6 +699,7 @@ class DeviceController extends Controller {
      *      @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
      */
+    #[UserStory('As a Host, I can add a photo to a device', persona: 'Host', theme: 'Log & edit devices')]
     public function uploadImagev2(Request $request, $iddevices): JsonResponse
     {
         $user = $request->user();
@@ -748,6 +757,7 @@ class DeviceController extends Controller {
      *      @OA\Response(response=404, ref="#/components/responses/NotFound")
      * )
      */
+    #[UserStory('As a Host, I can remove a photo from a device', persona: 'Host', theme: 'Log & edit devices')]
     public function deleteImagev2(Request $request, $iddevices, $idimages): JsonResponse
     {
         $user = $request->user();
@@ -792,6 +802,7 @@ class DeviceController extends Controller {
      *      )
      * )
      */
+    #[UserStory('As a Restarter, I can choose from standard barrier, spare-part and next-step options when logging a device', persona: 'Restarter', theme: 'Log & edit devices')]
     public function optionsv2(): JsonResponse
     {
         return response()->json([
@@ -843,6 +854,7 @@ class DeviceController extends Controller {
      *      )
      * )
      */
+    #[UserStory('As a Restarter, I can browse and search the devices logged across events', persona: 'Restarter', theme: 'Browse devices')]
     public function listDevicesv2(Request $request): JsonResponse
     {
         $page = max(1, (int) $request->input('page', 1));
@@ -989,6 +1001,7 @@ class DeviceController extends Controller {
      *      )
      * )
      */
+    #[UserStory('As a Guest, I can see the most recent event with a repaired device', persona: 'Guest', theme: 'Browse devices')]
     public function latestRepairedEventv2(): JsonResponse
     {
         $event = Party::with('theGroup')

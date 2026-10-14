@@ -40,6 +40,10 @@ class ProfileTest extends TestCase
         $this->assertTrue($policy->update($admin, $user1));
     }
 
+    /**
+     * @story:ApiController::getUserInfo
+     * @story:ApiController::getUserList
+     */
     public function testAPI(): void {
         $user = User::factory()->administrator()->create([
                                                                       'api_token' => '1234',

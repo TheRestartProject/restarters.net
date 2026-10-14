@@ -7,12 +7,14 @@ use App\Helpers\Fixometer;
 use App\Http\Resources\Tag;
 use Auth;
 
+#[Feature('Administration', description: 'Platform administration and configuration')]
 class GroupTagsController extends Controller
 {
     /**
      * Render the global group-tags admin page (a Vue SPA that talks to
      * /api/v2/group-tags). Network-scoped tags are managed elsewhere.
      */
+    #[UserStory('As an Admin, I can view all group tags', persona: 'Admin', theme: 'Reference data')]
     public function index($editId = null)
     {
         $user = Auth::user();

@@ -80,7 +80,12 @@ class NetworkTest extends TestCase
         $this->assertTrue($group->isMemberOf($network));
     }
 
-    /** @test */
+    /**
+     * @test
+     * @story:NetworkController::associateGroupsv2
+     * @story:GroupController::getGroupsByUsersNetworks
+     * @story:EventController::getEventsByUsersNetworks
+     */
     public function admins_can_associate_group_to_network(): void
     {
         $this->withoutExceptionHandling();
@@ -264,7 +269,10 @@ class NetworkTest extends TestCase
         $this->assertTrue($coordinator->isCoordinatorOf($network));
     }
 
-    /** @test */
+    /**
+     * @test
+     * @story:NetworkController::stats
+     */
     public function network_stats_can_be_queried(): void
     {
         $network = Network::factory()->create();
@@ -288,7 +296,13 @@ class NetworkTest extends TestCase
         $this->assertEquals($expectedStats, $stats);
     }
 
-    /** @test */
+    /**
+     * @test
+     * @story:NetworkController::getNetworksv2
+     * @story:NetworkController::getNetworkv2
+     * @story:NetworkController::associateGroupsv2
+     * @story:GroupController::network
+     */
     public function network_page(): void
     {
         // The /networks and /networks/{id} Blade pages, and the
@@ -327,7 +341,11 @@ class NetworkTest extends TestCase
         $this->assertEquals($network->id, collect($summary['networks'])->first()['id']);
     }
 
-    /** @test */
+    /**
+     * @test
+     * @story:NetworkController::updateNetworkv2
+     * @story:NetworkController::associateGroupsv2
+     */
     public function admins_can_edit(): void
     {
         // The /networks/{id}/edit and /networks/{id} (PUT) Blade routes,
@@ -355,6 +373,7 @@ class NetworkTest extends TestCase
         $this->assertTrue($group->isMemberOf($network));
     }
 
+    /** @story:UserController::postAdminEdit */
     public function testRemoveNetworkCoordinatorByRole(): void {
         $this->withoutExceptionHandling();
 

@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Attributes\Feature;
+use App\Attributes\UserStory;
 use App\Brands;
 use App\Helpers\Fixometer;
 use App\Http\Controllers\Controller;
@@ -11,6 +13,7 @@ use Auth;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
+#[Feature('Administration', description: 'Platform administration and configuration')]
 class BrandController extends Controller
 {
     /**
@@ -33,6 +36,7 @@ class BrandController extends Controller
      *      )
      * )
      */
+    #[UserStory('As an Admin, I can view all brands', persona: 'Admin', theme: 'Reference data')]
     public function listBrandsv2()
     {
         $brands = Brands::orderBy('brand_name', 'asc')->get();
@@ -63,6 +67,7 @@ class BrandController extends Controller
      *      @OA\Response(response=404, ref="#/components/responses/NotFound")
      * )
      */
+    #[UserStory('As an Admin, I can view a brand', persona: 'Admin', theme: 'Reference data')]
     public function getBrandv2($id)
     {
         $brand = Brands::findOrFail($id);
@@ -97,6 +102,7 @@ class BrandController extends Controller
      *      @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
      */
+    #[UserStory('As an Admin, I can create a new brand', persona: 'Admin', theme: 'Reference data')]
     public function createBrandv2(Request $request): JsonResponse
     {
         if ($resp = $this->requireAdministrator()) {
@@ -141,6 +147,7 @@ class BrandController extends Controller
      *      @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
      */
+    #[UserStory('As an Admin, I can edit a brand', persona: 'Admin', theme: 'Reference data')]
     public function updateBrandv2(Request $request, $id)
     {
         if ($resp = $this->requireAdministrator()) {
@@ -173,6 +180,7 @@ class BrandController extends Controller
      *      @OA\Response(response=404, ref="#/components/responses/NotFound")
      * )
      */
+    #[UserStory('As an Admin, I can delete a brand', persona: 'Admin', theme: 'Reference data')]
     public function deleteBrandv2($id)
     {
         if ($resp = $this->requireAdministrator()) {

@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Attributes\Feature;
+use App\Attributes\UserStory;
 use App\Events\PasswordChanged;
 use App\Events\UserRegistered;
 use App\EventsUsers;
@@ -42,6 +44,7 @@ use Illuminate\Validation\ValidationException;
  * Wiki login (and the Login event) happens at GET /auth/bridge instead, during
  * a top-level navigation where cookies land first-party.
  */
+#[Feature('Users', description: 'User accounts, profiles, and authentication')]
 class AuthController extends Controller
 {
     /**
@@ -80,6 +83,7 @@ class AuthController extends Controller
      *      @OA\Response(response=429, ref="#/components/responses/TooManyRequests")
      * )
      */
+    #[UserStory('As a Guest, I can log in with my email and password', persona: 'Guest', theme: 'Authentication')]
     public function loginv2(Request $request): JsonResponse
     {
         $request->validate([
@@ -129,6 +133,7 @@ class AuthController extends Controller
      *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated")
      * )
      */
+    #[UserStory('As a Restarter, I can log out and end my session', persona: 'Restarter', theme: 'Authentication')]
     public function logoutv2(Request $request): JsonResponse
     {
         $user = $request->user();
@@ -195,6 +200,7 @@ class AuthController extends Controller
      *      @OA\Response(response=429, ref="#/components/responses/TooManyRequests")
      * )
      */
+    #[UserStory('As a Guest, I can register a new account', persona: 'Guest', theme: 'Registration & onboarding')]
     public function registerv2(Request $request): JsonResponse
     {
         // Mirrors the rules of the Blade registration form (UserController::
@@ -305,6 +311,7 @@ class AuthController extends Controller
      *      @OA\Response(response=429, ref="#/components/responses/TooManyRequests")
      * )
      */
+    #[UserStory('As a Guest, I can request a password recovery email', persona: 'Guest', theme: 'Authentication')]
     public function forgotPasswordv2(Request $request): JsonResponse
     {
         $request->validate(['email' => 'required|string|email']);
@@ -358,6 +365,7 @@ class AuthController extends Controller
      *      @OA\Response(response=429, ref="#/components/responses/TooManyRequests")
      * )
      */
+    #[UserStory('As a Guest, I can reset my password using a recovery code', persona: 'Guest', theme: 'Authentication')]
     public function resetPasswordv2(Request $request): JsonResponse
     {
         $request->validate([
@@ -417,6 +425,7 @@ class AuthController extends Controller
      *      @OA\Response(response=429, ref="#/components/responses/TooManyRequests")
      * )
      */
+    #[UserStory('As a Guest, I can check that my password recovery link is still valid', persona: 'Guest', theme: 'Authentication')]
     public function recoveryInfov2(string $token): JsonResponse
     {
         $user = User::findByValidRecoveryToken($token);
@@ -449,6 +458,7 @@ class AuthController extends Controller
      *      @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
      */
+    #[UserStory('As a Guest, I can check whether an email address is already registered before signing up', persona: 'Guest', theme: 'Registration & onboarding')]
     public function emailAvailablev2(Request $request): JsonResponse
     {
         $request->validate(['email' => 'required|string|email']);
@@ -496,6 +506,7 @@ class AuthController extends Controller
      *      @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
      */
+    #[UserStory('As a Restarter, I can accept a group or event invitation, or join via a shareable invite code', persona: 'Restarter', theme: 'Registration & onboarding')]
     public function claimInvitev2(Request $request): JsonResponse
     {
         $request->validate([
@@ -534,6 +545,7 @@ class AuthController extends Controller
      *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated")
      * )
      */
+    #[UserStory('As a Restarter, I stay logged in when moving between Restarters, Talk and the wiki', persona: 'Restarter', theme: 'Authentication')]
     public function ssoTicketv2(Request $request): JsonResponse
     {
         return response()->json([
@@ -581,6 +593,7 @@ class AuthController extends Controller
      *      @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
      */
+    #[UserStory('As a Restarter, I can record my data consents and profile basics after registering', persona: 'Restarter', theme: 'Registration & onboarding')]
     public function consentv2(Request $request): JsonResponse
     {
         $request->validate([

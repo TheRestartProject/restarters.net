@@ -14,6 +14,10 @@ use Illuminate\Support\Facades\Notification;
 
 class GroupCreateTest extends TestCase
 {
+    /**
+     * @story:GroupController::create
+     * @story:GroupController::getGroupList
+     */
     public function testCreate(): void
     {
         $user = User::factory()->administrator()->create([
@@ -34,6 +38,7 @@ class GroupCreateTest extends TestCase
         self::assertEquals('dummy', $ret[0]['network_data']['dummy']);
     }
 
+    /** @story:GroupController::create */
     public function testCreateGroupAsRestarter(): void {
         // Restarters can create groups.  This wasn't true in the past and for backwards compatibility the act
         // of creation should convert them into a host.
@@ -48,6 +53,7 @@ class GroupCreateTest extends TestCase
         $this->assertTrue($user->hasRole('Host'));
     }
 
+    /** @story:GroupController::create */
     public function testCreateBadLocation(): void
     {
         $this->loginAsTestUser(Role::ADMINISTRATOR);
@@ -86,6 +92,7 @@ class GroupCreateTest extends TestCase
 
     /**
      * @dataProvider roles
+     * @story:GroupController::updateGroupv2
      */
     public function testApprove($role): void {
         Notification::fake();

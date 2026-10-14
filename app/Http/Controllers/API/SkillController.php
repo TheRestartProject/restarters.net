@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Attributes\Feature;
+use App\Attributes\UserStory;
 use App\Helpers\Fixometer;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Skill;
@@ -13,6 +15,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
+#[Feature('Administration', description: 'Platform administration and configuration')]
 class SkillController extends Controller
 {
     /**
@@ -31,6 +34,7 @@ class SkillController extends Controller
      *      )
      * )
      */
+    #[UserStory('As an Admin, I can view all skills', persona: 'Admin', theme: 'Reference data')]
     public function listSkillsv2()
     {
         $skills = Skills::orderBy('skill_name', 'asc')->get();
@@ -53,6 +57,7 @@ class SkillController extends Controller
      *      @OA\Response(response=404, ref="#/components/responses/NotFound")
      * )
      */
+    #[UserStory('As an Admin, I can view a skill', persona: 'Admin', theme: 'Reference data')]
     public function getSkillv2($id)
     {
         $skill = Skills::findOrFail($id);
@@ -87,6 +92,7 @@ class SkillController extends Controller
      *      @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
      */
+    #[UserStory('As an Admin, I can create a new skill', persona: 'Admin', theme: 'Reference data')]
     public function createSkillv2(Request $request): JsonResponse
     {
         if ($resp = $this->requireAdministrator()) {
@@ -129,6 +135,7 @@ class SkillController extends Controller
      *      @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
      */
+    #[UserStory('As an Admin, I can edit a skill', persona: 'Admin', theme: 'Reference data')]
     public function updateSkillv2(Request $request, $id)
     {
         if ($resp = $this->requireAdministrator()) {
@@ -159,6 +166,7 @@ class SkillController extends Controller
      *      @OA\Response(response=404, ref="#/components/responses/NotFound")
      * )
      */
+    #[UserStory('As an Admin, I can delete a skill', persona: 'Admin', theme: 'Reference data')]
     public function deleteSkillv2($id)
     {
         if ($resp = $this->requireAdministrator()) {

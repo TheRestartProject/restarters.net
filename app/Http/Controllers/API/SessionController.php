@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Attributes\Feature;
+use App\Attributes\UserStory;
+use App\Attributes\NoStory;
 use App\Http\Controllers\Controller;
 use App\User;
 use Illuminate\Http\JsonResponse;
@@ -13,6 +16,7 @@ use Illuminate\Support\Facades\Auth;
  * client-relevant config, and UI flags. Replaces every window.* global,
  * Auth::user() navbar read and env() value previously inlined into Blade.
  */
+#[Feature('Users', description: 'User accounts, profiles, and authentication')]
 class SessionController extends Controller
 {
     /**
@@ -66,6 +70,7 @@ class SessionController extends Controller
      *      )
      * )
      */
+    #[UserStory('As a Guest, I get the right language and my account state when the app loads', persona: 'Guest', theme: 'Authentication')]
     public function getSessionv2(): JsonResponse
     {
         return response()->json(['data' => self::sessionPayload(self::currentUser())]);
@@ -99,6 +104,7 @@ class SessionController extends Controller
      *      @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
      */
+    #[UserStory('As a Guest, I can choose my language for the session', persona: 'Guest', theme: 'Language')]
     public function patchSessionv2(Request $request): JsonResponse
     {
         $request->validate([
@@ -115,12 +121,14 @@ class SessionController extends Controller
         return response()->json(['data' => self::sessionPayload($user)]);
     }
 
+    #[NoStory(reason: 'Internal helper resolving the current user; not a route')]
     public static function currentUser(): ?User
     {
         // Session (phpunit actingAs), then SPA bearer token, then legacy token.
         return Auth::user() ?? auth('sanctum')->user() ?? auth('api')->user();
     }
 
+    #[NoStory(reason: 'Internal helper building the session payload; not a route')]
     public static function sessionPayload(?User $user): array
     {
         return [
@@ -179,6 +187,7 @@ class SessionController extends Controller
         ];
     }
 
+    #[NoStory(reason: 'Internal helper listing enabled locales; not a route')]
     public static function availableLocales(): array
     {
         return collect(scandir(base_path('lang')))

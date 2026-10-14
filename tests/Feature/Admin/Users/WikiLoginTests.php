@@ -65,7 +65,10 @@ class WikiLoginTests extends TestCase
         $this->assertEquals(WikiSyncStatus::Created, $user->wiki_sync_status);
     }
 
-    /** @test */
+    /**
+     * @test
+     * @story:AuthController::loginv2
+     */
     public function if_not_flagged_for_creation(): void
     {
         $this->withoutExceptionHandling();
@@ -88,7 +91,10 @@ class WikiLoginTests extends TestCase
         $this->assertEquals(WikiSyncStatus::DoNotCreate, $user->wiki_sync_status);
     }
 
-    /** @test */
+    /**
+     * @test
+     * @story:AuthController::loginv2
+     */
     public function if_already_created(): void
     {
         $this->withoutExceptionHandling();
@@ -111,7 +117,10 @@ class WikiLoginTests extends TestCase
         $this->assertEquals(WikiSyncStatus::Created, $user->wiki_sync_status);
     }
 
-    /** @test */
+    /**
+     * @test
+     * @story:UserController::postProfilePasswordEdit
+     */
     public function if_wiki_user_changes_password(): void
     {
         $this->withoutExceptionHandling();

@@ -25,7 +25,9 @@ class BasicTest extends TestCase
     }
 
     /**
-     *@dataProvider provider
+     * @story:DashboardController::indexv2
+     * @story:DiscourseController::discussionTopics
+     * @dataProvider provider
      */
     public function testPageLoads($city, $country, $lat, $lng, $nearbyGroupCount): void
     {
@@ -77,6 +79,11 @@ class BasicTest extends TestCase
         ];
     }
 
+    /**
+     * @story:DashboardController::indexv2
+     * @story:PartyController::index
+     * @story:EventController::updateEventv2
+     */
     public function testUpcomingEvents(): void {
         // The /dashboard and /party Blade pages, and the /group/join/{id}
         // and /group/invite web routes, are all retired under the Nuxt

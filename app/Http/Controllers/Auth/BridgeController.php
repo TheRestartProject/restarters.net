@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Attributes\Feature;
+use App\Attributes\UserStory;
 use App\Http\Controllers\Controller;
 use App\SsoTicket;
 use Illuminate\Http\RedirectResponse;
@@ -19,8 +21,10 @@ use Illuminate\Support\Facades\Auth;
  * LogInToWiki queues the mw_* cookies onto this first-party response — and
  * redirect onward to an allowlisted target.
  */
+#[Feature('Users', description: 'User accounts, profiles, and authentication')]
 class BridgeController extends Controller
 {
+    #[UserStory('As a Restarter, I am logged in to the Restarters web session after signing in through the app', persona: 'Restarter', theme: 'Authentication')]
     public function bridge(Request $request): RedirectResponse
     {
         $redirect = $this->safeRedirect($request->query('redirect'));

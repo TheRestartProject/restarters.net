@@ -12,7 +12,10 @@ use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Notification;
 use Illuminate\Validation\ValidationException;
+use App\Attributes\Feature;
+use App\Attributes\UserStory;
 
+#[Feature('Administration', description: 'Platform administration and configuration')]
 class AlertController extends Controller
 {
     /**
@@ -38,6 +41,7 @@ class AlertController extends Controller
      *       ),
      *     )
      */
+    #[UserStory('As a Guest, I can view active platform alerts', persona: 'Guest', theme: 'Platform alerts')]
     public function listAlertsv2(Request $request) {
         // Alerts don't change often, so we can cache them.
         if (\Cache::has('alerts')) {
@@ -92,6 +96,7 @@ class AlertController extends Controller
      *     @OA\Response(response=422, ref="#/components/responses/ValidationError")
      *  )
      */
+    #[UserStory('As an Admin, I can create a platform-wide alert', persona: 'Admin', theme: 'Platform alerts')]
     public function addAlertv2(Request $request)
     {
         $user = $this->getUser();
@@ -167,6 +172,7 @@ class AlertController extends Controller
      *     @OA\Response(response=422, ref="#/components/responses/ValidationError")
      *  )
      */
+    #[UserStory('As an Admin, I can update a platform alert', persona: 'Admin', theme: 'Platform alerts')]
     public function updateAlertv2(Request $request, $id)
     {
         $user = $this->getUser();

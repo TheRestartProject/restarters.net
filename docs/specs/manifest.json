@@ -1,0 +1,3659 @@
+{
+    "generatedAt": "2026-10-14T05:38:00Z",
+    "features": {
+        "Administration": {
+            "description": "Platform administration and configuration",
+            "sources": [
+                "app/Http/Controllers/API/AlertController.php",
+                "app/Http/Controllers/API/BrandController.php",
+                "app/Http/Controllers/API/CategoryController.php",
+                "app/Http/Controllers/API/GroupTagController.php",
+                "app/Http/Controllers/API/RoleController.php",
+                "app/Http/Controllers/API/SkillController.php",
+                "app/Http/Controllers/GroupTagsController.php"
+            ],
+            "stories": [
+                {
+                    "story": "As an Admin, I can create a platform-wide alert",
+                    "persona": "Admin",
+                    "theme": "Platform alerts",
+                    "method": "AlertController::addAlertv2",
+                    "class": "App\\Http\\Controllers\\API\\AlertController",
+                    "file": "app/Http/Controllers/API/AlertController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Alerts/AlertsTest.php",
+                            "test": "testCreate"
+                        }
+                    ]
+                },
+                {
+                    "story": "As an Admin, I can update a platform alert",
+                    "persona": "Admin",
+                    "theme": "Platform alerts",
+                    "method": "AlertController::updateAlertv2",
+                    "class": "App\\Http\\Controllers\\API\\AlertController",
+                    "file": "app/Http/Controllers/API/AlertController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Alerts/AlertsTest.php",
+                            "test": "testCreate"
+                        }
+                    ]
+                },
+                {
+                    "story": "As an Admin, I can create a new brand",
+                    "persona": "Admin",
+                    "theme": "Reference data",
+                    "method": "BrandController::createBrandv2",
+                    "class": "App\\Http\\Controllers\\API\\BrandController",
+                    "file": "app/Http/Controllers/API/BrandController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As an Admin, I can delete a brand",
+                    "persona": "Admin",
+                    "theme": "Reference data",
+                    "method": "BrandController::deleteBrandv2",
+                    "class": "App\\Http\\Controllers\\API\\BrandController",
+                    "file": "app/Http/Controllers/API/BrandController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As an Admin, I can view a brand",
+                    "persona": "Admin",
+                    "theme": "Reference data",
+                    "method": "BrandController::getBrandv2",
+                    "class": "App\\Http\\Controllers\\API\\BrandController",
+                    "file": "app/Http/Controllers/API/BrandController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As an Admin, I can view all brands",
+                    "persona": "Admin",
+                    "theme": "Reference data",
+                    "method": "BrandController::listBrandsv2",
+                    "class": "App\\Http\\Controllers\\API\\BrandController",
+                    "file": "app/Http/Controllers/API/BrandController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As an Admin, I can edit a brand",
+                    "persona": "Admin",
+                    "theme": "Reference data",
+                    "method": "BrandController::updateBrandv2",
+                    "class": "App\\Http\\Controllers\\API\\BrandController",
+                    "file": "app/Http/Controllers/API/BrandController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As an Admin, I can view a device category",
+                    "persona": "Admin",
+                    "theme": "Reference data",
+                    "method": "CategoryController::getCategoryv2",
+                    "class": "App\\Http\\Controllers\\API\\CategoryController",
+                    "file": "app/Http/Controllers/API/CategoryController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As an Admin, I can view all device categories",
+                    "persona": "Admin",
+                    "theme": "Reference data",
+                    "method": "CategoryController::listCategoriesv2",
+                    "class": "App\\Http\\Controllers\\API\\CategoryController",
+                    "file": "app/Http/Controllers/API/CategoryController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As an Admin, I can edit a device category",
+                    "persona": "Admin",
+                    "theme": "Reference data",
+                    "method": "CategoryController::updateCategoryv2",
+                    "class": "App\\Http\\Controllers\\API\\CategoryController",
+                    "file": "app/Http/Controllers/API/CategoryController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As an Admin, I can create a new group tag",
+                    "persona": "Admin",
+                    "theme": "Reference data",
+                    "method": "GroupTagController::createGroupTagv2",
+                    "class": "App\\Http\\Controllers\\API\\GroupTagController",
+                    "file": "app/Http/Controllers/API/GroupTagController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As an Admin, I can delete a group tag",
+                    "persona": "Admin",
+                    "theme": "Reference data",
+                    "method": "GroupTagController::deleteGroupTagv2",
+                    "class": "App\\Http\\Controllers\\API\\GroupTagController",
+                    "file": "app/Http/Controllers/API/GroupTagController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As an Admin, I can view a group tag",
+                    "persona": "Admin",
+                    "theme": "Reference data",
+                    "method": "GroupTagController::getGroupTagv2",
+                    "class": "App\\Http\\Controllers\\API\\GroupTagController",
+                    "file": "app/Http/Controllers/API/GroupTagController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As an Admin, I can view all group tags",
+                    "persona": "Admin",
+                    "theme": "Reference data",
+                    "method": "GroupTagController::listGroupTagsv2",
+                    "class": "App\\Http\\Controllers\\API\\GroupTagController",
+                    "file": "app/Http/Controllers/API/GroupTagController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As an Admin, I can update a group tag",
+                    "persona": "Admin",
+                    "theme": "Reference data",
+                    "method": "GroupTagController::updateGroupTagv2",
+                    "class": "App\\Http\\Controllers\\API\\GroupTagController",
+                    "file": "app/Http/Controllers/API/GroupTagController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As an Admin, I can view all group tags",
+                    "persona": "Admin",
+                    "theme": "Reference data",
+                    "method": "GroupTagsController::index",
+                    "class": "App\\Http\\Controllers\\GroupTagsController",
+                    "file": "app/Http/Controllers/GroupTagsController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As an Admin, I can view a role",
+                    "persona": "Admin",
+                    "theme": "Reference data",
+                    "method": "RoleController::getRolev2",
+                    "class": "App\\Http\\Controllers\\API\\RoleController",
+                    "file": "app/Http/Controllers/API/RoleController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As an Admin, I can view all permissions",
+                    "persona": "Admin",
+                    "theme": "Reference data",
+                    "method": "RoleController::listPermissionsv2",
+                    "class": "App\\Http\\Controllers\\API\\RoleController",
+                    "file": "app/Http/Controllers/API/RoleController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As an Admin, I can view all roles and their permissions",
+                    "persona": "Admin",
+                    "theme": "Reference data",
+                    "method": "RoleController::listRolesv2",
+                    "class": "App\\Http\\Controllers\\API\\RoleController",
+                    "file": "app/Http/Controllers/API/RoleController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As an Admin, I can change the permissions granted to a role",
+                    "persona": "Admin",
+                    "theme": "Reference data",
+                    "method": "RoleController::updateRolePermissionsv2",
+                    "class": "App\\Http\\Controllers\\API\\RoleController",
+                    "file": "app/Http/Controllers/API/RoleController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As an Admin, I can create a new skill",
+                    "persona": "Admin",
+                    "theme": "Reference data",
+                    "method": "SkillController::createSkillv2",
+                    "class": "App\\Http\\Controllers\\API\\SkillController",
+                    "file": "app/Http/Controllers/API/SkillController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As an Admin, I can delete a skill",
+                    "persona": "Admin",
+                    "theme": "Reference data",
+                    "method": "SkillController::deleteSkillv2",
+                    "class": "App\\Http\\Controllers\\API\\SkillController",
+                    "file": "app/Http/Controllers/API/SkillController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As an Admin, I can view a skill",
+                    "persona": "Admin",
+                    "theme": "Reference data",
+                    "method": "SkillController::getSkillv2",
+                    "class": "App\\Http\\Controllers\\API\\SkillController",
+                    "file": "app/Http/Controllers/API/SkillController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As an Admin, I can view all skills",
+                    "persona": "Admin",
+                    "theme": "Reference data",
+                    "method": "SkillController::listSkillsv2",
+                    "class": "App\\Http\\Controllers\\API\\SkillController",
+                    "file": "app/Http/Controllers/API/SkillController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As an Admin, I can edit a skill",
+                    "persona": "Admin",
+                    "theme": "Reference data",
+                    "method": "SkillController::updateSkillv2",
+                    "class": "App\\Http\\Controllers\\API\\SkillController",
+                    "file": "app/Http/Controllers/API/SkillController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Guest, I can view active platform alerts",
+                    "persona": "Guest",
+                    "theme": "Platform alerts",
+                    "method": "AlertController::listAlertsv2",
+                    "class": "App\\Http\\Controllers\\API\\AlertController",
+                    "file": "app/Http/Controllers/API/AlertController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Alerts/AlertsTest.php",
+                            "test": "testListNonePresent"
+                        },
+                        {
+                            "file": "tests/Feature/Alerts/AlertsTest.php",
+                            "test": "testCreate"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a Restarter, I can see the category clusters used to group repair data",
+                    "persona": "Restarter",
+                    "theme": "Reference data",
+                    "method": "CategoryController::listCategoryClustersv2",
+                    "class": "App\\Http\\Controllers\\API\\CategoryController",
+                    "file": "app/Http/Controllers/API/CategoryController.php",
+                    "tests": []
+                }
+            ],
+            "storyCount": 27,
+            "personas": [
+                "Admin",
+                "Guest",
+                "Restarter"
+            ]
+        },
+        "Dashboard": {
+            "description": "Personal dashboard for logged-in users",
+            "sources": [
+                "app/Http/Controllers/API/DashboardController.php"
+            ],
+            "stories": [
+                {
+                    "story": "As a Restarter, I can see my dashboard with my groups, upcoming events and impact",
+                    "persona": "Restarter",
+                    "theme": "Dashboard",
+                    "method": "DashboardController::indexv2",
+                    "class": "App\\Http\\Controllers\\API\\DashboardController",
+                    "file": "app/Http/Controllers/API/DashboardController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Dashboard/BasicTest.php",
+                            "test": "testPageLoads"
+                        },
+                        {
+                            "file": "tests/Feature/Dashboard/BasicTest.php",
+                            "test": "testUpcomingEvents"
+                        }
+                    ]
+                }
+            ],
+            "storyCount": 1,
+            "personas": [
+                "Restarter"
+            ]
+        },
+        "Devices": {
+            "description": "Repair device tracking and impact measurement",
+            "sources": [
+                "app/Http/Controllers/API/DeviceController.php",
+                "app/Http/Controllers/API/ItemController.php",
+                "app/Http/Controllers/DeviceController.php"
+            ],
+            "stories": [
+                {
+                    "story": "As a Guest, I can view device details via the API",
+                    "persona": "Guest",
+                    "theme": "Get device details",
+                    "method": "DeviceController::getDevicev2",
+                    "class": "App\\Http\\Controllers\\API\\DeviceController",
+                    "file": "app/Http/Controllers/API/DeviceController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Devices/APIv2DeviceTest.php",
+                            "test": "testGetDevice"
+                        },
+                        {
+                            "file": "tests/Feature/Devices/APIv2DeviceTest.php",
+                            "test": "testCreate"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a Guest, I can see the most recent event with a repaired device",
+                    "persona": "Guest",
+                    "theme": "Browse devices",
+                    "method": "DeviceController::latestRepairedEventv2",
+                    "class": "App\\Http\\Controllers\\API\\DeviceController",
+                    "file": "app/Http/Controllers/API/DeviceController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Guest, I can view suggested item types for device records",
+                    "persona": "Guest",
+                    "theme": "Browse & search devices",
+                    "method": "ItemController::listItemsv2",
+                    "class": "App\\Http\\Controllers\\API\\ItemController",
+                    "file": "app/Http/Controllers/API/ItemController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Devices/CategoryTest.php",
+                            "test": "testListItems"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a Host, I can delete a device record from my event",
+                    "persona": "Host",
+                    "theme": "Delete devices",
+                    "method": "DeviceController::deleteDevicev2",
+                    "class": "App\\Http\\Controllers\\API\\DeviceController",
+                    "file": "app/Http/Controllers/API/DeviceController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Devices/EditTest.php",
+                            "test": "testEdit"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a Host, I can remove a photo from a device",
+                    "persona": "Host",
+                    "theme": "Log & edit devices",
+                    "method": "DeviceController::deleteImagev2",
+                    "class": "App\\Http\\Controllers\\API\\DeviceController",
+                    "file": "app/Http/Controllers/API/DeviceController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Host, I can add a photo to a device",
+                    "persona": "Host",
+                    "theme": "Log & edit devices",
+                    "method": "DeviceController::uploadImagev2",
+                    "class": "App\\Http\\Controllers\\API\\DeviceController",
+                    "file": "app/Http/Controllers/API/DeviceController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Restarter, I can log a device repair at an event I attended",
+                    "persona": "Restarter",
+                    "theme": "Log & edit repairs",
+                    "method": "DeviceController::createDevicev2",
+                    "class": "App\\Http\\Controllers\\API\\DeviceController",
+                    "file": "app/Http/Controllers/API/DeviceController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Devices/APIv2DeviceTest.php",
+                            "test": "testCreate"
+                        },
+                        {
+                            "file": "tests/Feature/Devices/CategoryTest.php",
+                            "test": "testCategoryChange"
+                        },
+                        {
+                            "file": "tests/Feature/Devices/EditTest.php",
+                            "test": "testEdit"
+                        },
+                        {
+                            "file": "tests/Feature/Devices/EditTest.php",
+                            "test": "testEditAsNetworkCoordinator"
+                        },
+                        {
+                            "file": "tests/Feature/Devices/NullAgeProblemTest.php",
+                            "test": "testNullAgeCreate"
+                        },
+                        {
+                            "file": "tests/Feature/Devices/NullEstimateProblemTest.php",
+                            "test": "testNullEstimateCreate"
+                        },
+                        {
+                            "file": "tests/Feature/Devices/NullProblemTest.php",
+                            "test": "null_problem_mapped_to_empty_string"
+                        },
+                        {
+                            "file": "tests/Feature/Devices/SparePartsTest.php",
+                            "test": "recording_spare_parts_from_manufacturer"
+                        },
+                        {
+                            "file": "tests/Feature/Devices/SparePartsTest.php",
+                            "test": "recording_spare_parts_from_third_party"
+                        },
+                        {
+                            "file": "tests/Feature/Devices/SparePartsTest.php",
+                            "test": "recording_no_spare_parts_needed"
+                        },
+                        {
+                            "file": "tests/Feature/Devices/SparePartsTest.php",
+                            "test": "recording_spare_parts_related_barrier"
+                        },
+                        {
+                            "file": "tests/Feature/Devices/SparePartsTest.php",
+                            "test": "recording_no_spare_parts_related_barrier"
+                        },
+                        {
+                            "file": "tests/Feature/Devices/TooManyMiscTest.php",
+                            "test": "testTooMany"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a Restarter, I can delete device photos I've uploaded",
+                    "persona": "Restarter",
+                    "theme": "Device photos",
+                    "method": "DeviceController::deleteImage",
+                    "class": "App\\Http\\Controllers\\DeviceController",
+                    "file": "app/Http/Controllers/DeviceController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Restarter, I can upload photos of devices I've worked on",
+                    "persona": "Restarter",
+                    "theme": "Device photos",
+                    "method": "DeviceController::imageUpload",
+                    "class": "App\\Http\\Controllers\\DeviceController",
+                    "file": "app/Http/Controllers/DeviceController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Restarter, I can browse all devices and view global repair impact data",
+                    "persona": "Restarter",
+                    "theme": "Browse & search devices",
+                    "method": "DeviceController::index",
+                    "class": "App\\Http\\Controllers\\DeviceController",
+                    "file": "app/Http/Controllers/DeviceController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Restarter, I can browse and search the devices logged across events",
+                    "persona": "Restarter",
+                    "theme": "Browse devices",
+                    "method": "DeviceController::listDevicesv2",
+                    "class": "App\\Http\\Controllers\\API\\DeviceController",
+                    "file": "app/Http/Controllers/API/DeviceController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Restarter, I can choose from standard barrier, spare-part and next-step options when logging a device",
+                    "persona": "Restarter",
+                    "theme": "Log & edit devices",
+                    "method": "DeviceController::optionsv2",
+                    "class": "App\\Http\\Controllers\\API\\DeviceController",
+                    "file": "app/Http/Controllers/API/DeviceController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Restarter, I can update a device repair record at an event I attended",
+                    "persona": "Restarter",
+                    "theme": "Log & edit repairs",
+                    "method": "DeviceController::updateDevicev2",
+                    "class": "App\\Http\\Controllers\\API\\DeviceController",
+                    "file": "app/Http/Controllers/API/DeviceController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Devices/CategoryTest.php",
+                            "test": "testCategoryChange"
+                        },
+                        {
+                            "file": "tests/Feature/Devices/EditTest.php",
+                            "test": "testEdit"
+                        },
+                        {
+                            "file": "tests/Feature/Devices/EditTest.php",
+                            "test": "testEditAsNetworkCoordinator"
+                        },
+                        {
+                            "file": "tests/Feature/Devices/NullAgeProblemTest.php",
+                            "test": "testNullAgeEdit"
+                        },
+                        {
+                            "file": "tests/Feature/Devices/NullEstimateProblemTest.php",
+                            "test": "testNullEstimateEdit"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a ThirdParty, I can retrieve device repair data via the API",
+                    "persona": "ThirdParty",
+                    "theme": "Get device details",
+                    "method": "DeviceController::getDevicev2",
+                    "class": "App\\Http\\Controllers\\API\\DeviceController",
+                    "file": "app/Http/Controllers/API/DeviceController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Devices/APIv2DeviceTest.php",
+                            "test": "testGetDevice"
+                        },
+                        {
+                            "file": "tests/Feature/Devices/APIv2DeviceTest.php",
+                            "test": "testCreate"
+                        }
+                    ]
+                }
+            ],
+            "storyCount": 14,
+            "personas": [
+                "Guest",
+                "Host",
+                "Restarter",
+                "ThirdParty"
+            ]
+        },
+        "Events": {
+            "description": "Community repair event management",
+            "sources": [
+                "app/Http/Controllers/API/EventAttendanceController.php",
+                "app/Http/Controllers/API/EventController.php",
+                "app/Http/Controllers/CalendarEventsController.php",
+                "app/Http/Controllers/PartyController.php"
+            ],
+            "stories": [
+                {
+                    "story": "As an Admin, I can view the audit trail of an event",
+                    "persona": "Admin",
+                    "theme": "Create & manage events",
+                    "method": "EventController::auditsv2",
+                    "class": "App\\Http\\Controllers\\API\\EventController",
+                    "file": "app/Http/Controllers/API/EventController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As an Admin, I can view all events pending moderation",
+                    "persona": "Admin",
+                    "theme": "Create & manage events",
+                    "method": "EventController::moderateEventsv2",
+                    "class": "App\\Http\\Controllers\\API\\EventController",
+                    "file": "app/Http/Controllers/API/EventController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Events/APIv2EventTest.php",
+                            "test": "testGetEventsForGroup"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a Guest, I can subscribe to events in my area as an iCal feed",
+                    "persona": "Guest",
+                    "theme": "Calendar feeds",
+                    "method": "CalendarEventsController::allEventsByArea",
+                    "class": "App\\Http\\Controllers\\CalendarEventsController",
+                    "file": "app/Http/Controllers/CalendarEventsController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Calendar/CalendarTest.php",
+                            "test": "testByArea"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a Guest, I can subscribe to a group's events as an iCal feed",
+                    "persona": "Guest",
+                    "theme": "Calendar feeds",
+                    "method": "CalendarEventsController::allEventsByGroup",
+                    "class": "App\\Http\\Controllers\\CalendarEventsController",
+                    "file": "app/Http/Controllers/CalendarEventsController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Calendar/CalendarTest.php",
+                            "test": "testByGroup"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a Guest, I can subscribe to a network's events as an iCal feed",
+                    "persona": "Guest",
+                    "theme": "Calendar feeds",
+                    "method": "CalendarEventsController::allEventsByNetwork",
+                    "class": "App\\Http\\Controllers\\CalendarEventsController",
+                    "file": "app/Http/Controllers/CalendarEventsController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Calendar/CalendarTest.php",
+                            "test": "testByNetwork"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a Guest, I can see the devices logged at an event",
+                    "persona": "Guest",
+                    "theme": "Find & browse events",
+                    "method": "EventController::devicesv2",
+                    "class": "App\\Http\\Controllers\\API\\EventController",
+                    "file": "app/Http/Controllers/API/EventController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Guest, I can view event details via the API",
+                    "persona": "Guest",
+                    "theme": "Find & browse events",
+                    "method": "EventController::getEventv2",
+                    "class": "App\\Http\\Controllers\\API\\EventController",
+                    "file": "app/Http/Controllers/API/EventController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Events/APIv2EventTest.php",
+                            "test": "testGetEventsForGroup"
+                        },
+                        {
+                            "file": "tests/Feature/Events/APIv2EventTest.php",
+                            "test": "testGetEventsForUnapprovedGroup"
+                        },
+                        {
+                            "file": "tests/Feature/Events/APIv2EventTest.php",
+                            "test": "testMaxUpdatedAt"
+                        },
+                        {
+                            "file": "tests/Feature/Events/APIv2EventTest.php",
+                            "test": "testEmptyNetworkData"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a Guest, I can view confirmed volunteers for an event",
+                    "persona": "Guest",
+                    "theme": "Attendance & volunteers",
+                    "method": "EventController::listVolunteers",
+                    "class": "App\\Http\\Controllers\\API\\EventController",
+                    "file": "app/Http/Controllers/API/EventController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Events/AddRemoveVolunteerTest.php",
+                            "test": "testAddRemove"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a Guest, I can join an event using a shareable invite code",
+                    "persona": "Guest",
+                    "theme": "Invitations",
+                    "method": "PartyController::confirmCodeInvite",
+                    "class": "App\\Http\\Controllers\\PartyController",
+                    "file": "app/Http/Controllers/PartyController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Events/InviteEventTest.php",
+                            "test": "testInviteViaLink"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a Guest, I can view an event's repair impact statistics",
+                    "persona": "Guest",
+                    "theme": "Stats & data",
+                    "method": "PartyController::stats",
+                    "class": "App\\Http\\Controllers\\PartyController",
+                    "file": "app/Http/Controllers/PartyController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Stats/EventStatsTest.php",
+                            "test": "event_stats_with_both_powered_and_unpowered_devices"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a Guest, I can view a public event's details and repair statistics",
+                    "persona": "Guest",
+                    "theme": "Find & browse events",
+                    "method": "PartyController::view",
+                    "class": "App\\Http\\Controllers\\PartyController",
+                    "file": "app/Http/Controllers/PartyController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Events/AddRemoveVolunteerTest.php",
+                            "test": "testAddRemove"
+                        },
+                        {
+                            "file": "tests/Feature/Events/DeleteEventTest.php",
+                            "test": "view_edit_deleted_event"
+                        },
+                        {
+                            "file": "tests/Feature/Events/InviteEventTest.php",
+                            "test": "testInviteReal"
+                        },
+                        {
+                            "file": "tests/Feature/Events/InviteEventTest.php",
+                            "test": "testInvitableNotifications"
+                        },
+                        {
+                            "file": "tests/Feature/Events/JoinEventTest.php",
+                            "test": "testJoin"
+                        },
+                        {
+                            "file": "tests/Unit/CharsetTest.php",
+                            "test": "test_charset_db_insert"
+                        },
+                        {
+                            "file": "tests/Unit/Events/EventStateTest.php",
+                            "test": "testStatesOnViewPage"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a Host, I can delete my event",
+                    "persona": "Host",
+                    "theme": "Create & manage events",
+                    "method": "EventAttendanceController::deleteEventv2",
+                    "class": "App\\Http\\Controllers\\API\\EventAttendanceController",
+                    "file": "app/Http/Controllers/API/EventAttendanceController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Host, I can remove a photo from my event",
+                    "persona": "Host",
+                    "theme": "Create & manage events",
+                    "method": "EventAttendanceController::deleteImagev2",
+                    "class": "App\\Http\\Controllers\\API\\EventAttendanceController",
+                    "file": "app/Http/Controllers/API/EventAttendanceController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Host, I can remove a volunteer from my event",
+                    "persona": "Host",
+                    "theme": "Attendance & volunteers",
+                    "method": "EventAttendanceController::deleteVolunteerv2",
+                    "class": "App\\Http\\Controllers\\API\\EventAttendanceController",
+                    "file": "app/Http/Controllers/API/EventAttendanceController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Host, I can invite people to my event by email",
+                    "persona": "Host",
+                    "theme": "Invitations",
+                    "method": "EventAttendanceController::invitesv2",
+                    "class": "App\\Http\\Controllers\\API\\EventAttendanceController",
+                    "file": "app/Http/Controllers/API/EventAttendanceController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Host, I can make an event volunteer a host, or remove their host role",
+                    "persona": "Host",
+                    "theme": "Attendance & volunteers",
+                    "method": "EventAttendanceController::patchVolunteerv2",
+                    "class": "App\\Http\\Controllers\\API\\EventAttendanceController",
+                    "file": "app/Http/Controllers/API/EventAttendanceController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Host, I can ask attendees to review the repairs at my event",
+                    "persona": "Host",
+                    "theme": "Create & manage events",
+                    "method": "EventAttendanceController::requestReviewv2",
+                    "class": "App\\Http\\Controllers\\API\\EventAttendanceController",
+                    "file": "app/Http/Controllers/API/EventAttendanceController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Host, I can add photos to my event",
+                    "persona": "Host",
+                    "theme": "Create & manage events",
+                    "method": "EventAttendanceController::uploadImagev2",
+                    "class": "App\\Http\\Controllers\\API\\EventAttendanceController",
+                    "file": "app/Http/Controllers/API/EventAttendanceController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Host, I can add a volunteer to my event",
+                    "persona": "Host",
+                    "theme": "Attendance & volunteers",
+                    "method": "EventController::addVolunteer",
+                    "class": "App\\Http\\Controllers\\API\\EventController",
+                    "file": "app/Http/Controllers/API/EventController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Events/AddRemoveVolunteerTest.php",
+                            "test": "testAddRemove"
+                        },
+                        {
+                            "file": "tests/Feature/Events/CreateEventTest.php",
+                            "test": "a_host_can_be_added_later"
+                        },
+                        {
+                            "file": "tests/Feature/Events/CreateEventTest.php",
+                            "test": "an_invalid_email_is_trapped"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a Host, I can create an event via the API",
+                    "persona": "Host",
+                    "theme": "Create & manage events",
+                    "method": "EventController::createEventv2",
+                    "class": "App\\Http\\Controllers\\API\\EventController",
+                    "file": "app/Http/Controllers/API/EventController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Events/APIv2EventTest.php",
+                            "test": "testCreateLoggedOutUsingKey"
+                        },
+                        {
+                            "file": "tests/Feature/Events/APIv2EventTest.php",
+                            "test": "testCreateEventGeocodeFailure"
+                        },
+                        {
+                            "file": "tests/Feature/Events/APIv2EventTest.php",
+                            "test": "testCreateEventInvalidTimezone"
+                        },
+                        {
+                            "file": "tests/Feature/Events/CreateEventTest.php",
+                            "test": "emails_sent_when_created"
+                        },
+                        {
+                            "file": "tests/Feature/Events/CreateEventTest.php",
+                            "test": "emails_sent_to_restarters_when_upcoming_event_approved"
+                        },
+                        {
+                            "file": "tests/Feature/Events/CreateEventTest.php",
+                            "test": "emails_not_sent_to_volunteers_when_past_event_approved"
+                        },
+                        {
+                            "file": "tests/Feature/Events/CreateEventTest.php",
+                            "test": "emails_sent_to_coordinators_when_event_created"
+                        },
+                        {
+                            "file": "tests/Feature/Events/CreateEventTest.php",
+                            "test": "a_host_can_be_added_later"
+                        },
+                        {
+                            "file": "tests/Feature/Events/CreateEventTest.php",
+                            "test": "an_event_can_be_auto_approved"
+                        },
+                        {
+                            "file": "tests/Feature/Events/CreateEventTest.php",
+                            "test": "a_past_event_is_not_upcoming"
+                        },
+                        {
+                            "file": "tests/Feature/Events/CreateEventTest.php",
+                            "test": "a_future_event_is_upcoming"
+                        },
+                        {
+                            "file": "tests/Feature/Events/CreateEventTest.php",
+                            "test": "no_notification_after_leaving"
+                        },
+                        {
+                            "file": "tests/Feature/Events/CreateEventTest.php",
+                            "test": "notifications_are_queued_as_expected"
+                        },
+                        {
+                            "file": "tests/Feature/Events/CreateEventTest.php",
+                            "test": "network_coordinator_other_group"
+                        },
+                        {
+                            "file": "tests/Feature/Events/CreateEventTest.php",
+                            "test": "an_invalid_email_is_trapped"
+                        },
+                        {
+                            "file": "tests/Feature/Events/OnlineEventsTest.php",
+                            "test": "a_host_can_create_an_online_event"
+                        },
+                        {
+                            "file": "tests/Unit/Events/EventStateTest.php",
+                            "test": "testStatesOnViewPage"
+                        },
+                        {
+                            "file": "tests/Unit/Events/TimezoneTest.php",
+                            "test": "testOrder"
+                        },
+                        {
+                            "file": "tests/Unit/Events/TimezoneTest.php",
+                            "test": "testTimezoneChangeUpdatesFutureEvents"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a Host, I can update my event via the API",
+                    "persona": "Host",
+                    "theme": "Create & manage events",
+                    "method": "EventController::updateEventv2",
+                    "class": "App\\Http\\Controllers\\API\\EventController",
+                    "file": "app/Http/Controllers/API/EventController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Dashboard/BasicTest.php",
+                            "test": "testUpcomingEvents"
+                        },
+                        {
+                            "file": "tests/Feature/Events/APIv2EventTest.php",
+                            "test": "testEditForbidden"
+                        },
+                        {
+                            "file": "tests/Feature/Events/APIv2EventTest.php",
+                            "test": "testNetworkCoordinatorCanApprove"
+                        },
+                        {
+                            "file": "tests/Feature/Events/CreateEventTest.php",
+                            "test": "emails_sent_to_restarters_when_upcoming_event_approved"
+                        },
+                        {
+                            "file": "tests/Feature/Events/CreateEventTest.php",
+                            "test": "emails_not_sent_to_volunteers_when_past_event_approved"
+                        },
+                        {
+                            "file": "tests/Feature/Events/CreateEventTest.php",
+                            "test": "no_notification_after_leaving"
+                        },
+                        {
+                            "file": "tests/Feature/Events/InviteEventTest.php",
+                            "test": "testInviteReal"
+                        },
+                        {
+                            "file": "tests/Unit/Events/TimezoneTest.php",
+                            "test": "testOrder"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a Host, I can access the form to create a new event for my group",
+                    "persona": "Host",
+                    "theme": "Create & manage events",
+                    "method": "PartyController::create",
+                    "class": "App\\Http\\Controllers\\PartyController",
+                    "file": "app/Http/Controllers/PartyController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Events/CreateEventTest.php",
+                            "test": "network_coordinator_other_group"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a Host, I can delete an event from my group",
+                    "persona": "Host",
+                    "theme": "Create & manage events",
+                    "method": "PartyController::deleteEvent",
+                    "class": "App\\Http\\Controllers\\PartyController",
+                    "file": "app/Http/Controllers/PartyController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Events/DeleteEventTest.php",
+                            "test": "an_admin_can_delete_an_event"
+                        },
+                        {
+                            "file": "tests/Feature/Events/DeleteEventTest.php",
+                            "test": "view_edit_deleted_event"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a Host, I can duplicate an existing event to create a new one",
+                    "persona": "Host",
+                    "theme": "Create & manage events",
+                    "method": "PartyController::duplicate",
+                    "class": "App\\Http\\Controllers\\PartyController",
+                    "file": "app/Http/Controllers/PartyController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Host, I can edit my group's event details",
+                    "persona": "Host",
+                    "theme": "Create & manage events",
+                    "method": "PartyController::edit",
+                    "class": "App\\Http\\Controllers\\PartyController",
+                    "file": "app/Http/Controllers/PartyController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Events/CreateEventTest.php",
+                            "test": "network_coordinator_other_group"
+                        },
+                        {
+                            "file": "tests/Feature/Events/DeleteEventTest.php",
+                            "test": "view_edit_deleted_event"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a Host, I can request attendees log their repair contributions",
+                    "persona": "Host",
+                    "theme": "Devices & repairs",
+                    "method": "PartyController::getContributions",
+                    "class": "App\\Http\\Controllers\\PartyController",
+                    "file": "app/Http/Controllers/PartyController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Host, I can retrieve group member emails to invite them to an event",
+                    "persona": "Host",
+                    "theme": "Invitations",
+                    "method": "PartyController::getGroupEmailsWithNames",
+                    "class": "App\\Http\\Controllers\\PartyController",
+                    "file": "app/Http/Controllers/PartyController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Events/InviteEventTest.php",
+                            "test": "testInvitableNotifications"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a Host, I can send email invitations for an event",
+                    "persona": "Host",
+                    "theme": "Invitations",
+                    "method": "PartyController::postSendInvite",
+                    "class": "App\\Http\\Controllers\\PartyController",
+                    "file": "app/Http/Controllers/PartyController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Events/AddRemoveVolunteerTest.php",
+                            "test": "testAddRemove"
+                        },
+                        {
+                            "file": "tests/Feature/Events/InviteEventTest.php",
+                            "test": "testInvite"
+                        },
+                        {
+                            "file": "tests/Feature/Events/InviteEventTest.php",
+                            "test": "testInviteReal"
+                        },
+                        {
+                            "file": "tests/Feature/Events/InviteEventTest.php",
+                            "test": "testInvitableNotifications"
+                        },
+                        {
+                            "file": "tests/Feature/Events/InviteEventTest.php",
+                            "test": "testInviteNonUsers"
+                        },
+                        {
+                            "file": "tests/Feature/Events/InviteEventTest.php",
+                            "test": "testInviteNoUsers"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a Host, I can remove a volunteer from my event",
+                    "persona": "Host",
+                    "theme": "Attendance & volunteers",
+                    "method": "PartyController::removeVolunteer",
+                    "class": "App\\Http\\Controllers\\PartyController",
+                    "file": "app/Http/Controllers/PartyController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Events/AddRemoveVolunteerTest.php",
+                            "test": "testAddRemove"
+                        },
+                        {
+                            "file": "tests/Feature/Events/CreateEventTest.php",
+                            "test": "a_host_can_be_added_later"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a Host, I can update the participant count for my event",
+                    "persona": "Host",
+                    "theme": "Attendance & volunteers",
+                    "method": "PartyController::updateQuantity",
+                    "class": "App\\Http\\Controllers\\PartyController",
+                    "file": "app/Http/Controllers/PartyController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Events/AttendanceTest.php",
+                            "test": "testParticipants"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a Host, I can update the volunteer count for my event",
+                    "persona": "Host",
+                    "theme": "Attendance & volunteers",
+                    "method": "PartyController::updateVolunteerQuantity",
+                    "class": "App\\Http\\Controllers\\PartyController",
+                    "file": "app/Http/Controllers/PartyController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Events/AttendanceTest.php",
+                            "test": "testVolunteers"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a NetworkCoordinator, I can list events across my networks",
+                    "persona": "NetworkCoordinator",
+                    "theme": "Find & browse events",
+                    "method": "EventController::getEventsByUsersNetworks",
+                    "class": "App\\Http\\Controllers\\API\\EventController",
+                    "file": "app/Http/Controllers/API/EventController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Events/APIv2EventTest.php",
+                            "test": "testMaxUpdatedAt"
+                        },
+                        {
+                            "file": "tests/Feature/Networks/NetworkTest.php",
+                            "test": "admins_can_associate_group_to_network"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a NetworkCoordinator, I can view events pending moderation in my networks",
+                    "persona": "NetworkCoordinator",
+                    "theme": "Create & manage events",
+                    "method": "EventController::moderateEventsv2",
+                    "class": "App\\Http\\Controllers\\API\\EventController",
+                    "file": "app/Http/Controllers/API/EventController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Events/APIv2EventTest.php",
+                            "test": "testGetEventsForGroup"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a NetworkCoordinator, I can edit events for groups in my network",
+                    "persona": "NetworkCoordinator",
+                    "theme": "Create & manage events",
+                    "method": "PartyController::edit",
+                    "class": "App\\Http\\Controllers\\PartyController",
+                    "file": "app/Http/Controllers/PartyController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Events/CreateEventTest.php",
+                            "test": "network_coordinator_other_group"
+                        },
+                        {
+                            "file": "tests/Feature/Events/DeleteEventTest.php",
+                            "test": "view_edit_deleted_event"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a Restarter, I can subscribe to my events as an iCal feed",
+                    "persona": "Restarter",
+                    "theme": "Calendar feeds",
+                    "method": "CalendarEventsController::allEventsByUser",
+                    "class": "App\\Http\\Controllers\\CalendarEventsController",
+                    "file": "app/Http/Controllers/CalendarEventsController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Calendar/CalendarTest.php",
+                            "test": "testByUser"
+                        },
+                        {
+                            "file": "tests/Feature/Calendar/CalendarTest.php",
+                            "test": "testCancelled"
+                        },
+                        {
+                            "file": "tests/Feature/Calendar/CalendarTest.php",
+                            "test": "testEventNotApproved"
+                        },
+                        {
+                            "file": "tests/Feature/Calendar/CalendarTest.php",
+                            "test": "testGroupNotApproved"
+                        },
+                        {
+                            "file": "tests/Feature/Calendar/CalendarTest.php",
+                            "test": "testEventNotVisible"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a Restarter, I can cancel my RSVP or decline an invitation to an event",
+                    "persona": "Restarter",
+                    "theme": "Attendance & volunteers",
+                    "method": "EventAttendanceController::cancelRsvpv2",
+                    "class": "App\\Http\\Controllers\\API\\EventAttendanceController",
+                    "file": "app/Http/Controllers/API/EventAttendanceController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Restarter, I can RSVP to an event",
+                    "persona": "Restarter",
+                    "theme": "Attendance & volunteers",
+                    "method": "EventAttendanceController::rsvpv2",
+                    "class": "App\\Http\\Controllers\\API\\EventAttendanceController",
+                    "file": "app/Http/Controllers/API/EventAttendanceController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Restarter, I can see who is attending an event",
+                    "persona": "Restarter",
+                    "theme": "Attendance & volunteers",
+                    "method": "EventController::attendeesv2",
+                    "class": "App\\Http\\Controllers\\API\\EventController",
+                    "file": "app/Http/Controllers/API/EventController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Restarter, I can cancel my attendance at an event",
+                    "persona": "Restarter",
+                    "theme": "Invitations",
+                    "method": "PartyController::cancelInvite",
+                    "class": "App\\Http\\Controllers\\PartyController",
+                    "file": "app/Http/Controllers/PartyController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Events/JoinEventTest.php",
+                            "test": "testJoin"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a Restarter, I can accept an event invitation",
+                    "persona": "Restarter",
+                    "theme": "Invitations",
+                    "method": "PartyController::confirmInvite",
+                    "class": "App\\Http\\Controllers\\PartyController",
+                    "file": "app/Http/Controllers/PartyController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Events/InviteEventTest.php",
+                            "test": "testInviteReal"
+                        },
+                        {
+                            "file": "tests/Feature/Events/InviteEventTest.php",
+                            "test": "testInvitableNotifications"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a Restarter, I can delete my uploaded event photos",
+                    "persona": "Restarter",
+                    "theme": "Photos & media",
+                    "method": "PartyController::deleteImage",
+                    "class": "App\\Http\\Controllers\\PartyController",
+                    "file": "app/Http/Controllers/PartyController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Restarter, I can RSVP to attend an upcoming event",
+                    "persona": "Restarter",
+                    "theme": "Attendance & volunteers",
+                    "method": "PartyController::getJoinEvent",
+                    "class": "App\\Http\\Controllers\\PartyController",
+                    "file": "app/Http/Controllers/PartyController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Events/DeleteEventTest.php",
+                            "test": "an_admin_can_delete_an_event"
+                        },
+                        {
+                            "file": "tests/Feature/Events/JoinEventTest.php",
+                            "test": "testJoin"
+                        },
+                        {
+                            "file": "tests/Feature/Events/JoinEventTest.php",
+                            "test": "testJoinInvalid"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a Restarter, I can upload photos from an event",
+                    "persona": "Restarter",
+                    "theme": "Photos & media",
+                    "method": "PartyController::imageUpload",
+                    "class": "App\\Http\\Controllers\\PartyController",
+                    "file": "app/Http/Controllers/PartyController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Restarter, I can view upcoming events and events near me",
+                    "persona": "Restarter",
+                    "theme": "Find & browse events",
+                    "method": "PartyController::index",
+                    "class": "App\\Http\\Controllers\\PartyController",
+                    "file": "app/Http/Controllers/PartyController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Dashboard/BasicTest.php",
+                            "test": "testUpcomingEvents"
+                        },
+                        {
+                            "file": "tests/Feature/Events/InviteEventTest.php",
+                            "test": "testInviteReal"
+                        },
+                        {
+                            "file": "tests/Unit/Events/TimezoneTest.php",
+                            "test": "testOrder"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a ThirdParty holding the shared calendar secret, I can subscribe to every event on the platform as an iCal feed",
+                    "persona": "ThirdParty",
+                    "theme": "Calendar feeds",
+                    "method": "CalendarEventsController::allEvents",
+                    "class": "App\\Http\\Controllers\\CalendarEventsController",
+                    "file": "app/Http/Controllers/CalendarEventsController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a ThirdParty, I can retrieve event details to display on my platform",
+                    "persona": "ThirdParty",
+                    "theme": "Find & browse events",
+                    "method": "EventController::getEventv2",
+                    "class": "App\\Http\\Controllers\\API\\EventController",
+                    "file": "app/Http/Controllers/API/EventController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Events/APIv2EventTest.php",
+                            "test": "testGetEventsForGroup"
+                        },
+                        {
+                            "file": "tests/Feature/Events/APIv2EventTest.php",
+                            "test": "testGetEventsForUnapprovedGroup"
+                        },
+                        {
+                            "file": "tests/Feature/Events/APIv2EventTest.php",
+                            "test": "testMaxUpdatedAt"
+                        },
+                        {
+                            "file": "tests/Feature/Events/APIv2EventTest.php",
+                            "test": "testEmptyNetworkData"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a ThirdParty, I can retrieve volunteer data for an event via the API",
+                    "persona": "ThirdParty",
+                    "theme": "Attendance & volunteers",
+                    "method": "EventController::listVolunteers",
+                    "class": "App\\Http\\Controllers\\API\\EventController",
+                    "file": "app/Http/Controllers/API/EventController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Events/AddRemoveVolunteerTest.php",
+                            "test": "testAddRemove"
+                        }
+                    ]
+                }
+            ],
+            "storyCount": 47,
+            "personas": [
+                "Admin",
+                "Guest",
+                "Host",
+                "NetworkCoordinator",
+                "Restarter",
+                "ThirdParty"
+            ]
+        },
+        "Groups": {
+            "description": "Community repair group management and membership",
+            "sources": [
+                "app/Http/Controllers/API/GroupController.php",
+                "app/Http/Controllers/API/GroupMembershipController.php",
+                "app/Http/Controllers/API/UserGroupsController.php",
+                "app/Http/Controllers/GroupController.php"
+            ],
+            "stories": [
+                {
+                    "story": "As an Admin, I can view the audit trail of a group",
+                    "persona": "Admin",
+                    "theme": "Create & manage groups",
+                    "method": "GroupController::auditsv2",
+                    "class": "App\\Http\\Controllers\\API\\GroupController",
+                    "file": "app/Http/Controllers/API/GroupController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As an Admin, I can delete a group that has no device records",
+                    "persona": "Admin",
+                    "theme": "Create & manage groups",
+                    "method": "GroupController::delete",
+                    "class": "App\\Http\\Controllers\\GroupController",
+                    "file": "app/Http/Controllers/GroupController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As an Admin, I can list group audit changes for Zapier integration",
+                    "persona": "Admin",
+                    "theme": "Admin & integrations",
+                    "method": "GroupController::getGroupChanges",
+                    "class": "App\\Http\\Controllers\\API\\GroupController",
+                    "file": "app/Http/Controllers/API/GroupController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Zapier/ZapierNetworkTests.php",
+                            "test": "given_restart_network_when_new_group_created_included_in_trigger"
+                        },
+                        {
+                            "file": "tests/Feature/Zapier/ZapierNetworkTests.php",
+                            "test": "given_nonrestart_network_when_new_group_created_not_included_in_trigger"
+                        }
+                    ]
+                },
+                {
+                    "story": "As an Admin, I can view all groups pending moderation",
+                    "persona": "Admin",
+                    "theme": "Create & manage groups",
+                    "method": "GroupController::moderateGroupsv2",
+                    "class": "App\\Http\\Controllers\\API\\GroupController",
+                    "file": "app/Http/Controllers/API/GroupController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Groups/APIv2GroupTest.php",
+                            "test": "testGetGroup"
+                        },
+                        {
+                            "file": "tests/Feature/Groups/APIv2GroupTest.php",
+                            "test": "testNetworkCoordinatorApprove"
+                        }
+                    ]
+                },
+                {
+                    "story": "As an Admin, I can archive a group",
+                    "persona": "Admin",
+                    "theme": "Create & manage groups",
+                    "method": "GroupMembershipController::archivev2",
+                    "class": "App\\Http\\Controllers\\API\\GroupMembershipController",
+                    "file": "app/Http/Controllers/API/GroupMembershipController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As an Admin, I can permanently delete a group that has no events",
+                    "persona": "Admin",
+                    "theme": "Create & manage groups",
+                    "method": "GroupMembershipController::deletePermanentlyv2",
+                    "class": "App\\Http\\Controllers\\API\\GroupMembershipController",
+                    "file": "app/Http/Controllers/API/GroupMembershipController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As an Admin, I can list group membership changes for Zapier integration",
+                    "persona": "Admin",
+                    "theme": "Admin & integrations",
+                    "method": "UserGroupsController::changes",
+                    "class": "App\\Http\\Controllers\\API\\UserGroupsController",
+                    "file": "app/Http/Controllers/API/UserGroupsController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Zapier/ZapierNetworkTests.php",
+                            "test": "given_restart_group_and_restart_user_when_user_joins_group_then_included_in_trigger"
+                        },
+                        {
+                            "file": "tests/Feature/Zapier/ZapierNetworkTests.php",
+                            "test": "given_nonrestart_group_or_nonrestart_user_when_user_joins_group_then_not_included_in_trigger"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a Guest, I can join a group using a shareable invite code",
+                    "persona": "Guest",
+                    "theme": "Group invitations",
+                    "method": "GroupController::confirmCodeInvite",
+                    "class": "App\\Http\\Controllers\\GroupController",
+                    "file": "app/Http/Controllers/GroupController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Groups/InviteGroupTest.php",
+                            "test": "testInviteViaLink"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a Guest, I can list events for a group via the API",
+                    "persona": "Guest",
+                    "theme": "Events for group",
+                    "method": "GroupController::getEventsForGroupv2",
+                    "class": "App\\Http\\Controllers\\API\\GroupController",
+                    "file": "app/Http/Controllers/API/GroupController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Events/APIv2EventTest.php",
+                            "test": "testGetEventsForGroup"
+                        },
+                        {
+                            "file": "tests/Feature/Events/APIv2EventTest.php",
+                            "test": "testGetEventsForUnapprovedGroup"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a Guest, I can view group details via the API",
+                    "persona": "Guest",
+                    "theme": "Find & browse groups",
+                    "method": "GroupController::getGroupv2",
+                    "class": "App\\Http\\Controllers\\API\\GroupController",
+                    "file": "app/Http/Controllers/API/GroupController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Groups/APIv2GroupTest.php",
+                            "test": "testGetGroup"
+                        },
+                        {
+                            "file": "tests/Feature/Groups/APIv2GroupTest.php",
+                            "test": "testTags"
+                        },
+                        {
+                            "file": "tests/Feature/Groups/APIv2GroupTest.php",
+                            "test": "testLocales"
+                        },
+                        {
+                            "file": "tests/Feature/Groups/APIv2GroupTest.php",
+                            "test": "testEmptyNetworkData"
+                        },
+                        {
+                            "file": "tests/Feature/Groups/APIv2GroupTest.php",
+                            "test": "testNetworkDataUpdatedAt"
+                        },
+                        {
+                            "file": "tests/Feature/Groups/APIv2GroupTest.php",
+                            "test": "testArchived"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a Guest, I can view a group's volunteers via the API",
+                    "persona": "Guest",
+                    "theme": "Manage volunteers",
+                    "method": "GroupController::getVolunteersForGroupv2",
+                    "class": "App\\Http\\Controllers\\API\\GroupController",
+                    "file": "app/Http/Controllers/API/GroupController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Events/CreateEventTest.php",
+                            "test": "a_host_can_be_added_later"
+                        },
+                        {
+                            "file": "tests/Feature/Groups/GroupHostTest.php",
+                            "test": "testMakeHost"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a Guest, I can get a list of group names via the API",
+                    "persona": "Guest",
+                    "theme": "Find & browse groups",
+                    "method": "GroupController::listNamesv2",
+                    "class": "App\\Http\\Controllers\\API\\GroupController",
+                    "file": "app/Http/Controllers/API/GroupController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Groups/APIv2GroupTest.php",
+                            "test": "testCreateGroupLoggedOutWithToken"
+                        },
+                        {
+                            "file": "tests/Feature/Groups/APIv2GroupTest.php",
+                            "test": "testArchived"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a Guest, I can list summaries of groups (optionally only chosen ids) via the API",
+                    "persona": "Guest",
+                    "theme": "Browse groups",
+                    "method": "GroupController::listSummaryv2",
+                    "class": "App\\Http\\Controllers\\API\\GroupController",
+                    "file": "app/Http/Controllers/API/GroupController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Guest, I can get a list of group tags via the API",
+                    "persona": "Guest",
+                    "theme": "Find & browse groups",
+                    "method": "GroupController::listTagsv2",
+                    "class": "App\\Http\\Controllers\\API\\GroupController",
+                    "file": "app/Http/Controllers/API/GroupController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Groups/APIv2GroupTest.php",
+                            "test": "testTags"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a Guest, I can view a group's repair impact statistics",
+                    "persona": "Guest",
+                    "theme": "Stats & data",
+                    "method": "GroupController::stats",
+                    "class": "App\\Http\\Controllers\\GroupController",
+                    "file": "app/Http/Controllers/GroupController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Stats/GroupStatsTest.php",
+                            "test": "a_group_with_one_past_event_has_stats_for_that_event"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a Guest, I can see the impact statistics for a group",
+                    "persona": "Guest",
+                    "theme": "Find & browse groups",
+                    "method": "GroupMembershipController::statsv2",
+                    "class": "App\\Http\\Controllers\\API\\GroupMembershipController",
+                    "file": "app/Http/Controllers/API/GroupMembershipController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Host, I can remove my group's image",
+                    "persona": "Host",
+                    "theme": "Photos & branding",
+                    "method": "GroupController::ajaxDeleteImage",
+                    "class": "App\\Http\\Controllers\\GroupController",
+                    "file": "app/Http/Controllers/GroupController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Host, I can remove a volunteer from my group",
+                    "persona": "Host",
+                    "theme": "Manage volunteers",
+                    "method": "GroupController::deleteVolunteerForGroupv2",
+                    "class": "App\\Http\\Controllers\\API\\GroupController",
+                    "file": "app/Http/Controllers/API/GroupController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Events/CreateEventTest.php",
+                            "test": "no_notification_after_leaving"
+                        },
+                        {
+                            "file": "tests/Feature/Groups/GroupHostTest.php",
+                            "test": "testMakeHost"
+                        },
+                        {
+                            "file": "tests/Feature/Groups/GroupHostTest.php",
+                            "test": "testHostMakeHost"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a Host, I can edit my group's details and settings",
+                    "persona": "Host",
+                    "theme": "Create & manage groups",
+                    "method": "GroupController::edit",
+                    "class": "App\\Http\\Controllers\\GroupController",
+                    "file": "app/Http/Controllers/GroupController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Groups/GroupEditTest.php",
+                            "test": "group_tags_retained_after_edited_by_host"
+                        },
+                        {
+                            "file": "tests/Feature/Groups/GroupEditTest.php",
+                            "test": "testEditGroupAsRestarter"
+                        },
+                        {
+                            "file": "tests/Feature/Groups/GroupEditTest.php",
+                            "test": "edit_email"
+                        },
+                        {
+                            "file": "tests/Feature/Groups/GroupEditTest.php",
+                            "test": "testEditAsNetworkCoordinator"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a Host, I can upload an image for my group",
+                    "persona": "Host",
+                    "theme": "Photos & branding",
+                    "method": "GroupController::imageUpload",
+                    "class": "App\\Http\\Controllers\\GroupController",
+                    "file": "app/Http/Controllers/GroupController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Host, I can change a volunteer's role in my group",
+                    "persona": "Host",
+                    "theme": "Manage volunteers",
+                    "method": "GroupController::patchVolunteerForGroupv2",
+                    "class": "App\\Http\\Controllers\\API\\GroupController",
+                    "file": "app/Http/Controllers/API/GroupController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Groups/GroupHostTest.php",
+                            "test": "testMakeHost"
+                        },
+                        {
+                            "file": "tests/Feature/Groups/GroupHostTest.php",
+                            "test": "testHostMakeHost"
+                        },
+                        {
+                            "file": "tests/Feature/Groups/GroupHostTest.php",
+                            "test": "testNetworkCoordinatorDemoteHost"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a Host, I can send email invitations to join my group",
+                    "persona": "Host",
+                    "theme": "Group invitations",
+                    "method": "GroupController::postSendInvite",
+                    "class": "App\\Http\\Controllers\\GroupController",
+                    "file": "app/Http/Controllers/GroupController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Groups/InviteGroupTest.php",
+                            "test": "testInvite"
+                        },
+                        {
+                            "file": "tests/Feature/Groups/InviteGroupTest.php",
+                            "test": "testInviteInvalidEmail"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a Host, I can update my group via the API",
+                    "persona": "Host",
+                    "theme": "Create & manage groups",
+                    "method": "GroupController::updateGroupv2",
+                    "class": "App\\Http\\Controllers\\API\\GroupController",
+                    "file": "app/Http/Controllers/API/GroupController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Groups/APIv2GroupTest.php",
+                            "test": "testNetworkDataUpdatedAt"
+                        },
+                        {
+                            "file": "tests/Feature/Groups/APIv2GroupTest.php",
+                            "test": "testArchived"
+                        },
+                        {
+                            "file": "tests/Feature/Groups/GroupCreateTest.php",
+                            "test": "testApprove"
+                        },
+                        {
+                            "file": "tests/Feature/Groups/GroupEditTest.php",
+                            "test": "group_tags_retained_after_edited_by_host"
+                        },
+                        {
+                            "file": "tests/Feature/Groups/GroupEditTest.php",
+                            "test": "invalid_location"
+                        },
+                        {
+                            "file": "tests/Feature/Groups/GroupEditTest.php",
+                            "test": "host_can_edit_postcode_but_not_area"
+                        },
+                        {
+                            "file": "tests/Feature/Groups/GroupEditTest.php",
+                            "test": "edit_email"
+                        },
+                        {
+                            "file": "tests/Feature/Users/GroupsNearbyTest.php",
+                            "test": "testNotification"
+                        },
+                        {
+                            "file": "tests/Unit/Events/TimezoneTest.php",
+                            "test": "testTimezoneChangeUpdatesFutureEvents"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a Host, I can remove an image from my group",
+                    "persona": "Host",
+                    "theme": "Create & manage groups",
+                    "method": "GroupMembershipController::deleteImagev2",
+                    "class": "App\\Http\\Controllers\\API\\GroupMembershipController",
+                    "file": "app/Http/Controllers/API/GroupMembershipController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Host, I can invite people to my group by email",
+                    "persona": "Host",
+                    "theme": "Group invitations",
+                    "method": "GroupMembershipController::invitesv2",
+                    "class": "App\\Http\\Controllers\\API\\GroupMembershipController",
+                    "file": "app/Http/Controllers/API/GroupMembershipController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Host, I can add an image to my group",
+                    "persona": "Host",
+                    "theme": "Create & manage groups",
+                    "method": "GroupMembershipController::uploadImagev2",
+                    "class": "App\\Http\\Controllers\\API\\GroupMembershipController",
+                    "file": "app/Http/Controllers/API/GroupMembershipController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a NetworkCoordinator, I can list all groups in my networks via the API",
+                    "persona": "NetworkCoordinator",
+                    "theme": "Network membership",
+                    "method": "GroupController::getGroupsByUsersNetworks",
+                    "class": "App\\Http\\Controllers\\API\\GroupController",
+                    "file": "app/Http/Controllers/API/GroupController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Groups/APIv2GroupTest.php",
+                            "test": "testNetworkDataUpdatedAt"
+                        },
+                        {
+                            "file": "tests/Feature/Networks/NetworkTest.php",
+                            "test": "admins_can_associate_group_to_network"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a NetworkCoordinator, I can view groups pending moderation in my networks",
+                    "persona": "NetworkCoordinator",
+                    "theme": "Create & manage groups",
+                    "method": "GroupController::moderateGroupsv2",
+                    "class": "App\\Http\\Controllers\\API\\GroupController",
+                    "file": "app/Http/Controllers/API/GroupController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Groups/APIv2GroupTest.php",
+                            "test": "testGetGroup"
+                        },
+                        {
+                            "file": "tests/Feature/Groups/APIv2GroupTest.php",
+                            "test": "testNetworkCoordinatorApprove"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a Restarter, I can browse all repair groups on the platform",
+                    "persona": "Restarter",
+                    "theme": "Find & browse groups",
+                    "method": "GroupController::all",
+                    "class": "App\\Http\\Controllers\\GroupController",
+                    "file": "app/Http/Controllers/GroupController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Restarter, I can accept a group invitation",
+                    "persona": "Restarter",
+                    "theme": "Group invitations",
+                    "method": "GroupController::confirmInvite",
+                    "class": "App\\Http\\Controllers\\GroupController",
+                    "file": "app/Http/Controllers/GroupController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Groups/InviteGroupTest.php",
+                            "test": "testInvite"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a Restarter, I can create a new repair group and become its Host",
+                    "persona": "Restarter",
+                    "theme": "Create & manage groups",
+                    "method": "GroupController::create",
+                    "class": "App\\Http\\Controllers\\GroupController",
+                    "file": "app/Http/Controllers/GroupController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Groups/GroupCreateTest.php",
+                            "test": "testCreate"
+                        },
+                        {
+                            "file": "tests/Feature/Groups/GroupCreateTest.php",
+                            "test": "testCreateGroupAsRestarter"
+                        },
+                        {
+                            "file": "tests/Feature/Groups/GroupCreateTest.php",
+                            "test": "testCreateBadLocation"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a Restarter, I can create a new group via the API",
+                    "persona": "Restarter",
+                    "theme": "Create & manage groups",
+                    "method": "GroupController::createGroupv2",
+                    "class": "App\\Http\\Controllers\\API\\GroupController",
+                    "file": "app/Http/Controllers/API/GroupController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Events/APIv2EventTest.php",
+                            "test": "testCreateLoggedOutUsingKey"
+                        },
+                        {
+                            "file": "tests/Feature/Groups/APIv2GroupTest.php",
+                            "test": "testCreateGroupLoggedOut"
+                        },
+                        {
+                            "file": "tests/Feature/Groups/APIv2GroupTest.php",
+                            "test": "testCreateGroupLoggedInWithoutToken"
+                        },
+                        {
+                            "file": "tests/Feature/Groups/APIv2GroupTest.php",
+                            "test": "testCreateGroupLoggedOutWithToken"
+                        },
+                        {
+                            "file": "tests/Feature/Groups/APIv2GroupTest.php",
+                            "test": "testCreateGroupGeocodeFailure"
+                        },
+                        {
+                            "file": "tests/Feature/Groups/APIv2GroupTest.php",
+                            "test": "testCreateGroupInvalidTimezone"
+                        },
+                        {
+                            "file": "tests/Feature/Groups/APIv2GroupTest.php",
+                            "test": "testCreateGroupDuplicate"
+                        },
+                        {
+                            "file": "tests/Feature/Groups/APIv2GroupTest.php",
+                            "test": "testOutdated"
+                        },
+                        {
+                            "file": "tests/Feature/Groups/APIv2GroupTest.php",
+                            "test": "testEmptyNetworkData"
+                        },
+                        {
+                            "file": "tests/Feature/Groups/APIv2GroupTest.php",
+                            "test": "testNetworkDataUpdatedAt"
+                        },
+                        {
+                            "file": "tests/Feature/Groups/GroupNetworkCreateTest.php",
+                            "test": "given_specific_domain_when_group_created_then_it_is_created_as_part_of_corresponding_network"
+                        },
+                        {
+                            "file": "tests/Feature/Zapier/ZapierNetworkTests.php",
+                            "test": "given_restart_network_when_new_group_created_included_in_trigger"
+                        },
+                        {
+                            "file": "tests/Feature/Zapier/ZapierNetworkTests.php",
+                            "test": "given_nonrestart_network_when_new_group_created_not_included_in_trigger"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a Restarter, I can list all groups via the API",
+                    "persona": "Restarter",
+                    "theme": "Find & browse groups",
+                    "method": "GroupController::getGroupList",
+                    "class": "App\\Http\\Controllers\\API\\GroupController",
+                    "file": "app/Http/Controllers/API/GroupController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Groups/GroupCreateTest.php",
+                            "test": "testCreate"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a Restarter, I can join a repair group",
+                    "persona": "Restarter",
+                    "theme": "Manage volunteers",
+                    "method": "GroupController::getJoinGroup",
+                    "class": "App\\Http\\Controllers\\GroupController",
+                    "file": "app/Http/Controllers/GroupController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Groups/GroupJoinTest.php",
+                            "test": "testJoin"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a Restarter, I can view the groups I belong to",
+                    "persona": "Restarter",
+                    "theme": "Find & browse groups",
+                    "method": "GroupController::mine",
+                    "class": "App\\Http\\Controllers\\GroupController",
+                    "file": "app/Http/Controllers/GroupController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Restarter, I can discover repair groups near my location",
+                    "persona": "Restarter",
+                    "theme": "Find & browse groups",
+                    "method": "GroupController::nearby",
+                    "class": "App\\Http\\Controllers\\GroupController",
+                    "file": "app/Http/Controllers/GroupController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Restarter, I can browse groups within a specific network",
+                    "persona": "Restarter",
+                    "theme": "Find & browse groups",
+                    "method": "GroupController::network",
+                    "class": "App\\Http\\Controllers\\GroupController",
+                    "file": "app/Http/Controllers/GroupController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Networks/NetworkTest.php",
+                            "test": "network_page"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a Restarter, I can view a group's details, events, and members",
+                    "persona": "Restarter",
+                    "theme": "Find & browse groups",
+                    "method": "GroupController::view",
+                    "class": "App\\Http\\Controllers\\GroupController",
+                    "file": "app/Http/Controllers/GroupController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Groups/GroupViewTest.php",
+                            "test": "testBasic"
+                        },
+                        {
+                            "file": "tests/Feature/Groups/GroupViewTest.php",
+                            "test": "testCanDelete"
+                        },
+                        {
+                            "file": "tests/Feature/Groups/GroupViewTest.php",
+                            "test": "testInProgressVisible"
+                        },
+                        {
+                            "file": "tests/Feature/Groups/InviteGroupTest.php",
+                            "test": "testInvite"
+                        },
+                        {
+                            "file": "tests/Feature/Groups/InviteGroupTest.php",
+                            "test": "testInviteViaLink"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a Restarter, I can join a group",
+                    "persona": "Restarter",
+                    "theme": "Group membership",
+                    "method": "GroupMembershipController::joinv2",
+                    "class": "App\\Http\\Controllers\\API\\GroupMembershipController",
+                    "file": "app/Http/Controllers/API/GroupMembershipController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Restarter, I can leave a group",
+                    "persona": "Restarter",
+                    "theme": "Group membership",
+                    "method": "GroupMembershipController::leavev2",
+                    "class": "App\\Http\\Controllers\\API\\GroupMembershipController",
+                    "file": "app/Http/Controllers/API/GroupMembershipController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Restarter, I can find groups near my location",
+                    "persona": "Restarter",
+                    "theme": "Find & browse groups",
+                    "method": "GroupMembershipController::nearbyv2",
+                    "class": "App\\Http\\Controllers\\API\\GroupMembershipController",
+                    "file": "app/Http/Controllers/API/GroupMembershipController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Restarter, I can leave a group I belong to",
+                    "persona": "Restarter",
+                    "theme": "Manage volunteers",
+                    "method": "UserGroupsController::leave",
+                    "class": "App\\Http\\Controllers\\API\\UserGroupsController",
+                    "file": "app/Http/Controllers/API/UserGroupsController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Events/AddRemoveVolunteerTest.php",
+                            "test": "testAdminRemoveReaddHost"
+                        },
+                        {
+                            "file": "tests/Feature/Groups/GroupJoinTest.php",
+                            "test": "testJoin"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a ThirdParty, I can retrieve events for a group to display on my platform",
+                    "persona": "ThirdParty",
+                    "theme": "Events for group",
+                    "method": "GroupController::getEventsForGroupv2",
+                    "class": "App\\Http\\Controllers\\API\\GroupController",
+                    "file": "app/Http/Controllers/API/GroupController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Events/APIv2EventTest.php",
+                            "test": "testGetEventsForGroup"
+                        },
+                        {
+                            "file": "tests/Feature/Events/APIv2EventTest.php",
+                            "test": "testGetEventsForUnapprovedGroup"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a ThirdParty, I can retrieve group details to display on my platform",
+                    "persona": "ThirdParty",
+                    "theme": "Find & browse groups",
+                    "method": "GroupController::getGroupv2",
+                    "class": "App\\Http\\Controllers\\API\\GroupController",
+                    "file": "app/Http/Controllers/API/GroupController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Groups/APIv2GroupTest.php",
+                            "test": "testGetGroup"
+                        },
+                        {
+                            "file": "tests/Feature/Groups/APIv2GroupTest.php",
+                            "test": "testTags"
+                        },
+                        {
+                            "file": "tests/Feature/Groups/APIv2GroupTest.php",
+                            "test": "testLocales"
+                        },
+                        {
+                            "file": "tests/Feature/Groups/APIv2GroupTest.php",
+                            "test": "testEmptyNetworkData"
+                        },
+                        {
+                            "file": "tests/Feature/Groups/APIv2GroupTest.php",
+                            "test": "testNetworkDataUpdatedAt"
+                        },
+                        {
+                            "file": "tests/Feature/Groups/APIv2GroupTest.php",
+                            "test": "testArchived"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a ThirdParty, I can retrieve volunteer data for a group via the API",
+                    "persona": "ThirdParty",
+                    "theme": "Manage volunteers",
+                    "method": "GroupController::getVolunteersForGroupv2",
+                    "class": "App\\Http\\Controllers\\API\\GroupController",
+                    "file": "app/Http/Controllers/API/GroupController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Events/CreateEventTest.php",
+                            "test": "a_host_can_be_added_later"
+                        },
+                        {
+                            "file": "tests/Feature/Groups/GroupHostTest.php",
+                            "test": "testMakeHost"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a ThirdParty, I can retrieve group names to display on my own platform",
+                    "persona": "ThirdParty",
+                    "theme": "Find & browse groups",
+                    "method": "GroupController::listNamesv2",
+                    "class": "App\\Http\\Controllers\\API\\GroupController",
+                    "file": "app/Http/Controllers/API/GroupController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Groups/APIv2GroupTest.php",
+                            "test": "testCreateGroupLoggedOutWithToken"
+                        },
+                        {
+                            "file": "tests/Feature/Groups/APIv2GroupTest.php",
+                            "test": "testArchived"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a ThirdParty, I can retrieve group summaries to display on my platform",
+                    "persona": "ThirdParty",
+                    "theme": "Browse groups",
+                    "method": "GroupController::listSummaryv2",
+                    "class": "App\\Http\\Controllers\\API\\GroupController",
+                    "file": "app/Http/Controllers/API/GroupController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a ThirdParty, I can retrieve group tags to categorise groups on my platform",
+                    "persona": "ThirdParty",
+                    "theme": "Find & browse groups",
+                    "method": "GroupController::listTagsv2",
+                    "class": "App\\Http\\Controllers\\API\\GroupController",
+                    "file": "app/Http/Controllers/API/GroupController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Groups/APIv2GroupTest.php",
+                            "test": "testTags"
+                        }
+                    ]
+                }
+            ],
+            "storyCount": 48,
+            "personas": [
+                "Admin",
+                "Guest",
+                "Host",
+                "NetworkCoordinator",
+                "Restarter",
+                "ThirdParty"
+            ]
+        },
+        "Networks": {
+            "description": "Regional network management and coordination",
+            "sources": [
+                "app/Http/Controllers/API/NetworkController.php"
+            ],
+            "stories": [
+                {
+                    "story": "As an Admin, I can create a group tag for any network via the API",
+                    "persona": "Admin",
+                    "theme": "Network tags",
+                    "method": "NetworkController::createNetworkTagv2",
+                    "class": "App\\Http\\Controllers\\API\\NetworkController",
+                    "file": "app/Http/Controllers/API/NetworkController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As an Admin, I can delete a group tag belonging to any network via the API",
+                    "persona": "Admin",
+                    "theme": "Network tags",
+                    "method": "NetworkController::deleteNetworkTagv2",
+                    "class": "App\\Http\\Controllers\\API\\NetworkController",
+                    "file": "app/Http/Controllers/API/NetworkController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As an Admin, I can edit a group tag belonging to any network via the API",
+                    "persona": "Admin",
+                    "theme": "Network tags",
+                    "method": "NetworkController::updateNetworkTagv2",
+                    "class": "App\\Http\\Controllers\\API\\NetworkController",
+                    "file": "app/Http/Controllers/API/NetworkController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Guest, I can list events for a network via the API",
+                    "persona": "Guest",
+                    "theme": "Network groups & events",
+                    "method": "NetworkController::getNetworkEventsv2",
+                    "class": "App\\Http\\Controllers\\API\\NetworkController",
+                    "file": "app/Http/Controllers/API/NetworkController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Events/APIv2EventTest.php",
+                            "test": "testGetEventsForUnapprovedGroup"
+                        },
+                        {
+                            "file": "tests/Feature/Networks/APIv2NetworkTest.php",
+                            "test": "testListEvents"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a Guest, I can list groups for a network via the API",
+                    "persona": "Guest",
+                    "theme": "Network groups & events",
+                    "method": "NetworkController::getNetworkGroupsv2",
+                    "class": "App\\Http\\Controllers\\API\\NetworkController",
+                    "file": "app/Http/Controllers/API/NetworkController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Guest, I can view a network's impact statistics via the API, optionally for one group tag",
+                    "persona": "Guest",
+                    "theme": "Network stats",
+                    "method": "NetworkController::getNetworkStatsv2",
+                    "class": "App\\Http\\Controllers\\API\\NetworkController",
+                    "file": "app/Http/Controllers/API/NetworkController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Guest, I can list a network's group tags via the API",
+                    "persona": "Guest",
+                    "theme": "Network tags",
+                    "method": "NetworkController::getNetworkTagsv2",
+                    "class": "App\\Http\\Controllers\\API\\NetworkController",
+                    "file": "app/Http/Controllers/API/NetworkController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Guest, I can list all networks via the API",
+                    "persona": "Guest",
+                    "theme": "Browse networks",
+                    "method": "NetworkController::getNetworksv2",
+                    "class": "App\\Http\\Controllers\\API\\NetworkController",
+                    "file": "app/Http/Controllers/API/NetworkController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Networks/APIv2NetworkTest.php",
+                            "test": "testList"
+                        },
+                        {
+                            "file": "tests/Feature/Networks/NetworkTest.php",
+                            "test": "network_page"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a Guest, I can view network details via the API",
+                    "persona": "Guest",
+                    "theme": "Browse networks",
+                    "method": "NetworkController::getNetworkv2",
+                    "class": "App\\Http\\Controllers\\API\\NetworkController",
+                    "file": "app/Http/Controllers/API/NetworkController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Networks/NetworkTest.php",
+                            "test": "network_page"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a NetworkCoordinator, I can add groups to my network",
+                    "persona": "NetworkCoordinator",
+                    "theme": "Network management",
+                    "method": "NetworkController::associateGroupsv2",
+                    "class": "App\\Http\\Controllers\\API\\NetworkController",
+                    "file": "app/Http/Controllers/API/NetworkController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Networks/NetworkTest.php",
+                            "test": "admins_can_associate_group_to_network"
+                        },
+                        {
+                            "file": "tests/Feature/Networks/NetworkTest.php",
+                            "test": "network_page"
+                        },
+                        {
+                            "file": "tests/Feature/Networks/NetworkTest.php",
+                            "test": "admins_can_edit"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a NetworkCoordinator, I can create a group tag for my network via the API",
+                    "persona": "NetworkCoordinator",
+                    "theme": "Network tags",
+                    "method": "NetworkController::createNetworkTagv2",
+                    "class": "App\\Http\\Controllers\\API\\NetworkController",
+                    "file": "app/Http/Controllers/API/NetworkController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a NetworkCoordinator, I can delete a group tag belonging to my network via the API",
+                    "persona": "NetworkCoordinator",
+                    "theme": "Network tags",
+                    "method": "NetworkController::deleteNetworkTagv2",
+                    "class": "App\\Http\\Controllers\\API\\NetworkController",
+                    "file": "app/Http/Controllers/API/NetworkController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a NetworkCoordinator, I can view my network's statistics via the API",
+                    "persona": "NetworkCoordinator",
+                    "theme": "Network stats",
+                    "method": "NetworkController::stats",
+                    "class": "App\\Http\\Controllers\\API\\NetworkController",
+                    "file": "app/Http/Controllers/API/NetworkController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Networks/NetworkTest.php",
+                            "test": "network_stats_can_be_queried"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a NetworkCoordinator, I can edit a group tag belonging to my network via the API",
+                    "persona": "NetworkCoordinator",
+                    "theme": "Network tags",
+                    "method": "NetworkController::updateNetworkTagv2",
+                    "class": "App\\Http\\Controllers\\API\\NetworkController",
+                    "file": "app/Http/Controllers/API/NetworkController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a NetworkCoordinator, I can edit my network's settings",
+                    "persona": "NetworkCoordinator",
+                    "theme": "Network management",
+                    "method": "NetworkController::updateNetworkv2",
+                    "class": "App\\Http\\Controllers\\API\\NetworkController",
+                    "file": "app/Http/Controllers/API/NetworkController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Networks/NetworkTest.php",
+                            "test": "admins_can_edit"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a NetworkCoordinator, I can upload a logo for my network",
+                    "persona": "NetworkCoordinator",
+                    "theme": "Network management",
+                    "method": "NetworkController::uploadLogov2",
+                    "class": "App\\Http\\Controllers\\API\\NetworkController",
+                    "file": "app/Http/Controllers/API/NetworkController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a ThirdParty, I can retrieve events for a network to display on my platform",
+                    "persona": "ThirdParty",
+                    "theme": "Network groups & events",
+                    "method": "NetworkController::getNetworkEventsv2",
+                    "class": "App\\Http\\Controllers\\API\\NetworkController",
+                    "file": "app/Http/Controllers/API/NetworkController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Events/APIv2EventTest.php",
+                            "test": "testGetEventsForUnapprovedGroup"
+                        },
+                        {
+                            "file": "tests/Feature/Networks/APIv2NetworkTest.php",
+                            "test": "testListEvents"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a ThirdParty, I can retrieve groups for a network to display on my platform",
+                    "persona": "ThirdParty",
+                    "theme": "Network groups & events",
+                    "method": "NetworkController::getNetworkGroupsv2",
+                    "class": "App\\Http\\Controllers\\API\\NetworkController",
+                    "file": "app/Http/Controllers/API/NetworkController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a ThirdParty, I can retrieve a network's impact statistics to display on my platform",
+                    "persona": "ThirdParty",
+                    "theme": "Network stats",
+                    "method": "NetworkController::getNetworkStatsv2",
+                    "class": "App\\Http\\Controllers\\API\\NetworkController",
+                    "file": "app/Http/Controllers/API/NetworkController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a ThirdParty, I can retrieve a network's group tags to display on my platform",
+                    "persona": "ThirdParty",
+                    "theme": "Network tags",
+                    "method": "NetworkController::getNetworkTagsv2",
+                    "class": "App\\Http\\Controllers\\API\\NetworkController",
+                    "file": "app/Http/Controllers/API/NetworkController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a ThirdParty, I can retrieve all networks to display on my platform",
+                    "persona": "ThirdParty",
+                    "theme": "Browse networks",
+                    "method": "NetworkController::getNetworksv2",
+                    "class": "App\\Http\\Controllers\\API\\NetworkController",
+                    "file": "app/Http/Controllers/API/NetworkController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Networks/APIv2NetworkTest.php",
+                            "test": "testList"
+                        },
+                        {
+                            "file": "tests/Feature/Networks/NetworkTest.php",
+                            "test": "network_page"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a ThirdParty, I can retrieve network details via the API",
+                    "persona": "ThirdParty",
+                    "theme": "Browse networks",
+                    "method": "NetworkController::getNetworkv2",
+                    "class": "App\\Http\\Controllers\\API\\NetworkController",
+                    "file": "app/Http/Controllers/API/NetworkController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Networks/NetworkTest.php",
+                            "test": "network_page"
+                        }
+                    ]
+                }
+            ],
+            "storyCount": 22,
+            "personas": [
+                "Admin",
+                "Guest",
+                "NetworkCoordinator",
+                "ThirdParty"
+            ]
+        },
+        "Platform": {
+            "description": "Platform-wide statistics and public impact data",
+            "sources": [
+                "app/Http/Controllers/API/DiscourseController.php",
+                "app/Http/Controllers/API/RepairController.php",
+                "app/Http/Controllers/AdminController.php",
+                "app/Http/Controllers/ApiController.php",
+                "app/Http/Controllers/ExportController.php",
+                "app/Http/Controllers/HomeController.php",
+                "app/Http/Controllers/InformationAlertCookieController.php",
+                "app/Http/Controllers/LocaleController.php",
+                "app/Http/Controllers/OutboundController.php"
+            ],
+            "stories": [
+                {
+                    "story": "As an Admin, I can retrieve a list of all users via the API",
+                    "persona": "Admin",
+                    "theme": "Platform impact stats",
+                    "method": "ApiController::getUserList",
+                    "class": "App\\Http\\Controllers\\ApiController",
+                    "file": "app/Http/Controllers/ApiController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Users/ProfileTest.php",
+                            "test": "testAPI"
+                        }
+                    ]
+                },
+                {
+                    "story": "As an Admin, I can export approved repair records in the Open Repair Data Standard format as JSON or CSV",
+                    "persona": "Admin",
+                    "theme": "Data exports",
+                    "method": "RepairController::listRepairsv2",
+                    "class": "App\\Http\\Controllers\\API\\RepairController",
+                    "file": "app/Http/Controllers/API/RepairController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Guest, I can view the platform's global repair impact statistics",
+                    "persona": "Guest",
+                    "theme": "Landing page",
+                    "method": "AdminController::stats",
+                    "class": "App\\Http\\Controllers\\AdminController",
+                    "file": "app/Http/Controllers/AdminController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Stats/EventStatsTest.php",
+                            "test": "event_stats_with_both_powered_and_unpowered_devices"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a Guest, I can search and filter device records via the API",
+                    "persona": "Guest",
+                    "theme": "Data exports",
+                    "method": "ApiController::getDevices",
+                    "class": "App\\Http\\Controllers\\ApiController",
+                    "file": "app/Http/Controllers/ApiController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Groups/GroupViewTest.php",
+                            "test": "testCanDelete"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a Guest, I can view repair statistics for a specific group",
+                    "persona": "Guest",
+                    "theme": "Platform impact stats",
+                    "method": "ApiController::groupStats",
+                    "class": "App\\Http\\Controllers\\ApiController",
+                    "file": "app/Http/Controllers/ApiController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Events/DeleteEventTest.php",
+                            "test": "an_admin_can_delete_an_event"
+                        },
+                        {
+                            "file": "tests/Feature/Stats/GroupStatsTest.php",
+                            "test": "get_of_stats_after_deletion"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a Guest, I can view aggregate platform impact statistics",
+                    "persona": "Guest",
+                    "theme": "Platform impact stats",
+                    "method": "ApiController::homepage_data",
+                    "class": "App\\Http\\Controllers\\ApiController",
+                    "file": "app/Http/Controllers/ApiController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Guest, I can view repair statistics for a specific event",
+                    "persona": "Guest",
+                    "theme": "Platform impact stats",
+                    "method": "ApiController::partyStats",
+                    "class": "App\\Http\\Controllers\\ApiController",
+                    "file": "app/Http/Controllers/ApiController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Events/DeleteEventTest.php",
+                            "test": "an_admin_can_delete_an_event"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a Guest, I can view recent community discussion topics",
+                    "persona": "Guest",
+                    "theme": "Discussion integration",
+                    "method": "DiscourseController::discussionTopics",
+                    "class": "App\\Http\\Controllers\\API\\DiscourseController",
+                    "file": "app/Http/Controllers/API/DiscourseController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Dashboard/BasicTest.php",
+                            "test": "testPageLoads"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a Guest, I can export all device records as CSV",
+                    "persona": "Guest",
+                    "theme": "Data exports",
+                    "method": "ExportController::devices",
+                    "class": "App\\Http\\Controllers\\ExportController",
+                    "file": "app/Http/Controllers/ExportController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Events/ExportTest.php",
+                            "test": "testExport"
+                        },
+                        {
+                            "file": "tests/Feature/Fixometer/BasicTest.php",
+                            "test": "testExport"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a Guest, I can export device data from an event as CSV",
+                    "persona": "Guest",
+                    "theme": "Data exports",
+                    "method": "ExportController::devicesEvent",
+                    "class": "App\\Http\\Controllers\\ExportController",
+                    "file": "app/Http/Controllers/ExportController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Events/ExportTest.php",
+                            "test": "testExport"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a Guest, I can export device data from a group as CSV",
+                    "persona": "Guest",
+                    "theme": "Data exports",
+                    "method": "ExportController::devicesGroup",
+                    "class": "App\\Http\\Controllers\\ExportController",
+                    "file": "app/Http/Controllers/ExportController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Events/ExportTest.php",
+                            "test": "testExport"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a Guest, I can export a group's event summary as CSV",
+                    "persona": "Guest",
+                    "theme": "Data exports",
+                    "method": "ExportController::groupEvents",
+                    "class": "App\\Http\\Controllers\\ExportController",
+                    "file": "app/Http/Controllers/ExportController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Events/ExportTest.php",
+                            "test": "testExport"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a Guest, I can export a network's event summary as CSV",
+                    "persona": "Guest",
+                    "theme": "Data exports",
+                    "method": "ExportController::networkEvents",
+                    "class": "App\\Http\\Controllers\\ExportController",
+                    "file": "app/Http/Controllers/ExportController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Events/ExportTest.php",
+                            "test": "testExport"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a Guest, I can view the landing page with platform impact statistics",
+                    "persona": "Guest",
+                    "theme": "Landing page",
+                    "method": "HomeController::index",
+                    "class": "App\\Http\\Controllers\\HomeController",
+                    "file": "app/Http/Controllers/HomeController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Guest, I can dismiss an information alert banner",
+                    "persona": "Guest",
+                    "theme": "Cookie alerts",
+                    "method": "InformationAlertCookieController::__invoke",
+                    "class": "App\\Http\\Controllers\\InformationAlertCookieController",
+                    "file": "app/Http/Controllers/InformationAlertCookieController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Guest, I can switch the application language",
+                    "persona": "Guest",
+                    "theme": "Language preferences",
+                    "method": "LocaleController::setLang",
+                    "class": "App\\Http\\Controllers\\LocaleController",
+                    "file": "app/Http/Controllers/LocaleController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Guest, I can view embeddable CO2 impact visualisations for events and groups",
+                    "persona": "Guest",
+                    "theme": "Embeddable widgets",
+                    "method": "OutboundController::info",
+                    "class": "App\\Http\\Controllers\\OutboundController",
+                    "file": "app/Http/Controllers/OutboundController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Events/DeleteEventTest.php",
+                            "test": "an_admin_can_delete_an_event"
+                        },
+                        {
+                            "file": "tests/Feature/Groups/GroupViewTest.php",
+                            "test": "testCanDelete"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a Restarter, I can retrieve my own profile information via the API",
+                    "persona": "Restarter",
+                    "theme": "Platform impact stats",
+                    "method": "ApiController::getUserInfo",
+                    "class": "App\\Http\\Controllers\\ApiController",
+                    "file": "app/Http/Controllers/ApiController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Users/ProfileTest.php",
+                            "test": "testAPI"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a ThirdParty, I can search and retrieve device records via the API",
+                    "persona": "ThirdParty",
+                    "theme": "Data exports",
+                    "method": "ApiController::getDevices",
+                    "class": "App\\Http\\Controllers\\ApiController",
+                    "file": "app/Http/Controllers/ApiController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Groups/GroupViewTest.php",
+                            "test": "testCanDelete"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a ThirdParty, I can retrieve group repair statistics for embedding",
+                    "persona": "ThirdParty",
+                    "theme": "Platform impact stats",
+                    "method": "ApiController::groupStats",
+                    "class": "App\\Http\\Controllers\\ApiController",
+                    "file": "app/Http/Controllers/ApiController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Events/DeleteEventTest.php",
+                            "test": "an_admin_can_delete_an_event"
+                        },
+                        {
+                            "file": "tests/Feature/Stats/GroupStatsTest.php",
+                            "test": "get_of_stats_after_deletion"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a ThirdParty, I can retrieve aggregate platform impact data for embedding",
+                    "persona": "ThirdParty",
+                    "theme": "Platform impact stats",
+                    "method": "ApiController::homepage_data",
+                    "class": "App\\Http\\Controllers\\ApiController",
+                    "file": "app/Http/Controllers/ApiController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a ThirdParty, I can retrieve event repair statistics for embedding",
+                    "persona": "ThirdParty",
+                    "theme": "Platform impact stats",
+                    "method": "ApiController::partyStats",
+                    "class": "App\\Http\\Controllers\\ApiController",
+                    "file": "app/Http/Controllers/ApiController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Events/DeleteEventTest.php",
+                            "test": "an_admin_can_delete_an_event"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a ThirdParty, I can export all device records as CSV, for example for the download-dataset page on therestartproject.org",
+                    "persona": "ThirdParty",
+                    "theme": "Data exports",
+                    "method": "ExportController::devices",
+                    "class": "App\\Http\\Controllers\\ExportController",
+                    "file": "app/Http/Controllers/ExportController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Events/ExportTest.php",
+                            "test": "testExport"
+                        },
+                        {
+                            "file": "tests/Feature/Fixometer/BasicTest.php",
+                            "test": "testExport"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a ThirdParty, I can export device data from an event as CSV, for example for the download-dataset page on therestartproject.org",
+                    "persona": "ThirdParty",
+                    "theme": "Data exports",
+                    "method": "ExportController::devicesEvent",
+                    "class": "App\\Http\\Controllers\\ExportController",
+                    "file": "app/Http/Controllers/ExportController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Events/ExportTest.php",
+                            "test": "testExport"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a ThirdParty, I can export device data from a group as CSV, for example for the download-dataset page on therestartproject.org",
+                    "persona": "ThirdParty",
+                    "theme": "Data exports",
+                    "method": "ExportController::devicesGroup",
+                    "class": "App\\Http\\Controllers\\ExportController",
+                    "file": "app/Http/Controllers/ExportController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Events/ExportTest.php",
+                            "test": "testExport"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a ThirdParty, I can export a group's event summary as CSV, for example for the download-dataset page on therestartproject.org",
+                    "persona": "ThirdParty",
+                    "theme": "Data exports",
+                    "method": "ExportController::groupEvents",
+                    "class": "App\\Http\\Controllers\\ExportController",
+                    "file": "app/Http/Controllers/ExportController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Events/ExportTest.php",
+                            "test": "testExport"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a ThirdParty, I can export a network's event summary as CSV, for example for the download-dataset page on therestartproject.org",
+                    "persona": "ThirdParty",
+                    "theme": "Data exports",
+                    "method": "ExportController::networkEvents",
+                    "class": "App\\Http\\Controllers\\ExportController",
+                    "file": "app/Http/Controllers/ExportController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Events/ExportTest.php",
+                            "test": "testExport"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a ThirdParty, I can embed CO2 impact widgets for events and groups on my platform",
+                    "persona": "ThirdParty",
+                    "theme": "Embeddable widgets",
+                    "method": "OutboundController::info",
+                    "class": "App\\Http\\Controllers\\OutboundController",
+                    "file": "app/Http/Controllers/OutboundController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Events/DeleteEventTest.php",
+                            "test": "an_admin_can_delete_an_event"
+                        },
+                        {
+                            "file": "tests/Feature/Groups/GroupViewTest.php",
+                            "test": "testCanDelete"
+                        }
+                    ]
+                }
+            ],
+            "storyCount": 28,
+            "personas": [
+                "Admin",
+                "Guest",
+                "Restarter",
+                "ThirdParty"
+            ]
+        },
+        "Users": {
+            "description": "User accounts, profiles, and authentication",
+            "sources": [
+                "app/Http/Controllers/API/AuthController.php",
+                "app/Http/Controllers/API/SessionController.php",
+                "app/Http/Controllers/API/UserController.php",
+                "app/Http/Controllers/Auth/BridgeController.php",
+                "app/Http/Controllers/UserController.php"
+            ],
+            "stories": [
+                {
+                    "story": "As an Admin, I can view and search all users on the platform",
+                    "persona": "Admin",
+                    "theme": "Admin user management",
+                    "method": "UserController::all",
+                    "class": "App\\Http\\Controllers\\UserController",
+                    "file": "app/Http/Controllers/UserController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As an Admin, I can list user audit changes for Zapier integration",
+                    "persona": "Admin",
+                    "theme": "Data exports",
+                    "method": "UserController::changes",
+                    "class": "App\\Http\\Controllers\\API\\UserController",
+                    "file": "app/Http/Controllers/API/UserController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Zapier/ZapierNetworkTests.php",
+                            "test": "given_restart_network_when_new_user_created_then_included_in_trigger"
+                        },
+                        {
+                            "file": "tests/Feature/Zapier/ZapierNetworkTests.php",
+                            "test": "given_nonrestart_network_when_new_user_created_then_not_included_in_trigger"
+                        }
+                    ]
+                },
+                {
+                    "story": "As an Admin, I can create a new user account",
+                    "persona": "Admin",
+                    "theme": "Admin user management",
+                    "method": "UserController::create",
+                    "class": "App\\Http\\Controllers\\UserController",
+                    "file": "app/Http/Controllers/UserController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As an Admin, I can create a user account",
+                    "persona": "Admin",
+                    "theme": "User administration",
+                    "method": "UserController::createUserv2",
+                    "class": "App\\Http\\Controllers\\API\\UserController",
+                    "file": "app/Http/Controllers/API/UserController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As an Admin, I can delete a user's account",
+                    "persona": "Admin",
+                    "theme": "User administration",
+                    "method": "UserController::deleteUserv2",
+                    "class": "App\\Http\\Controllers\\API\\UserController",
+                    "file": "app/Http/Controllers/API/UserController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As an Admin, I can edit any user's account details",
+                    "persona": "Admin",
+                    "theme": "Admin user management",
+                    "method": "UserController::edit",
+                    "class": "App\\Http\\Controllers\\UserController",
+                    "file": "app/Http/Controllers/UserController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Events/AddRemoveVolunteerTest.php",
+                            "test": "testAdminRemoveReaddHost"
+                        }
+                    ]
+                },
+                {
+                    "story": "As an Admin, I can view a user's role, groups and permissions",
+                    "persona": "Admin",
+                    "theme": "User administration",
+                    "method": "UserController::getAdminSettingsv2",
+                    "class": "App\\Http\\Controllers\\API\\UserController",
+                    "file": "app/Http/Controllers/API/UserController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As an Admin, I can see which Repair Directory roles a user can be given",
+                    "persona": "Admin",
+                    "theme": "User administration",
+                    "method": "UserController::getRepairDirOptionsv2",
+                    "class": "App\\Http\\Controllers\\API\\UserController",
+                    "file": "app/Http/Controllers/API/UserController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As an Admin, I can view a user's email preferences",
+                    "persona": "Admin",
+                    "theme": "User administration",
+                    "method": "UserController::getUserPreferencesv2",
+                    "class": "App\\Http\\Controllers\\API\\UserController",
+                    "file": "app/Http/Controllers/API/UserController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As an Admin, I can view a user's profile details",
+                    "persona": "Admin",
+                    "theme": "User administration",
+                    "method": "UserController::getUserProfilev2",
+                    "class": "App\\Http\\Controllers\\API\\UserController",
+                    "file": "app/Http/Controllers/API/UserController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As an Admin, I can see the repair skills a user has selected",
+                    "persona": "Admin",
+                    "theme": "User administration",
+                    "method": "UserController::getUserSkillsv2",
+                    "class": "App\\Http\\Controllers\\API\\UserController",
+                    "file": "app/Http/Controllers/API/UserController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As an Admin, I can search and list all users",
+                    "persona": "Admin",
+                    "theme": "User administration",
+                    "method": "UserController::listUsersv2",
+                    "class": "App\\Http\\Controllers\\API\\UserController",
+                    "file": "app/Http/Controllers/API/UserController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As an Admin, I can edit a user's role, groups, and permissions",
+                    "persona": "Admin",
+                    "theme": "Admin user management",
+                    "method": "UserController::postAdminEdit",
+                    "class": "App\\Http\\Controllers\\UserController",
+                    "file": "app/Http/Controllers/UserController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Events/AddRemoveVolunteerTest.php",
+                            "test": "testAdminRemoveReaddHost"
+                        },
+                        {
+                            "file": "tests/Feature/Networks/NetworkTest.php",
+                            "test": "testRemoveNetworkCoordinatorByRole"
+                        }
+                    ]
+                },
+                {
+                    "story": "As an Admin, I can delete a user's account",
+                    "persona": "Admin",
+                    "theme": "Admin user management",
+                    "method": "UserController::postSoftDeleteUser",
+                    "class": "App\\Http\\Controllers\\UserController",
+                    "file": "app/Http/Controllers/UserController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As an Admin, I can filter and search the user list",
+                    "persona": "Admin",
+                    "theme": "Admin user management",
+                    "method": "UserController::search",
+                    "class": "App\\Http\\Controllers\\UserController",
+                    "file": "app/Http/Controllers/UserController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As an Admin, I can change a user's role, groups and permissions",
+                    "persona": "Admin",
+                    "theme": "User administration",
+                    "method": "UserController::updateAdminSettingsv2",
+                    "class": "App\\Http\\Controllers\\API\\UserController",
+                    "file": "app/Http/Controllers/API/UserController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As an Admin, I can set a user's Repair Directory role",
+                    "persona": "Admin",
+                    "theme": "User administration",
+                    "method": "UserController::updateRepairDirRolev2",
+                    "class": "App\\Http\\Controllers\\API\\UserController",
+                    "file": "app/Http/Controllers/API/UserController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As an Admin, I can change a user's password",
+                    "persona": "Admin",
+                    "theme": "User administration",
+                    "method": "UserController::updateUserPasswordv2",
+                    "class": "App\\Http\\Controllers\\API\\UserController",
+                    "file": "app/Http/Controllers/API/UserController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As an Admin, I can update a user's email preferences",
+                    "persona": "Admin",
+                    "theme": "User administration",
+                    "method": "UserController::updateUserPreferencesv2",
+                    "class": "App\\Http\\Controllers\\API\\UserController",
+                    "file": "app/Http/Controllers/API/UserController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As an Admin, I can edit a user's profile details",
+                    "persona": "Admin",
+                    "theme": "User administration",
+                    "method": "UserController::updateUserProfilev2",
+                    "class": "App\\Http\\Controllers\\API\\UserController",
+                    "file": "app/Http/Controllers/API/UserController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As an Admin, I can change the repair skills of a user",
+                    "persona": "Admin",
+                    "theme": "User administration",
+                    "method": "UserController::updateUserSkillsv2",
+                    "class": "App\\Http\\Controllers\\API\\UserController",
+                    "file": "app/Http/Controllers/API/UserController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Guest, I can check whether an email address is already registered before signing up",
+                    "persona": "Guest",
+                    "theme": "Registration & onboarding",
+                    "method": "AuthController::emailAvailablev2",
+                    "class": "App\\Http\\Controllers\\API\\AuthController",
+                    "file": "app/Http/Controllers/API/AuthController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Guest, I can request a password recovery email",
+                    "persona": "Guest",
+                    "theme": "Authentication",
+                    "method": "AuthController::forgotPasswordv2",
+                    "class": "App\\Http\\Controllers\\API\\AuthController",
+                    "file": "app/Http/Controllers/API/AuthController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Guest, I can log in with my email and password",
+                    "persona": "Guest",
+                    "theme": "Authentication",
+                    "method": "AuthController::loginv2",
+                    "class": "App\\Http\\Controllers\\API\\AuthController",
+                    "file": "app/Http/Controllers/API/AuthController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Admin/Users/WikiLoginTests.php",
+                            "test": "if_not_flagged_for_creation"
+                        },
+                        {
+                            "file": "tests/Feature/Admin/Users/WikiLoginTests.php",
+                            "test": "if_already_created"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a Guest, I can check that my password recovery link is still valid",
+                    "persona": "Guest",
+                    "theme": "Authentication",
+                    "method": "AuthController::recoveryInfov2",
+                    "class": "App\\Http\\Controllers\\API\\AuthController",
+                    "file": "app/Http/Controllers/API/AuthController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Guest, I can register a new account",
+                    "persona": "Guest",
+                    "theme": "Registration & onboarding",
+                    "method": "AuthController::registerv2",
+                    "class": "App\\Http\\Controllers\\API\\AuthController",
+                    "file": "app/Http/Controllers/API/AuthController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Guest, I can reset my password using a recovery code",
+                    "persona": "Guest",
+                    "theme": "Authentication",
+                    "method": "AuthController::resetPasswordv2",
+                    "class": "App\\Http\\Controllers\\API\\AuthController",
+                    "file": "app/Http/Controllers/API/AuthController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Guest, I get the right language and my account state when the app loads",
+                    "persona": "Guest",
+                    "theme": "Authentication",
+                    "method": "SessionController::getSessionv2",
+                    "class": "App\\Http\\Controllers\\API\\SessionController",
+                    "file": "app/Http/Controllers/API/SessionController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Guest, I can choose my language for the session",
+                    "persona": "Guest",
+                    "theme": "Language",
+                    "method": "SessionController::patchSessionv2",
+                    "class": "App\\Http\\Controllers\\API\\SessionController",
+                    "file": "app/Http/Controllers/API/SessionController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Guest, I can view the registration page",
+                    "persona": "Guest",
+                    "theme": "Registration & onboarding",
+                    "method": "UserController::getRegister",
+                    "class": "App\\Http\\Controllers\\UserController",
+                    "file": "app/Http/Controllers/UserController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Guest, I can register a new account",
+                    "persona": "Guest",
+                    "theme": "Registration & onboarding",
+                    "method": "UserController::postRegister",
+                    "class": "App\\Http\\Controllers\\UserController",
+                    "file": "app/Http/Controllers/UserController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Guest, I can request a password recovery email",
+                    "persona": "Guest",
+                    "theme": "Authentication",
+                    "method": "UserController::recover",
+                    "class": "App\\Http\\Controllers\\UserController",
+                    "file": "app/Http/Controllers/UserController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Guest, I can reset my password using a recovery code",
+                    "persona": "Guest",
+                    "theme": "Authentication",
+                    "method": "UserController::reset",
+                    "class": "App\\Http\\Controllers\\UserController",
+                    "file": "app/Http/Controllers/UserController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Repair Directory SuperAdmin or RegionalAdmin, I can change a user's Repair Directory role",
+                    "persona": "RepairDirectoryAdmin",
+                    "theme": "Admin user management",
+                    "method": "UserController::postProfileRepairDirectory",
+                    "class": "App\\Http\\Controllers\\UserController",
+                    "file": "app/Http/Controllers/UserController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Restarter, I can accept a group or event invitation, or join via a shareable invite code",
+                    "persona": "Restarter",
+                    "theme": "Registration & onboarding",
+                    "method": "AuthController::claimInvitev2",
+                    "class": "App\\Http\\Controllers\\API\\AuthController",
+                    "file": "app/Http/Controllers/API/AuthController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Restarter, I can record my data consents and profile basics after registering",
+                    "persona": "Restarter",
+                    "theme": "Registration & onboarding",
+                    "method": "AuthController::consentv2",
+                    "class": "App\\Http\\Controllers\\API\\AuthController",
+                    "file": "app/Http/Controllers/API/AuthController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Restarter, I can log out and end my session",
+                    "persona": "Restarter",
+                    "theme": "Authentication",
+                    "method": "AuthController::logoutv2",
+                    "class": "App\\Http\\Controllers\\API\\AuthController",
+                    "file": "app/Http/Controllers/API/AuthController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Restarter, I stay logged in when moving between Restarters, Talk and the wiki",
+                    "persona": "Restarter",
+                    "theme": "Authentication",
+                    "method": "AuthController::ssoTicketv2",
+                    "class": "App\\Http\\Controllers\\API\\AuthController",
+                    "file": "app/Http/Controllers/API/AuthController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Restarter, I am logged in to the Restarters web session after signing in through the app",
+                    "persona": "Restarter",
+                    "theme": "Authentication",
+                    "method": "BridgeController::bridge",
+                    "class": "App\\Http\\Controllers\\Auth\\BridgeController",
+                    "file": "app/Http/Controllers/Auth/BridgeController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Restarter, I can delete my account",
+                    "persona": "Restarter",
+                    "theme": "Profile & settings",
+                    "method": "UserController::deleteMyAccountv2",
+                    "class": "App\\Http\\Controllers\\API\\UserController",
+                    "file": "app/Http/Controllers/API/UserController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Restarter, I can get calendar subscription links for my events",
+                    "persona": "Restarter",
+                    "theme": "Profile & settings",
+                    "method": "UserController::getMyCalendarsv2",
+                    "class": "App\\Http\\Controllers\\API\\UserController",
+                    "file": "app/Http/Controllers/API/UserController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Restarter, I can view my email preferences",
+                    "persona": "Restarter",
+                    "theme": "Profile & settings",
+                    "method": "UserController::getMyEmailPreferencesv2",
+                    "class": "App\\Http\\Controllers\\API\\UserController",
+                    "file": "app/Http/Controllers/API/UserController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Restarter, I can see the events I have attended or am invited to",
+                    "persona": "Restarter",
+                    "theme": "Profile & settings",
+                    "method": "UserController::getMyEventsv2",
+                    "class": "App\\Http\\Controllers\\API\\UserController",
+                    "file": "app/Http/Controllers/API/UserController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Restarter, I can see the groups I belong to",
+                    "persona": "Restarter",
+                    "theme": "Profile & settings",
+                    "method": "UserController::getMyGroupsv2",
+                    "class": "App\\Http\\Controllers\\API\\UserController",
+                    "file": "app/Http/Controllers/API/UserController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Restarter, I can view my preferred language",
+                    "persona": "Restarter",
+                    "theme": "Profile & settings",
+                    "method": "UserController::getMyLanguagev2",
+                    "class": "App\\Http\\Controllers\\API\\UserController",
+                    "file": "app/Http/Controllers/API/UserController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Restarter, I can see my in-app notifications",
+                    "persona": "Restarter",
+                    "theme": "Notifications",
+                    "method": "UserController::getMyNotificationsv2",
+                    "class": "App\\Http\\Controllers\\API\\UserController",
+                    "file": "app/Http/Controllers/API/UserController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Restarter, I can view my profile details",
+                    "persona": "Restarter",
+                    "theme": "Profile & settings",
+                    "method": "UserController::getMyProfilev2",
+                    "class": "App\\Http\\Controllers\\API\\UserController",
+                    "file": "app/Http/Controllers/API/UserController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Restarter, I can see the repair skills I have selected",
+                    "persona": "Restarter",
+                    "theme": "Profile & settings",
+                    "method": "UserController::getMySkillsv2",
+                    "class": "App\\Http\\Controllers\\API\\UserController",
+                    "file": "app/Http/Controllers/API/UserController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Restarter, I can view my notifications",
+                    "persona": "Restarter",
+                    "theme": "Notifications",
+                    "method": "UserController::getNotifications",
+                    "class": "App\\Http\\Controllers\\UserController",
+                    "file": "app/Http/Controllers/UserController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Notifications/BasicTest.php",
+                            "test": "testNotificationsPage"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a Restarter, I can complete my onboarding process",
+                    "persona": "Restarter",
+                    "theme": "Registration & onboarding",
+                    "method": "UserController::getOnboardingComplete",
+                    "class": "App\\Http\\Controllers\\UserController",
+                    "file": "app/Http/Controllers/UserController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Restarter, I can access the form to edit my profile",
+                    "persona": "Restarter",
+                    "theme": "Profile management",
+                    "method": "UserController::getProfileEdit",
+                    "class": "App\\Http\\Controllers\\UserController",
+                    "file": "app/Http/Controllers/UserController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Restarter, I can view another volunteer's public profile",
+                    "persona": "Restarter",
+                    "theme": "Profile & settings",
+                    "method": "UserController::getPublicProfilev2",
+                    "class": "App\\Http\\Controllers\\API\\UserController",
+                    "file": "app/Http/Controllers/API/UserController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Restarter, I can view my profile or another user's profile",
+                    "persona": "Restarter",
+                    "theme": "Profile management",
+                    "method": "UserController::index",
+                    "class": "App\\Http\\Controllers\\UserController",
+                    "file": "app/Http/Controllers/UserController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Restarter, I can log out of my account",
+                    "persona": "Restarter",
+                    "theme": "Authentication",
+                    "method": "UserController::logout",
+                    "class": "App\\Http\\Controllers\\UserController",
+                    "file": "app/Http/Controllers/UserController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Restarter, I can mark my notifications as read",
+                    "persona": "Restarter",
+                    "theme": "Notifications",
+                    "method": "UserController::markMyNotificationsReadv2",
+                    "class": "App\\Http\\Controllers\\API\\UserController",
+                    "file": "app/Http/Controllers/API/UserController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Restarter, I can dismiss the onboarding prompt once I have seen it",
+                    "persona": "Restarter",
+                    "theme": "Registration & onboarding",
+                    "method": "UserController::onboardingCompletev2",
+                    "class": "App\\Http\\Controllers\\API\\UserController",
+                    "file": "app/Http/Controllers/API/UserController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Restarter, I can update my profile information",
+                    "persona": "Restarter",
+                    "theme": "Profile management",
+                    "method": "UserController::postProfileInfoEdit",
+                    "class": "App\\Http\\Controllers\\UserController",
+                    "file": "app/Http/Controllers/UserController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Restarter, I can change my password",
+                    "persona": "Restarter",
+                    "theme": "Profile management",
+                    "method": "UserController::postProfilePasswordEdit",
+                    "class": "App\\Http\\Controllers\\UserController",
+                    "file": "app/Http/Controllers/UserController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Admin/Users/WikiLoginTests.php",
+                            "test": "if_wiki_user_changes_password"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a Restarter, I can upload a new profile picture",
+                    "persona": "Restarter",
+                    "theme": "Profile management",
+                    "method": "UserController::postProfilePictureEdit",
+                    "class": "App\\Http\\Controllers\\UserController",
+                    "file": "app/Http/Controllers/UserController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Restarter, I can update my notification preferences",
+                    "persona": "Restarter",
+                    "theme": "Profile management",
+                    "method": "UserController::postProfilePreferencesEdit",
+                    "class": "App\\Http\\Controllers\\UserController",
+                    "file": "app/Http/Controllers/UserController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Restarter, I can update my repair skills",
+                    "persona": "Restarter",
+                    "theme": "Profile management",
+                    "method": "UserController::postProfileTagsEdit",
+                    "class": "App\\Http\\Controllers\\UserController",
+                    "file": "app/Http/Controllers/UserController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Restarter, I can delete my own account",
+                    "persona": "Restarter",
+                    "theme": "Account management",
+                    "method": "UserController::postSoftDeleteUser",
+                    "class": "App\\Http\\Controllers\\UserController",
+                    "file": "app/Http/Controllers/UserController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Restarter, I can change my preferred language",
+                    "persona": "Restarter",
+                    "theme": "Language preferences",
+                    "method": "UserController::storeLanguage",
+                    "class": "App\\Http\\Controllers\\UserController",
+                    "file": "app/Http/Controllers/UserController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Restarter, I can update my email preferences",
+                    "persona": "Restarter",
+                    "theme": "Profile & settings",
+                    "method": "UserController::updateMyEmailPreferencesv2",
+                    "class": "App\\Http\\Controllers\\API\\UserController",
+                    "file": "app/Http/Controllers/API/UserController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Restarter, I can change my preferred language",
+                    "persona": "Restarter",
+                    "theme": "Profile & settings",
+                    "method": "UserController::updateMyLanguagev2",
+                    "class": "App\\Http\\Controllers\\API\\UserController",
+                    "file": "app/Http/Controllers/API/UserController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Restarter, I can change my password",
+                    "persona": "Restarter",
+                    "theme": "Profile & settings",
+                    "method": "UserController::updateMyPasswordv2",
+                    "class": "App\\Http\\Controllers\\API\\UserController",
+                    "file": "app/Http/Controllers/API/UserController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Restarter, I can upload a profile photo",
+                    "persona": "Restarter",
+                    "theme": "Profile & settings",
+                    "method": "UserController::updateMyPhotov2",
+                    "class": "App\\Http\\Controllers\\API\\UserController",
+                    "file": "app/Http/Controllers/API/UserController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Restarter, I can edit my profile details",
+                    "persona": "Restarter",
+                    "theme": "Profile & settings",
+                    "method": "UserController::updateMyProfilev2",
+                    "class": "App\\Http\\Controllers\\API\\UserController",
+                    "file": "app/Http/Controllers/API/UserController.php",
+                    "tests": []
+                },
+                {
+                    "story": "As a Restarter, I can choose my repair skills",
+                    "persona": "Restarter",
+                    "theme": "Profile & settings",
+                    "method": "UserController::updateMySkillsv2",
+                    "class": "App\\Http\\Controllers\\API\\UserController",
+                    "file": "app/Http/Controllers/API/UserController.php",
+                    "tests": []
+                }
+            ],
+            "storyCount": 69,
+            "personas": [
+                "Admin",
+                "Guest",
+                "RepairDirectoryAdmin",
+                "Restarter"
+            ]
+        }
+    },
+    "personas": {
+        "Admin": {
+            "features": [
+                "Administration",
+                "Events",
+                "Groups",
+                "Networks",
+                "Platform",
+                "Users"
+            ],
+            "storyCount": 60
+        },
+        "Guest": {
+            "features": [
+                "Administration",
+                "Devices",
+                "Events",
+                "Groups",
+                "Networks",
+                "Platform",
+                "Users"
+            ],
+            "storyCount": 55
+        },
+        "Host": {
+            "features": [
+                "Devices",
+                "Events",
+                "Groups"
+            ],
+            "storyCount": 33
+        },
+        "NetworkCoordinator": {
+            "features": [
+                "Events",
+                "Groups",
+                "Networks"
+            ],
+            "storyCount": 12
+        },
+        "RepairDirectoryAdmin": {
+            "features": [
+                "Users"
+            ],
+            "storyCount": 1
+        },
+        "Restarter": {
+            "features": [
+                "Administration",
+                "Dashboard",
+                "Devices",
+                "Events",
+                "Groups",
+                "Platform",
+                "Users"
+            ],
+            "storyCount": 69
+        },
+        "ThirdParty": {
+            "features": [
+                "Devices",
+                "Events",
+                "Groups",
+                "Networks",
+                "Platform"
+            ],
+            "storyCount": 26
+        }
+    },
+    "coverage": {
+        "annotatedStories": 256,
+        "storiesWithTests": 107
+    }
+}

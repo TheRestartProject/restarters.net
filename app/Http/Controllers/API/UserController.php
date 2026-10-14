@@ -27,7 +27,11 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use App\Attributes\Feature;
+use App\Attributes\UserStory;
+use App\Attributes\NoStory;
 
+#[Feature('Users', description: 'User accounts, profiles, and authentication')]
 class UserController extends Controller
 {
     /**
@@ -38,6 +42,7 @@ class UserController extends Controller
      *
      * Only Administrators can access this API call.
      */
+    #[UserStory('As an Admin, I can list user audit changes for Zapier integration', persona: 'Admin', theme: 'Data exports')]
     public static function changes(Request $request)
     {
         $authenticatedUser = Auth::user();
@@ -121,6 +126,7 @@ class UserController extends Controller
     /**
      * Get notification counts for a user.
      */
+    #[NoStory(reason: 'Internal notification count endpoint')]
     public function notifications(Request $request, int $id): JsonResponse
     {
         $user = User::findOrFail($id);
@@ -180,6 +186,7 @@ class UserController extends Controller
      *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated")
      * )
      */
+    #[UserStory('As a Restarter, I can view my email preferences', persona: 'Restarter', theme: 'Profile & settings')]
     public function getMyEmailPreferencesv2(): JsonResponse
     {
         return response()->json([
@@ -210,6 +217,7 @@ class UserController extends Controller
      *      @OA\Response(response=404, ref="#/components/responses/NotFound")
      * )
      */
+    #[UserStory('As an Admin, I can view a user\'s email preferences', persona: 'Admin', theme: 'User administration')]
     public function getUserPreferencesv2(int $id): JsonResponse
     {
         $target = User::findOrFail($id);
@@ -257,6 +265,7 @@ class UserController extends Controller
      *      @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
      */
+    #[UserStory('As a Restarter, I can update my email preferences', persona: 'Restarter', theme: 'Profile & settings')]
     public function updateMyEmailPreferencesv2(Request $request): JsonResponse
     {
         return response()->json([
@@ -294,6 +303,7 @@ class UserController extends Controller
      *      @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
      */
+    #[UserStory('As an Admin, I can update a user\'s email preferences', persona: 'Admin', theme: 'User administration')]
     public function updateUserPreferencesv2(Request $request, int $id): JsonResponse
     {
         $target = User::findOrFail($id);
@@ -338,6 +348,7 @@ class UserController extends Controller
      *      @OA\Response(response=403, description="Data consent required")
      * )
      */
+    #[UserStory('As a Restarter, I can dismiss the onboarding prompt once I have seen it', persona: 'Restarter', theme: 'Registration & onboarding')]
     public function onboardingCompletev2(): JsonResponse
     {
         $user = Auth::user();
@@ -381,6 +392,7 @@ class UserController extends Controller
      *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated")
      * )
      */
+    #[UserStory('As a Restarter, I can see the groups I belong to', persona: 'Restarter', theme: 'Profile & settings')]
     public function getMyGroupsv2(): JsonResponse
     {
         $user = Auth::user();
@@ -488,6 +500,7 @@ class UserController extends Controller
      *      @OA\Response(response=401, description="Unauthenticated")
      * )
      */
+    #[UserStory('As a Restarter, I can see the events I have attended or am invited to', persona: 'Restarter', theme: 'Profile & settings')]
     public function getMyEventsv2(Request $request): JsonResponse
     {
         $user = $request->user();
@@ -615,6 +628,7 @@ class UserController extends Controller
      *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated")
      * )
      */
+    #[UserStory('As a Restarter, I can get calendar subscription links for my events', persona: 'Restarter', theme: 'Profile & settings')]
     public function getMyCalendarsv2(): JsonResponse
     {
         $user = Auth::user();
@@ -694,6 +708,7 @@ class UserController extends Controller
      *      @OA\Response(response=404, ref="#/components/responses/NotFound")
      * )
      */
+    #[UserStory('As an Admin, I can see which Repair Directory roles a user can be given', persona: 'Admin', theme: 'User administration')]
     public function getRepairDirOptionsv2(int $id): JsonResponse
     {
         $perp = Auth::user();
@@ -742,6 +757,7 @@ class UserController extends Controller
      *      @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
      */
+    #[UserStory('As an Admin, I can set a user\'s Repair Directory role', persona: 'Admin', theme: 'User administration')]
     public function updateRepairDirRolev2(Request $request, int $id): JsonResponse
     {
         $perp = Auth::user();
@@ -791,6 +807,7 @@ class UserController extends Controller
      *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated")
      * )
      */
+    #[UserStory('As a Restarter, I can view my preferred language', persona: 'Restarter', theme: 'Profile & settings')]
     public function getMyLanguagev2(): JsonResponse
     {
         $supported = [];
@@ -842,6 +859,7 @@ class UserController extends Controller
      *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated")
      * )
      */
+    #[UserStory('As a Restarter, I can see my in-app notifications', persona: 'Restarter', theme: 'Notifications')]
     public function getMyNotificationsv2(Request $request): JsonResponse
     {
         $user = Auth::user();
@@ -894,6 +912,7 @@ class UserController extends Controller
      *      @OA\Response(response=403, description="Data consent required")
      * )
      */
+    #[UserStory('As a Restarter, I can mark my notifications as read', persona: 'Restarter', theme: 'Notifications')]
     public function markMyNotificationsReadv2(Request $request): JsonResponse
     {
         $user = Auth::user();
@@ -931,6 +950,7 @@ class UserController extends Controller
      *      @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
      */
+    #[UserStory('As a Restarter, I can change my preferred language', persona: 'Restarter', theme: 'Profile & settings')]
     public function updateMyLanguagev2(Request $request): JsonResponse
     {
         $supportedCodes = array_keys(\LaravelLocalization::getSupportedLocales());
@@ -1006,6 +1026,7 @@ class UserController extends Controller
      *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated")
      * )
      */
+    #[UserStory('As a Restarter, I can view my profile details', persona: 'Restarter', theme: 'Profile & settings')]
     public function getMyProfilev2(): JsonResponse
     {
         return response()->json([
@@ -1047,6 +1068,7 @@ class UserController extends Controller
      *      @OA\Response(response=404, ref="#/components/responses/NotFound")
      * )
      */
+    #[UserStory('As an Admin, I can view a user\'s profile details', persona: 'Admin', theme: 'User administration')]
     public function getUserProfilev2(int $id): JsonResponse
     {
         $target = User::findOrFail($id);
@@ -1121,6 +1143,7 @@ class UserController extends Controller
      *      @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
      */
+    #[UserStory('As a Restarter, I can edit my profile details', persona: 'Restarter', theme: 'Profile & settings')]
     public function updateMyProfilev2(Request $request, Geocoder $geocoder): JsonResponse
     {
         return response()->json([
@@ -1171,6 +1194,7 @@ class UserController extends Controller
      *      @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
      */
+    #[UserStory('As an Admin, I can edit a user\'s profile details', persona: 'Admin', theme: 'User administration')]
     public function updateUserProfilev2(Request $request, Geocoder $geocoder, int $id): JsonResponse
     {
         $target = User::findOrFail($id);
@@ -1261,6 +1285,7 @@ class UserController extends Controller
      *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated")
      * )
      */
+    #[UserStory('As a Restarter, I can see the repair skills I have selected', persona: 'Restarter', theme: 'Profile & settings')]
     public function getMySkillsv2(): JsonResponse
     {
         return response()->json([
@@ -1299,6 +1324,7 @@ class UserController extends Controller
      *      @OA\Response(response=404, ref="#/components/responses/NotFound")
      * )
      */
+    #[UserStory('As an Admin, I can see the repair skills a user has selected', persona: 'Admin', theme: 'User administration')]
     public function getUserSkillsv2(int $id): JsonResponse
     {
         $target = User::findOrFail($id);
@@ -1373,6 +1399,7 @@ class UserController extends Controller
      *      @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
      */
+    #[UserStory('As a Restarter, I can choose my repair skills', persona: 'Restarter', theme: 'Profile & settings')]
     public function updateMySkillsv2(Request $request): JsonResponse
     {
         return response()->json([
@@ -1410,6 +1437,7 @@ class UserController extends Controller
      *      @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
      */
+    #[UserStory('As an Admin, I can change the repair skills of a user', persona: 'Admin', theme: 'User administration')]
     public function updateUserSkillsv2(Request $request, int $id): JsonResponse
     {
         $target = User::findOrFail($id);
@@ -1482,6 +1510,7 @@ class UserController extends Controller
      *      @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
      */
+    #[UserStory('As a Restarter, I can change my password', persona: 'Restarter', theme: 'Profile & settings')]
     public function updateMyPasswordv2(Request $request): JsonResponse
     {
         // This endpoint always operates on the authenticated user - there is no id
@@ -1529,6 +1558,7 @@ class UserController extends Controller
      *      @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
      */
+    #[UserStory('As an Admin, I can change a user\'s password', persona: 'Admin', theme: 'User administration')]
     public function updateUserPasswordv2(Request $request, int $id): JsonResponse
     {
         $actor = Auth::user();
@@ -1637,6 +1667,7 @@ class UserController extends Controller
      *      @OA\Response(response=404, ref="#/components/responses/NotFound")
      * )
      */
+    #[UserStory('As an Admin, I can view a user\'s role, groups and permissions', persona: 'Admin', theme: 'User administration')]
     public function getAdminSettingsv2(int $id): JsonResponse
     {
         if (! Auth::user()->hasRole('Administrator')) {
@@ -1717,6 +1748,7 @@ class UserController extends Controller
      *      @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
      */
+    #[UserStory('As an Admin, I can change a user\'s role, groups and permissions', persona: 'Admin', theme: 'User administration')]
     public function updateAdminSettingsv2(Request $request, int $id): JsonResponse
     {
         // Administrator-only. Matches the web handler's exact check (postAdminEdit) -
@@ -1807,6 +1839,7 @@ class UserController extends Controller
      *      @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
      */
+    #[UserStory('As a Restarter, I can upload a profile photo', persona: 'Restarter', theme: 'Profile & settings')]
     public function updateMyPhotov2(Request $request): JsonResponse
     {
         // This endpoint always operates on Auth::user() - there is no id parameter, so
@@ -1899,6 +1932,7 @@ class UserController extends Controller
      *      @OA\Response(response=403, description="Data consent required")
      * )
      */
+    #[UserStory('As a Restarter, I can delete my account', persona: 'Restarter', theme: 'Profile & settings')]
     public function deleteMyAccountv2(Request $request): JsonResponse
     {
         // This endpoint always operates on Auth::user() - there is no id parameter, so a
@@ -1939,6 +1973,7 @@ class UserController extends Controller
      *      @OA\Response(response=404, ref="#/components/responses/NotFound")
      * )
      */
+    #[UserStory('As an Admin, I can delete a user\'s account', persona: 'Admin', theme: 'User administration')]
     public function deleteUserv2(int $id): JsonResponse
     {
         $target = User::findOrFail($id);
@@ -1982,6 +2017,7 @@ class UserController extends Controller
      *      @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
      */
+    #[UserStory('As an Admin, I can create a user account', persona: 'Admin', theme: 'User administration')]
     public function createUserv2(Request $request): JsonResponse
     {
         // SECURITY: Administrator only, matching develop's
@@ -2057,6 +2093,7 @@ class UserController extends Controller
      *      @OA\Response(response=403, ref="#/components/responses/Forbidden")
      * )
      */
+    #[UserStory('As an Admin, I can search and list all users', persona: 'Admin', theme: 'User administration')]
     public function listUsersv2(Request $request): JsonResponse
     {
         if ($resp = $this->requireAdministrator()) {
@@ -2183,6 +2220,7 @@ class UserController extends Controller
      * that page rendered publicly - name, avatar, role name, location, the
      * user's groups and skills, and their biography.
      */
+    #[UserStory('As a Restarter, I can view another volunteer\'s public profile', persona: 'Restarter', theme: 'Profile & settings')]
     public function getPublicProfilev2($id): JsonResponse
     {
         $user = User::find($id);

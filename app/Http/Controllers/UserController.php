@@ -6,6 +6,9 @@ use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\JsonResponse;
 use App;
+use App\Attributes\Feature;
+use App\Attributes\NoStory;
+use App\Attributes\UserStory;
 use App\Device;
 use App\Events\PasswordChanged;
 use App\Events\UserLanguageUpdated;
@@ -43,11 +46,13 @@ use Lang;
 use LaravelLocalization;
 use Notification;
 
+#[Feature('Users', description: 'User accounts, profiles, and authentication')]
 class UserController extends Controller
 {
     /**
      * Show the application dashboard.
      */
+    #[UserStory('As a Restarter, I can view my profile or another user\'s profile', persona: 'Restarter', theme: 'Profile management')]
     public function index($id = null): View
     {
         if (is_null($id)) {
@@ -65,6 +70,7 @@ class UserController extends Controller
         ]);
     }
 
+    #[UserStory('As a Restarter, I can access the form to edit my profile', persona: 'Restarter', theme: 'Profile management')]
     public function getProfileEdit($id = null): View
     {
         if (is_null($id)) {
@@ -120,6 +126,7 @@ class UserController extends Controller
         ]);
     }
 
+    #[UserStory('As a Restarter, I can view my notifications', persona: 'Restarter', theme: 'Notifications')]
     public function getNotifications(): View
     {
         $user = Auth::user();
@@ -131,6 +138,7 @@ class UserController extends Controller
         ]);
     }
 
+    #[UserStory('As a Restarter, I can update my profile information', persona: 'Restarter', theme: 'Profile management')]
     public function postProfileInfoEdit(Request $request, App\Helpers\Geocoder $geocoder): RedirectResponse
     {
         $rules = [
@@ -180,6 +188,7 @@ class UserController extends Controller
         return redirect()->back()->with('message', __('profile.profile_updated'));
     }
 
+    #[UserStory('As a Restarter, I can change my password', persona: 'Restarter', theme: 'Profile management')]
     public function postProfilePasswordEdit(Request $request): RedirectResponse
     {
         $id = $request->input('id', Auth::id());
@@ -209,6 +218,7 @@ class UserController extends Controller
         return redirect()->back()->with('error', __('profile.password_old_mismatch'));
     }
 
+    #[UserStory('As a Repair Directory SuperAdmin or RegionalAdmin, I can change a user\'s Repair Directory role', persona: 'RepairDirectoryAdmin', theme: 'Admin user management')]
     public function postProfileRepairDirectory(Request $request): RedirectResponse
     {
         $rules = [
@@ -237,6 +247,7 @@ class UserController extends Controller
         return redirect()->back()->with('message', __('profile.profile_updated'));
     }
 
+    #[UserStory('As a Restarter, I can change my preferred language', persona: 'Restarter', theme: 'Language preferences')]
     public function storeLanguage(Request $request): RedirectResponse
     {
         if ($request->input('id') !== null) {
@@ -264,6 +275,8 @@ class UserController extends Controller
         return redirect()->back()->with('message', Lang::get('profile.language_updated'));
     }
 
+    #[UserStory('As a Restarter, I can delete my own account', persona: 'Restarter', theme: 'Account management')]
+    #[UserStory('As an Admin, I can delete a user\'s account', persona: 'Admin', theme: 'Admin user management')]
     public function postSoftDeleteUser(Request $request): RedirectResponse
     {
         if ($request->input('id') !== null) {
@@ -289,6 +302,7 @@ class UserController extends Controller
         }
     }
 
+    #[UserStory('As a Restarter, I can update my notification preferences', persona: 'Restarter', theme: 'Profile management')]
     public function postProfilePreferencesEdit(Request $request): RedirectResponse
     {
         if ($request->input('id') !== null) {
@@ -310,6 +324,7 @@ class UserController extends Controller
         return redirect()->back()->with('message', Lang::get('profile.preferences_updated'));
     }
 
+    #[UserStory('As a Restarter, I can update my repair skills', persona: 'Restarter', theme: 'Profile management')]
     public function postProfileTagsEdit(Request $request): RedirectResponse
     {
         if ($request->input('id') !== null) {
@@ -334,6 +349,7 @@ class UserController extends Controller
         return redirect()->back()->with('message', Lang::get('profile.skills_updated'));
     }
 
+    #[UserStory('As a Restarter, I can upload a new profile picture', persona: 'Restarter', theme: 'Profile management')]
     public function postProfilePictureEdit(Request $request): RedirectResponse
     {
         $id = $request->input('id', Auth::id());
@@ -349,6 +365,7 @@ class UserController extends Controller
         return redirect()->back()->with('error', __('profile.picture_error'));
     }
 
+    #[UserStory('As an Admin, I can edit a user\'s role, groups, and permissions', persona: 'Admin', theme: 'Admin user management')]
     public function postAdminEdit(Request $request): RedirectResponse
     {
         if (! Auth::user()->hasRole('Administrator')) {
@@ -397,6 +414,7 @@ class UserController extends Controller
      * which is what the SPA's /user/recover page submits to. This GET-only route exists so any
      * old bookmarks/links to /user/recover still land somewhere useful.
      */
+    #[UserStory('As a Guest, I can request a password recovery email', persona: 'Guest', theme: 'Authentication')]
     public function recover(): RedirectResponse
     {
         return redirect(rtrim(config('restarters.frontend_url'), '/').'/user/recover');
@@ -409,6 +427,7 @@ class UserController extends Controller
      * POST /api/v2/auth/password/reset (resetPasswordv2), which the SPA's /user/reset page
      * (client/app/pages/user/reset.vue) calls.
      */
+    #[UserStory('As a Guest, I can reset my password using a recovery code', persona: 'Guest', theme: 'Authentication')]
     public function reset(Request $request): RedirectResponse
     {
         $frontend = rtrim(config('restarters.frontend_url'), '/');
@@ -421,6 +440,7 @@ class UserController extends Controller
         return redirect($frontend.'/user/reset'.($recovery !== null ? '?recovery='.urlencode($recovery) : ''));
     }
 
+    #[UserStory('As an Admin, I can view and search all users on the platform', persona: 'Admin', theme: 'Admin user management')]
     public function all()
     {
         $user = User::find(Auth::id());
@@ -456,6 +476,7 @@ class UserController extends Controller
         }
     }
 
+    #[UserStory('As an Admin, I can filter and search the user list', persona: 'Admin', theme: 'Admin user management')]
     public function search(Request $request)
     {
         $user = User::find(Auth::id());
@@ -527,6 +548,7 @@ class UserController extends Controller
         }
     }
 
+    #[UserStory('As an Admin, I can create a new user account', persona: 'Admin', theme: 'Admin user management')]
     public function create(Request $request)
     {
         $user = Auth::user();
@@ -635,6 +657,7 @@ class UserController extends Controller
         }
     }
 
+    #[UserStory('As an Admin, I can edit any user\'s account details', persona: 'Admin', theme: 'Admin user management')]
     public function edit($id, Request $request)
     {
         global $fixometer_languages;
@@ -742,6 +765,7 @@ class UserController extends Controller
         }
     }
 
+    #[UserStory('As a Restarter, I can log out of my account', persona: 'Restarter', theme: 'Authentication')]
     public function logout(): RedirectResponse
     {
         Auth::logout();
@@ -757,6 +781,7 @@ class UserController extends Controller
      * EventAttendanceController:336, EventController:214) still point at this Laravel URL, so
      * they keep working unchanged - only what happens when they're opened has changed.
      */
+    #[UserStory('As a Guest, I can view the registration page', persona: 'Guest', theme: 'Registration & onboarding')]
     public function getRegister($hash = null): RedirectResponse
     {
         $frontend = rtrim(config('restarters.frontend_url'), '/');
@@ -764,6 +789,7 @@ class UserController extends Controller
         return redirect($frontend.'/user/register'.($hash ? '?invite_hash='.urlencode($hash) : ''));
     }
 
+    #[UserStory('As a Guest, I can register a new account', persona: 'Guest', theme: 'Registration & onboarding')]
     public function postRegister(Request $request, $hash = null): RedirectResponse
     {
         $geocoder = app(\App\Helpers\Geocoder::class);
@@ -924,6 +950,7 @@ class UserController extends Controller
         }
     }
 
+    #[UserStory('As a Restarter, I can complete my onboarding process', persona: 'Restarter', theme: 'Registration & onboarding')]
     public function getOnboardingComplete()
     {
         $user = Auth::user();
@@ -936,6 +963,7 @@ class UserController extends Controller
         return 'true';
     }
 
+    #[NoStory(reason: 'AJAX email validation helper')]
     public function postEmail(Request $request): JsonResponse
     {
         if (User::where('email', '=', $request->get('email'))->exists()) {
@@ -945,6 +973,7 @@ class UserController extends Controller
         return response()->json(['message' => 'Email is available']);
     }
 
+    #[NoStory(reason: 'MediaWiki thumbnail integration')]
     public static function getThumbnail(Request $request): JsonResponse
     {
         $user = User::where('mediawiki', $request->input('wiki_username'))->first();
@@ -962,6 +991,7 @@ class UserController extends Controller
         return response()->json($thumbnailPath);
     }
 
+    #[NoStory(reason: 'MediaWiki menu integration')]
     public function getUserMenus(Request $request): JsonResponse
     {
         $user = User::where('mediawiki', $request->input('wiki_username'))->first();

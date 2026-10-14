@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Attributes\Feature;
+use App\Attributes\UserStory;
 use App\Helpers\Fixometer;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\Permission;
@@ -13,6 +15,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
+#[Feature('Administration', description: 'Platform administration and configuration')]
 class RoleController extends Controller
 {
     /**
@@ -34,6 +37,7 @@ class RoleController extends Controller
      *      @OA\Response(response=403, ref="#/components/responses/Forbidden")
      * )
      */
+    #[UserStory('As an Admin, I can view all roles and their permissions', persona: 'Admin', theme: 'Reference data')]
     public function listRolesv2(): JsonResponse
     {
         if ($resp = $this->requireAdministrator()) {
@@ -74,6 +78,7 @@ class RoleController extends Controller
      *      @OA\Response(response=404, ref="#/components/responses/NotFound")
      * )
      */
+    #[UserStory('As an Admin, I can view a role', persona: 'Admin', theme: 'Reference data')]
     public function getRolev2($id): JsonResponse
     {
         if ($resp = $this->requireAdministrator()) {
@@ -123,6 +128,7 @@ class RoleController extends Controller
      *      @OA\Response(response=403, ref="#/components/responses/Forbidden")
      * )
      */
+    #[UserStory('As an Admin, I can view all permissions', persona: 'Admin', theme: 'Reference data')]
     public function listPermissionsv2(): JsonResponse
     {
         if ($resp = $this->requireAdministrator()) {
@@ -171,6 +177,7 @@ class RoleController extends Controller
      *      @OA\Response(response=422, ref="#/components/responses/ValidationError")
      * )
      */
+    #[UserStory('As an Admin, I can change the permissions granted to a role', persona: 'Admin', theme: 'Reference data')]
     public function updateRolePermissionsv2(Request $request, $id): JsonResponse
     {
         if ($resp = $this->requireAdministrator()) {

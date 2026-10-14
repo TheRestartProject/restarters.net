@@ -15,6 +15,7 @@ use Tests\TestCase;
 
 class APIv2NetworkTest extends TestCase
 {
+    /** @story:NetworkController::getNetworksv2 */
     public function testList(): void {
         $user = User::factory()->administrator()->create([
                                                                           'api_token' => '1234',
@@ -215,6 +216,7 @@ class APIv2NetworkTest extends TestCase
     }
 
     /**
+     * @story:NetworkController::getNetworkEventsv2
      * @dataProvider providerEventsParameters
      * @param $value
      */

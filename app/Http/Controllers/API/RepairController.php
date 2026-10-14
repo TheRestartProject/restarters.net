@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Attributes\UserStory;
+use App\Attributes\Feature;
 use App\Device;
 use App\Http\Controllers\Controller;
 use App\Services\Ords\OrdsRecordMapper;
@@ -24,6 +26,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
  *
  * @see config/ords.php for the vocabulary maps and the id namespace guard.
  */
+#[Feature('Platform', description: 'Platform-wide statistics and public impact data')]
 class RepairController extends Controller
 {
     /**
@@ -162,6 +165,7 @@ class RepairController extends Controller
      *      ),
      *     )
      */
+    #[UserStory('As an Admin, I can export approved repair records in the Open Repair Data Standard format as JSON or CSV', persona: 'Admin', theme: 'Data exports')]
     public function listRepairsv2(Request $request): Response
     {
         // Checked before the config guard so the export's configuration state
