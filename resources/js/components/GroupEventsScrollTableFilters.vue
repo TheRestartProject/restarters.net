@@ -13,7 +13,6 @@
         track-by="country"
         label="country"
         :multiple="false"
-        :allow-empty="false"
         deselect-label=""
         :taggable="false"
         selectLabel=""

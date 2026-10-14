@@ -16,7 +16,6 @@
       :taggable="false"
       selectLabel=""
       ref="multiselect"
-      @select=""
       :selectedLabel="allowEmpty ? __('partials.remove') : null"
       @open="onOpen"
     >

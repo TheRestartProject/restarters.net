@@ -1,8 +1,7 @@
 <template>
   <div>
     <b-alert v-for="alert in alertsNotDismissed" :key="'alert-' + alert.id"
-             :variant="alert.variant"
-             variant="secondary" dismissible class="information-alert mb-2" @dismissed="dismissed(alert.id)" show>
+             :variant="alert.variant || 'secondary'" dismissible class="information-alert mb-2" @dismissed="dismissed(alert.id)" show>
       <div class="d-sm-flex flex-row justify-content-between align-items-center">
         <div class="action-text-left float-left d-flex flex-row">
           <div class="action-text mb-0">
