@@ -151,6 +151,11 @@ jobs:
             # Configure Discourse settings (only if Discourse web app is up)
             docker exec restarters php artisan discourse:setting personal_message_enabled_groups 10 || echo "Warning: discourse:setting failed - Discourse may not be fully started"
 
+      # Fail fast if a controller method lacks a #[UserStory]/#[NoStory] annotation or the specs manifest is stale
+      - run:
+          name: Check living specs
+          command: docker exec restarters php artisan specs:extract --check
+
       # Run PHPUnit tests
       - run:
           name: Run PHPUnit tests

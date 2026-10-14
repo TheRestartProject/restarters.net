@@ -14,6 +14,7 @@ use Tests\TestCase;
 
 class GroupViewTest extends TestCase
 {
+    /** @story:GroupController::view */
     public function testBasic(): void
     {
         // Check we can create a group and view it.
@@ -55,6 +56,7 @@ class GroupViewTest extends TestCase
         $this->assertEquals(1, count(json_decode($props[1][':events'], TRUE)));
     }
 
+    /** @story:GroupController::view */
     public function testInvalidGroup(): void
     {
         $this->loginAsTestUser(Role::RESTARTER);
@@ -62,6 +64,7 @@ class GroupViewTest extends TestCase
         $this->get('/group/view/undefined');
     }
 
+    /** @story:GroupController::view */
     public function testInvalidGroup2(): void
     {
         $this->loginAsTestUser(Role::RESTARTER);
@@ -69,6 +72,11 @@ class GroupViewTest extends TestCase
         $this->get('/group/view/1');
     }
 
+    /**
+     * @story:GroupController::view
+     * @story:ApiController::getDevices
+     * @story:OutboundController::info
+     */
     public function testCanDelete(): void
     {
         $this->loginAsTestUser(Role::ADMINISTRATOR);
@@ -141,6 +149,7 @@ class GroupViewTest extends TestCase
         }
     }
 
+    /** @story:GroupController::view */
     public function testInProgressVisible(): void {
         $this->loginAsTestUser(Role::ADMINISTRATOR);
         $id = $this->createGroup();

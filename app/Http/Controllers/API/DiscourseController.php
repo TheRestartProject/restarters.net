@@ -9,12 +9,16 @@ use App\User;
 use Auth;
 use Illuminate\Http\Request;
 use Cache;
+use App\Attributes\Feature;
+use App\Attributes\UserStory;
 
+#[Feature('Platform', description: 'Platform-wide statistics and public impact data')]
 class DiscourseController extends Controller
 {
     /**
      * Get top Talk topics.
      */
+    #[UserStory('As a Guest, I can view recent community discussion topics', persona: 'Guest', theme: 'Discussion integration')]
     public function discussionTopics(Request $request, DiscourseService $discourseService, string $tag = NULL): JsonResponse
     {
         $topics = [];

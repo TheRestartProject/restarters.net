@@ -29,7 +29,11 @@ use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Notification;
 use Illuminate\Validation\ValidationException;
+use App\Attributes\Feature;
+use App\Attributes\UserStory;
+use App\Attributes\NoStory;
 
+#[Feature('Groups', description: 'Community repair group management and membership')]
 class GroupController extends Controller
 {
     /**
@@ -40,6 +44,7 @@ class GroupController extends Controller
      *
      * Only Administrators can access this API call.
      */
+    #[UserStory('As an Admin, I can list group audit changes for Zapier integration', persona: 'Admin', theme: 'Admin & integrations')]
     public static function getGroupChanges(Request $request)
     {
         $authenticatedUser = Auth::user();
@@ -62,6 +67,7 @@ class GroupController extends Controller
         return response()->json($groupChanges);
     }
 
+    #[UserStory('As a NetworkCoordinator, I can list all groups in my networks via the API', persona: 'NetworkCoordinator', theme: 'Network membership')]
     public static function getGroupsByUsersNetworks(Request $request): JsonResponse
     {
         $authenticatedUser = Auth::user();
@@ -184,6 +190,7 @@ class GroupController extends Controller
     /**
      * Get all of the audits related to groups from the audits table.
      */
+    #[NoStory(reason: 'Internal audit helper for Zapier')]
     public static function getGroupAudits($dateFrom = null)
     {
         $query = \OwenIt\Auditing\Models\Audit::where('auditable_type', \App\Group::class);
@@ -202,6 +209,7 @@ class GroupController extends Controller
      * Map from the group and audit information as recorded by the audits library,
      * into the format needed for Zapier.
      */
+    #[NoStory(reason: 'Internal Zapier formatting helper')]
     public static function mapDetailsAndAuditToChange($group, $groupAudit)
     {
         $group->makeHidden(['updated_at', 'wordpress_post_id', 'ShareableLink', 'shareable_code']);
@@ -217,6 +225,7 @@ class GroupController extends Controller
         return $groupChange;
     }
 
+    #[UserStory('As a Restarter, I can list all groups via the API', persona: 'Restarter', theme: 'Find & browse groups')]
     public static function getGroupList(): JsonResponse
     {
         $groups = Group::orderBy('created_at', 'desc');
@@ -270,6 +279,8 @@ class GroupController extends Controller
      *     )
      */
 
+    #[UserStory('As a Guest, I can get a list of group names via the API', persona: 'Guest', theme: 'Find & browse groups')]
+    #[UserStory('As a ThirdParty, I can retrieve group names to display on my own platform', persona: 'ThirdParty', theme: 'Find & browse groups')]
     public static function listNamesv2(Request $request) {
         $request->validate([
             'includeArchived' => ['string', 'in:true,false'],
@@ -380,6 +391,8 @@ class GroupController extends Controller
      *     )
      */
 
+    #[UserStory('As a Guest, I can list summaries of groups (optionally only chosen ids) via the API', persona: 'Guest', theme: 'Browse groups')]
+    #[UserStory('As a ThirdParty, I can retrieve group summaries to display on my platform', persona: 'ThirdParty', theme: 'Browse groups')]
     public static function listSummaryv2(Request $request) {
         $request->validate([
             'archived' => ['string', 'in:true,false'],
@@ -434,6 +447,8 @@ class GroupController extends Controller
      *       ),
      *     )
      */
+    #[UserStory('As a Guest, I can get a list of group tags via the API', persona: 'Guest', theme: 'Find & browse groups')]
+    #[UserStory('As a ThirdParty, I can retrieve group tags to categorise groups on my platform', persona: 'ThirdParty', theme: 'Find & browse groups')]
     public static function listTagsv2(Request $request) {
         // Try session auth first, then API token auth
         $user = Auth::user();
@@ -500,6 +515,8 @@ class GroupController extends Controller
      *      ),
      *     )
      */
+    #[UserStory('As a Guest, I can view group details via the API', persona: 'Guest', theme: 'Find & browse groups')]
+    #[UserStory('As a ThirdParty, I can retrieve group details to display on my platform', persona: 'ThirdParty', theme: 'Find & browse groups')]
     public static function getGroupv2(Request $request, $idgroups) {
         $group = Group::findOrFail($idgroups);
         return \App\Http\Resources\Group::make($group);
@@ -563,6 +580,8 @@ class GroupController extends Controller
      *     )
      */
 
+    #[UserStory('As a Guest, I can list events for a group via the API', persona: 'Guest', theme: 'Events for group')]
+    #[UserStory('As a ThirdParty, I can retrieve events for a group to display on my platform', persona: 'ThirdParty', theme: 'Events for group')]
     public static function getEventsForGroupv2(Request $request, $idgroups) {
         $group = Group::findOrFail($idgroups);
 
@@ -622,6 +641,8 @@ class GroupController extends Controller
      *     )
      */
 
+    #[UserStory('As a Guest, I can view a group\'s volunteers via the API', persona: 'Guest', theme: 'Manage volunteers')]
+    #[UserStory('As a ThirdParty, I can retrieve volunteer data for a group via the API', persona: 'ThirdParty', theme: 'Manage volunteers')]
     public function getVolunteersForGroupv2(Request $request, $idgroups) {
         $group = Group::findOrFail($idgroups);
         $query = $group->allConfirmedVolunteers();
@@ -678,6 +699,7 @@ class GroupController extends Controller
      *     )
      */
 
+    #[UserStory('As a Host, I can remove a volunteer from my group', persona: 'Host', theme: 'Manage volunteers')]
     public function deleteVolunteerForGroupv2(Request $request, $id, $iduser)
     {
         $user = $this->getUser();
@@ -733,6 +755,7 @@ class GroupController extends Controller
      *     )
      */
 
+    #[UserStory('As a Host, I can change a volunteer\'s role in my group', persona: 'Host', theme: 'Manage volunteers')]
     public function patchVolunteerForGroupv2(Request $request, $id, $iduser)
     {
         $user = $this->getUser();
@@ -808,6 +831,8 @@ class GroupController extends Controller
      *       ),
      *     )
      */
+    #[UserStory('As a NetworkCoordinator, I can view groups pending moderation in my networks', persona: 'NetworkCoordinator', theme: 'Create & manage groups')]
+    #[UserStory('As an Admin, I can view all groups pending moderation', persona: 'Admin', theme: 'Create & manage groups')]
     public function moderateGroupsv2(Request $request): JsonResponse {
         $user = $this->getUser();
         $ret = \App\Http\Resources\GroupCollection::make(Group::unapprovedVisibleTo($user->id));
@@ -890,6 +915,7 @@ class GroupController extends Controller
      *     )
      *  )
      */
+    #[UserStory('As a Restarter, I can create a new group via the API', persona: 'Restarter', theme: 'Create & manage groups')]
     public function createGroupv2(Request $request): JsonResponse {
         $user = $this->getUser();
         $user->convertToHost();
@@ -1038,6 +1064,7 @@ class GroupController extends Controller
      *     )
      *  )
      */
+    #[UserStory('As a Host, I can update my group via the API', persona: 'Host', theme: 'Create & manage groups')]
     public function updateGroupv2(Request $request, $idGroup): JsonResponse {
         $user = $this->getUser();
 
@@ -1182,10 +1209,11 @@ class GroupController extends Controller
             }
         }
 
-        if (array_key_exists('timezone', $data) && $timezone != $old_zone) {
+        if (array_key_exists('timezone', $data) && !empty($timezone) && $timezone != $old_zone) {
             // The timezone of the group has changed.  Update the zone of any future events.  This happens
             // sometimes when a group is created and events are created before the group is approved (and therefore
-            // before the admin has a chance to set the zone on the group.
+            // before the admin has a chance to set the zone on the group.  Clearing the group's timezone leaves
+            // events alone, so their times don't move.
             foreach ($group->upcomingParties() as $party) {
                 $party->update([
                                    'timezone' => $timezone
@@ -1238,6 +1266,8 @@ class GroupController extends Controller
                                    'description' => ['required'],
                                    'website' => ['nullable', 'url', 'max:255'],
                                    'postcode' => ['nullable', 'max:32'],
+                                   'lat' => ['nullable', 'numeric', 'between:-90,90', 'required_with:lng'],
+                                   'lng' => ['nullable', 'numeric', 'between:-180,180', 'required_with:lat'],
                                ]);
         } else {
             $request->validate([
@@ -1246,6 +1276,8 @@ class GroupController extends Controller
                                    'website' => ['nullable', 'url', 'max:255'],
                                    'archived_at' => ['nullable', 'date'],
                                    'postcode' => ['nullable', 'max:32'],
+                                   'lat' => ['nullable', 'numeric', 'between:-90,90', 'required_with:lng'],
+                                   'lng' => ['nullable', 'numeric', 'between:-180,180', 'required_with:lat'],
                                ]);
         }
 
@@ -1269,6 +1301,12 @@ class GroupController extends Controller
             throw ValidationException::withMessages(['location ' => __('partials.validate_timezone')]);
         }
 
+        // The add/edit page shows a draggable map, so the client can send explicit
+        // coordinates that take precedence over geocoding the location text.
+        $clientLat = $request->input('lat');
+        $clientLng = $request->input('lng');
+        $hasClientCoords = $clientLat !== null && $clientLng !== null;
+
         if (!empty($location)) {
             // Skip geocoding when the location string hasn't changed — avoids unnecessary API calls
             // and prevents failures when editing other fields (e.g. group icon) in environments
@@ -1284,16 +1322,25 @@ class GroupController extends Controller
                 $geocoded = $geocoder->geocode($location);
 
                 if (empty($geocoded)) {
-                    throw ValidationException::withMessages(['location ' => __('groups.geocode_failed')]);
+                    // With an explicit pin we can still place the group; without
+                    // one, an ungeocodable location is fatal as before.
+                    if (!$hasClientCoords) {
+                        throw ValidationException::withMessages(['location ' => __('groups.geocode_failed')]);
+                    }
+                } else {
+                    $latitude = $geocoded['latitude'];
+                    $longitude = $geocoded['longitude'];
+
+                    // Note that the country returned by the geocoder is already in English, which is what we need for the
+                    // value in the database.
+                    $country_code = $geocoded['country_code'] ?? null;
                 }
-
-                $latitude = $geocoded['latitude'];
-                $longitude = $geocoded['longitude'];
-
-                // Note that the country returned by the geocoder is already in English, which is what we need for the
-                // value in the database.
-                $country_code = $geocoded['country_code'] ?? null;
             }
+        }
+
+        if ($hasClientCoords) {
+            $latitude = (float) $clientLat;
+            $longitude = (float) $clientLng;
         }
 
         return [

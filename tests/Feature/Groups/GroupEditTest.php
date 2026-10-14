@@ -17,7 +17,11 @@ use Illuminate\Support\Facades\Storage;
 
 class GroupEditTest extends TestCase
 {
-    /** @test */
+    /**
+     * @test
+     * @story:GroupController::edit
+     * @story:GroupController::updateGroupv2
+     */
     public function group_tags_retained_after_edited_by_host(): void
     {
         $this->withoutExceptionHandling();
@@ -58,6 +62,7 @@ class GroupEditTest extends TestCase
         ]);
     }
 
+    /** @story:GroupController::edit */
     public function testEditGroupAsRestarter(): void {
         $group = Group::factory()->create();
 
@@ -66,7 +71,10 @@ class GroupEditTest extends TestCase
         $this->get('/group/edit/' . $group->idgroups);
     }
 
-    /** @test */
+    /**
+     * @test
+     * @story:GroupController::updateGroupv2
+     */
     public function invalid_location(): void
     {
         $this->withoutExceptionHandling();
@@ -92,7 +100,10 @@ class GroupEditTest extends TestCase
         ]);
     }
 
-    /** @test */
+    /**
+     * @test
+     * @story:GroupController::updateGroupv2
+     */
     public function partial_update_only_changes_the_fields_sent(): void {
         $group = Group::factory()->create([
             'name' => 'Partial Group',
@@ -141,7 +152,10 @@ class GroupEditTest extends TestCase
         $this->assertEquals('Europe/London', $event->fresh()->timezone);
     }
 
-    /** @test */
+    /**
+     * @test
+     * @story:GroupController::updateGroupv2
+     */
     public function archiving_with_only_the_date_keeps_the_rest_of_the_group(): void {
         $group = Group::factory()->create([
             'name' => 'Archive Me',
@@ -162,7 +176,10 @@ class GroupEditTest extends TestCase
         $this->assertEquals(['foo' => 'bar'], $group->network_data);
     }
 
-    /** @test */
+    /**
+     * @test
+     * @story:GroupController::updateGroupv2
+     */
     public function sending_a_field_empty_or_null_clears_it(): void {
         $group = Group::factory()->create([
             'name' => 'Clear Me',
@@ -183,7 +200,10 @@ class GroupEditTest extends TestCase
         $this->assertEquals('Clear Me', $group->name);
     }
 
-    /** @test */
+    /**
+     * @test
+     * @story:GroupController::updateGroupv2
+     */
     public function sending_an_empty_archive_date_unarchives(): void {
         $group = Group::factory()->create([
             'name' => 'Archived',
@@ -200,7 +220,10 @@ class GroupEditTest extends TestCase
         $this->assertEquals('Archived', $group->name);
     }
 
-    /** @test */
+    /**
+     * @test
+     * @story:GroupController::updateGroupv2
+     */
     public function archiving_is_audited_as_a_change_to_the_archive_date_only(): void {
         $group = Group::factory()->create(['name' => 'Audit Me', 'network_data' => ['foo' => 'bar']]);
 
@@ -222,7 +245,10 @@ class GroupEditTest extends TestCase
         $this->assertEquals(['archived_at'], array_keys(json_decode($audit->new_values, true)));
     }
 
-    /** @test */
+    /**
+     * @test
+     * @story:GroupController::updateGroupv2
+     */
     public function changing_the_location_updates_the_map_position_and_country(): void {
         $group = Group::factory()->create([
             'location' => 'London',
@@ -243,7 +269,10 @@ class GroupEditTest extends TestCase
         $this->assertEquals('BE', $group->country_code);
     }
 
-    /** @test */
+    /**
+     * @test
+     * @story:GroupController::updateGroupv2
+     */
     public function changing_the_timezone_moves_future_events(): void {
         $group = Group::factory()->create(['timezone' => 'Europe/London']);
         $future = \App\Party::factory()->create([
@@ -262,7 +291,32 @@ class GroupEditTest extends TestCase
         $this->assertEquals('Europe/Brussels', $future->fresh()->timezone);
     }
 
-    /** @test */
+    /**
+     * @test
+     * @story:GroupController::updateGroupv2
+     */
+    public function clearing_the_timezone_leaves_future_events_alone(): void {
+        $group = Group::factory()->create(['timezone' => 'Europe/London']);
+        $future = \App\Party::factory()->create([
+            'group' => $group->idgroups,
+            'event_start_utc' => Carbon::now()->addWeek()->toIso8601String(),
+            'event_end_utc' => Carbon::now()->addWeek()->addHours(2)->toIso8601String(),
+            'timezone' => 'Europe/London',
+        ]);
+
+        $admin = User::factory()->administrator()->create();
+        $this->actingAs($admin);
+
+        $this->patch('/api/v2/groups/' . $group->idgroups, ['timezone' => ''])->assertSuccessful();
+
+        $this->assertEmpty($group->fresh()->getAttributes()['timezone']);
+        $this->assertEquals('Europe/London', $future->fresh()->getAttributes()['timezone']);
+    }
+
+    /**
+     * @test
+     * @story:GroupController::updateGroupv2
+     */
     public function host_cannot_archive_or_set_the_area(): void {
         $group = Group::factory()->create(['area' => 'London', 'archived_at' => null]);
 
@@ -281,7 +335,10 @@ class GroupEditTest extends TestCase
         $this->assertNull($group->archived_at);
     }
 
-    /** @test */
+    /**
+     * @test
+     * @story:GroupController::updateGroupv2
+     */
     public function approving_without_resending_the_location_still_notifies_nearby_volunteers(): void {
         \Illuminate\Support\Facades\Notification::fake();
 
@@ -311,7 +368,10 @@ class GroupEditTest extends TestCase
         $this->assertEquals('Approve Me', $group->fresh()->name);
     }
 
-    /** @test */
+    /**
+     * @test
+     * @story:GroupController::updateGroupv2
+     */
     public function host_can_edit_postcode_but_not_area(): void {
         $group = Group::factory()->create(['postcode' => 'SW9 7QD', 'area' => 'London']);
 
@@ -344,7 +404,11 @@ class GroupEditTest extends TestCase
         ]);
     }
 
-    /** @test */
+    /**
+     * @test
+     * @story:GroupController::imageUpload
+     * @story:GroupController::ajaxDeleteImage
+     */
     public function image_upload(): void {
         Storage::fake('avatars');
         $group = Group::factory()->create();
@@ -480,7 +544,11 @@ class GroupEditTest extends TestCase
         self::assertTrue($found);
     }
 
-    /** @test */
+    /**
+     * @test
+     * @story:GroupController::edit
+     * @story:GroupController::updateGroupv2
+     */
     public function edit_email(): void
     {
         $this->withoutExceptionHandling();
@@ -514,6 +582,7 @@ class GroupEditTest extends TestCase
         $this->assertEquals('info@test.com', $group->email);
     }
 
+    /** @story:GroupController::edit */
     public function testEditAsNetworkCoordinator(): void {
         $network = Network::factory()->create();
         $coordinator = User::factory()->restarter()->create();
