@@ -148,14 +148,14 @@ jobs:
           name: Setup application
           command: |
             # Grant timezone access - run directly on MySQL container
-            docker exec restarters_db mysql -u root -ps3cr3t -e "GRANT SELECT ON mysql.time_zone_name TO 'restarters'@'%';"
+            docker exec restarters_db sh -c 'mysql -u root -p"$MYSQL_ROOT_PASSWORD" -e "GRANT SELECT ON mysql.time_zone_name TO '"'"'restarters'"'"'@'"'"'%'"'"';"'
 
             # Setup additional configuration needed for CI (most setup already done by docker_run.sh)
             # Set MySQL function creators using session variable (compatible with MySQL 5.7)
-            docker exec restarters_db mysql -u root -ps3cr3t -e "SET GLOBAL log_bin_trust_function_creators = 1;"
+            docker exec restarters_db sh -c 'mysql -u root -p"$MYSQL_ROOT_PASSWORD" -e "SET GLOBAL log_bin_trust_function_creators = 1;"'
 
             # Disable ONLY_FULL_GROUP_BY for compatibility with getItemTypes() query
-            docker exec restarters_db mysql -u root -ps3cr3t -e "SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));"
+            docker exec restarters_db sh -c 'mysql -u root -p"$MYSQL_ROOT_PASSWORD" -e "SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode,\"ONLY_FULL_GROUP_BY\",\"\"));"'
 
             # Generate additional Laravel artifacts for testing
             docker exec restarters php artisan l5-swagger:generate
@@ -306,9 +306,9 @@ jobs:
       - run:
           name: Setup application
           command: |
-            docker exec restarters_db mysql -u root -ps3cr3t -e "GRANT SELECT ON mysql.time_zone_name TO 'restarters'@'%';"
-            docker exec restarters_db mysql -u root -ps3cr3t -e "SET GLOBAL log_bin_trust_function_creators = 1;"
-            docker exec restarters_db mysql -u root -ps3cr3t -e "SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));"
+            docker exec restarters_db sh -c 'mysql -u root -p"$MYSQL_ROOT_PASSWORD" -e "GRANT SELECT ON mysql.time_zone_name TO '"'"'restarters'"'"'@'"'"'%'"'"';"'
+            docker exec restarters_db sh -c 'mysql -u root -p"$MYSQL_ROOT_PASSWORD" -e "SET GLOBAL log_bin_trust_function_creators = 1;"'
+            docker exec restarters_db sh -c 'mysql -u root -p"$MYSQL_ROOT_PASSWORD" -e "SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode,\"ONLY_FULL_GROUP_BY\",\"\"));"'
             docker exec restarters php artisan l5-swagger:generate
       - run:
           name: Run client Playwright tests

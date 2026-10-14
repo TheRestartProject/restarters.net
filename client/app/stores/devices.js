@@ -1,6 +1,9 @@
 import { defineStore } from 'pinia'
 import { useToastStore } from './toast.js'
 
+// Disambiguates optimistic placeholder ids created within the same millisecond.
+let tempIdSeq = 0
+
 // Fields the read (Device resource) and write (validateDeviceParams)
 // shapes agree on scalar-for-scalar - safe to optimistically splat straight
 // from the submitted payload onto the cached row while a create/update
@@ -170,7 +173,7 @@ export const useDevicesStore = defineStore('devices', {
       }
       const entry = this.byEvent[eventId]
 
-      const tempId = -(Date.now() + Math.floor(Math.random() * 1000))
+      const tempId = -(Date.now() * 1000 + (tempIdSeq++ % 1000))
       const optimisticDevice = {
         id: tempId,
         eventid: eventId,

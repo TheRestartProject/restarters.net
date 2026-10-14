@@ -7,7 +7,8 @@
 export function useClipboard() {
   function copy(text) {
     if (navigator.clipboard) {
-      navigator.clipboard.writeText(text)
+      // Permission denial / insecure context rejects; nothing useful to do.
+      Promise.resolve(navigator.clipboard.writeText(text)).catch(() => {})
     }
   }
 
