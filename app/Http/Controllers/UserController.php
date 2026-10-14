@@ -1057,6 +1057,8 @@ class UserController extends Controller
         if (Auth::attempt($credentials)) {
             return redirect()->intended($redirectTo);
         }
+
+        return redirect($redirectTo);
     }
 
     #[UserStory('As a Restarter, I can complete my onboarding process', persona: 'Restarter', theme: 'Registration & onboarding')]

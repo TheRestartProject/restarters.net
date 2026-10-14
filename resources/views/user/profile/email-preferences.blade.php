@@ -10,7 +10,7 @@
     <form action="/profile/edit-preferences" method="post">
         @csrf
 
-        {{ Form::hidden('id', $user->id) }}
+        <input type="hidden" name="id" value="{{ $user->id }}">
 
         <fieldset class="email-options">
             {{-- <div class="form-check d-flex align-items-center justify-content-start">
