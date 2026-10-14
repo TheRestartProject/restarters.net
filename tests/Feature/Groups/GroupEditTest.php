@@ -269,11 +269,7 @@ class GroupEditTest extends TestCase
         $this->assertEquals('BE', $group->country_code);
     }
 
-    /**
-     * @test
-     * @story:GroupController::updateGroupv2
-     */
-    public function changing_the_timezone_moves_future_events(): void {
+    private function londonGroupWithFutureEventAsAdmin(): array {
         $group = Group::factory()->create(['timezone' => 'Europe/London']);
         $future = \App\Party::factory()->create([
             'group' => $group->idgroups,
@@ -282,8 +278,17 @@ class GroupEditTest extends TestCase
             'timezone' => 'Europe/London',
         ]);
 
-        $admin = User::factory()->administrator()->create();
-        $this->actingAs($admin);
+        $this->actingAs(User::factory()->administrator()->create());
+
+        return [$group, $future];
+    }
+
+    /**
+     * @test
+     * @story:GroupController::updateGroupv2
+     */
+    public function changing_the_timezone_moves_future_events(): void {
+        [$group, $future] = $this->londonGroupWithFutureEventAsAdmin();
 
         $this->patch('/api/v2/groups/' . $group->idgroups, ['timezone' => 'Europe/Brussels'])->assertSuccessful();
 
@@ -296,16 +301,7 @@ class GroupEditTest extends TestCase
      * @story:GroupController::updateGroupv2
      */
     public function clearing_the_timezone_leaves_future_events_alone(): void {
-        $group = Group::factory()->create(['timezone' => 'Europe/London']);
-        $future = \App\Party::factory()->create([
-            'group' => $group->idgroups,
-            'event_start_utc' => Carbon::now()->addWeek()->toIso8601String(),
-            'event_end_utc' => Carbon::now()->addWeek()->addHours(2)->toIso8601String(),
-            'timezone' => 'Europe/London',
-        ]);
-
-        $admin = User::factory()->administrator()->create();
-        $this->actingAs($admin);
+        [$group, $future] = $this->londonGroupWithFutureEventAsAdmin();
 
         $this->patch('/api/v2/groups/' . $group->idgroups, ['timezone' => ''])->assertSuccessful();
 

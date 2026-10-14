@@ -11,6 +11,13 @@ use Tests\TestCase;
 
 class EditEventPartialTest extends TestCase
 {
+    private const DATE_FORMAT = 'Y-m-d H:i:s';
+
+    private function patchEvent(Party $event, array $data)
+    {
+        return $this->patch('/api/v2/events/' . $event->idevents, $data);
+    }
+
     private function makeEvent(array $atts = []): Party
     {
         $group = Group::factory()->create();
@@ -39,7 +46,7 @@ class EditEventPartialTest extends TestCase
         $event = $this->makeEvent();
         $this->actingAs(User::factory()->administrator()->create());
 
-        $this->patch('/api/v2/events/' . $event->idevents, ['link' => 'https://example.org/new'])->assertSuccessful();
+        $this->patchEvent($event, ['link' => 'https://example.org/new'])->assertSuccessful();
 
         $event->refresh();
         $this->assertEquals('https://example.org/new', $event->link);
@@ -49,8 +56,8 @@ class EditEventPartialTest extends TestCase
         $this->assertEquals(51.5073509, $event->latitude);
         $this->assertEquals(-0.1277583, $event->longitude);
         $this->assertEquals('Europe/London', $event->getAttributes()['timezone']);
-        $this->assertEquals('2100-01-01 10:00:00', Carbon::parse($event->event_start_utc)->format('Y-m-d H:i:s'));
-        $this->assertEquals('2100-01-01 12:00:00', Carbon::parse($event->event_end_utc)->format('Y-m-d H:i:s'));
+        $this->assertEquals('2100-01-01 10:00:00', Carbon::parse($event->event_start_utc)->format(self::DATE_FORMAT));
+        $this->assertEquals('2100-01-01 12:00:00', Carbon::parse($event->event_end_utc)->format(self::DATE_FORMAT));
     }
 
     /**
@@ -62,11 +69,11 @@ class EditEventPartialTest extends TestCase
         $event = $this->makeEvent();
         $this->actingAs(User::factory()->administrator()->create());
 
-        $this->patch('/api/v2/events/' . $event->idevents, ['start' => '2100-01-01T09:00:00Z'])->assertSuccessful();
+        $this->patchEvent($event, ['start' => '2100-01-01T09:00:00Z'])->assertSuccessful();
 
         $event->refresh();
-        $this->assertEquals('2100-01-01 09:00:00', Carbon::parse($event->event_start_utc)->format('Y-m-d H:i:s'));
-        $this->assertEquals('2100-01-01 12:00:00', Carbon::parse($event->event_end_utc)->format('Y-m-d H:i:s'));
+        $this->assertEquals('2100-01-01 09:00:00', Carbon::parse($event->event_start_utc)->format(self::DATE_FORMAT));
+        $this->assertEquals('2100-01-01 12:00:00', Carbon::parse($event->event_end_utc)->format(self::DATE_FORMAT));
         $this->assertEquals(3, $event->hours);
     }
 
@@ -79,7 +86,7 @@ class EditEventPartialTest extends TestCase
         $event = $this->makeEvent(['online' => true]);
         $this->actingAs(User::factory()->administrator()->create());
 
-        $this->patch('/api/v2/events/' . $event->idevents, [
+        $this->patchEvent($event, [
             'link' => '',
             'online' => '0',
         ])->assertSuccessful();
@@ -99,7 +106,7 @@ class EditEventPartialTest extends TestCase
         $event = $this->makeEvent();
         $this->actingAs(User::factory()->administrator()->create());
 
-        $this->patch('/api/v2/events/' . $event->idevents, ['location' => 'Brussels, Belgium'])->assertSuccessful();
+        $this->patchEvent($event, ['location' => 'Brussels, Belgium'])->assertSuccessful();
 
         $event->refresh();
         $this->assertEquals('Brussels, Belgium', $event->location);
@@ -118,6 +125,6 @@ class EditEventPartialTest extends TestCase
         $this->actingAs(User::factory()->administrator()->create());
 
         $this->expectException(ValidationException::class);
-        $this->patch('/api/v2/events/' . $event->idevents, ['title' => '']);
+        $this->patchEvent($event, ['title' => '']);
     }
 }
