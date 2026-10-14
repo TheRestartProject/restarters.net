@@ -135,6 +135,10 @@ class DeviceController extends Controller {
      *                     property="barrier",
      *                     ref="#/components/schemas/Device/properties/barrier",
      *                ),
+     *                @OA\Property(
+     *                     property="reference",
+     *                     ref="#/components/schemas/Device/properties/reference",
+     *                ),
      *             )
      *         )
      *    ),
@@ -194,7 +198,8 @@ class DeviceController extends Controller {
             $professional_help,
             $more_time_needed,
             $do_it_yourself,
-            $barrier
+            $barrier,
+            $reference
         ) = $this->validateDeviceParams($request,true);
 
         // We may have uploaded photos before creation, and we have a draft id which allows us to patch that
@@ -225,6 +230,7 @@ class DeviceController extends Controller {
             'professional_help' => $professional_help,
             'more_time_needed' => $more_time_needed,
             'do_it_yourself' => $do_it_yourself,
+            'reference' => $reference,
             'repaired_by' => $user->id,
         ];
 
@@ -348,6 +354,10 @@ class DeviceController extends Controller {
      *                     property="barrier",
      *                     ref="#/components/schemas/Device/properties/barrier",
      *                ),
+     *                @OA\Property(
+     *                     property="reference",
+     *                     ref="#/components/schemas/Device/properties/reference",
+     *                ),
      *             )
      *         )
      *    ),
@@ -407,7 +417,8 @@ class DeviceController extends Controller {
             $professional_help,
             $more_time_needed,
             $do_it_yourself,
-            $barrier
+            $barrier,
+            $reference
             ) = $this->validateDeviceParams($request,false);
 
         $event = Party::findOrFail($eventid);
@@ -443,6 +454,7 @@ class DeviceController extends Controller {
             'professional_help' => $professional_help,
             'more_time_needed' => $more_time_needed,
             'do_it_yourself' => $do_it_yourself,
+            'reference' => $reference,
             'repaired_by' => $user->id,
         ];
 
@@ -555,6 +567,7 @@ class DeviceController extends Controller {
             'age' => [ 'numeric', 'max:500' ],
             'estimate' => [ 'numeric', 'min:0' ],
             'problem' => [ 'string', 'nullable' ],
+            'reference' => [ 'string', 'nullable', 'max:255' ],
             'notes' => 'string',
             'repair_status' => [ 'string', 'in:Fixed,Repairable,End of life' ],
             'next_steps' => [ 'string', 'in:More time needed,Professional help,Do it yourself', 'nullable' ],
@@ -573,6 +586,7 @@ class DeviceController extends Controller {
         $estimate = $estimate ? $estimate : 0;
         $problem = $request->input('problem');
         $notes = $request->input('notes');
+        $reference = $request->input('reference');
         $repair_status = $request->input('repair_status');
         $barrierInput = $request->input('barrier');
 
@@ -668,7 +682,8 @@ class DeviceController extends Controller {
             $professional_help,
             $more_time_needed,
             $do_it_yourself,
-            $barrier
+            $barrier,
+            $reference
         ];
     }
 
