@@ -1,0 +1,305 @@
+<script setup>
+import { computed, onMounted, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { useEventsStore } from '~/stores/events.js'
+import { useAuth } from '~/composables/useAuth.js'
+import { useEventPermissions } from '~/composables/useEventPermissions.js'
+import EventForm from '~/components/events/EventForm.vue'
+import TusImageUpload from '~/components/forms/TusImageUpload.vue'
+import { useUploadedImageUrl } from '~/composables/useUploadedImageUrl.js'
+
+// /party/edit/[id] - resources/views/events/edit.blade.php +
+// EventAddEdit.vue (design.md §6.2 section 4 C4 task brief). Adds, over the
+// create page: the "photos" tab (existing photos with a remove control, plus
+// TusImageUpload) and the moderation approve select (EventForm.vue, gated on
+// data-testid=event-approve).
+//
+// The legacy page's admin-only "Event log" audit tab
+// (App\Helpers\Fixometer::hasRole($user,'Administrator') && $audits,
+// resources/views/partials/log-accordion.blade.php) is deliberately
+// omitted, same rationale as group/edit/[id].vue's B6 scope cut: there is
+// no API endpoint at all for an event's audit trail.
+definePageMeta({ auth: true })
+
+const { t } = useI18n()
+const route = useRoute()
+const eventsStore = useEventsStore()
+
+const id = computed(() => Number(route.params.id))
+const event = computed(() => eventsStore.current.data)
+const { uploadedImageUrl } = useUploadedImageUrl()
+
+// No permissions object on the v2 Event resource (unlike Group's) - approximate
+// canedit via useEventPermissions: Administrator (and Root) always qualify;
+// a Host qualifies for their own group's events. Host status comes from the
+// UNCAPPED GET /api/v2/users/me/groups list (not the dashboard's your_groups,
+// which is capped at 5 alphabetically - a host of a 6th+ group was wrongly
+// denied edit). NetworkCoordinator's per-network match still can't be checked
+// client-side, so remains a safe false-negative.
+const { hasRole } = useAuth()
+const isAdmin = computed(() => hasRole('Administrator'))
+const { canManageEventForGroup, ensureLoaded: ensureEventPerms } = useEventPermissions()
+const canEdit = computed(() => canManageEventForGroup(event.value?.group?.id))
+
+const updatedMessage = ref('')
+const imageMessage = ref('')
+const imageError = ref('')
+
+// Consumed once, on arrival from the create/duplicate flow, then cleared from
+// the store immediately so that navigating away and back - or editing another
+// event - doesn't resurrect the "Event created!" banner. Captured into a local
+// ref because clearing the store value would otherwise hide the banner in the
+// same tick. develop gets this for free by never unmounting the component
+// (EventAddEditPage.vue), and drops the flag on the first save
+// (@edited="justCreated = false"), which onUpdated below mirrors.
+const justCreated = ref(false)
+
+// edit.blade.php's Details/Photos/Event log tabs; details is active by default.
+const activeTab = ref('details')
+
+// Event log (edit.blade.php:40) - Administrator only, matching
+// `@if($audits && hasRole(Administrator))`. Fetched lazily on first open
+// rather than on mount: it is an admin-only panel most page loads never show.
+const audits = ref([])
+const auditsLoaded = ref(false)
+const auditsError = ref(false)
+const openAuditId = ref(null)
+
+async function showAuditLog() {
+  activeTab.value = 'log'
+
+  if (auditsLoaded.value) return
+
+  try {
+    const { $api } = useNuxtApp()
+    const { data } = await $api.event.audits(id.value)
+    audits.value = data || []
+  } catch {
+    auditsError.value = true
+  } finally {
+    auditsLoaded.value = true
+  }
+}
+
+onMounted(() => {
+  if (eventsStore.justCreatedId === id.value) {
+    justCreated.value = true
+  }
+  eventsStore.justCreatedId = null
+})
+
+useHead({ title: computed(() => (event.value ? `${t('events.editing', { event: event.value.title })}` : t('events.editing', { event: '' }))) })
+
+function load() {
+  eventsStore.fetchEvent(id.value)
+  ensureEventPerms().catch(() => {})
+}
+
+onMounted(load)
+
+function retry() {
+  load()
+}
+
+function onUpdated() {
+  updatedMessage.value = t('events.save_event')
+  // EventAddEditPage.vue:11 - `@edited="justCreated = false"`. Once saved the
+  // event is no longer merely "just created", and the pre-submit notice the
+  // banner was suppressing becomes relevant again.
+  justCreated.value = false
+  load()
+}
+
+async function onImageUploaded({ uploadKey }) {
+  imageError.value = ''
+  imageMessage.value = ''
+
+  try {
+    await eventsStore.uploadEventImage(id.value, uploadKey)
+    imageMessage.value = t('events.field_event_images')
+  } catch {
+    imageError.value = t('client.events.image_upload_error')
+  }
+}
+
+function onImageUploadError(message) {
+  imageError.value = message
+}
+
+// events/edit.blade.php gives each photo a "Remove file" link. Same shape as
+// DevicePhotos.vue's removeImage.
+const deletingImageId = ref(null)
+
+async function removeImage(image) {
+  deletingImageId.value = image.idimages
+  imageError.value = ''
+  imageMessage.value = ''
+
+  try {
+    await eventsStore.deleteEventImage(id.value, image.idimages)
+  } catch {
+    imageError.value = t('client.events.image_delete_error')
+  } finally {
+    deletingImageId.value = null
+  }
+}
+</script>
+
+<template>
+  <div class="container py-4" data-testid="event-edit-page">
+    <div v-if="eventsStore.current.loading" data-testid="event-edit-loading">
+      <div class="placeholder-glow">
+        <span class="placeholder col-12" style="height: 6rem" />
+      </div>
+    </div>
+
+    <BAlert v-else-if="eventsStore.current.error" :model-value="true" variant="danger" data-testid="event-edit-error">
+      <p>{{ t('client.events.view_load_error') }}</p>
+      <BButton variant="danger" data-testid="event-edit-retry" @click="retry">
+        {{ t('client.dashboard.retry') }}
+      </BButton>
+    </BAlert>
+
+    <BAlert v-else-if="event && !canEdit" :model-value="true" variant="danger" data-testid="event-edit-forbidden">
+      {{ t('client.events.edit_forbidden') }}
+    </BAlert>
+
+    <template v-else-if="event">
+      <!-- edit.blade.php:20 interpolates the event NAME as the link into
+           events.editing itself, rather than adding a separate "View event"
+           link underneath. i18n-t keeps the interpolation translatable - the
+           name's position inside "Editing :event" differs by locale, so
+           concatenating around it would break fr/fr-BE. -->
+      <h1>
+        <i18n-t keypath="events.editing" tag="span" scope="global">
+          <template #event>
+            <NuxtLink :to="`/party/view/${id}`" class="event-edit-title-link" data-testid="event-edit-view-link">
+              {{ event.title }}
+            </NuxtLink>
+          </template>
+        </i18n-t>
+      </h1>
+
+      <BAlert v-if="updatedMessage" :model-value="true" variant="success" dismissible data-testid="event-edit-success" @dismissed="updatedMessage = ''">
+        {{ updatedMessage }}
+      </BAlert>
+
+      <!-- edit.blade.php:30-42 - Details / Photos tabs above the panel. This
+           rendered the form bare with Photos as a section BELOW it, so the
+           page had no tab structure at all. develop's third tab, Event log, is
+           gated on `$audits && Administrator`; there is no API endpoint for an
+           event's audit trail, so it is genuinely not buildable yet - but that
+           only ever explained the missing log CONTENT, never the missing tabs.
+      -->
+      <ul class="nav nav-tabs" data-testid="event-edit-tabs">
+        <li class="nav-item">
+          <button
+            type="button"
+            class="nav-link"
+            :class="{ active: activeTab === 'details' }"
+            data-testid="event-edit-tab-details"
+            @click="activeTab = 'details'"
+          >
+            {{ t('events.event_details') }}
+          </button>
+        </li>
+        <li class="nav-item">
+          <button
+            type="button"
+            class="nav-link"
+            :class="{ active: activeTab === 'photos' }"
+            data-testid="event-edit-tab-photos"
+            @click="activeTab = 'photos'"
+          >
+            {{ t('events.event_photos') }}
+          </button>
+        </li>
+        <li v-if="isAdmin" class="nav-item">
+          <button
+            type="button"
+            class="nav-link"
+            :class="{ active: activeTab === 'log' }"
+            data-testid="event-edit-tab-log"
+            @click="showAuditLog"
+          >
+            {{ t('events.event_log') }}
+          </button>
+        </li>
+      </ul>
+
+      <div v-show="activeTab === 'details'" data-testid="event-edit-pane-details">
+        <EventForm :event-id="id" :initial-event="event" :is-admin="isAdmin" :just-created="justCreated" @updated="onUpdated" />
+      </div>
+
+      <div v-if="isAdmin" v-show="activeTab === 'log'" class="pt-3" data-testid="event-edit-pane-log">
+        <BAlert v-if="auditsError" :model-value="true" variant="danger" data-testid="event-edit-log-error">
+          {{ t('client.events.view_load_error') }}
+        </BAlert>
+        <p v-else-if="auditsLoaded && !audits.length" class="text-muted" data-testid="event-edit-log-empty">
+          {{ t('event-audits.unavailable_audits') }}
+        </p>
+        <div v-else class="accordion" data-testid="event-edit-log-accordion">
+          <!-- log-accordion.blade.php: each entry's heading expands to the
+               list of modified attributes. Both are HTML rendered server-side
+               from the event-audits lang files, so v-html is required to show
+               the <strong> emphasis develop uses. -->
+          <div v-for="audit in audits" :key="audit.id" class="accordion-item">
+            <h3 class="accordion-header">
+              <button
+                type="button"
+                class="accordion-button"
+                :class="{ collapsed: openAuditId !== audit.id }"
+                :data-testid="`event-edit-log-heading-${audit.id}`"
+                @click="openAuditId = openAuditId === audit.id ? null : audit.id"
+              >
+                <!-- eslint-disable-next-line vue/no-v-html -->
+                <span v-html="audit.heading" />
+              </button>
+            </h3>
+            <div v-show="openAuditId === audit.id" class="accordion-body" :data-testid="`event-edit-log-body-${audit.id}`">
+              <ul class="list-unstyled mb-0">
+                <!-- eslint-disable-next-line vue/no-v-html -->
+                <li v-for="(change, i) in audit.changes" :key="i" v-html="change" />
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div v-show="activeTab === 'photos'" class="pt-3" data-testid="event-edit-pane-photos">
+        <div v-if="event?.images?.length" class="d-flex flex-wrap gap-2 mb-3">
+          <div
+            v-for="image in event.images"
+            :key="image.idimages"
+            class="position-relative"
+            data-testid="event-edit-photo"
+          >
+            <img :src="uploadedImageUrl(image.path)" width="100" height="100" style="object-fit: cover" alt="">
+            <button
+              type="button"
+              class="btn btn-sm btn-light position-absolute top-0 end-0 p-1 lh-1"
+              :disabled="deletingImageId === image.idimages"
+              :aria-label="t('client.events.remove_photo')"
+              :data-testid="`event-edit-photo-remove-${image.idimages}`"
+              @click="removeImage(image)"
+            >
+              &times;
+            </button>
+          </div>
+        </div>
+
+        <TusImageUpload @uploaded="onImageUploaded" @upload-error="onImageUploadError" />
+        <div v-if="imageMessage" class="text-success" data-testid="event-edit-image-success">{{ imageMessage }}</div>
+        <div v-if="imageError" class="text-danger" data-testid="event-edit-image-error">{{ imageError }}</div>
+      </div>
+    </template>
+  </div>
+</template>
+
+<style scoped>
+/* edit.blade.php:20 styles the interpolated link black + underlined. */
+.event-edit-title-link {
+  color: #000;
+  text-decoration: underline;
+}
+</style>
