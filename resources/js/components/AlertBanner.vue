@@ -1,4 +1,4 @@
-<template xmlns="http://www.w3.org/1999/html">
+<template>
   <div>
     <b-alert v-for="alert in alertsNotDismissed" :key="'alert-' + alert.id"
              :variant="alert.variant"

@@ -43,7 +43,7 @@
           <b-img-lazy :src="imageUrl('/icons/host_ico.svg')" class="icon" />
         </div>
         <div>
-          <div v-for="host in hosts">
+          <div v-for="(host, index) in hosts" :key="index">
             {{ host.volunteer.name }}
           </div>
         </div>

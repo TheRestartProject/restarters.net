@@ -23,7 +23,7 @@
     </multiselect>
     <div v-if="iconVariant !== 'none'" v-b-popover.html.left="__('devices.tooltip_category')" class="ml-3 mt-2">
       <b-img class="icon clickable" :src="imageUrl('/icons/info_ico_black.svg')" v-if="iconVariant === 'black'" />
-      <b-img class="icon clickable" :src="imageUrl('/icons/info_ico_green.svg')" v-else="iconVariant === 'brand'" />
+      <b-img class="icon clickable" :src="imageUrl('/icons/info_ico_green.svg')" v-else />
     </div>
     <div class="multiselect__content-wrapper d-none" />
   </div>
