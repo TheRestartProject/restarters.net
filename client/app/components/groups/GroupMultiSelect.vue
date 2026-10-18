@@ -112,6 +112,7 @@ function remove(value) {
     <input
       v-model="search"
       type="text"
+      :aria-label="placeholder"
       class="form-control"
       :placeholder="placeholder"
       :data-testid="`${testid}-search`"

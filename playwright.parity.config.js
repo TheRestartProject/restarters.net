@@ -8,7 +8,7 @@
 // Run: task parity:capture
 const config = {
   testDir: 'client/parity',
-  outputDir: '/tmp/test-results/parity-output',
+  outputDir: 'test-results/parity-output',
   // Live pages + full-page screenshots at two viewports are slow. This is a
   // whole-suite-of-pages budget, not a single-page one: each `logged-in pages`
   // test walks ~28 URLs in one go, and the legacy side additionally blocks

@@ -204,6 +204,7 @@ function removeCompactFile(event) {
     <input
       ref="fileInputEl"
       type="file"
+      :aria-label="t('groups.group_image')"
       accept="image/*"
       class="visually-hidden"
       data-testid="tus-image-upload-file-input"

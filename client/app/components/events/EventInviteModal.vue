@@ -193,7 +193,7 @@ function close() {
     <div v-if="showingLink" data-testid="event-invite-link-panel">
       <BFormGroup :label="`${t('events.shareable_link_box')}:`" label-for="event-invite-link">
         <input
-          id="event-invite-link"
+          id="event-invite-link" :aria-label="`${t('events.shareable_link_box')}`"
           :value="shareableLink"
           type="text"
           class="form-control"
@@ -264,8 +264,8 @@ function close() {
 
       <BFormGroup :label="`${t('events.message_to_restarters')}:`" label-for="event-invite-message" class="mt-3">
         <textarea
-          id="event-invite-message"
-          v-model="message"
+          id="event-invite-message" v-model="message"
+          :aria-label="`${t('events.message_to_restarters')}`"
           class="form-control"
           rows="3"
           :placeholder="t('events.sample_text_message_to_restarters')"

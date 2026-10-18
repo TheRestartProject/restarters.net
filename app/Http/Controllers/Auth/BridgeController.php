@@ -82,7 +82,16 @@ class BridgeController extends Controller
             if ($target === $prefix
                 || str_starts_with($target, $prefix.'/')
                 || str_starts_with($target, $prefix.'?')) {
-                return $target;
+                // Rebuild from the trusted prefix plus a suffix restricted to
+                // RFC 3986 URL characters (no backslash, whitespace or control
+                // characters that browsers normalise into a different host).
+                $suffix = substr($target, strlen($prefix));
+
+                if (preg_match('~^[A-Za-z0-9\-._~!$&\'()*+,;=:@%/?#]*$~', $suffix) !== 1) {
+                    return $frontend;
+                }
+
+                return $prefix.$suffix;
             }
         }
 

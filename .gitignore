@@ -37,6 +37,7 @@ restarters-anonymised.sql
 /storage/app/tus-cache
 /.phpunit.result.cache
 /playwright-report/
+/test-results/
 /events.csv
 /public/repair-data*.csv
 /uploads/*.jpg

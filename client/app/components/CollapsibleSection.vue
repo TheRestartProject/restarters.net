@@ -31,6 +31,7 @@ function toggle() {
       class="collapsible-section__header d-flex align-items-center"
       data-testid="collapsible-header"
       @click="toggle"
+      @keydown.self.enter.prevent="toggle"
     >
       <!-- flex-grow-1 lets a title that has its own justify-between layout
            (e.g. Your Groups' heading + "newly added" badge) span the row. -->

@@ -6,7 +6,7 @@
 //                     (PLAYWRIGHT_BASE_URL=http://restarters_client:3000)
 const config = {
   testDir: 'client/e2e',
-  outputDir: '/tmp/test-results/playwright-client-output',
+  outputDir: 'test-results/playwright-client-output',
   timeout: 120 * 1000,
   retries: 2,
   // Auth flows mutate the same seeded users; keep serial until G3 evaluates

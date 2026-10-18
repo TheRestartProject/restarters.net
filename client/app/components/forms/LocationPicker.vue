@@ -185,8 +185,8 @@ function onLngInput(event) {
     <BFormGroup :label="`${label || t('groups.location')}:`" label-for="location-picker-input">
       <div class="location-picker__autocomplete">
         <input
-          id="location-picker-input"
-          v-model="inputValue"
+          id="location-picker-input" v-model="inputValue"
+          :aria-label="`${label || t('groups.location')}`"
           type="text"
           class="form-control"
           :class="{ 'location-picker__input--error': hasError }"
@@ -218,7 +218,7 @@ function onLngInput(event) {
 
     <BFormGroup v-if="showPostcode" :label="`${t('groups.postcode')}:`" label-for="location-picker-postcode">
       <input
-        id="location-picker-postcode"
+        id="location-picker-postcode" :aria-label="`${t('groups.postcode')}`"
         type="text"
         class="form-control"
         :value="postcode"
@@ -234,7 +234,7 @@ function onLngInput(event) {
       <div class="col-6">
         <BFormGroup :label="`${t('client.groups.latitude_label')}:`" label-for="location-picker-lat">
           <input
-            id="location-picker-lat"
+            id="location-picker-lat" :aria-label="`${t('client.groups.latitude_label')}`"
             type="number"
             step="any"
             class="form-control"
@@ -247,7 +247,7 @@ function onLngInput(event) {
       <div class="col-6">
         <BFormGroup :label="`${t('client.groups.longitude_label')}:`" label-for="location-picker-lng">
           <input
-            id="location-picker-lng"
+            id="location-picker-lng" :aria-label="`${t('client.groups.longitude_label')}`"
             type="number"
             step="any"
             class="form-control"

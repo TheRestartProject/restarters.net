@@ -464,8 +464,8 @@ defineExpose({ submit })
       <div class="event-form-venue d-flex flex-wrap align-items-end gap-3">
         <BFormGroup class="flex-grow-1 mb-0" :label="`${t('events.field_event_name')}:`" label-for="event-form-venue">
           <input
-            id="event-form-venue"
-            v-model="form.venue"
+            id="event-form-venue" v-model="form.venue"
+            :aria-label="`${t('events.field_event_name')}`"
             type="text"
             class="form-control"
             :class="{ 'is-invalid': fieldError('venue') }"
@@ -484,8 +484,8 @@ defineExpose({ submit })
 
       <BFormGroup class="event-form-link" :label="`${t('events.field_event_link')}:`" label-for="event-form-link">
         <input
-          id="event-form-link"
-          v-model="form.link"
+          id="event-form-link" v-model="form.link"
+          :aria-label="`${t('events.field_event_link')}`"
           type="url"
           class="form-control"
           :class="{ 'is-invalid': fieldError('link') }"
@@ -570,8 +570,8 @@ defineExpose({ submit })
       <div class="event-form-time d-flex gap-2">
         <BFormGroup :label="`${t('events.field_event_time')}:`" label-for="event-form-start" class="flex-grow-1">
           <input
-            id="event-form-start"
-            v-model="form.startTime"
+            id="event-form-start" v-model="form.startTime"
+            :aria-label="`${t('events.field_event_time')}`"
             type="time"
             class="form-control"
             :class="{ 'is-invalid': fieldError('startTime') }"
@@ -586,6 +586,7 @@ defineExpose({ submit })
           <input
             id="event-form-end"
             v-model="form.endTime"
+            :aria-label="t('events.field_event_time')"
             type="time"
             class="form-control"
             :class="{ 'is-invalid': fieldError('endTime') }"

@@ -546,8 +546,8 @@ defineExpose({ submit })
         <BFormGroup :label="`${t('devices.brand')}:`" label-for="device-form-brand">
           <div class="position-relative typeahead-field">
             <input
-              id="device-form-brand"
-              v-model="form.brand"
+              id="device-form-brand" v-model="form.brand"
+              :aria-label="`${t('devices.brand')}`"
               type="text"
               class="form-control form-control-lg"
               autocomplete="off"
@@ -588,6 +588,7 @@ defineExpose({ submit })
           <input
             id="device-form-model"
             v-model="form.model"
+            :aria-label="t('devices.model')"
             type="text"
             class="form-control"
             :placeholder="t('devices.model_if_known')"
@@ -615,8 +616,8 @@ defineExpose({ submit })
 
         <BFormGroup :label="`${t('devices.age')}:`" label-for="device-form-age">
           <input
-            id="device-form-age"
-            v-model="form.age"
+            id="device-form-age" v-model="form.age"
+            :aria-label="`${t('devices.age')}`"
             type="number"
             min="0"
             step="0.5"
@@ -630,8 +631,8 @@ defineExpose({ submit })
 
         <BFormGroup v-if="showWeight" :label="`${t('devices.weight')}:`" label-for="device-form-weight">
           <input
-            id="device-form-weight"
-            v-model="form.estimate"
+            id="device-form-weight" v-model="form.estimate"
+            :aria-label="`${t('devices.weight')}`"
             type="number"
             min="0"
             step="0.1"
@@ -807,6 +808,7 @@ defineExpose({ submit })
           <textarea
             id="device-form-problem"
             v-model="form.problem"
+            :aria-label="t('devices.devices_description')"
             rows="4"
             class="form-control"
             :disabled="readonly"
@@ -822,6 +824,7 @@ defineExpose({ submit })
           <textarea
             id="device-form-notes"
             v-model="form.notes"
+            :aria-label="t('client.devices.notes')"
             rows="4"
             class="form-control"
             :placeholder="t('devices.placeholder_notes')"
@@ -833,7 +836,7 @@ defineExpose({ submit })
     </div>
 
     <BFormGroup v-if="!editing" :label="`${t('client.devices.quantity')}:`" label-for="device-form-quantity">
-      <select id="device-form-quantity" v-model.number="form.quantity" class="form-select w-auto" data-testid="device-form-quantity">
+      <select id="device-form-quantity" v-model.number="form.quantity" :aria-label="`${t('client.devices.quantity')}`" class="form-select w-auto" data-testid="device-form-quantity">
         <option v-for="q in quantities" :key="q" :value="q">{{ q }}</option>
       </select>
     </BFormGroup>

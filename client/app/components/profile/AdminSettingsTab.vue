@@ -106,7 +106,7 @@ async function save() {
 
         <div class="col-lg-6">
           <BFormGroup :label="`${t('auth.assigned_groups')}:`" label-for="admin-groups-select">
-            <select id="admin-groups-select" v-model="selectedGroups" class="form-control" multiple size="8" data-testid="admin-groups-select">
+            <select id="admin-groups-select" v-model="selectedGroups" :aria-label="`${t('auth.assigned_groups')}`" class="form-control" multiple size="8" data-testid="admin-groups-select">
               <option v-for="g in data.groups" :key="g.id" :value="g.id">{{ g.name }}</option>
             </select>
           </BFormGroup>

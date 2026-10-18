@@ -84,7 +84,7 @@ async function save() {
 
     <BForm v-else-if="!loading" data-testid="skills-form" @submit.prevent="save">
       <BFormGroup :label="`${t('general.your_repair_skills')}:`" label-for="skills-select">
-        <select id="skills-select" v-model="selected" class="form-control" multiple size="10" data-testid="skills-select">
+        <select id="skills-select" v-model="selected" :aria-label="`${t('general.your_repair_skills')}`" class="form-control" multiple size="10" data-testid="skills-select">
           <optgroup v-for="cat in source.data?.categories || []" :key="cat.id" :label="t(cat.label)">
             <option v-for="skill in cat.skills" :key="skill.id" :value="skill.id">{{ t(skill.name) }}</option>
           </optgroup>

@@ -92,8 +92,8 @@ function close() {
     <BForm data-testid="network-associate-groups-form" @submit.prevent="submit">
       <BFormGroup :label="`${t('networks.show.add_groups_select_label')}:`" label-for="network-associate-groups-select">
         <select
-          id="network-associate-groups-select"
-          v-model="selectedIds"
+          id="network-associate-groups-select" v-model="selectedIds"
+          :aria-label="`${t('networks.show.add_groups_select_label')}`"
           multiple
           size="8"
           class="form-control"

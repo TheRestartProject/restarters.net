@@ -6,7 +6,7 @@ set -e
 # leaks in. Install when the volume is empty or the lockfile changed.
 if [ ! -f node_modules/.package-lock.json ] || ! cmp -s package-lock.json node_modules/.package-lock.json; then
     echo "Installing client dependencies..."
-    npm ci
+    npm ci --ignore-scripts
     cp package-lock.json node_modules/.package-lock.json
 fi
 

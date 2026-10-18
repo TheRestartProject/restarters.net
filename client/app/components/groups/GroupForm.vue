@@ -351,8 +351,8 @@ defineExpose({ submit })
     <div class="group-form-layout">
       <BFormGroup class="group-form-name" :label="`${t('groups.groups_name_of')}:`" label-for="group-form-name">
         <input
-          id="group-form-name"
-          v-model="form.name"
+          id="group-form-name" v-model="form.name"
+          :aria-label="`${t('groups.groups_name_of')}`"
           type="text"
           class="form-control"
           :class="{ 'is-invalid': fieldError('name') || duplicateName }"
@@ -369,8 +369,8 @@ defineExpose({ submit })
 
       <BFormGroup class="group-form-website" :label="`${t('groups.groups_website')}:`" label-for="group-form-website">
         <input
-          id="group-form-website"
-          v-model="form.website"
+          id="group-form-website" v-model="form.website"
+          :aria-label="`${t('groups.groups_website')}`"
           type="url"
           class="form-control"
           :class="{ 'is-invalid': fieldError('website') }"
@@ -384,8 +384,8 @@ defineExpose({ submit })
 
       <BFormGroup class="group-form-email" :label="`${t('groups.groups_email')}:`" label-for="group-form-email">
         <input
-          id="group-form-email"
-          v-model="form.email"
+          id="group-form-email" v-model="form.email"
+          :aria-label="`${t('groups.groups_email')}`"
           type="email"
           class="form-control"
           :class="{ 'is-invalid': fieldError('email') }"
@@ -399,8 +399,8 @@ defineExpose({ submit })
 
       <BFormGroup class="group-form-phone" :label="`${t('groups.field_phone')}:`" label-for="group-form-phone">
         <input
-          id="group-form-phone"
-          v-model="form.phone"
+          id="group-form-phone" v-model="form.phone"
+          :aria-label="`${t('groups.field_phone')}`"
           type="text"
           class="form-control"
           data-testid="group-form-phone"
@@ -448,8 +448,8 @@ defineExpose({ submit })
 
       <BFormGroup class="group-form-timezone" :label="`${t('groups.timezone')}:`" label-for="group-form-timezone">
         <input
-          id="group-form-timezone"
-          v-model="form.timezone"
+          id="group-form-timezone" v-model="form.timezone"
+          :aria-label="`${t('groups.timezone')}`"
           type="text"
           list="group-form-timezones"
           class="form-control"
@@ -501,11 +501,11 @@ defineExpose({ submit })
           </BFormGroup>
 
           <BFormGroup v-if="canModerate" :label="`${t('groups.area')}:`" label-for="group-form-area" class="mt-2">
-            <input id="group-form-area" v-model="form.area" type="text" class="form-control" data-testid="group-form-area">
+            <input id="group-form-area" v-model="form.area" :aria-label="`${t('groups.area')}`" type="text" class="form-control" data-testid="group-form-area">
           </BFormGroup>
 
           <BFormGroup v-if="canModerate && !approved" :label="`${t('groups.approve_group')}:`" label-for="group-form-moderate" class="mt-2">
-            <select id="group-form-moderate" v-model="form.moderate" class="form-select" data-testid="group-form-moderate">
+            <select id="group-form-moderate" v-model="form.moderate" :aria-label="`${t('groups.approve_group')}`" class="form-select" data-testid="group-form-moderate">
               <option value="" />
               <!-- Hardcoded, untranslated - matches develop's GroupAddEdit.vue
                    <option value="approve">Approve</option> verbatim (no lang

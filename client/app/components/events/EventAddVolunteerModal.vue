@@ -118,7 +118,7 @@ function close() {
 
     <BFormGroup :label="`${t('events.group_member')}:`" label-for="event-add-volunteer-user">
       <select
-        id="event-add-volunteer-user"
+        id="event-add-volunteer-user" :aria-label="`${t('events.group_member')}`"
         class="form-select"
         data-testid="event-add-volunteer-user"
         :value="user"
@@ -133,8 +133,8 @@ function close() {
     <template v-if="user === 'not-registered'">
       <BFormGroup :label="`${t('events.full_name')}:`" label-for="event-add-volunteer-name" class="mt-3">
         <input
-          id="event-add-volunteer-name"
-          v-model="fullName"
+          id="event-add-volunteer-name" v-model="fullName"
+          :aria-label="`${t('events.full_name')}`"
           type="text"
           class="form-control"
           :placeholder="t('events.full_name_helper')"
@@ -144,8 +144,8 @@ function close() {
 
       <BFormGroup :label="`${t('events.volunteer_email_address')}:`" label-for="event-add-volunteer-email" class="mt-3">
         <input
-          id="event-add-volunteer-email"
-          v-model="volunteerEmailAddress"
+          id="event-add-volunteer-email" v-model="volunteerEmailAddress"
+          :aria-label="`${t('events.volunteer_email_address')}`"
           type="email"
           class="form-control"
           data-testid="event-add-volunteer-email"

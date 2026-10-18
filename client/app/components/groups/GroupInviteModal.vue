@@ -134,7 +134,7 @@ function close() {
     <div v-if="showingLink" data-testid="group-invite-link-panel">
       <BFormGroup :label="`${t('groups.shareable_link_box')}:`" label-for="group-invite-link">
         <input
-          id="group-invite-link"
+          id="group-invite-link" :aria-label="`${t('groups.shareable_link_box')}`"
           :value="shareableLink"
           type="text"
           class="form-control"
@@ -158,8 +158,8 @@ function close() {
     <BForm v-else data-testid="group-invite-form" @submit.prevent="submit">
       <BFormGroup :label="`${t('groups.email_addresses_field')}:`" label-for="group-invite-emails">
         <textarea
-          id="group-invite-emails"
-          v-model="emailsText"
+          id="group-invite-emails" v-model="emailsText"
+          :aria-label="`${t('groups.email_addresses_field')}`"
           class="form-control"
           rows="3"
           data-testid="group-invite-emails"
@@ -172,8 +172,8 @@ function close() {
 
       <BFormGroup :label="`${t('groups.message_header')}:`" label-for="group-invite-message" class="mt-3">
         <textarea
-          id="group-invite-message"
-          v-model="message"
+          id="group-invite-message" v-model="message"
+          :aria-label="`${t('groups.message_header')}`"
           class="form-control"
           rows="3"
           :placeholder="t('groups.message_example_text')"

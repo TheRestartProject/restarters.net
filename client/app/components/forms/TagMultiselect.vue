@@ -1,5 +1,5 @@
 <script setup>
-import { computed, nextTick, ref } from 'vue'
+import { computed, nextTick, ref, useId } from 'vue'
 
 // Tag-chip multi-select, replacing the native <select multiple> that stood in
 // for develop's vue-multiselect across the invite modals, device form, event
@@ -37,6 +37,7 @@ const props = defineProps({
 
 const emit = defineEmits(['update:modelValue', 'tag'])
 
+const listboxId = useId()
 const search = ref('')
 const open = ref(false)
 const highlighted = ref(0)
@@ -158,7 +159,7 @@ function onBlur(event) {
     :class="{ 'multiselect--active': open, 'multiselect--disabled': disabled }"
     data-testid="tag-multiselect"
   >
-    <div class="multiselect__tags" @click="focusInput">
+    <div class="multiselect__tags" @click="focusInput" @keydown.self.enter.prevent="focusInput">
       <span
         v-for="value in selected"
         :key="String(value)"
@@ -189,6 +190,7 @@ function onBlur(event) {
         :disabled="disabled"
         role="combobox"
         :aria-expanded="open"
+        :aria-controls="listboxId"
         data-testid="tag-multiselect-input"
         @focus="open = true"
         @blur="onBlur"
@@ -202,7 +204,7 @@ function onBlur(event) {
     </div>
 
     <div v-if="open && (available.length || (taggable && search.trim()))" class="multiselect__content-wrapper">
-      <ul class="multiselect__content" role="listbox">
+      <ul :id="listboxId" class="multiselect__content" role="listbox">
         <li
           v-for="(option, index) in available"
           :key="String(valueOf(option))"

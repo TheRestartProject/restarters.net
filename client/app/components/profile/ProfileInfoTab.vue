@@ -175,7 +175,7 @@ async function save() {
       </div>
 
       <BFormGroup :label="`${t('profile.biography')}:`" label-for="profile-biography">
-        <textarea id="profile-biography" v-model="form.biography" class="form-control" rows="8" data-testid="profile-biography" />
+        <textarea id="profile-biography" v-model="form.biography" :aria-label="`${t('profile.biography')}`" class="form-control" rows="8" data-testid="profile-biography" />
       </BFormGroup>
 
       <div class="d-flex justify-content-end mt-3">
