@@ -165,7 +165,7 @@ class StoredXssHardeningTest extends TestCase
     {
         $attacker = User::factory()->restarter()->create([
             'name' => $this->payload,
-            'biography' => null,
+            'biography' => '',
         ]);
         $viewer = User::factory()->administrator()->create();
 

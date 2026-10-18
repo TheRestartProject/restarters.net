@@ -9,6 +9,7 @@ GROUP_ID=${GID:-1000}
 # Timestamp logging for CI diagnostics
 log_step() {
   echo "[$(date '+%H:%M:%S')] $1"
+  return 0
 }
 
 log_step "docker_run.sh started"
@@ -90,8 +91,8 @@ log_step "migrate:fresh --seed done"
 # npm install, node-sass rebuild, Playwright browser download, and Vite are slow
 # (network-dependent) and not needed for PHP-FPM to serve HTTP. Run them in the
 # background so php-fpm can start immediately after migrations.
-(npm install --legacy-peer-deps && npm rebuild node-sass && nohup npm run dev > /tmp/vite.log 2>&1) &
-(npm install -D @playwright/test && npx playwright install) &
+(npm install --legacy-peer-deps --ignore-scripts && npm rebuild node-sass && nohup npm run dev > /tmp/vite.log 2>&1) &
+(npm install -D @playwright/test --ignore-scripts && ./node_modules/.bin/playwright install) &
 
 log_step "Starting artisan setup commands"
 php artisan key:generate

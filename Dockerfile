@@ -27,9 +27,8 @@ ADD --chmod=0755 https://github.com/mlocati/docker-php-extension-installer/relea
 # bcmath via PHP's own docker-php-ext-install — install-php-extensions
 # trips over a pre-existing libbcmath/src/.libs directory in some PHP 8.4
 # base image variants ("mkdir: cannot create directory ...: File exists").
-RUN docker-php-ext-install bcmath
-
-RUN install-php-extensions \
+RUN docker-php-ext-install bcmath && \
+    install-php-extensions \
     pdo_mysql \
     zip \
     xmlrpc \
