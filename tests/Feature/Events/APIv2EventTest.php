@@ -223,7 +223,7 @@ class APIv2EventTest extends TestCase
         self::assertNotNull($idevents);
     }
 
-    public function roleProvider(): array {
+    public static function roleProvider(): array {
         return [
             [ 'Administrator' ],
             [ 'NetworkCoordinator' ],
