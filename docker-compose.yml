@@ -116,6 +116,9 @@ services:
       dockerfile: Dockerfile
     container_name: restarters_client
     restart: unless-stopped
+    # Bind-mounted source is owned by the host user; the image defaults to the
+    # unprivileged "node" user, so keep root unless CLIENT_UID/CLIENT_GID is set.
+    user: "${CLIENT_UID:-0}:${CLIENT_GID:-0}"
     ports:
       # Host port overridable for machines where 3000 is taken (CLIENT_PORT in .env).
       - "${CLIENT_PORT:-3000}:3000"
