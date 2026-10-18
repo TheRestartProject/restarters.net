@@ -87,7 +87,7 @@ class BridgeController extends Controller
                 // characters that browsers normalise into a different host).
                 $suffix = substr($target, strlen($prefix));
 
-                if (preg_match('~^[A-Za-z0-9\-._~!$&\'()*+,;=:@%/?#]*$~', $suffix) !== 1) {
+                if (preg_match('~^[A-Za-z0-9\-._\~!$&\'()*+,;=:@%/?#]*$~', $suffix) !== 1) {
                     return $frontend;
                 }
 
