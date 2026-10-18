@@ -15,7 +15,7 @@
         unit="kg"
         class="impact-waste"
       />
-      <div v-if="notincluded" class="d-flex justify-content-end">
+      <div v-if="showNotIncluded && notincluded" class="d-flex justify-content-end">
         <div class="impact-notincluded">
           <div class="impact-notincluded-content p-1">
             {{ notincluded }}
@@ -57,6 +57,12 @@ export default {
     statsEntity: {
       required: true,
       type: String
+    },
+    showNotIncluded: {
+      // The note on what the figures leave out.
+      type: Boolean,
+      required: false,
+      default: true
     }
   },
   computed: {

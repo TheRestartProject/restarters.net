@@ -87,6 +87,7 @@ return [
   'notification_greeting' => 'Bonjour !',
   'notification_footer' => 'Si vous souhaitez ne plus recevoir ces courriels, veuillez consulter <a href=":url">vos préférences</a> sur votre compte.',
   'validate_timezone' => 'Veuillez sélectionner un fuseau horaire valide.',
+  'dragmap' => 'Le repère n\'est pas tout à fait au bon endroit ? Faites-le glisser pour le corriger.',
   'share_this' => 'Partager ceci',
   'download' => 'Télécharger',
   'share_modal_title' => 'Statistiques à partager',
@@ -100,4 +101,5 @@ return [
   'share_modal_planting_around' => "planter environ",
   'share_modal_hectares' => "hectare d’arbres.*|hectares d’arbres.*",
   'impact_estimates' => 'Les chiffres relatifs à l\'impact sont des estimations basées sur les données saisies par les groupes dans Restarters.net.',
+  'see_further_reports' => 'Voir plus d\'analyses dans nos rapports détaillés.',
 ];

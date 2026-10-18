@@ -3,7 +3,7 @@
     <div class="d-flex justify-content-between mb-3">
       <h1 class="d-block d-md-none">{{ __('groups.groups') }}</h1>
       <GroupActions :idgroups="idgroups" :can-see-delete="canSeeDelete" :can-perform-delete="canPerformDelete"
-                    :can-perform-archive="canPerformArchive"
+                    :can-perform-archive="canPerformArchive" :reporting-url="reportingUrl"
                     class="d-block d-md-none" @left="$emit('left')"/>
     </div>
     <div class="border-top-very-thick border-bottom-thin mb-3">
@@ -26,7 +26,7 @@
               <ExternalLink v-if="group.website" :href="group.website">{{ __('groups.website') }}</ExternalLink>
             </div>
             <GroupActions :idgroups="idgroups" :can-see-delete="canSeeDelete" :can-perform-delete="canPerformDelete"
-                          :can-perform-archive="canPerformArchive"
+                          :can-perform-archive="canPerformArchive" :reporting-url="reportingUrl"
                           class="d-none d-md-block" @left="$emit('left')"/>
           </div>
         </div>
@@ -62,6 +62,11 @@ export default {
       type: Boolean,
       required: false,
       default: false
+    },
+    reportingUrl: {
+      type: String,
+      required: false,
+      default: null
     },
   },
   computed: {

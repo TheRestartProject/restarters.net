@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Attributes\Feature;
+use App\Attributes\UserStory;
 use App\Device;
 use App\EventsUsers;
 use App\Group;
@@ -22,38 +24,32 @@ use Illuminate\Http\Request;
 use Response;
 use Illuminate\Database\Eloquent\Collection;
 
+#[Feature('Platform', description: 'Platform-wide statistics and public impact data')]
 class ExportController extends Controller
 {
+    #[UserStory('As a Guest, I can export device data from an event as CSV', persona: 'Guest', theme: 'Data exports')]
+    #[UserStory('As a ThirdParty, I can export device data from an event as CSV, for example for the download-dataset page on therestartproject.org', persona: 'ThirdParty', theme: 'Data exports')]
     public function devicesEvent(Request $request, $idevents = NULL) {
         return $this->devices($request, $idevents);
     }
 
+    #[UserStory('As a Guest, I can export device data from a group as CSV', persona: 'Guest', theme: 'Data exports')]
+    #[UserStory('As a ThirdParty, I can export device data from a group as CSV, for example for the download-dataset page on therestartproject.org', persona: 'ThirdParty', theme: 'Data exports')]
     public function devicesGroup(Request $request, $idgroups = NULL) {
         return $this->devices($request, NULL, $idgroups);
     }
 
+    #[UserStory('As a Guest, I can export all device records as CSV', persona: 'Guest', theme: 'Data exports')]
+    #[UserStory('As a ThirdParty, I can export all device records as CSV, for example for the download-dataset page on therestartproject.org', persona: 'ThirdParty', theme: 'Data exports')]
     public function devices(Request $request, $idevents = NULL, $idgroups = NULL)
     {
         // To not display column if the referring URL is therestartproject.org
         $host = parse_url(\Request::server('HTTP_REFERER'), PHP_URL_HOST);
 
-        $all_devices = Device::with([
-            'deviceCategory',
-            'deviceEvent',
-        ])
-            ->join('events', 'events.idevents', '=', 'devices.event')
-            ->join('groups', 'groups.idgroups', '=', 'events.group')
-            ->when($idevents != NULL, function($query) use ($idevents) {
-                return $query->where('events.idevents', $idevents);
-            })
-            ->when($idgroups != NULL, function($query) use ($idgroups) {
-                return $query->where('events.group', $idgroups);
-            })
-            ->select('devices.*', 'groups.name AS group_name')->get();
+        $me = auth()->user();
 
-        $displacementFactor = \App\Device::getDisplacementFactor();
-        $eEmissionRatio = \App\Helpers\LcaStats::getEmissionRatioPowered();
-        $uEmissionratio = \App\Helpers\LcaStats::getEmissionRatioUnpowered();
+        $export = app(\App\Services\RepairDataExport::class);
+        $all_devices = $export->query($me, $idevents, $idgroups);
 
         // Create CSV
         $filename = 'repair-data';
@@ -75,70 +71,7 @@ class ExportController extends Controller
         $fullpath = $this->exportPath($filename);
         $file = fopen($fullpath, 'w+');
 
-        $me = auth()->user();
-
-        // We can't put accented characters into a CSV file, so flatten them.
-        // Use //TRANSLIT//IGNORE to handle characters that can't be transliterated on
-        // servers with older glibc (e.g. 2.27) and POSIX locale, which lack transliteration
-        // tables for certain Unicode characters like emdash (—). Without //IGNORE, iconv
-        // throws "Detected an illegal character in input string" on such systems.
-        $columns = [
-            iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', __('devices.item_type_short')),
-            iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', __('devices.category')),
-            iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', __('devices.brand')),
-            iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', __('devices.model')),
-            iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', __('devices.title_assessment')),
-            iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', __('devices.repair_status')),
-            iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', __('devices.spare_parts')),
-            iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', __('events.event')),
-            iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', __('groups.group')),
-            iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', __('events.event_date')),
-            iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', __('events.stat-7')),
-            iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', __('events.stat-6')),
-            iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', ucfirst(__('devices.title_powered')))
-        ];
-
-        fputcsv($file, $columns);
-        $party = null;
-
-        foreach ($all_devices as $device) {
-            set_time_limit(60);
-            $party = !$party || $party->idevents != $device->event ? Party::findOrFail($device->event) : $party;
-
-            if (User::userCanSeeEvent($me, $party)) {
-                $wasteImpact = 0;
-                $co2Diverted = 0;
-
-                if ($device->isFixed())
-                {
-                    if ($device->deviceCategory->powered)
-                    {
-                        $wasteImpact = $device->eWasteDiverted();
-                        $co2Diverted = $device->eCo2Diverted($eEmissionRatio, $displacementFactor);
-                    } else
-                    {
-                        $wasteImpact = $device->uWasteDiverted();
-                        $co2Diverted = $device->uCo2Diverted($uEmissionratio, $displacementFactor);
-                    }
-                }
-
-                fputcsv($file, $this->csvSafeRow([
-                    $device->item_type,
-                    $device->deviceCategory->name,
-                    $device->brand,
-                    $device->model,
-                    $device->problem,
-                    $device->getRepairStatus(),
-                    $device->getSpareParts(),
-                    $device->deviceEvent->getEventName(),
-                    $device->deviceEvent->theGroup->name,
-                    $device->deviceEvent->getFormattedLocalStart('Y-m-d'),
-                    $wasteImpact,
-                    $co2Diverted,
-                    $device->deviceCategory->powered ? 'Powered' : 'Unpowered'
-                ]));
-            }
-        }
+        $export->write($all_devices, $file);
 
         fclose($file);
 
@@ -152,6 +85,8 @@ class ExportController extends Controller
     /**
      * @return \Illuminate\Http\Response
      */
+    #[UserStory('As a Guest, I can export a group\'s event summary as CSV', persona: 'Guest', theme: 'Data exports')]
+    #[UserStory('As a ThirdParty, I can export a group\'s event summary as CSV, for example for the download-dataset page on therestartproject.org', persona: 'ThirdParty', theme: 'Data exports')]
     public function groupEvents(Request $request, $idgroups)
     {
         $group = Group::findOrFail($idgroups);
@@ -159,6 +94,8 @@ class ExportController extends Controller
         return $this->exportEvents($parties);
     }
 
+    #[UserStory('As a Guest, I can export a network\'s event summary as CSV', persona: 'Guest', theme: 'Data exports')]
+    #[UserStory('As a ThirdParty, I can export a network\'s event summary as CSV, for example for the download-dataset page on therestartproject.org', persona: 'ThirdParty', theme: 'Data exports')]
     public function networkEvents(Request $request, $id)
     {
         $network = Network::findOrFail($id);
@@ -226,7 +163,7 @@ class ExportController extends Controller
         fputcsv($file, $headers);
 
         foreach ($PartyArray as $d) {
-            fputcsv($file, $this->csvSafeRow($d));
+            fputcsv($file, \App\Services\RepairDataExport::csvSafeRow($d));
         }
         fclose($file);
 
@@ -251,20 +188,5 @@ class ExportController extends Controller
         }
 
         return $dir . DIRECTORY_SEPARATOR . $filename;
-    }
-
-    /**
-     * Spreadsheets treat a cell starting with =, +, - or @ as a formula, so prefix those
-     * with an apostrophe.  Device fields are free text entered at events.
-     */
-    private function csvSafeRow(array $row)
-    {
-        return array_map(function ($value) {
-            if (is_string($value) && $value !== '' && in_array($value[0], ['=', '+', '-', '@'], true)) {
-                return "'" . $value;
-            }
-
-            return $value;
-        }, $row);
     }
 }

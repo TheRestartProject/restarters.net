@@ -15,6 +15,7 @@ use Tests\TestCase;
 
 class APIv2NetworkTest extends TestCase
 {
+    /** @story:NetworkController::getNetworksv2 */
     public function testList(): void {
         $user = User::factory()->administrator()->create([
                                                                           'api_token' => '1234',
@@ -46,6 +47,10 @@ class APIv2NetworkTest extends TestCase
         self::assertTrue($found);
     }
 
+    /**
+     * @story:NetworkController::getNetworkv2
+     * @story:NetworkController::getNetworksv2
+     */
     public function testGet(): void {
         $network = Network::first();
         self::assertNotNull($network);
@@ -78,6 +83,7 @@ class APIv2NetworkTest extends TestCase
     }
 
     /**
+     * @story:NetworkController::getNetworkGroupsv2
      * @dataProvider providerGroupsParameters
      * @param $value
      */
@@ -158,6 +164,7 @@ class APIv2NetworkTest extends TestCase
     }
 
     /**
+     * @story:NetworkController::getNetworkEventsv2
      * @dataProvider providerEventsParameters
      * @param $value
      */
