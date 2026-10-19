@@ -65,13 +65,8 @@ import FixometerRecordsTable from './FixometerRecordsTable.vue'
 import FixometerFilters from './FixometerFilters.vue'
 import auth from '../mixins/auth'
 import AlertBanner from './AlertBanner.vue'
-import moment from 'moment'
+import { today } from '../today'
 
-// Records from future events are almost always events entered with the wrong date, and look odd at the top of the
-// list, so by default we only show repairs up to today.  The 'to' date can still be changed to see them.
-function today() {
-  return moment().format('YYYY-MM-DD')
-}
 
 export default {
   components: {

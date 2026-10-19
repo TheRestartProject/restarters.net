@@ -180,7 +180,6 @@ export default {
   data () {
     return {
       currentPage: 1,
-      requestSeq: 0,
       perPage: 20,
       showModal: false,
       device: null,
@@ -311,7 +310,6 @@ export default {
       // table's async method of providing data.  The server sorts by the column the table is sorted by; with no
       // column chosen it shows the most recent events first.
       const sortBy = ctx.sortBy || null
-      const request = ++this.requestSeq
       let sortDesc = 'DESC'
 
       if (ctx.sortBy && !ctx.sortDesc) {
@@ -337,11 +335,6 @@ export default {
         }
       })
           .then(ret => {
-            if (request !== this.requestSeq) {
-              // A newer request has been made (e.g. filters changed); ignore this stale response.
-              return
-            }
-
             this.total = ret.data.count
             this.weight = ret.data.weight
             this.co2 = ret.data.co2

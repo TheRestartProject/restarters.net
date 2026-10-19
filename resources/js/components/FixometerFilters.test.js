@@ -5,6 +5,7 @@ Vue.use(BootstrapVue)
 import { mount, createLocalVue } from '@vue/test-utils'
 import LangMixin from 'resources/js/mixins/lang.js'
 import FixometerFilters from './FixometerFilters.vue'
+import { today } from '../today'
 
 // These pull in a typeahead that Jest can't load; the filters only need to place them.
 jest.mock('./DeviceBrand.vue', () => ({ name: 'DeviceBrand', template: '<div class="brand-stub" />' }))
@@ -86,15 +87,16 @@ test('clear filters in each section only clears that section', async () => {
   await wrapper.vm.$nextTick()
   expect(wrapper.emitted('update:group').pop()).toEqual([null])
   expect(wrapper.emitted('update:from_date').pop()).toEqual([null])
-  expect(wrapper.emitted('update:to_date').pop()).toEqual([null])
+  expect(wrapper.emitted('update:to_date').pop()).toEqual([today()])
 })
 
 test('clear all filters clears both sections', async () => {
-  const wrapper = makeWrapper({ group: 'Alpha', brand: 'Acme' })
+  const wrapper = makeWrapper({ group: 'Alpha', brand: 'Acme', wiki: true })
   await wrapper.vm.$nextTick()
 
   await wrapper.find('.clear-all-filters').trigger('click')
   await wrapper.vm.$nextTick()
   expect(wrapper.emitted('update:brand').pop()).toEqual([null])
   expect(wrapper.emitted('update:group').pop()).toEqual([null])
+  expect(wrapper.emitted('update:wiki').pop()).toEqual([false])
 })

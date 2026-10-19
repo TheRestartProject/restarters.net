@@ -132,6 +132,7 @@ import DeviceCategorySelect from './DeviceCategorySelect.vue'
 import DeviceModel from './DeviceModel.vue'
 import DeviceBrand from './DeviceBrand.vue'
 import images from '../mixins/images'
+import { today } from '../today'
 import { END_OF_LIFE, FIXED, REPAIRABLE } from '../constants'
 
 export default {
@@ -362,10 +363,11 @@ export default {
     clearEvents() {
       this.current_group = null
       this.current_from_date = null
-      this.current_to_date = null
+      this.current_to_date = today()
     },
     clearAll() {
       this.clearItems()
+      this.current_wiki = false
       this.clearEvents()
     },
     toggleItems() {
