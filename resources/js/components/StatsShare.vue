@@ -20,7 +20,7 @@
   </div>
 </template>
 <script>
-import { hasBakedFootnote, footnoteLayout } from '../misc/statsFootnote'
+import { hasBakedFootnote, footnoteLayout, footnoteKey } from '../misc/statsFootnote'
 
 const MARG = 10
 const RADIUS = 8
@@ -595,7 +595,7 @@ export default {
       img.onload = () => {
         ctx.drawImage(img, x, y, width, height)
         if (name.indexOf('ImpactRange') === 0) {
-          this.replaceFootnote(name)
+          this.replaceFootnote(name, ctx)
         }
 
         if (cb) {
@@ -603,15 +603,14 @@ export default {
         }
       }
     },
-    replaceFootnote(name) {
+    replaceFootnote(name, ctx) {
       // The footnote is baked into the background PNGs in English.  Blank it and write a translated one.
       if (!hasBakedFootnote(name)) {
         return
       }
 
-      const ctx = this.ctx
-      const W = this.canvas.width
-      const H = this.canvas.height
+      const W = ctx.canvas.width
+      const H = ctx.canvas.height
       const L = footnoteLayout(this.portrait)
 
       try {
@@ -621,7 +620,7 @@ export default {
 
         let size = Math.round(L.fontH * H)
         ctx.font = 'bold ' + size + 'px Asap, sans-serif'
-        const text = this.__('partials.share_modal_footnote')
+        const text = this.__(footnoteKey(name))
         const maxW = L.maxW * W
         const width = ctx.measureText(text).width
         if (width > maxW) {

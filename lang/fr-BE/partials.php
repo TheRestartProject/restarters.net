@@ -101,6 +101,7 @@ return [
   'share_modal_planting_around' => "planter environ",
   'share_modal_hectares' => "hectare d’arbres.*|hectares d’arbres.*",
   'share_modal_footnote' => "*arbres conifères ou feuillus à croissance moyenne, plantés en milieu urbain et cultivés pendant 10 ans",
+  'share_modal_footnote_hectares' => "*semis d’arbres feuillus cultivés pendant 1 an dans une plantation ou un boisé en Angleterre",
   'impact_estimates' => 'Les chiffres relatifs à l\'impact sont des estimations basées sur les données saisies par les groupes dans Restarters.net.',
   'see_further_reports' => 'Voir plus d\'analyses dans nos rapports détaillés.',
 ];
