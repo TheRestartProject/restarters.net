@@ -7,7 +7,7 @@
     </div>
     <div v-else>
       <GroupMap
-          v-model:ready="mapready"
+          @update:ready="mapready = $event"
           :initial-bounds="initialBounds"
           :min-zoom="minZoom"
           :max-zoom="maxZoom"
