@@ -27,6 +27,22 @@ class NetworkPolicy
     }
 
     /**
+     * Determine whether the user can view the network page with its coordinator-only parts hidden.  That is
+     * anyone who can fully view it, plus hosts of a group in the network.
+     */
+    public function viewPublic(User $user, Network $network): bool
+    {
+        if ($this->view($user, $network)) {
+            return true;
+        }
+
+        return \App\UserGroups::where('user', $user->id)
+            ->where('role', \App\Role::HOST)
+            ->whereIn('group', $network->groups()->select('groups.idgroups'))
+            ->exists();
+    }
+
+    /**
      * Determine whether the user can create networks.
      */
     public function create(User $user): bool

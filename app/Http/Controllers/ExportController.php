@@ -101,8 +101,8 @@ class ExportController extends Controller
         $network = Network::findOrFail($id);
         $parties = collect([]);
 
-        foreach ($network->groups as $group) {
-            $parties = $parties->merge($group->parties()->undeleted()->get());
+        foreach ($network->groups()->where('groups.approved', true)->get() as $group) {
+            $parties = $parties->merge($group->parties()->undeleted()->where('events.approved', true)->get());
         }
 
         return $this->exportEvents($parties);

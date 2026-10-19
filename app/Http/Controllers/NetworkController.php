@@ -56,7 +56,11 @@ class NetworkController extends Controller
     {
         $user = Auth::user();
 
-        $this->authorize('view', $network);
+        // Coordinators and admins get the full page; hosts of groups in the network get it without the
+        // coordinator-only parts.
+        $this->authorize('viewPublic', $network);
+
+        $canModerate = $user->can('view', $network);
 
         $groupsForAssociating = [];
 
@@ -93,9 +97,9 @@ class NetworkController extends Controller
             'name' => $network->name,
             'description' => $network->description,
             'website' => $network->website,
-            'reporting_url' => $network->reporting_url,
+            'reporting_url' => $canModerate ? $network->reporting_url : null,
             'logo' => $network->sizedLogo('_x100'),
-            'coordinators' => $network->coordinators->map(function ($c) {
+            'coordinators' => $canModerate ? $network->coordinators->map(function ($c) {
                 $profile = $c->getProfile($c->id);
                 $path = $profile ? $profile->path : null;
                 return [
@@ -103,10 +107,11 @@ class NetworkController extends Controller
                     'name' => $c->name,
                     'picture' => $path ? '/uploads/thumbnail_' . $path : '/images/placeholder-avatar.png',
                 ];
-            }),
+            }) : [],
         ];
 
         return view('networks.show', [
+            'canModerate' => $canModerate,
             'network' => $network,
             'networkData' => $networkData,
             'groupsForAssociating' => $groupsForAssociating,

@@ -11,10 +11,10 @@
         </a>
       </div>
       <div class="network-actions" v-if="isLoggedIn">
-        <b-dropdown right variant="primary" :text="__('networks.general.actions')">
+        <b-dropdown v-if="canAssociateGroups || canModerate" right variant="primary" :text="__('networks.general.actions')">
           <b-dropdown-item v-if="canAssociateGroups" @click="showAddGroupModal">{{ __('networks.show.add_groups_menuitem') }}</b-dropdown-item>
           <b-dropdown-item v-if="network.reporting_url" :href="network.reporting_url" target="_blank" rel="noopener" link-class="network-reporting-link">{{ __('networks.general.view_reports') }}</b-dropdown-item>
-          <b-dropdown-item :href="'/export/networks/' + network.id + '/events'">{{ __('groups.export_event_list') }}</b-dropdown-item>
+          <b-dropdown-item v-if="canModerate" :href="'/export/networks/' + network.id + '/events'">{{ __('groups.export_event_list') }}</b-dropdown-item>
         </b-dropdown>
       </div>
     </div>
@@ -68,14 +68,14 @@
     </section>
 
     <!-- Groups requiring moderation (full width) -->
-    <section class="mb-4">
+    <section class="mb-4" v-if="canModerate">
       <h2>{{ __('groups.groups_title_admin') }}</h2>
       <GroupsRequiringModeration :networks="[network.id]" ref="groupsModeration" />
       <div v-if="groupsModerationEmpty" class="text-muted">{{ __('networks.show.none') }}</div>
     </section>
 
     <!-- Events requiring moderation (full width) -->
-    <section class="mb-4">
+    <section class="mb-4" v-if="canModerate">
       <h2>{{ __('events.events_title_admin') }}</h2>
       <EventsRequiringModeration :networks="[network.id]" ref="eventsModeration" />
       <div v-if="eventsModerationEmpty" class="text-muted">{{ __('networks.show.none') }}</div>
@@ -203,6 +203,11 @@ export default {
       default: () => []
     },
     canManageTags: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    canModerate: {
       type: Boolean,
       required: false,
       default: false
