@@ -20,6 +20,8 @@
   </div>
 </template>
 <script>
+import { hasBakedFootnote, footnoteLayout } from '../misc/statsFootnote'
+
 const MARG = 10
 const RADIUS = 8
 
@@ -592,10 +594,46 @@ export default {
       img.src = '/images/stats/' + name
       img.onload = () => {
         ctx.drawImage(img, x, y, width, height)
+        if (name.indexOf('ImpactRange') === 0) {
+          this.replaceFootnote(name)
+        }
 
         if (cb) {
           setTimeout(cb.bind(this), 500)
         }
+      }
+    },
+    replaceFootnote(name) {
+      // The footnote is baked into the background PNGs in English.  Blank it and write a translated one.
+      if (!hasBakedFootnote(name)) {
+        return
+      }
+
+      const ctx = this.ctx
+      const W = this.canvas.width
+      const H = this.canvas.height
+      const L = footnoteLayout(this.portrait)
+
+      try {
+        const p = ctx.getImageData(5, H - 5, 1, 1).data
+        ctx.fillStyle = 'rgb(' + p[0] + ',' + p[1] + ',' + p[2] + ')'
+        ctx.fillRect(L.x * W, L.y * H, L.w * W, L.h * H)
+
+        let size = Math.round(L.fontH * H)
+        ctx.font = 'bold ' + size + 'px Asap, sans-serif'
+        const text = this.__('partials.share_modal_footnote')
+        const maxW = L.maxW * W
+        const width = ctx.measureText(text).width
+        if (width > maxW) {
+          size = Math.floor(size * maxW / width)
+          ctx.font = 'bold ' + size + 'px Asap, sans-serif'
+        }
+
+        const x = L.centre ? (W - ctx.measureText(text).width) / 2 : L.textX * W
+        ctx.fillStyle = 'black'
+        ctx.fillText(text, x, L.textY * H + size / 3)
+      } catch (e) {
+        console.error('Failed to replace footnote', e)
       }
     },
     next() {
