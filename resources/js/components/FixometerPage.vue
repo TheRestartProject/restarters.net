@@ -14,6 +14,9 @@
         <b-btn variant="primary" :href="downloadUrl" class="export-devices">
           {{ __('devices.export_device_data') }}
         </b-btn>
+        <b-btn v-if="hasFilters" variant="secondary" :href="filteredDownloadUrl" class="export-devices-filtered ml-2">
+          {{ __('devices.export_filtered_data') }}
+        </b-btn>
       </div>
     </div>
     <p>{{ __('devices.search_text') }}</p>
@@ -233,6 +236,41 @@ export default {
     }
   },
   computed: {
+    // The to date starts as today, so it only counts as a filter once it has been changed.
+    filterParams() {
+      const params = {
+        powered: this.powered,
+        category: this.category,
+        brand: this.brand,
+        model: this.model,
+        item_type: this.item_type,
+        comments: this.comments,
+        wiki: this.wiki,
+        status: this.status,
+        group: this.group,
+        from_date: this.from_date,
+        to_date: this.to_date === today() ? null : this.to_date,
+      }
+
+      const ret = {}
+
+      Object.keys(params).forEach(key => {
+        const value = params[key]
+
+        if (value !== null && value !== undefined && value !== '' && value !== false) {
+          ret[key] = value
+        }
+      })
+
+      return ret
+    },
+    hasFilters() {
+      return Object.keys(this.filterParams).length > 0
+    },
+    // The same export as the full download, narrowed to the records the filters show.
+    filteredDownloadUrl() {
+      return '/export/devices?' + new URLSearchParams(this.filterParams).toString()
+    },
     url() {
       // We want to change the URL.  In a full app the router would handle this.
       //

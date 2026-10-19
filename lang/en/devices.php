@@ -3,6 +3,7 @@
 return [
   'devices' => 'Repairs',
   'export_device_data' => 'Download all data',
+  'export_filtered_data' => 'Download filtered data',
   'export_event_data' => 'Download event data',
   'export_group_data' => 'Download repair data',
   'category' => 'Category',
