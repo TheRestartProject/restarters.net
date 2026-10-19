@@ -906,4 +906,51 @@ class APIv2NetworkTest extends TestCase
         // Should return empty array
         $this->assertEmpty($json);
     }
+
+    public function testNetworkEventsOverlapArchivedAndCancelled(): void {
+        $network = Network::factory()->create();
+        $group = Group::factory()->create(['approved' => true]);
+        $archived = Group::factory()->create(['approved' => true, 'archived_at' => '2020-01-01']);
+        $network->addGroup($group);
+        $network->addGroup($archived);
+
+        // Event spanning midnight between 1st and 2nd Jan 2038.
+        $spanning = Party::factory()->moderated()->create([
+            'group' => $group->idgroups,
+            'event_start_utc' => '2038-01-01T23:00:00Z',
+            'event_end_utc' => '2038-01-02T02:00:00Z',
+        ]);
+        $cancelled = Party::factory()->moderated()->create([
+            'group' => $group->idgroups,
+            'event_start_utc' => '2038-01-05T10:00:00Z',
+            'event_end_utc' => '2038-01-05T12:00:00Z',
+        ]);
+        DB::table('events')->where('idevents', $cancelled->idevents)->update(['cancelled' => 1]);
+        Party::factory()->moderated()->create([
+            'group' => $archived->idgroups,
+            'event_start_utc' => '2038-01-02T10:00:00Z',
+            'event_end_utc' => '2038-01-02T12:00:00Z',
+        ]);
+
+        // A window which only touches the end of the spanning event returns it (overlap, not containment).
+        $response = $this->get("/api/v2/networks/{$network->id}/events?start=" . urlencode('2038-01-02T00:00:00Z') .
+            '&end=' . urlencode('2038-01-03T00:00:00Z'));
+        $response->assertSuccessful();
+        $json = json_decode($response->getContent(), true)['data'];
+        $this->assertCount(1, $json, 'Archived group event must be excluded');
+        $this->assertEquals($spanning->idevents, $json[0]['id']);
+        $this->assertFalse($json[0]['cancelled']);
+
+        // Window after the spanning event does not return it.
+        $response = $this->get("/api/v2/networks/{$network->id}/events?start=" . urlencode('2038-01-03T00:00:00Z') .
+            '&end=' . urlencode('2038-01-04T00:00:00Z'));
+        $this->assertCount(0, json_decode($response->getContent(), true)['data']);
+
+        // Cancelled events are returned, flagged.
+        $response = $this->get("/api/v2/networks/{$network->id}/events?start=" . urlencode('2038-01-05T00:00:00Z') .
+            '&end=' . urlencode('2038-01-06T00:00:00Z'));
+        $json = json_decode($response->getContent(), true)['data'];
+        $this->assertCount(1, $json);
+        $this->assertTrue($json[0]['cancelled']);
+    }
 }

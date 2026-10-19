@@ -415,12 +415,13 @@ class NetworkController extends Controller
         $query = Party::join('groups', 'groups.idgroups', '=', 'events.group')
             ->join('group_network', 'group_network.group_id', '=', 'groups.idgroups')
             ->where('group_network.network_id', $id)
-            ->where('event_start_utc', '>=', $start)
-            ->where('event_end_utc', '<=', $end)
+            ->where('event_start_utc', '<=', $end)
+            ->where('event_end_utc', '>=', $start)
             ->where('events.updated_at', '>=', $updated_start)
             ->where('events.updated_at', '<=', $updated_end)
             ->where('events.approved', true)
-            ->where('groups.approved', true);
+            ->where('groups.approved', true)
+            ->whereNull('groups.archived_at');
 
         // Filter by group tag if specified
         if ($request->has('group_tag')) {

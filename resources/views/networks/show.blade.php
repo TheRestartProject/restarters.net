@@ -31,6 +31,8 @@
                 :can-associate-groups="{{ json_encode($canAssociateGroups) }}"
                 :is-logged-in="{{ json_encode(Auth::check()) }}"
                 api-token="{{ $apiToken }}"
+                calendar-copy-url="{{ url('/calendar/network/' . $network->id) }}"
+                calendar-edit-url="{{ url('/profile/edit/' . Auth::id() . '#list-calendar-links') }}"
             />
         </div>
 

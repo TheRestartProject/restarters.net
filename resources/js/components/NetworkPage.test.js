@@ -57,6 +57,7 @@ function makeWrapper(props = {}) {
       GroupsRequiringModeration: true,
       EventsRequiringModeration: true,
       GroupMapAndList: groupMapStub,
+      NetworkEvents: true,
     },
   })
 }
@@ -141,4 +142,13 @@ test('shows a page of groups and a button for the rest, not an infinite scroll',
   const wrapper = makeWrapper()
 
   expect(wrapper.findComponent(groupMapStub).props('showAllButton')).toBe(true)
+})
+
+test('shows the upcoming events section for this network', () => {
+  const wrapper = makeWrapper({ calendarCopyUrl: 'http://x/calendar/network/5' })
+
+  const events = wrapper.findComponent({ name: 'NetworkEvents' })
+  expect(events.exists()).toBe(true)
+  expect(events.props('networkId')).toBe(5)
+  expect(events.props('calendarCopyUrl')).toBe('http://x/calendar/network/5')
 })
