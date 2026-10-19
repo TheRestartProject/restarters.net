@@ -384,51 +384,7 @@ function initializeJQuery() {
 
 
       // Initialize Vue instances on any divs which have asked for it.
-      //
-      // Normally you'd initialise one instance on a single top-level div.  But we put content directly under body.
-      // Initialising multiple instances is a bit more expensive, but not much.
-      //
-      // We need to list all the top-level components we will use in blades here; they are stored in
-      // resources/js/components.  Lower level components can be included from within those as normal;
-      // they don't need listing here.
-      console.log('About to initialize Vue instances, found', window.jQuery(".vue").length, 'elements');
-      window.jQuery(".vue").each(function(index) {
-        console.log('Initializing Vue instance', index);
-        new Vue({
-          el: window.jQuery(this).get(0),
-          store: store,
-          components: {
-            'loginpage': LoginPage,
-            'dashboardpage': DashboardPage,
-            'eventaddeditpage': EventAddEditPage,
-            'eventaddedit': EventAddEdit,
-            'eventsrequiringmoderation': EventsRequiringModeration,
-            'eventpage': EventPage,
-            'fixometerpage': FixometerPage,
-            'groupspage': GroupsPage,
-            'grouppage': GroupPage,
-            'groupaddeditpage': GroupAddEditPage,
-            'groupeventspage': GroupEventsPage,
-            'groupevents': GroupEvents,
-            'groupsrequiringmoderation': GroupsRequiringModeration,
-            'networkpage': NetworkPage,
-
-            'eventtimerangepicker': EventTimeRangePicker,
-            'eventdatepicker': EventDatePicker,
-            'venueaddress': VenueAddress,
-            'richtexteditor': RichTextEditor,
-            'notifications': Notifications,
-            'grouptimezone': GroupTimeZone,
-            'statsshare': StatsShare,
-            'categories-table': CategoriesTable,
-            'roles-table': RolesTable,
-            'emailvalidation': EmailValidation,
-            'groupmapandlist': GroupMapAndList,
-            'groupmarker': GroupMarker,
-            'groupinfomodal': GroupInfoModal,
-          }
-        })
-      })
+      mountVueInstances();
 
       // Initialize Leaflet components now that CDN Leaflet is available
       try {
@@ -451,6 +407,71 @@ function initializeJQuery() {
       console.error('Global JS initialization error:', e);
     }
   });
+}
+
+// Initialize Vue instances on any divs which have asked for it.
+//
+// Normally you'd initialise one instance on a single top-level div.  But we put content directly under body.
+// Initialising multiple instances is a bit more expensive, but not much.
+//
+// We need to list all the top-level components we will use in blades here; they are stored in
+// resources/js/components.  Lower level components can be included from within those as normal;
+// they don't need listing here.
+//
+// Each element is only mounted once, so this is safe to call from more than one place.
+function mountVueInstances() {
+  const elements = document.querySelectorAll('.vue')
+  console.log('About to initialize Vue instances, found', elements.length, 'elements')
+
+  elements.forEach(function (el, index) {
+    if (el.__restartersMounted) {
+      return
+    }
+
+    el.__restartersMounted = true
+    console.log('Initializing Vue instance', index)
+    new Vue({
+      el: el,
+      store: store,
+      components: {
+        'loginpage': LoginPage,
+        'dashboardpage': DashboardPage,
+        'eventaddeditpage': EventAddEditPage,
+        'eventaddedit': EventAddEdit,
+        'eventsrequiringmoderation': EventsRequiringModeration,
+        'eventpage': EventPage,
+        'fixometerpage': FixometerPage,
+        'groupspage': GroupsPage,
+        'grouppage': GroupPage,
+        'groupaddeditpage': GroupAddEditPage,
+        'groupeventspage': GroupEventsPage,
+        'groupevents': GroupEvents,
+        'groupsrequiringmoderation': GroupsRequiringModeration,
+        'networkpage': NetworkPage,
+
+        'eventtimerangepicker': EventTimeRangePicker,
+        'eventdatepicker': EventDatePicker,
+        'venueaddress': VenueAddress,
+        'richtexteditor': RichTextEditor,
+        'notifications': Notifications,
+        'grouptimezone': GroupTimeZone,
+        'statsshare': StatsShare,
+        'categories-table': CategoriesTable,
+        'roles-table': RolesTable,
+        'emailvalidation': EmailValidation,
+        'groupmapandlist': GroupMapAndList,
+        'groupmarker': GroupMarker,
+        'groupinfomodal': GroupInfoModal,
+      }
+    })
+  })
+}
+
+// Embeddable iframe pages (e.g. /outbound/info/group/N/leaf) deliberately don't load the CDN jQuery/Leaflet scripts
+// that initializeJQuery() waits for, so it would never run and the Vue content would never mount.  They only need
+// Vue, so mount it directly.
+if (window.restartersIframe) {
+  mountVueInstances()
 }
 
 // Start the initialization
