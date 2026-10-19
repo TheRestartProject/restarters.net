@@ -72,6 +72,11 @@
               </b-form-group>
               <div />
             </div>
+            <div class="d-flex justify-content-end">
+              <b-btn variant="link" class="clear-item-filters p-0" @click="clearItems">
+                {{ __('devices.clear_filters') }}
+              </b-btn>
+            </div>
           </b-card-body>
         </b-card>
       </b-collapse>
@@ -106,9 +111,19 @@
             <b-form-group :label="__('devices.to_date')">
               <b-form-datepicker class="datepicker" v-model="current_to_date" :date-format-options="{ year: 'numeric', month: 'numeric', day: 'numeric' }"></b-form-datepicker>
             </b-form-group>
+            <div class="d-flex justify-content-end">
+              <b-btn variant="link" class="clear-event-filters p-0" @click="clearEvents">
+                {{ __('devices.clear_filters') }}
+              </b-btn>
+            </div>
           </b-card-body>
         </b-card>
       </b-collapse>
+    </div>
+    <div class="d-flex justify-content-end mt-2">
+      <b-btn variant="link" class="clear-all-filters p-0" @click="clearAll">
+        {{ __('devices.clear_all_filters') }}
+      </b-btn>
     </div>
   </div>
 </template>
@@ -334,6 +349,25 @@ export default {
     }
   },
   methods: {
+    clearItems() {
+      // Setting powered also clears the category.
+      this.current_powered = null
+      this.current_category = null
+      this.current_item_type = null
+      this.current_brand = null
+      this.current_model = null
+      this.$emit('update:comments', null)
+      this.$emit('update:status', null)
+    },
+    clearEvents() {
+      this.current_group = null
+      this.current_from_date = null
+      this.current_to_date = null
+    },
+    clearAll() {
+      this.clearItems()
+      this.clearEvents()
+    },
     toggleItems() {
       this.expandedItems = !this.expandedItems
       this.$emit('expandItems', this.expandedItems)

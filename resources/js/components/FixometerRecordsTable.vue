@@ -180,6 +180,7 @@ export default {
   data () {
     return {
       currentPage: 1,
+      requestSeq: 0,
       perPage: 20,
       showModal: false,
       device: null,
@@ -253,37 +254,37 @@ export default {
   },
   watch: {
     powered(newVal) {
-      this.$refs.table.refresh()
+      this.filtersChanged()
     },
     category(newVal) {
-      this.$refs.table.refresh()
+      this.filtersChanged()
     },
     brand(newVal) {
-      this.$refs.table.refresh()
+      this.filtersChanged()
     },
     model(newVal) {
-      this.$refs.table.refresh()
+      this.filtersChanged()
     },
     comments(newVal) {
-      this.$refs.table.refresh()
+      this.filtersChanged()
     },
     wiki(newVal) {
-      this.$refs.table.refresh()
+      this.filtersChanged()
     },
     item_type(newVal) {
-      this.$refs.table.refresh()
+      this.filtersChanged()
     },
     status(newVal) {
-      this.$refs.table.refresh()
+      this.filtersChanged()
     },
     group(newVal) {
-      this.$refs.table.refresh()
+      this.filtersChanged()
     },
     from_date(newVal) {
-      this.$refs.table.refresh()
+      this.filtersChanged()
     },
     to_date(newVal) {
-      this.$refs.table.refresh()
+      this.filtersChanged()
     },
     total(newVal) {
       this.$emit('update:total', newVal)
@@ -296,11 +297,21 @@ export default {
     }
   },
   methods: {
+    filtersChanged () {
+      // The new results may have fewer pages than the one we are on, which would show an empty page.  Go back to
+      // the first page; the table fetches when the page changes, so only refresh if we're already there.
+      if (this.currentPage !== 1) {
+        this.currentPage = 1
+      } else {
+        this.$refs.table.refresh()
+      }
+    },
     items (ctx, callback) {
       // We want to take advantage of the paging and sorting features of the table, and therefore we are using the
       // table's async method of providing data.  The server sorts by the column the table is sorted by; with no
       // column chosen it shows the most recent events first.
       const sortBy = ctx.sortBy || null
+      const request = ++this.requestSeq
       let sortDesc = 'DESC'
 
       if (ctx.sortBy && !ctx.sortDesc) {
@@ -326,6 +337,11 @@ export default {
         }
       })
           .then(ret => {
+            if (request !== this.requestSeq) {
+              // A newer request has been made (e.g. filters changed); ignore this stale response.
+              return
+            }
+
             this.total = ret.data.count
             this.weight = ret.data.weight
             this.co2 = ret.data.co2

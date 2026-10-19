@@ -24,6 +24,8 @@ return [
   'devices_description' => 'Description of problem/solution',
   'delete_device' => 'Delete device',
   'devices_date' => 'Date',
+  'clear_filters' => 'Clear filters',
+  'clear_all_filters' => 'Clear all filters',
   'event_info' => 'Event info',
   'fixometer' => 'Fixometer',
   'global_impact' => 'Our Global Impact',
