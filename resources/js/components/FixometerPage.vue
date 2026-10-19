@@ -257,7 +257,8 @@ export default {
       Object.keys(params).forEach(key => {
         const value = params[key]
 
-        if (value !== null && value !== undefined && value !== '' && value !== false) {
+        // The powered filter is a boolean where false means unpowered, so false is a real value.
+        if (value !== null && value !== undefined && value !== '' && (key === 'powered' || value !== false)) {
           ret[key] = value
         }
       })
@@ -269,7 +270,15 @@ export default {
     },
     // The same export as the full download, narrowed to the records the filters show.
     filteredDownloadUrl() {
-      return '/export/devices?' + new URLSearchParams(this.filterParams).toString()
+      // Always send the to date, even when it is today, because the list does too.  That keeps future-dated events
+      // out of the download just as they are out of the list.
+      const params = { ...this.filterParams }
+
+      if (this.to_date) {
+        params.to_date = this.to_date
+      }
+
+      return '/export/devices?' + new URLSearchParams(params).toString()
     },
     url() {
       // We want to change the URL.  In a full app the router would handle this.

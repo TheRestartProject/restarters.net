@@ -32,7 +32,8 @@ class ExportFilteredDevicesTest extends TestCase
         $response = $this->get($url);
         $response->assertSuccessful();
         $header = $response->headers->get('content-disposition');
-        $filename = storage_path('app/exports/' . trim(substr($header, strpos($header, 'filename=') + 9), '"'));
+        // Each export is written to its own unique file; the friendly name is only the download name.
+        $filename = $response->baseResponse->getFile()->getPathname();
 
         $lines = file($filename);
         $columns = count(str_getcsv(array_shift($lines)));
@@ -63,6 +64,23 @@ class ExportFilteredDevicesTest extends TestCase
 
         [$rows] = $this->rows('/export/devices?from_date=2024-02-01&to_date=2024-02-01');
         $this->assertEquals(['Plinth'], array_column($rows, 2));
+    }
+
+    public function testFilteredExportCanSelectUnpoweredOnly(): void
+    {
+        $this->actingAs(User::factory()->restarter()->create());
+
+        $unpowered = \DB::table('categories')->where('powered', 0)->value('idcategories');
+        $powered = \DB::table('categories')->where('powered', 1)->value('idcategories');
+
+        $this->addEvent('2024-01-01', true, ['brand' => 'Unplugged', 'category' => $unpowered, 'category_creation' => $unpowered]);
+        $this->addEvent('2024-01-02', true, ['brand' => 'Plugged', 'category' => $powered, 'category_creation' => $powered]);
+
+        [$rows] = $this->rows('/export/devices?powered=false');
+        $this->assertEquals(['Unplugged'], array_column($rows, 2));
+
+        [$rows] = $this->rows('/export/devices?powered=true');
+        $this->assertEquals(['Plugged'], array_column($rows, 2));
     }
 
     public function testFilteredExportKeepsVisibilityRules(): void

@@ -80,7 +80,9 @@ class ExportController extends Controller
         }
 
         $filename .= '.csv';
-        $fullpath = $this->exportPath($filename);
+        // A unique file per request, so overlapping exports (different users, different filters) can't clobber
+        // each other.  The friendly name is only the download name.
+        $fullpath = tempnam(dirname($this->exportPath($filename)), 'export-');
         $file = fopen($fullpath, 'w+');
 
         $export->write($all_devices, $file);
