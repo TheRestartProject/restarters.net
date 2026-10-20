@@ -72,10 +72,10 @@
               </b-form-group>
               <div />
             </div>
-            <div class="d-flex justify-content-end">
-              <b-btn variant="link" class="clear-item-filters p-0" @click="clearItems">
+            <div class="d-flex justify-content-end mt-1">
+              <button type="button" class="btn clear-item-filters clear-filters" @click="clearItems">
                 {{ __('devices.clear_filters') }}
-              </b-btn>
+              </button>
             </div>
           </b-card-body>
         </b-card>
@@ -111,19 +111,14 @@
             <b-form-group :label="__('devices.to_date')">
               <b-form-datepicker class="datepicker" v-model="current_to_date" :date-format-options="{ year: 'numeric', month: 'numeric', day: 'numeric' }"></b-form-datepicker>
             </b-form-group>
-            <div class="d-flex justify-content-end">
-              <b-btn variant="link" class="clear-event-filters p-0" @click="clearEvents">
+            <div class="d-flex justify-content-end mt-1">
+              <button type="button" class="btn clear-event-filters clear-filters" @click="clearEvents">
                 {{ __('devices.clear_filters') }}
-              </b-btn>
+              </button>
             </div>
           </b-card-body>
         </b-card>
       </b-collapse>
-    </div>
-    <div class="d-flex justify-content-end mt-2">
-      <b-btn variant="link" class="clear-all-filters p-0" @click="clearAll">
-        {{ __('devices.clear_all_filters') }}
-      </b-btn>
     </div>
   </div>
 </template>
@@ -365,11 +360,6 @@ export default {
       this.current_from_date = null
       this.current_to_date = today()
     },
-    clearAll() {
-      this.clearItems()
-      this.current_wiki = false
-      this.clearEvents()
-    },
     toggleItems() {
       this.expandedItems = !this.expandedItems
       this.$emit('expandItems', this.expandedItems)
@@ -418,10 +408,6 @@ export default {
   background-color: $brand-grey-darker;
 }
 
-::v-deep .btn-link:hover {
-  color: transparent;
-}
-
 ::v-deep .btn:focus, .btn.focus {
   outline: 0;
   -webkit-box-shadow: none
@@ -463,5 +449,33 @@ export default {
 
 .clickme {
   user-select: none;
+}
+
+// Placed last so it also wins the specificity tie with the generic .btn:focus rule above.
+.clear-filters {
+  border: 1px solid $brand;
+  border-radius: 0;
+  background-color: $white;
+  color: $brand;
+  font-size: 13px;
+  font-weight: bold;
+  line-height: 1.2;
+  padding: 4px 12px;
+  text-decoration: none;
+
+  &:hover {
+    background-color: $brand;
+    border-color: $brand;
+    color: $white;
+    text-decoration: none;
+  }
+
+  &:focus {
+    background-color: $brand;
+    border-color: $brand;
+    color: $white;
+    box-shadow: 0 0 0 2px rgba($brand, 0.35);
+    outline: 0;
+  }
 }
 </style>

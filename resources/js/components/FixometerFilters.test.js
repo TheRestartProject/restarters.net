@@ -89,14 +89,3 @@ test('clear filters in each section only clears that section', async () => {
   expect(wrapper.emitted('update:from_date').pop()).toEqual([null])
   expect(wrapper.emitted('update:to_date').pop()).toEqual([today()])
 })
-
-test('clear all filters clears both sections', async () => {
-  const wrapper = makeWrapper({ group: 'Alpha', brand: 'Acme', wiki: true })
-  await wrapper.vm.$nextTick()
-
-  await wrapper.find('.clear-all-filters').trigger('click')
-  await wrapper.vm.$nextTick()
-  expect(wrapper.emitted('update:brand').pop()).toEqual([null])
-  expect(wrapper.emitted('update:group').pop()).toEqual([null])
-  expect(wrapper.emitted('update:wiki').pop()).toEqual([false])
-})

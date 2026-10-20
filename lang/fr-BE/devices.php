@@ -24,7 +24,6 @@ return [
   'devices_description' => 'Description du problème/solution',
   'delete_device' => 'Effacer l\'appareil',
   'clear_filters' => 'Effacer les filtres',
-  'clear_all_filters' => 'Effacer tous les filtres',
   'event_info' => 'Informations sur l\'événement',
   'devices_date' => 'Date',
   'add_data_action_button' => 'Participer à l\'événément',
