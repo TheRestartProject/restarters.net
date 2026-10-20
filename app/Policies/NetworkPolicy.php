@@ -38,7 +38,7 @@ class NetworkPolicy
 
         return \App\UserGroups::where('user', $user->id)
             ->where('role', \App\Role::HOST)
-            ->whereIn('group', $network->groups()->select('groups.idgroups'))
+            ->whereIn('group', \DB::table('group_network')->where('network_id', $network->id)->select('group_id'))
             ->exists();
     }
 
