@@ -39,10 +39,10 @@
       <template v-if="view === 'list'">
         <b-form-select v-model="range" :options="rangeOptions" size="sm" class="range-select mr-3 mb-2" />
         <template v-if="range === 'custom'">
-          <label class="mr-1 mb-2 small">{{ __('networks.events.from') }}</label>
-          <b-form-input v-model="customFrom" type="date" size="sm" class="date-input mr-2 mb-2" />
-          <label class="mr-1 mb-2 small">{{ __('networks.events.to') }}</label>
-          <b-form-input v-model="customTo" type="date" size="sm" class="date-input mr-3 mb-2" />
+          <label for="network-events-from" class="mr-1 mb-2 small">{{ __('networks.events.from') }}</label>
+          <b-form-input id="network-events-from" v-model="customFrom" type="date" size="sm" class="date-input mr-2 mb-2" />
+          <label for="network-events-to" class="mr-1 mb-2 small">{{ __('networks.events.to') }}</label>
+          <b-form-input id="network-events-to" v-model="customTo" type="date" size="sm" class="date-input mr-3 mb-2" />
         </template>
         <b-form-checkbox v-model="includePast" class="mr-3 mb-2 include-past">{{ __('networks.events.include_past') }}</b-form-checkbox>
       </template>
@@ -84,7 +84,8 @@ function storedView() {
   try {
     const v = window.localStorage.getItem(VIEW_KEY)
     return v === 'calendar' ? 'calendar' : 'list'
-  } catch (e) {
+  } catch {
+    // localStorage can be unavailable (private mode); fall back to the default view.
     return 'list'
   }
 }
@@ -164,7 +165,7 @@ export default {
 
       return {
         start: this.includePast ? now.clone().subtract(90, 'days') : now,
-        end: now.clone().add(parseInt(this.range) || 30, 'days')
+        end: now.clone().add(Number.parseInt(this.range, 10) || 30, 'days')
       }
     },
     visibleEvents() {
@@ -240,7 +241,8 @@ export default {
           }
         })
         this.loaded = true
-      } catch (e) {
+      } catch {
+        // Only the latest request may flag failure; stale ones are deliberately ignored.
         if (id === this.requestId) {
           this.failed = true
         }

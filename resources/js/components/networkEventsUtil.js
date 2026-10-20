@@ -62,7 +62,7 @@ export function clashDays(buckets) {
 
   Object.keys(buckets).forEach(day => {
     const live = buckets[day].filter(e => !e.cancelled)
-    const groups = new Set(live.map(e => e.group && e.group.id))
+    const groups = new Set(live.map(e => e.group?.id))
 
     if (groups.size >= 2) {
       clashes[day] = live.length

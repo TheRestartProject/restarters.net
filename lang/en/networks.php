@@ -87,7 +87,6 @@ return [
     'cancelled' => 'Cancelled',
     'prev_month' => 'Previous month',
     'next_month' => 'Next month',
-    'more' => '+:count more',
     'loading' => 'Loading events...',
     'error' => 'Could not load events.',
     'view_toggle' => 'Events view',

@@ -15,6 +15,8 @@ use Tests\TestCase;
 
 class APIv2NetworkTest extends TestCase
 {
+    private const END_PARAM = '&end=';
+
     /** @story:NetworkController::getNetworksv2 */
     public function testList(): void {
         $user = User::factory()->administrator()->create([
@@ -934,7 +936,7 @@ class APIv2NetworkTest extends TestCase
 
         // A window which only touches the end of the spanning event returns it (overlap, not containment).
         $response = $this->get("/api/v2/networks/{$network->id}/events?start=" . urlencode('2038-01-02T00:00:00Z') .
-            '&end=' . urlencode('2038-01-03T00:00:00Z'));
+            self::END_PARAM . urlencode('2038-01-03T00:00:00Z'));
         $response->assertSuccessful();
         $json = json_decode($response->getContent(), true)['data'];
         $this->assertCount(1, $json, 'Archived group event must be excluded');
@@ -943,12 +945,12 @@ class APIv2NetworkTest extends TestCase
 
         // Window after the spanning event does not return it.
         $response = $this->get("/api/v2/networks/{$network->id}/events?start=" . urlencode('2038-01-03T00:00:00Z') .
-            '&end=' . urlencode('2038-01-04T00:00:00Z'));
+            self::END_PARAM . urlencode('2038-01-04T00:00:00Z'));
         $this->assertCount(0, json_decode($response->getContent(), true)['data']);
 
         // Cancelled events are returned, flagged.
         $response = $this->get("/api/v2/networks/{$network->id}/events?start=" . urlencode('2038-01-05T00:00:00Z') .
-            '&end=' . urlencode('2038-01-06T00:00:00Z'));
+            self::END_PARAM . urlencode('2038-01-06T00:00:00Z'));
         $json = json_decode($response->getContent(), true)['data'];
         $this->assertCount(1, $json);
         $this->assertTrue($json[0]['cancelled']);

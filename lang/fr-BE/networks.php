@@ -87,7 +87,6 @@ return [
     'cancelled' => 'Annulé',
     'prev_month' => 'Mois précédent',
     'next_month' => 'Mois suivant',
-    'more' => '+:count de plus',
     'loading' => 'Chargement des événements...',
     'error' => 'Impossible de charger les événements.',
     'view_toggle' => 'Affichage des événements',
