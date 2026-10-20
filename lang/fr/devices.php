@@ -3,6 +3,7 @@
 return [
   'devices' => 'Appareils',
   'export_device_data' => 'Exporter les données des appareils',
+  'export_filtered_data' => 'Exporter les données filtrées',
   'export_event_data' => 'Exporter les données de l\'événement',
   'export_group_data' => 'Exporter les données du Repair Café',
   'category' => 'Catégorie',
