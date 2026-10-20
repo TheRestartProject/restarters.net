@@ -117,6 +117,7 @@ class CheckTranslations extends Command
             'resources/views/',               // Blade templates
             'resources/js/components/',       // Vue templates
             'resources/js/mixins/',           // Vue mixins (rare)
+            'resources/js/misc/',             // JS helpers (e.g. share footnote keys)
             'app/',                           // Models (rare)
             'app/Notifications/',             // Email notifications
             'app/Http/Controllers/',          // Controllers (rarely)
@@ -124,7 +125,7 @@ class CheckTranslations extends Command
             'app/Services/',                  // Services(rarely)
             'app/'                            // Models rarely)
                  ] as $loc) {
-            $cmd = 'grep -r "' . addslashes($key) . '" ' . $loc . ' > /dev/null';
+            $cmd = 'grep -r --exclude="*.test.js" "' . addslashes($key) . '" ' . $loc . ' > /dev/null';
             system($cmd, $rc);
 
             if ($rc == 0) {
