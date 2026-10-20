@@ -108,6 +108,8 @@ class ExportFilteredDevicesTest extends TestCase
 
     public function testFilteredExportRejectsBadDates(): void
     {
+        // TestCase disables exception handling globally; we want the rendered 422 here.
+        $this->withExceptionHandling();
         $this->get('/export/devices?from_date=banana', ['Accept' => 'application/json'])
             ->assertStatus(422);
     }

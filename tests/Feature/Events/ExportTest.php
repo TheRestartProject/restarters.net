@@ -157,7 +157,7 @@ class ExportTest extends TestCase
         // Export devices.
         $response = $this->get("/export/devices");
         $header = $response->headers->get('content-disposition');
-        $filename = storage_path('app/exports') . '/' . substr($header, strpos($header, 'filename=') + 9);
+        $filename = $response->baseResponse->getFile()->getPathname();
 
         $fh = fopen($filename, 'r');
         fgetcsv($fh);
@@ -178,7 +178,7 @@ class ExportTest extends TestCase
         // Export devices for a particular event.
         $response = $this->get("/export/devices/event/$idevents1");
         $header = $response->headers->get('content-disposition');
-        $filename = storage_path('app/exports') . '/' . substr($header, strpos($header, 'filename=') + 9);
+        $filename = $response->baseResponse->getFile()->getPathname();
         $fh = fopen($filename, 'r');
         fgetcsv($fh);
         $row2 = fgetcsv($fh);
@@ -187,7 +187,7 @@ class ExportTest extends TestCase
 
         $response = $this->get("/export/devices/event/$idevents2");
         $header = $response->headers->get('content-disposition');
-        $filename = storage_path('app/exports') . '/' . substr($header, strpos($header, 'filename=') + 9);
+        $filename = $response->baseResponse->getFile()->getPathname();
         $fh = fopen($filename, 'r');
         fgetcsv($fh);
         $row2 = fgetcsv($fh);
@@ -195,7 +195,7 @@ class ExportTest extends TestCase
 
         $response = $this->get("/export/devices/event/$idevents3");
         $header = $response->headers->get('content-disposition');
-        $filename = storage_path('app/exports') . '/' . substr($header, strpos($header, 'filename=') + 9);
+        $filename = $response->baseResponse->getFile()->getPathname();
         $fh = fopen($filename, 'r');
         fgetcsv($fh);
         $row2 = fgetcsv($fh);
@@ -209,7 +209,7 @@ class ExportTest extends TestCase
         // Export devices for a particular group.
         $response = $this->get("/export/devices/group/{$group1->idgroups}");
         $header = $response->headers->get('content-disposition');
-        $filename = storage_path('app/exports') . '/' . substr($header, strpos($header, 'filename=') + 9);
+        $filename = $response->baseResponse->getFile()->getPathname();
         $fh = fopen($filename, 'r');
         fgetcsv($fh);
         $row2 = fgetcsv($fh);
@@ -217,7 +217,7 @@ class ExportTest extends TestCase
 
         $response = $this->get("/export/devices/group/{$group2->idgroups}");
         $header = $response->headers->get('content-disposition');
-        $filename = storage_path('app/exports') . '/' . substr($header, strpos($header, 'filename=') + 9);
+        $filename = $response->baseResponse->getFile()->getPathname();
         $fh = fopen($filename, 'r');
         fgetcsv($fh);
         $row2 = fgetcsv($fh);
@@ -225,7 +225,7 @@ class ExportTest extends TestCase
 
         $response = $this->get("/export/devices/group/{$group3->idgroups}");
         $header = $response->headers->get('content-disposition');
-        $filename = storage_path('app/exports') . '/' . substr($header, strpos($header, 'filename=') + 9);
+        $filename = $response->baseResponse->getFile()->getPathname();
         $fh = fopen($filename, 'r');
         fgetcsv($fh);
         $row2 = fgetcsv($fh);
@@ -290,7 +290,7 @@ class ExportTest extends TestCase
         $this->assertStringContainsString($expectedFilename, $header);
 
         // Verify the file can be read
-        $filename = storage_path('app/exports') . '/' . $expectedFilename;
+        $filename = $response->baseResponse->getFile()->getPathname();
         $this->assertFileExists($filename);
         $fh = fopen($filename, 'r');
         $this->assertNotFalse($fh);
@@ -308,7 +308,7 @@ class ExportTest extends TestCase
         $this->assertStringContainsString('.csv', $header);
 
         // Verify the event export file can be read and contains event data
-        $filename = storage_path('app/exports') . '/' . substr($header, strpos($header, 'filename=') + 9);
+        $filename = $response->baseResponse->getFile()->getPathname();
         $this->assertFileExists($filename);
         $fh = fopen($filename, 'r');
         $this->assertNotFalse($fh);
