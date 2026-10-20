@@ -60,6 +60,7 @@ class CalendarTest extends TestCase
                                                    'longitude' => 5.575,
                                                    'event_start_utc' => $this->start,
                                                    'event_end_utc' => $this->end,
+                                                   'approved' => true,
                                                ]);
 
         $event->approve();
@@ -148,7 +149,7 @@ class CalendarTest extends TestCase
 
         $group2 = Group::factory()->create(['approved' => false]);
         $network->addGroup($group2);
-        $event = Party::factory()->create(['group' => $group2->idgroups,
+        $event = Party::factory()->create(['group' => $group2->idgroups, 'approved' => true,
             'event_start_utc' => $this->start, 'event_end_utc' => $this->end]);
         $event->approve();
 

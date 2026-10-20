@@ -68,7 +68,8 @@ class NetworkPageVisibilityTest extends TestCase
         [, , $otherHost] = $this->networkWithHost();
 
         $this->actingAs($otherHost);
-        $this->get('/networks/' . $network->id)->assertStatus(403);
+        $this->expectException(\Illuminate\Auth\Access\AuthorizationException::class);
+        $this->get('/networks/' . $network->id);
     }
 
     public function testRestarterInGroupIsForbidden(): void
@@ -79,7 +80,8 @@ class NetworkPageVisibilityTest extends TestCase
         $group->addVolunteer($member);
 
         $this->actingAs($member);
-        $this->get('/networks/' . $network->id)->assertStatus(403);
+        $this->expectException(\Illuminate\Auth\Access\AuthorizationException::class);
+        $this->get('/networks/' . $network->id);
     }
 
     public function testCoordinatorStillGetsFullPage(): void
