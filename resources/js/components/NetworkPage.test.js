@@ -105,6 +105,7 @@ test('does not offer the tag filter to users who cannot see tags', () => {
 
 test('links to the network reporting dashboard from the actions menu', () => {
   const wrapper = makeWrapper({
+    canModerate: true,
     network: { id: 5, name: 'Test Network', coordinators: [], reporting_url: 'https://reports.example.org/dashboard/7' },
   })
 
