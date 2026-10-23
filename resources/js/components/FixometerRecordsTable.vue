@@ -253,37 +253,37 @@ export default {
   },
   watch: {
     powered(newVal) {
-      this.$refs.table.refresh()
+      this.filtersChanged()
     },
     category(newVal) {
-      this.$refs.table.refresh()
+      this.filtersChanged()
     },
     brand(newVal) {
-      this.$refs.table.refresh()
+      this.filtersChanged()
     },
     model(newVal) {
-      this.$refs.table.refresh()
+      this.filtersChanged()
     },
     comments(newVal) {
-      this.$refs.table.refresh()
+      this.filtersChanged()
     },
     wiki(newVal) {
-      this.$refs.table.refresh()
+      this.filtersChanged()
     },
     item_type(newVal) {
-      this.$refs.table.refresh()
+      this.filtersChanged()
     },
     status(newVal) {
-      this.$refs.table.refresh()
+      this.filtersChanged()
     },
     group(newVal) {
-      this.$refs.table.refresh()
+      this.filtersChanged()
     },
     from_date(newVal) {
-      this.$refs.table.refresh()
+      this.filtersChanged()
     },
     to_date(newVal) {
-      this.$refs.table.refresh()
+      this.filtersChanged()
     },
     total(newVal) {
       this.$emit('update:total', newVal)
@@ -296,6 +296,15 @@ export default {
     }
   },
   methods: {
+    filtersChanged () {
+      // The new results may have fewer pages than the one we are on, which would show an empty page.  Go back to
+      // the first page; the table fetches when the page changes, so only refresh if we're already there.
+      if (this.currentPage !== 1) {
+        this.currentPage = 1
+      } else {
+        this.$refs.table.refresh()
+      }
+    },
     items (ctx, callback) {
       // We want to take advantage of the paging and sorting features of the table, and therefore we are using the
       // table's async method of providing data.  The server sorts by the column the table is sorted by; with no

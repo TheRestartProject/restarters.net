@@ -49,7 +49,15 @@ class ExportController extends Controller
         $me = auth()->user();
 
         $export = app(\App\Services\RepairDataExport::class);
-        $all_devices = $export->query($me, $idevents, $idgroups);
+
+        // The Fixometer page can ask for just the records matching its filters.  With none, this is the full export.
+        $request->validate([
+            'from_date' => 'nullable|date',
+            'to_date' => 'nullable|date',
+        ]);
+
+        $filters = ApiController::deviceFilters($request);
+        $all_devices = $export->query($me, $idevents, $idgroups, $filters);
 
         // Create CSV
         $filename = 'repair-data';
@@ -67,8 +75,14 @@ class ExportController extends Controller
             $filename .= '-' . $groupName;
         }
 
+        if (count($filters)) {
+            $filename .= '-filtered';
+        }
+
         $filename .= '.csv';
-        $fullpath = $this->exportPath($filename);
+        // A unique file per request, so overlapping exports (different users, different filters) can't clobber
+        // each other.  The friendly name is only the download name.
+        $fullpath = tempnam(dirname($this->exportPath($filename)), 'export-');
         $file = fopen($fullpath, 'w+');
 
         $export->write($all_devices, $file);
