@@ -84,7 +84,6 @@ return [
   'environmental_impact' => 'Impact environnemental',
   'impact_calculation' => '<b>Comment calculons-nous l\'impact environnemental?</b><p>Pour les appareils électriques: Nous avons recherché le poids moyen et l\'empreinte de CO2 de produits parmi une série de catégories, du smartphone au sèche-cheveu. Lorsque vous encodez un appareil que vous avez réparé, nous utilisons ces moyennes pour estimer l\'impact de cette réparation basé sur la catégorie de l\'appareil. </p><p>Pour les objets non-électriques: lorsque vous encodez un objet non-électrique que vous avez réparé, nous utilisons son poids (que vous avez encodé). Nous n\'avons pas encore de données de références pour les objets non-électriques, ce qui ne nous permet pas de donner une estimation de CO2 évité.</p><p><a href="https://therestartproject.org/faq/" target="_blank" rel="nofollow">En savoir plus sur notre calcul d\'impact ici</a></p>',
   'not_counting' => 'L\'impact environnemental de ce Repair Café n\'est pas pris en compte',
-  'and' => 'et',
   'make_host' => 'Nommer organisateur',
   'remove_host_role' => 'Retirer rôle d\'organisateur',
   'no_volunteers' => 'Il n\'y a pas de bénévoles dans ce repair café',

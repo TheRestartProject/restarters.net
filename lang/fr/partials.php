@@ -37,8 +37,6 @@ return [
   'are_you_sure' => 'Etes-vous sûr?',
   'emissions_equivalent_consume_low' => "c'est comme cultiver un semis d'arbre de valeur pendant 10 ans|c'est comme cultiver :value semis d'arbres pendant 10 ans.",
   'emissions_equivalent_consume_high' => "c'est comme planter environ 1 hectare d'arbres|c'est comme planter environ :value hectares d'arbres.",
-  'emissions_equivalent_consume_low_explanation' => 'Arbres à croissance moyenne, conifères ou feuillus, plantés en milieu urbain et cultivés pendant 10 ans.',
-  'emissions_equivalent_consume_high_explanation' => "Semis d'arbres feuillus cultivés dans une plantation ou un bois en Angleterre pendant 1 an.",
   'skills' => 'Compétence(s)',
   'something_wrong' => 'Quelque chose ne va pas',
   'event_requires_moderation' => 'L\'événement nécessite une approbation',
