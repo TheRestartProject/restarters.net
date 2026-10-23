@@ -6,7 +6,7 @@ return [
   'add_device' => 'Add item',
   'read_more' => 'Read more',
   'waste_prevented' => 'waste prevented',
-  'co2' => 'estimated CO<sub>2</sub>e emissions prevented',
+  'co2' => 'CO<sub>2</sub>e emissions prevented',
   'host' => 'Host',
   'category_none' => 'None of the above',
   'fixed' => 'Fixed',

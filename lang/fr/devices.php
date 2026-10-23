@@ -3,6 +3,7 @@
 return [
   'devices' => 'Appareils',
   'export_device_data' => 'Exporter les données des appareils',
+  'export_filtered_data' => 'Exporter les données filtrées',
   'export_event_data' => 'Exporter les données de l\'événement',
   'category' => 'Catégorie',
   'group' => 'Repair Café',
@@ -16,6 +17,7 @@ return [
   'age' => 'Âge',
   'devices_description' => 'Description du problème/solution',
   'delete_device' => 'Effacer l\'appareil',
+  'clear_filters' => 'Effacer les filtres',
   'devices_date' => 'Date',
   'event_info' => 'Informations sur l\'événement',
   'fixometer' => 'Fixometer',

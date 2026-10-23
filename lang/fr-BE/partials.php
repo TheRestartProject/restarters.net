@@ -5,7 +5,7 @@ return [
   'add_device' => 'Ajouter appareil',
   'read_more' => 'Lire plus',
   'waste_prevented' => 'Déchets évités',
-  'co2' => 'Estimation des émissions de CO<sub>2</sub> évitées',
+  'co2' => 'Émissions de CO<sub>2</sub>e évitées',
   'host' => 'Organisateur',
   'category' => 'Catégorie',
   'category_none' => 'Aucun de ceux ci-dessus',

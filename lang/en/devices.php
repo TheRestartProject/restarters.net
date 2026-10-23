@@ -3,6 +3,7 @@
 return [
   'devices' => 'Repairs',
   'export_device_data' => 'Download all data',
+  'export_filtered_data' => 'Download filtered data',
   'export_event_data' => 'Download event data',
   'category' => 'Category',
   'group' => 'Group',
@@ -17,6 +18,7 @@ return [
   'devices_description' => 'Description of problem/solution',
   'delete_device' => 'Delete device',
   'devices_date' => 'Date',
+  'clear_filters' => 'Clear filters',
   'event_info' => 'Event info',
   'fixometer' => 'Fixometer',
   'global_impact' => 'Our Global Impact',

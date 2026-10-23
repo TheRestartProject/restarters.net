@@ -396,7 +396,8 @@ class ApiController extends Controller
     /**
      * The where clauses for the device list's search filters.
      */
-    private static function deviceFilters(Request $request): array
+    #[NoStory(reason: 'Shared filter helper, not a route')]
+    public static function deviceFilters(Request $request): array
     {
         $wheres = [];
 

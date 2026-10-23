@@ -1,5 +1,5 @@
 {
-    "generatedAt": "2026-10-14T05:38:00Z",
+    "generatedAt": "2026-10-23T17:48:00Z",
     "features": {
         "Administration": {
             "description": "Platform administration and configuration",
@@ -951,6 +951,26 @@
                             "test": "no_notification_after_leaving"
                         },
                         {
+                            "file": "tests/Feature/Events/EditEventPartialTest.php",
+                            "test": "partial_update_only_changes_the_fields_sent"
+                        },
+                        {
+                            "file": "tests/Feature/Events/EditEventPartialTest.php",
+                            "test": "sending_only_the_start_keeps_the_end_and_recalculates_the_hours"
+                        },
+                        {
+                            "file": "tests/Feature/Events/EditEventPartialTest.php",
+                            "test": "sending_a_field_empty_clears_it"
+                        },
+                        {
+                            "file": "tests/Feature/Events/EditEventPartialTest.php",
+                            "test": "a_new_location_brings_its_map_position"
+                        },
+                        {
+                            "file": "tests/Feature/Events/EditEventPartialTest.php",
+                            "test": "a_required_field_sent_empty_is_rejected"
+                        },
+                        {
                             "file": "tests/Feature/Events/InviteEventTest.php",
                             "test": "testInviteReal"
                         },
@@ -1763,6 +1783,46 @@
                         {
                             "file": "tests/Feature/Groups/GroupEditTest.php",
                             "test": "invalid_location"
+                        },
+                        {
+                            "file": "tests/Feature/Groups/GroupEditTest.php",
+                            "test": "partial_update_only_changes_the_fields_sent"
+                        },
+                        {
+                            "file": "tests/Feature/Groups/GroupEditTest.php",
+                            "test": "archiving_with_only_the_date_keeps_the_rest_of_the_group"
+                        },
+                        {
+                            "file": "tests/Feature/Groups/GroupEditTest.php",
+                            "test": "sending_a_field_empty_or_null_clears_it"
+                        },
+                        {
+                            "file": "tests/Feature/Groups/GroupEditTest.php",
+                            "test": "sending_an_empty_archive_date_unarchives"
+                        },
+                        {
+                            "file": "tests/Feature/Groups/GroupEditTest.php",
+                            "test": "archiving_is_audited_as_a_change_to_the_archive_date_only"
+                        },
+                        {
+                            "file": "tests/Feature/Groups/GroupEditTest.php",
+                            "test": "changing_the_location_updates_the_map_position_and_country"
+                        },
+                        {
+                            "file": "tests/Feature/Groups/GroupEditTest.php",
+                            "test": "changing_the_timezone_moves_future_events"
+                        },
+                        {
+                            "file": "tests/Feature/Groups/GroupEditTest.php",
+                            "test": "clearing_the_timezone_leaves_future_events_alone"
+                        },
+                        {
+                            "file": "tests/Feature/Groups/GroupEditTest.php",
+                            "test": "host_cannot_archive_or_set_the_area"
+                        },
+                        {
+                            "file": "tests/Feature/Groups/GroupEditTest.php",
+                            "test": "approving_without_resending_the_location_still_notifies_nearby_volunteers"
                         },
                         {
                             "file": "tests/Feature/Groups/GroupEditTest.php",
