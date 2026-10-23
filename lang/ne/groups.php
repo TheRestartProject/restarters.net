@@ -111,8 +111,6 @@ return [
   'no_groups_nearest_with_location' => '<p>Er zijn geen groepen binnen 50 km van jouw locatie. Je kunt <a href="/group/all">hier alle groepen bekijken</a>. Of waarom begin je niet je eigen? <a href="https://talk.restarters.net/t/how-to-run-a-repair-event-the-restart-party-kit/324">Lees wat het runnen van je eigen reparatie-evenement inhoudt.</a></p>',
   'group_count' => 'Er is <b>:count groep</b>.|Er zijn <b>:count groepen</b>.',
   'search_name_placeholder' => 'Naam zoeken...',
-  'search_location_placeholder' => 'Locatie zoeken...',
-  'search_country_placeholder' => 'Land...',
   'search_tags_placeholder' => 'Label',
   'show_filters' => 'Filters tonen',
   'hide_filters' => 'Filters verbergen',

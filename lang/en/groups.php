@@ -110,8 +110,6 @@ return [
   'group_count' => 'There is <b>:count group</b> in this area.  Search and zoom to find more.|There are <b>:count groups</b> in this area.  Search and zoom to find more.',
   'group_count_none' => 'If you can\'t see any here yet, why not <a href="/group/nearby">find a group</a> near you?',
   'search_name_placeholder' => 'Search by name',
-  'search_location_placeholder' => 'Search by location',
-  'search_country_placeholder' => 'Filter by country',
   'search_tags_placeholder' => 'Filter by tags',
   'show_filters' => 'Show filters',
   'hide_filters' => 'Hide filters',

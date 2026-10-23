@@ -53,6 +53,11 @@ describe('choiceWithLocale — explicit {n} / [n,m] qualifiers', () => {
     it('handles [2,*] range match', () => {
         expect(choiceWithLocale(translations, 'en', 'test.key', 5)).toBe('many');
     });
+
+    it('falls back to English for a plural key the locale does not have', () => {
+        const t = { it: { test: {} }, en: { test: { key: 'one tree|:count trees' } } };
+        expect(choiceWithLocale(t, 'it', 'test.key', 3)).toBe('3 trees');
+    });
 });
 
 // ---------------------------------------------------------------------------
@@ -70,6 +75,25 @@ describe('translateWithLocale — top-level locale keys', () => {
 
     it('falls back to English when the locale is not in the table', () => {
         expect(translateWithLocale(translations, 'de', 'Desktop computer')).toBe('Desktop computer');
+    });
+
+    it('falls back to English for a key the locale does not have', () => {
+        const t = {
+            it: { partials: { share_modal_weve_saved: 'Abbiamo risparmiato' } },
+            en: { partials: { share_modal_weve_saved: "We've saved", share_modal_footnote: '*medium growth trees' } },
+        };
+        expect(translateWithLocale(t, 'it', 'partials.share_modal_footnote')).toBe('*medium growth trees');
+        expect(translateWithLocale(t, 'it', 'partials.share_modal_weve_saved')).toBe('Abbiamo risparmiato');
+    });
+
+    it('substitutes values into the English fallback', () => {
+        const t = { it: { partials: {} }, en: { partials: { seedlings: ':count seedlings' } } };
+        expect(translateWithLocale(t, 'it', 'partials.seedlings', { count: 4 })).toBe('4 seedlings');
+    });
+
+    it('returns the key when neither the locale nor English has it', () => {
+        const t = { it: { partials: {} }, en: { partials: {} } };
+        expect(translateWithLocale(t, 'it', 'partials.nope')).toBe('partials.nope');
     });
 
     it('translates nested keys (e.g. partials.to_be_recycled)', () => {

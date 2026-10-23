@@ -116,8 +116,6 @@ return [
   'no_groups_mine' => '<b>Si vous ne pouvez encore en voir aucun ici, pourquoi ne pas <a href="/group/other">trouver un Repair Café près de chez vous</a>?</b>',
   'no_groups_nearest_no_location' => '<b><p>Vous n\'avez  pas défini de village/ville. Vous pouvez en ajouter un.e dans <a href="/profile/edit">votre profil</a>.</p><p>Vous pouvez aussi <a href="/group/all">voir tous les Repair Cafés</a>.</p></b>',
   'no_groups_nearest_with_location' => '<b><p>Il n\'y a apparemment pas encore de Repair Cafés listé proche de chez vous.</p><p>Voulez-vous créer ou ajouter un Repair Café?  Regardez comment faire dans <a href="https://talk.restarters.net/t/how-to-power-up-community-repair-with-restarters-net/1228/2">nos ressources</a>.</p></b>',
-  'search_country_placeholder' => 'Filtrer par pays',
-  'search_location_placeholder' => 'Rechercher par localisation',
   'search_name_placeholder' => 'Rechercher par nom',
   'search_tags_placeholder' => 'Filtrer par tag',
   'show_filters' => 'Afficher les filtres',

@@ -4,56 +4,47 @@
  * injected in tests without mocking import.meta.env.
  */
 
-export function translateWithLocale(translations, locale, key, values = {}) {
-    const parts = key.split('.');
-    let translation;
+function lookup(table, key) {
+    let translation = table;
 
-    if (translations[locale]) {
-        translation = translations[locale];
-    } else if (translations['en']) {
-        translation = translations['en'];
-    } else {
-        return key;
-    }
-
-    for (const part of parts) {
+    for (const part of key.split('.')) {
         if (translation && typeof translation === 'object' && part in translation) {
             translation = translation[part];
         } else {
-            return key;
+            return undefined;
         }
     }
 
-    if (typeof translation === 'string' && Object.keys(values).length > 0) {
+    return typeof translation === 'string' ? translation : undefined;
+}
+
+// Like Laravel's fallback_locale: a key missing from the locale (or a locale we don't have at all) comes from
+// English.  Returns undefined if English doesn't have it either.
+function resolve(translations, locale, key) {
+    const translation = lookup(translations[locale], key);
+    return translation !== undefined ? translation : lookup(translations['en'], key);
+}
+
+export function translateWithLocale(translations, locale, key, values = {}) {
+    const translation = resolve(translations, locale, key);
+
+    if (translation === undefined) {
+        return key;
+    }
+
+    if (Object.keys(values).length > 0) {
         return translation.replace(/:(\w+)/g, (match, param) => {
             return values[param] !== undefined ? values[param] : match;
         });
     }
 
-    return typeof translation === 'string' ? translation : key;
+    return translation;
 }
 
 export function choiceWithLocale(translations, locale, key, count, values = {}) {
-    const parts = key.split('.');
-    let rawTranslation;
+    const rawTranslation = resolve(translations, locale, key);
 
-    if (translations[locale]) {
-        rawTranslation = translations[locale];
-    } else if (translations['en']) {
-        rawTranslation = translations['en'];
-    } else {
-        return key;
-    }
-
-    for (const part of parts) {
-        if (rawTranslation && typeof rawTranslation === 'object' && part in rawTranslation) {
-            rawTranslation = rawTranslation[part];
-        } else {
-            return key;
-        }
-    }
-
-    if (typeof rawTranslation !== 'string') {
+    if (rawTranslation === undefined) {
         return key;
     }
 
