@@ -2,6 +2,7 @@ import { mount, flushPromises } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
 import { createI18n } from 'vue-i18n'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import moment from 'moment'
 import DevicesSearchTable from '../../../app/components/fixometer/DevicesSearchTable.vue'
 import { useDevicesStore } from '../../../app/stores/devices.js'
 import { useAuthStore } from '../../../app/stores/auth.js'
@@ -617,6 +618,76 @@ describe('components/fixometer/DevicesSearchTable', () => {
 
       expect(wrapper.find('[data-testid="device-search-mobile-powered-toggle"]').attributes('aria-expanded')).toBe('false')
       expect(wrapper.find('[data-testid="device-search-results-body"]').classes()).toContain('d-none')
+    })
+  })
+
+  describe('clearing filters and the filtered download (develop #924)', () => {
+    const today = () => moment().format('YYYY-MM-DD')
+    const lastDownload = (wrapper) => wrapper.emitted('update:filteredDownloadUrl')?.at(-1)?.[0]
+
+    it('shows repairs up to today by default, since later ones are almost always mistyped dates', async () => {
+      const wrapper = mountComponent()
+      await flushPromises()
+
+      expect(mockApi.device.search).toHaveBeenCalledWith(expect.objectContaining({ to_date: today() }))
+      expect(lastDownload(wrapper)).toBeNull()
+    })
+
+    it('clears the item filters without leaving the tab', async () => {
+      const wrapper = mountComponent()
+      await flushPromises()
+
+      await wrapper.find('[data-testid="device-search-brand"]').setValue('Acme')
+      await wrapper.find('[data-testid="device-search-comments"]').setValue('fuse')
+      await wrapper.find('[data-testid="device-search-group"]').setValue('Chiswick')
+      await flushPromises()
+      mockApi.device.search.mockClear()
+
+      await wrapper.find('[data-testid="device-search-clear-items"]').trigger('click')
+      await flushPromises()
+
+      const params = mockApi.device.search.mock.calls.at(-1)[0]
+      expect(params.brand).toBeUndefined()
+      expect(params.comments).toBeUndefined()
+      expect(params.powered).toBe(true)
+      // The event filters are left alone.
+      expect(params.group).toBe('Chiswick')
+    })
+
+    it('clears the event filters and puts the to date back to today', async () => {
+      const wrapper = mountComponent()
+      await flushPromises()
+
+      await wrapper.find('[data-testid="device-search-group"]').setValue('Chiswick')
+      await wrapper.find('[data-testid="device-search-from-date"]').setValue('2026-01-01')
+      await wrapper.find('[data-testid="device-search-to-date"]').setValue('2026-02-01')
+      await flushPromises()
+      mockApi.device.search.mockClear()
+
+      await wrapper.find('[data-testid="device-search-clear-events"]').trigger('click')
+      await flushPromises()
+
+      const params = mockApi.device.search.mock.calls.at(-1)[0]
+      expect(params.group).toBeUndefined()
+      expect(params.from_date).toBeUndefined()
+      expect(params.to_date).toBe(today())
+      expect(lastDownload(wrapper)).toBeNull()
+    })
+
+    it('offers a download of just the filtered records, with the tab and the to date', async () => {
+      const wrapper = mountComponent()
+      await flushPromises()
+
+      await wrapper.find('[data-testid="device-search-brand"]').setValue('Acme')
+      await flushPromises()
+
+      const url = new URL(lastDownload(wrapper), 'http://x')
+      expect(url.pathname).toBe('/export/devices')
+      expect(url.searchParams.get('brand')).toBe('Acme')
+      expect(url.searchParams.get('powered')).toBe('true')
+      expect(url.searchParams.get('to_date')).toBe(today())
+      expect(url.searchParams.has('page')).toBe(false)
+      expect(url.searchParams.has('sortBy')).toBe(false)
     })
   })
 })

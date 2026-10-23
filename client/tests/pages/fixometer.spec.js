@@ -13,7 +13,10 @@ const BButtonStub = { template: '<button v-bind="$attrs"><slot /></button>' }
 // DevicesSearchTable is mounted for real by DevicesSearchTable.spec.js -
 // stubbed here so this page-level suite doesn't also need a working $api
 // mock for its onMounted() searches/metadata fetches.
-const DevicesSearchTableStub = { template: '<div data-testid="devices-search-table-stub" />' }
+const DevicesSearchTableStub = {
+  emits: ['update:filteredDownloadUrl'],
+  template: '<div data-testid="devices-search-table-stub" />',
+}
 // AddDataModal.spec.js covers its own fetch/render logic - stubbed here so
 // this page-level suite doesn't also need dashboard/events $api mocks.
 const AddDataModalStub = { props: ['show'], template: '<div v-if="show" data-testid="add-data-modal-stub" />' }
@@ -144,5 +147,37 @@ describe('pages/fixometer', () => {
     expect(link.exists()).toBe(true)
     expect(link.attributes('href')).toBe('https://reports.example.org/all')
     expect(link.attributes('target')).toBe('_blank')
+  })
+
+  it('keeps a space between the headline and the rest of the sentence', async () => {
+    fixometerStore.impactData.data = { participants: 5, hours_volunteered: 100, waste_total: 100, co2_total: 100 }
+    fixometerStore.impactData.loaded = true
+
+    const wrapper = mountPage()
+    await flushPromises()
+
+    // The template compiler condenses whitespace between sibling elements, so the gap has to be explicit.
+    const sentence = wrapper.find('p > b').element.parentElement.textContent
+    expect(sentence.startsWith(en.devices.huge_impact + ' ')).toBe(true)
+  })
+
+  it('offers the filtered download next to the full one once the table is filtered', async () => {
+    fixometerStore.impactData.data = { participants: 5, hours_volunteered: 100, waste_total: 100, co2_total: 100 }
+    fixometerStore.impactData.loaded = true
+
+    const wrapper = mountPage()
+    await flushPromises()
+    expect(wrapper.find('[data-testid="fixometer-export-devices-filtered"]').exists()).toBe(false)
+
+    wrapper.findComponent(DevicesSearchTableStub).vm.$emit('update:filteredDownloadUrl', '/export/devices?brand=Acme')
+    await flushPromises()
+
+    const link = wrapper.find('[data-testid="fixometer-export-devices-filtered"]')
+    expect(link.attributes('href')).toBe('/export/devices?brand=Acme')
+    expect(link.text()).toBe(en.devices.export_filtered_data)
+
+    wrapper.findComponent(DevicesSearchTableStub).vm.$emit('update:filteredDownloadUrl', null)
+    await flushPromises()
+    expect(wrapper.find('[data-testid="fixometer-export-devices-filtered"]').exists()).toBe(false)
   })
 })

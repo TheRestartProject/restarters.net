@@ -47,6 +47,9 @@ const fixometerStore = useFixometerStore()
 // logged-out/no-groups case (same warning branch legacy shows either way).
 const showAddData = ref(false)
 
+// Set by DevicesSearchTable once its filters narrow the records; null otherwise.
+const filteredDownloadUrl = ref(null)
+
 function retry() {
   fixometerStore.fetchImpactData({ force: true })
   fixometerStore.fetchLatestRepaired({ force: true })
@@ -90,6 +93,8 @@ onMounted(() => {
       <h2>{{ t('devices.global_impact') }}</h2>
       <p>
         <b>{{ t('devices.huge_impact') }}</b>
+        <!-- The compiler condenses the whitespace between the two, so the space has to be explicit. -->
+        {{ ' ' }}
         <!-- eslint-disable-next-line vue/no-v-html -->
         <span v-html="t('devices.huge_impact_2')" />
       </p>
@@ -120,10 +125,20 @@ onMounted(() => {
           >
             {{ t('devices.export_device_data') }}
           </a>
+          <!-- The same export narrowed to the records the table's filters show (develop #924). -->
+          <a
+            v-if="filteredDownloadUrl"
+            :href="filteredDownloadUrl"
+            class="btn btn-secondary"
+            data-testid="fixometer-export-devices-filtered"
+          >
+            {{ t('devices.export_filtered_data') }}
+          </a>
         </div>
       </div>
 
       <DevicesSearchTable
+        v-model:filtered-download-url="filteredDownloadUrl"
         :powered-count="fixometerStore.impactData.data?.total_powered ?? null"
         :unpowered-count="fixometerStore.impactData.data?.total_unpowered ?? null"
       />

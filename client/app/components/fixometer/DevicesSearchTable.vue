@@ -92,10 +92,27 @@ const filters = reactive({
   comments: '',
   group: '',
   from_date: '',
-  to_date: '',
+  // Records from future events are almost always events entered with the wrong date, so by default we only show
+  // repairs up to today.  The to date can still be changed to see them.
+  to_date: today(),
 })
 
+const emit = defineEmits(['update:filteredDownloadUrl'])
+
 const page = ref(1)
+
+function today() {
+  return moment().format('YYYY-MM-DD')
+}
+
+// The powered/unpowered tab isn't a filter, so it stays as it is.
+function clearItems() {
+  Object.assign(filters, { category: null, brand: '', model: '', item_type: '', status: null, comments: '' })
+}
+
+function clearEvents() {
+  Object.assign(filters, { group: '', from_date: '', to_date: today() })
+}
 
 // Server-side sort (GET /api/v2/devices sortBy/sortDesc). Default matches the
 // legacy fixometer table: the repair-event date, newest first. Only the
@@ -198,6 +215,19 @@ function buildParams() {
     to_date: filters.to_date || undefined,
   }
 }
+
+// The same export as the full download, narrowed to the records the list shows: the search's filters without the
+// paging and sorting.  Null until a filter is set, because the tab alone, and a to date of today, are what the
+// list shows anyway.
+const filteredDownloadUrl = computed(() => {
+  const { page: _page, size: _size, sortBy: _sortBy, sortDesc: _sortDesc, ...params } = buildParams()
+  const set = Object.entries(params).filter(([, value]) => value !== undefined && value !== null && value !== '')
+  const filtered = set.some(([key, value]) => key !== 'powered' && !(key === 'to_date' && value === today()))
+
+  return filtered ? '/export/devices?' + new URLSearchParams(Object.fromEntries(set)).toString() : null
+})
+
+watch(filteredDownloadUrl, (url) => emit('update:filteredDownloadUrl', url), { immediate: true })
 
 function runSearch() {
   devicesStore.searchDevices(buildParams())
@@ -409,6 +439,11 @@ function toggleMobileSection(section) {
             <input id="device-search-comments" v-model="filters.comments" type="text" class="form-control" data-testid="device-search-comments">
           </div>
         </div>
+        <div class="d-flex justify-content-end mt-2">
+          <button type="button" class="btn clear-filters" data-testid="device-search-clear-items" @click="clearItems">
+            {{ t('devices.clear_filters') }}
+          </button>
+        </div>
       </fieldset>
     </div>
 
@@ -481,6 +516,11 @@ function toggleMobileSection(section) {
               data-testid="device-search-to-date"
             >
           </div>
+        </div>
+        <div class="d-flex justify-content-end mt-2">
+          <button type="button" class="btn clear-filters" data-testid="device-search-clear-events" @click="clearEvents">
+            {{ t('devices.clear_filters') }}
+          </button>
         </div>
       </fieldset>
     </div>
@@ -696,6 +736,26 @@ function toggleMobileSection(section) {
 </template>
 
 <style scoped lang="scss">
+// The per-section "Clear filters" buttons, as on develop's FixometerFilters.vue: a small brand outline button.
+.clear-filters {
+  border: 1px solid #0394a6;
+  border-radius: 0;
+  background-color: #fff;
+  color: #0394a6;
+  font-size: 13px;
+  font-weight: bold;
+  line-height: 1.2;
+  padding: 4px 12px;
+  text-decoration: none;
+
+  &:hover,
+  &:focus {
+    background-color: #0394a6;
+    border-color: #0394a6;
+    color: #fff;
+  }
+}
+
 // Two-column Repair Records layout (legacy FixometerPage.vue's .fp-layout):
 // a narrow filter rail beside the tabbed results. .fp-layout itself has no
 // border - it's just a grid; the two halves are separately boxed (the filter
