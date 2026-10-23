@@ -10,6 +10,7 @@ use App\Group;
 use App\GroupTags;
 use App\Helpers\Fixometer;
 use App\Network;
+use App\Role;
 use Auth;
 use FixometerFile;
 use Illuminate\Http\Request;
@@ -51,6 +52,39 @@ class NetworkController extends Controller
     /**
      * Display the specified network.
      */
+    /**
+     * The groups in the network nearest to one of the user's own groups in it, preferring one they host.  Null if
+     * they have no located group in the network.
+     */
+    private function nearbyGroups(Network $network, $user): ?array
+    {
+        $mine = Group::join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
+            ->join('group_network', 'group_network.group_id', '=', 'groups.idgroups')
+            ->where('group_network.network_id', $network->id)
+            ->where('users_groups.user', $user->id)
+            ->whereNull('users_groups.deleted_at')
+            ->whereNotNull('groups.latitude')
+            ->whereNotNull('groups.longitude')
+            ->orderByRaw('users_groups.role = ? DESC', [Role::HOST])
+            ->orderBy('groups.name')
+            ->select('groups.*')
+            ->first();
+
+        if (! $mine) {
+            return null;
+        }
+
+        return [
+            'from' => $mine->name,
+            'groups' => $network->nearestGroups($mine)->map(fn ($g) => [
+                'id' => $g->idgroups,
+                'name' => $g->name,
+                'location' => $g->location,
+                'distance' => round($g->dist, 1),
+            ])->values()->all(),
+        ];
+    }
+
     #[UserStory('As a NetworkCoordinator, I can view my network\'s details and statistics', persona: 'NetworkCoordinator', theme: 'Browse networks')]
     public function show(Network $network): View
     {
@@ -99,7 +133,8 @@ class NetworkController extends Controller
             'website' => $network->website,
             'reporting_url' => $canModerate ? $network->reporting_url : null,
             'logo' => $network->sizedLogo('_x100'),
-            'coordinators' => $canModerate ? $network->coordinators->map(function ($c) {
+            // Organisers can see who their coordinators are, so they know who to contact.
+            'coordinators' => $network->coordinators->map(function ($c) {
                 $profile = $c->getProfile($c->id);
                 $path = $profile ? $profile->path : null;
                 return [
@@ -107,11 +142,12 @@ class NetworkController extends Controller
                     'name' => $c->name,
                     'picture' => $path ? '/uploads/thumbnail_' . $path : '/images/placeholder-avatar.png',
                 ];
-            }) : [],
+            }),
         ];
 
         return view('networks.show', [
             'canModerate' => $canModerate,
+            'nearbyGroups' => $this->nearbyGroups($network, $user),
             'network' => $network,
             'networkData' => $networkData,
             'groupsForAssociating' => $groupsForAssociating,

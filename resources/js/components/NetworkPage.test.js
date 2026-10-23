@@ -6,6 +6,9 @@ import { mount, createLocalVue } from '@vue/test-utils'
 import Vuex from 'vuex'
 import LangMixin from 'resources/js/mixins/lang.js'
 import NetworkPage from './NetworkPage.vue'
+import axios from 'axios'
+
+jest.mock('axios')
 
 const localVue = createLocalVue()
 localVue.use(Vuex)
@@ -142,4 +145,55 @@ test('shows a page of groups and a button for the rest, not an infinite scroll',
   const wrapper = makeWrapper()
 
   expect(wrapper.findComponent(groupMapStub).props('showAllButton')).toBe(true)
+})
+
+const flush = () => new Promise(resolve => setTimeout(resolve, 0))
+
+test('the period toggle fetches the last 12 completed months and says which months they are', async () => {
+  axios.get.mockResolvedValue({
+    data: { groups: 2, parties: 7, waste_total: 10, co2_total: 20, period: { start: '2025-10-01', end: '2026-09-30' } }
+  })
+  const wrapper = makeWrapper()
+
+  expect(wrapper.find('.period-all').classes()).toContain('active')
+  await wrapper.find('.period-last12').trigger('click')
+  await flush()
+
+  expect(axios.get).toHaveBeenCalledWith('/api/v2/networks/5/stats', { params: { period: 'last_12_months' } })
+  expect(wrapper.find('.period-last12').classes()).toContain('active')
+  expect(wrapper.find('.stat-events .stat-value').text()).toBe('7')
+  // Jest has no translations loaded, so check the label is there and built from the period's months.
+  expect(wrapper.find('.stats-period').exists()).toBe(true)
+  expect(wrapper.vm.periodLabel).toBe('networks.stats.period_range')
+  expect(wrapper.vm.stats.period).toEqual({ start: '2025-10-01', end: '2026-09-30' })
+
+  // Back to all time uses the stats already on the page.
+  axios.get.mockClear()
+  await wrapper.find('.period-all').trigger('click')
+  await flush()
+  expect(axios.get).not.toHaveBeenCalled()
+  expect(wrapper.find('.stats-period').exists()).toBe(false)
+})
+
+test('lists the nearest groups in the network with their distance', () => {
+  const wrapper = makeWrapper({
+    nearbyGroups: {
+      from: 'Hackney Fixers',
+      groups: [
+        { id: 7, name: 'Islington Repair Cafe', location: 'Islington', distance: 5.6 },
+        { id: 8, name: 'Camden Fixers', location: 'Camden', distance: 8.1 }
+      ]
+    }
+  })
+
+  const rows = wrapper.findAll('.nearby-group')
+  expect(rows).toHaveLength(2)
+  expect(rows.at(0).find('a').attributes('href')).toBe('/group/view/7')
+  expect(rows.at(0).text()).toContain('Islington Repair Cafe')
+  expect(rows.at(1).text()).toContain('Camden')
+})
+
+test('has no nearby groups section without a located group of your own', () => {
+  expect(makeWrapper().find('.nearby-groups').exists()).toBe(false)
+  expect(makeWrapper({ nearbyGroups: { from: 'X', groups: [] } }).find('.nearby-groups').exists()).toBe(false)
 })

@@ -38,7 +38,7 @@ class NetworkPageVisibilityTest extends TestCase
         return [$network, $group, $host];
     }
 
-    public function testHostOfGroupInNetworkSeesPageWithoutCoordinatorData(): void
+    public function testHostOfGroupInNetworkSeesPageWithoutCoordinatorOnlyData(): void
     {
         [$network, , $host] = $this->networkWithHost();
 
@@ -51,13 +51,16 @@ class NetworkPageVisibilityTest extends TestCase
 
         $data = $this->networkData($response);
         $this->assertNull($data['reporting_url']);
-        $this->assertEmpty($data['coordinators']);
+
+        // Organisers can see who their coordinators are.
+        $this->assertCount(1, $data['coordinators']);
+        $this->assertEquals('Cordelia Coordinator', $data['coordinators'][0]['name']);
+        $this->assertArrayHasKey('picture', $data['coordinators'][0]);
         $this->assertFalse($this->vueProp($response, ':can-moderate'));
         $this->assertFalse($this->vueProp($response, ':can-manage-tags'));
         $this->assertFalse($this->vueProp($response, ':can-associate-groups'));
         $this->assertEmpty($this->vueProp($response, ':initial-tags'));
 
-        $response->assertDontSee('Cordelia Coordinator');
         $response->assertDontSee('reports.example.org');
         $response->assertDontSee('network-add-group');
     }
@@ -110,5 +113,52 @@ class NetworkPageVisibilityTest extends TestCase
         $response = $this->get('/networks/' . $network->id);
         $response->assertStatus(200);
         $this->assertTrue($this->vueProp($response, ':can-moderate'));
+    }
+
+    private function groupAt(Network $network, string $name, float $lat, float $lng, array $extra = []): Group
+    {
+        $group = Group::factory()->create(array_merge(['name' => $name, 'approved' => true, 'latitude' => $lat, 'longitude' => $lng], $extra));
+        $network->addGroup($group);
+
+        return $group;
+    }
+
+    public function testHostSeesTheFiveNearestGroupsInTheNetwork(): void
+    {
+        [$network, $group, $host] = $this->networkWithHost();
+        $group->update(['latitude' => 51.50, 'longitude' => -0.10]);
+
+        // Six candidates at increasing distances, plus groups that must not be listed.
+        foreach ([1, 2, 3, 4, 5, 6] as $i) {
+            $this->groupAt($network, "Near $i", 51.50 + $i * 0.05, -0.10);
+        }
+        $this->groupAt($network, 'Unapproved', 51.501, -0.10, ['approved' => false]);
+        $this->groupAt($network, 'Archived', 51.501, -0.10, ['archived_at' => '2020-01-01']);
+        Group::factory()->create(['name' => 'Other network', 'approved' => true, 'latitude' => 51.501, 'longitude' => -0.10]);
+
+        $this->actingAs($host);
+        $response = $this->get('/networks/' . $network->id);
+        $response->assertStatus(200);
+
+        $nearby = $this->vueProp($response, ':nearby-groups');
+        $this->assertEquals($group->name, $nearby['from']);
+        $this->assertEquals(['Near 1', 'Near 2', 'Near 3', 'Near 4', 'Near 5'], array_column($nearby['groups'], 'name'));
+        $this->assertEqualsWithDelta(5.6, $nearby['groups'][0]['distance'], 0.2);
+    }
+
+    public function testNoNearbyGroupsWithoutAGroupLocation(): void
+    {
+        [$network, $group, $host] = $this->networkWithHost();
+        $group->update(['latitude' => null, 'longitude' => null]);
+        $this->groupAt($network, 'Somewhere', 51.5, -0.1);
+
+        $this->actingAs($host);
+        $this->assertNull($this->vueProp($this->get('/networks/' . $network->id), ':nearby-groups'));
+
+        // A coordinator with no group of their own gets no nearby section either.
+        $coordinator = User::factory()->networkCoordinator()->create();
+        $network->addCoordinator($coordinator);
+        $this->actingAs($coordinator);
+        $this->assertNull($this->vueProp($this->get('/networks/' . $network->id), ':nearby-groups'));
     }
 }

@@ -315,8 +315,10 @@ class Group extends Model implements Auditable
     /**
      * Compute stats for multiple groups in O(1) queries instead of O(N).
      * Returns a map of [groupId => stats array].
+     *
+     * $from and $to (UTC, $to exclusive) limit the stats to events starting in that window.
      */
-    public static function bulkGroupStats(iterable $groups, ?float $eEmissionRatio = null, ?float $uEmissionratio = null): array
+    public static function bulkGroupStats(iterable $groups, ?float $eEmissionRatio = null, ?float $uEmissionratio = null, ?\Carbon\Carbon $from = null, ?\Carbon\Carbon $to = null): array
     {
         $groups = collect($groups);
         if ($groups->isEmpty()) {
@@ -351,6 +353,8 @@ class Group extends Model implements Auditable
             ->with('allDevices')
             ->withCount('allInvited')
             ->whereIn('events.group', $groupIds)
+            ->when($from, fn ($q) => $q->where('event_start_utc', '>=', $from->toIso8601String()))
+            ->when($to, fn ($q) => $q->where('event_start_utc', '<', $to->toIso8601String()))
             // lazyById pages on the primary key (WHERE idevents > last) rather than lazy()'s growing
             // OFFSET, which made MySQL rescan every earlier row for each chunk on large networks.  past()
             // orders by date, and keyset paging needs the id to be the only sort key or events are skipped

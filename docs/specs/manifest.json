@@ -1,5 +1,5 @@
 {
-    "generatedAt": "2026-10-14T05:47:25Z",
+    "generatedAt": "2026-10-23T17:10:43Z",
     "features": {
         "Administration": {
             "description": "Platform administration and configuration",
@@ -2415,7 +2415,12 @@
                     "method": "NetworkController::getNetworkStatsv2",
                     "class": "App\\Http\\Controllers\\API\\NetworkController",
                     "file": "app/Http/Controllers/API/NetworkController.php",
-                    "tests": []
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Networks/APIv2NetworkTest.php",
+                            "test": "testNetworkStatsForLastTwelveCompletedMonths"
+                        }
+                    ]
                 },
                 {
                     "story": "As a Guest, I can list a network's group tags via the API",
@@ -2455,6 +2460,20 @@
                         {
                             "file": "tests/Feature/Networks/APIv2NetworkTest.php",
                             "test": "testGet"
+                        }
+                    ]
+                },
+                {
+                    "story": "As a Host, I can see my network's impact over the last 12 completed months as well as all time",
+                    "persona": "Host",
+                    "theme": "Network stats",
+                    "method": "NetworkController::getNetworkStatsv2",
+                    "class": "App\\Http\\Controllers\\API\\NetworkController",
+                    "file": "app/Http/Controllers/API/NetworkController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Networks/APIv2NetworkTest.php",
+                            "test": "testNetworkStatsForLastTwelveCompletedMonths"
                         }
                     ]
                 },
@@ -2616,7 +2635,12 @@
                     "method": "NetworkController::getNetworkStatsv2",
                     "class": "App\\Http\\Controllers\\API\\NetworkController",
                     "file": "app/Http/Controllers/API/NetworkController.php",
-                    "tests": []
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Networks/APIv2NetworkTest.php",
+                            "test": "testNetworkStatsForLastTwelveCompletedMonths"
+                        }
+                    ]
                 },
                 {
                     "story": "As a ThirdParty, I can retrieve a network's group tags to display on my platform",
@@ -2660,10 +2684,11 @@
                     ]
                 }
             ],
-            "storyCount": 25,
+            "storyCount": 26,
             "personas": [
                 "Admin",
                 "Guest",
+                "Host",
                 "NetworkCoordinator",
                 "ThirdParty"
             ]
@@ -3594,9 +3619,10 @@
                 "Dashboard",
                 "Devices",
                 "Events",
-                "Groups"
+                "Groups",
+                "Networks"
             ],
-            "storyCount": 22
+            "storyCount": 23
         },
         "NetworkCoordinator": {
             "features": [
@@ -3635,7 +3661,7 @@
         }
     },
     "coverage": {
-        "annotatedStories": 188,
-        "storiesWithTests": 168
+        "annotatedStories": 189,
+        "storiesWithTests": 171
     }
 }

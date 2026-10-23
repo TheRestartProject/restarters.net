@@ -16,6 +16,10 @@ return [
     'impact' => 'Impact'
   ],
   'stats' => [
+    'all_time' => 'All time',
+    'last_12_months' => 'Last 12 months',
+    'period_toggle' => 'Period',
+    'period_range' => ':start to :end',
     'groups' => '{1} Group|[0,*] Groups',
     'events' => '{1} Event|[0,*] Events',
     'waste_diverted' => 'Waste Diverted',
@@ -64,5 +68,10 @@ return [
     'add_new_field' => 'Add new field',
     'new_field_name' => 'New field name',
     'add_field' => 'Add field',
+  ],
+  'nearby' => [
+    'title' => 'Groups near you',
+    'intro' => 'The nearest groups in this network to :group.',
+    'distance' => ':distance km',
   ],
 ];

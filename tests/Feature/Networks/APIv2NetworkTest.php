@@ -906,4 +906,40 @@ class APIv2NetworkTest extends TestCase
         // Should return empty array
         $this->assertEmpty($json);
     }
+
+    /**
+     * The headline stats can be for the last 12 completed months instead of all time.
+     *
+     * @story:NetworkController::getNetworkStatsv2
+     */
+    public function testNetworkStatsForLastTwelveCompletedMonths(): void {
+        Carbon::setTestNow('2026-10-23 12:00:00');
+
+        $network = Network::factory()->create();
+        $group = Group::factory()->create(['approved' => true]);
+        $network->addGroup($group);
+
+        // The window is 1 Oct 2025 to 30 Sep 2026: the first and last events fall outside it.
+        foreach (['2025-09-15', '2025-10-01', '2026-09-30', '2026-10-05'] as $day) {
+            Party::factory()->moderated()->create([
+                'group' => $group->idgroups,
+                'event_start_utc' => $day . 'T10:00:00Z',
+                'event_end_utc' => $day . 'T12:00:00Z',
+            ]);
+        }
+
+        $all = $this->get("/api/v2/networks/{$network->id}/stats")->assertSuccessful()->json();
+        $this->assertEquals(4, $all['parties']);
+
+        $recent = $this->get("/api/v2/networks/{$network->id}/stats?period=last_12_months")->assertSuccessful()->json();
+        $this->assertEquals(2, $recent['parties']);
+        $this->assertEquals(1, $recent['groups'], 'The group tally is not limited to the period');
+        $this->assertEquals('2025-10-01', $recent['period']['start']);
+        $this->assertEquals('2026-09-30', $recent['period']['end']);
+
+        Carbon::setTestNow();
+
+        $this->expectException(\Illuminate\Validation\ValidationException::class);
+        $this->getJson("/api/v2/networks/{$network->id}/stats?period=nonsense");
+    }
 }

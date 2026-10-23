@@ -29,6 +29,7 @@
                 :initial-tags="{{ json_encode($tags) }}"
                 :can-manage-tags="{{ json_encode($canManageTags) }}"
                 :can-moderate="{{ json_encode($canModerate) }}"
+                :nearby-groups="{{ json_encode($nearbyGroups) }}"
                 :can-associate-groups="{{ json_encode($canAssociateGroups) }}"
                 :is-logged-in="{{ json_encode(Auth::check()) }}"
                 api-token="{{ $apiToken }}"
