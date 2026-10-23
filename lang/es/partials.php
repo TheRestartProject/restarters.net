@@ -64,8 +64,6 @@ return [
   'add_device_unpowered' => 'Añadir artículo sin alimentación',
   'emissions_equivalent_consume_low' => "es como cultivar :value árbol durante 10 años|es como cultivar :value árboles durante 10 años",
   'emissions_equivalent_consume_high' => "es como plantar alrededor de :value hectárea de árboles|es como plantar alrededor de :value hectáreas de árboles",
-  'emissions_equivalent_consume_low_explanation' => 'Árboles de crecimiento medio, coníferas o caducifolias, plantados en entorno urbano y cultivados durante 10 años.',
-  'emissions_equivalent_consume_high_explanation' => 'Plántulas de árboles de hoja ancha cultivadas en una plantación o arboleda en Inglaterra durante 1 año.',
   'to_be_recycled' => ':value artículo para reciclar|:value artículos para reciclar',
   'to_be_repaired' => ':value artículo para reparar|:value artículos para reparar',
   'no_weight' => ':value artículo misceláneo o sin alimentación sin estimación de peso|:value artículos misceláneos o sin alimentación sin estimación de peso',
