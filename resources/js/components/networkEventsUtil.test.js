@@ -1,4 +1,4 @@
-import { bucketByDay, monthGrid, clashDays, localDay, shiftMonth } from './networkEventsUtil'
+import { bucketByDay, monthGrid, localDay, shiftMonth } from './networkEventsUtil'
 
 const ev = (id, group, start, tz = 'Europe/London', extra = {}) => ({
   id, group: { id: group }, start, end: start, timezone: tz, ...extra
@@ -43,18 +43,6 @@ describe('networkEventsUtil', () => {
     const weeks = monthGrid('2025-06', 0)
     expect(weeks[0][0].date).toBe('2025-06-01')
     expect(weeks[weeks.length - 1][6].date).toBe('2025-07-05')
-  })
-
-  test('clashDays needs two different groups and ignores cancelled', () => {
-    const b = bucketByDay([
-      ev(1, 1, '2025-03-05T10:00:00Z'),
-      ev(2, 1, '2025-03-05T14:00:00Z'),
-      ev(3, 1, '2025-03-06T10:00:00Z'),
-      ev(4, 2, '2025-03-06T10:00:00Z'),
-      ev(5, 1, '2025-03-07T10:00:00Z'),
-      ev(6, 2, '2025-03-07T10:00:00Z', 'Europe/London', { cancelled: true })
-    ])
-    expect(clashDays(b)).toEqual({ '2025-03-06': 2 })
   })
 
   test('shiftMonth crosses year boundaries', () => {

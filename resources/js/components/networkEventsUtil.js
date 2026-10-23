@@ -55,23 +55,6 @@ export function monthGrid(month, firstDay = 1) {
   return weeks
 }
 
-// Days on which two or more different groups have events (version 1 of clash detection).  Cancelled events don't
-// count.  Returns { 'YYYY-MM-DD': number of events that day }.
-export function clashDays(buckets) {
-  const clashes = {}
-
-  Object.keys(buckets).forEach(day => {
-    const live = buckets[day].filter(e => !e.cancelled)
-    const groups = new Set(live.map(e => e.group?.id))
-
-    if (groups.size >= 2) {
-      clashes[day] = live.length
-    }
-  })
-
-  return clashes
-}
-
 // 'YYYY-MM' shifted by n months.
 export function shiftMonth(month, n) {
   return moment.utc(month + '-01', 'YYYY-MM-DD').add(n, 'months').format('YYYY-MM')

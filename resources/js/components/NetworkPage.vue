@@ -88,6 +88,7 @@
           :network-id="network.id"
           :calendar-copy-url="calendarCopyUrl"
           :calendar-edit-url="calendarEditUrl"
+          :api-token="apiToken"
       />
     </section>
 

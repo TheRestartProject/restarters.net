@@ -22,13 +22,10 @@
             &middot; {{ e.group.name }}
             <span v-if="e.online" class="badge badge-info ml-1">{{ __('networks.events.online') }}</span>
             <span v-if="e.cancelled" class="badge badge-secondary ml-1">{{ __('networks.events.cancelled') }}</span>
+            <span v-if="e.group.approved === false" class="badge badge-warning ml-1 unapproved-badge">{{ __('networks.events.group_unapproved') }}</span>
+            <span v-if="e.group.archived_at" class="badge badge-dark ml-1 archived-badge">{{ __('networks.events.group_archived') }}</span>
           </div>
         </div>
-        <span
-            v-if="clashDays[e.day] && !e.cancelled"
-            class="badge badge-warning clash-badge ml-2"
-            :title="__('networks.events.clash_title')"
-        >{{ __('networks.events.clash', { count: clashDays[e.day] }) }}</span>
       </a>
     </div>
   </div>
@@ -41,11 +38,6 @@ export default {
     events: {
       type: Array,
       required: true
-    },
-    clashDays: {
-      type: Object,
-      required: false,
-      default: () => ({})
     }
   },
   computed: {
@@ -57,7 +49,7 @@ export default {
         const tz = raw.timezone || 'UTC'
         const localStart = moment.tz(raw.start, tz)
         const localEnd = moment.tz(raw.end, tz)
-        const e = { ...raw, localStart, localEnd, day: localStart.format('YYYY-MM-DD') }
+        const e = { ...raw, localStart, localEnd }
         const key = localStart.format('YYYY-MM')
 
         if (!byKey[key]) {
@@ -86,12 +78,8 @@ export default {
     text-decoration: none;
   }
 
-  &.cancelled {
-    opacity: 0.6;
-
-    .event-title {
-      text-decoration: line-through;
-    }
+  &.cancelled .event-title {
+    text-decoration: line-through;
   }
 }
 
