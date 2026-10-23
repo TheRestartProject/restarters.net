@@ -72,6 +72,11 @@
               </b-form-group>
               <div />
             </div>
+            <div class="d-flex justify-content-end mt-1">
+              <button type="button" class="btn clear-item-filters clear-filters" @click="clearItems">
+                {{ __('devices.clear_filters') }}
+              </button>
+            </div>
           </b-card-body>
         </b-card>
       </b-collapse>
@@ -106,6 +111,11 @@
             <b-form-group :label="__('devices.to_date')">
               <b-form-datepicker class="datepicker" v-model="current_to_date" :date-format-options="{ year: 'numeric', month: 'numeric', day: 'numeric' }"></b-form-datepicker>
             </b-form-group>
+            <div class="d-flex justify-content-end mt-1">
+              <button type="button" class="btn clear-event-filters clear-filters" @click="clearEvents">
+                {{ __('devices.clear_filters') }}
+              </button>
+            </div>
           </b-card-body>
         </b-card>
       </b-collapse>
@@ -117,6 +127,7 @@ import DeviceCategorySelect from './DeviceCategorySelect.vue'
 import DeviceModel from './DeviceModel.vue'
 import DeviceBrand from './DeviceBrand.vue'
 import images from '../mixins/images'
+import { today } from '../today'
 import { END_OF_LIFE, FIXED, REPAIRABLE } from '../constants'
 
 export default {
@@ -334,6 +345,21 @@ export default {
     }
   },
   methods: {
+    clearItems() {
+      // Setting powered also clears the category.
+      this.current_powered = null
+      this.current_category = null
+      this.current_item_type = null
+      this.current_brand = null
+      this.current_model = null
+      this.$emit('update:comments', null)
+      this.$emit('update:status', null)
+    },
+    clearEvents() {
+      this.current_group = null
+      this.current_from_date = null
+      this.current_to_date = today()
+    },
     toggleItems() {
       this.expandedItems = !this.expandedItems
       this.$emit('expandItems', this.expandedItems)
@@ -382,10 +408,6 @@ export default {
   background-color: $brand-grey-darker;
 }
 
-::v-deep .btn-link:hover {
-  color: transparent;
-}
-
 ::v-deep .btn:focus, .btn.focus {
   outline: 0;
   -webkit-box-shadow: none
@@ -427,5 +449,33 @@ export default {
 
 .clickme {
   user-select: none;
+}
+
+// Placed last so it also wins the specificity tie with the generic .btn:focus rule above.
+.clear-filters {
+  border: 1px solid $brand;
+  border-radius: 0;
+  background-color: $white;
+  color: $brand;
+  font-size: 13px;
+  font-weight: bold;
+  line-height: 1.2;
+  padding: 4px 12px;
+  text-decoration: none;
+
+  &:hover {
+    background-color: $brand;
+    border-color: $brand;
+    color: $white;
+    text-decoration: none;
+  }
+
+  &:focus {
+    background-color: $brand;
+    border-color: $brand;
+    color: $white;
+    box-shadow: 0 0 0 2px rgba($brand, 0.35);
+    outline: 0;
+  }
 }
 </style>

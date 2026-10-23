@@ -14,7 +14,7 @@ return [
   'how_to_host_an_event_text' => 'We have years of experience hosting community repair events, and we offer materials on how to organise events them. We also offer peer to peer support on our forum.',
   'view_the_materials' => 'View the materials',
   'waste_prevented' => 'waste prevented',
-  'co2' => 'estimated CO<sub>2</sub>e emissions prevented',
+  'co2' => 'CO<sub>2</sub>e emissions prevented',
   'restarters_in_your_area' => 'Volunteers in your area',
   'information_up_to_date' => 'Keep your group information up to date!',
   'information_up_to_date_text' => 'A fresh profile helps recruit more volunteers. Make sure to link to your website or social media channels.',

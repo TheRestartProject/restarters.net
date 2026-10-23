@@ -13,9 +13,10 @@ class RepairDataExport
 {
     /**
      * The devices a user can see - the same rules as User::userCanSeeEvent(), but applied in the query so that we
-     * don't have to look up each event and group in turn.  No user means what anyone can see.
+     * don't have to look up each event and group in turn.  No user means what anyone can see.  $filters are where
+     * clauses narrowing the result to what a filtered list of repair records shows.
      */
-    public function query($viewer = null, $idevents = null, $idgroups = null)
+    public function query($viewer = null, $idevents = null, $idgroups = null, array $filters = [])
     {
         return Device::with([
             'deviceCategory',
@@ -24,6 +25,11 @@ class RepairDataExport
             ->join('events', 'events.idevents', '=', 'devices.event')
             ->join('groups', 'groups.idgroups', '=', 'events.group')
             ->whereNull('events.deleted_at')
+            // Filters from the repair records list (see ApiController::deviceFilters) refer to the category too.
+            ->when(count($filters) > 0, function ($query) use ($filters) {
+                return $query->join('categories', 'devices.category', '=', 'categories.idcategories')
+                    ->where($filters);
+            })
             ->when($idevents != null, function ($query) use ($idevents) {
                 return $query->where('events.idevents', $idevents);
             })

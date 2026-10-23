@@ -162,9 +162,17 @@ export default {
       try {
         const formData = new FormData()
 
+        // The API only changes the fields it's sent, so send blanks too, or clearing a field (e.g. the link, or
+        // turning off online) would be ignored.  An empty string arrives as null.
         for (const key in params) {
-          if (params[key]) {
-            formData.append(key, params[key]);
+          const value = params[key]
+
+          if (value === undefined || value === null) {
+            formData.append(key, '')
+          } else if (typeof value === 'boolean') {
+            formData.append(key, value ? '1' : '0')
+          } else {
+            formData.append(key, value)
           }
         }
 
