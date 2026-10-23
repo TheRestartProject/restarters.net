@@ -1,6 +1,7 @@
 <script setup>
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useCo2Equivalent } from '~/composables/useCo2Equivalent.js'
 
 // GET /api/v2/groups/{id}/stats. Functional + visual spec:
 // group/view.blade.php's GroupStatsFacts + StatsImpact - group achievements
@@ -70,36 +71,12 @@ function printableCount(value) {
 // more than one applies. events.to_be_recycled/to_be_repaired/no_weight are
 // reused as-is (already exported to the client, identical wording pattern to
 // the group-specific groups.not_counting intro).
-const notCounting = computed(() => {
-  if (!groupStats.value) {
-    return null
-  }
+const { equivalentConsumer } = useCo2Equivalent()
 
-  const parts = []
+const co2Description = computed(() => {
+  const co2 = Math.round(groupStats.value?.co2_total ?? 0)
 
-  if (groupStats.value.dead_devices) {
-    parts.push(t('events.to_be_recycled', { value: groupStats.value.dead_devices }, groupStats.value.dead_devices))
-  }
-  if (groupStats.value.repairable_devices) {
-    parts.push(t('events.to_be_repaired', { value: groupStats.value.repairable_devices }, groupStats.value.repairable_devices))
-  }
-  if (groupStats.value.no_weight) {
-    parts.push(t('events.no_weight', { value: groupStats.value.no_weight }, groupStats.value.no_weight))
-  }
-
-  if (!parts.length) {
-    return null
-  }
-
-  const intro = t('groups.not_counting', parts.length)
-
-  if (parts.length === 1) {
-    return `${intro} ${parts[0]}.`
-  }
-
-  const last = parts[parts.length - 1]
-  const rest = parts.slice(0, -1)
-  return `${intro} ${rest.join(', ')} ${t('groups.and')} ${last}.`
+  return co2 > 0 ? equivalentConsumer(co2) : null
 })
 </script>
 
@@ -151,26 +128,30 @@ const notCounting = computed(() => {
               <div class="stat-card__count">{{ kg(groupStats.waste_total) }}</div>
               <div class="stat-card__label">{{ t('partials.waste_prevented') }}</div>
             </div>
-            <div class="stat-card" data-testid="group-stats-co2">
-              <img :src="'/images/cloud-empty.svg'" alt="" class="stat-card__icon">
-              <div class="stat-card__count">{{ kg(groupStats.co2_total) }}</div>
-              <!-- eslint-disable-next-line vue/no-v-html -->
-              <div class="stat-card__label" v-html="t('partials.co2')" />
-              <button
-                type="button"
-                class="btn btn-link p-0 small"
-                data-testid="group-stats-share"
-                @click="emit('share-stats')"
-              >
-                {{ t('partials.share_this') }}
-              </button>
+            <!-- develop #946: the figure on the left, its "that's like..." comparison and the share link on the
+                 right, with a dashed line between them. -->
+            <div class="stat-card stat-card--aside" data-testid="group-stats-co2">
+              <div class="stat-card__main">
+                <img :src="'/images/cloud-empty.svg'" alt="" class="stat-card__icon">
+                <div class="stat-card__count">{{ kg(groupStats.co2_total) }}</div>
+                <!-- eslint-disable-next-line vue/no-v-html -->
+                <div class="stat-card__label" v-html="t('partials.co2')" />
+              </div>
+              <div class="stat-card__aside">
+                <p v-if="co2Description" class="stat-card__description mb-0" data-testid="group-stats-co2-description">
+                  {{ co2Description }}
+                </p>
+                <button
+                  type="button"
+                  class="btn btn-link p-0 small stat-card__share"
+                  data-testid="group-stats-share"
+                  @click="emit('share-stats')"
+                >
+                  {{ t('partials.share_this') }}
+                </button>
+              </div>
             </div>
           </div>
-          <!-- StatsImpact.vue's .impact-notincluded-content: brand-teal
-               ($brand-light/#4aaebc), not Bootstrap's generic muted grey. -->
-          <p v-if="notCounting && !compact" class="small not-counting mt-2" data-testid="group-stats-not-counting">
-            {{ notCounting }}
-          </p>
         </section>
       </div>
     </template>
@@ -293,8 +274,57 @@ const notCounting = computed(() => {
   vertical-align: middle;
 }
 
-// StatsImpact.vue's .impact-notincluded-content: $brand-light (#4aaebc).
-.not-counting {
-  color: #4aaebc;
+// develop #946's StatsValue .impact-stat-aside: the CO2e card has the icon, figure and title on the left, and the
+// comparison and share link on the right, split by a dashed line.  Stacked, with the line between them, below lg.
+.stat-card--aside {
+  flex-direction: column;
+  align-items: stretch;
+
+  .stat-card__main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.35rem;
+    padding-bottom: 0.75rem;
+  }
+
+  .stat-card__aside {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding-top: 0.75rem;
+    border-top: 3px dashed #222;
+  }
+
+  .stat-card__label {
+    // Let the title wrap, rather than squeeze the description.
+    max-width: 170px;
+  }
+
+  @media (min-width: 992px) {
+    flex-direction: row;
+    text-align: left;
+
+    .stat-card__main {
+      padding: 0 1rem 0 0;
+      border-right: 3px dashed #222;
+      text-align: center;
+    }
+
+    .stat-card__aside {
+      flex: 1;
+      padding: 0 0 0 1rem;
+      border-top: none;
+    }
+  }
+}
+
+.stat-card__description {
+  font-size: 16px;
+}
+
+.stat-card__share {
+  align-self: flex-end;
 }
 </style>

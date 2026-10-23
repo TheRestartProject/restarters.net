@@ -43,6 +43,14 @@ const props = defineProps({
 
 const { t, locale } = useI18n()
 
+// The group name starts the heading, so "events" is lower case, in sentence case like the rest of the page
+// (develop #946).
+const eventsWord = computed(() => {
+  const word = t('events.events')
+
+  return word.charAt(0).toLowerCase() + word.slice(1)
+})
+
 const activeTab = ref('upcoming')
 const sortDesc = ref(false)
 // GroupEventScrollTable.vue is a b-table with every column sortable. Only the
@@ -208,7 +216,7 @@ function copyCalendarUrl() {
            calendar-subscribe button sit together to the left of the
            export/add-event actions (parity diff: heading text + icon). -->
       <div class="d-flex flex-wrap align-items-center gap-2">
-        <h2 class="mb-0" data-testid="group-events-heading">{{ groupName }} {{ t('events.events') }}</h2>
+        <h2 class="mb-0" data-testid="group-events-heading">{{ groupName }} {{ eventsWord }}</h2>
         <BButton
           v-if="showCalendar"
           variant="primary"

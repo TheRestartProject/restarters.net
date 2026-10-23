@@ -73,23 +73,27 @@ describe('components/groups/GroupStats', () => {
     expect(wrapper.emitted('share-stats')).toBeTruthy()
   })
 
-  it('shows the not-counting caveat when dead/repairable/no-weight devices exist (gap 10)', () => {
+  // develop #946 (Neil, 21 Oct): the group page no longer shows the "not counting" caveat.
+  it('does not show the not-counting caveat, even when devices are excluded', () => {
     const wrapper = mountComponent({ stats: STATS })
 
-    const note = wrapper.find('[data-testid="group-stats-not-counting"]')
-    expect(note.exists()).toBe(true)
-    expect(note.text()).toContain('Not counting')
-    expect(note.text()).toContain('recycled')
-    expect(note.text()).toContain('repaired')
-    expect(note.text()).toContain('and')
+    expect(wrapper.find('[data-testid="group-stats-not-counting"]').exists()).toBe(false)
   })
 
-  it('omits the not-counting caveat when nothing is excluded', () => {
-    const wrapper = mountComponent({
-      stats: { group_stats: { ...STATS.group_stats, dead_devices: 0, repairable_devices: 0, no_weight: 0 } },
-    })
+  // develop #946: the CO2e figure has its "that's like..." comparison beside it, with the share link.
+  it('describes the CO2e figure beside it, next to the share link', () => {
+    const wrapper = mountComponent({ stats: { group_stats: { ...STATS.group_stats, co2_total: 600 } } })
 
-    expect(wrapper.find('[data-testid="group-stats-not-counting"]').exists()).toBe(false)
+    const card = wrapper.find('[data-testid="group-stats-co2"]')
+    expect(card.classes()).toContain('stat-card--aside')
+    expect(card.find('[data-testid="group-stats-co2-description"]').text()).toBe("that's like growing 10 tree seedlings for 10 years")
+    expect(card.find('.stat-card__aside [data-testid="group-stats-share"]').exists()).toBe(true)
+  })
+
+  it('has no comparison when there is no CO2e', () => {
+    const wrapper = mountComponent({ stats: { group_stats: { ...STATS.group_stats, co2_total: 0 } } })
+
+    expect(wrapper.find('[data-testid="group-stats-co2-description"]').exists()).toBe(false)
   })
 
   // StatsValue.vue's printableCount(): stat-card counts get thousand

@@ -33,13 +33,5 @@ export function useCo2Equivalent() {
     return t(key, { value }, value)
   }
 
-  function popoverConsumer(co2) {
-    const key =
-      co2 >= 13501
-        ? 'partials.emissions_equivalent_consume_high_explanation'
-        : 'partials.emissions_equivalent_consume_low_explanation'
-    return t(key)
-  }
-
-  return { equivalentConsumer, popoverConsumer }
+  return { equivalentConsumer }
 }

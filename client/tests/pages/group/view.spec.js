@@ -498,23 +498,24 @@ describe('pages/group/view/[id]', () => {
         .map(([id]) => id)
     }
 
-    it('puts all the stats before the events by default (compact)', () => {
+    // develop #946 (Neil, 21 Oct): the stats now go after the events by default.
+    it('puts all the stats after the events by default', () => {
       const wrapper = layout({})
-
-      expect(wrapper.find('[data-testid="group-stats-layout-compact"]').exists()).toBe(true)
-      expect(order(wrapper).slice(0, 2).sort()).toEqual(['group-stats-devices', 'group-stats-facts'])
-    })
-
-    it('ignores an unknown layout', () => {
-      expect(layout({ stats_layout: 'sideways' }).find('[data-testid="group-stats-layout-compact"]').exists()).toBe(true)
-    })
-
-    it('puts all the stats after the events with ?stats_layout=after', () => {
-      const wrapper = layout({ stats_layout: 'after' })
 
       expect(wrapper.find('[data-testid="group-stats-layout-compact"]').exists()).toBe(false)
       expect(wrapper.find('[data-testid="group-stats-layout-after"]').exists()).toBe(true)
       expect(wrapper.findAll('.stats-before-events')).toHaveLength(0)
+    })
+
+    it('ignores an unknown layout', () => {
+      expect(layout({ stats_layout: 'sideways' }).find('[data-testid="group-stats-layout-after"]').exists()).toBe(true)
+    })
+
+    it('puts all the stats before the events with ?stats_layout=compact', () => {
+      const wrapper = layout({ stats_layout: 'compact' })
+
+      expect(wrapper.find('[data-testid="group-stats-layout-compact"]').exists()).toBe(true)
+      expect(order(wrapper).slice(0, 2).sort()).toEqual(['group-stats-devices', 'group-stats-facts'])
     })
 
     it('splits them around the events with ?stats_layout=split', () => {
@@ -525,10 +526,10 @@ describe('pages/group/view/[id]', () => {
       expect(wrapper.find('.stats-after-events [data-testid="group-stats-devices"]').exists()).toBe(true)
     })
 
-    it('leaves out the "not counting" note in the compact layout only', () => {
+    it('leaves out the "not counting" note in every layout', () => {
       const stats = { ...STATS, group_stats: { ...STATS.group_stats, dead_devices: 2, repairable_devices: 1, no_weight: 1 } }
 
-      for (const [query, shown] of [[{}, false], [{ stats_layout: 'after' }, true]]) {
+      for (const [query, shown] of [[{}, false], [{ stats_layout: 'compact' }, false], [{ stats_layout: 'after' }, false]]) {
         vi.stubGlobal('useRoute', () => ({ params: { id: '5' }, query, fullPath: '/group/view/5' }))
         groupsStore.current.data = BASE_GROUP
         groupsStore.stats.data = stats

@@ -32,9 +32,9 @@ const sessionStore = useSessionStore()
 const id = computed(() => Number(route.params.id))
 
 // Where the stats go, while we choose between them (develop #922):
-// - compact: all of them before the events, achievements over impact beside
-//   items worked on over most repaired
-// - after: all of them after the events
+// - compact: all of them before the events, achievements beside impact over
+//   items worked on beside most repaired
+// - after (the default since develop #946): all of them after the events
 // - split: achievements and impact before the events, items worked on and
 //   most repaired after
 // ?stats_layout= on the page address picks one, so they can be compared.
@@ -42,7 +42,7 @@ const STATS_LAYOUTS = ['compact', 'after', 'split']
 const statsLayout = computed(() => {
   const asked = Array.isArray(route.query.stats_layout) ? route.query.stats_layout[0] : route.query.stats_layout
 
-  return STATS_LAYOUTS.includes(asked) ? asked : 'compact'
+  return STATS_LAYOUTS.includes(asked) ? asked : 'after'
 })
 
 const group = computed(() => groupsStore.current.data)
@@ -515,8 +515,8 @@ onMounted(() => {
 </template>
 
 <style scoped>
-/* Compact stats layout (develop #922): achievements over impact on the left,
-   items worked on over most repaired on the right. GroupStats and
+/* Compact stats layout (develop #922, rearranged in #946): achievements beside
+   impact, over items worked on beside most repaired. GroupStats and
    GroupDevicesSummary render their sections straight into this grid. */
 .stats-compact {
   display: grid;
@@ -529,8 +529,8 @@ onMounted(() => {
     column-gap: 1.5rem;
     grid-template-columns: 1fr 1fr;
     grid-template-areas:
-      'facts worked-on'
-      'impact most-repaired';
+      'facts impact'
+      'worked-on most-repaired';
   }
 
   .stats-compact :deep(.stats-facts) { grid-area: facts; }

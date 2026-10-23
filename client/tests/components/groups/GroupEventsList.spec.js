@@ -233,11 +233,13 @@ describe('components/groups/GroupEventsList', () => {
     expect(viewer.find('[data-testid="group-events-export"]').exists()).toBe(false)
   })
 
-  it('shows the group name + "Events" heading, with the calendar button beside it (parity: heading + icon)', () => {
+  // develop #946: the group name starts the heading, so "events" is lower case, in sentence case like the rest of
+  // the page.
+  it('shows the group name + "events" heading, with the calendar button beside it (parity: heading + icon)', () => {
     const wrapper = mountComponent({ events: EVENTS, showCalendar: true })
 
     const heading = wrapper.find('[data-testid="group-events-heading"]')
-    expect(heading.text()).toBe('Fixers United Events')
+    expect(heading.text()).toBe('Fixers United events')
 
     // The calendar-subscribe button sits next to the heading, not grouped
     // with the export/add-event actions on the right.

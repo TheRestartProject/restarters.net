@@ -50,10 +50,4 @@ describe('composables/useCo2Equivalent', () => {
     const { equivalentConsumer } = withI18n(() => useCo2Equivalent())
     expect(equivalentConsumer(13500)).toContain('seedling')
   })
-
-  it('popoverConsumer returns the matching explanation text for each bracket', () => {
-    const { popoverConsumer } = withI18n(() => useCo2Equivalent())
-    expect(popoverConsumer(100)).toMatch(/urban setting/)
-    expect(popoverConsumer(20000)).toMatch(/plantation or woodlot/)
-  })
 })
