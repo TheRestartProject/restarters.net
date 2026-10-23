@@ -1,0 +1,8 @@
+<svg id="ic-actions-close" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+  <rect id="Rectangle_33" data-name="Rectangle 33" width="24" height="24" fill="none"/>
+  <g id="Layer" transform="translate(1 1)">
+    <path id="Path_78" data-name="Path 78" d="M12,3a9,9,0,1,0,9,9A9,9,0,0,0,12,3ZM1,12A11,11,0,1,1,12,23,11,11,0,0,1,1,12Z" transform="translate(-1 -1)" fill="#f45b69" fill-rule="evenodd"/>
+    <path id="Path_79" data-name="Path 79" d="M7.12,16.71a1,1,0,0,1,0-1.42l8.49-8.48A1,1,0,0,1,17,8.22L8.54,16.71a1,1,0,0,1-1.42,0Z" transform="translate(-1 -1)" fill="#f45b69"/>
+    <path id="Path_80" data-name="Path 80" d="M6.71,6.71a1,1,0,0,1,1.41,0l8.49,8.48a1,1,0,0,1-1.42,1.42L6.71,8.12A1,1,0,0,1,6.71,6.71Z" transform="translate(-1 -1)" fill="#f45b69"/>
+  </g>
+</svg>

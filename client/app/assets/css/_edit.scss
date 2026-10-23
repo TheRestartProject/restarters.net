@@ -1,0 +1,75 @@
+// Ported from develop's resources/sass/_edit.scss.
+//
+// `.edit-panel` is applied by the notifications page, the group edit page and
+// the profile tabs, but had NO rule on this side at all - the class was inert,
+// so those panels rendered as bare content with no border, padding or shadow.
+//
+// Bootstrap 5 keeps media-breakpoint-up unchanged (it takes the breakpoint the
+// range starts at), so those calls port verbatim - unlike media-breakpoint-down.
+.edit-panel {
+  background-color: #fff;
+  // develop's Fixometer-only palette has $brand and $brand-black both
+  // resolving to #222 - this app's own $brand is the teal brand colour
+  // used elsewhere, so both are hardcoded to #222 here to match the
+  // rendered near-black border/shadow rather than picking up teal.
+  border: 1px solid #222;
+  padding: 20px 20px 20px;
+  box-shadow: 5px 5px #222;
+  margin: 0 0 30px 0;
+
+  @include media-breakpoint-up(lg) {
+    padding: 30px;
+  }
+
+  .after-offset {
+    font-size: 13px;
+  }
+
+  &__side {
+    padding: 20px;
+    margin-bottom: 5px;
+  }
+
+  &__device {
+    @include media-breakpoint-up(lg) {
+      padding: 60px;
+    }
+
+    margin: 10px auto;
+  }
+
+  .btn-preferences {
+    color: #000;
+    text-decoration: underline;
+
+    &:hover {
+      text-decoration: none;
+    }
+  }
+
+  // Two equal-height side-by-side panels (e.g. Skills/Photo on the
+  // profile page) are wrapped in a `.d-flex` column - stretch to fill it
+  // instead of the default bottom margin/shrink-to-content.
+  .d-flex & {
+    margin-bottom: 0;
+    flex: 1;
+  }
+}
+
+// .btn-save lives in develop's _buttons.scss (not _edit.scss), but that
+// file isn't owned by this batch - ported here instead since every
+// consumer of it today is an .edit-panel submit button.
+.btn-save {
+  margin: auto 0;
+  min-width: 170px;
+}
+
+.row-end {
+  > div {
+    flex-direction: column;
+  }
+}
+
+.col-bottom {
+  margin-bottom: 30px;
+}

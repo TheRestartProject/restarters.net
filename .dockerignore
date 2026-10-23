@@ -1,4 +1,7 @@
-node_modules
+# Docker only applies a bare directory name at the top level, so `node_modules`
+# alone never excluded client/node_modules (~466MB) — it was uploaded to the
+# builder on every deploy, CI included. Use ** for anything nested.
+**/node_modules
 vendor
 .git
 .env*
@@ -15,3 +18,24 @@ tests/Browser/console
 *.log
 .DS_Store
 Thumbs.db
+
+# Local-only clutter. These never exist in a CI checkout, but a manual
+# `flyctl deploy` from a working tree uploads them: together they took the
+# build context to 8.1GB / 358k files and made the deploy time out.
+.worktrees/
+.claude/
+.idea/
+.vscode/
+
+# Test/report output. All untracked, so a CI checkout never has them, but a
+# local deploy would ship ~253MB of screenshots and reports.
+playwright-report/
+parity-shots/
+test-results/
+/uploads/
+
+# Root-level database dumps (e.g. restarters-anonymised.sql, ~662MB).
+# Anchored to the root on purpose: database/data_updates/*.sql is tracked and
+# must stay in the image.
+/*.sql
+/*.sql.gz

@@ -19,7 +19,6 @@ class GroupFilterTranslationsTest extends TestCase
     {
         $keys = [
             'search_name_placeholder',
-            'search_location_placeholder',
             'search_country_placeholder',
             'search_tags_placeholder',
             'show_filters',

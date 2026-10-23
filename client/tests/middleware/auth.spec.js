@@ -1,0 +1,154 @@
+import { createPinia, setActivePinia } from 'pinia'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import authMiddleware from '../../app/middleware/auth.global.ts'
+import { useAuthStore } from '../../app/stores/auth.js'
+
+describe('middleware/auth.global', () => {
+  let navigateToMock
+
+  beforeEach(() => {
+    setActivePinia(createPinia())
+    navigateToMock = vi.fn()
+    vi.stubGlobal('navigateTo', navigateToMock)
+  })
+
+  function route({ auth, role, fullPath = '/somewhere', path = '/somewhere' } = {}) {
+    return { meta: { auth, role }, fullPath, path }
+  }
+
+  it('does nothing for routes that do not require auth', () => {
+    const result = authMiddleware(route({ auth: undefined }), route())
+    expect(result).toBeUndefined()
+    expect(navigateToMock).not.toHaveBeenCalled()
+  })
+
+  it('redirects to /login with a redirect query when logged out', () => {
+    authMiddleware(route({ auth: true, fullPath: '/dashboard' }), route())
+
+    expect(navigateToMock).toHaveBeenCalledWith('/login?redirect=%2Fdashboard')
+  })
+
+  it('allows through when logged in and no role is required', () => {
+    const authStore = useAuthStore()
+    authStore.token = 'tok-1'
+    authStore.user = { id: 1, role_name: 'Restarter' }
+
+    authMiddleware(route({ auth: true }), route())
+
+    expect(navigateToMock).not.toHaveBeenCalled()
+  })
+
+  it('allows through when the role matches exactly', () => {
+    const authStore = useAuthStore()
+    authStore.token = 'tok-1'
+    authStore.user = { id: 1, role_name: 'Administrator' }
+
+    authMiddleware(route({ auth: true, role: 'Administrator' }), route())
+
+    expect(navigateToMock).not.toHaveBeenCalled()
+  })
+
+  it('redirects to /forbidden when the role does not match', () => {
+    const authStore = useAuthStore()
+    authStore.token = 'tok-1'
+    authStore.user = { id: 1, role_name: 'Restarter' }
+
+    authMiddleware(route({ auth: true, role: 'Administrator' }), route())
+
+    expect(navigateToMock).toHaveBeenCalledWith('/forbidden')
+  })
+
+  it('Root satisfies any required role', () => {
+    const authStore = useAuthStore()
+    authStore.token = 'tok-1'
+    authStore.user = { id: 1, role_name: 'Root' }
+
+    authMiddleware(route({ auth: true, role: 'Administrator' }), route())
+
+    expect(navigateToMock).not.toHaveBeenCalled()
+  })
+
+  it('redirects to /forbidden when logged in but there is no role_name at all', () => {
+    const authStore = useAuthStore()
+    authStore.token = 'tok-1'
+    authStore.user = { id: 1 }
+
+    authMiddleware(route({ auth: true, role: 'Administrator' }), route())
+
+    expect(navigateToMock).toHaveBeenCalledWith('/forbidden')
+  })
+
+  it('redirects unconsented users to the consent page with a redirect query', () => {
+    const authStore = useAuthStore()
+    authStore.token = 'tok-1'
+    authStore.user = { id: 1, role_name: 'Restarter', consent: { given: false } }
+
+    authMiddleware(route({ auth: true, fullPath: '/dashboard', path: '/dashboard' }), route())
+
+    expect(navigateToMock).toHaveBeenCalledWith('/user/consent?redirect=%2Fdashboard')
+  })
+
+  it('does not consent-redirect while the session user is still loading', () => {
+    const authStore = useAuthStore()
+    authStore.token = 'tok-1'
+    authStore.user = null
+
+    authMiddleware(route({ auth: true }), route())
+
+    expect(navigateToMock).not.toHaveBeenCalled()
+  })
+
+  it('does not consent-redirect consented users', () => {
+    const authStore = useAuthStore()
+    authStore.token = 'tok-1'
+    authStore.user = { id: 1, role_name: 'Restarter', consent: { given: true } }
+
+    authMiddleware(route({ auth: true }), route())
+
+    expect(navigateToMock).not.toHaveBeenCalled()
+  })
+
+  it('lets unconsented users reach the consent page itself', () => {
+    const authStore = useAuthStore()
+    authStore.token = 'tok-1'
+    authStore.user = { id: 1, role_name: 'Restarter', consent: { given: false } }
+
+    authMiddleware(route({ auth: true, path: '/user/consent', fullPath: '/user/consent' }), route())
+
+    expect(navigateToMock).not.toHaveBeenCalled()
+  })
+
+  // Guest-only pages. Legacy gated these with Laravel's `guest` middleware
+  // (RegisterController's unconditional $this->middleware('guest'), and
+  // LoginController's ->except(['index',...]) which exempted a method that does
+  // not exist, so the login form was gated too). A logged-in user was bounced.
+  describe('guest-only pages', () => {
+    function guestRoute(path = '/login') {
+      return { meta: { guest: true }, fullPath: path, path }
+    }
+
+    it('bounces a logged-in user off a guest-only page', () => {
+      const authStore = useAuthStore()
+      authStore.token = 'tok-1'
+      authStore.user = { id: 1, role_name: 'Restarter' }
+
+      authMiddleware(guestRoute('/login'), route())
+
+      expect(navigateToMock).toHaveBeenCalledWith('/dashboard')
+    })
+
+    it('lets a logged-out visitor through to a guest-only page', () => {
+      authMiddleware(guestRoute('/user/register'), route())
+
+      expect(navigateToMock).not.toHaveBeenCalled()
+    })
+
+    it('does not apply the auth gate to guest-only pages', () => {
+      // guest pages must not also be treated as auth-required
+      const result = authMiddleware(guestRoute('/login'), route())
+
+      expect(result).toBeUndefined()
+      expect(navigateToMock).not.toHaveBeenCalled()
+    })
+  })
+})

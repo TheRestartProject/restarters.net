@@ -19,6 +19,8 @@ use Illuminate\Http\Resources\Json\ResourceCollection;
 
 class SkillCollection extends ResourceCollection
 {
+    public $collects = \App\Http\Resources\Skill::class;
+
     /**
      * Transform the resource collection into an array.
      */
