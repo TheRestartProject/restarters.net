@@ -1,4 +1,4 @@
-import { hasBakedFootnote, footnoteLayout, footnoteKey } from './statsFootnote'
+import { hasBakedFootnote, footnoteLayout, footnoteKey, hasBakedBranding, brandingLayout } from './statsFootnote'
 import fs from 'fs'
 import path from 'path'
 
@@ -32,6 +32,45 @@ describe('stats share footnote', () => {
 
   test('landscape cover starts above the baked footnote text (0.909)', () => {
     expect(footnoteLayout(false).y).toBeLessThan(0.909)
+  })
+
+  test('every range has the baked branding, range 6 included', () => {
+    for (const r of [1, 2, 3, 4, 5, 6]) {
+      expect(hasBakedBranding('ImpactRange' + r + 'Landscape-1.png')).toBe(true)
+      expect(hasBakedBranding('ImpactRange' + r + 'Square-1.png')).toBe(true)
+    }
+    expect(hasBakedBranding(null)).toBe(false)
+  })
+
+  // Measured from the PNGs: square branding spans x 0.333-0.667, y 0.948-0.980; landscape spans x 0.717-0.985,
+  // y 0.909-0.953, with the dashed line ending at ~0.89.
+  test('square branding cover sits below the footnote cover and covers the baked text', () => {
+    const b = brandingLayout(true)
+    const f = footnoteLayout(true)
+    expect(b.y).toBeGreaterThanOrEqual(f.y + f.h - 1e-9)
+    expect(b.y).toBeLessThan(0.948)
+    expect(b.y + b.h).toBeGreaterThan(0.980)
+    expect(b.centre).toBe(true)
+  })
+
+  test('landscape branding cover is right of the footnote cover and below the dashed line', () => {
+    const b = brandingLayout(false)
+    const f = footnoteLayout(false)
+    expect(b.x).toBeGreaterThanOrEqual(f.x + f.w - 1e-9)
+    expect(b.x).toBeLessThan(0.717)
+    expect(b.x + b.w).toBeGreaterThan(0.985)
+    expect(b.y).toBeGreaterThan(0.89)
+    expect(b.y).toBeLessThan(0.909)
+    expect(b.y + b.h).toBeGreaterThan(0.953)
+  })
+
+  test('the branding is translated but restarters.net is not', () => {
+    for (const loc of ['en', 'fr', 'fr-BE']) {
+      const v = value(loc, 'share_modal_generated_by')
+      expect(v).toContain(':site')
+      expect(v).not.toMatch(/restarters/i)
+    }
+    expect(value('fr', 'share_modal_generated_by')).not.toBe(value('en', 'share_modal_generated_by'))
   })
 
   test('footnotes are translated in en, fr and fr-BE', () => {
