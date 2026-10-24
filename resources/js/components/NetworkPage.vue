@@ -23,14 +23,7 @@
     <div class="network-stats mb-4">
       <div class="d-flex flex-wrap align-items-center justify-content-between">
         <h2>{{ __('networks.general.impact') }}</h2>
-        <b-button-group :aria-label="__('networks.stats.period_toggle')" class="period-toggle mb-2">
-          <b-button class="period-all" size="sm" variant="primary" :pressed="period === 'all'" @click="setPeriod('all')">
-            {{ __('networks.stats.all_time') }}
-          </b-button>
-          <b-button class="period-last12" size="sm" variant="primary" :pressed="period === 'last_12_months'" @click="setPeriod('last_12_months')">
-            {{ __('networks.stats.last_12_months') }}
-          </b-button>
-        </b-button-group>
+        <PeriodToggle class="mb-2" :value="period" @input="setPeriod" />
       </div>
       <p v-if="periodLabel" class="stats-period text-muted small">{{ periodLabel }}</p>
       <div class="stats-grid">
@@ -206,13 +199,14 @@
 <script>
 import axios from 'axios'
 import moment from 'moment-timezone'
+import PeriodToggle from './PeriodToggle.vue'
 import GroupsRequiringModeration from './GroupsRequiringModeration.vue'
 import EventsRequiringModeration from './EventsRequiringModeration.vue'
 import GroupMapAndList from './GroupMapAndList.vue'
 import images from '../mixins/images'
 
 export default {
-  components: { GroupsRequiringModeration, EventsRequiringModeration, GroupMapAndList },
+  components: { PeriodToggle, GroupsRequiringModeration, EventsRequiringModeration, GroupMapAndList },
   mixins: [images],
   props: {
     network: {
@@ -475,17 +469,6 @@ export default {
 
 <style scoped lang="scss">
 @import 'resources/global/css/_variables';
-
-// Same look as the target toggle in StatsShareModal: the theme's .btn-primary.active is white on white.
-::v-deep .period-toggle .btn {
-  color: black !important;
-  background-color: white !important;
-
-  &.active {
-    color: white !important;
-    background-color: black !important;
-  }
-}
 
 .stats-grid {
   display: grid;

@@ -75,14 +75,27 @@ class NetworkPageVisibilityTest extends TestCase
         $this->get('/networks/' . $network->id);
     }
 
-    public function testRestarterInGroupIsForbidden(): void
+    public function testVolunteerInGroupSeesPageWithoutCoordinatorOnlyData(): void
     {
         [$network, $group] = $this->networkWithHost();
+        $network->addCoordinator(User::factory()->networkCoordinator()->create(['name' => 'Cordelia Coordinator']));
 
         $member = User::factory()->restarter()->create();
         $group->addVolunteer($member);
 
         $this->actingAs($member);
+        $response = $this->get('/networks/' . $network->id);
+        $response->assertStatus(200);
+        $this->assertNull($this->networkData($response)['reporting_url']);
+        $this->assertFalse($this->vueProp($response, ':can-moderate'));
+        $response->assertDontSee('reports.example.org');
+    }
+
+    public function testUserWithNoGroupInNetworkIsForbidden(): void
+    {
+        [$network] = $this->networkWithHost();
+
+        $this->actingAs(User::factory()->restarter()->create());
         $this->expectException(\Illuminate\Auth\Access\AuthorizationException::class);
         $this->get('/networks/' . $network->id);
     }
@@ -144,6 +157,31 @@ class NetworkPageVisibilityTest extends TestCase
         $this->assertEquals($group->name, $nearby['from']);
         $this->assertEquals(['Near 1', 'Near 2', 'Near 3', 'Near 4', 'Near 5'], array_column($nearby['groups'], 'name'));
         $this->assertEqualsWithDelta(5.6, $nearby['groups'][0]['distance'], 0.2);
+    }
+
+    public function testUserInSeveralGroupsSeesNearestToAnyOfThemOnce(): void
+    {
+        [$network, $group, $host] = $this->networkWithHost();
+        $group->update(['latitude' => 51.50, 'longitude' => -0.10]);
+
+        $second = $this->groupAt($network, 'Second home', 53.00, -0.10);
+        $second->addVolunteer($host);
+
+        // One near each of the user's groups, and one far from both.
+        $this->groupAt($network, 'By first', 51.55, -0.10);
+        $this->groupAt($network, 'By second', 53.03, -0.10);
+        $this->groupAt($network, 'Far away', 56.00, -0.10);
+
+        $this->actingAs($host);
+        $nearby = $this->vueProp($this->get('/networks/' . $network->id), ':nearby-groups');
+
+        $names = array_column($nearby['groups'], 'name');
+        $this->assertEquals(['By second', 'By first', 'Far away'], $names);
+        $this->assertCount(count(array_unique($names)), $names);
+        $this->assertNotContains('Second home', $names);
+        $this->assertNotContains($group->name, $names);
+        $this->assertEqualsWithDelta(3.3, $nearby['groups'][0]['distance'], 0.2);
+        $this->assertEqualsWithDelta(5.6, $nearby['groups'][1]['distance'], 0.2);
     }
 
     public function testNoNearbyGroupsWithoutAGroupLocation(): void

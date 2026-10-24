@@ -10,7 +10,6 @@ use App\Group;
 use App\GroupTags;
 use App\Helpers\Fixometer;
 use App\Network;
-use App\Role;
 use Auth;
 use FixometerFile;
 use Illuminate\Http\Request;
@@ -50,11 +49,9 @@ class NetworkController extends Controller
     }
 
     /**
-     * Display the specified network.
-     */
-    /**
-     * The groups in the network nearest to one of the user's own groups in it, preferring one they host.  Null if
-     * they have no located group in the network.
+     * The groups in the network nearest to any of the user's own located groups in it, nearest first, with each
+     * group listed once at its smallest distance.  The user's own groups are left out.  Null if they have no
+     * located group in the network.
      */
     private function nearbyGroups(Network $network, $user): ?array
     {
@@ -65,18 +62,33 @@ class NetworkController extends Controller
             ->whereNull('users_groups.deleted_at')
             ->whereNotNull('groups.latitude')
             ->whereNotNull('groups.longitude')
-            ->orderByRaw('users_groups.role = ? DESC', [Role::HOST])
             ->orderBy('groups.name')
             ->select('groups.*')
-            ->first();
+            ->get();
 
-        if (! $mine) {
+        if ($mine->isEmpty()) {
             return null;
         }
 
+        $mineIds = $mine->pluck('idgroups')->all();
+        $nearest = [];
+
+        foreach ($mine as $group) {
+            // Ask for extra so that skipping the user's other groups still leaves enough.
+            foreach ($network->nearestGroups($group, 5 + count($mineIds)) as $g) {
+                if (in_array($g->idgroups, $mineIds)) {
+                    continue;
+                }
+
+                if (! isset($nearest[$g->idgroups]) || $g->dist < $nearest[$g->idgroups]->dist) {
+                    $nearest[$g->idgroups] = $g;
+                }
+            }
+        }
+
         return [
-            'from' => $mine->name,
-            'groups' => $network->nearestGroups($mine)->map(fn ($g) => [
+            'from' => $mine->pluck('name')->implode(', '),
+            'groups' => collect($nearest)->sortBy('dist')->take(5)->map(fn ($g) => [
                 'id' => $g->idgroups,
                 'name' => $g->name,
                 'location' => $g->location,
@@ -85,12 +97,15 @@ class NetworkController extends Controller
         ];
     }
 
+    /**
+     * Display the specified network.
+     */
     #[UserStory('As a NetworkCoordinator, I can view my network\'s details and statistics', persona: 'NetworkCoordinator', theme: 'Browse networks')]
     public function show(Network $network): View
     {
         $user = Auth::user();
 
-        // Coordinators and admins get the full page; hosts of groups in the network get it without the
+        // Coordinators and admins get the full page; volunteers and hosts of groups in the network get it without the
         // coordinator-only parts.
         $this->authorize('viewPublic', $network);
 

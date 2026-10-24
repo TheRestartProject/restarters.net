@@ -11,6 +11,7 @@ use App\Http\Resources\Tag as TagResource;
 use App\Network;
 use App\Party;
 use Auth;
+use App\Helpers\StatsPeriod;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -569,25 +570,16 @@ class NetworkController extends Controller
     {
         $network = Network::findOrFail($id);
 
-        $request->validate(['period' => 'nullable|in:all,last_12_months']);
+        $request->validate(['period' => 'nullable|in:' . StatsPeriod::ALL . ',' . StatsPeriod::LAST_12_MONTHS]);
 
-        $from = $to = null;
-
-        if ($request->get('period') === 'last_12_months') {
-            // Completed months only, so the figure doesn't change day by day through the current month.
-            $to = Carbon::now('UTC')->startOfMonth();
-            $from = $to->copy()->subMonths(12);
-        }
+        [$from, $to] = StatsPeriod::window($request->get('period'));
 
         $stats = $request->has('group_tag')
             ? $this->statsForTag($network, $request->get('group_tag'), $from, $to)
             : $network->stats($from, $to);
 
         if ($from) {
-            $stats['period'] = [
-                'start' => $from->toDateString(),
-                'end' => $to->copy()->subDay()->toDateString(),
-            ];
+            $stats['period'] = StatsPeriod::describe($from, $to);
         }
 
         return response()->json($stats);
