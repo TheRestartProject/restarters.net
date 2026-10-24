@@ -11,6 +11,7 @@ use App\Http\Resources\Tag as TagResource;
 use App\Network;
 use App\Party;
 use Auth;
+use App\Helpers\StatsPeriod;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -40,7 +41,7 @@ class NetworkController extends Controller
     /**
      * Get stats for groups in a network that have a specific tag.
      */
-    private function statsForTag(Network $network, int $tagId): array
+    private function statsForTag(Network $network, int $tagId, ?Carbon $from = null, ?Carbon $to = null): array
     {
         $eEmissionRatio = \App\Helpers\LcaStats::getEmissionRatioPowered();
         $uEmissionratio = \App\Helpers\LcaStats::getEmissionRatioUnpowered();
@@ -51,7 +52,7 @@ class NetworkController extends Controller
             ->where('grouptags_groups.group_tag', $tagId)
             ->get();
 
-        $allStats = \App\Group::bulkGroupStats($groups, $eEmissionRatio, $uEmissionratio);
+        $allStats = \App\Group::bulkGroupStats($groups, $eEmissionRatio, $uEmissionratio, $from, $to);
 
         $stats = \App\Group::getGroupStatsArrayKeys();
 
@@ -521,10 +522,24 @@ class NetworkController extends Controller
      *              type="integer"
      *          )
      *      ),
+     *      @OA\Parameter(
+     *          name="period",
+     *          description="all (default) for all time, or last_12_months for events in the last 12 completed calendar months.  The group count is always the current one.",
+     *          required=false,
+     *          in="query",
+     *          @OA\Schema(
+     *              type="string",
+     *              enum={"all", "last_12_months"}
+     *          )
+     *      ),
      *      @OA\Response(
      *          response=200,
      *          description="Successful operation",
      *          @OA\JsonContent(
+     *              @OA\Property(property="period", type="object", description="Only for last_12_months: the first and last days covered.",
+     *                  @OA\Property(property="start", type="string", example="2025-10-01"),
+     *                  @OA\Property(property="end", type="string", example="2026-09-30")
+     *              ),
      *              @OA\Property(property="co2_total", type="number", example=17631.6),
      *              @OA\Property(property="co2_powered", type="number", example=17475.97),
      *              @OA\Property(property="co2_unpowered", type="number", example=155.64),
@@ -550,16 +565,24 @@ class NetworkController extends Controller
      */
     #[UserStory('As a Guest, I can view a network\'s impact statistics via the API, optionally for one group tag', persona: 'Guest', theme: 'Network stats')]
     #[UserStory('As a ThirdParty, I can retrieve a network\'s impact statistics to display on my platform', persona: 'ThirdParty', theme: 'Network stats')]
+    #[UserStory('As a Host, I can see my network\'s impact over the last 12 completed months as well as all time', persona: 'Host', theme: 'Network stats')]
     public function getNetworkStatsv2(Request $request, $id): JsonResponse
     {
         $network = Network::findOrFail($id);
 
-        if ($request->has('group_tag')) {
-            $tagId = $request->get('group_tag');
-            return response()->json($this->statsForTag($network, $tagId));
+        $request->validate(['period' => 'nullable|in:' . StatsPeriod::ALL . ',' . StatsPeriod::LAST_12_MONTHS]);
+
+        [$from, $to] = StatsPeriod::window($request->get('period'));
+
+        $stats = $request->has('group_tag')
+            ? $this->statsForTag($network, $request->get('group_tag'), $from, $to)
+            : $network->stats($from, $to);
+
+        if ($from) {
+            $stats['period'] = StatsPeriod::describe($from, $to);
         }
 
-        return response()->json($network->stats());
+        return response()->json($stats);
     }
 
     /**

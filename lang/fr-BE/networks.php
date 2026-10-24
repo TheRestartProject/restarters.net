@@ -23,6 +23,10 @@ return [
     'impact' => 'Impact',
   ],
   'stats' => [
+    'all_time' => 'Depuis le début',
+    'last_12_months' => '12 derniers mois',
+    'period_toggle' => 'Période',
+    'period_range' => 'De :start à :end',
     'groups' => '{1} Repair Café|[0,*] Repair Cafés',
     'events' => '{1} Événement|[0,*] Événements',
     'waste_diverted' => 'Déchets évités',
@@ -64,5 +68,10 @@ return [
     'add_groups_success' => '{1} :number repair café ajouté.|[2,*] :number repair cafés ajoutés.',
     'add_groups_warning_none_selected' => 'Pas de repair café(s) sélectionné(s)',
     'none' => 'Aucun',
+  ],
+  'nearby' => [
+    'title' => 'Repair cafés près de chez vous',
+    'intro' => 'Les repair cafés de ce réseau les plus proches de :group.',
+    'distance' => ':distance km',
   ],
 ];

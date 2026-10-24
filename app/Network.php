@@ -101,7 +101,34 @@ class Network extends Model
         return $query->get();
     }
 
-    public function stats()
+    /**
+     * The approved, active groups in this network nearest to $from (not including it), with their distance in km.
+     */
+    public function nearestGroups(Group $from, int $count = 5)
+    {
+        if (is_null($from->latitude) || is_null($from->longitude)) {
+            return collect();
+        }
+
+        return $this->groups()
+            ->select('groups.idgroups', 'groups.name', 'groups.location', 'groups.latitude', 'groups.longitude')
+            ->selectRaw(
+                '( 6371 * acos( cos( radians(?) ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians(?) ) + sin( radians(?) ) * sin( radians( latitude ) ) ) ) AS dist',
+                [$from->latitude, $from->longitude, $from->latitude]
+            )
+            ->where('groups.idgroups', '!=', $from->idgroups)
+            ->where('groups.approved', true)
+            ->whereNull('groups.archived_at')
+            ->whereNotNull('groups.latitude')
+            ->whereNotNull('groups.longitude')
+            ->orderBy('dist')
+            ->take($count)
+            ->get();
+    }
+
+    // $from and $to (UTC, $to exclusive) limit the impact figures to events in that window.  The group tally is
+    // always the current one.
+    public function stats(?\Carbon\Carbon $from = null, ?\Carbon\Carbon $to = null)
     {
         $eEmissionRatio = \App\Helpers\LcaStats::getEmissionRatioPowered();
         $uEmissionratio = \App\Helpers\LcaStats::getEmissionRatioUnpowered();
@@ -110,7 +137,7 @@ class Network extends Model
         $groups = $this->groups()->withoutGlobalScopes()->without(['networks', 'group_tags'])
             ->get(['groups.idgroups', 'groups.archived_at']);
 
-        $allStats = \App\Group::bulkGroupStats($groups, $eEmissionRatio, $uEmissionratio);
+        $allStats = \App\Group::bulkGroupStats($groups, $eEmissionRatio, $uEmissionratio, $from, $to);
 
         $stats = \App\Group::getGroupStatsArrayKeys();
 

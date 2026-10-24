@@ -11,23 +11,27 @@
         </a>
       </div>
       <div class="network-actions" v-if="isLoggedIn">
-        <b-dropdown right variant="primary" :text="__('networks.general.actions')">
+        <b-dropdown v-if="canAssociateGroups || canModerate" right variant="primary" :text="__('networks.general.actions')">
           <b-dropdown-item v-if="canAssociateGroups" @click="showAddGroupModal">{{ __('networks.show.add_groups_menuitem') }}</b-dropdown-item>
           <b-dropdown-item v-if="network.reporting_url" :href="network.reporting_url" target="_blank" rel="noopener" link-class="network-reporting-link">{{ __('networks.general.view_reports') }}</b-dropdown-item>
-          <b-dropdown-item :href="'/export/networks/' + network.id + '/events'">{{ __('groups.export_event_list') }}</b-dropdown-item>
+          <b-dropdown-item v-if="canModerate" :href="'/export/networks/' + network.id + '/events'">{{ __('groups.export_event_list') }}</b-dropdown-item>
         </b-dropdown>
       </div>
     </div>
 
     <!-- Impact Stats -->
     <div class="network-stats mb-4">
-      <h2>{{ __('networks.general.impact') }}</h2>
+      <div class="d-flex flex-wrap align-items-center justify-content-between">
+        <h2>{{ __('networks.general.impact') }}</h2>
+        <PeriodToggle class="mb-2" :value="period" @input="setPeriod" />
+      </div>
+      <p v-if="periodLabel" class="stats-period text-muted small">{{ periodLabel }}</p>
       <div class="stats-grid">
         <div class="stat-box">
           <div class="stat-value">{{ statsLoaded ? (stats.groups || 0) : statsPlaceholder }}</div>
           <div class="stat-label">{{ __('networks.stats.groups', { count: stats.groups || 0 }) }}</div>
         </div>
-        <div class="stat-box">
+        <div class="stat-box stat-events">
           <div class="stat-value">{{ statsLoaded ? (stats.parties || 0) : statsPlaceholder }}</div>
           <div class="stat-label">{{ __('networks.stats.events', { count: stats.parties || 0 }) }}</div>
         </div>
@@ -67,15 +71,30 @@
       </div>
     </section>
 
+    <!-- The groups nearest to the viewer's own group -->
+    <section class="mb-4 nearby-groups" v-if="nearbyGroups && nearbyGroups.groups.length">
+      <h2>{{ __('networks.nearby.title') }}</h2>
+      <p class="text-muted">{{ __('networks.nearby.intro', { group: nearbyGroups.from }) }}</p>
+      <ul class="list-unstyled mb-0">
+        <li v-for="g in nearbyGroups.groups" :key="g.id" class="nearby-group d-flex justify-content-between py-1 border-bottom">
+          <span>
+            <a :href="'/group/view/' + g.id">{{ g.name }}</a>
+            <span v-if="g.location" class="text-muted small ml-1">{{ g.location }}</span>
+          </span>
+          <span class="text-muted small">{{ __('networks.nearby.distance', { distance: g.distance }) }}</span>
+        </li>
+      </ul>
+    </section>
+
     <!-- Groups requiring moderation (full width) -->
-    <section class="mb-4">
+    <section class="mb-4" v-if="canModerate">
       <h2>{{ __('groups.groups_title_admin') }}</h2>
       <GroupsRequiringModeration :networks="[network.id]" ref="groupsModeration" />
       <div v-if="groupsModerationEmpty" class="text-muted">{{ __('networks.show.none') }}</div>
     </section>
 
     <!-- Events requiring moderation (full width) -->
-    <section class="mb-4">
+    <section class="mb-4" v-if="canModerate">
       <h2>{{ __('events.events_title_admin') }}</h2>
       <EventsRequiringModeration :networks="[network.id]" ref="eventsModeration" />
       <div v-if="eventsModerationEmpty" class="text-muted">{{ __('networks.show.none') }}</div>
@@ -179,13 +198,15 @@
 
 <script>
 import axios from 'axios'
+import moment from 'moment-timezone'
+import PeriodToggle from './PeriodToggle.vue'
 import GroupsRequiringModeration from './GroupsRequiringModeration.vue'
 import EventsRequiringModeration from './EventsRequiringModeration.vue'
 import GroupMapAndList from './GroupMapAndList.vue'
 import images from '../mixins/images'
 
 export default {
-  components: { GroupsRequiringModeration, EventsRequiringModeration, GroupMapAndList },
+  components: { PeriodToggle, GroupsRequiringModeration, EventsRequiringModeration, GroupMapAndList },
   mixins: [images],
   props: {
     network: {
@@ -207,6 +228,17 @@ export default {
       required: false,
       default: false
     },
+    canModerate: {
+      type: Boolean,
+      required: false,
+      default: false
+    },
+    // { from: name of the viewer's group, groups: [{ id, name, location, distance (km) }] }, or null.
+    nearbyGroups: {
+      type: Object,
+      required: false,
+      default: null
+    },
     canAssociateGroups: {
       type: Boolean,
       required: false,
@@ -227,6 +259,9 @@ export default {
     return {
       stats: this.initialStats,
       statsFailed: false,
+      period: 'all',
+      // Stats already fetched, by period, so switching back doesn't refetch.
+      statsByPeriod: {},
       tags: this.initialTags,
       newTagName: '',
       newTagDescription: '',
@@ -244,6 +279,17 @@ export default {
   computed: {
     statsLoaded() {
       return !!this.stats && Object.keys(this.stats).length > 0
+    },
+    periodLabel() {
+      const p = this.period !== 'all' && this.stats && this.stats.period
+
+      if (!p) {
+        return null
+      }
+
+      const fmt = d => moment(d).format('MMM YYYY')
+
+      return this.__('networks.stats.period_range', { start: fmt(p.start), end: fmt(p.end) })
     },
     statsPlaceholder() {
       // Loading, or a dash if the stats request failed rather than an ellipsis forever.
@@ -286,6 +332,36 @@ export default {
     }
   },
   methods: {
+    async setPeriod(period) {
+      this.period = period
+
+      if (this.statsByPeriod[period]) {
+        this.stats = this.statsByPeriod[period]
+        return
+      }
+
+      await this.loadStats()
+    },
+    async loadStats() {
+      const period = this.period
+      this.stats = {}
+      this.statsFailed = false
+
+      try {
+        // The public v2 endpoint, so organisers who aren't coordinators can see the figures too.
+        const response = await axios.get(`/api/v2/networks/${this.network.id}/stats`, {
+          params: period === 'all' ? {} : { period }
+        })
+        this.statsByPeriod[period] = response.data
+
+        if (this.period === period) {
+          this.stats = response.data
+        }
+      } catch (error) {
+        console.error('Failed to fetch network stats:', error)
+        this.statsFailed = true
+      }
+    },
     formatWeight(value) {
       if (!value) return '0 kg'
       if (value >= 1000) {
@@ -373,13 +449,9 @@ export default {
   async mounted() {
     // Fetch stats if not provided
     if (!this.initialStats || Object.keys(this.initialStats).length === 0) {
-      try {
-        const response = await axios.get(`/api/networks/${this.network.id}/stats/?api_token=${this.apiToken}`)
-        this.stats = response.data
-      } catch (error) {
-        console.error('Failed to fetch network stats:', error)
-        this.statsFailed = true
-      }
+      await this.loadStats()
+    } else {
+      this.statsByPeriod.all = this.initialStats
     }
 
     // Fetch tags if not provided and user can manage tags

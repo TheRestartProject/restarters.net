@@ -87,6 +87,8 @@ class CalendarEventsController extends Controller
                 $query->where('group_network.network_id', $network->id)
                     ->whereNull('events.deleted_at');
             })
+            ->where('events.approved', true)
+            ->where('groups.approved', true)
             ->select('events.*', 'groups.name')
             ->groupBy('events.idevents')
             ->orderBy('events.event_start_utc', 'ASC')

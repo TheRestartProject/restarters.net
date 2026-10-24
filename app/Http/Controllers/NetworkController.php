@@ -49,6 +49,55 @@ class NetworkController extends Controller
     }
 
     /**
+     * The groups in the network nearest to any of the user's own located groups in it, nearest first, with each
+     * group listed once at its smallest distance.  The user's own groups are left out.  Null if they have no
+     * located group in the network.
+     */
+    private function nearbyGroups(Network $network, $user): ?array
+    {
+        $mine = Group::join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
+            ->join('group_network', 'group_network.group_id', '=', 'groups.idgroups')
+            ->where('group_network.network_id', $network->id)
+            ->where('users_groups.user', $user->id)
+            ->whereNull('users_groups.deleted_at')
+            ->whereNotNull('groups.latitude')
+            ->whereNotNull('groups.longitude')
+            ->orderBy('groups.name')
+            ->select('groups.*')
+            ->get();
+
+        if ($mine->isEmpty()) {
+            return null;
+        }
+
+        $mineIds = $mine->pluck('idgroups')->all();
+        $nearest = [];
+
+        foreach ($mine as $group) {
+            // Ask for extra so that skipping the user's other groups still leaves enough.
+            foreach ($network->nearestGroups($group, 5 + count($mineIds)) as $g) {
+                if (in_array($g->idgroups, $mineIds)) {
+                    continue;
+                }
+
+                if (! isset($nearest[$g->idgroups]) || $g->dist < $nearest[$g->idgroups]->dist) {
+                    $nearest[$g->idgroups] = $g;
+                }
+            }
+        }
+
+        return [
+            'from' => $mine->pluck('name')->implode(', '),
+            'groups' => collect($nearest)->sortBy('dist')->take(5)->map(fn ($g) => [
+                'id' => $g->idgroups,
+                'name' => $g->name,
+                'location' => $g->location,
+                'distance' => round($g->dist, 1),
+            ])->values()->all(),
+        ];
+    }
+
+    /**
      * Display the specified network.
      */
     #[UserStory('As a NetworkCoordinator, I can view my network\'s details and statistics', persona: 'NetworkCoordinator', theme: 'Browse networks')]
@@ -56,7 +105,11 @@ class NetworkController extends Controller
     {
         $user = Auth::user();
 
-        $this->authorize('view', $network);
+        // Coordinators and admins get the full page; volunteers and hosts of groups in the network get it without the
+        // coordinator-only parts.
+        $this->authorize('viewPublic', $network);
+
+        $canModerate = $user->can('view', $network);
 
         $groupsForAssociating = [];
 
@@ -93,8 +146,9 @@ class NetworkController extends Controller
             'name' => $network->name,
             'description' => $network->description,
             'website' => $network->website,
-            'reporting_url' => $network->reporting_url,
+            'reporting_url' => $canModerate ? $network->reporting_url : null,
             'logo' => $network->sizedLogo('_x100'),
+            // Organisers can see who their coordinators are, so they know who to contact.
             'coordinators' => $network->coordinators->map(function ($c) {
                 $profile = $c->getProfile($c->id);
                 $path = $profile ? $profile->path : null;
@@ -107,6 +161,8 @@ class NetworkController extends Controller
         ];
 
         return view('networks.show', [
+            'canModerate' => $canModerate,
+            'nearbyGroups' => $this->nearbyGroups($network, $user),
             'network' => $network,
             'networkData' => $networkData,
             'groupsForAssociating' => $groupsForAssociating,
