@@ -22,7 +22,7 @@
       </div>
     </div>
 
-    <div v-if="statsLayout !== 'after'" class="vue w-100 mt-md-50 stats-before-events">
+    <div v-if="statsLayout !== 'after'" class="vue w-100 mt-md-50 mb-4 stats-before-events">
       <GroupStats
           :idgroups="idgroups"
           :stats="groupStats"
@@ -34,7 +34,7 @@
       />
     </div>
 
-    <hr style="color: white; border-top: 1px solid black;" />
+    <hr class="my-4" style="color: white; border-top: 1px solid black;" />
     <GroupEvents
         heading-level="h2"
         heading-sub-level="h3"
@@ -74,7 +74,7 @@ import auth from '../mixins/auth'
 // - split: achievements and impact before the events, items worked on and most repaired after
 // ?stats_layout= on the page address picks one, so they can be compared.
 const STATS_LAYOUTS = ['compact', 'after', 'split']
-const DEFAULT_STATS_LAYOUT = 'compact'
+const DEFAULT_STATS_LAYOUT = 'after'
 
 export default {
   components: {

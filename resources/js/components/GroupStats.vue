@@ -2,7 +2,7 @@
   <div>
     <div :class="['stats', 'stats-' + arrangement]">
       <GroupStatsFacts v-if="showHeadline" :stats="stats" class="statsborder stats-facts" />
-      <StatsImpact v-if="showHeadline" :stats="stats" statsEntity="group" :show-not-included="!compact" class="statsborder stats-impact" />
+      <StatsImpact v-if="showHeadline" :stats="stats" statsEntity="group" :show-not-included="false" :aside-co2="true" class="statsborder stats-impact" />
       <GroupDevicesWorkedOn v-if="showItems" :idgroups="idgroups" :stats="deviceStats" class="statsborder stats-worked-on" />
       <GroupDevicesMostRepaired v-if="showItems" :idgroups="idgroups" :devices="topDevices" class="statsborder stats-most-repaired" />
     </div>
@@ -100,7 +100,7 @@ export default {
   }
 
   .stats-compact {
-    grid-template-areas: "facts worked-on" "impact most-repaired";
+    grid-template-areas: "facts impact" "worked-on most-repaired";
   }
 
   .stats-single {

@@ -30,7 +30,7 @@
             :description="equivalent_consumer(Math.round(stats.co2_total))"
             unit="kg"
             class="impact-co2"
-            :popover="popover_consumer(Math.round(stats.co2_total))"
+            :aside="asideCo2"
             share
             @share="share"
       />
@@ -63,6 +63,12 @@ export default {
       type: Boolean,
       required: false,
       default: true
+    },
+    asideCo2: {
+      // Show the CO2e stat with its description alongside it, rather than below it.
+      type: Boolean,
+      required: false,
+      default: false
     }
   },
   computed: {

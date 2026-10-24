@@ -5,6 +5,7 @@ Vue.use(BootstrapVue)
 import { mount, createLocalVue } from '@vue/test-utils'
 import LangMixin from 'resources/js/mixins/lang.js'
 import FixometerFilters from './FixometerFilters.vue'
+import { today } from '../today'
 
 // These pull in a typeahead that Jest can't load; the filters only need to place them.
 jest.mock('./DeviceBrand.vue', () => ({ name: 'DeviceBrand', template: '<div class="brand-stub" />' }))
@@ -69,4 +70,22 @@ test('the item filter asks what it is, and the filters have no info icons', () =
   expect(wrapper.find('.item-filter input').attributes('placeholder')).toBe('devices.item_type')
   expect(wrapper.find('img.icon.clickable').exists()).toBe(false)
   expect(wrapper.findComponent({ name: 'DeviceCategorySelect' }).props('iconVariant')).toBe('none')
+})
+
+test('clear filters in each section only clears that section', async () => {
+  const wrapper = makeWrapper({ startExpandedEvents: true, category: 5, brand: 'Acme', group: 'Alpha', from_date: '2024-01-01', to_date: '2024-02-01' })
+  await wrapper.vm.$nextTick()
+
+  await wrapper.find('.clear-item-filters').trigger('click')
+  expect(wrapper.emitted('update:category').pop()).toEqual([null])
+  expect(wrapper.emitted('update:brand').pop()).toEqual([null])
+  expect(wrapper.emitted('update:status').pop()).toEqual([null])
+  expect(wrapper.emitted('update:comments').pop()).toEqual([null])
+  expect(wrapper.emitted('update:group').pop()).toEqual(['Alpha'])
+
+  await wrapper.find('.clear-event-filters').trigger('click')
+  await wrapper.vm.$nextTick()
+  expect(wrapper.emitted('update:group').pop()).toEqual([null])
+  expect(wrapper.emitted('update:from_date').pop()).toEqual([null])
+  expect(wrapper.emitted('update:to_date').pop()).toEqual([today()])
 })
