@@ -983,6 +983,7 @@ class APIv2NetworkTest extends TestCase
         $other->addCoordinator($otherCoordinator);
         User::factory()->administrator()->create(['api_token' => 'admin-token']);
         User::factory()->host()->create(['api_token' => 'host-token']);
+        User::factory()->restarter()->create(['api_token' => 'volunteer-token']);
 
         $url = "/api/v2/networks/{$network->id}/events?include_unapproved=1&start=" .
             urlencode('2038-02-01T00:00:00Z') . self::END_PARAM . urlencode('2038-02-02T00:00:00Z');
@@ -999,6 +1000,7 @@ class APIv2NetworkTest extends TestCase
         // The parameter is ignored for anyone who isn't a coordinator of this network or an admin.
         $this->assertEquals([$approved->idgroups], $ids(null));
         $this->assertEquals([$approved->idgroups], $ids('host-token'));
+        $this->assertEquals([$approved->idgroups], $ids('volunteer-token'));
         $this->assertEquals([$approved->idgroups], $ids('other-coord-token'));
 
         $all = collect([$approved, $unapproved, $archived])->pluck('idgroups')->sort()->values()->all();
