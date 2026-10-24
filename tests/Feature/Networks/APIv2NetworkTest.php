@@ -15,6 +15,8 @@ use Tests\TestCase;
 
 class APIv2NetworkTest extends TestCase
 {
+    private const END_PARAM = '&end=';
+
     /** @story:NetworkController::getNetworksv2 */
     public function testList(): void {
         $user = User::factory()->administrator()->create([
@@ -905,5 +907,112 @@ class APIv2NetworkTest extends TestCase
 
         // Should return empty array
         $this->assertEmpty($json);
+    }
+
+    public function testNetworkEventsOverlapArchivedAndCancelled(): void {
+        $network = Network::factory()->create();
+        $group = Group::factory()->create(['approved' => true]);
+        $archived = Group::factory()->create(['approved' => true, 'archived_at' => '2020-01-01']);
+        $network->addGroup($group);
+        $network->addGroup($archived);
+
+        // Event spanning midnight between 1st and 2nd Jan 2038.
+        $spanning = Party::factory()->moderated()->create([
+            'group' => $group->idgroups,
+            'event_start_utc' => '2038-01-01T23:00:00Z',
+            'event_end_utc' => '2038-01-02T02:00:00Z',
+        ]);
+        $cancelled = Party::factory()->moderated()->create([
+            'group' => $group->idgroups,
+            'event_start_utc' => '2038-01-05T10:00:00Z',
+            'event_end_utc' => '2038-01-05T12:00:00Z',
+        ]);
+        DB::table('events')->where('idevents', $cancelled->idevents)->update(['cancelled' => 1]);
+        Party::factory()->moderated()->create([
+            'group' => $archived->idgroups,
+            'event_start_utc' => '2038-01-02T10:00:00Z',
+            'event_end_utc' => '2038-01-02T12:00:00Z',
+        ]);
+
+        // A window which only touches the end of the spanning event returns it (overlap, not containment).
+        $response = $this->get("/api/v2/networks/{$network->id}/events?start=" . urlencode('2038-01-02T00:00:00Z') .
+            self::END_PARAM . urlencode('2038-01-03T00:00:00Z'));
+        $response->assertSuccessful();
+        $json = json_decode($response->getContent(), true)['data'];
+        $this->assertCount(1, $json, 'Archived group event must be excluded');
+        $this->assertEquals($spanning->idevents, $json[0]['id']);
+        $this->assertFalse($json[0]['cancelled']);
+
+        // Window after the spanning event does not return it.
+        $response = $this->get("/api/v2/networks/{$network->id}/events?start=" . urlencode('2038-01-03T00:00:00Z') .
+            self::END_PARAM . urlencode('2038-01-04T00:00:00Z'));
+        $this->assertCount(0, json_decode($response->getContent(), true)['data']);
+
+        // Cancelled events are returned, flagged.
+        $response = $this->get("/api/v2/networks/{$network->id}/events?start=" . urlencode('2038-01-05T00:00:00Z') .
+            self::END_PARAM . urlencode('2038-01-06T00:00:00Z'));
+        $json = json_decode($response->getContent(), true)['data'];
+        $this->assertCount(1, $json);
+        $this->assertTrue($json[0]['cancelled']);
+    }
+
+    /**
+     * Coordinators can also see events from unapproved and archived groups in their network.  Nobody else can.
+     *
+     * @story:NetworkController::getNetworkEventsv2
+     */
+    public function testNetworkEventsIncludeUnapprovedForCoordinators(): void {
+        $network = Network::factory()->create();
+        $other = Network::factory()->create();
+        $approved = Group::factory()->create(['approved' => true]);
+        $unapproved = Group::factory()->create(['approved' => false]);
+        $archived = Group::factory()->create(['approved' => true, 'archived_at' => '2020-01-01']);
+
+        foreach ([$approved, $unapproved, $archived] as $g) {
+            $network->addGroup($g);
+            Party::factory()->moderated()->create([
+                'group' => $g->idgroups,
+                'event_start_utc' => '2038-02-01T10:00:00Z',
+                'event_end_utc' => '2038-02-01T12:00:00Z',
+            ]);
+        }
+
+        $coordinator = User::factory()->networkCoordinator()->create(['api_token' => 'coord-token']);
+        $network->addCoordinator($coordinator);
+        $otherCoordinator = User::factory()->networkCoordinator()->create(['api_token' => 'other-coord-token']);
+        $other->addCoordinator($otherCoordinator);
+        User::factory()->administrator()->create(['api_token' => 'admin-token']);
+        User::factory()->host()->create(['api_token' => 'host-token']);
+        User::factory()->restarter()->create(['api_token' => 'volunteer-token']);
+
+        $url = "/api/v2/networks/{$network->id}/events?include_unapproved=1&start=" .
+            urlencode('2038-02-01T00:00:00Z') . self::END_PARAM . urlencode('2038-02-02T00:00:00Z');
+
+        $ids = function ($token) use ($url) {
+            // The token guard caches its user for the life of the app, which spans requests in a test.
+            $this->app['auth']->forgetGuards();
+            $response = $this->get($url . ($token ? '&api_token=' . $token : ''));
+            $response->assertSuccessful();
+
+            return collect(json_decode($response->getContent(), true)['data'])->pluck('group.id')->sort()->values()->all();
+        };
+
+        // The parameter is ignored for anyone who isn't a coordinator of this network or an admin.
+        $this->assertEquals([$approved->idgroups], $ids(null));
+        $this->assertEquals([$approved->idgroups], $ids('host-token'));
+        $this->assertEquals([$approved->idgroups], $ids('volunteer-token'));
+        $this->assertEquals([$approved->idgroups], $ids('other-coord-token'));
+
+        $all = collect([$approved, $unapproved, $archived])->pluck('idgroups')->sort()->values()->all();
+        $this->assertEquals($all, $ids('coord-token'));
+        $this->assertEquals($all, $ids('admin-token'));
+
+        // The group's approval and archive state come back so the page can badge them.
+        $this->app['auth']->forgetGuards();
+        $response = $this->get($url . '&api_token=coord-token');
+        $byGroup = collect(json_decode($response->getContent(), true)['data'])->keyBy('group.id');
+        $this->assertTrue($byGroup[$approved->idgroups]['group']['approved']);
+        $this->assertFalse($byGroup[$unapproved->idgroups]['group']['approved']);
+        $this->assertNotNull($byGroup[$archived->idgroups]['group']['archived_at']);
     }
 }

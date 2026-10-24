@@ -81,6 +81,17 @@
       <div v-if="eventsModerationEmpty" class="text-muted">{{ __('networks.show.none') }}</div>
     </section>
 
+    <!-- Upcoming events: list/calendar toggle (RESDISCO-248 prototype) -->
+    <section class="mb-4 network-events-section">
+      <h2>{{ __('networks.events.title') }}</h2>
+      <NetworkEvents
+          :network-id="network.id"
+          :calendar-copy-url="calendarCopyUrl"
+          :calendar-edit-url="calendarEditUrl"
+          :api-token="apiToken"
+      />
+    </section>
+
     <!-- Groups: map + list of the groups in this network, starting zoomed out
          so every group in the network is in view. -->
     <section class="groups-section mb-4">
@@ -182,15 +193,26 @@ import axios from 'axios'
 import GroupsRequiringModeration from './GroupsRequiringModeration.vue'
 import EventsRequiringModeration from './EventsRequiringModeration.vue'
 import GroupMapAndList from './GroupMapAndList.vue'
+import NetworkEvents from './NetworkEvents.vue'
 import images from '../mixins/images'
 
 export default {
-  components: { GroupsRequiringModeration, EventsRequiringModeration, GroupMapAndList },
+  components: { GroupsRequiringModeration, EventsRequiringModeration, GroupMapAndList, NetworkEvents },
   mixins: [images],
   props: {
     network: {
       type: Object,
       required: true
+    },
+    calendarCopyUrl: {
+      type: String,
+      required: false,
+      default: ''
+    },
+    calendarEditUrl: {
+      type: String,
+      required: false,
+      default: ''
     },
     initialStats: {
       type: Object,

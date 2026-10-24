@@ -399,9 +399,16 @@ class NetworkController extends Controller
 
     #[UserStory('As a Guest, I can list events for a network via the API', persona: 'Guest', theme: 'Network groups & events')]
     #[UserStory('As a ThirdParty, I can retrieve events for a network to display on my platform', persona: 'ThirdParty', theme: 'Network groups & events')]
+    #[UserStory('As a NetworkCoordinator, I can also see events from unapproved and archived groups in my network', persona: 'NetworkCoordinator', theme: 'Network groups & events')]
     public function getNetworkEventsv2(Request $request, $id)
     {
-        Network::findOrFail($id);
+        $network = Network::findOrFail($id);
+
+        // Coordinators of this network (and admins) can ask for events on unapproved and archived groups too, so
+        // that they can spot a group waiting for approval which already has events, or look back at a closed one.
+        $user = auth('api')->user();
+        $includeUnapproved = $request->boolean('include_unapproved') && $user &&
+            ($user->hasRole('Administrator') || $user->isCoordinatorOf($network));
 
         // Get date filters.  We default to far past and far future so that we don't need multiple code branches.  We
         // don't need to validate the date format - if they put junk in then they'll get junk matches back.
@@ -415,12 +422,15 @@ class NetworkController extends Controller
         $query = Party::join('groups', 'groups.idgroups', '=', 'events.group')
             ->join('group_network', 'group_network.group_id', '=', 'groups.idgroups')
             ->where('group_network.network_id', $id)
-            ->where('event_start_utc', '>=', $start)
-            ->where('event_end_utc', '<=', $end)
+            ->where('event_start_utc', '<=', $end)
+            ->where('event_end_utc', '>=', $start)
             ->where('events.updated_at', '>=', $updated_start)
             ->where('events.updated_at', '<=', $updated_end)
-            ->where('events.approved', true)
-            ->where('groups.approved', true);
+            ->where('events.approved', true);
+
+        if (!$includeUnapproved) {
+            $query = $query->where('groups.approved', true)->whereNull('groups.archived_at');
+        }
 
         // Filter by group tag if specified
         if ($request->has('group_tag')) {
