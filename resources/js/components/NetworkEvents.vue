@@ -7,18 +7,18 @@
           class="subscribe-btn mr-2"
           @click="$refs.calendar.show()"
       >{{ __('networks.events.subscribe') }}</b-button>
-      <b-button-group :aria-label="__('networks.events.view_toggle')">
+      <b-button-group :aria-label="__('networks.events.view_toggle')" class="view-toggle">
         <b-button
             class="view-list"
             size="sm"
-            :variant="view === 'list' ? 'primary' : 'outline-primary'"
+            variant="primary"
             :pressed="view === 'list'"
             @click="setView('list')"
         >{{ __('networks.events.list') }}</b-button>
         <b-button
             class="view-calendar"
             size="sm"
-            :variant="view === 'calendar' ? 'primary' : 'outline-primary'"
+            variant="primary"
             :pressed="view === 'calendar'"
             @click="setView('calendar')"
         >{{ __('networks.events.calendar') }}</b-button>
@@ -54,12 +54,11 @@
 
     <b-alert v-if="failed" show variant="danger">{{ __('networks.events.error') }}</b-alert>
     <div v-else-if="loading && !loaded" class="text-muted">{{ __('networks.events.loading') }}</div>
-    <NetworkEventsList v-else-if="view === 'list'" :events="visibleEvents" :clash-days="clashes" />
+    <NetworkEventsList v-else-if="view === 'list'" :events="visibleEvents" />
     <NetworkEventsCalendar
         v-else
         :events="visibleEvents"
         :month="month"
-        :clash-days="clashes"
         @prev="shift(-1)"
         @next="shift(1)"
     />
@@ -76,7 +75,7 @@ import moment from 'moment-timezone'
 import CalendarAddModal from './CalendarAddModal.vue'
 import NetworkEventsList from './NetworkEventsList.vue'
 import NetworkEventsCalendar from './NetworkEventsCalendar.vue'
-import { bucketByDay, clashDays, shiftMonth } from './networkEventsUtil'
+import { shiftMonth } from './networkEventsUtil'
 
 const VIEW_KEY = 'networkEventsView'
 
@@ -103,6 +102,13 @@ export default {
       default: ''
     },
     calendarEditUrl: {
+      type: String,
+      required: false,
+      default: ''
+    },
+    // Lets the server see whether we coordinate this network, in which case it also returns events on unapproved
+    // and archived groups.
+    apiToken: {
       type: String,
       required: false,
       default: ''
@@ -176,9 +182,6 @@ export default {
         .filter(e => this.view === 'calendar' || this.includePast || moment(e.end).isSameOrAfter(now))
         .sort((a, b) => new Date(a.start) - new Date(b.start))
     },
-    clashes() {
-      return clashDays(bucketByDay(this.visibleEvents))
-    },
     filtersActive() {
       return this.groupIds.length > 0 || this.range !== '30' || this.includePast
     },
@@ -225,7 +228,9 @@ export default {
         const response = await axios.get(`/api/v2/networks/${this.networkId}/events`, {
           params: {
             start: this.timeWindow.start.toISOString(),
-            end: this.timeWindow.end.toISOString()
+            end: this.timeWindow.end.toISOString(),
+            include_unapproved: 1,
+            ...(this.apiToken ? { api_token: this.apiToken } : {})
           }
         })
 
@@ -256,6 +261,17 @@ export default {
 }
 </script>
 <style scoped lang="scss">
+// Same look as the target toggle in StatsShareModal: the theme's .btn-primary.active is white on white.
+::v-deep .view-toggle .btn {
+  color: black !important;
+  background-color: white !important;
+
+  &.active {
+    color: white !important;
+    background-color: black !important;
+  }
+}
+
 .range-select {
   width: auto;
 }

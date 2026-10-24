@@ -23,7 +23,7 @@
               v-for="d in week"
               :key="d.date"
               class="day-cell"
-              :class="{ 'out-of-month': !d.inMonth, clash: clashDays[d.date], today: d.date === today }"
+              :class="{ 'out-of-month': !d.inMonth, today: d.date === today }"
               :aria-label="cellLabel(d)"
           >
             <div class="day-number small">{{ d.day }}</div>
@@ -33,18 +33,13 @@
                   :key="e.id"
                   :href="'/party/view/' + e.id"
                   class="chip d-none d-md-block"
-                  :class="{ cancelled: e.cancelled, online: e.online }"
-                  :title="e.title"
+                  :class="{ cancelled: e.cancelled, online: e.online, unapproved: e.group.approved === false, archived: !!e.group.archived_at }"
+                  :title="chipTitle(e)"
               >{{ time(e) }} {{ e.group.name }}</a>
               <span
                   v-if="buckets[d.date]"
                   class="count-dot d-md-none badge badge-pill badge-primary"
               >{{ buckets[d.date].length }}</span>
-              <span
-                  v-if="clashDays[d.date]"
-                  class="badge badge-warning clash-badge d-none d-md-inline-block"
-                  :title="__('networks.events.clash_title')"
-              >{{ __('networks.events.clash', { count: clashDays[d.date] }) }}</span>
             </template>
           </td>
         </tr>
@@ -66,11 +61,6 @@ export default {
     month: {
       type: String,
       required: true
-    },
-    clashDays: {
-      type: Object,
-      required: false,
-      default: () => ({})
     }
   },
   computed: {
@@ -93,6 +83,22 @@ export default {
     }
   },
   methods: {
+    // The chip only has room for the time and group, so say the rest on hover.
+    chipTitle(e) {
+      const notes = []
+
+      if (e.cancelled) {
+        notes.push(this.__('networks.events.cancelled'))
+      }
+      if (e.group.approved === false) {
+        notes.push(this.__('networks.events.group_unapproved'))
+      }
+      if (e.group.archived_at) {
+        notes.push(this.__('networks.events.group_archived'))
+      }
+
+      return notes.length ? e.title + ' (' + notes.join(', ') + ')' : e.title
+    },
     time(e) {
       return moment.tz(e.start, e.timezone || 'UTC').format('HH:mm')
     },
@@ -128,10 +134,6 @@ export default {
     font-weight: bold;
     color: $brand;
   }
-
-  &.clash {
-    background: lighten($brand-orange, 28%);
-  }
 }
 
 .chip {
@@ -146,6 +148,8 @@ export default {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  // The site underlines links in tables; a chip is a block, so it doesn't need it.
+  text-decoration: none !important;
 
   &:hover {
     text-decoration: none;
@@ -157,13 +161,15 @@ export default {
   }
 
   &.cancelled {
-    opacity: 0.5;
-    text-decoration: line-through;
+    text-decoration: line-through !important;
   }
-}
 
-.clash-badge {
-  font-size: 0.7rem;
+  &.unapproved,
+  &.archived {
+    background: $white;
+    color: $black;
+    border: 1px dashed $black;
+  }
 }
 
 @media (max-width: 767px) {

@@ -955,4 +955,62 @@ class APIv2NetworkTest extends TestCase
         $this->assertCount(1, $json);
         $this->assertTrue($json[0]['cancelled']);
     }
+
+    /**
+     * Coordinators can also see events from unapproved and archived groups in their network.  Nobody else can.
+     *
+     * @story:NetworkController::getNetworkEventsv2
+     */
+    public function testNetworkEventsIncludeUnapprovedForCoordinators(): void {
+        $network = Network::factory()->create();
+        $other = Network::factory()->create();
+        $approved = Group::factory()->create(['approved' => true]);
+        $unapproved = Group::factory()->create(['approved' => false]);
+        $archived = Group::factory()->create(['approved' => true, 'archived_at' => '2020-01-01']);
+
+        foreach ([$approved, $unapproved, $archived] as $g) {
+            $network->addGroup($g);
+            Party::factory()->moderated()->create([
+                'group' => $g->idgroups,
+                'event_start_utc' => '2038-02-01T10:00:00Z',
+                'event_end_utc' => '2038-02-01T12:00:00Z',
+            ]);
+        }
+
+        $coordinator = User::factory()->networkCoordinator()->create(['api_token' => 'coord-token']);
+        $network->addCoordinator($coordinator);
+        $otherCoordinator = User::factory()->networkCoordinator()->create(['api_token' => 'other-coord-token']);
+        $other->addCoordinator($otherCoordinator);
+        User::factory()->administrator()->create(['api_token' => 'admin-token']);
+        User::factory()->host()->create(['api_token' => 'host-token']);
+
+        $url = "/api/v2/networks/{$network->id}/events?include_unapproved=1&start=" .
+            urlencode('2038-02-01T00:00:00Z') . self::END_PARAM . urlencode('2038-02-02T00:00:00Z');
+
+        $ids = function ($token) use ($url) {
+            // The token guard caches its user for the life of the app, which spans requests in a test.
+            $this->app['auth']->forgetGuards();
+            $response = $this->get($url . ($token ? '&api_token=' . $token : ''));
+            $response->assertSuccessful();
+
+            return collect(json_decode($response->getContent(), true)['data'])->pluck('group.id')->sort()->values()->all();
+        };
+
+        // The parameter is ignored for anyone who isn't a coordinator of this network or an admin.
+        $this->assertEquals([$approved->idgroups], $ids(null));
+        $this->assertEquals([$approved->idgroups], $ids('host-token'));
+        $this->assertEquals([$approved->idgroups], $ids('other-coord-token'));
+
+        $all = collect([$approved, $unapproved, $archived])->pluck('idgroups')->sort()->values()->all();
+        $this->assertEquals($all, $ids('coord-token'));
+        $this->assertEquals($all, $ids('admin-token'));
+
+        // The group's approval and archive state come back so the page can badge them.
+        $this->app['auth']->forgetGuards();
+        $response = $this->get($url . '&api_token=coord-token');
+        $byGroup = collect(json_decode($response->getContent(), true)['data'])->keyBy('group.id');
+        $this->assertTrue($byGroup[$approved->idgroups]['group']['approved']);
+        $this->assertFalse($byGroup[$unapproved->idgroups]['group']['approved']);
+        $this->assertNotNull($byGroup[$archived->idgroups]['group']['archived_at']);
+    }
 }

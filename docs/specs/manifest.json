@@ -1,5 +1,5 @@
 {
-    "generatedAt": "2026-10-14T05:47:25Z",
+    "generatedAt": "2026-10-23T13:36:57Z",
     "features": {
         "Administration": {
             "description": "Platform administration and configuration",
@@ -2391,6 +2391,10 @@
                         {
                             "file": "tests/Feature/Networks/APIv2NetworkTest.php",
                             "test": "testListEvents"
+                        },
+                        {
+                            "file": "tests/Feature/Networks/APIv2NetworkTest.php",
+                            "test": "testNetworkEventsIncludeUnapprovedForCoordinators"
                         }
                     ]
                 },
@@ -2513,6 +2517,28 @@
                     ]
                 },
                 {
+                    "story": "As a NetworkCoordinator, I can also see events from unapproved and archived groups in my network",
+                    "persona": "NetworkCoordinator",
+                    "theme": "Network groups & events",
+                    "method": "NetworkController::getNetworkEventsv2",
+                    "class": "App\\Http\\Controllers\\API\\NetworkController",
+                    "file": "app/Http/Controllers/API/NetworkController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Events/APIv2EventTest.php",
+                            "test": "testGetEventsForUnapprovedGroup"
+                        },
+                        {
+                            "file": "tests/Feature/Networks/APIv2NetworkTest.php",
+                            "test": "testListEvents"
+                        },
+                        {
+                            "file": "tests/Feature/Networks/APIv2NetworkTest.php",
+                            "test": "testNetworkEventsIncludeUnapprovedForCoordinators"
+                        }
+                    ]
+                },
+                {
                     "story": "As a NetworkCoordinator, I can view the networks I coordinate",
                     "persona": "NetworkCoordinator",
                     "theme": "Browse networks",
@@ -2592,6 +2618,10 @@
                         {
                             "file": "tests/Feature/Networks/APIv2NetworkTest.php",
                             "test": "testListEvents"
+                        },
+                        {
+                            "file": "tests/Feature/Networks/APIv2NetworkTest.php",
+                            "test": "testNetworkEventsIncludeUnapprovedForCoordinators"
                         }
                     ]
                 },
@@ -2660,7 +2690,7 @@
                     ]
                 }
             ],
-            "storyCount": 25,
+            "storyCount": 26,
             "personas": [
                 "Admin",
                 "Guest",
@@ -3604,7 +3634,7 @@
                 "Groups",
                 "Networks"
             ],
-            "storyCount": 14
+            "storyCount": 15
         },
         "RepairDirectoryAdmin": {
             "features": [
@@ -3635,7 +3665,7 @@
         }
     },
     "coverage": {
-        "annotatedStories": 188,
-        "storiesWithTests": 168
+        "annotatedStories": 189,
+        "storiesWithTests": 169
     }
 }

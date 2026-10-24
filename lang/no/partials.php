@@ -64,8 +64,6 @@ return [
   'add_device_unpowered' => 'Legg til ikke-elektrisk gjenstand',
   'emissions_equivalent_consume_low' => "det tilsvarer å dyrke frem :value trefrøplante i 10 år|det tilsvarer å dyrke frem :value trefrøplanter i 10 år",
   'emissions_equivalent_consume_high' => "det tilsvarer å plante rundt :value hektar med trær|det tilsvarer å plante rundt :value hektar med trær",
-  'emissions_equivalent_consume_low_explanation' => 'Mellomvoksende bartrær eller løvtrær, plantet i et bymiljø og dyrket i 10 år.',
-  'emissions_equivalent_consume_high_explanation' => 'Løvtrefrøplanter dyrket i en plantasje eller en skogflekk i England i 1 år.',
   'to_be_recycled' => ':value gjenstand skal resirkuleres|:value gjenstander skal resirkuleres',
   'to_be_repaired' => ':value gjenstand skal repareres|:value gjenstander skal repareres',
   'no_weight' => ':value diverse eller ikke-elektrisk gjenstand uten vektestimat|:value diverse eller ikke-elektriske gjenstander uten vektestimat',
