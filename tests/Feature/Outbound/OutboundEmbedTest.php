@@ -7,7 +7,7 @@ use Tests\TestCase;
 
 class OutboundEmbedTest extends TestCase
 {
-    public function testLeafEmbedMountsVueWithoutJquery(): void
+    public function testEmbedsRenderWithoutJquery(): void
     {
         $this->loginAsTestUser(Role::ADMINISTRATOR);
         $id = $this->createGroup();
@@ -16,13 +16,12 @@ class OutboundEmbedTest extends TestCase
             $response = $this->get("/outbound/info/group/$id/$format");
             $response->assertStatus(200);
 
-            // The embed doesn't load the CDN jQuery/Leaflet scripts, so it must tell the bundle to mount Vue
-            // directly; otherwise the visualisation never renders.
-            $response->assertSee('window.restartersIframe = true', false);
+            // The embeds are plain server-rendered pages (the leaf one draws its own canvas), so they don't need
+            // the CDN jQuery/Leaflet scripts.
             $response->assertDontSee('cdn.jsdelivr.net/npm/jquery', false);
         }
 
         $response = $this->get("/outbound/info/group/$id/leaf");
-        $response->assertSee('<StatsShare', false);
+        $response->assertSee('data-stats-share', false);
     }
 }

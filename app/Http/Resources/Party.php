@@ -2,9 +2,11 @@
 
 namespace App\Http\Resources;
 
+use App\Helpers\Fixometer;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Auth;
 
 /**
  * @OA\Schema(
@@ -226,6 +228,38 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *          format="date-time",
  *     ),
  *     @OA\Property(
+ *          property="attending",
+ *          title="attending",
+ *          description="Whether the authenticated user is attending this event (EventsUsers.status==='1'). Omitted when the caller is not authenticated.",
+ *          format="boolean",
+ *          example="true",
+ *          nullable=true
+ *     ),
+ *     @OA\Property(
+ *         property="images",
+ *         title="images",
+ *         description="Any photos uploaded for this event",
+ *         type="array",
+ *         @OA\Items(
+ *           ref="#/components/schemas/Image"
+ *         )
+ *     ),
+ *     @OA\Property(
+ *          property="shareable_link",
+ *          title="shareable_link",
+ *          description="A link that can be shared to let people join this event directly, without an email invite. Only present when the authenticated user has permission to edit the event - it is shown in the host-only invite modal.",
+ *          format="string",
+ *          example="https://app.restarters.net/party/invite/abc123"
+ *     ),
+ *     @OA\Property(
+ *          property="discourse_thread",
+ *          title="discourse_thread",
+ *          description="The id of this event's linked Discourse discussion thread. Combine with the session config's discourse_url as {discourse_url}/t/{discourse_thread} to link to the thread. Only present when the authenticated user is a confirmed attendee (EventsUsers.status==='1', same check as 'attending') - unlike Group.discourse_group this is not public. Null when there is no linked thread, the caller is unauthenticated, or the caller isn't a confirmed attendee.",
+ *          format="string",
+ *          nullable=true,
+ *          example="4821"
+ *     ),
+ *     @OA\Property(
  *          property="full",
  *          title="full",
  *          description="Indicates that this is a full result, not summary group information.",
@@ -267,7 +301,38 @@ class Party extends JsonResource
             'approved' => $this->approved ? true : false,
             'network_data' => $networkData,
             'full' => true,
+            'images' => \App\Http\Resources\Image::collection($this->resource->getImages()),
+            // develop's GroupEventScrollTable shows an invited-volunteer count
+            // (PartyController.php:76's allinvitedcount), which the moderation
+            // queue needs. whenCounted, NOT a direct ->count(): this resource is
+            // used by list endpoints, and counting per row there would be an
+            // N+1. Endpoints that want it call loadCount('allInvited') - one
+            // query for the whole collection - and it is simply absent
+            // elsewhere, exactly as before.
+            'invited' => $this->whenCounted('allInvited'),
         ];
+
+        // Mirrors expandEvent()'s Auth::user() && $event->isBeingAttendedBy(...) check (strict
+        // status==='1'). Optional-auth chain matches Volunteer resource / API\EventController::getUser().
+        $currentUser = Auth::user() ?? auth('sanctum')->user() ?? auth('api')->user();
+        $isAttending = $currentUser !== null && $this->resource->isBeingAttendedBy($currentUser->id);
+        $ret['attending'] = $this->when($currentUser !== null, fn () => $isAttending);
+
+        // The invite modal's "invite via shareable link" tab (events.shareable_link).
+        // Gated on the same permission that guards actually sending invites
+        // (EventAttendanceController::invitesv2), because that tab is only ever
+        // rendered to hosts. Group.shareable_link is unconditional by contrast -
+        // there, the link grants exactly what the public join button already
+        // does, so there is nothing to gate.
+        $ret['shareable_link'] = $this->when(
+            $currentUser !== null && Fixometer::userHasEditPartyPermission($this->idevents, $currentUser->id),
+            fn () => $this->resource->shareable_link
+        );
+
+        // events/view.blade.php: $discourseThread = ($is_attending && $event->discourse_thread) ?
+        // ... : null - gated the same way as 'attending' above, unlike Group.discourse_group which
+        // is unconditionally public.
+        $ret['discourse_thread'] = ($isAttending && $this->discourse_thread) ? $this->discourse_thread : null;
 
         if ($this->link) {
             // Don't return this unless present - the OpenAPI schema doesn't allow null values.

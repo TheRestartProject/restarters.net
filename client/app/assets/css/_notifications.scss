@@ -1,0 +1,157 @@
+// Ported from develop's resources/sass/_notifications.scss.
+//
+// Covers BOTH the navbar notifications panel (.notifications) and the
+// /notifications page (.notifications-page) - none of it existed on this side,
+// which is why the page and panel looked nothing like develop's.
+//
+// Bootstrap 5 keeps media-breakpoint-down but its argument is the breakpoint
+// ABOVE the range (BS4's down(md) == BS5's down(lg)), so those calls are
+// shifted up one step rather than copied verbatim.
+
+.notifications {
+    position: absolute;
+    right: 200px;
+    top: 0;
+    padding-top: 100px;
+    width: 350px;
+    height: 100vh;
+    z-index: 900;
+    background-color: #f5f7fa;
+    @include media-breakpoint-down(xxl) {
+        right: 0;
+    }
+}
+
+.notifications,
+.notifications-page {
+    &__scroll {
+        overflow-y: auto;
+        height: 100%;
+        width: 100% ;
+        box-shadow: -2px 5px 5px rgba(0, 0, 0, 0.17);
+        background-color: #f5f7fa;
+    }
+
+    &__inner {
+        border-top:1px solid #D9D9D9;
+        padding: 20px 15px;
+        @include media-breakpoint-down(xxl) {
+            padding-bottom: 65px;
+        }
+    }
+
+    &__older {
+        padding: 15px 20px;
+        text-transform: uppercase;
+        font-size: 12px;
+        text-align: center;
+        display: block;
+        color: #000;
+        text-decoration: underline;
+        width: 100%;
+        background: transparent;
+        border: 0 none;
+
+        &:hover, &:focus {
+            text-decoration: underline;
+        }
+    }
+
+    .alert-secondary {
+        background-color:#BEC0C0;
+        background-color: #F8F8F8;
+        border:2px solid #BEC0C0;
+        margin-bottom: 10px;
+
+        h3 {
+            font-size: 16px;
+        }
+        p {
+            font-size: 13px;
+
+            &:last-child {
+                margin-bottom: 0;
+            }
+        }
+    }
+
+    .card {
+        margin-bottom: 10px;
+        padding: 15px;
+        padding-left: 55px;
+        padding-bottom: 10px;
+        background-repeat: no-repeat;
+        background-position: 20px 20px;
+        border-radius: 0;
+        border-color: $brand;
+
+        &.status-read {
+            background-color: #FFEED7;
+        }
+
+        &-body {
+            padding: 0;
+        }
+
+        h5 {
+            font-size: 15px;
+            font-weight: normal;
+            font-family: $font-family-second;
+            margin-bottom: 5px;
+
+            a {
+                text-decoration: underline;
+                color: #000;
+            }
+        }
+
+        time {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        &__restart {
+            background-image: url('../images/restart.svg');
+        }
+
+        &__parties {
+            background-image: url('../images/parties.svg');
+        }
+
+        &__groups {
+            background-image: url('../images/groups.svg');
+        }
+
+        &__devices {
+            background-image: url('../images/devices.svg');
+        }
+    }
+
+}
+
+.badge-group .badge-talk-notifications {
+    background-color : #ffbe5f;
+}
+
+.badge-group .badge-no-notifications {
+    background-color : #ccc;
+    color: white;
+}
+
+.badge-group .badge-no-notifications:hover,
+.badge-group .badge-no-notifications:focus,
+.badge-group .badge-no-notifications:active {
+    background-color : #7e7e7e;
+    color: white;
+}
+
+
+// _global.scss:235 - breathing room between the sidebar column and the panel
+// beside it at the widest breakpoint. Used by the notifications and profile
+// sidebars.
+.offset-lg-sidebar {
+  @include media-breakpoint-up(xl) {
+    padding-right: 40px;
+  }
+}

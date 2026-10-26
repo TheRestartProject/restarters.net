@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-# Startup script for per-PR preview apps (see fly.pr.toml).
+# Startup script for every preview app - per-PR previews and the develop
+# branch's restarters-dev alike (see fly.preview.toml).
 #
 # Cold-boot sequence (rootfs is always fresh — Fly resets it on every start):
 #   1. Serve a static "warming up" page on port 80 immediately, so the Fly
@@ -85,11 +86,12 @@ http {
     server {
         listen 80 default_server;
         listen [::]:80 default_server;
-        # Matches the main nginx-fly.conf. Without it nginx sends no charset,
-        # and browsers guess a legacy encoding for the warming page's UTF-8
-        # em-dash (mojibake).
-        charset utf-8;
         root /tmp/warming;
+
+        # Matches the main nginx-fly.conf. Without it nginx sends no charset,
+        # so the holding page's em-dash renders as mojibake even in browsers
+        # that would otherwise sniff UTF-8.
+        charset utf-8;
 
         location = /robots.txt { }
         location = /_preview_status {
@@ -206,14 +208,31 @@ MIGRATE_OK=false
 if [ "$RESTORE_OK" = "true" ]; then
     write_status "migrating" true false
     log "Running migrations..."
-    php /var/www/artisan migrate --force 2>&1 | tee -a "$LOG"
+    MIGRATE_OUT=$(mktemp)
+    php /var/www/artisan migrate --force 2>&1 | tee -a "$LOG" "$MIGRATE_OUT"
     # tee always succeeds - the pipeline hides migrate's exit code without this.
     if [ "${PIPESTATUS[0]}" = "0" ]; then
         MIGRATE_OK=true
         log "Migrations complete."
     else
         log "ERROR: migrate --force failed - see above."
+        # Public status detail: which migration was running and the SQLSTATE /
+        # driver error code only. The exception message is left out because it
+        # can quote restored production values (e.g. a duplicate email).
+        FAILED_MIGRATION=$(grep -oE '[0-9]{4}_[0-9]{2}_[0-9]{2}_[0-9]{6}_[A-Za-z0-9_]+' "$MIGRATE_OUT" | tail -1)
+        SQL_STATE=$(grep -oE 'SQLSTATE\[[0-9A-Z]+\]' "$MIGRATE_OUT" | head -1)
+        SQL_CODE=$(grep -oE 'SQLSTATE\[[0-9A-Z]+\]: [^:]+: [0-9]{3,5}' "$MIGRATE_OUT" | head -1 | grep -oE '[0-9]{3,5}$')
+        EXC_CLASS=$(grep -oE '^ +([A-Za-z]+\\)+[A-Za-z]*(Exception|Error)' "$MIGRATE_OUT" | head -1 | tr -d ' ' | sed 's/\\/./g')
+        # Errors with no SQLSTATE (class not found, bad config, PHP fatal) cannot
+        # quote database rows, so their first line is safe to publish.
+        PHP_ERR=""
+        if [ -z "$SQL_STATE" ]; then
+            PHP_ERR=$(grep -vE '^\s*$|vendor/' "$MIGRATE_OUT" | head -12 | tr '\n' ' ' | cut -c1-900)
+        fi
+        MIGRATE_DETAIL="${PHP_ERR:+$PHP_ERR - }migrate failed at ${FAILED_MIGRATION:-unknown} ${EXC_CLASS} ${SQL_STATE} ${SQL_CODE:+driver $SQL_CODE} - see machine logs"
+        MIGRATE_DETAIL=$(echo "$MIGRATE_DETAIL" | tr "\\\\" . | tr -cd 'A-Za-z0-9_ .:()[]/-' | tr -s ' ')
     fi
+    rm -f "$MIGRATE_OUT"
     timeout 30 php /var/www/artisan translations:import 2>/dev/null || true
 fi
 
@@ -226,7 +245,7 @@ chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
 if [ "$RESTORE_OK" = "true" ] && [ "$MIGRATE_OK" = "true" ]; then
     write_status "ready" true true
 elif [ "$RESTORE_OK" = "true" ]; then
-    write_status "failed" true false "migrate failed - check machine logs"
+    write_status "failed" true false "${MIGRATE_DETAIL:-migrate failed - check machine logs}"
 else
     write_status "failed" false false "restore failed - check machine logs"
 fi
