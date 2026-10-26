@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Attributes\Feature;
+use App\Attributes\UserStory;
 use Illuminate\Http\RedirectResponse;
 use App\Brands;
 use App\Cluster;
@@ -25,8 +27,10 @@ use Lang;
 use Notification;
 use View;
 
+#[Feature('Devices', description: 'Repair device tracking and impact measurement')]
 class DeviceController extends Controller
 {
+    #[UserStory('As a Restarter, I can browse all devices and view global repair impact data', persona: 'Restarter', theme: 'Browse & search devices')]
     public function index($search = null): \Illuminate\View\View
     {
         $user = User::getProfile(Auth::id());
@@ -62,9 +66,12 @@ class DeviceController extends Controller
             'clusters' => $clusters,
             'barriers' => \App\Helpers\Fixometer::allBarriers(),
             'brands' => $brands,
+            // The nightly file if it's there; a new machine won't have it until the hourly build has run.
+            'download_url' => file_exists(\App\Console\Commands\ExportRepairData::path()) ? '/exports/repair-data.csv' : '/export/devices',
         ]);
     }
 
+    #[UserStory('As a Restarter, I can upload photos of devices I\'ve worked on', persona: 'Restarter', theme: 'Device photos')]
     public function imageUpload(Request $request, $id)
     {
         // Same rule as deleteImage below.  Only an existing device can be checked - a
@@ -117,6 +124,7 @@ class DeviceController extends Controller
         }
     }
 
+    #[UserStory('As a Restarter, I can delete device photos I\'ve uploaded', persona: 'Restarter', theme: 'Device photos')]
     public function deleteImage($device_id, $idxref): RedirectResponse
     {
         $user = Auth::user();

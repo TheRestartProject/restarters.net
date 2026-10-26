@@ -16,6 +16,7 @@ use Tests\TestCase;
 
 class BasicTest extends TestCase
 {
+    /** @story:DeviceController::index */
     public function testPageLoads(): void
     {
         // Create a past event with a fixed device.  This is shown on the Fixometer page as the latest data.
@@ -99,6 +100,7 @@ class BasicTest extends TestCase
         $this->assertEquals($event->idevents, $data['idevents']);
     }
 
+    /** @story:ExportController::devices */
     public function testExport(): void {
         $this->loginAsTestUser(Role::ADMINISTRATOR);
 
@@ -131,7 +133,7 @@ class BasicTest extends TestCase
 
         // Bit hacky, but grab the file that was created.  Can't find a way to do this in Laravel easily, though it's
         // probably possible using mocking.
-        $filename = storage_path('app' . DIRECTORY_SEPARATOR . 'exports') . DIRECTORY_SEPARATOR . 'repair-data.csv';
+        $filename = $response->baseResponse->getFile()->getPathname();
         $fh = fopen($filename, 'r');
 
         # Skip headers.

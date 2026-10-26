@@ -15,7 +15,7 @@
         unit="kg"
         class="impact-waste"
       />
-      <div v-if="notincluded" class="d-flex justify-content-end">
+      <div v-if="showNotIncluded && notincluded" class="d-flex justify-content-end">
         <div class="impact-notincluded">
           <div class="impact-notincluded-content p-1">
             {{ notincluded }}
@@ -30,7 +30,7 @@
             :description="equivalent_consumer(Math.round(stats.co2_total))"
             unit="kg"
             class="impact-co2"
-            :popover="popover_consumer(Math.round(stats.co2_total))"
+            :aside="asideCo2"
             share
             @share="share"
       />
@@ -57,6 +57,18 @@ export default {
     statsEntity: {
       required: true,
       type: String
+    },
+    showNotIncluded: {
+      // The note on what the figures leave out.
+      type: Boolean,
+      required: false,
+      default: true
+    },
+    asideCo2: {
+      // Show the CO2e stat with its description alongside it, rather than below it.
+      type: Boolean,
+      required: false,
+      default: false
     }
   },
   computed: {

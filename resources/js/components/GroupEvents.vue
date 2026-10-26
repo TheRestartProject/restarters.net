@@ -164,11 +164,16 @@ export default {
       }
     },
     translatedTitle() {
-      // If we have a group then we are putting the name elsewhere and just want "events" (force the plural).  Otherwise
-      // "Your events".
-      let ret = this.group ? 'events' : this.__('events.your_events')
-      ret = ret.charAt(0).toUpperCase() + ret.slice(1)
-      return ret
+      // If we have a group then we are putting the name elsewhere and just want "events" (force the plural).
+      // The group name comes first, so "events" is lower case, to match the sentence case of the rest of the
+      // page.  Otherwise "Your events" starts the heading, so it is capitalised.
+      if (this.group) {
+        const events = this.__('events.events')
+        return events.charAt(0).toLowerCase() + events.slice(1)
+      }
+
+      const ret = this.__('events.your_events')
+      return ret.charAt(0).toUpperCase() + ret.slice(1)
     },
     translatedCalendarTitle() {
       return this.__('groups.calendar_copy_title', {

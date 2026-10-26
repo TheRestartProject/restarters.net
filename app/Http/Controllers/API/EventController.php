@@ -22,9 +22,14 @@ use Auth;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
+use App\Attributes\Feature;
+use App\Attributes\UserStory;
+use App\Attributes\NoStory;
 
+#[Feature('Events', description: 'Community repair event management')]
 class EventController extends Controller
 {
+    #[UserStory('As a NetworkCoordinator, I can list events across my networks', persona: 'NetworkCoordinator', theme: 'Find & browse events')]
     public function getEventsByUsersNetworks(Request $request, $date_from = null, $date_to = null, $timezone = 'UTC')
     {
         $authenticatedUser = Auth::user();
@@ -146,6 +151,7 @@ class EventController extends Controller
         return $collection;
     }
 
+    #[UserStory('As a Host, I can add a volunteer to my event', persona: 'Host', theme: 'Attendance & volunteers')]
     public function addVolunteer(Request $request, $idevents): JsonResponse
     {
         $request->validate([
@@ -237,6 +243,8 @@ class EventController extends Controller
     }
 
 
+    #[UserStory('As a Guest, I can view confirmed volunteers for an event', persona: 'Guest', theme: 'Attendance & volunteers')]
+    #[UserStory('As a ThirdParty, I can retrieve volunteer data for an event via the API', persona: 'ThirdParty', theme: 'Attendance & volunteers')]
     public function listVolunteers(Request $request, $idevents): JsonResponse
     {
         $party = Party::findOrFail($idevents);
@@ -288,6 +296,8 @@ class EventController extends Controller
      *     )
      */
 
+    #[UserStory('As a Guest, I can view event details via the API', persona: 'Guest', theme: 'Find & browse events')]
+    #[UserStory('As a ThirdParty, I can retrieve event details to display on my platform', persona: 'ThirdParty', theme: 'Find & browse events')]
     public function getEventv2(Request $request, $idevents)
     {
         $party = Party::findOrFail($idevents);
@@ -354,6 +364,8 @@ class EventController extends Controller
      *       ),
      *     )
      */
+    #[UserStory('As a NetworkCoordinator, I can view events pending moderation in my networks', persona: 'NetworkCoordinator', theme: 'Create & manage events')]
+    #[UserStory('As an Admin, I can view all events pending moderation', persona: 'Admin', theme: 'Create & manage events')]
     public function moderateEventsv2(Request $request)
     {
         // Get the user that the API has been authenticated as.
@@ -466,6 +478,7 @@ class EventController extends Controller
      *     )
      *  )
      */
+    #[UserStory('As a Host, I can create an event via the API', persona: 'Host', theme: 'Create & manage events')]
     public function createEventv2(Request $request): JsonResponse
     {
         $user = $this->getUser();
@@ -580,7 +593,7 @@ class EventController extends Controller
      *      operationId="editEvent",
      *      tags={"Events"},
      *      summary="Edit Event",
-     *      description="Edits an event.  The event of a group cannot be changed after creation.",
+     *      description="Edits an event.  The event of a group cannot be changed after creation.  Only the fields sent are changed; a field sent empty or null is cleared.",
      *      @OA\Parameter(
      *          name="api_token",
      *          description="A valid user API token",
@@ -595,7 +608,6 @@ class EventController extends Controller
      *         @OA\MediaType(
      *             mediaType="multipart/form-data",
      *             @OA\Schema(
-     *                required={"start","end","title","description","location","lat","lng"},
      *                @OA\Property(
      *                   property="start",
      *                   ref="#/components/schemas/Event/properties/start",
@@ -644,6 +656,7 @@ class EventController extends Controller
      *     )
      *  )
      */
+    #[UserStory('As a Host, I can update my event via the API', persona: 'Host', theme: 'Create & manage events')]
     public function updateEventv2(Request $request, $idEvents): JsonResponse
     {
         $user = $this->getUser();
@@ -657,28 +670,44 @@ class EventController extends Controller
             abort(403);
         }
 
-        // Convert the timezone to UTC, because the timezone is not itself stored in the DB.
-        $event_start_utc = Carbon::parse($start)->setTimezone('UTC')->toIso8601String();
-        $event_end_utc = Carbon::parse($end)->setTimezone('UTC')->toIso8601String();
-        $hours = Carbon::parse($event_start_utc)->diffInHours(Carbon::parse($event_end_utc));
+        $party = Party::findOrFail($idEvents);
 
+        // Only update the fields the request sends, as for groups.  Fields sent empty or null are cleared.
         // We don't let the user change the group that an event is on.
-        $update = [
-            'event_start_utc' => $event_start_utc,
-            'event_end_utc' => $event_end_utc,
-            'hours' => $hours,
-            'free_text' => $description,
-            'online' => $online,
-            'venue' => $title,
-            'link' => $link,
-            'location' => $location,
-            'latitude' => $latitude,
-            'longitude' => $longitude,
-            'timezone' => $timezone,
-            'network_data' => $network_data,
+        $update = [];
+
+        if ($request->has('start') || $request->has('end')) {
+            // Convert the timezone to UTC, because the timezone is not itself stored in the DB.  The duration
+            // depends on both ends, so recalculate it from whichever end was not sent.
+            $event_start_utc = Carbon::parse($start ?? $party->event_start_utc)->setTimezone('UTC')->toIso8601String();
+            $event_end_utc = Carbon::parse($end ?? $party->event_end_utc)->setTimezone('UTC')->toIso8601String();
+            $update['event_start_utc'] = $event_start_utc;
+            $update['event_end_utc'] = $event_end_utc;
+            $update['hours'] = Carbon::parse($event_start_utc)->diffInHours(Carbon::parse($event_end_utc));
+        }
+
+        $fields = [
+            'free_text' => ['description', $description],
+            'online' => ['online', $online],
+            'venue' => ['title', $title],
+            'link' => ['link', $link],
+            'timezone' => ['timezone', $timezone],
+            'network_data' => ['network_data', $network_data],
         ];
 
-        $party = Party::findOrFail($idEvents);
+        foreach ($fields as $column => [$key, $value]) {
+            if ($request->has($key)) {
+                $update[$column] = $value;
+            }
+        }
+
+        if ($request->has('location')) {
+            // The coordinates come from geocoding the location.
+            $update['location'] = $location;
+            $update['latitude'] = $latitude;
+            $update['longitude'] = $longitude;
+        }
+
         $party->update($update);
 
         if ($request->has('moderate') && $request->input('moderate') == 'approve' && Fixometer::userCanApproveEvent($idEvents, $user->id)) {
@@ -714,11 +743,12 @@ class EventController extends Controller
                 'online' => ['boolean'],
             ]);
         } else {
+            // An update only changes the fields sent, so these are only required when they are sent.
             $request->validate([
-                                   'start' => ['required', 'date_format:Y-m-d\TH:i:sP,Y-m-d\TH:i:s\Z'],
-                                   'end' => ['required', 'date_format:Y-m-d\TH:i:sP,Y-m-d\TH:i:s\Z'],
-                'title' => ['required', 'max:255'],
-                'description' => ['required'],
+                'start' => ['sometimes', 'required', 'date_format:Y-m-d\TH:i:sP,Y-m-d\TH:i:s\Z'],
+                'end' => ['sometimes', 'required', 'date_format:Y-m-d\TH:i:sP,Y-m-d\TH:i:s\Z'],
+                'title' => ['sometimes', 'required', 'max:255'],
+                'description' => ['sometimes', 'required'],
                 'location' => [
                     function ($attribute, $value, $fail) use ($request) {
                         if (!$request->filled('online') && !$value) {

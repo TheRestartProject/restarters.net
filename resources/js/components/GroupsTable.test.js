@@ -364,3 +364,41 @@ describe('GroupsTable distance column', () => {
     expect(wrapper.vm.itemsToShow.map(g => g.name)).toEqual(['Zed Near', 'Alpha Far', 'Mid Nowhere'])
   })
 })
+
+// On a page with more below the list - a network's tags, say - an infinite
+// scroll keeps pushing that out of reach as you scroll towards it (#918). A
+// button shows the rest of the list only when asked, all in one go: nobody
+// wants to reveal a long list a page at a time.
+describe('GroupsTable show all button', () => {
+  const many = Array.from({ length: 60 }, (_, i) => ({
+    ...group,
+    id: i + 1,
+    name: 'Group ' + String(i + 1).padStart(3, '0'),
+  }))
+
+  test('shows every group at once rather than scrolling infinitely', async () => {
+    const wrapper = mountTable(many, { showAllButton: true })
+
+    expect(wrapper.findComponent({ name: 'infinite-loading' }).exists()).toBe(false)
+    expect(wrapper.vm.itemsToShow.length).toBe(wrapper.vm.pageSize)
+
+    const button = wrapper.find('.groups-show-all')
+    expect(button.exists()).toBe(true)
+
+    await button.trigger('click')
+    expect(wrapper.vm.itemsToShow.length).toBe(many.length)
+    expect(wrapper.find('.groups-show-all').exists()).toBe(false)
+  })
+
+  test('has no button when every group already fits on one page', () => {
+    const wrapper = mountTable(many.slice(0, 10), { showAllButton: true })
+
+    expect(wrapper.find('.groups-show-all').exists()).toBe(false)
+  })
+
+  test('scrolls infinitely by default', () => {
+    const wrapper = mountTable(many)
+
+    expect(wrapper.find('.groups-show-all').exists()).toBe(false)
+  })
+})

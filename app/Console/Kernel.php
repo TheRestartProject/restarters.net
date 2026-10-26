@@ -44,6 +44,9 @@ class Kernel extends ConsoleKernel
         $schedule->command('event:timezones')->hourly();
 
         $schedule->command('wordpress:event:create_failed')->daily();
+
+        // Rebuilds at most daily; hourly so that a new machine gets the file soon after it starts.
+        $schedule->command('export:repair-data')->hourly()->withoutOverlapping();
     }
 
     /**

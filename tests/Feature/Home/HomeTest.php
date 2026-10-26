@@ -11,6 +11,7 @@ use Tests\TestCase;
 class HomeTest extends TestCase
 {
     /**
+     * @story:HomeController::index
      * @dataProvider landingPagesProvider
      */
     public function testLoggedOut($url): void
@@ -29,6 +30,7 @@ class HomeTest extends TestCase
         ];
     }
 
+    /** @story:HomeController::index */
     public function testLoggedIn(): void {
         $this->loginAsTestUser(Role::RESTARTER);
         $response = $this->get('/user');

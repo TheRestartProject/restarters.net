@@ -26,7 +26,9 @@ class BasicTest extends TestCase
     }
 
     /**
-     *@dataProvider provider
+     * @story:DashboardController::index
+     * @story:DiscourseController::discussionTopics
+     * @dataProvider provider
      */
     public function testPageLoads($city, $country, $lat, $lng, $nearbyGroupCount): void
     {
@@ -86,6 +88,11 @@ class BasicTest extends TestCase
         ];
     }
 
+    /**
+     * @story:DashboardController::index
+     * @story:PartyController::index
+     * @story:EventController::updateEventv2
+     */
     public function testUpcomingEvents(): void {
         $host = User::factory()->restarter()->create();
 

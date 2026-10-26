@@ -14,7 +14,6 @@
         track-by="id"
         label="tag_name"
         :multiple="true"
-        :allow-empty="false"
         deselect-label=""
         :taggable="true"
         selectLabel=""

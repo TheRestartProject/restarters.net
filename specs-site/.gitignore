@@ -1,0 +1,7 @@
+node_modules/
+.vitepress/cache/
+.vitepress/dist/
+# Generated pages (rebuilt from manifest)
+features/
+personas/
+index.md

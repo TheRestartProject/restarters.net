@@ -14,6 +14,9 @@
         <b-dropdown-item  data-toggle="modal" data-target="#group-share-stats" v-if="canedit">
           {{ __('groups.share_group_stats') }}
         </b-dropdown-item>
+        <b-dropdown-item v-if="reportingUrl" :href="reportingUrl" target="_blank" rel="noopener" link-class="group-reporting-action">
+          {{ __('groups.view_reports') }}
+        </b-dropdown-item>
         <b-dropdown-item :href="'/export/devices/group/' + idgroups">
           {{ __('devices.export_group_data') }}
         </b-dropdown-item>
@@ -44,6 +47,9 @@
         </b-dropdown-item>
         <b-dropdown-item  data-toggle="modal" data-target="#group-share-stats">
           {{ __('groups.share_group_stats') }}
+        </b-dropdown-item>
+        <b-dropdown-item v-if="reportingUrl" :href="reportingUrl" target="_blank" rel="noopener" link-class="group-reporting-action">
+          {{ __('groups.view_reports') }}
         </b-dropdown-item>
         <b-dropdown-item data-toggle="modal" @click="leaveGroup" v-if="ingroup">
           {{ __('groups.leave_group_button') }}
@@ -86,6 +92,11 @@ export default {
       required: false,
       default: false
     },
+    reportingUrl: {
+      type: String,
+      required: false,
+      default: null
+    },
   },
   computed: {
     group() {
@@ -126,15 +137,12 @@ export default {
       form.submit()
     },
     async archiveConfirmed() {
-      const group = this.group
-      group.id = this.idgroups
-      group.archived_at = (new Date()).toISOString()
-      group.description = group.free_text
-
-      // Make sure we don't stomp on the networks.
-      delete group.networks
-
-      await this.$store.dispatch('groups/edit', group)
+      // Send only the archive date: the API updates just the fields it's given.  Sending the whole group back
+      // posted object fields such as network_data as the string "[object Object]".
+      await this.$store.dispatch('groups/edit', {
+        id: this.idgroups,
+        archived_at: (new Date()).toISOString()
+      })
 
       await this.$store.dispatch('groups/fetch', {
         id: this.idgroups
