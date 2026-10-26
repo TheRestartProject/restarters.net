@@ -64,6 +64,8 @@ return [
   'add_device_unpowered' => 'Niet-elektrisch item toevoegen',
   'emissions_equivalent_consume_low' => "dat staat gelijk aan het laten groeien van :value boomzaailing gedurende 10 jaar|dat staat gelijk aan het laten groeien van :value boomzaalingen gedurende 10 jaar",
   'emissions_equivalent_consume_high' => "dat staat gelijk aan het aanplanten van ongeveer :value hectare bomen|dat staat gelijk aan het aanplanten van ongeveer :value hectare bomen",
+  'emissions_equivalent_consume_low_explanation' => 'Middelmatig groeiende naald- of loofbomen, geplant in een stedelijke omgeving en 10 jaar lang gekweekt.',
+  'emissions_equivalent_consume_high_explanation' => 'Loofboomzaalingen gekweekt in een plantage of bos in Engeland gedurende 1 jaar.',
   'to_be_recycled' => ':value item te recycleren|:value items te recycleren',
   'to_be_repaired' => ':value item te herstellen|:value items te herstellen',
   'no_weight' => ':value diversen of niet-elektrisch item zonder gewichtsschatting|:value diversen of niet-elektrische items zonder gewichtsschatting',

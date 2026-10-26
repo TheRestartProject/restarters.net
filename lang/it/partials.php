@@ -64,6 +64,8 @@ return [
   'add_device_unpowered' => 'Aggiungi oggetto non alimentato',
   'emissions_equivalent_consume_low' => "è come far crescere :value alberello per 10 anni|è come far crescere :value alberelli per 10 anni",
   'emissions_equivalent_consume_high' => "è come piantare circa :value ettaro di alberi|è come piantare circa :value ettari di alberi",
+  'emissions_equivalent_consume_low_explanation' => 'Alberi di conifere o latifoglie a crescita media, piantati in un contesto urbano e coltivati per 10 anni.',
+  'emissions_equivalent_consume_high_explanation' => 'Alberelli di latifoglie coltivati in una piantagione o boschetto in Inghilterra per 1 anno.',
   'to_be_recycled' => ':value oggetto da riciclare|:value oggetti da riciclare',
   'to_be_repaired' => ':value oggetto da riparare|:value oggetti da riparare',
   'no_weight' => ':value oggetto vario o non alimentato senza stima del peso|:value oggetti vari o non alimentati senza stima del peso',
