@@ -64,6 +64,8 @@ return [
   'add_device_unpowered' => 'Nicht-elektrischen Artikel hinzufügen',
   'emissions_equivalent_consume_low' => "das entspricht dem Wachstum von :value Baumsetzling über 10 Jahre|das entspricht dem Wachstum von :value Baumsetzlingen über 10 Jahre",
   'emissions_equivalent_consume_high' => "das entspricht der Pflanzung von etwa :value Hektar Wald|das entspricht der Pflanzung von etwa :value Hektar Wald",
+  'emissions_equivalent_consume_low_explanation' => 'Mittelwüchsige Nadel- oder Laubbäume, in einer städtischen Umgebung gepflanzt und 10 Jahre lang gewachsen.',
+  'emissions_equivalent_consume_high_explanation' => 'Laubbaumsetzlinge, die in einer Plantage oder einem Gehölz in England 1 Jahr lang gewachsen sind.',
   'to_be_recycled' => ':value Artikel zum Recyceln|:value Artikel zum Recyceln',
   'to_be_repaired' => ':value Artikel zur Reparatur|:value Artikel zur Reparatur',
   'no_weight' => ':value sonstiger oder nicht-elektrischer Artikel ohne Gewichtsschätzung|:value sonstige oder nicht-elektrische Artikel ohne Gewichtsschätzung',
