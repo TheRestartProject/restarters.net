@@ -1,11 +1,11 @@
 <template>
   <div :class="className">
-    <div class="impact-stat-icon mt-2 mb-2" v-if="!iconInline">
+    <div class="impact-stat-icon" v-if="!iconInline">
       <b-img :src="src" class="impact-stat-img" :width="iconWidth" />
     </div>
     <div :class="'impact-stat-count impact-stat-count-' + variant + (iconInline ? ' d-flex' : '')">
       {{ printableCount }} {{ unit }}
-      <div class="impact-stat-icon mt-2 mb-2" v-if="iconInline">
+      <div class="impact-stat-icon" v-if="iconInline">
         <b-img :src="src" class="impact-stat-img" :width="iconWidth" />
       </div>
     </div>
@@ -14,15 +14,15 @@
     <div class="impact-stat-title" v-if="percent !== null">
       {{ percent }}%
     </div>
-    <div class="impact-stat-subtitle" v-html="translatedSubtitle" />
-    <div v-if="description && count > 0" class="impact-stat-description pt-3 m-3 d-flex" >
+    <div class="impact-stat-subtitle" v-if="subtitle" v-html="translatedSubtitle" />
+    <div v-if="description && count > 0" class="impact-stat-description d-flex" >
       <span v-html="translatedDescription" />
       <b-img v-if="popover" v-b-popover.html="popover" class="ml-2 icon-info clickable" :src="imageUrl('/icons/info_ico_green.svg')" />
     </div>
     <div class="image d-flex justify-content-around" v-if="image">
       <b-img :src="image" />
     </div>
-    <div class="d-flex justify-content-end" v-if="share">
+    <div class="d-flex justify-content-end impact-stat-share" v-if="share">
       <b-btn href="#" variant="link" @click="shareThis" class="text-brand">
         {{ __('partials.share_this') }}
       </b-btn>
@@ -122,6 +122,12 @@ export default {
       type: Number,
       required: false,
       default: 0
+    },
+    aside: {
+      // Put the description alongside the icon and the figure, rather than below them.
+      type: Boolean,
+      required: false,
+      default: false
     }
   },
   computed: {
@@ -130,7 +136,7 @@ export default {
       return this.imageUrl('/images/' + this.icon + '.svg')
     },
     className() {
-      return 'impact-stat impact-stat-' + this.size + ' impact-stat-' + this.variant + (this.border ? ' hasBorder' : '')
+      return 'impact-stat impact-stat-' + this.size + ' impact-stat-' + this.variant + (this.border ? ' hasBorder' : '') + (this.aside ? ' impact-stat-aside' : '')
     },
     translatedTitle() {
       return this.translate ? this.__(this.title, { count: this.roundedCount }) : this.title
@@ -225,6 +231,118 @@ export default {
       }
     }
   }
+
+  &.impact-stat-aside {
+    // The box has a left side with the icon, the figure and the title, and a right side with the
+    // description and the share link.  The rows are the same as the other stats, so that the
+    // spacing on the left matches them.
+    grid-template-columns: auto 1fr;
+    grid-template-rows: 55px 54px auto;
+
+    &::after {
+      // A dashed line separating the two sides of the box.
+      content: '';
+      grid-column: 1;
+      grid-row: 1 / -1;
+      align-self: stretch;
+      border-right: 3px dashed #222;
+      pointer-events: none;
+    }
+
+    .impact-stat-icon {
+      grid-column: 1;
+      grid-row: 1;
+      padding-right: 1rem;
+    }
+
+    .impact-stat-count {
+      grid-column: 1;
+      grid-row: 2;
+      padding-right: 1rem;
+    }
+
+    .impact-stat-title {
+      grid-column: 1;
+      grid-row: 3;
+      // Let the title wrap, rather than squeeze the description on the right.
+      max-width: 170px;
+      margin: 0 auto;
+      padding-right: 1rem;
+    }
+
+    .impact-stat-description {
+      grid-column: 2;
+      grid-row: 1 / 3;
+      align-self: end;
+      border-top: none;
+      font-size: 16px;
+      padding-top: 0;
+      padding-left: 1rem;
+      margin: 0;
+    }
+
+    .impact-stat-share {
+      grid-column: 2;
+      grid-row: 3;
+      align-self: end;
+
+      .btn {
+        padding: 0;
+        font-size: 0.875rem;
+      }
+    }
+  }
+
+  @include media-breakpoint-down(md) {
+    &.impact-stat-aside {
+      // On smaller screens the two sides are stacked, with the figure above the description.
+      grid-template-columns: 1fr;
+      grid-template-rows: 55px 54px auto auto auto auto;
+
+      &::after {
+        grid-column: 1;
+        grid-row: 4;
+        align-self: start;
+        border-right: none;
+        border-top: 3px dashed #222;
+      }
+
+      .impact-stat-icon {
+        grid-column: 1;
+        grid-row: 1;
+        padding-right: 0;
+      }
+
+      .impact-stat-count {
+        grid-column: 1;
+        grid-row: 2;
+        padding-right: 0;
+      }
+
+      .impact-stat-title {
+        grid-column: 1;
+        grid-row: 3;
+        max-width: none;
+        padding-right: 0;
+        padding-bottom: 0.5rem;
+      }
+
+      .impact-stat-description {
+        grid-column: 1;
+        grid-row: 5;
+        align-self: start;
+        justify-content: center;
+        padding-top: 0.5rem;
+        padding-left: 0;
+      }
+
+      .impact-stat-share {
+        grid-column: 1;
+        grid-row: 6;
+        align-self: start;
+      }
+    }
+  }
 }
 
 .impact-stat-count {
@@ -260,12 +378,15 @@ export default {
 
 .impact-stat-icon {
   height: 41px;
+  margin: 0.5rem 0;
 }
 
 .impact-stat-description {
   border-top: 3px dashed #222;
   font-family: $font-family-third;
   font-size: 18px;
+  padding-top: 1rem;
+  margin: 1rem;
 }
 
 .image {

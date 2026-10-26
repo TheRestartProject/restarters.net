@@ -47,7 +47,7 @@
       <template slot="head(title)">
         <span />
       </template>
-      <template slot="cell(title)" slot-scope="data" v-bind:addGroupName="addGroupName">
+      <template slot="cell(title)" slot-scope="data">
         <b><EventTitle :idevents="data.item.title.idevents" component="a" :href="'/party/view/' + data.item.title.idevents" /></b>
         <div class="hidecell">
           <span v-if="addGroupName && data.item.title.group" class="small">
@@ -77,7 +77,7 @@
       <template slot="head(actions)">
         <span />
       </template>
-      <template slot="cell(actions)" slot-scope="data" v-bind:upcoming="upcoming">
+      <template slot="cell(actions)" slot-scope="data">
         <GroupEventsScrollTableActions :idevents="data.item.actions.idevents" class="actionsHeight" />
       </template>
 
@@ -104,7 +104,7 @@
           <b-img class="icon mt-3" :src="imageUrl('/images/trash.svg')" :title="__('groups.waste_prevented')" />
         </div>
       </template>
-      <template slot="cell(waste)" slot-scope="data" v-bind="stats">
+      <template slot="cell(waste)" slot-scope="data">
         <div v-if="noDevices(data.item.waste)" class="d-none d-md-block">
           {{ __('partials.no_devices_added') }}
           <a :href="'/party/view/' + data.item.waste.idevents">
@@ -119,7 +119,7 @@
           <b-img class="icon mt-3" :src="imageUrl('/images/cloud_empty.svg')" :title="__('groups.co2_emissions_prevented')" />
         </div>
       </template>
-      <template slot="cell(co2)" slot-scope="data" v-bind="stats">
+      <template slot="cell(co2)" slot-scope="data">
         <GroupEventsScrollTableNumber :value="Math.round(stats(data.item.co2).co2_total)" units="kg" />
       </template>
 
@@ -128,7 +128,7 @@
           <b-img class="icon mt-3" :src="imageUrl('/images/fixed.svg')" :title="__('groups.fixed_items')" />
         </div>
       </template>
-      <template slot="cell(fixed_devices)" slot-scope="data" v-bind="stats">
+      <template slot="cell(fixed_devices)" slot-scope="data">
         <GroupEventsScrollTableNumber :value="stats(data.item.fixed_devices).fixed_devices" v-if="stats(data.item.fixed_devices)" />
       </template>
 
@@ -137,7 +137,7 @@
           <b-img class="icon mt-3" :src="imageUrl('/images/repairable_ico.svg')" :title="__('groups.repairable_items')" />
         </div>
       </template>
-      <template slot="cell(repairable_devices)" slot-scope="data" v-bind="stats">
+      <template slot="cell(repairable_devices)" slot-scope="data">
         <GroupEventsScrollTableNumber :value="stats(data.item.repairable_devices).repairable_devices" v-if="stats(data.item.repairable_devices)" />
       </template>
 
@@ -146,7 +146,7 @@
           <b-img class="icon mt-3" :src="imageUrl('/images/dead_ico.svg')" :title="__('groups.end_of_life_items')" />
         </div>
       </template>
-      <template slot="cell(dead_devices)" slot-scope="data" v-bind="stats">
+      <template slot="cell(dead_devices)" slot-scope="data">
         <GroupEventsScrollTableNumber :value="stats(data.item.dead_devices).dead_devices" v-if="stats(data.item.dead_devices)" />
       </template>
 

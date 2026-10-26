@@ -163,3 +163,35 @@ test('has no how-to-use-the-table text', async () => {
 
   expect(wrapper.text()).not.toContain('devices.table_intro')
 })
+
+function lastUrl() {
+  const calls = axios.get.mock.calls
+  return calls[calls.length - 1][0]
+}
+
+// Being on page 3 and then filtering to a handful of records used to leave the table on a page that no longer
+// existed, so it showed nothing until you paged back.
+test('changing a filter goes back to the first page', async () => {
+  const wrapper = await makeWrapper()
+  await wrapper.setData({ currentPage: 3 })
+  await flush()
+  expect(lastUrl()).toBe('/api/devices/3/20')
+
+  await wrapper.setProps({ category: 42 })
+  await flush()
+
+  expect(wrapper.vm.currentPage).toBe(1)
+  expect(lastUrl()).toBe('/api/devices/1/20')
+  expect(lastParams().category).toBe(42)
+})
+
+test('changing a filter on the first page refetches', async () => {
+  const wrapper = await makeWrapper()
+  const before = axios.get.mock.calls.length
+
+  await wrapper.setProps({ brand: 'Acme' })
+  await flush()
+
+  expect(axios.get.mock.calls.length).toBe(before + 1)
+  expect(lastParams().brand).toBe('Acme')
+})

@@ -3,7 +3,7 @@
     <b-input v-model="mValue" :placeholder="placeholder || __('devices.model_if_known')" size="lg" class="marg" :disabled="disabled" />
     <div v-if="iconVariant !== 'none'" v-b-popover.html.left="__('devices.tooltip_model')" class="ml-3 mt-2">
       <b-img class="icon clickable" :src="imageUrl('/icons/info_ico_black.svg')" v-if="iconVariant === 'black'" />
-      <b-img class="icon clickable" :src="imageUrl('/icons/info_ico_green.svg')" v-else="iconVariant === 'brand'" />
+      <b-img class="icon clickable" :src="imageUrl('/icons/info_ico_green.svg')" v-else />
     </div>
   </div>
 </template>

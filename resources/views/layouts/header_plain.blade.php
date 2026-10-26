@@ -19,6 +19,10 @@
 
         @yield('extra-css')
 
+        @if( isset($iframe) && $iframe )
+        <script>window.restartersIframe = true</script>
+        @endif
+
         @if( !isset($iframe) || !$iframe )
         <!-- Load jQuery first to ensure it's available for all scripts -->
         <script src="https://cdn.jsdelivr.net/npm/jquery@3.4.1/dist/jquery.min.js"></script>
