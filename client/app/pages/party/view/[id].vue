@@ -79,7 +79,7 @@ const id = computed(() => Number(route.params.id))
 const event = computed(() => eventsStore.current.data)
 const { upcoming, finished, dayOfMonth, month } = useEventComputed(event)
 const { hosts } = useEventAttendance(id)
-const { equivalentConsumer } = useCo2Equivalent()
+const { equivalentConsumer, popoverConsumer } = useCo2Equivalent()
 const { uploadedImageUrl } = useUploadedImageUrl()
 
 const isAttending = computed(() => !!event.value?.attending)
@@ -205,6 +205,7 @@ const requestingReview = ref(false)
 const showFollowPrompt = ref(false)
 const nowFollowing = ref(false)
 const co2InfoButton = ref(null)
+const co2EquivalentInfoButton = ref(null)
 
 useHead({ title: computed(() => event.value?.title || t('events.events')) })
 
@@ -592,13 +593,21 @@ function closeAddVolunteer() {
               <div class="stat-card__count">{{ kg(event.stats.co2_total) }}</div>
               <!-- eslint-disable-next-line vue/no-v-html -->
               <div class="stat-card__label" v-html="t('partials.co2')" />
-              <!-- eslint-disable-next-line vue/no-v-html -->
               <!-- StatsValue.vue:18 gates the equivalence description on
                    `count > 0`, so develop shows nothing here for an event
                    with no CO2 recorded. We rendered it unconditionally,
                    producing "that's like growing 0 tree seedlings for 10
                    years" on every zero-impact event. -->
-              <div v-if="event.stats.co2_total > 0" class="small" data-testid="event-view-impact-equivalent" v-html="equivalentConsumer(event.stats.co2_total)" />
+              <div v-if="event.stats.co2_total > 0" class="small" data-testid="event-view-impact-equivalent">
+                <!-- eslint-disable-next-line vue/no-v-html -->
+                <span v-html="equivalentConsumer(event.stats.co2_total)" />
+                <button ref="co2EquivalentInfoButton" type="button" class="info-toggle" data-testid="event-view-impact-equivalent-info">
+                  <img src="/icons/info_ico_green.svg" alt="" width="20" height="20">
+                </button>
+                <BPopover :target="co2EquivalentInfoButton" triggers="hover focus click" data-testid="event-view-impact-equivalent-popover">
+                  {{ popoverConsumer(Math.round(event.stats.co2_total)) }}
+                </BPopover>
+              </div>
               <!-- StatsValue.vue's "Share this" - the CO2-card trigger for
                    the social-image modal, distinct from the header
                    dropdown's "Share event stats" embed-code modal above. -->

@@ -9,9 +9,8 @@ import { useI18n } from 'vue-i18n'
 // translation strings are reused completely unchanged (see
 // i18n/locales/en.json, GENERATED from the same lang/en/partials.php).
 //
-// popover_consumer()'s explanation text is ported too but NOT wired into
-// ImpactStats.vue yet - the legacy popover needs a b-popover equivalent
-// that isn't part of this task's brief; recorded in api-gaps.md.
+// popoverConsumer() is popover_consumer(): what the comparison's trees are,
+// shown in the info popover beside it on the group and event pages.
 export function useCo2Equivalent() {
   const { t } = useI18n()
 
@@ -33,5 +32,11 @@ export function useCo2Equivalent() {
     return t(key, { value }, value)
   }
 
-  return { equivalentConsumer }
+  function popoverConsumer(co2) {
+    return co2 >= 13501
+      ? t('partials.emissions_equivalent_consume_high_explanation')
+      : t('partials.emissions_equivalent_consume_low_explanation')
+  }
+
+  return { equivalentConsumer, popoverConsumer }
 }

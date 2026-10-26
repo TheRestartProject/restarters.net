@@ -42,6 +42,7 @@ const { t } = useI18n()
 const groupStats = computed(() => props.stats?.group_stats || null)
 
 const infoButton = ref(null)
+const co2InfoButton = ref(null)
 
 // GroupStatsFacts.vue: events (brand-teal) / participants / hours.
 const achievements = computed(() =>
@@ -71,7 +72,7 @@ function printableCount(value) {
 // more than one applies. events.to_be_recycled/to_be_repaired/no_weight are
 // reused as-is (already exported to the client, identical wording pattern to
 // the group-specific groups.not_counting intro).
-const { equivalentConsumer } = useCo2Equivalent()
+const { equivalentConsumer, popoverConsumer } = useCo2Equivalent()
 
 const co2Description = computed(() => {
   const co2 = Math.round(groupStats.value?.co2_total ?? 0)
@@ -138,8 +139,14 @@ const co2Description = computed(() => {
                 <div class="stat-card__label" v-html="t('partials.co2')" />
               </div>
               <div class="stat-card__aside">
-                <p v-if="co2Description" class="stat-card__description mb-0" data-testid="group-stats-co2-description">
-                  {{ co2Description }}
+                <p v-if="co2Description" class="stat-card__description mb-0">
+                  <span data-testid="group-stats-co2-description">{{ co2Description }}</span>
+                  <button ref="co2InfoButton" type="button" class="info-toggle" data-testid="group-stats-co2-info">
+                    <img :src="'/icons/info_ico_green.svg'" alt="" width="20" height="20">
+                  </button>
+                  <BPopover :target="co2InfoButton" triggers="hover focus click" data-testid="group-stats-co2-popover">
+                    {{ popoverConsumer(Math.round(groupStats.co2_total)) }}
+                  </BPopover>
                 </p>
                 <button
                   type="button"

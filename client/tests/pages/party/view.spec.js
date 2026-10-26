@@ -866,6 +866,7 @@ describe('pages/party/view/[id]', () => {
       expect(wrapper.find('[data-testid="event-view-stats-fixed"] img').exists()).toBe(true)
       expect(wrapper.find('[data-testid="event-view-impact-equivalent"]').exists()).toBe(true)
       expect(wrapper.find('[data-testid="event-view-impact-info"]').exists()).toBe(true)
+      expect(wrapper.find('[data-testid="event-view-impact-equivalent-info"]').exists()).toBe(true)
     })
   })
 })

@@ -27,6 +27,8 @@ return [
   'add_device_unpowered' => 'Add Unpowered Item',
   'emissions_equivalent_consume_low' => "that's like growing :value tree seedling for 10 years|that's like growing :value tree seedlings for 10 years",
   'emissions_equivalent_consume_high' => "that's like planting around :value hectare of trees|that's like planting around :value hectares of trees",
+  'emissions_equivalent_consume_low_explanation' => 'Medium growth coniferous or deciduous trees, planted in an urban setting and grown for 10 years.',
+  'emissions_equivalent_consume_high_explanation' => 'Broadleaf tree seedlings grown in a plantation or woodlot in England for 1 year.',
   'cancel' => 'Cancel',
   'close' => 'Close',
   'download' => 'Download',

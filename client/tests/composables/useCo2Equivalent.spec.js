@@ -50,4 +50,10 @@ describe('composables/useCo2Equivalent', () => {
     const { equivalentConsumer } = withI18n(() => useCo2Equivalent())
     expect(equivalentConsumer(13500)).toContain('seedling')
   })
+
+  it('explains the seedlings below the threshold and the hectares from it', () => {
+    const { popoverConsumer } = withI18n(() => useCo2Equivalent())
+    expect(popoverConsumer(13500)).toContain('grown for 10 years')
+    expect(popoverConsumer(13501)).toContain('Broadleaf tree seedlings')
+  })
 })

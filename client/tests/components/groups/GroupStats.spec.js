@@ -87,6 +87,8 @@ describe('components/groups/GroupStats', () => {
     const card = wrapper.find('[data-testid="group-stats-co2"]')
     expect(card.classes()).toContain('stat-card--aside')
     expect(card.find('[data-testid="group-stats-co2-description"]').text()).toBe("that's like growing 10 tree seedlings for 10 years")
+    expect(card.find('[data-testid="group-stats-co2-info"]').exists()).toBe(true)
+    expect(card.find('[data-testid="group-stats-co2-popover"]').text()).toContain('grown for 10 years')
     expect(card.find('.stat-card__aside [data-testid="group-stats-share"]').exists()).toBe(true)
   })
 
