@@ -387,6 +387,8 @@ export default {
   font-size: 18px;
   padding-top: 1rem;
   margin: 1rem;
+  // The info icon is a flex item, so without this it would be stretched to the height of the text.
+  align-items: center;
 }
 
 .image {
