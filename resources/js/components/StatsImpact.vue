@@ -28,6 +28,7 @@
             size="lg"
             title="partials.co2"
             :description="equivalent_consumer(Math.round(stats.co2_total))"
+            :popover="popover_consumer(Math.round(stats.co2_total))"
             unit="kg"
             class="impact-co2"
             :aside="asideCo2"
