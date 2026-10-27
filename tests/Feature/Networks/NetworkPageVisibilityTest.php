@@ -68,6 +68,8 @@ class NetworkPageVisibilityTest extends TestCase
 
     public function testUserWithNoGroupInNetworkIsForbidden(): void
     {
+        $this->withExceptionHandling();
+
         [$network] = $this->networkWithHost();
         [, , $otherHost] = $this->networkWithHost();
 
@@ -77,6 +79,8 @@ class NetworkPageVisibilityTest extends TestCase
 
     public function testGuestIsRejected(): void
     {
+        $this->withExceptionHandling();
+
         [$network] = $this->networkWithHost();
 
         $this->viewer(null, $network)->assertStatus(401);
@@ -95,6 +99,8 @@ class NetworkPageVisibilityTest extends TestCase
 
     public function testCoordinatorOfAnotherNetworkIsForbidden(): void
     {
+        $this->withExceptionHandling();
+
         [$network] = $this->networkWithHost();
         $other = Network::factory()->create();
 
