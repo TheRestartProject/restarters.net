@@ -60,6 +60,7 @@ class CalendarTest extends TestCase
                                                    'longitude' => 5.575,
                                                    'event_start_utc' => $this->start,
                                                    'event_end_utc' => $this->end,
+                                                   'approved' => true,
                                                ]);
 
         $event->approve();
@@ -135,6 +136,25 @@ class CalendarTest extends TestCase
         $network = Network::factory()->create();
         $this->expectException(NotFoundHttpException::class);
         $response = $this->get('/calendar/network/' . $network->id);
+    }
+
+    public function testByNetworkExcludesUnapproved(): void {
+        $network = Network::factory()->create();
+
+        // An approved group with only an unapproved event, and an unapproved group with an approved event.
+        $group = Group::factory()->create(['approved' => true]);
+        $network->addGroup($group);
+        Party::factory()->create(['group' => $group->idgroups, 'approved' => false,
+            'event_start_utc' => $this->start, 'event_end_utc' => $this->end]);
+
+        $group2 = Group::factory()->create(['approved' => false]);
+        $network->addGroup($group2);
+        $event = Party::factory()->create(['group' => $group2->idgroups, 'approved' => true,
+            'event_start_utc' => $this->start, 'event_end_utc' => $this->end]);
+        $event->approve();
+
+        $this->expectException(NotFoundHttpException::class);
+        $this->get('/calendar/network/' . $network->id);
     }
 
     /** @story:CalendarEventsController::allEventsByArea */
