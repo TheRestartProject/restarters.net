@@ -96,18 +96,38 @@ describe('components/networks/NetworkTagsManager', () => {
     expect(deleteIcon.attributes('width')).toBe('20')
   })
 
-  it('always shows the inline create form (not a modal-behind-a-button)', async () => {
+  it('hides the create inputs until "Add tag" is clicked, then creates inline and hides them again', async () => {
     store.tags.data = []
     store.createTag = vi.fn().mockResolvedValue({ id: 2, name: 'New Tag', description: null, groups_count: 0 })
 
     const wrapper = mountComponent()
 
+    expect(wrapper.find('[data-testid="network-tags-create-form"]').exists()).toBe(false)
+    expect(wrapper.get('[data-testid="network-tags-add"]').text()).toBe('Add tag')
+
+    await wrapper.get('[data-testid="network-tags-add"]').trigger('click')
+
     const form = wrapper.get('[data-testid="network-tags-create-form"]')
+    expect(wrapper.find('[data-testid="network-tags-add"]').exists()).toBe(false)
     await form.get('[data-testid="network-tags-create-name"]').setValue('New Tag')
     await form.trigger('submit')
     await flushPromises()
 
     expect(store.createTag).toHaveBeenCalledWith(1, { name: 'New Tag', description: null })
+    expect(wrapper.find('[data-testid="network-tags-create-form"]').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="network-tags-add"]').exists()).toBe(true)
+  })
+
+  it('cancelling the create form hides it without creating anything', async () => {
+    store.tags.data = []
+    store.createTag = vi.fn()
+
+    const wrapper = mountComponent()
+    await wrapper.get('[data-testid="network-tags-add"]').trigger('click')
+    await wrapper.get('[data-testid="network-tags-create-cancel"]').trigger('click')
+
+    expect(wrapper.find('[data-testid="network-tags-create-form"]').exists()).toBe(false)
+    expect(store.createTag).not.toHaveBeenCalled()
   })
 
   it('opens the edit modal with the tag pre-filled and saves via updateTag', async () => {

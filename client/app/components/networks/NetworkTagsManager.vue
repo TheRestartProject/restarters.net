@@ -6,8 +6,9 @@ import { useNetworksStore } from '~/stores/networks.js'
 // Network tag CRUD for /networks/{id}'s "Group Tags" section (parity-v2/
 // networks.md gap #4). Legacy NetworkPage.vue's tags-management block is
 // the functional spec: bordered card rows (name + count, description shown
-// inline underneath, pencil/trash icon buttons) plus an always-visible
-// inline create form below the list - NOT components/admin/AdminCrudTable.
+// inline underneath, pencil/trash icon buttons) plus an inline create form
+// below the list (hidden until "Add tag" is clicked, per the network page
+// rework) - NOT components/admin/AdminCrudTable.
 // vue's generic modal-driven create flow + name-as-edit-link + text
 // "Delete" button (AdminCrudTable is shared by 5 other reference-data pages
 // which is a DIFFERENT shape, so a bespoke component here is the parity
@@ -32,6 +33,8 @@ const error = computed(() => networksStore.tags.error)
 const newTagName = ref('')
 const newTagDescription = ref('')
 const creating = ref(false)
+// The create inputs stay out of the way until "Add tag" is clicked.
+const showCreate = ref(false)
 const createError = ref('')
 
 const showEditModal = ref(false)
@@ -62,6 +65,7 @@ async function createTag() {
     })
     newTagName.value = ''
     newTagDescription.value = ''
+    showCreate.value = false
   } catch (err) {
     createError.value = err?.data?.message || t('networks.tags.create_error')
   } finally {
@@ -174,7 +178,11 @@ async function performDelete() {
         </div>
       </div>
 
-      <BForm data-testid="network-tags-create-form" @submit.prevent="createTag">
+      <BButton v-if="!showCreate" variant="primary" size="sm" data-testid="network-tags-add" @click="showCreate = true">
+        {{ t('networks.tags.add') }}
+      </BButton>
+
+      <BForm v-else data-testid="network-tags-create-form" @submit.prevent="createTag">
         <input
           v-model="newTagName"
           type="text"
@@ -194,6 +202,9 @@ async function performDelete() {
         >
         <BButton type="submit" variant="primary" size="sm" :disabled="!newTagName.trim() || creating" data-testid="network-tags-create-submit">
           {{ t('networks.tags.create') }}
+        </BButton>
+        <BButton variant="outline-secondary" size="sm" class="ms-2" data-testid="network-tags-create-cancel" @click="showCreate = false">
+          {{ t('partials.cancel') }}
         </BButton>
         <div v-if="createError" class="text-danger small mt-1" data-testid="network-tags-create-error">{{ createError }}</div>
       </BForm>

@@ -11,6 +11,7 @@ use App\Http\Resources\Tag as TagResource;
 use App\Network;
 use App\Party;
 use Auth;
+use App\Helpers\StatsPeriod;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -40,7 +41,7 @@ class NetworkController extends Controller
     /**
      * Get stats for groups in a network that have a specific tag.
      */
-    private function statsForTag(Network $network, int $tagId): array
+    private function statsForTag(Network $network, int $tagId, ?Carbon $from = null, ?Carbon $to = null): array
     {
         $eEmissionRatio = \App\Helpers\LcaStats::getEmissionRatioPowered();
         $uEmissionratio = \App\Helpers\LcaStats::getEmissionRatioUnpowered();
@@ -51,7 +52,7 @@ class NetworkController extends Controller
             ->where('grouptags_groups.group_tag', $tagId)
             ->get();
 
-        $allStats = \App\Group::bulkGroupStats($groups, $eEmissionRatio, $uEmissionratio);
+        $allStats = \App\Group::bulkGroupStats($groups, $eEmissionRatio, $uEmissionratio, $from, $to);
 
         $stats = \App\Group::getGroupStatsArrayKeys();
 
@@ -386,9 +387,17 @@ class NetworkController extends Controller
 
     #[UserStory('As a Guest, I can list events for a network via the API', persona: 'Guest', theme: 'Network groups & events')]
     #[UserStory('As a ThirdParty, I can retrieve events for a network to display on my platform', persona: 'ThirdParty', theme: 'Network groups & events')]
+    #[UserStory('As a NetworkCoordinator, I can also see events from unapproved and archived groups in my network', persona: 'NetworkCoordinator', theme: 'Network groups & events')]
     public function getNetworkEventsv2(Request $request, $id)
     {
-        Network::findOrFail($id);
+        $network = Network::findOrFail($id);
+
+        // Coordinators of this network (and admins) can ask for events on unapproved and archived groups too, so
+        // that they can spot a group waiting for approval which already has events, or look back at a closed one.
+        // The SPA's bearer tokens authenticate via sanctum; third parties use the legacy api_token.
+        $user = auth('sanctum')->user() ?? auth('api')->user();
+        $includeUnapproved = $request->boolean('include_unapproved') && $user &&
+            ($user->hasRole('Administrator') || $user->isCoordinatorOf($network));
 
         // Get date filters.  We default to far past and far future so that we don't need multiple code branches.  We
         // don't need to validate the date format - if they put junk in then they'll get junk matches back.
@@ -415,12 +424,15 @@ class NetworkController extends Controller
             ->with('allDevices', 'theGroup.networks', 'theGroup.groupImage.image')
             ->withCount('allInvited')
             ->where('group_network.network_id', $id)
-            ->where('event_start_utc', '>=', $start)
-            ->where('event_end_utc', '<=', $end)
+            ->where('event_start_utc', '<=', $end)
+            ->where('event_end_utc', '>=', $start)
             ->where('events.updated_at', '>=', $updated_start)
             ->where('events.updated_at', '<=', $updated_end)
-            ->where('events.approved', true)
-            ->where('groups.approved', true);
+            ->where('events.approved', true);
+
+        if (!$includeUnapproved) {
+            $query = $query->where('groups.approved', true)->whereNull('groups.archived_at');
+        }
 
         // Filter by group tag if specified
         if ($request->has('group_tag')) {
@@ -524,10 +536,24 @@ class NetworkController extends Controller
      *              type="integer"
      *          )
      *      ),
+     *      @OA\Parameter(
+     *          name="period",
+     *          description="all (default) for all time, or last_12_months for events in the last 12 completed calendar months.  The group count is always the current one.",
+     *          required=false,
+     *          in="query",
+     *          @OA\Schema(
+     *              type="string",
+     *              enum={"all", "last_12_months"}
+     *          )
+     *      ),
      *      @OA\Response(
      *          response=200,
      *          description="Successful operation",
      *          @OA\JsonContent(
+     *              @OA\Property(property="period", type="object", description="Only for last_12_months: the first and last days covered.",
+     *                  @OA\Property(property="start", type="string", example="2025-10-01"),
+     *                  @OA\Property(property="end", type="string", example="2026-09-30")
+     *              ),
      *              @OA\Property(property="co2_total", type="number", example=17631.6),
      *              @OA\Property(property="co2_powered", type="number", example=17475.97),
      *              @OA\Property(property="co2_unpowered", type="number", example=155.64),
@@ -556,16 +582,24 @@ class NetworkController extends Controller
      */
     #[UserStory('As a Guest, I can view a network\'s impact statistics via the API, optionally for one group tag', persona: 'Guest', theme: 'Network stats')]
     #[UserStory('As a ThirdParty, I can retrieve a network\'s impact statistics to display on my platform', persona: 'ThirdParty', theme: 'Network stats')]
+    #[UserStory('As a Host, I can see my network\'s impact over the last 12 completed months as well as all time', persona: 'Host', theme: 'Network stats')]
     public function getNetworkStatsv2(Request $request, $id): JsonResponse
     {
         $network = Network::findOrFail($id);
 
-        if ($request->has('group_tag')) {
-            $tagId = $request->get('group_tag');
-            return response()->json($this->statsForTag($network, $tagId));
+        $request->validate(['period' => 'nullable|in:' . StatsPeriod::ALL . ',' . StatsPeriod::LAST_12_MONTHS]);
+
+        [$from, $to] = StatsPeriod::window($request->get('period'));
+
+        $stats = $request->has('group_tag')
+            ? $this->statsForTag($network, $request->get('group_tag'), $from, $to)
+            : $network->stats($from, $to);
+
+        if ($from) {
+            $stats['period'] = StatsPeriod::describe($from, $to);
         }
 
-        return response()->json($network->stats());
+        return response()->json($stats);
     }
 
     /**

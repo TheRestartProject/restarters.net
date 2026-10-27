@@ -25,6 +25,10 @@ const props = defineProps({
   },
 })
 
+// The list under the map starts at this many groups; "Show all" reveals the
+// rest (the map always shows every group).
+const LIST_LIMIT = 5
+
 const { t } = useI18n()
 const groupsStore = useGroupsStore()
 
@@ -94,6 +98,9 @@ const rows = computed(() =>
   })
 )
 
+const showAll = ref(false)
+const visibleRows = computed(() => (showAll.value ? rows.value : rows.value.slice(0, LIST_LIMIT)))
+
 const selectedGroup = computed(() => {
   if (selectedGroupId.value === null) return null
   const row = rows.value.find((r) => r.id === selectedGroupId.value)
@@ -144,12 +151,18 @@ onMounted(() => {
       <GroupsTable
         v-model:hovered-id="hoveredId"
         class="mt-3"
-        :groups="rows"
+        :groups="visibleRows"
         show-filters
         :show-tags="canManageTags"
         :optional-columns="{ location: true, next_event: true }"
         @update:filters="onFilters"
       />
+
+      <div v-if="rows.length > LIST_LIMIT" class="mt-2 text-center">
+        <BButton variant="link" data-testid="network-groups-show-all" @click="showAll = !showAll">
+          {{ showAll ? t('networks.show.groups_fewer') : t('networks.show.groups_all', { count: rows.length }) }}
+        </BButton>
+      </div>
     </template>
   </div>
 </template>

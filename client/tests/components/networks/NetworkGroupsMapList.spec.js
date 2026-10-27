@@ -16,12 +16,14 @@ const GroupsTableStub = {
   template: '<div data-testid="stub-table" :data-ids="groups.map(g => g.id).join(\',\')" :data-filters="String(showFilters)" :data-tags="String(showTags)" />',
 }
 
+const BButtonStub = { template: '<button v-bind="$attrs"><slot /></button>' }
+
 function mountIt(props = {}) {
   return mount(NetworkGroupsMapList, {
     props: { networkId: 5, ...props },
     global: {
       plugins: [createI18n({ legacy: false, locale: 'en', messages: { en: {} }, missingWarn: false })],
-      stubs: { GroupMap: GroupMapStub, GroupsTable: GroupsTableStub, GroupInfoModal: true, BAlert: true },
+      stubs: { GroupMap: GroupMapStub, GroupsTable: GroupsTableStub, GroupInfoModal: true, BAlert: true, BButton: BButtonStub },
     },
   })
 }
@@ -82,5 +84,33 @@ describe('NetworkGroupsMapList', () => {
     const w = mountIt({ canManageTags: true })
     expect(w.find('[data-testid="stub-table"]').attributes('data-filters')).toBe('true')
     expect(w.find('[data-testid="stub-table"]').attributes('data-tags')).toBe('true')
+  })
+
+  describe('list length', () => {
+    beforeEach(() => {
+      store.names = Array.from({ length: 8 }, (_, i) => ({ id: i + 1, name: `Group ${i + 1}`, network_ids: [5], tag_ids: [], archived_at: null }))
+    })
+
+    it('lists only 5 groups to start with, while the map keeps every pin', () => {
+      const w = mountIt()
+      expect(w.find('[data-testid="stub-table"]').attributes('data-ids')).toBe('1,2,3,4,5')
+      expect(w.find('[data-testid="stub-map"]').attributes('data-ids')).toBe('1,2,3,4,5,6,7,8')
+      expect(w.find('[data-testid="network-groups-show-all"]').text()).toBe('networks.show.groups_all')
+    })
+
+    it('Show all reveals the rest and Show fewer collapses it again', async () => {
+      const w = mountIt()
+      await w.get('[data-testid="network-groups-show-all"]').trigger('click')
+      expect(w.find('[data-testid="stub-table"]').attributes('data-ids')).toBe('1,2,3,4,5,6,7,8')
+
+      await w.get('[data-testid="network-groups-show-all"]').trigger('click')
+      expect(w.find('[data-testid="stub-table"]').attributes('data-ids')).toBe('1,2,3,4,5')
+    })
+
+    it('has no Show all control when there are 5 or fewer groups', () => {
+      store.names = store.names.slice(0, 5)
+      const w = mountIt()
+      expect(w.find('[data-testid="network-groups-show-all"]').exists()).toBe(false)
+    })
   })
 })
