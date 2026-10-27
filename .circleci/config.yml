@@ -219,6 +219,11 @@ jobs:
             docker cp restarters:/tmp/phpunit-results.xml /tmp/test-results/phpunit/results.xml
           no_output_timeout: 45m
 
+      # PHP coverage to Coveralls (develop only; see scripts/coveralls.sh)
+      - run:
+          name: Upload PHP coverage to Coveralls
+          command: scripts/coveralls.sh report php clover tests/clover.xml
+
       # Store artifacts
       - store_artifacts:
           path: /tmp/test-results
@@ -253,7 +258,10 @@ jobs:
           name: Vitest
           command: |
             mkdir -p /tmp/test-results/vitest
-            cd client && npx vitest run --reporter=default --reporter=junit --outputFile=/tmp/test-results/vitest/results.xml
+            cd client && npx vitest run --coverage --coverage.reporter=lcov --reporter=default --reporter=junit --outputFile=/tmp/test-results/vitest/results.xml
+      - run:
+          name: Upload client coverage to Coveralls
+          command: scripts/coveralls.sh report client lcov client/coverage/lcov.info client
       - run:
           name: Nuxt build
           command: cd client && npx nuxi build
@@ -262,6 +270,18 @@ jobs:
       - store_artifacts:
           path: /tmp/test-results
           destination: client-test-results
+
+  # Closes the Coveralls build once the php and client parallel jobs have
+  # uploaded, so Coveralls reports combined coverage.
+  coverage-done:
+    docker:
+      - image: cimg/base:current
+    resource_class: small
+    steps:
+      - checkout
+      - run:
+          name: Close Coveralls build
+          command: scripts/coveralls.sh done
 
   # Playwright against the real two-container stack (Laravel API + Nuxt client).
   # Separate machine job — the monolithic `build` job's time budget is already
@@ -573,6 +593,13 @@ workflows:
           filters:
             branches:
               ignore: production
+      - coverage-done:
+          requires:
+            - build
+            - build-client
+          filters:
+            branches:
+              only: develop
       - deploy-fly-dev:
           requires:
             - build
