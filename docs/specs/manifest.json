@@ -1,5 +1,5 @@
 {
-    "generatedAt": "2026-10-23T17:48:00Z",
+    "generatedAt": "2026-10-27T17:01:43Z",
     "features": {
         "Administration": {
             "description": "Platform administration and configuration",
@@ -2317,6 +2317,10 @@
                         {
                             "file": "tests/Feature/Networks/APIv2NetworkTest.php",
                             "test": "testListEvents"
+                        },
+                        {
+                            "file": "tests/Feature/Networks/APIv2NetworkTest.php",
+                            "test": "testNetworkEventsIncludeUnapprovedForCoordinators"
                         }
                     ]
                 },
@@ -2336,7 +2340,12 @@
                     "method": "NetworkController::getNetworkStatsv2",
                     "class": "App\\Http\\Controllers\\API\\NetworkController",
                     "file": "app/Http/Controllers/API/NetworkController.php",
-                    "tests": []
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Networks/APIv2NetworkTest.php",
+                            "test": "testNetworkStatsForLastTwelveCompletedMonths"
+                        }
+                    ]
                 },
                 {
                     "story": "As a Guest, I can list a network's group tags via the API",
@@ -2380,6 +2389,20 @@
                     ]
                 },
                 {
+                    "story": "As a Host, I can see my network's impact over the last 12 completed months as well as all time",
+                    "persona": "Host",
+                    "theme": "Network stats",
+                    "method": "NetworkController::getNetworkStatsv2",
+                    "class": "App\\Http\\Controllers\\API\\NetworkController",
+                    "file": "app/Http/Controllers/API/NetworkController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Networks/APIv2NetworkTest.php",
+                            "test": "testNetworkStatsForLastTwelveCompletedMonths"
+                        }
+                    ]
+                },
+                {
                     "story": "As a NetworkCoordinator, I can add groups to my network",
                     "persona": "NetworkCoordinator",
                     "theme": "Network management",
@@ -2418,6 +2441,28 @@
                     "class": "App\\Http\\Controllers\\API\\NetworkController",
                     "file": "app/Http/Controllers/API/NetworkController.php",
                     "tests": []
+                },
+                {
+                    "story": "As a NetworkCoordinator, I can also see events from unapproved and archived groups in my network",
+                    "persona": "NetworkCoordinator",
+                    "theme": "Network groups & events",
+                    "method": "NetworkController::getNetworkEventsv2",
+                    "class": "App\\Http\\Controllers\\API\\NetworkController",
+                    "file": "app/Http/Controllers/API/NetworkController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Events/APIv2EventTest.php",
+                            "test": "testGetEventsForUnapprovedGroup"
+                        },
+                        {
+                            "file": "tests/Feature/Networks/APIv2NetworkTest.php",
+                            "test": "testListEvents"
+                        },
+                        {
+                            "file": "tests/Feature/Networks/APIv2NetworkTest.php",
+                            "test": "testNetworkEventsIncludeUnapprovedForCoordinators"
+                        }
+                    ]
                 },
                 {
                     "story": "As a NetworkCoordinator, I can view my network's statistics via the API",
@@ -2480,6 +2525,10 @@
                         {
                             "file": "tests/Feature/Networks/APIv2NetworkTest.php",
                             "test": "testListEvents"
+                        },
+                        {
+                            "file": "tests/Feature/Networks/APIv2NetworkTest.php",
+                            "test": "testNetworkEventsIncludeUnapprovedForCoordinators"
                         }
                     ]
                 },
@@ -2499,7 +2548,12 @@
                     "method": "NetworkController::getNetworkStatsv2",
                     "class": "App\\Http\\Controllers\\API\\NetworkController",
                     "file": "app/Http/Controllers/API/NetworkController.php",
-                    "tests": []
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Networks/APIv2NetworkTest.php",
+                            "test": "testNetworkStatsForLastTwelveCompletedMonths"
+                        }
+                    ]
                 },
                 {
                     "story": "As a ThirdParty, I can retrieve a network's group tags to display on my platform",
@@ -2543,10 +2597,11 @@
                     ]
                 }
             ],
-            "storyCount": 22,
+            "storyCount": 24,
             "personas": [
                 "Admin",
                 "Guest",
+                "Host",
                 "NetworkCoordinator",
                 "ThirdParty"
             ]
@@ -3671,9 +3726,10 @@
             "features": [
                 "Devices",
                 "Events",
-                "Groups"
+                "Groups",
+                "Networks"
             ],
-            "storyCount": 33
+            "storyCount": 34
         },
         "NetworkCoordinator": {
             "features": [
@@ -3681,7 +3737,7 @@
                 "Groups",
                 "Networks"
             ],
-            "storyCount": 12
+            "storyCount": 13
         },
         "RepairDirectoryAdmin": {
             "features": [
@@ -3713,7 +3769,7 @@
         }
     },
     "coverage": {
-        "annotatedStories": 256,
-        "storiesWithTests": 107
+        "annotatedStories": 258,
+        "storiesWithTests": 111
     }
 }

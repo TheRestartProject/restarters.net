@@ -62,6 +62,13 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *          example="false"
  *     ),
  *     @OA\Property(
+ *          property="cancelled",
+ *          title="cancelled",
+ *          description="Whether this event has been cancelled.",
+ *          format="boolean",
+ *          example="false"
+ *     ),
+ *     @OA\Property(
  *          property="lat",
  *          title="lat",
  *          description="Latitude at which the event is taking place.  Only valid if online=false.",
@@ -131,6 +138,7 @@ class PartySummary extends JsonResource
             'title' => $this->venue ?? $this->location,
             'location' => $this->location,
             'online' => $this->online,
+            'cancelled' => $this->cancelled ? true : false,
             'lat' => $this->latitude,
             'lng' => $this->longitude,
             'group' => \App\Http\Resources\GroupSummary::make($this->theGroup),

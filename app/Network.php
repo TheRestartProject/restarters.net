@@ -101,7 +101,9 @@ class Network extends Model
         return $query->get();
     }
 
-    public function stats()
+    // $from and $to (UTC, $to exclusive) limit the impact figures to events in that window.  The group tally is
+    // always the current one.
+    public function stats(?\Carbon\Carbon $from = null, ?\Carbon\Carbon $to = null)
     {
         $eEmissionRatio = \App\Helpers\LcaStats::getEmissionRatioPowered();
         $uEmissionratio = \App\Helpers\LcaStats::getEmissionRatioUnpowered();
@@ -110,7 +112,7 @@ class Network extends Model
         $groups = $this->groups()->withoutGlobalScopes()->without(['networks', 'group_tags'])
             ->get(['groups.idgroups', 'groups.archived_at']);
 
-        $allStats = \App\Group::bulkGroupStats($groups, $eEmissionRatio, $uEmissionratio);
+        $allStats = \App\Group::bulkGroupStats($groups, $eEmissionRatio, $uEmissionratio, $from, $to);
 
         $stats = \App\Group::getGroupStatsArrayKeys();
 
