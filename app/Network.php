@@ -101,6 +101,80 @@ class Network extends Model
         return $query->get();
     }
 
+    /**
+     * The approved, active groups in this network nearest to $from (not including it), with their distance in km.
+     */
+    public function nearestGroups(Group $from, int $count = 5)
+    {
+        if (is_null($from->latitude) || is_null($from->longitude)) {
+            return collect();
+        }
+
+        return $this->groups()
+            ->select('groups.idgroups', 'groups.name', 'groups.location', 'groups.latitude', 'groups.longitude')
+            ->selectRaw(
+                '( 6371 * acos( cos( radians(?) ) * cos( radians( latitude ) ) * cos( radians( longitude ) - radians(?) ) + sin( radians(?) ) * sin( radians( latitude ) ) ) ) AS dist',
+                [$from->latitude, $from->longitude, $from->latitude]
+            )
+            ->where('groups.idgroups', '!=', $from->idgroups)
+            ->where('groups.approved', true)
+            ->whereNull('groups.archived_at')
+            ->whereNotNull('groups.latitude')
+            ->whereNotNull('groups.longitude')
+            ->orderBy('dist')
+            ->take($count)
+            ->get();
+    }
+
+    /**
+     * The groups in the network nearest to any of the user's own located groups in it, nearest first, with each
+     * group listed once at its smallest distance.  The user's own groups are left out.  Null if they have no
+     * located group in the network.
+     */
+    public function nearbyGroupsFor(User $user): ?array
+    {
+        $mine = Group::join('users_groups', 'users_groups.group', '=', 'groups.idgroups')
+            ->join('group_network', 'group_network.group_id', '=', 'groups.idgroups')
+            ->where('group_network.network_id', $this->id)
+            ->where('users_groups.user', $user->id)
+            ->whereNull('users_groups.deleted_at')
+            ->whereNotNull('groups.latitude')
+            ->whereNotNull('groups.longitude')
+            ->orderBy('groups.name')
+            ->select('groups.*')
+            ->get();
+
+        if ($mine->isEmpty()) {
+            return null;
+        }
+
+        $mineIds = $mine->pluck('idgroups')->all();
+        $nearest = [];
+
+        foreach ($mine as $group) {
+            // Ask for extra so that skipping the user's other groups still leaves enough.
+            foreach ($this->nearestGroups($group, 5 + count($mineIds)) as $g) {
+                if (in_array($g->idgroups, $mineIds)) {
+                    continue;
+                }
+
+                if (! isset($nearest[$g->idgroups]) || $g->dist < $nearest[$g->idgroups]->dist) {
+                    $nearest[$g->idgroups] = $g;
+                }
+            }
+        }
+
+        return [
+            'from' => $mine->pluck('name')->implode(', '),
+            'groups' => collect($nearest)->sortBy('dist')->take(5)->map(fn ($g) => [
+                'id' => $g->idgroups,
+                'name' => $g->name,
+                'location' => $g->location,
+                'distance' => round($g->dist, 1),
+            ])->values()->all(),
+        ];
+    }
+
     public function stats()
     {
         $eEmissionRatio = \App\Helpers\LcaStats::getEmissionRatioPowered();

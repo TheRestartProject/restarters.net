@@ -118,6 +118,19 @@ async function flushPromises() {
   await Promise.resolve()
 }
 
+// What GET /api/v2/networks/{id}/viewer returns; `forbidden` makes it 403.
+function viewerResult(data, forbidden = false) {
+  const store = useNetworksStore()
+  store.fetchViewer = vi.fn().mockImplementation(async () => {
+    if (forbidden) {
+      store.viewer.error = { status: 403 }
+      throw store.viewer.error
+    }
+    store.viewer.data = data
+    return data
+  })
+}
+
 describe('pages/networks/[id]', () => {
   let networksStore
   let groupsStore
@@ -130,6 +143,7 @@ describe('pages/networks/[id]', () => {
     vi.stubGlobal('navigateTo', navigateToSpy)
 
     networksStore = useNetworksStore()
+    viewerResult({ can_moderate: true, nearby_groups: null })
     networksStore.fetchCurrent = vi.fn().mockImplementation(async () => {
       networksStore.current.data = NETWORK
     })
@@ -145,42 +159,87 @@ describe('pages/networks/[id]', () => {
   })
 
   describe('permission gate', () => {
-    it('redirects Hosts to /forbidden without fetching the network', () => {
-      setLoggedInUser({ id: 1, role_name: 'Host', networks: [] })
-
-      mountPage()
-
-      expect(navigateToSpy).toHaveBeenCalledWith('/forbidden')
-      expect(networksStore.fetchCurrent).not.toHaveBeenCalled()
-    })
-
-    it('redirects a NetworkCoordinator who does not coordinate THIS network', () => {
-      setLoggedInUser({ id: 1, role_name: 'NetworkCoordinator', networks: [{ id: 99, name: 'Other Network' }] })
-
-      mountPage()
-
-      expect(navigateToSpy).toHaveBeenCalledWith('/forbidden')
-      expect(networksStore.fetchCurrent).not.toHaveBeenCalled()
-    })
-
-    it('lets in the coordinator of this network', async () => {
-      setLoggedInUser({ id: 1, role_name: 'NetworkCoordinator', networks: [{ id: 1, name: 'Test London' }] })
+    it('sends a user the API forbids to /forbidden without loading the network', async () => {
+      setLoggedInUser({ id: 1, role_name: 'Restarter', networks: [] })
+      viewerResult(null, true)
 
       mountPage()
       await flushPromises()
 
-      expect(navigateToSpy).not.toHaveBeenCalled()
-      expect(networksStore.fetchCurrent).toHaveBeenCalledWith(1)
+      expect(navigateToSpy).toHaveBeenCalledWith('/forbidden')
+      expect(networksStore.fetchCurrent).not.toHaveBeenCalled()
     })
 
-    it('lets in an Administrator regardless of their own coordinated networks', async () => {
+    it('lets in the coordinator of this network with the full page', async () => {
+      setLoggedInUser({ id: 1, role_name: 'NetworkCoordinator', networks: [{ id: 1, name: 'Test London' }] })
+
+      const wrapper = mountPage()
+      await flushPromises()
+
+      expect(navigateToSpy).not.toHaveBeenCalled()
+      expect(networksStore.fetchViewer).toHaveBeenCalledWith(1)
+      expect(networksStore.fetchCurrent).toHaveBeenCalledWith(1)
+      expect(wrapper.find('[data-testid="network-groups-moderation"]').exists()).toBe(true)
+    })
+
+    it('lets in a host or volunteer, without any coordinator-only parts', async () => {
+      setLoggedInUser({ id: 2, role_name: 'Host', networks: [] })
+      viewerResult({ can_moderate: false, nearby_groups: null })
+      networksStore.fetchCurrent = vi.fn().mockImplementation(async () => {
+        networksStore.current.data = {
+          ...NETWORK,
+          reporting_url: null,
+          coordinators: [{ id: 7, name: 'Coord Inator', avatar_url: null }],
+        }
+      })
+
+      const wrapper = mountPage()
+      await flushPromises()
+
+      expect(navigateToSpy).not.toHaveBeenCalled()
+      expect(wrapper.find('[data-testid="network-show-name"]').text()).toBe('Test London')
+      // Coordinators are visible to everyone who can open the page.
+      expect(wrapper.find('[data-testid="network-coordinator-7"]').exists()).toBe(true)
+      expect(wrapper.find('[data-testid="stub-network-groups-map-list"]').attributes('data-can-manage-tags')).toBe('false')
+
+      for (const hidden of [
+        'network-groups-moderation',
+        'network-events-moderation',
+        'tags-management',
+        'network-show-actions',
+        'network-show-add-groups',
+        'network-show-export-events',
+        'network-show-reports',
+        'network-show-reports-link',
+      ]) {
+        expect(wrapper.find(`[data-testid="${hidden}"]`).exists()).toBe(false)
+      }
+      expect(networksStore.fetchTags).not.toHaveBeenCalled()
+      expect(groupsStore.fetchNames).not.toHaveBeenCalled()
+    })
+
+    it('shows the nearby groups to a member who has some', async () => {
+      setLoggedInUser({ id: 2, role_name: 'Host', networks: [] })
+      viewerResult({
+        can_moderate: false,
+        nearby_groups: { from: 'My Group', groups: [{ id: 5, name: 'Close By', location: 'Town', distance: 1.2 }] },
+      })
+
+      const wrapper = mountPage()
+      await flushPromises()
+
+      const nearby = wrapper.get('[data-testid="network-nearby-groups"]')
+      expect(nearby.text()).toContain('Close By')
+    })
+
+    it('lets in an Administrator and loads tags for them', async () => {
       setLoggedInUser({ id: 1, role_name: 'Administrator', networks: [] })
 
       mountPage()
       await flushPromises()
 
       expect(navigateToSpy).not.toHaveBeenCalled()
-      expect(networksStore.fetchCurrent).toHaveBeenCalledWith(1)
+      expect(networksStore.fetchTags).toHaveBeenCalledWith(1)
     })
   })
 

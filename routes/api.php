@@ -233,6 +233,7 @@ Route::prefix('v2')->middleware(\App\Http\Middleware\VerifyUserConsentApi::class
             Route::get('{id}/tags', [API\NetworkController::class, 'getNetworkTagsv2']);
             Route::get('{id}/stats', [API\NetworkController::class, 'getNetworkStatsv2']);
             Route::middleware('auth:sanctum,api')->group(function() {
+                Route::get('{id}/viewer', [API\NetworkController::class, 'getNetworkViewerv2']);
                 Route::post('{id}/tags', [API\NetworkController::class, 'createNetworkTagv2']);
                 Route::put('{id}/tags/{tagId}', [API\NetworkController::class, 'updateNetworkTagv2']);
                 Route::delete('{id}/tags/{tagId}', [API\NetworkController::class, 'deleteNetworkTagv2']);

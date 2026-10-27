@@ -141,6 +141,38 @@ class NetworkController extends Controller
 
     /**
      * @OA\Get(
+     *      path="/api/v2/networks/{id}/viewer",
+     *      operationId="getNetworkViewer",
+     *      tags={"Networks"},
+     *      summary="Get what the caller can do on a network page",
+     *      description="Returns whether the caller can moderate the network, and the groups nearest to the caller's own groups in it. 403 unless the caller is an administrator, a coordinator of the network, or a member of one of its groups.",
+     *      @OA\Parameter(name="id", required=true, in="path", @OA\Schema(type="integer")),
+     *      @OA\Response(response=200, description="Successful operation"),
+     *      @OA\Response(response=403, description="Forbidden"),
+     *      @OA\Response(response=404, ref="#/components/responses/NotFound"),
+     *     )
+     */
+
+    #[UserStory('As a group volunteer or host, I can open my network\'s page and see the groups nearest to mine', persona: 'Restarter', theme: 'Network groups & events')]
+    public function getNetworkViewerv2($id): JsonResponse
+    {
+        $network = Network::findOrFail($id);
+        $user = Auth::user();
+
+        if (! $user || ! $user->can('viewPublic', $network)) {
+            abort(403, 'You do not have access to this network');
+        }
+
+        return response()->json([
+            'data' => [
+                'can_moderate' => $user->can('view', $network),
+                'nearby_groups' => $network->nearbyGroupsFor($user),
+            ],
+        ]);
+    }
+
+    /**
+     * @OA\Get(
      *      path="/api/v2/networks/{id}/groups",
      *      operationId="getNetworkGroups",
      *      tags={"Networks"},

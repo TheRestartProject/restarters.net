@@ -1,8 +1,6 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useAuth } from '~/composables/useAuth.js'
-import { useSessionStore } from '~/stores/session.js'
 import { useNetworksStore } from '~/stores/networks.js'
 import { useGroupsStore } from '~/stores/groups.js'
 import NetworkStats from '~/components/networks/NetworkStats.vue'
@@ -11,16 +9,17 @@ import NetworkGroupsModerationTable from '~/components/networks/NetworkGroupsMod
 import NetworkEventsModerationTable from '~/components/networks/NetworkEventsModerationTable.vue'
 import NetworkTagsManager from '~/components/networks/NetworkTagsManager.vue'
 import NetworkGroupsMapList from '~/components/networks/NetworkGroupsMapList.vue'
+import NetworkNearbyGroups from '~/components/networks/NetworkNearbyGroups.vue'
 
 // /networks/{id} - resources/views/networks/show.blade.php +
 // resources/js/components/NetworkPage.vue (design.md §6.2 Phase E task E1).
-// Administrator/coordinator-of-this-network only (NetworkPolicy@view -
-// there is no plain "Host can view" case at all, unlike the grouptags
-// suite's group-page permission matrix). Since view access and manage
-// access (tags CRUD, associate groups - NetworkPolicy@associateGroups) are
-// governed by the exact same condition, reaching this page already implies
-// "can manage" - there is no separate reduced-permission view here (unlike
-// e.g. /group/view/[id] where hosts see a read-only page).
+// Administrators, this network's coordinators and the volunteers/hosts of its
+// groups can open it (NetworkPolicy@viewPublic); access follows
+// GET /api/v2/networks/{id}/viewer, which 403s anyone else. Only
+// administrators and coordinators (`can_moderate`) get the moderation
+// sections, add-groups, the event export, the tags manager and the reporting
+// links; everyone else sees the impact, about, coordinators, groups map and
+// their nearby groups.
 //
 // "Network coordinators" section (avatar + name cards), matching legacy
 // resources/js/components/NetworkPage.vue: GET /api/v2/networks/{id}'s
@@ -49,16 +48,13 @@ definePageMeta({ auth: true })
 
 const { t } = useI18n()
 const route = useRoute()
-const { hasRole } = useAuth()
-const sessionStore = useSessionStore()
 const networksStore = useNetworksStore()
 const groupsStore = useGroupsStore()
 
 const id = computed(() => Number(route.params.id))
 
-const isAdministrator = computed(() => hasRole('Administrator'))
-const isCoordinatorHere = computed(() => (sessionStore.user?.networks || []).some((n) => n.id === id.value))
-const canManage = computed(() => isAdministrator.value || isCoordinatorHere.value)
+const canManage = computed(() => !!networksStore.viewer.data?.can_moderate)
+const nearbyGroups = computed(() => networksStore.viewer.data?.nearby_groups ?? null)
 
 const network = computed(() => networksStore.current.data)
 
@@ -111,18 +107,23 @@ function loadGroups() {
 
 function loadNetwork() {
   networksStore.fetchCurrent(id.value)
-  networksStore.fetchTags(id.value)
+  if (canManage.value) networksStore.fetchTags(id.value)
   loadGroups()
 }
 
-onMounted(() => {
-  if (!isAdministrator.value && !isCoordinatorHere.value) {
-    navigateTo('/forbidden')
-    return
+onMounted(async () => {
+  try {
+    await networksStore.fetchViewer(id.value)
+  } catch (error) {
+    if (error?.status === 403) {
+      navigateTo('/forbidden')
+      return
+    }
+    // Anything else (e.g. a 404) is reported by the network load below.
   }
 
   loadNetwork()
-  groupsStore.fetchNames().catch(() => {})
+  if (canManage.value) groupsStore.fetchNames().catch(() => {})
 })
 
 function retry() {
@@ -165,7 +166,7 @@ function retry() {
              in, only its add-groups item on canAssociateGroups. develop
              dropped its "View groups" item when the Groups section became an
              inline map and list. -->
-        <BDropdown variant="primary" placement="bottom-end" :text="t('networks.general.actions')" data-testid="network-show-actions">
+        <BDropdown v-if="canManage" variant="primary" placement="bottom-end" :text="t('networks.general.actions')" data-testid="network-show-actions">
           <BDropdownItem v-if="canManage" data-testid="network-show-add-groups" @click="showAssociateModal = true">
             {{ t('networks.show.add_groups_menuitem') }}
           </BDropdownItem>
@@ -179,7 +180,7 @@ function retry() {
           >
             {{ t('networks.general.view_reports') }}
           </BDropdownItem>
-          <BDropdownItem :href="`/export/networks/${network.id}/events`" data-testid="network-show-export-events">
+          <BDropdownItem v-if="canManage" :href="`/export/networks/${network.id}/events`" data-testid="network-show-export-events">
             {{ t('groups.export_event_list') }}
           </BDropdownItem>
         </BDropdown>
@@ -229,6 +230,8 @@ function retry() {
           </NuxtLink>
         </div>
       </section>
+
+      <NetworkNearbyGroups :nearby="nearbyGroups" />
 
       <!-- Groups/events awaiting moderation, for Administrators and this
            network's coordinators - the network-specific rich tables (gap

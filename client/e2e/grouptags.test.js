@@ -401,19 +401,20 @@ test.describe('tag visibility', () => {
     await setGroupTagAssignment(page, groupId, tagName, false)
   })
 
-  test('Host is redirected away from the network page entirely', async ({ page }) => {
+  test('Host sees the network page without tag management', async ({ page }) => {
     test.slow()
     // GET /api/v2/networks is a public route (routes/api.php), so resolving
     // the id needs no login.
     const networkId = await getNetworkId(page)
 
-    // Host coordinates no networks and isn't an Administrator -
-    // NetworkPolicy::view has no reduced-permission "read only" case, so
-    // the page itself redirects to /forbidden on mount (pages/networks/
-    // [id].vue) rather than hiding just the tags section.
+    // Host hosts a group in the network, so NetworkPolicy::viewPublic lets
+    // them open the page, but the coordinator-only parts (tags management,
+    // moderation, add groups) stay hidden.
     await login(page, USERS.host)
     await page.goto(`/networks/${networkId}`)
-    await page.waitForURL('**/forbidden**', { timeout: 10000 })
+    await expect(page.getByTestId('network-show-name')).toBeVisible({ timeout: 10000 })
+    await expect(page.getByTestId('tags-management')).toHaveCount(0)
+    await expect(page.getByTestId('network-groups-moderation')).toHaveCount(0)
   })
 })
 

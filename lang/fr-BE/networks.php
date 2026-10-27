@@ -71,4 +71,9 @@ return [
     'add_groups_warning_none_selected' => 'Pas de repair café(s) sélectionné(s)',
     'none' => 'Aucun',
   ],
+  'nearby' => [
+    'title' => 'Groupes près de chez vous',
+    'intro' => 'Les groupes de ce réseau les plus proches de :group.',
+    'distance' => ':distance km',
+  ],
 ];

@@ -77,4 +77,9 @@ return [
     'new_field_name' => 'New field name',
     'add_field' => 'Add field',
   ],
+  'nearby' => [
+    'title' => 'Groups near you',
+    'intro' => 'The nearest groups in this network to :group.',
+    'distance' => ':distance km',
+  ],
 ];
