@@ -1,5 +1,5 @@
 {
-    "generatedAt": "2026-10-23T17:48:00Z",
+    "generatedAt": "2026-10-27T17:49:55Z",
     "features": {
         "Administration": {
             "description": "Platform administration and configuration",
@@ -2466,6 +2466,15 @@
                     "tests": []
                 },
                 {
+                    "story": "As a group volunteer or host, I can open my network's page and see the groups nearest to mine",
+                    "persona": "Restarter",
+                    "theme": "Network groups & events",
+                    "method": "NetworkController::getNetworkViewerv2",
+                    "class": "App\\Http\\Controllers\\API\\NetworkController",
+                    "file": "app/Http/Controllers/API/NetworkController.php",
+                    "tests": []
+                },
+                {
                     "story": "As a ThirdParty, I can retrieve events for a network to display on my platform",
                     "persona": "ThirdParty",
                     "theme": "Network groups & events",
@@ -2543,11 +2552,12 @@
                     ]
                 }
             ],
-            "storyCount": 22,
+            "storyCount": 23,
             "personas": [
                 "Admin",
                 "Guest",
                 "NetworkCoordinator",
+                "Restarter",
                 "ThirdParty"
             ]
         },
@@ -3696,10 +3706,11 @@
                 "Devices",
                 "Events",
                 "Groups",
+                "Networks",
                 "Platform",
                 "Users"
             ],
-            "storyCount": 69
+            "storyCount": 70
         },
         "ThirdParty": {
             "features": [
@@ -3713,7 +3724,7 @@
         }
     },
     "coverage": {
-        "annotatedStories": 256,
+        "annotatedStories": 257,
         "storiesWithTests": 107
     }
 }
