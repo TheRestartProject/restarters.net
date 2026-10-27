@@ -394,7 +394,8 @@ class NetworkController extends Controller
 
         // Coordinators of this network (and admins) can ask for events on unapproved and archived groups too, so
         // that they can spot a group waiting for approval which already has events, or look back at a closed one.
-        $user = auth('api')->user();
+        // The SPA's bearer tokens authenticate via sanctum; third parties use the legacy api_token.
+        $user = auth('sanctum')->user() ?? auth('api')->user();
         $includeUnapproved = $request->boolean('include_unapproved') && $user &&
             ($user->hasRole('Administrator') || $user->isCoordinatorOf($network));
 
