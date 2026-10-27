@@ -141,6 +141,7 @@ onBeforeUnmount(() => {
               :aria-label="popoverTitle(d.date)"
               :data-testid="`network-events-popover-${d.date}`"
               @click.stop
+              @keydown.esc.stop="close"
             >
               <div class="d-flex align-items-center justify-content-between mb-2">
                 <strong class="small">{{ popoverTitle(d.date) }}</strong>
