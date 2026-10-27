@@ -181,7 +181,7 @@ Before running tests, you need to configure the Google API key for geocoding fun
 > Without a valid `GOOGLE_API_CONSOLE_KEY`, tests that create groups or events will fail with location validation errors.
 
 > [!NOTE]
-> The PHPUnit task will automatically upload coverage to Coveralls if the `COVERALLS_REPO_TOKEN` environment variable is set.
+> On develop, CI uploads PHP (`php`) and client (`client`) coverage to Coveralls as one combined build with `scripts/coveralls.sh`. It needs `COVERALLS_REPO_TOKEN` and skips without it.
 
 </details>
 
