@@ -54,6 +54,7 @@ return [
     'delete_confirm_title' => 'Supprimer l\'etiquette',
     'delete_confirm_message' => 'Êtes-vous sûr de vouloir supprimer l\'etiquette ":name"?',
     'delete_warning' => '{1} Cette action supprimera l\'etiquette de :count Repair Café.|[2,*] Cette action supprimera l\'etiquette de :count Repair Cafés.',
+    'add' => 'Ajouter une etiquette',
   ],
   'index' => [
     'all_networks' => 'Tous les réseaux',
@@ -74,6 +75,10 @@ return [
     'add_groups_success' => '{1} :number repair café ajouté.|[2,*] :number repair cafés ajoutés.',
     'add_groups_warning_none_selected' => 'Pas de repair café(s) sélectionné(s)',
     'none' => 'Aucun',
+    'coordinators_more' => 'Afficher :count de plus',
+    'coordinators_fewer' => 'Afficher moins',
+    'groups_all' => 'Afficher les :count repair cafés',
+    'groups_fewer' => 'Afficher moins de repair cafés',
   ],
   'events' => [
     'title' => 'Événements à venir',
@@ -99,6 +104,10 @@ return [
     'next_month' => 'Mois suivant',
     'loading' => 'Chargement des événements...',
     'error' => 'Impossible de charger les événements.',
+    'more' => '+:count de plus',
+    'day_events' => 'Événements du :date',
+    'close' => 'Fermer',
+    'subscribe_description' => 'Ajoutez tous les événements à venir de ce réseau à votre calendrier Google/Outlook/Yahoo/Apple avec le lien ci-dessous :',
     'view_toggle' => 'Affichage des événements',
   ],
 ];

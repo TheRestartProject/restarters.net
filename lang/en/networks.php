@@ -52,7 +52,8 @@ return [
     'delete' => 'Delete',
     'delete_confirm_title' => 'Delete Tag',
     'delete_confirm_message' => 'Are you sure you want to delete the tag ":name"?',
-    'delete_warning' => '{1} This will remove the tag from :count group.|[2,*] This will remove the tag from :count groups.'
+    'delete_warning' => '{1} This will remove the tag from :count group.|[2,*] This will remove the tag from :count groups.',
+    'add' => 'Add tag',
   ],
   'index' => [
     'your_networks' => 'Your networks',
@@ -71,6 +72,10 @@ return [
     'add_groups_warning_none_selected' => 'No groups selected.',
     'add_groups_success' => '{1} :number group added.|[2,*] :number groups added.',
     'none' => 'None',
+    'coordinators_more' => 'Show :count more',
+    'coordinators_fewer' => 'Show fewer',
+    'groups_all' => 'Show all :count groups',
+    'groups_fewer' => 'Show fewer groups',
   ],
   'edit' => [
     'label_reporting_url' => 'Reporting dashboard address',
@@ -105,6 +110,10 @@ return [
     'next_month' => 'Next month',
     'loading' => 'Loading events...',
     'error' => 'Could not load events.',
+    'more' => '+:count more',
+    'day_events' => 'Events on :date',
+    'close' => 'Close',
+    'subscribe_description' => 'Add all upcoming events in this network to your Google/Outlook/Yahoo/Apple calendar with the link below:',
     'view_toggle' => 'Events view',
   ],
 ];
