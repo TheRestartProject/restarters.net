@@ -222,13 +222,18 @@ class Network extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $user = \Illuminate\Support\Facades\Auth::user()
+            ?? auth('sanctum')->user()
+            ?? auth('api')->user();
+
         return [
             'id' => $this->id,
             'name' => $this->name,
             'logo' => $this->logo ? ($request->root() . '/uploads/' . $this->logo) : null,
             'description' => $this->description,
             'website' => $this->website,
-            'reporting_url' => $this->reporting_url,
+            // The reporting dashboard is for the network's coordinators and administrators only.
+            'reporting_url' => ($user && $user->can('view', $this->resource)) ? $this->reporting_url : null,
             'shortname' => $this->shortname,
             'default_language' => $this->default_language,
             'stats' => $this->resource->stats(),

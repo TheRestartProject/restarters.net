@@ -19,6 +19,13 @@ export default class NetworkAPI extends BaseAPI {
     return this.$get(`/api/v2/networks/${id}`)
   }
 
+  // GET /api/v2/networks/{id}/viewer - what the caller may do on the network
+  // page: {can_moderate, nearby_groups}. Requires auth; 403 unless they are an
+  // administrator, a coordinator of the network or a member of one of its groups.
+  viewer(id) {
+    return this.$get(`/api/v2/networks/${id}/viewer`)
+  }
+
   // includeNextEvent/includeDetails/includeStats/includeArchived/group_tag
   // query params (getNetworkGroupsv2). Also honours includeCounts (read
   // directly off the request by GroupSummary#toArray, not documented in

@@ -33,6 +33,7 @@ export const useNetworksStore = defineStore('networks', {
   state: () => ({
     list: { data: [], loading: false, error: null },
     current: { data: null, loading: false, error: null },
+    viewer: { data: null, loading: false, error: null },
     groups: { data: [], loading: false, error: null },
     tags: { data: [], loading: false, error: null },
   }),
@@ -71,6 +72,27 @@ export const useNetworksStore = defineStore('networks', {
         throw error
       } finally {
         this.current.loading = false
+      }
+    },
+
+    // What the caller may do on this network's page ({can_moderate,
+    // nearby_groups}); rejects with a 403 error when they may not open it.
+    async fetchViewer(id) {
+      const { $api } = useNuxtApp()
+
+      this.viewer.loading = true
+      this.viewer.error = null
+      this.viewer.data = null
+
+      try {
+        const { data } = await $api.network.viewer(id)
+        this.viewer.data = data
+        return data
+      } catch (error) {
+        this.viewer.error = error
+        throw error
+      } finally {
+        this.viewer.loading = false
       }
     },
 
