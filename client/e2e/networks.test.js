@@ -67,4 +67,37 @@ test.describe('network management', () => {
     await expect(page.getByTestId('network-edit-forbidden')).toHaveCount(0)
     await expect(page.getByTestId('network-logo-upload')).toBeVisible()
   })
+
+  test('Network page puts moderation above Impact and shows the events calendar by default', async ({ page }) => {
+    test.slow()
+    await login(page, USERS.admin)
+    const networkId = await getNetworkId(page)
+
+    const [eventsResponse] = await Promise.all([
+      page.waitForResponse((resp) => resp.url().includes(`/api/v2/networks/${networkId}/events`)),
+      page.goto(`/networks/${networkId}`, { waitUntil: 'domcontentloaded' }),
+    ])
+    expect(eventsResponse.status()).toBe(200)
+
+    // Calendar is the default view (unless a view was remembered in localStorage).
+    await expect(page.getByTestId('network-events-calendar')).toBeVisible({ timeout: 10000 })
+
+    // Section order: groups to moderate, events to moderate, Impact, ..., Upcoming events.
+    const top = async (testId) => (await page.getByTestId(testId).boundingBox()).y
+    const groupsModeration = await top('network-groups-moderation')
+    const eventsModeration = await top('network-events-moderation')
+    const impact = await top('network-show-impact')
+    const events = await top('network-show-events')
+    expect(groupsModeration).toBeLessThan(eventsModeration)
+    expect(eventsModeration).toBeLessThan(impact)
+    expect(impact).toBeLessThan(events)
+
+    // Last 12 months asks the stats API for that period.
+    const [statsResponse] = await Promise.all([
+      page.waitForResponse((resp) => resp.url().includes(`/api/v2/networks/${networkId}/stats`) && resp.url().includes('period=last_12_months')),
+      page.getByTestId('period-last12').click(),
+    ])
+    expect(statsResponse.status()).toBe(200)
+    await expect(page.getByTestId('network-show-period-label')).toBeVisible()
+  })
 })

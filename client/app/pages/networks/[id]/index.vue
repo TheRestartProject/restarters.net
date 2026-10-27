@@ -11,6 +11,8 @@ import NetworkGroupsModerationTable from '~/components/networks/NetworkGroupsMod
 import NetworkEventsModerationTable from '~/components/networks/NetworkEventsModerationTable.vue'
 import NetworkTagsManager from '~/components/networks/NetworkTagsManager.vue'
 import NetworkGroupsMapList from '~/components/networks/NetworkGroupsMapList.vue'
+import NetworkEvents from '~/components/networks/NetworkEvents.vue'
+import PeriodToggle from '~/components/networks/PeriodToggle.vue'
 
 // /networks/{id} - resources/views/networks/show.blade.php +
 // resources/js/components/NetworkPage.vue (design.md §6.2 Phase E task E1).
@@ -40,14 +42,17 @@ import NetworkGroupsMapList from '~/components/networks/NetworkGroupsMapList.vue
 // name-only list develop never had anywhere) - legacy's
 // GroupsRequiringModeration/EventsRequiringModeration render the FULL
 // GroupsTable/GroupEventScrollTable here, not a bare name list. Section
-// ORDER also matches legacy exactly (gap #6): Header -> Impact -> About ->
-// Coordinators -> Groups-requiring-moderation -> Events-requiring-moderation
-// -> Groups -> Tags. Logo management is NOT here: develop puts it on
+// ORDER (network page rework): Header -> Groups/Events requiring moderation
+// (managers only, at the top because they are the things to act on) -> Impact
+// (with the All time / Last 12 months toggle) -> About -> Coordinators (one
+// row, "Show N more") -> Upcoming events (calendar by default) -> Groups map
+// and list (5 groups, then "Show all") -> Tags (full width, create inputs
+// behind "Add tag"). Logo management is NOT here: develop puts it on
 // networks/{id}/edit (networks/edit.blade.php), which now exists as
 // pages/networks/[id]/edit.vue.
 definePageMeta({ auth: true })
 
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const route = useRoute()
 const { hasRole } = useAuth()
 const sessionStore = useSessionStore()
@@ -63,6 +68,52 @@ const canManage = computed(() => isAdministrator.value || isCoordinatorHere.valu
 const network = computed(() => networksStore.current.data)
 
 useHead({ title: computed(() => network.value?.name || t('networks.general.networks')) })
+
+// Impact figures: all time (already embedded in the network) or the last 12
+// completed calendar months (GET /api/v2/networks/{id}/stats?period=
+// last_12_months, which also says which months it covered). Fetched once per
+// period, so switching back is instant.
+const period = ref('all')
+const statsByPeriod = ref({})
+const periodLoading = ref(false)
+const periodError = ref(false)
+
+const displayedStats = computed(() =>
+  period.value === 'all' ? network.value?.stats : statsByPeriod.value[period.value]
+)
+
+const periodLabel = computed(() => {
+  const covered = period.value !== 'all' && statsByPeriod.value[period.value]?.period
+  if (!covered) return ''
+  const fmt = (d) => new Date(`${d}T00:00:00Z`).toLocaleDateString(locale.value, { month: 'long', year: 'numeric', timeZone: 'UTC' })
+  return t('networks.stats.period_range', { start: fmt(covered.start), end: fmt(covered.end) })
+})
+
+async function setPeriod(next) {
+  period.value = next
+  periodError.value = false
+  if (next === 'all' || statsByPeriod.value[next]) return
+
+  periodLoading.value = true
+  try {
+    const stats = await networksStore.fetchStats(id.value, { period: next })
+    statsByPeriod.value = { ...statsByPeriod.value, [next]: stats }
+  } catch {
+    periodError.value = true
+  } finally {
+    // A later toggle may have moved on; only the current period's request
+    // controls the spinner.
+    if (period.value === next) periodLoading.value = false
+  }
+}
+
+// Coordinators sit in one row; the rest are behind "Show N more".
+const COORDINATORS_SHOWN = 4
+const showAllCoordinators = ref(false)
+const coordinators = computed(() => network.value?.coordinators || [])
+const visibleCoordinators = computed(() =>
+  showAllCoordinators.value ? coordinators.value : coordinators.value.slice(0, COORDINATORS_SHOWN)
+)
 
 const showDescriptionModal = ref(false)
 const showAssociateModal = ref(false)
@@ -185,9 +236,36 @@ function retry() {
         </BDropdown>
       </div>
 
-      <section class="mb-4">
+      <!-- Groups/events awaiting moderation, for Administrators and this
+           network's coordinators, at the top: they are what needs acting on.
+           The network-specific rich tables (gap #2/#11), not a plain
+           name-only list. Always-visible heading + "None" fallback,
+           matching legacy NetworkPage.vue. -->
+      <template v-if="canManage">
+        <section class="mb-4" data-testid="network-groups-moderation">
+          <h2>{{ t('networks.moderation.groups_title') }}</h2>
+          <NetworkGroupsModerationTable :network-id="id">
+            <template #empty>
+              <div class="text-muted" data-testid="network-groups-moderation-empty">
+                {{ t('networks.show.none') }}
+              </div>
+            </template>
+          </NetworkGroupsModerationTable>
+        </section>
+        <section class="mb-4" data-testid="network-events-moderation">
+          <h2>{{ t('networks.moderation.events_title') }}</h2>
+          <NetworkEventsModerationTable :network-id="id" />
+        </section>
+      </template>
+
+      <section class="mb-4" data-testid="network-show-impact">
         <h2>{{ t('networks.general.impact') }}</h2>
-        <NetworkStats :stats="network.stats" :groups-count="groupsCount" />
+        <PeriodToggle class="mb-2" :model-value="period" @update:model-value="setPeriod" />
+        <p v-if="periodLabel" class="text-muted small" data-testid="network-show-period-label">{{ periodLabel }}</p>
+        <BAlert v-if="periodError" :model-value="true" variant="danger" data-testid="network-show-period-error">
+          {{ t('client.networks.stats_unavailable') }}
+        </BAlert>
+        <NetworkStats :stats="displayedStats" :groups-count="groupsCount" :loading="periodLoading" />
         <p v-if="network.reporting_url" class="mt-3 mb-0 text-end">
           <a
             :href="network.reporting_url"
@@ -208,11 +286,11 @@ function retry() {
         </button>
       </section>
 
-      <section v-if="(network.coordinators || []).length" class="mb-4" data-testid="network-show-coordinators">
+      <section v-if="coordinators.length" class="mb-4" data-testid="network-show-coordinators">
         <h2>{{ t('networks.general.coordinators') }}</h2>
-        <div class="d-flex flex-wrap gap-3">
+        <div class="d-flex flex-wrap align-items-center gap-3">
           <NuxtLink
-            v-for="coordinator in network.coordinators"
+            v-for="coordinator in visibleCoordinators"
             :key="coordinator.id"
             :to="`/profile/${coordinator.id}`"
             class="d-flex align-items-center p-2 pe-3 text-decoration-none coordinator-card"
@@ -227,30 +305,22 @@ function retry() {
             >
             <span class="coordinator-name">{{ coordinator.name }}</span>
           </NuxtLink>
+          <button
+            v-if="coordinators.length > COORDINATORS_SHOWN"
+            type="button"
+            class="btn btn-link"
+            data-testid="network-show-coordinators-toggle"
+            @click="showAllCoordinators = !showAllCoordinators"
+          >
+            {{ showAllCoordinators ? t('networks.show.coordinators_fewer') : t('networks.show.coordinators_more', { count: coordinators.length - COORDINATORS_SHOWN }) }}
+          </button>
         </div>
       </section>
 
-      <!-- Groups/events awaiting moderation, for Administrators and this
-           network's coordinators - the network-specific rich tables (gap
-           #2/#11), not a plain name-only list
-           bare-link list used elsewhere. Always-visible heading + "None"
-           fallback, matching legacy NetworkPage.vue exactly. -->
-      <template v-if="canManage">
-        <section class="mb-4" data-testid="network-groups-moderation">
-          <h2>{{ t('networks.moderation.groups_title') }}</h2>
-          <NetworkGroupsModerationTable :network-id="id">
-            <template #empty>
-              <div class="text-muted" data-testid="network-groups-moderation-empty">
-                {{ t('networks.show.none') }}
-              </div>
-            </template>
-          </NetworkGroupsModerationTable>
-        </section>
-        <section class="mb-4" data-testid="network-events-moderation">
-          <h2>{{ t('networks.moderation.events_title') }}</h2>
-          <NetworkEventsModerationTable :network-id="id" />
-        </section>
-      </template>
+      <section class="mb-4" data-testid="network-show-events">
+        <h2>{{ t('networks.events.title') }}</h2>
+        <NetworkEvents :network-id="id" />
+      </section>
 
       <!-- NetworkPage.vue: a map and filterable list of the network's
            groups, starting zoomed out so every group is in view. -->
@@ -259,18 +329,12 @@ function retry() {
         <NetworkGroupsMapList :network-id="id" :can-manage-tags="canManage" />
       </section>
 
-      <!-- NetworkPage.vue wraps the tags-management section in a
-           <div class="row"><div class="col-lg-6">, constraining it to half
-           the container width at >=992px (desktop). -->
-      <div class="row">
-        <div class="col-lg-6">
-          <section v-if="canManage" class="mb-4" data-testid="tags-management">
-            <h2>{{ t('networks.tags.title') }}</h2>
-            <NetworkTagsManager :network-id="id" />
-          </section>
-        </div>
-      </div>
-
+      <!-- Tag management uses the full width (legacy NetworkPage.vue
+           confined it to half at >=992px). -->
+      <section v-if="canManage" class="mb-4" data-testid="tags-management">
+        <h2>{{ t('networks.tags.title') }}</h2>
+        <NetworkTagsManager :network-id="id" />
+      </section>
 
       <BModal :model-value="showDescriptionModal" :title="network.name" size="lg" ok-only data-testid="network-description-modal" @hide="showDescriptionModal = false">
         <!-- eslint-disable-next-line vue/no-v-html -->

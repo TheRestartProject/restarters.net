@@ -20,8 +20,8 @@ const BModalStub = {
   template: '<div v-if="modelValue" :data-title="title"><slot /></div>',
 }
 const NetworkStatsStub = {
-  props: ['stats', 'groupsCount'],
-  template: '<div data-testid="stub-network-stats" :data-groups-count="groupsCount" />',
+  props: ['stats', 'groupsCount', 'loading'],
+  template: '<div data-testid="stub-network-stats" :data-groups-count="groupsCount" :data-parties="stats && stats.parties" :data-loading="String(loading)" />',
 }
 const AssociateGroupsModalStub = {
   props: ['show', 'networkId', 'networkName', 'candidates'],
@@ -44,6 +44,10 @@ const NetworkGroupsMapListStub = {
   props: ['networkId', 'canManageTags'],
   template: '<div data-testid="stub-network-groups-map-list" :data-network-id="networkId" :data-can-manage-tags="String(canManageTags)" />',
 }
+const NetworkEventsStub = {
+  props: ['networkId'],
+  template: '<div data-testid="stub-network-events" :data-network-id="networkId" />',
+}
 const GroupsTableStub = {
   props: ['groups', 'showJoin'],
   template: '<div data-testid="stub-groups-table" :data-row-count="groups.length" />',
@@ -63,6 +67,7 @@ const GLOBAL_STUBS = {
   NetworkEventsModerationTable: NetworkEventsModerationTableStub,
   GroupsTable: GroupsTableStub,
   NetworkGroupsMapList: NetworkGroupsMapListStub,
+  NetworkEvents: NetworkEventsStub,
 }
 
 function setLoggedInUser(user) {
@@ -264,6 +269,130 @@ describe('pages/networks/[id]', () => {
 
       const card8 = wrapper.get('[data-testid="network-coordinator-8"]')
       expect(card8.get('img').attributes('src')).toBe('/images/placeholder-avatar.webp')
+    })
+
+    // Network page rework: the order of the sections is part of the design.
+    it('lays the page out as moderation, impact, about, coordinators, events, groups, tags', async () => {
+      networksStore.fetchCurrent = vi.fn().mockImplementation(async () => {
+        networksStore.current.data = { ...NETWORK, coordinators: [{ id: 7, name: 'Coord', avatar_url: null }] }
+      })
+      const wrapper = mountPage()
+      await flushPromises()
+
+      const html = wrapper.html()
+      const order = [
+        'network-show-name',
+        'network-groups-moderation"',
+        'network-events-moderation"',
+        'network-show-impact',
+        'network-show-coordinators"',
+        'network-show-events',
+        'network-groups-map-list',
+        'tags-management',
+      ].map((marker) => [marker, html.indexOf(marker)])
+
+      order.forEach(([marker, at]) => expect(at, marker).toBeGreaterThan(-1))
+      expect(order.map(([, at]) => at)).toEqual([...order.map(([, at]) => at)].sort((a, b) => a - b))
+      expect(html.indexOf('About')).toBeGreaterThan(html.indexOf('network-show-impact'))
+      expect(html.indexOf('About')).toBeLessThan(html.indexOf('network-show-coordinators"'))
+    })
+
+    it('renders the network events section for the network', async () => {
+      const wrapper = mountPage()
+      await flushPromises()
+
+      expect(wrapper.get('[data-testid="network-show-events"]').text()).toContain('Upcoming events')
+      expect(wrapper.get('[data-testid="stub-network-events"]').attributes('data-network-id')).toBe('1')
+    })
+
+    it('uses the full width for tags (no half-width column)', async () => {
+      const wrapper = mountPage()
+      await flushPromises()
+
+      expect(wrapper.find('.col-lg-6').exists()).toBe(false)
+    })
+
+    describe('impact period', () => {
+      it('defaults to all time, then fetches and shows the last 12 months with the months covered', async () => {
+        networksStore.fetchStats = vi.fn().mockResolvedValue({
+          parties: 2,
+          period: { start: '2025-10-01', end: '2026-09-30' },
+        })
+        const wrapper = mountPage()
+        await flushPromises()
+
+        expect(wrapper.find('[data-testid="period-all"]').classes()).toContain('active')
+        expect(wrapper.get('[data-testid="stub-network-stats"]').attributes('data-parties')).toBe('3')
+        expect(wrapper.find('[data-testid="network-show-period-label"]').exists()).toBe(false)
+
+        await wrapper.get('[data-testid="period-last12"]').trigger('click')
+        await flushPromises()
+
+        expect(networksStore.fetchStats).toHaveBeenCalledWith(1, { period: 'last_12_months' })
+        expect(wrapper.get('[data-testid="stub-network-stats"]').attributes('data-parties')).toBe('2')
+        expect(wrapper.get('[data-testid="network-show-period-label"]').text()).toBe('October 2025 to September 2026')
+        // The group tally is the current one whichever period is shown.
+        expect(wrapper.get('[data-testid="stub-network-stats"]').attributes('data-groups-count')).toBe('7')
+      })
+
+      it('goes back to all time without refetching, and remembers last 12 months once fetched', async () => {
+        networksStore.fetchStats = vi.fn().mockResolvedValue({ parties: 2, period: { start: '2025-10-01', end: '2026-09-30' } })
+        const wrapper = mountPage()
+        await flushPromises()
+
+        await wrapper.get('[data-testid="period-last12"]').trigger('click')
+        await flushPromises()
+        await wrapper.get('[data-testid="period-all"]').trigger('click')
+        await wrapper.get('[data-testid="period-last12"]').trigger('click')
+        await flushPromises()
+
+        expect(networksStore.fetchStats).toHaveBeenCalledTimes(1)
+        expect(wrapper.get('[data-testid="stub-network-stats"]').attributes('data-parties')).toBe('2')
+      })
+
+      it('says so when the last 12 months cannot be loaded', async () => {
+        networksStore.fetchStats = vi.fn().mockRejectedValue({ status: 500 })
+        const wrapper = mountPage()
+        await flushPromises()
+
+        await wrapper.get('[data-testid="period-last12"]').trigger('click')
+        await flushPromises()
+
+        expect(wrapper.find('[data-testid="network-show-period-error"]').exists()).toBe(true)
+      })
+    })
+
+    describe('coordinators row', () => {
+      function withCoordinators(n) {
+        networksStore.fetchCurrent = vi.fn().mockImplementation(async () => {
+          networksStore.current.data = {
+            ...NETWORK,
+            coordinators: Array.from({ length: n }, (_, i) => ({ id: i + 1, name: `Coord ${i + 1}`, avatar_url: null })),
+          }
+        })
+      }
+
+      it('shows 4 coordinators and a Show N more control for the rest', async () => {
+        withCoordinators(7)
+        const wrapper = mountPage()
+        await flushPromises()
+
+        expect(wrapper.findAll('[data-testid^="network-coordinator-"]')).toHaveLength(4)
+        const toggle = wrapper.get('[data-testid="network-show-coordinators-toggle"]')
+        expect(toggle.text()).toBe('Show 3 more')
+
+        await toggle.trigger('click')
+        expect(wrapper.findAll('[data-testid^="network-coordinator-"]')).toHaveLength(7)
+        expect(toggle.text()).toBe('Show fewer')
+      })
+
+      it('has no toggle when they all fit in the row', async () => {
+        withCoordinators(4)
+        const wrapper = mountPage()
+        await flushPromises()
+
+        expect(wrapper.find('[data-testid="network-show-coordinators-toggle"]').exists()).toBe(false)
+      })
     })
 
     it('renders the network-scoped groups/events moderation tables, always, with the legacy heading copy', async () => {
