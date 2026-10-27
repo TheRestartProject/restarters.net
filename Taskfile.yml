@@ -207,7 +207,6 @@ tasks:
       - Coverage reporting (clover.xml)
       - JUnit XML output for CI integration
       - TeamCity output format for better test reporting
-      - Coverage upload to Coveralls if COVERALLS_REPO_TOKEN is set
       - Support for additional PHPUnit options via CLI_ARGS
 
       Use this task instead of running phpunit directly to maintain consistency.
@@ -225,14 +224,34 @@ tasks:
         else
           echo "Running on CircleCI - skipping database reset (handled by CI setup)"
         fi
-      - docker exec -e COVERALLS_REPO_TOKEN="$COVERALLS_REPO_TOKEN" restarters bash -c "export XDEBUG_MODE=coverage; ./vendor/bin/phpunit -d memory_limit=1024M --bootstrap vendor/autoload.php --coverage-clover tests/clover.xml --log-junit /tmp/phpunit-results.xml --configuration ./phpunit.xml --teamcity {{ .CLI_ARGS }}"
+      - docker exec restarters bash -c "export XDEBUG_MODE=coverage; ./vendor/bin/phpunit -d memory_limit=1024M --bootstrap vendor/autoload.php --coverage-clover tests/clover.xml --log-junit /tmp/phpunit-results.xml --configuration ./phpunit.xml --teamcity {{ .CLI_ARGS }}"
+
+  coverage:upload:
+    desc: Upload PHPUnit coverage (tests/clover.xml) to Coveralls.
+    summary: |
+      Upload the Clover coverage written by docker:test:phpunit to Coveralls,
+      using the official Coveralls reporter. Runs on the host, not in the
+      container, so the reporter can read CircleCI's branch/commit/PR variables.
+
+      PHPUnit runs in the container, so the Clover paths start /var/www/; they
+      are rewritten to be relative to the repo root before uploading.
+
+      Skips (exit 0) when COVERALLS_REPO_TOKEN is not set, e.g. locally or on
+      forked PRs. Fails if Coveralls rejects the upload.
+    vars:
+      COVERALLS_VERSION: v0.6.22
+    cmds:
       - |
-        if [ ! -z "$COVERALLS_REPO_TOKEN" ]; then
-          echo "Uploading coverage to Coveralls..."
-          docker exec -e COVERALLS_REPO_TOKEN="$COVERALLS_REPO_TOKEN" restarters bash -c "./upload-coverage.sh tests/clover.xml"
-        else
+        if [ -z "$COVERALLS_REPO_TOKEN" ]; then
           echo "COVERALLS_REPO_TOKEN not set, skipping coverage upload"
+          exit 0
         fi
+        set -e
+        test -s tests/clover.xml || { echo "tests/clover.xml not found - run task docker:test:phpunit first"; exit 1; }
+        tmp=$(mktemp -d)
+        curl -fsSL https://github.com/coverallsapp/coverage-reporter/releases/download/{{.COVERALLS_VERSION}}/coveralls-linux.tar.gz | tar -xz -C "$tmp"
+        sed 's#name="/var/www/#name="#g' tests/clover.xml > "$tmp/clover.xml"
+        "$tmp/coveralls" report "$tmp/clover.xml" --format=clover --no-logo
 
   docker:test:jest:
     desc: Run Jest tests in the core application container.
