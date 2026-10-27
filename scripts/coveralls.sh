@@ -17,35 +17,35 @@ set -euo pipefail
 
 VERSION=v0.6.22
 
-if [ -z "${COVERALLS_REPO_TOKEN:-}" ]; then
+if [[ -z "${COVERALLS_REPO_TOKEN:-}" ]]; then
     echo "COVERALLS_REPO_TOKEN not set, skipping Coveralls"
     exit 0
 fi
 
-if [ -n "${CIRCLE_BRANCH:-}" ] && [ "$CIRCLE_BRANCH" != "develop" ]; then
+if [[ -n "${CIRCLE_BRANCH:-}" && "$CIRCLE_BRANCH" != "develop" ]]; then
     echo "Coverage is only uploaded for develop, skipping Coveralls"
     exit 0
 fi
 
 tmp=$(mktemp -d)
-curl -fsSL "https://github.com/coverallsapp/coverage-reporter/releases/download/$VERSION/coveralls-linux.tar.gz" | tar -xz -C "$tmp"
+curl --proto '=https' --proto-redir '=https' -fsSL "https://github.com/coverallsapp/coverage-reporter/releases/download/$VERSION/coveralls-linux.tar.gz" | tar -xz -C "$tmp"
 
 build=()
-if [ -n "${CIRCLE_WORKFLOW_ID:-}" ]; then
+if [[ -n "${CIRCLE_WORKFLOW_ID:-}" ]]; then
     build=(--build-number "$CIRCLE_WORKFLOW_ID")
 fi
 
 case "${1:-}" in
     report)
         flag=$2 format=$3 file=$4 base=${5:-}
-        test -s "$file" || { echo "$file not found"; exit 1; }
-        if [ "$format" = "clover" ]; then
+        [[ -s "$file" ]] || { echo "$file not found"; exit 1; }
+        if [[ "$format" = "clover" ]]; then
             # PHPUnit runs in the container, so its paths start /var/www/.
             sed 's#name="/var/www/#name="#g' "$file" > "$tmp/clover.xml"
             file=$tmp/clover.xml
         fi
         args=(report "$file" --format="$format" --job-flag="$flag" --parallel --no-logo "${build[@]}")
-        if [ -n "$base" ]; then
+        if [[ -n "$base" ]]; then
             args+=(--base-path="$base")
         fi
         "$tmp/coveralls" "${args[@]}"
