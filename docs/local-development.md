@@ -182,7 +182,7 @@ Before running tests, you need to configure the Google API key for geocoding fun
 > Without a valid `GOOGLE_API_CONSOLE_KEY`, tests that create groups or events will fail with location validation errors.
 
 > [!NOTE]
-> The PHPUnit task will automatically upload coverage to Coveralls if the `COVERALLS_REPO_TOKEN` environment variable is set.
+> The PHPUnit task writes coverage to `tests/clover.xml`. CI then uploads it to Coveralls with `task coverage:upload`, which needs the `COVERALLS_REPO_TOKEN` environment variable and skips the upload without it.
 
 </details>
 
