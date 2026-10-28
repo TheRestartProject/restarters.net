@@ -234,7 +234,7 @@ class FixometerFile extends Model
         }
 
         $placeholders = implode(',', array_fill(0, count($ref_ids), '?'));
-        $sql = "SELECT `i`.*, `x`.`reference` FROM `images` AS `i`
+        $sql = "SELECT `i`.*, `x`.`idxref`, `x`.`reference` FROM `images` AS `i`
                     INNER JOIN `xref` AS `x` ON `x`.`object` = `i`.`idimages`
                     WHERE `x`.`object_type` = ? AND
                     `x`.`reference_type` = ? AND
