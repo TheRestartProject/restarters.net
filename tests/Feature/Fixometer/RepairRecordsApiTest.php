@@ -6,6 +6,7 @@ use App\Device;
 use App\Party;
 use App\Role;
 use Carbon\Carbon;
+use DB;
 use Tests\TestCase;
 
 class RepairRecordsApiTest extends TestCase
@@ -124,5 +125,26 @@ class RepairRecordsApiTest extends TestCase
         $this->assertEquals($device->iddevices, $item['id']);
         $this->assertEquals('2024-03-11', substr($item['created_at'], 0, 10));
         $this->assertEquals('2024-03-10', substr($item['event_date'], 0, 10));
+    }
+
+    public function testRecordsIncludeTheirImages(): void
+    {
+        // A device with an image in the list used to fail the whole page.
+        $device = Device::where('item_type', 'Laptop')->first();
+        $imageId = DB::table('images')->insertGetId(['path' => 'laptop.jpg']);
+        $idxref = DB::table('xref')->insertGetId([
+            'object' => $imageId,
+            'object_type' => env('TBL_IMAGES'),
+            'reference' => $device->iddevices,
+            'reference_type' => env('TBL_DEVICES'),
+        ]);
+
+        $items = $this->records([])['items'];
+        $laptop = $items[array_search('Laptop', array_column($items, 'item_type'))];
+        $this->assertEquals([[
+            'id' => $imageId,
+            'idxref' => $idxref,
+            'path' => 'laptop.jpg',
+        ]], $laptop['images']);
     }
 }
