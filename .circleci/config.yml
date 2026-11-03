@@ -213,10 +213,14 @@ jobs:
       - run:
           name: Run PHPUnit tests
           command: |
-            # Run PHPUnit tests using Task for consistency with local development
-            task docker:test:phpunit
-            # Copy test results to host
-            docker cp restarters:/tmp/phpunit-results.xml /tmp/test-results/phpunit/results.xml
+            # Run PHPUnit tests using Task for consistency with local development.
+            # Copy the JUnit results out even when tests fail: the step's log is
+            # truncated to its last 400KB, so without them a failure early in the
+            # alphabetical run can't be seen at all.
+            status=0
+            task docker:test:phpunit || status=$?
+            docker cp restarters:/tmp/phpunit-results.xml /tmp/test-results/phpunit/results.xml || true
+            exit $status
           no_output_timeout: 45m
 
       # Upload PHPUnit coverage to Coveralls (skipped when the token is unavailable, e.g. forked PRs)
@@ -224,13 +228,15 @@ jobs:
           name: Upload coverage to Coveralls
           command: task coverage:upload
 
-      # Store artifacts
+      # Store artifacts (always, so failed runs still show which tests failed)
       - store_artifacts:
           path: /tmp/test-results
           destination: playwright-test-results
-      
+          when: always
+
       - store_test_results:
           path: /tmp/test-results
+          when: always
 
   # Nuxt client: lint + unit tests + production build. Fast feedback, no
   # docker-compose stack needed.
