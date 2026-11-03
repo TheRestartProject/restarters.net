@@ -97,7 +97,6 @@ return [
   'volunteers_confirmed' => 'Voluntarios confirmados',
   'participants_attended' => 'Participantes asistidos',
   'volunteers_attended' => 'Voluntarios asistidos',
-  'co2_emissions_prevented' => 'Emisiones de CO2 evitadas',
   'fixed_items' => 'Artículos reparados',
   'repairable_items' => 'Artículos reparables',
   'end_of_life_items' => 'Artículos al final de su vida útil',

@@ -97,7 +97,6 @@ return [
   'volunteers_confirmed' => 'Vrijwilligers bevestigd',
   'participants_attended' => 'Deelnemers aanwezig',
   'volunteers_attended' => 'Vrijwilligers aanwezig',
-  'co2_emissions_prevented' => 'CO2-uitstoot voorkomen',
   'fixed_items' => 'Gerepareerde items',
   'repairable_items' => 'Repareerbare items',
   'end_of_life_items' => 'Items aan einde levensduur',

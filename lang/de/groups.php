@@ -97,7 +97,6 @@ return [
   'volunteers_confirmed' => 'Bestätigte Freiwillige',
   'participants_attended' => 'Teilnehmende anwesend',
   'volunteers_attended' => 'Freiwillige anwesend',
-  'co2_emissions_prevented' => 'Verhinderte CO2-Emissionen',
   'fixed_items' => 'Reparierte Artikel',
   'repairable_items' => 'Reparierbare Artikel',
   'end_of_life_items' => 'Artikel am Ende ihres Lebens',

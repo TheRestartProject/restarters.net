@@ -97,7 +97,6 @@ return [
   'volunteers_confirmed' => 'Frivillige bekreftet',
   'participants_attended' => 'Deltakere som møtte opp',
   'volunteers_attended' => 'Frivillige som møtte opp',
-  'co2_emissions_prevented' => 'Forhindrede CO2-utslipp',
   'fixed_items' => 'Reparerte gjenstander',
   'repairable_items' => 'Reparerbare gjenstander',
   'end_of_life_items' => 'Gjenstander ved slutten av levetid',

@@ -526,9 +526,6 @@
         "getting_the_most_bullet2": "<strong>Get organising</strong>: <a href=\"https://talk.restarters.net/session/sso?return_path=https://talk.restarters.net/t/how-to-run-a-repair-event-the-restart-party-kit/324/\" target=\"_blank\">learn how to run a repair event</a> and/or <a href=\"https://talk.restarters.net/c/community-repair/5\" target=\"_blank\">ask the community for help on Talk</a>.",
         "getting_the_most_bullet3": "<strong>Get chatting</strong>: <a href=\"https://talk.restarters.net/session/sso?return_path=https://talk.restarters.net/\" target=\"_blank\">catch up on the latest conversations</a> on our forum, Talk. Why not <a href=\"https://talk.restarters.net/t/who-is-everyone-meet-and-greet/44\" target=\"_blank\">introduce yourself</a> too?",
         "getting_the_most_bullet4": "<strong>Get analytical</strong>: see our impact in <a href=\"https://restarters.net/fixometer\" target=\"_blank\">the Fixometer</a>.",
-        "add_data_heading": "Add Data",
-        "see_your_impact": "And see your impact in the Fixometer",
-        "add_data_add": "Add",
         "whats_happening_heading": "What's happening",
         "whats_happening_see_all": "see all"
     },
@@ -1004,7 +1001,6 @@
         "export_group_data": "Download repair data",
         "participants_attended": "Participants attended",
         "volunteers_attended": "Volunteers attended",
-        "co2_emissions_prevented": "CO2 emissions prevented",
         "fixed_items": "Fixed items",
         "repairable_items": "Repairable items",
         "end_of_life_items": "End-of-life items",
