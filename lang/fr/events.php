@@ -37,6 +37,8 @@ return [
   'field_event_time' => 'Heures de début et de fin',
   'field_event_venue' => 'Adresse du lieu',
   'field_event_images' => 'Ajoutez des images de l\'événement ici',
+  'field_event_images_2' => 'Choisissez une image pour votre événement',
+  'field_add_image' => 'Ajoutez une image',
   'save_event' => 'Sauver l\'événement',
   'approve_event' => 'Approuver l\'événement',
   'cancel_invites_link' => 'Annuler invitation',

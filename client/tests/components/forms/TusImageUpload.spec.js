@@ -217,4 +217,72 @@ describe('components/forms/TusImageUpload', () => {
       })
     })
   })
+
+  // events/edit.blade.php's photos dropzone: dropzone.css's default white
+  // box with the two lines of text, click or drop, several files at once.
+  describe('dropzone mode', () => {
+    it('shows the two lines of text and no Dashboard panel', async () => {
+      const wrapper = await mountUpload({ dropzone: true, message: 'Add event images here', hint: 'Choose an image for your event' })
+
+      expect(wrapper.find('[data-testid="tus-image-upload-dashboard"]').exists()).toBe(false)
+      expect(wrapper.find('.dz-message span').text()).toBe('Add event images here')
+      expect(wrapper.find('.dz-message small').text()).toBe('Choose an image for your event')
+    })
+
+    it('accepts several files and gives the input the caller\'s id', async () => {
+      const wrapper = await mountUpload({ dropzone: true, inputId: 'event-photos-input' })
+      const input = wrapper.find('[data-testid="tus-image-upload-file-input"]')
+
+      expect(input.attributes('multiple')).toBeDefined()
+      expect(input.attributes('id')).toBe('event-photos-input')
+    })
+
+    it('opens the file picker when the box is clicked', async () => {
+      const wrapper = await mountUpload({ dropzone: true })
+      const clickSpy = vi.spyOn(wrapper.find('[data-testid="tus-image-upload-file-input"]').element, 'click')
+
+      await wrapper.find('[data-testid="tus-image-upload-dropzone"]').trigger('click')
+
+      expect(clickSpy).toHaveBeenCalled()
+    })
+
+    it('adds every picked file to uppy', async () => {
+      const wrapper = await mountUpload({ dropzone: true })
+      const addFileSpy = vi.spyOn(lastUppyInstance, 'addFile')
+      const files = [new File(['a'], 'a.png', { type: 'image/png' }), new File(['b'], 'b.jpg', { type: 'image/jpeg' })]
+
+      const input = wrapper.find('[data-testid="tus-image-upload-file-input"]')
+      Object.defineProperty(input.element, 'files', { value: files, configurable: true })
+      await input.trigger('change')
+
+      expect(addFileSpy).toHaveBeenCalledTimes(2)
+      expect(addFileSpy).toHaveBeenCalledWith(expect.objectContaining({ name: 'b.jpg' }))
+    })
+
+    it('emits uploaded once per successful file', async () => {
+      const wrapper = await mountUpload({ dropzone: true })
+
+      lastUppyInstance.emitComplete({
+        successful: [
+          { tus: { uploadUrl: 'http://localhost:8001/api/tus/one' } },
+          { tus: { uploadUrl: 'http://localhost:8001/api/tus/two' } },
+        ],
+      })
+
+      expect(wrapper.emitted('uploaded').map((e) => e[0].uploadKey)).toEqual(['one', 'two'])
+    })
+
+    it('still reports only the first file outside dropzone mode', async () => {
+      const wrapper = await mountUpload()
+
+      lastUppyInstance.emitComplete({
+        successful: [
+          { tus: { uploadUrl: 'http://localhost:8001/api/tus/one' } },
+          { tus: { uploadUrl: 'http://localhost:8001/api/tus/two' } },
+        ],
+      })
+
+      expect(wrapper.emitted('uploaded')).toHaveLength(1)
+    })
+  })
 })

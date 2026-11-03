@@ -18,6 +18,7 @@ const EventFormStub = {
   template: '<button data-testid="stub-updated" @click="$emit(\'updated\', eventId)" />',
 }
 const TusImageUploadStub = {
+  props: { dropzone: Boolean, message: String, hint: String, inputId: String },
   emits: ['uploaded', 'upload-error'],
   template:
     '<div><button data-testid="stub-upload-ok" @click="$emit(\'uploaded\', { uploadKey: \'key123\' })" /><button data-testid="stub-upload-fail" @click="$emit(\'upload-error\', \'boom\')" /></div>',
@@ -246,6 +247,33 @@ describe('pages/party/edit/[id]', () => {
 
       expect(wrapper.findAll('[data-testid="event-edit-photo"]')).toHaveLength(2)
       expect(wrapper.find('[data-testid="event-edit-photo-remove-11"]').exists()).toBe(true)
+    })
+
+    it('shows each photo as its thumbnail linking to the full image, with a "Remove file" link, as legacy', async () => {
+      eventsStore.fetchEvent = vi.fn().mockResolvedValue(WITH_IMAGES)
+      eventsStore.current.data = WITH_IMAGES
+
+      const wrapper = mountPage()
+      await flushPromises()
+
+      const photo = wrapper.findAll('[data-testid="event-edit-photo"]')[0]
+      expect(photo.find('img').attributes('src')).toMatch(/\/uploads\/thumbnail_a\.jpg$/)
+      expect(photo.find('a').attributes('href')).toMatch(/\/uploads\/a\.jpg$/)
+      expect(wrapper.find('[data-testid="event-edit-photo-remove-11"]').text()).toBe('Remove file')
+    })
+
+    it('uses the uploader in dropzone mode with the legacy text, labelled "Add images:"', async () => {
+      eventsStore.fetchEvent = vi.fn().mockResolvedValue(WITH_IMAGES)
+      eventsStore.current.data = WITH_IMAGES
+
+      const wrapper = mountPage()
+      await flushPromises()
+
+      const upload = wrapper.findComponent(TusImageUploadStub)
+      expect(upload.props('dropzone')).toBe(true)
+      expect(upload.props('message')).toBe('Add event images here')
+      expect(upload.props('hint')).toBe('Choose an image for your event')
+      expect(wrapper.find(`label[for="${upload.props('inputId')}"]`).text()).toBe('Add images:')
     })
 
     it('deletes the photo it was clicked on', async () => {

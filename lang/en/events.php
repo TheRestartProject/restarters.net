@@ -9,6 +9,8 @@ return [
   'approve_event' => 'Approve Event',
   'save_event' => 'Save Event',
   'field_event_images' => 'Add event images here',
+  'field_event_images_2' => 'Choose an image for your event',
+  'field_add_image' => 'Add images',
   'sample_text_message_to_restarters' => '<add a custom message here if required>',
   'stat-7' => 'Waste prevented',
   'stat-6' => 'CO2 emissions prevented',

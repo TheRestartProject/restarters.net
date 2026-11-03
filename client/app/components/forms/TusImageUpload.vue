@@ -38,6 +38,29 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  // `dropzone`: the event edit page's Photos tab. Legacy events/edit.blade.php
+  // used a jQuery Dropzone there (app.js loadDropzones, styled by
+  // resources/sass/_dropzone.scss): a dashed grey box with a camera icon and
+  // two lines of text, click or drop to add, several files at once. Like
+  // `compact` it drives Uppy Core directly rather than the Dashboard panel.
+  dropzone: {
+    type: Boolean,
+    default: false,
+  },
+  // dropzone mode's two lines of text (data-field1/data-field2 in legacy).
+  message: {
+    type: String,
+    default: '',
+  },
+  hint: {
+    type: String,
+    default: '',
+  },
+  // dropzone mode: id for the file input, so the caller's <label for> works.
+  inputId: {
+    type: String,
+    default: null,
+  },
 })
 
 const emit = defineEmits(['uploaded', 'upload-error', 'remove'])
@@ -67,14 +90,15 @@ onMounted(async () => {
   uppy = new Uppy({
     autoProceed: true,
     restrictions: {
-      maxNumberOfFiles: 1,
+      // Legacy's event dropzone took many files at once (uploadMultiple).
+      maxNumberOfFiles: props.dropzone ? null : 1,
       allowedFileTypes: ['image/*', '.jpg', '.jpeg', '.png', '.gif'],
     },
   })
     .use(Tus, { endpoint: tusEndpoint })
     .use(Compressor)
 
-  if (props.compact) {
+  if (props.compact || props.dropzone) {
     uppy.on('upload', () => {
       uploading.value = true
     })
@@ -107,20 +131,24 @@ onBeforeUnmount(() => {
 function onComplete(result) {
   uploading.value = false
 
-  const successful = result.successful && result.successful[0]
-  if (!successful) return
+  // Single-file modes only ever report the first; dropzone mode reports each.
+  const files = (result.successful || []).slice(0, props.dropzone ? undefined : 1)
+  if (!files.length) return
 
-  // Same convention as ProfilePhotoTab.vue / Freegle's OurUploader.vue: the
-  // tus upload key is the last path segment of the tus upload URL.
-  const uploadUrl = successful.tus && successful.tus.uploadUrl
-  const uploadKey = uploadUrl ? uploadUrl.substring(uploadUrl.lastIndexOf('/') + 1) : null
+  for (const successful of files) {
+    // Same convention as ProfilePhotoTab.vue / Freegle's OurUploader.vue: the
+    // tus upload key is the last path segment of the tus upload URL.
+    const uploadUrl = successful.tus && successful.tus.uploadUrl
+    const uploadKey = uploadUrl ? uploadUrl.substring(uploadUrl.lastIndexOf('/') + 1) : null
 
-  if (!uploadKey) {
-    emit('upload-error', t('client.groups.image_upload_error'))
-    return
+    if (!uploadKey) {
+      emit('upload-error', t('client.groups.image_upload_error'))
+      continue
+    }
+
+    emit('uploaded', { uploadKey, file: successful })
   }
 
-  emit('uploaded', { uploadKey, file: successful })
   uppy?.clear()
 }
 
@@ -148,6 +176,25 @@ function addCompactFile(file) {
 function onFileInputChange(event) {
   addCompactFile(event.target.files && event.target.files[0])
   event.target.value = ''
+}
+
+function addDropzoneFiles(fileList) {
+  for (const file of Array.from(fileList || [])) {
+    try {
+      uppy.addFile({ name: file.name, type: file.type, data: file })
+    } catch (err) {
+      emit('upload-error', err?.message || t('client.groups.image_upload_error'))
+    }
+  }
+}
+
+function onDropzoneInputChange(event) {
+  addDropzoneFiles(event.target.files)
+  event.target.value = ''
+}
+
+function onDropzoneDrop(event) {
+  addDropzoneFiles(event.dataTransfer && event.dataTransfer.files)
 }
 
 function onDrop(event) {
@@ -217,6 +264,34 @@ function removeCompactFile(event) {
       @change="onFileInputChange"
     >
   </div>
+  <div v-else-if="dropzone" class="tus-image-upload tus-image-upload--dropzone" data-testid="tus-image-upload">
+    <div
+      class="dropzone dz-clickable"
+      role="button"
+      tabindex="0"
+      data-testid="tus-image-upload-dropzone"
+      @click="openFilePicker"
+      @keydown.enter="openFilePicker"
+      @dragover.prevent
+      @drop.prevent="onDropzoneDrop"
+    >
+      <div class="dz-message">
+        <span>{{ message }}</span><small>{{ hint }}</small>
+      </div>
+      <span v-if="uploading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true" />
+    </div>
+    <input
+      :id="inputId"
+      ref="fileInputEl"
+      type="file"
+      multiple
+      :aria-label="message"
+      accept="image/*"
+      class="visually-hidden"
+      data-testid="tus-image-upload-file-input"
+      @change="onDropzoneInputChange"
+    >
+  </div>
   <div v-else class="tus-image-upload" data-testid="tus-image-upload">
     <img v-if="currentImageUrl" :src="currentImageUrl" alt="" class="tus-image-upload__preview" data-testid="tus-image-upload-preview">
     <div ref="dashboardEl" data-testid="tus-image-upload-dashboard" />
@@ -224,12 +299,29 @@ function removeCompactFile(event) {
 </template>
 
 <style scoped lang="scss">
-// Belt and braces alongside the Dashboard's width option: whatever Uppy
-// computes, its panel must not be able to exceed the column it sits in.
-// A page that scrolls sideways is never what was wanted here.
-:deep(.uppy-Dashboard-inner),
-:deep(.uppy-Dashboard-innerWrap) {
-  max-width: 100%;
+// Dropzone mode: what legacy actually rendered. resources/sass/_dropzone.scss
+// wraps its dashed-border/camera-icon rules in `:not .leave-dropzone-alone`,
+// which compiles to an invalid selector, so browsers drop them and live shows
+// dropzone.css's own defaults: white box, 2px solid grey border, centred text.
+.tus-image-upload--dropzone .dropzone {
+  position: relative;
+  box-sizing: border-box;
+  min-height: 150px;
+  padding: 20px;
+  border: 2px solid rgba(0, 0, 0, 0.3);
+  background: #fff;
+  cursor: pointer;
+
+  .dz-message {
+    margin: 2em 0;
+    text-align: center;
+  }
+
+  .spinner-border {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+  }
 }
 
 .tus-image-upload__preview {

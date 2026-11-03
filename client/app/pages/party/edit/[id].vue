@@ -267,28 +267,43 @@ async function removeImage(image) {
       </div>
 
       <div v-show="activeTab === 'photos'" class="pt-3" data-testid="event-edit-pane-photos">
-        <div v-if="event?.images?.length" class="d-flex flex-wrap gap-2 mb-3">
-          <div
-            v-for="image in event.images"
-            :key="image.idimages"
-            class="position-relative"
-            data-testid="event-edit-photo"
-          >
-            <img :src="uploadedImageUrl(image.path)" width="100" height="100" style="object-fit: cover" alt="">
-            <button
-              type="button"
-              class="btn btn-sm btn-light position-absolute top-0 end-0 p-1 lh-1"
-              :disabled="deletingImageId === image.idimages"
-              :aria-label="t('client.events.remove_photo')"
-              :data-testid="`event-edit-photo-remove-${image.idimages}`"
-              @click="removeImage(image)"
-            >
-              &times;
-            </button>
+        <!-- events/edit.blade.php's photos pane: "Add images:" + the dropzone in
+             the left half, the existing photos in the right half, each a
+             thumbnail (linking to the full image) with a "Remove file" link. -->
+        <div class="row">
+          <div class="col-6">
+            <label for="event-photos-input">{{ t('events.field_add_image') }}:</label>
+            <TusImageUpload
+              dropzone
+              input-id="event-photos-input"
+              :message="t('events.field_event_images')"
+              :hint="t('events.field_event_images_2')"
+              @uploaded="onImageUploaded"
+              @upload-error="onImageUploadError"
+            />
+          </div>
+          <div class="col-6">
+            <div class="previews">
+              <div
+                v-for="image in event?.images || []"
+                :key="image.idimages"
+                class="dz-image"
+                data-testid="event-edit-photo"
+              >
+                <a :href="uploadedImageUrl(image.path)" target="_blank" rel="noopener">
+                  <img :src="uploadedImageUrl(`thumbnail_${image.path}`)" alt="">
+                </a>
+                <a
+                  href="#"
+                  class="dz-remove"
+                  :class="{ disabled: deletingImageId === image.idimages }"
+                  :data-testid="`event-edit-photo-remove-${image.idimages}`"
+                  @click.prevent="deletingImageId !== image.idimages && removeImage(image)"
+                >{{ t('client.events.remove_photo') }}</a>
+              </div>
+            </div>
           </div>
         </div>
-
-        <TusImageUpload @uploaded="onImageUploaded" @upload-error="onImageUploadError" />
         <div v-if="imageMessage" class="text-success" data-testid="event-edit-image-success">{{ imageMessage }}</div>
         <div v-if="imageError" class="text-danger" data-testid="event-edit-image-error">{{ imageError }}</div>
       </div>
