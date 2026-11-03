@@ -219,6 +219,11 @@ jobs:
             docker cp restarters:/tmp/phpunit-results.xml /tmp/test-results/phpunit/results.xml
           no_output_timeout: 45m
 
+      # Upload PHPUnit coverage to Coveralls (skipped when the token is unavailable, e.g. forked PRs)
+      - run:
+          name: Upload coverage to Coveralls
+          command: task coverage:upload
+
       # Store artifacts
       - store_artifacts:
           path: /tmp/test-results
