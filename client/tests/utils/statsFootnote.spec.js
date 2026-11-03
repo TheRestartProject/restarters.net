@@ -1,15 +1,13 @@
 import { describe, expect, test } from 'vitest'
 import { hasBakedFootnote, footnoteLayout, footnoteKey, hasBakedBranding, brandingLayout } from '../../app/utils/statsFootnote.js'
-import fs from 'node:fs'
-import path from 'node:path'
-import { fileURLToPath } from 'node:url'
+import en from '../../i18n/locales/en.json'
+import fr from '../../i18n/locales/fr.json'
+import frBE from '../../i18n/locales/fr-BE.json'
 
-const LANG_DIR = path.join(path.dirname(fileURLToPath(import.meta.url)), '../../../lang')
+const LOCALES = { en, fr, 'fr-BE': frBE }
 
 function value(loc, key) {
-  const f = fs.readFileSync(path.join(LANG_DIR, loc, 'partials.php'), 'utf8')
-  const m = new RegExp("'" + key + "' => \"([^\"]*)\"").exec(f)
-  return m ? m[1] : null
+  return LOCALES[loc].partials?.[key] ?? null
 }
 
 describe('stats share footnote', () => {
@@ -71,7 +69,7 @@ describe('stats share footnote', () => {
   test('the branding is translated but restarters.net is not', () => {
     for (const loc of ['en', 'fr', 'fr-BE']) {
       const v = value(loc, 'share_modal_generated_by')
-      expect(v).toContain(':site')
+      expect(v).toContain('{site}')
       expect(v).not.toMatch(/restarters/i)
     }
     expect(value('fr', 'share_modal_generated_by')).not.toBe(value('en', 'share_modal_generated_by'))
