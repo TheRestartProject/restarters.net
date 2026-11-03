@@ -44,4 +44,6 @@ return [
   'see_all_groups_near_you' => 'Alle groepen bij jou in de buurt bekijken →',
   'see_all_groups' => 'Alle groepen bekijken',
   'no_groups_intro' => 'Er zijn gemeenschaps<a href="/group/all">groepen over de hele wereld</a>. Je bent welkom om elke groep te volgen om meldingen te ontvangen wanneer zij evenementen organiseren.',
+  'whats_happening_heading' => 'Wat gebeurt er',
+  'whats_happening_see_all' => 'alles bekijken',
 ];

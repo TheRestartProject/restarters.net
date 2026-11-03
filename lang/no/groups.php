@@ -176,4 +176,23 @@ Lær hvordan du bruker denne gruppen her: :help.',
   'export.events.items_end_of_life' => 'Gjenstander ved slutten av levetid',
   'export.events.items_kg_waste_prevented' => 'kg avfall forhindret',
   'export.events.items_kg_co2_prevent' => 'kg CO2 forhindret',
+  'already_member' => 'Du er allerede medlem av denne gruppen.',
+  'environmental_impact' => 'Miljøpåvirkning',
+  'export_group_data' => 'Last ned reparasjonsdata',
+  'goto_group' => 'Gå til gruppe',
+  'group_count_map' => 'Det er <b>:count gruppe</b> i dette området.  Søk og zoom for å finne flere.|Det er <b>:count grupper</b> i dette området.  Søk og zoom for å finne flere.',
+  'group_count_none' => 'Hvis du ikke ser noen her ennå, hvorfor ikke <a href="/group/nearby">finne en gruppe</a> i nærheten av deg?',
+  'image_upload_error' => 'Kunne ikke laste opp gruppebilde!',
+  'impact_calculation' => '<p><strong>Hvordan beregner vi miljøpåvirkning?</strong></p>
+<p>Vi har undersøkt gjennomsnittsvekten og CO<sub>2</sub>e-fotavtrykket til produkter i en rekke kategorier, fra smarttelefoner til T-skjorter. Når du registrerer en gjenstand du har reparert, bruker vi disse gjennomsnittene til å estimere påvirkningen av reparasjonen basert på gjenstandens kategori.</p>
+<p>For diverse gjenstander bruker vi et generelt forhold mellom CO<sub>2</sub>e og vekt for å estimere påvirkningen av hver vellykkede reparasjon.</p>
+<p><a href="https://talk.restarters.net/t/how-do-we-measure-the-environmental-impact-of-events/6077" target="_blank" rel="nofollow">Les mer om hvordan vi beregner påvirkning her</a></p>',
+  'marker_title' => 'Klikk for mer informasjon',
+  'next_event' => 'Neste arrangement',
+  'parties_thrown' => 'arrangementer holdt',
+  'search_nothing_found' => 'Fant ingenting.',
+  'search_place' => 'Søk etter et sted...',
+  'see_group_reports' => 'Se mer i gruppens rapporter',
+  'view_reports' => 'Vis rapporter',
+  'years_of_time_volunteered' => 'år med frivillig tid',
 ];

@@ -45,4 +45,6 @@ return [
   'see_all_groups_near_you' => 'Alle Gruppen in Ihrer Nähe anzeigen →',
   'see_all_groups' => 'Alle Gruppen anzeigen',
   'no_groups_intro' => 'Es gibt Gemeinschafts-<a href="/group/all">Gruppen auf der ganzen Welt</a>. Sie können jeder Gruppe folgen, um benachrichtigt zu werden, wenn Veranstaltungen geplant werden.',
+  'whats_happening_heading' => 'Was gerade passiert',
+  'whats_happening_see_all' => 'alle anzeigen',
 ];

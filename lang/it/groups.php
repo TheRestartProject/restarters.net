@@ -176,4 +176,23 @@ Scopri come usare questo gruppo qui: :help.',
   'export.events.items_end_of_life' => 'Oggetti a fine vita',
   'export.events.items_kg_waste_prevented' => 'kg rifiuti prevenuti',
   'export.events.items_kg_co2_prevent' => 'kg CO2 prevenuti',
+  'already_member' => 'Sei già membro di questo gruppo.',
+  'environmental_impact' => 'Impatto ambientale',
+  'export_group_data' => 'Scarica i dati delle riparazioni',
+  'goto_group' => 'Vai al gruppo',
+  'group_count_map' => 'C\'è <b>:count gruppo</b> in quest\'area.  Cerca e ingrandisci per trovarne altri.|Ci sono <b>:count gruppi</b> in quest\'area.  Cerca e ingrandisci per trovarne altri.',
+  'group_count_none' => 'Se non ne vedi ancora nessuno qui, perché non <a href="/group/nearby">trovare un gruppo</a> vicino a te?',
+  'image_upload_error' => 'Impossibile caricare l\'immagine del gruppo!',
+  'impact_calculation' => '<p><strong>Come calcoliamo l\'impatto ambientale?</strong></p>
+<p>Abbiamo studiato il peso medio e l\'impronta di CO<sub>2</sub>e dei prodotti in una serie di categorie, dagli smartphone alle magliette. Quando inserisci un oggetto che hai riparato, usiamo queste medie per stimare l\'impatto di quella riparazione in base alla categoria dell\'oggetto.</p>
+<p>Per gli oggetti vari, applichiamo un rapporto generico tra CO<sub>2</sub>e e peso per stimare l\'impatto di ogni riparazione riuscita.</p>
+<p><a href="https://talk.restarters.net/t/how-do-we-measure-the-environmental-impact-of-events/6077" target="_blank" rel="nofollow">Scopri di più su come calcoliamo l\'impatto qui</a></p>',
+  'marker_title' => 'Clicca per maggiori informazioni',
+  'next_event' => 'Prossimo evento',
+  'parties_thrown' => 'eventi svolti',
+  'search_nothing_found' => 'Nessun risultato.',
+  'search_place' => 'Cerca un luogo...',
+  'see_group_reports' => 'Scopri di più nei report del tuo gruppo',
+  'view_reports' => 'Vedi i report',
+  'years_of_time_volunteered' => 'anni di tempo donato come volontari',
 ];

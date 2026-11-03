@@ -45,4 +45,6 @@ return [
   'see_all_groups' => 'Se alle grupper',
   'no_groups_intro' => 'Det finnes fellesskaps<a href="/group/all">grupper over hele verden</a>. Du er velkommen til å følge en gruppe for å bli varslet når de arrangerer arrangementer.',
   'join_group' => 'Bli med i en gruppe',
+  'whats_happening_heading' => 'Hva skjer',
+  'whats_happening_see_all' => 'se alle',
 ];

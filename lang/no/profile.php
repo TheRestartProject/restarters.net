@@ -49,4 +49,5 @@ return [
   'picture_error' => 'Kunne ikke laste opp profilbilde!',
   'admin_success' => 'Administratorinnstillinger oppdatert',
   'create_success' => 'Bruker opprettet!',
+  'other_profile' => 'Profilen til :name',
 ];

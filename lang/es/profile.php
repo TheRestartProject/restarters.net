@@ -49,4 +49,5 @@ return [
   'picture_error' => '¡Error al subir la foto de perfil!',
   'admin_success' => 'Configuración de administrador actualizada',
   'create_success' => '¡Usuario creado correctamente!',
+  'other_profile' => 'Perfil de :name',
 ];

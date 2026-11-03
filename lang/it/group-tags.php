@@ -6,4 +6,7 @@ return [
     'delete_success' => 'Tag di gruppo eliminato!',
     'title' => 'Tag di gruppo',
     'edit_tag' => 'Modifica tag di gruppo',
+  'create_error' => 'Impossibile creare il tag di gruppo.',
+  'delete_error' => 'Impossibile eliminare il tag di gruppo.',
+  'update_error' => 'Impossibile salvare il tag di gruppo.',
 ];

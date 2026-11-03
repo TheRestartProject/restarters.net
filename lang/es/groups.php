@@ -176,4 +176,23 @@ Aprende a usar este grupo aquí: :help.',
   'export.events.items_end_of_life' => 'Artículos al final de su vida útil',
   'export.events.items_kg_waste_prevented' => 'kg de residuos evitados',
   'export.events.items_kg_co2_prevent' => 'kg de CO2 evitados',
+  'already_member' => 'Ya eres miembro de este grupo.',
+  'environmental_impact' => 'Impacto ambiental',
+  'export_group_data' => 'Descargar datos de reparación',
+  'goto_group' => 'Ir al grupo',
+  'group_count_map' => 'Hay <b>:count grupo</b> en esta zona. Busca y haz zoom para encontrar más.|Hay <b>:count grupos</b> en esta zona. Busca y haz zoom para encontrar más.',
+  'group_count_none' => 'Si todavía no ves ninguno aquí, ¿por qué no <a href="/group/nearby">buscas un grupo</a> cerca de ti?',
+  'image_upload_error' => '¡Error al subir la imagen del grupo!',
+  'impact_calculation' => '<p><strong>¿Cómo calculamos el impacto ambiental?</strong></p>
+<p>Hemos investigado el peso medio y la huella de CO<sub>2</sub>e de productos de una amplia gama de categorías, desde teléfonos inteligentes hasta camisetas. Cuando introduces un artículo que has reparado, usamos estos promedios para estimar el impacto de esa reparación según la categoría del artículo.</p>
+<p>Para los artículos varios, aplicamos una proporción genérica de CO<sub>2</sub>e por peso para estimar el impacto de cada reparación exitosa.</p>
+<p><a href="https://talk.restarters.net/t/how-do-we-measure-the-environmental-impact-of-events/6077" target="_blank" rel="nofollow">Más información sobre cómo calculamos el impacto aquí</a></p>',
+  'marker_title' => 'Haz clic para más información',
+  'next_event' => 'Próximo evento',
+  'parties_thrown' => 'eventos celebrados',
+  'search_nothing_found' => 'No se encontró nada.',
+  'search_place' => 'Busca un lugar...',
+  'see_group_reports' => 'Ver más en los informes de tu grupo',
+  'view_reports' => 'Ver informes',
+  'years_of_time_volunteered' => 'años de tiempo de voluntariado',
 ];

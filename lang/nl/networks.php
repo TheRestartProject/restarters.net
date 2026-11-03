@@ -11,7 +11,9 @@ return [
     'about' => 'Over',
     'actions' => 'Netwerkacties',
     'coordinators' => 'Netwerkcoördinatoren',
-    'impact' => 'Impact'
+    'impact' => 'Impact',
+    'see_network_reports' => 'Zie meer in de rapporten van je netwerk',
+    'view_reports' => 'Rapporten bekijken',
   ],
   'stats' => [
     'groups' => '{1} Groep|[0,*] Groepen',
@@ -63,5 +65,12 @@ return [
     'add_new_field' => 'Nieuw veld toevoegen',
     'new_field_name' => 'Naam van nieuw veld',
     'add_field' => 'Veld toevoegen',
+    'help_reporting_url' => 'Waar de rapporten van dit netwerk worden gepubliceerd. Laat leeg als het netwerk geen rapporten heeft.',
+    'label_reporting_url' => 'Adres van het rapportagedashboard',
+  ],
+  'moderation' => [
+    'events_title' => 'Evenementen te modereren',
+    'group_requires_moderation' => 'Groep vereist moderatie',
+    'groups_title' => 'Groepen te modereren',
   ],
 ];

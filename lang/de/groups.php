@@ -176,4 +176,23 @@ Erfahren Sie hier, wie Sie diese Gruppe nutzen können: :help.',
   'export.events.items_end_of_life' => 'Artikel am Lebensende',
   'export.events.items_kg_waste_prevented' => 'kg Abfall verhindert',
   'export.events.items_kg_co2_prevent' => 'kg CO2 verhindert',
+  'already_member' => 'Sie sind bereits Mitglied dieser Gruppe.',
+  'environmental_impact' => 'Umweltauswirkungen',
+  'export_group_data' => 'Reparaturdaten herunterladen',
+  'goto_group' => 'Zur Gruppe',
+  'group_count_map' => 'In diesem Bereich gibt es <b>:count Gruppe</b>. Suchen und zoomen Sie, um weitere zu finden.|In diesem Bereich gibt es <b>:count Gruppen</b>. Suchen und zoomen Sie, um weitere zu finden.',
+  'group_count_none' => 'Wenn Sie hier noch keine sehen, wie wäre es, wenn Sie <a href="/group/nearby">eine Gruppe</a> in Ihrer Nähe finden?',
+  'image_upload_error' => 'Das Gruppenbild konnte nicht hochgeladen werden!',
+  'impact_calculation' => '<p><strong>Wie berechnen wir die Umweltauswirkungen?</strong></p>
+<p>Wir haben das durchschnittliche Gewicht und den CO<sub>2</sub>e-Fußabdruck von Produkten aus einer Reihe von Kategorien erforscht, von Smartphones bis zu T-Shirts. Wenn Sie einen von Ihnen reparierten Gegenstand eingeben, nutzen wir diese Durchschnittswerte, um die Auswirkungen dieser Reparatur anhand der Kategorie des Gegenstands abzuschätzen.</p>
+<p>Für sonstige Gegenstände wenden wir ein allgemeines Verhältnis von CO<sub>2</sub>e zu Gewicht an, um die Auswirkungen jeder erfolgreichen Reparatur abzuschätzen.</p>
+<p><a href="https://talk.restarters.net/t/how-do-we-measure-the-environmental-impact-of-events/6077" target="_blank" rel="nofollow">Hier erfahren Sie mehr darüber, wie wir die Auswirkungen berechnen</a></p>',
+  'marker_title' => 'Klicken für weitere Informationen',
+  'next_event' => 'Nächste Veranstaltung',
+  'parties_thrown' => 'durchgeführte Veranstaltungen',
+  'search_nothing_found' => 'Nichts gefunden.',
+  'search_place' => 'Nach einem Ort suchen...',
+  'see_group_reports' => 'Mehr in den Berichten Ihrer Gruppe ansehen',
+  'view_reports' => 'Berichte ansehen',
+  'years_of_time_volunteered' => 'Jahre ehrenamtlich geleistete Zeit',
 ];
