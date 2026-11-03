@@ -168,7 +168,8 @@ class ExportTest extends TestCase
         $header = $response->headers->get('content-disposition');
         $fh = fopen($response->getFile()->getPathname(), 'r');
         $headerRow = fgetcsv($fh);
-        self::assertEquals('Reference', end($headerRow));
+        // The device reference isn't on live yet, so it's not exported either.
+        self::assertNotContains('Reference', $headerRow);
         $row2 = fgetcsv($fh);
         self::assertEquals(e($event1->getEventName()), e($row2[7]));
         self::assertEquals('Unpowered', e($row2[12]));
