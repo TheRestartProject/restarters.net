@@ -38,6 +38,12 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  // Tag options for the filter bar, when not the role-filtered list (see
+  // GroupsTableFilters.vue).
+  filterTags: {
+    type: Array,
+    default: null,
+  },
   // Develop's list has no per-row follow button ("the follow button on every
   // row invites following groups you haven't read about"): following belongs
   // on the group's own page. Opt in for any page that wants one.
@@ -209,6 +215,7 @@ function sortCaretClass(key) {
     <GroupsTableFilters
       v-if="showFilters"
       :show-tags="showTags"
+      :tags="filterTags"
       @update:filters="onFilters"
     />
     <table class="table groups-table">

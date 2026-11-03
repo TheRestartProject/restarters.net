@@ -301,9 +301,12 @@ onUnmounted(() => {
                     </NuxtLink>
                   </li>
                   <li>
-                    <button type="button" class="btn btn-link" data-testid="nav-logout" @click="logout">
+                    <!-- A link like its siblings (live: <a href="/logout">), not a
+                         .btn-link button, which picked up button padding, size
+                         and the teal link colour. -->
+                    <a href="/logout" data-testid="nav-logout" @click.prevent="logout">
                       {{ t('general.logout') }}
-                    </button>
+                    </a>
                   </li>
                 </ul>
               </li>

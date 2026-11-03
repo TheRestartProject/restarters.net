@@ -481,6 +481,7 @@ async function submit() {
 }
 
 .registration-step__status {
+  font-family: 'Open Sans', sans-serif;
   position: absolute;
   top: 20px;
   right: 25px;
@@ -488,8 +489,48 @@ async function submit() {
   color: #757575;
 }
 
+/* resources/sass/_registration.scss (.registration / .registration__step):
+   live renders the step heading at 20px bold and the intro <legend> at 15px
+   Open Sans. Without these, Bootstrap 5's reboot makes the legend ~1.5rem
+   and floated, and the h3 falls back to the global heading size. */
+.registration-wizard {
+  padding: 44px 0 50px;
+}
+
 .registration-step h3 {
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.2;
+  margin: 0 0 10px;
   padding-right: 100px;
+}
+
+.registration-step legend {
+  float: none;
+  font-size: 15px;
+  line-height: 1;
+  font-weight: 500;
+  margin-bottom: 15px;
+  font-family: 'Open Sans', sans-serif;
+}
+
+.registration-step fieldset {
+  margin-bottom: 10px;
+}
+
+/* Consent/notification checkboxes: legacy markup was
+   .form-check.d-flex.align-items-top with input.checkbox-top (margin-top 5px),
+   i.e. the box sits beside the first line of its label, not above it. */
+.registration-step :deep(.form-check) {
+  display: flex;
+  align-items: flex-start;
+  padding-left: 0;
+}
+
+.registration-step :deep(.form-check-input) {
+  float: none;
+  flex: none;
+  margin: 5px 10px 0 0;
 }
 
 /* Required-field marker: resources/sass/_registration.scss's

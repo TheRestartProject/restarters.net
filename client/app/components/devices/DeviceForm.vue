@@ -209,8 +209,14 @@ const brandUnknown = computed(() => {
   return !brands.value.some((b) => b.brand_name === form.brand)
 })
 
+// DeviceCategorySelect.vue: only the categories matching the device's
+// powered/unpowered type, minus this type's misc category (it's offered once
+// at the end as "None of the above"). Filtering by type also drops the other
+// type's misc, which would otherwise show up as a second "Misc".
 function categoryOptionsForCluster(cluster) {
-  return (cluster.categories || []).filter((c) => c.idcategories !== miscCategoryId.value)
+  return (cluster.categories || []).filter(
+    (c) => c.idcategories !== miscCategoryId.value && Boolean(c.powered) === Boolean(props.powered),
+  )
 }
 
 function nextStepLabel(value) {
@@ -303,24 +309,30 @@ function selectBarrier(value) {
 
 // Item type/brand: a real <input> (so typed text is directly editable, as
 // in vue-typeahead-bootstrap) plus a custom-styled suggestion panel below it
-// instead of the browser's own <datalist> popup. maxMatches 5 matches
-// DeviceType.vue/DeviceBrand.vue's own `:maxMatches="5"`.
-const itemTypeMatches = computed(() => {
-  const term = form.itemType.trim().toLowerCase()
-  const list = term ? itemTypeSuggestions.value.filter((s) => s.toLowerCase().includes(term)) : itemTypeSuggestions.value
-  return list.slice(0, 5)
-})
+// instead of the browser's own <datalist> popup. Matching follows
+// vue-typeahead-bootstrap as DeviceType.vue/DeviceBrand.vue configured it
+// (`:minMatchingChars="1" :maxMatches="5"`): nothing until something is
+// typed, case-insensitive substring match, then a stable sort by where the
+// match starts - so "Kettle lead" comes before "Electric kettle".
+function typeaheadMatches(list, query) {
+  if (!query) return []
+  const term = query.toLowerCase()
+  return list
+    .map((text, i) => ({ text, i, pos: text.toLowerCase().indexOf(term) }))
+    .filter((m) => m.pos !== -1)
+    .sort((a, b) => a.pos - b.pos || a.i - b.i)
+    .slice(0, 5)
+    .map((m) => m.text)
+}
+
+const itemTypeMatches = computed(() => typeaheadMatches(itemTypeSuggestions.value, form.itemType))
 function selectItemType(value) {
   form.itemType = value
   openDropdown.value = null
 }
 
 const brandNames = computed(() => brands.value.map((b) => b.brand_name))
-const brandMatches = computed(() => {
-  const term = form.brand.trim().toLowerCase()
-  const list = term ? brandNames.value.filter((s) => s.toLowerCase().includes(term)) : brandNames.value
-  return list.slice(0, 5)
-})
+const brandMatches = computed(() => typeaheadMatches(brandNames.value, form.brand))
 function selectBrand(value) {
   form.brand = value
   openDropdown.value = null
@@ -428,6 +440,11 @@ async function confirmDeleteDevice() {
 }
 
 defineExpose({ submit })
+
+// The device reference (PR #907) isn't on the live site yet; hidden until the
+// rest of the Nuxt client matches live. Flip to true to bring it back -
+// stored values are untouched either way.
+const SHOW_DEVICE_REFERENCE = false
 </script>
 
 <template>
@@ -597,7 +614,7 @@ defineExpose({ submit })
           >
         </BFormGroup>
 
-        <BFormGroup label-for="device-form-reference">
+        <BFormGroup v-if="SHOW_DEVICE_REFERENCE" label-for="device-form-reference">
           <template #label>
             {{ t('devices.reference') }}:
             <FieldInfoPopover :content="t('devices.tooltip_reference')" :variant="infoIconVariant" />
@@ -917,5 +934,52 @@ defineExpose({ submit })
 
 .multiselect__tags {
   cursor: pointer;
+}
+
+/* EventDevice.vue gave every field `class="mb-2"`; without it the next
+   label (and its (i) icon) sits right against the field above. */
+.device-form-card > .b-form-group {
+  margin-bottom: 0.5rem;
+}
+
+/* The closed dropdowns, as develop's _global.scss styled vue-multiselect:
+   `.multiselect .multiselect__tags { padding: 3px 40px 3px 12px; border: 1px
+   solid #222 }`, the selected value with 5px left padding on a 25px line,
+   DeviceCategorySelect.vue's 43px min-height, and the black chevron
+   (`.multiselect__select:before`). The text sits directly in
+   .multiselect__tags here, so the shared 0 bottom padding (balanced by
+   vue-multiselect's inner span margin) left it sitting low. */
+.device-form-card .multiselect__tags {
+  position: relative;
+  min-height: 43px;
+  padding: 3px 40px 3px 17px;
+  border: 1px solid #222;
+  line-height: 25px;
+  color: #000;
+}
+
+.device-form-card .multiselect__tags::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  margin-top: -4px;
+  border-style: solid;
+  border-width: 8px 8px 0;
+  border-color: #000 transparent transparent;
+}
+
+.device-form-card .multiselect--active .multiselect__tags::after {
+  transform: rotate(180deg);
+}
+
+.device-form-card .multiselect--disabled .multiselect__tags::after {
+  display: none;
+}
+
+/* DeviceRepairStatus.vue: "Reduce the size of the options so they fit". */
+[data-testid="device-form-card-repair"] .multiselect__tags,
+[data-testid="device-form-card-repair"] .multiselect__content-wrapper {
+  font-size: 14px;
 }
 </style>

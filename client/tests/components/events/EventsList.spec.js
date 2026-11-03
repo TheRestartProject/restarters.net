@@ -3,6 +3,7 @@ import { createPinia, setActivePinia } from 'pinia'
 import { createI18n } from 'vue-i18n'
 import { beforeEach, describe, expect, it } from 'vitest'
 import EventsList from '../../../app/components/events/EventsList.vue'
+import EventCard from '../../../app/components/events/EventCard.vue'
 import en from '../../../i18n/locales/en.json'
 import clientEn from '../../../i18n/locales/client-en.json'
 
@@ -73,8 +74,9 @@ describe('components/events/EventsList', () => {
   it('marks a card as hosting only when its group id is in hostedGroupIds', () => {
     const wrapper = mountComponent({ events: EVENTS, hostedGroupIds: [5] })
 
-    expect(wrapper.find('[data-testid="event-card-hosting-1"]').exists()).toBe(true)
-    expect(wrapper.find('[data-testid="event-card-hosting-2"]').exists()).toBe(false)
+    const cards = wrapper.findAllComponents(EventCard)
+    expect(cards[0].props('hosting')).toBe(true)
+    expect(cards[1].props('hosting')).toBe(false)
   })
 
   // GroupEventScrollTable.vue's head(invited)/head(volunteers) icon titles -
@@ -98,5 +100,72 @@ describe('components/events/EventsList', () => {
     expect(icons[5].attributes('title')).toBe(en.groups.fixed_items)
     expect(icons[6].attributes('title')).toBe(en.groups.repairable_items)
     expect(icons[7].attributes('title')).toBe(en.groups.end_of_life_items)
+  })
+
+  // GroupEventScrollTable.vue (the group page) sorts by date, title and the
+  // number columns; the /party pages never did.
+  describe('sortable', () => {
+    const order = (wrapper) => wrapper.findAll('tbody tr').map((row) => row.attributes('data-testid'))
+
+    it('has no sort controls unless asked', () => {
+      const wrapper = mountComponent({ events: EVENTS })
+
+      expect(wrapper.find('[data-testid="events-list-sort-date"]').exists()).toBe(false)
+    })
+
+    it('starts in the order given, flips on the date header, and sorts a new column ascending', async () => {
+      const events = [
+        { ...EVENTS[0], title: 'Zebra', stats: { invited: 9 } },
+        { ...EVENTS[1], title: 'Aardvark', stats: { invited: 1 } },
+      ]
+      const wrapper = mountComponent({ events, sortable: true })
+
+      expect(order(wrapper)).toEqual(['event-card-1', 'event-card-2'])
+      expect(wrapper.find('[data-testid="events-list-sort-date"]').attributes('aria-sort')).toBe('ascending')
+
+      await wrapper.find('[data-testid="events-list-sort-date"]').trigger('click')
+      expect(order(wrapper)).toEqual(['event-card-2', 'event-card-1'])
+
+      await wrapper.find('[data-testid="events-list-sort-title"]').trigger('click')
+      expect(order(wrapper)).toEqual(['event-card-2', 'event-card-1'])
+      expect(wrapper.find('[data-testid="events-list-sort-title"]').attributes('aria-sort')).toBe('ascending')
+      expect(wrapper.find('[data-testid="events-list-sort-date"]').attributes('aria-sort')).toBe('none')
+
+      await wrapper.find('[data-testid="events-list-sort-invited"]').trigger('click')
+      expect(order(wrapper)).toEqual(['event-card-2', 'event-card-1'])
+      await wrapper.find('[data-testid="events-list-sort-invited"]').trigger('click')
+      expect(order(wrapper)).toEqual(['event-card-1', 'event-card-2'])
+    })
+
+    it('starts past events most recent first', () => {
+      const wrapper = mountComponent({ events: [EVENTS[1], EVENTS[0]], sortable: true, past: true })
+
+      expect(order(wrapper)).toEqual(['event-card-2', 'event-card-1'])
+      expect(wrapper.find('[data-testid="events-list-sort-date"]').attributes('aria-sort')).toBe('descending')
+    })
+
+    it('puts events without a figure last either way', async () => {
+      const events = [{ ...EVENTS[0] }, { ...EVENTS[1], stats: { invited: 0 } }]
+      const wrapper = mountComponent({ events, sortable: true })
+
+      await wrapper.find('[data-testid="events-list-sort-invited"]').trigger('click')
+      expect(order(wrapper)).toEqual(['event-card-2', 'event-card-1'])
+      await wrapper.find('[data-testid="events-list-sort-invited"]').trigger('click')
+      expect(order(wrapper)).toEqual(['event-card-2', 'event-card-1'])
+    })
+  })
+
+  it('leaves out the group name when showGroup is off', () => {
+    const wrapper = mountComponent({ events: EVENTS, showGroup: false })
+
+    expect(wrapper.find('[data-testid="event-card-group-1"]').exists()).toBe(false)
+  })
+
+  it('passes on attendance changes from its rows', () => {
+    const wrapper = mountComponent({ events: EVENTS })
+
+    wrapper.findComponent({ name: 'EventCard' }).vm.$emit('attendance', { id: 1, attending: true })
+
+    expect(wrapper.emitted('attendance')).toEqual([[{ id: 1, attending: true }]])
   })
 })

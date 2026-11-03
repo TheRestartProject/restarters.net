@@ -663,6 +663,11 @@ class Party extends Model implements Auditable
     // Set by callers that batch-load images to avoid N+1 (see FixometerFile::findImagesForMany).
     public ?array $preloadedImages = null;
 
+    // Set by callers that batch-load whether the current user is attending each event in a list, to
+    // avoid an isBeingAttendedBy() query per event (see API\GroupController::getEventsForGroupv2).
+    // PartySummary returns it as 'attending' when set.
+    public ?bool $preloadedAttending = null;
+
     // Mirrors Device::getImages() - event photos are a gallery (multiple per event), same
     // xref-backed images table the upload/delete endpoints already use.
     public function getImages()

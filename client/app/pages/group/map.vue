@@ -239,64 +239,65 @@ onMounted(() => {
          single /group page, which renders it once above the tabs. -->
     <GroupsRequiringModeration v-if="showModeration"  />
 
-    <GroupsTabsNav active="map" />
+    <GroupsTabsNav active="map">
 
-    <div v-if="loading" data-testid="group-map-loading">
-      <div class="placeholder-glow mb-3">
-        <span class="placeholder col-12" style="height: 400px" />
+      <div v-if="loading" data-testid="group-map-loading">
+        <div class="placeholder-glow mb-3">
+          <span class="placeholder col-12" style="height: 400px" />
+        </div>
       </div>
-    </div>
 
-    <BAlert v-else-if="groupsStore.namesError" :model-value="true" variant="danger" data-testid="group-map-error">
-      <p>{{ t('client.groups.load_error') }}</p>
-      <BButton variant="danger" data-testid="group-map-retry" @click="retry">
-        {{ t('client.dashboard.retry') }}
-      </BButton>
-    </BAlert>
+      <BAlert v-else-if="groupsStore.namesError" :model-value="true" variant="danger" data-testid="group-map-error">
+        <p>{{ t('client.groups.load_error') }}</p>
+        <BButton variant="danger" data-testid="group-map-retry" @click="retry">
+          {{ t('client.dashboard.retry') }}
+        </BButton>
+      </BAlert>
 
-    <template v-else>
-      <GroupMap
-        v-model:hovered-id="hoveredId"
-        :groups="mapGroups"
-        :network="networkFilter"
-        :your-group-ids="groupsStore.memberIds"
-        :initial-bounds="countryBounds"
-        :your-lat="yourPoint ? yourPoint.lat : null"
-        :your-lng="yourPoint ? yourPoint.lng : null"
-        :your-area="yourArea"
-        :frame-request="frameRequest"
-        @update:group-ids-in-bounds="groupIdsInBounds = $event"
-        @update:centre="centre = $event"
-        @select="selectedGroupId = $event"
-        @searched="searchedPoint = $event"
-      />
+      <template v-else>
+        <GroupMap
+          v-model:hovered-id="hoveredId"
+          :groups="mapGroups"
+          :network="networkFilter"
+          :your-group-ids="groupsStore.memberIds"
+          :initial-bounds="countryBounds"
+          :your-lat="yourPoint ? yourPoint.lat : null"
+          :your-lng="yourPoint ? yourPoint.lng : null"
+          :your-area="yourArea"
+          :frame-request="frameRequest"
+          @update:group-ids-in-bounds="groupIdsInBounds = $event"
+          @update:centre="centre = $event"
+          @select="selectedGroupId = $event"
+          @searched="searchedPoint = $event"
+        />
 
-      <GroupInfoModal :group="selectedGroup" @close="selectedGroupId = null" />
+        <GroupInfoModal :group="selectedGroup" @close="selectedGroupId = null" />
 
-      <p data-testid="group-map-count">
-        <!-- Wording and zero-state from PR 887 (RES-1995 map of groups):
-             "... in this area. Search and zoom to find more." with a count, and
-             a friendlier "why not find a group near you?" (linking to
-             /group/nearby) when nothing is in view. group_count_none carries the
-             link inline, as develop's does, so it's rendered with v-html. -->
-        <!-- eslint-disable-next-line vue/no-v-html -->
-        <span v-if="rows.length === 0" data-testid="group-map-count-none" v-html="t('groups.group_count_none')" />
-        <!-- eslint-disable-next-line vue/no-v-html -->
-        <span v-else v-html="t('groups.group_count_map', { count: rows.length }, rows.length)" />
-      </p>
+        <p data-testid="group-map-count">
+          <!-- Wording and zero-state from PR 887 (RES-1995 map of groups):
+               "... in this area. Search and zoom to find more." with a count, and
+               a friendlier "why not find a group near you?" (linking to
+               /group/nearby) when nothing is in view. group_count_none carries the
+               link inline, as develop's does, so it's rendered with v-html. -->
+          <!-- eslint-disable-next-line vue/no-v-html -->
+          <span v-if="rows.length === 0" data-testid="group-map-count-none" v-html="t('groups.group_count_none')" />
+          <!-- eslint-disable-next-line vue/no-v-html -->
+          <span v-else v-html="t('groups.group_count_map', { count: rows.length }, rows.length)" />
+        </p>
 
-      <!-- Distance column only with an anchor point; nearest-first is the
-           default order either way (all-null distances fall back stably). -->
-      <GroupsTable
-        v-model:hovered-id="hoveredId"
-        class="mt-3"
-        :groups="rows"
-        show-filters
-        :show-tags="canManageTags"
-        :optional-columns="{ location: true, next_event: true, distance: referencePoint !== null }"
-        initial-sort-key="distance"
-        @update:filters="onFilters"
-      />
-    </template>
+        <!-- Distance column only with an anchor point; nearest-first is the
+             default order either way (all-null distances fall back stably). -->
+        <GroupsTable
+          v-model:hovered-id="hoveredId"
+          class="mt-3"
+          :groups="rows"
+          show-filters
+          :show-tags="canManageTags"
+          :optional-columns="{ location: true, next_event: true, distance: referencePoint !== null }"
+          initial-sort-key="distance"
+          @update:filters="onFilters"
+        />
+      </template>
+    </GroupsTabsNav>
   </div>
 </template>

@@ -256,7 +256,7 @@ function retry() {
            groups, starting zoomed out so every group is in view. -->
       <section class="groups-section mb-4">
         <h2>{{ t('networks.general.groups') }}</h2>
-        <NetworkGroupsMapList :network-id="id" :can-manage-tags="canManage" />
+        <NetworkGroupsMapList :network-id="id" :can-manage-tags="canManage" :tags="networksStore.tags.data" />
       </section>
 
       <!-- NetworkPage.vue wraps the tags-management section in a

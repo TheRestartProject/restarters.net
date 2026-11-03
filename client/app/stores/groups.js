@@ -355,6 +355,12 @@ export const useGroupsStore = defineStore('groups', {
       }
     },
 
+    // The group page's events list after an RSVP from it: the events store
+    // only updates its own lists, not this one.
+    setEventAttending(id, attending) {
+      this.events.data = this.events.data.map((e) => (e.id === id ? { ...e, attending } : e))
+    },
+
     // Group members offered by the event invite modal's picker. Returns the
     // list rather than storing it: `volunteers` backs the group view page's
     // own list, and a modal opened from elsewhere must not overwrite it.
@@ -480,16 +486,29 @@ export const useGroupsStore = defineStore('groups', {
 
     // PATCH /api/v2/groups/{id} (already implemented server-side -
     // API\GroupController::updateGroupv2). Same bare {id: ...} response
-    // shape as createGroup. Invalidates the cached details/current entry so
-    // other pages (group view, all-groups table) re-fetch fresh data next
-    // time they're visited.
+    // shape as createGroup. Drops the cached details entry so other pages
+    // (group view, all-groups table) re-fetch fresh data next time they're
+    // visited, and refreshes `current` in place.
+    //
+    // Refreshed, not cleared: the edit page renders its form from `current`,
+    // so clearing it unmounted the form mid-submit - its "updated" event was
+    // then dropped, nothing reloaded, and the page went blank. No loading
+    // flag either, so the form stays put while the fresh copy arrives.
     async updateGroup(id, payload) {
       const { $api } = useNuxtApp()
       const { id: returnedId } = await $api.group.update(id, payload)
       delete this.details[id]
+
       if (this.current.data && this.current.data.id === id) {
-        this.current.data = null
+        try {
+          const { data } = await $api.group.get(id)
+          this.current.data = data
+          this.details = { ...this.details, [id]: data }
+        } catch {
+          // The save worked; keep showing what we had rather than nothing.
+        }
       }
+
       return returnedId
     },
 

@@ -90,6 +90,13 @@ describe('components/groups/GroupsTable', () => {
     expect(wrapper.findAll('tbody tr')).toHaveLength(0)
   })
 
+  it('hands the filter bar any tags it was given for the tag filter', () => {
+    const wrapper = mountComponent({ groups: [], showFilters: true, showTags: true, filterTags: [{ id: 9, name: 'Ours' }] })
+
+    expect(wrapper.findComponent({ name: 'GroupsTableFilters' }).props('tags')).toEqual([{ id: 9, name: 'Ours' }])
+    expect(useGroupsStore().fetchTags).not.toHaveBeenCalled()
+  })
+
   it('renders one row per group, linked to its view page', () => {
     const wrapper = mountComponent({ groups: rows })
 

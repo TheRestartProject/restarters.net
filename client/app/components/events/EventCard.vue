@@ -46,7 +46,18 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  // GroupEventScrollTable.vue's addGroupName: the group name (and here the
+  // venue) under the title. Off on a group's own page, where develop shows
+  // just the title.
+  showGroup: {
+    type: Boolean,
+    default: true,
+  },
 })
+
+// After a successful RSVP/cancel, so a caller showing events that aren't in
+// the events store's lists (the group page's) can update its own copy.
+const emit = defineEmits(['attendance'])
 
 const { t } = useI18n()
 const eventsStore = useEventsStore()
@@ -96,8 +107,10 @@ async function onToggleAttendance() {
   try {
     if (attending.value) {
       await eventsStore.unattend(props.event.id)
+      emit('attendance', { id: props.event.id, attending: false })
     } else {
       await eventsStore.attend(props.event.id)
+      emit('attendance', { id: props.event.id, attending: true })
     }
   } catch {
     // Store already reverted the optimistic state and pushed a toast.
@@ -129,7 +142,7 @@ async function onToggleAttendance() {
       <div>{{ date }}</div>
       <div>{{ start }} <span class="d-none d-md-inline">- {{ end }}</span></div>
       <div class="text-muted">
-        <img :src="'/images/clock.svg'" alt="" class="datelong-icon">
+        <img :src="'/images/clock.svg'" alt="" class="icon datelong-icon">
         {{ timezone }}
       </div>
     </td>
@@ -138,25 +151,19 @@ async function onToggleAttendance() {
       <NuxtLink :to="`/party/view/${event.id}`" :data-testid="`event-card-link-${event.id}`">
         <b>{{ event.title }}</b>
       </NuxtLink>
-
+      <!-- EventTitle.vue's online pill, for when the line below that says so is off. -->
       <BBadge
-        v-if="attending"
-        variant="success"
-        class="ms-2"
-        :data-testid="`event-card-attending-${event.id}`"
-      >
-        {{ t('client.dashboard.attending') }}
-      </BBadge>
-      <BBadge
-        v-if="hosting"
+        v-if="!showGroup && event.online"
         variant="primary"
-        class="ms-2"
-        :data-testid="`event-card-hosting-${event.id}`"
+        pill
+        class="ms-1"
+        :data-testid="`event-card-online-badge-${event.id}`"
       >
-        {{ t('client.events.hosting') }}
+        {{ t('events.online') }}
       </BBadge>
 
-      <div class="small text-muted">
+
+      <div v-if="showGroup" class="small text-muted">
         <NuxtLink v-if="event.group" :to="`/group/view/${event.group.id}`" :data-testid="`event-card-group-${event.id}`">
           {{ event.group.name }}
         </NuxtLink>

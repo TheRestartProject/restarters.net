@@ -11,9 +11,9 @@ const GroupMapStub = {
   template: '<div data-testid="stub-map" :data-ids="groups.map(g => g.id).join(\',\')" :data-network="network" />',
 }
 const GroupsTableStub = {
-  props: { groups: Array, showFilters: Boolean, showTags: Boolean },
+  props: { groups: Array, showFilters: Boolean, showTags: Boolean, filterTags: Array },
   emits: ['update:filters'],
-  template: '<div data-testid="stub-table" :data-ids="groups.map(g => g.id).join(\',\')" :data-filters="String(showFilters)" :data-tags="String(showTags)" />',
+  template: '<div data-testid="stub-table" :data-ids="groups.map(g => g.id).join(\',\')" :data-filters="String(showFilters)" :data-tags="String(showTags)" :data-filter-tags="(filterTags || []).map(t => t.id).join(\',\')" />',
 }
 
 function mountIt(props = {}) {
@@ -82,5 +82,10 @@ describe('NetworkGroupsMapList', () => {
     const w = mountIt({ canManageTags: true })
     expect(w.find('[data-testid="stub-table"]').attributes('data-filters')).toBe('true')
     expect(w.find('[data-testid="stub-table"]').attributes('data-tags')).toBe('true')
+  })
+
+  it('passes the network\'s own tags to the filter bar', () => {
+    const w = mountIt({ canManageTags: true, tags: [{ id: 7, name: 'Ours' }] })
+    expect(w.find('[data-testid="stub-table"]').attributes('data-filter-tags')).toBe('7')
   })
 })

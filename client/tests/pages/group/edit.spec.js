@@ -123,14 +123,17 @@ describe('pages/group/edit/[id]', () => {
     expect(wrapper.findComponent(GroupFormStub).props('isAdmin')).toBe(false)
   })
 
-  it('shows a success banner and re-fetches when GroupForm emits updated', async () => {
+  // The store refreshes the group as part of the save, so the page just says
+  // so - reloading would swap the form for the loading placeholder.
+  it('shows a success banner and keeps the form when GroupForm emits updated', async () => {
     groupsStore.current.data = BASE_GROUP
     const wrapper = mountPage()
 
     await wrapper.find('[data-testid="stub-updated"]').trigger('click')
 
     expect(wrapper.find('[data-testid="group-edit-success"]').exists()).toBe(true)
-    expect(groupsStore.fetchCurrent).toHaveBeenCalledTimes(2)
+    expect(wrapper.find('[data-testid="stub-updated"]').exists()).toBe(true)
+    expect(groupsStore.fetchCurrent).toHaveBeenCalledTimes(1)
   })
 
   // gap 4: an always-present "Group details" tab strip above the form, so

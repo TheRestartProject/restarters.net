@@ -41,8 +41,8 @@ const NetworkEventsModerationTableStub = {
   template: '<div data-testid="stub-network-events-moderation-table" :data-network-id="networkId" />',
 }
 const NetworkGroupsMapListStub = {
-  props: ['networkId', 'canManageTags'],
-  template: '<div data-testid="stub-network-groups-map-list" :data-network-id="networkId" :data-can-manage-tags="String(canManageTags)" />',
+  props: ['networkId', 'canManageTags', 'tags'],
+  template: '<div data-testid="stub-network-groups-map-list" :data-network-id="networkId" :data-can-manage-tags="String(canManageTags)" :data-tag-ids="(tags || []).map(t => t.id).join(\',\')" />',
 }
 const GroupsTableStub = {
   props: ['groups', 'showJoin'],
@@ -223,6 +223,15 @@ describe('pages/networks/[id]', () => {
       expect(embed.attributes('data-network-id')).toBe('1')
       expect(embed.attributes('data-can-manage-tags')).toBe('true')
       expect(wrapper.find('[data-testid="network-show-groups-info"]').exists()).toBe(false)
+    })
+
+    // develop's NetworkPage.vue filtered by this network's own tags
+    // (groupFilterTags), not every tag the viewer can see.
+    it('offers this network\'s own tags in the groups filter', async () => {
+      const wrapper = mountPage()
+      await flushPromises()
+
+      expect(wrapper.find('[data-testid="stub-network-groups-map-list"]').attributes('data-tag-ids')).toBe('1')
     })
 
     it('has no View groups item in the actions menu', async () => {

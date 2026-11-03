@@ -118,11 +118,12 @@ describe('components/devices/DeviceForm', () => {
   // DeviceCategorySelect/DeviceType/DeviceModel/DeviceProblem/DeviceNotes
   // each carry an info popover; ours had none. Asserting the count rather
   // than mere presence, because four of the five rendering and one silently
-  // missing would still look fine on screen.
-  it('shows an info popover on each of the six documented fields', () => {
+  // missing would still look fine on screen. Five while the reference field
+  // (the sixth) is hidden.
+  it('shows an info popover on each of the five documented fields', () => {
     const wrapper = mountForm()
 
-    expect(wrapper.findAll('[data-testid="field-info-toggle"]')).toHaveLength(6)
+    expect(wrapper.findAll('[data-testid="field-info-toggle"]')).toHaveLength(5)
   })
 
   // The item-type help text differs by powered-ness: the examples are
@@ -193,32 +194,16 @@ describe('components/devices/DeviceForm', () => {
     })
   })
 
-  // PR #775 (device reference). Groups cross-reference items to their own
-  // repair-tracking software, so the field has to survive a round trip: it is
-  // free text, optional, and capped at 255 to match the column.
-  it('offers an optional reference field with its tooltip', () => {
-    const wrapper = mountForm()
-    const input = wrapper.find('[data-testid="device-form-reference"]')
-
-    expect(input.exists()).toBe(true)
-    expect(input.attributes('maxlength')).toBe('255')
-    expect(wrapper.findAllComponents({ name: 'FieldInfoPopover' }).map(c => c.props('content')))
-      .toContain(en.devices.tooltip_reference)
-  })
-
-  it('sends the reference when one is given', async () => {
-    store.addDevice = vi.fn().mockResolvedValue({ device: { id: 42 } })
+  // PR #775/#907 (device reference). Live doesn't have the field yet, so it
+  // is hidden (SHOW_DEVICE_REFERENCE) until the rest of the client matches
+  // live.
+  it('hides the reference field', () => {
     const wrapper = mountForm()
 
-    await chooseOption(wrapper, 'device-form-category', '10')
-    await wrapper.find('[data-testid="device-form-reference"]').setValue('REP1234')
-    await wrapper.find('[data-testid="device-form"]').trigger('submit')
-    await wrapper.vm.$nextTick()
-
-    expect(store.addDevice).toHaveBeenCalledWith(5, expect.objectContaining({ reference: 'REP1234' }))
+    expect(wrapper.find('[data-testid="device-form-reference"]').exists()).toBe(false)
   })
 
-  it('omits the reference when it is left blank', async () => {
+  it('omits the reference when adding a device', async () => {
     store.addDevice = vi.fn().mockResolvedValue({ device: { id: 42 } })
     const wrapper = mountForm()
 
@@ -369,10 +354,14 @@ describe('components/devices/DeviceForm', () => {
       expect(wrapper.find('[data-testid="device-form-model"]').element.value).toBe('K1')
     })
 
-    it('prefills the reference from the device prop', () => {
+    it('keeps an existing reference when saving, although the field is hidden', async () => {
+      store.updateDevice = vi.fn().mockResolvedValue({ device: editDevice() })
       const wrapper = mountForm({ device: editDevice({ reference: 'REP1234' }) })
 
-      expect(wrapper.find('[data-testid="device-form-reference"]').element.value).toBe('REP1234')
+      await wrapper.find('[data-testid="device-form"]').trigger('submit')
+      await wrapper.vm.$nextTick()
+
+      expect(store.updateDevice).toHaveBeenCalledWith(5, 7, expect.objectContaining({ reference: 'REP1234' }))
     })
 
     it('shows DevicePhotos with the device id and existing images', () => {
@@ -529,6 +518,57 @@ describe('components/devices/DeviceForm', () => {
       await wrapper.find('[data-testid="device-form-brand-option-Acme"]').trigger('mousedown')
 
       expect(wrapper.find('[data-testid="device-form-brand"]').element.value).toBe('Acme')
+    })
+
+    // vue-typeahead-bootstrap (DeviceType.vue, `:minMatchingChars="1"
+    // :maxMatches="5"`): nothing until typed, then a stable sort by match
+    // position, capped at 5.
+    it('orders item type suggestions by where the match starts, as live does', async () => {
+      store.itemTypes.data = [
+        'Ceramic kettle', 'Electric Kettle', 'George Home Fast Boil Kettle', 'Iron with kettle', 'KETTLE LEAD', 'Kettle', 'Toaster',
+      ].map((type) => ({ type, powered: true }))
+      const wrapper = mountForm({ powered: true })
+      const input = wrapper.find('[data-testid="device-form-item-type"]')
+
+      await input.trigger('focus')
+      expect(wrapper.find('[data-testid="device-form-item-type-suggestions"]').exists()).toBe(false)
+
+      await input.setValue('kettle')
+      const shown = wrapper.findAll('[data-testid^="device-form-item-type-option-"]').map((o) => o.text())
+
+      expect(shown).toEqual(['KETTLE LEAD', 'Kettle', 'Ceramic kettle', 'Electric Kettle', 'Iron with kettle'])
+    })
+  })
+
+  // DeviceCategorySelect.vue: only the device's own powered/unpowered
+  // categories, with that type's misc offered once as "None of the above".
+  describe('category options', () => {
+    beforeEach(() => {
+      store.categories.data = [
+        { id: 10, name: 'Toaster', powered: true, cluster: 1, cluster_name: 'Kitchen' },
+        { id: 46, name: 'Misc', powered: true, cluster: 1, cluster_name: 'Kitchen' },
+        { id: 20, name: 'Bicycle', powered: false, cluster: 2, cluster_name: 'Outdoors' },
+        { id: 50, name: 'Misc', powered: false, cluster: 2, cluster_name: 'Outdoors' },
+      ]
+    })
+
+    function shownOptions(wrapper) {
+      return wrapper.findAll('[data-testid^="device-form-category-option-"]').map((o) => o.attributes('data-testid').replace('device-form-category-option-', ''))
+    }
+
+    it('offers only powered categories, then powered misc as "None of the above", for a powered item', async () => {
+      const wrapper = mountForm({ powered: true })
+      await wrapper.find('[data-testid="device-form-category"]').trigger('click')
+
+      expect(shownOptions(wrapper)).toEqual(['10', '46'])
+      expect(wrapper.find('[data-testid="device-form-category-option-46"]').text()).toBe(en.partials.category_none)
+    })
+
+    it('offers only unpowered categories, then unpowered misc, for an unpowered item', async () => {
+      const wrapper = mountForm({ powered: false })
+      await wrapper.find('[data-testid="device-form-category"]').trigger('click')
+
+      expect(shownOptions(wrapper)).toEqual(['20', '50'])
     })
   })
 

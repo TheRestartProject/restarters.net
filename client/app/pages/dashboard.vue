@@ -3,8 +3,6 @@ import { computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useSessionStore } from '~/stores/session.js'
 import { useDashboardStore } from '~/stores/dashboard.js'
-import { useEventsStore } from '~/stores/events.js'
-import DashboardAddData from '~/components/dashboard/DashboardAddData.vue'
 import DashboardYourGroups from '~/components/dashboard/DashboardYourGroups.vue'
 import DashboardRightSidebar from '~/components/dashboard/DashboardRightSidebar.vue'
 import DashboardWhatsHappening from '~/components/dashboard/DashboardWhatsHappening.vue'
@@ -18,8 +16,10 @@ import DashboardOnboardingModal from '~/components/dashboard/DashboardOnboarding
 // Getting started -> Your Groups (single panel; DashboardNoGroups nests
 // inside it as the empty state, and Upcoming events nests inside it as the
 // has-groups branch's right-hand column - legacy's dyg-layout, not separate
-// panels) -> Add Data -> What's happening. On desktop legacy sits Your
-// Groups/Add Data in a left column beside Getting started on the right -
+// panels) -> What's happening. Legacy's DashboardAddData.vue is deliberately
+// not ported: it only renders for events with `attended` set, a field
+// PartyController::expandEvent() never sets, so live never shows it. On
+// desktop legacy sits Your Groups in a left column beside Getting started on the right -
 // dashboard-grid below reproduces that with grid-template-areas while
 // keeping DOM order the mobile (stacked) order.
 definePageMeta({ auth: true })
@@ -29,8 +29,6 @@ useHead({ title: t('dashboard.title') })
 
 const sessionStore = useSessionStore()
 const dashboardStore = useDashboardStore()
-const eventsStore = useEventsStore()
-const myEvents = computed(() => eventsStore.myEvents.data ?? [])
 
 const yourGroups = computed(() => dashboardStore.data?.your_groups ?? [])
 const nearbyGroups = computed(() => dashboardStore.data?.nearby_groups ?? [])
@@ -56,9 +54,6 @@ function dismissOnboarding() {
 
 onMounted(() => {
   dashboardStore.fetch()
-  // Backs the Add Data group -> event picker (all of the user's events, not
-  // just the dashboard's upcoming set).
-  eventsStore.fetchMyEvents()
 })
 </script>
 
@@ -101,8 +96,6 @@ onMounted(() => {
           />
         </div>
 
-        <DashboardAddData :groups="yourGroups" :events="myEvents" class="dashboard-grid__adddata" />
-
         <DashboardWhatsHappening class="dashboard-grid__whatshappening" />
       </div>
     </template>
@@ -131,7 +124,6 @@ onMounted(() => {
     grid-template-columns: 2fr 1fr;
     grid-template-areas:
       'yourgroups sidebar'
-      'adddata sidebar'
       'whatshappening whatshappening';
 
     &__yourgroups {
@@ -140,10 +132,6 @@ onMounted(() => {
 
     &__sidebar {
       grid-area: sidebar;
-    }
-
-    &__adddata {
-      grid-area: adddata;
     }
 
     &__whatshappening {

@@ -505,6 +505,8 @@ describe('pages/group/view/[id]', () => {
       expect(wrapper.find('[data-testid="group-stats-layout-compact"]').exists()).toBe(false)
       expect(wrapper.find('[data-testid="group-stats-layout-after"]').exists()).toBe(true)
       expect(wrapper.findAll('.stats-before-events')).toHaveLength(0)
+      // Not butting up against the events box above.
+      expect(wrapper.find('[data-testid="group-stats-layout-after"]').classes()).toContain('mt-4')
     })
 
     it('ignores an unknown layout', () => {

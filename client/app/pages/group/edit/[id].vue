@@ -87,9 +87,10 @@ function retry() {
   load()
 }
 
+// The store has already refreshed the group (updateGroup) - reloading here
+// would swap the form for the loading placeholder.
 function onUpdated() {
   updatedMessage.value = t('groups.edit_group_save_changes')
-  load()
 }
 </script>
 

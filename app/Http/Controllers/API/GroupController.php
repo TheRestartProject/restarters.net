@@ -688,6 +688,23 @@ class GroupController extends Controller
                 ->where('event_start_utc', '>=', $start)
                 ->where('event_end_utc', '<=', $end)
                 ->get();
+
+            // The group page's events list shows "You're going!" and highlights the row for events the
+            // viewer is attending, as develop's expandEvent() did with isBeingAttendedBy() - loaded in
+            // one query rather than one per event. Optional auth, as for Party resource's 'attending'.
+            $currentUser = Auth::user() ?? auth('sanctum')->user() ?? auth('api')->user();
+
+            if ($currentUser) {
+                $attending = EventsUsers::where('user', $currentUser->id)
+                    ->where('status', '1')
+                    ->whereIn('event', $parties->pluck('idevents'))
+                    ->pluck('event')
+                    ->all();
+
+                foreach ($parties as $party) {
+                    $party->preloadedAttending = in_array($party->idevents, $attending);
+                }
+            }
         }
 
         return PartySummaryCollection::make($parties);

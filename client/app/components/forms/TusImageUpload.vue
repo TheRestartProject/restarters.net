@@ -1,6 +1,12 @@
 <script setup>
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+// Uppy's Dashboard needs its own stylesheet: without it the drag-over hint
+// ("Drop your files here"), which should only appear while dragging, is always
+// on screen above the real "Drop files here or browse files". The rules are
+// all under .uppy-* classes, so loading them for the compact path is harmless.
+import '@uppy/core/dist/style.min.css'
+import '@uppy/dashboard/dist/style.min.css'
 
 // Reusable Uppy Core + tus resumable-upload widget. Mirrors the pattern
 // folded in from PR #868's resources/js/components/ProfilePhotoTab.vue

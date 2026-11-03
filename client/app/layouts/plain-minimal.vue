@@ -24,7 +24,8 @@ import CookieConsent from '~/components/CookieConsent.vue'
     <main class="flex-grow-1">
       <slot />
     </main>
-    <footer class="container d-flex justify-content-end py-3" data-testid="plain-language-bar">
+    <!-- No .container: live's fixed .language-bar spans the full viewport. -->
+    <footer data-testid="plain-language-bar">
       <LocaleSwitcher />
     </footer>
     <ToastContainer />

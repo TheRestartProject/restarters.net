@@ -84,7 +84,7 @@ onMounted(() => {
             <div>{{ eventDateLabel(event) }}</div>
             <div>{{ eventStartLocal(event) }} <span class="d-none d-md-inline">- {{ eventEndLocal(event) }}</span></div>
             <div class="text-muted">
-              <img :src="'/images/clock.svg'" alt="" class="datelong-icon">
+              <img :src="'/images/clock.svg'" alt="" class="icon datelong-icon">
               {{ event.timezone }}
             </div>
           </td>

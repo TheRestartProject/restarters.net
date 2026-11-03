@@ -1,0 +1,52 @@
+// Entry panels (login, forgotten password, password reset)
+// ========================================================
+// resources/sass/_entry.scss, as it actually renders on live. Live loads that
+// file before the Bootstrap 4 global bundle, so `.col-12` (max-width:100%),
+// `.card` (border/radius) and the global h1 size win over parts of it: the
+// panel is full container width with a faint card border, not the 450px
+// rounded box the source file suggests. These are the computed values from
+// live, so the Nuxt pages match what users see today.
+.entry-panel {
+  background-color: $white;
+  border: 1px solid rgba(34, 34, 34, 0.125);
+  border-radius: 4.5px;
+  padding: 40px 15px 50px;
+  font-size: 15px;
+  line-height: 1.5;
+
+  h1 {
+    line-height: 1.2;
+    margin-bottom: 20px;
+  }
+
+  p {
+    font-size: 15px;
+    margin-bottom: 20px;
+  }
+
+  label {
+    font-size: 17px;
+    line-height: 1.5;
+  }
+
+  a {
+    color: #000;
+  }
+
+  .form-control {
+    background-color: $white;
+    font-family: $font-family-second;
+    font-size: 15px;
+    line-height: 1.5;
+  }
+
+  &__link {
+    margin-top: auto;
+    margin-bottom: auto;
+    display: block;
+  }
+
+  &__actions {
+    padding-top: 15px;
+  }
+}

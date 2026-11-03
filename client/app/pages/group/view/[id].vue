@@ -479,7 +479,9 @@ onMounted(() => {
         :show-calendar="showCalendar"
       />
 
-      <div v-if="statsLayout === 'after'" class="stats-after-events" data-testid="group-stats-layout-after">
+      <!-- Spaced off the events box (and its drop shadow) as develop's
+           events section's own bottom margin did. -->
+      <div v-if="statsLayout === 'after'" class="stats-after-events mt-4" data-testid="group-stats-layout-after">
         <GroupStats
           :stats="groupsStore.stats.data"
           :loading="groupsStore.stats.loading"

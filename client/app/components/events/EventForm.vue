@@ -702,7 +702,7 @@ defineExpose({ submit })
       </div>
 
       <!-- EventAddEdit.vue:94 -->
-      <BAlert v-if="justCreated" :model-value="true" variant="success" class="mt-2 mb-2" data-testid="event-form-created">
+      <BAlert v-if="justCreated" :model-value="true" variant="success" class="event-form-created mt-2 mb-2" data-testid="event-form-created">
         {{ autoApprove ? t('events.created_success_message_autoapproved') : t('events.created_success_message') }}
       </BAlert>
 
@@ -836,7 +836,10 @@ defineExpose({ submit })
     left: 8px;
   }
 
-  :deep(.mx-input) {
+  // Targets the input via its wrapper: `input-class` above replaces the
+  // library's own `mx-input` class, so a `.mx-input` selector never matched
+  // and "No date selected" ran under the icon.
+  :deep(.mx-input-wrapper input) {
     padding-left: 30px;
     padding-right: 10px;
   }
@@ -862,8 +865,17 @@ defineExpose({ submit })
   grid-column: 1 / 2;
 }
 
-.event-form-buttons {
+// EventAddEdit.vue's .creation-message: its own full-width row just above
+// the buttons. Without a grid position the browser auto-placed it into the
+// empty right-hand cell beside the description and stretched it to the
+// editor's height.
+.event-form-created {
   grid-row: 10 / 11;
+  grid-column: 1 / 2;
+}
+
+.event-form-buttons {
+  grid-row: 11 / 12;
   grid-column: 1 / 2;
 }
 
@@ -901,8 +913,13 @@ defineExpose({ submit })
     grid-column: 1 / 3;
   }
 
-  .event-form-buttons {
+  .event-form-created {
     grid-row: 7 / 8;
+    grid-column: 1 / 3;
+  }
+
+  .event-form-buttons {
+    grid-row: 8 / 9;
     grid-column: 1 / 3;
   }
 }

@@ -102,6 +102,13 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *          ref="#/components/schemas/Event/properties/stats"
  *     ),
  *     @OA\Property(
+ *          property="attending",
+ *          title="attending",
+ *          description="Whether the authenticated user is attending this event (EventsUsers.status==='1'). Only returned by endpoints that batch-load it (GET /api/v2/groups/{id}/events), and only when the caller is authenticated.",
+ *          format="boolean",
+ *          example="true"
+ *     ),
+ *     @OA\Property(
  *          property="summary",
  *          title="summary",
  *          description="Indicates that this is a summary result, not full group information.",
@@ -136,6 +143,7 @@ class PartySummary extends JsonResource
             'group' => \App\Http\Resources\GroupSummary::make($this->theGroup),
             'updated_at' => $this->updated_at->toIso8601String(),
             'stats' => $this->resource->getEventStats(),
+            'attending' => $this->when($this->resource->preloadedAttending !== null, fn () => $this->resource->preloadedAttending),
             'summary' => true
         ];
     }

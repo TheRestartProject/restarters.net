@@ -9,7 +9,10 @@ import LocaleSwitcher from '~/components/LocaleSwitcher.vue'
 </script>
 
 <template>
-  <footer class="language-bar d-flex justify-content-end px-4 py-3" data-testid="app-language-bar">
+  <!-- The bar itself (rule, background, right alignment) is LocaleSwitcher's
+       own .language-bar root, as live's partials.languages is. Giving this
+       wrapper that class too drew two rules with padding between them. -->
+  <footer data-testid="app-language-bar">
     <LocaleSwitcher />
   </footer>
 </template>

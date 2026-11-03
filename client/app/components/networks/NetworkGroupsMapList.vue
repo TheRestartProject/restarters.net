@@ -23,6 +23,13 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  // This network's own tags, for the Tag filter (develop's NetworkPage.vue
+  // groupFilterTags) - not the role-filtered list of every tag the viewer
+  // can see, which for an admin is all of them.
+  tags: {
+    type: Array,
+    default: () => [],
+  },
 })
 
 const { t } = useI18n()
@@ -147,6 +154,7 @@ onMounted(() => {
         :groups="rows"
         show-filters
         :show-tags="canManageTags"
+        :filter-tags="tags"
         :optional-columns="{ location: true, next_event: true }"
         @update:filters="onFilters"
       />

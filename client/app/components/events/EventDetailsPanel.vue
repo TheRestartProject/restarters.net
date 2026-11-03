@@ -65,17 +65,21 @@ const discourseThread = computed(() => {
         <img src="/icons/date_ico.svg" alt="" class="detail-icon me-2">
         <div data-testid="event-details-date">{{ date }}</div>
       </div>
-      <div v-if="upcoming && calendarLinks" class="dropdown" data-testid="event-view-calendar-dropdown">
-        <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
-          {{ t('calendars.add_to_calendar') }}
-        </button>
-        <ul class="dropdown-menu">
-          <li><a class="dropdown-item" target="_blank" rel="noopener" :href="calendarLinks.google" data-testid="event-view-calendar-google">{{ t('events.calendar_google') }}</a></li>
-          <li><a class="dropdown-item" target="_blank" rel="noopener" :href="calendarLinks.webOutlook" data-testid="event-view-calendar-outlook">{{ t('events.calendar_outlook') }}</a></li>
-          <li><a class="dropdown-item" target="_blank" rel="noopener" :href="calendarLinks.ics" data-testid="event-view-calendar-ics">{{ t('events.calendar_ical') }}</a></li>
-          <li><a class="dropdown-item" target="_blank" rel="noopener" :href="calendarLinks.yahoo" data-testid="event-view-calendar-yahoo">{{ t('events.calendar_yahoo') }}</a></li>
-        </ul>
-      </div>
+      <!-- BDropdown rather than a raw Bootstrap `data-bs-toggle` dropdown:
+           Bootstrap's own JS isn't loaded in the Nuxt client, so the raw
+           version never opened. -->
+      <BDropdown
+        v-if="upcoming && calendarLinks"
+        :text="t('calendars.add_to_calendar')"
+        size="sm"
+        variant="outline-secondary"
+        data-testid="event-view-calendar-dropdown"
+      >
+        <BDropdownItem :href="calendarLinks.google" target="_blank" rel="noopener" data-testid="event-view-calendar-google">{{ t('events.calendar_google') }}</BDropdownItem>
+        <BDropdownItem :href="calendarLinks.webOutlook" target="_blank" rel="noopener" data-testid="event-view-calendar-outlook">{{ t('events.calendar_outlook') }}</BDropdownItem>
+        <BDropdownItem :href="calendarLinks.ics" target="_blank" rel="noopener" data-testid="event-view-calendar-ics">{{ t('events.calendar_ical') }}</BDropdownItem>
+        <BDropdownItem :href="calendarLinks.yahoo" target="_blank" rel="noopener" data-testid="event-view-calendar-yahoo">{{ t('events.calendar_yahoo') }}</BDropdownItem>
+      </BDropdown>
     </div>
 
     <div class="detail-row d-flex pt-1 pb-1">

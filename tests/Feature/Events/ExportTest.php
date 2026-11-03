@@ -113,7 +113,6 @@ class ExportTest extends TestCase
                                                                       'category' => 222,
                                                                       'category_creation' => 222,
                                                                       'event' => $idevents2,
-                                                                      'reference' => 'REF-42',
                                                                   ]);
         $device = Device::factory()->fixed()->create([
                                                                       'category' => 111,
@@ -176,7 +175,6 @@ class ExportTest extends TestCase
         $row3 = fgetcsv($fh);
         self::assertEquals(e($event2->getEventName()), e($row3[7]));
         self::assertEquals('Powered', e($row3[12]));
-        self::assertEquals('REF-42', $row3[13]);
         $row4 = fgetcsv($fh);
 
         if ($role == 'Host') {

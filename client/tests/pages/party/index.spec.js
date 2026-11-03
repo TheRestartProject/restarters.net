@@ -3,6 +3,7 @@ import { createPinia, setActivePinia } from 'pinia'
 import { createI18n } from 'vue-i18n'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import PartyIndexPage from '../../../app/pages/party/index.vue'
+import EventCard from '../../../app/components/events/EventCard.vue'
 import { useEventsStore } from '../../../app/stores/events.js'
 import { useDashboardStore } from '../../../app/stores/dashboard.js'
 import { useProfileStore } from '../../../app/stores/profile.js'
@@ -278,7 +279,7 @@ describe('pages/party/index (mine)', () => {
 
     const wrapper = mountPage()
 
-    expect(wrapper.find('[data-testid="event-card-hosting-1"]').exists()).toBe(true)
+    expect(wrapper.findAllComponents(EventCard).find(c => c.props('event').id === 1).props('hosting')).toBe(true)
   })
 
   describe('calendar link modal', () => {

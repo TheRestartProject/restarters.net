@@ -79,12 +79,17 @@ async function confirmDelete() {
     deleting.value = false
   }
 }
+
+// The device reference (PR #907) isn't on the live site yet; hidden until the
+// rest of the Nuxt client matches live. Flip to true to bring it back -
+// stored values are untouched either way.
+const SHOW_DEVICE_REFERENCE = false
 </script>
 
 <template>
   <tr v-if="!editing" :data-testid="`event-device-${device.id}`">
     <td class="device-reference-cell">
-      <span v-if="device.reference" class="device-reference text-muted d-block" :data-testid="`event-device-reference-${device.id}`">
+      <span v-if="SHOW_DEVICE_REFERENCE && device.reference" class="device-reference text-muted d-block" :data-testid="`event-device-reference-${device.id}`">
         {{ device.reference }}
       </span>
       {{ device.item_type || '-' }}
