@@ -155,10 +155,19 @@ export default {
     value: {
       handler: function (val) {
         this.currentValue = val
-        this.$refs.autocomplete.update(this.currentValue)
+
+        // `immediate` runs this before the template exists, when there's no ref yet; mounted() then applies it.
+        if (this.$refs.autocomplete) {
+          this.$refs.autocomplete.update(this.currentValue)
+        }
       },
       immediate: true
     },
+  },
+  mounted() {
+    if (this.$refs.autocomplete) {
+      this.$refs.autocomplete.update(this.currentValue)
+    }
   },
   beforeDestroy () {
     clearTimeout(this.timer)
@@ -180,7 +189,9 @@ export default {
       this.$emit('update:lng', null)
     },
     useGroup() {
-      this.$refs.autocomplete.update(this.groupLocation)
+      if (this.$refs.autocomplete) {
+        this.$refs.autocomplete.update(this.groupLocation)
+      }
       this.$emit('update:value', this.groupLocation)
       this.$emit('update:lat', parseFloat(this.groupLat))
       this.$emit('update:lng', parseFloat(this.groupLng))

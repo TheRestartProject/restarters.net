@@ -253,7 +253,7 @@ Route::middleware('ensureAPIToken')->group(function () {
 
     Route::middleware('guest')->group(function () {
         Route::get('/', [HomeController::class, 'index'])->name('home');
-        Route::get('/about', [HomeController::class, 'index'])->name('home');
+        Route::get('/about', [HomeController::class, 'index'])->name('about');
     });
 });
 

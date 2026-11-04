@@ -21,8 +21,7 @@ class MenusTest extends TestCase
                 'Administrator',
                 [
                     0 => 'Administrator',
-                    1 => 'Reporting',
-                    2 => 'General',
+                    1 => 'General',
                 ],
                 true,
                 [
@@ -40,8 +39,7 @@ class MenusTest extends TestCase
                 'NetworkCoordinator',
                 [
                     0 => 'Administrator',
-                    1 => 'Reporting',
-                    2 => 'General',
+                    1 => 'General',
                 ],
                 true,
                 [
@@ -52,8 +50,7 @@ class MenusTest extends TestCase
             [
                 'Host',
                 [
-                    0 => 'Reporting',
-                    1 => 'General',
+                    0 => 'General',
                 ],
                 false,
                 []
