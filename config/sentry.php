@@ -7,9 +7,15 @@ return [
     // InvalidOptionsException while the app boots or reports an exception,
     // hiding the original error. Anything else means "no DSN", which disables
     // reporting.
-    'dsn' => preg_match('#^https?://#', trim((string) env('SENTRY_LARAVEL_DSN', env('SENTRY_DSN'))))
-        ? trim((string) env('SENTRY_LARAVEL_DSN', env('SENTRY_DSN')))
-        : null,
+    //
+    // Test runs and local development don't report. Most of what they raise is expected (no Discourse, no
+    // geocoder, deliberately bad input), and from CI and developers' machines it outnumbered production several
+    // times over. SENTRY_REPORT_LOCAL=true turns it back on for checking the integration itself.
+    'dsn' => (in_array(env('APP_ENV'), ['testing', 'local'], true) && ! env('SENTRY_REPORT_LOCAL', false))
+        ? null
+        : (preg_match('#^https?://#', trim((string) env('SENTRY_LARAVEL_DSN', env('SENTRY_DSN'))))
+            ? trim((string) env('SENTRY_LARAVEL_DSN', env('SENTRY_DSN')))
+            : null),
 
     // capture release as git sha
     // 'release' => trim(exec('git --git-dir ' . base_path('.git') . ' log --pretty="%h" -n1 HEAD')),
