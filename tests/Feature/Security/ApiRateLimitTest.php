@@ -20,13 +20,10 @@ class ApiRateLimitTest extends TestCase
         $response = null;
 
         for ($i = 0; $i < 301; $i++) {
-            $this->resetAuth();
             $response = $this->call('GET', '/api/v2/items?api_token=1234');
         }
 
         $response->assertStatus(429);
-
-        $this->resetAuth();
 
         $this->call('GET', '/api/v2/items?api_token=5678')->assertSuccessful();
     }
@@ -47,15 +44,5 @@ class ApiRateLimitTest extends TestCase
         $response->assertStatus(429);
 
         $this->call('GET', '/api/v2/groups/names', [], [], [], ['HTTP_FLY_CLIENT_IP' => '10.0.0.2'])->assertSuccessful();
-    }
-
-    /**
-     * The test app instance is shared between requests, and auth:api leaves the api guard as the default with the
-     * user remembered.  Reset that so each request starts as it would in production.
-     */
-    private function resetAuth(): void
-    {
-        $this->app['auth']->forgetGuards();
-        $this->app['auth']->shouldUse('web');
     }
 }

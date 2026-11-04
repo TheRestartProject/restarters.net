@@ -160,6 +160,7 @@ class AddRemoveVolunteerTest extends TestCase
         assertEquals(0, $event->volunteers);
 
         $response = $this->put('/api/events/' . $event->idevents . '/volunteers', [
+            'api_token' => $host->api_token,
             'volunteer_email_address' => $restarter->email,
             'full_name' => $restarter->name,
             'user' => $restarter->id,
@@ -180,6 +181,7 @@ class AddRemoveVolunteerTest extends TestCase
 
         // Add by name only
         $response = $this->put('/api/events/' . $event->idevents . '/volunteers', [
+            'api_token' => $host->api_token,
             'full_name' => 'Jo Bloggins',
             'volunteer_email_address' => NULL,
         ]);
@@ -198,7 +200,9 @@ class AddRemoveVolunteerTest extends TestCase
         assertEquals(0, $event->volunteers);
 
         // Add anonymous.
-        $response = $this->put('/api/events/' . $event->idevents . '/volunteers', []);
+        $response = $this->put('/api/events/' . $event->idevents . '/volunteers', [
+            'api_token' => $host->api_token,
+        ]);
 
         $response->assertJson([
             'success' => 'success'
