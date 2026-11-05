@@ -74,6 +74,7 @@ const labels = computed(() => ({
       :form-fields="formFields"
       :labels="labels"
       testid-prefix="brands"
+      create-modal-class="modal-form modal-brand"
       :allow-delete="false"
       :edit-id="editId"
       :items="adminStore.brands.data"

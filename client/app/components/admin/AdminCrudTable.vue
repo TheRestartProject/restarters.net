@@ -61,6 +61,12 @@ const props = defineProps({
     type: String,
     required: true,
   },
+  // Live's create modals for brands/skills/tags are .modal-form (445px wide);
+  // brands adds .modal-brand (wider padding). See assets/css/_modal.scss.
+  createModalClass: {
+    type: String,
+    default: '',
+  },
   allowCreate: {
     type: Boolean,
     default: true,
@@ -528,6 +534,7 @@ onMounted(load)
     <BModal
       :model-value="showCreate"
       :title="labels.createButton"
+      :modal-class="createModalClass"
       no-footer
       :data-testid="`${testidPrefix}-create-modal`"
       @hide="showCreate = false; resetCreateForm()"

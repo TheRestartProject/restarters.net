@@ -38,3 +38,21 @@
     margin: 0;
   }
 }
+
+// Variants from live's resources/global/css/components/_modal.scss.
+.modal__invite textarea {
+  min-height: 140px;
+}
+
+.modal__description p:last-child {
+  margin-bottom: 0;
+}
+
+// Admin create modals (brands, skills, tags): a narrow dialog.
+.modal-form .modal-dialog {
+  max-width: 445px;
+}
+
+.modal-brand .modal-content {
+  padding: 40px 55px;
+}

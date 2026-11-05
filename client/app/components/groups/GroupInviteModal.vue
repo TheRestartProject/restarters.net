@@ -111,7 +111,7 @@ function close() {
 </script>
 
 <template>
-  <BModal :model-value="show" data-testid="group-invite-modal" :title="t('groups.invite_group_header_link')" no-footer @hide="close">
+  <BModal :model-value="show" size="lg" modal-class="modal__invite" data-testid="group-invite-modal" :title="t('groups.invite_group_header_link')" no-footer @hide="close">
     <BAlert v-if="successMessage" :model-value="true" variant="success" data-testid="group-invite-success">
       {{ successMessage }}
     </BAlert>

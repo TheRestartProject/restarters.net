@@ -107,6 +107,7 @@ const labels = computed(() => ({
       :form-fields="formFields"
       :labels="labels"
       testid-prefix="skills"
+      create-modal-class="modal-form"
       :edit-id="editId"
       :items="adminStore.skills.data"
       :fetch-items="adminStore.fetchSkills"
