@@ -490,13 +490,13 @@ class ApiController extends Controller
         $sortColumn = (is_string($sortKey) && isset($sortColumns[$sortKey])) ? $sortColumns[$sortKey] : 'events.event_start_utc';
         $sortDesc = strtolower((string) $request->input('sortDesc', 'desc')) === 'asc' ? 'asc' : 'desc';
 
-        // The groups table is only joined when a filter or the sort needs it.
-        $needsGroupsJoin = $request->filled('group') || str_starts_with($sortColumn, 'groups.');
-
+        // Select only device columns - the joined tables share column names such as created_at, which would otherwise
+        // overwrite the device's own.  The groups join also leaves out devices whose event has no group, as the
+        // repair data export does.
         return Device::with(['deviceEvent.theGroup', 'deviceCategory', 'barriers'])
             ->select('devices.*')
             ->join('events', 'events.idevents', '=', 'devices.event')
-            ->when($needsGroupsJoin, fn ($q) => $q->join('groups', 'events.group', '=', 'groups.idgroups'))
+            ->join('groups', 'events.group', '=', 'groups.idgroups')
             ->join('categories', 'devices.category', '=', 'categories.idcategories')
             ->whereNull('events.deleted_at')
             ->where(self::deviceFilters($request))
