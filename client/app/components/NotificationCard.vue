@@ -67,7 +67,8 @@ const icon = computed(() => CATEGORY_ICONS[category.value] || null)
     <div class="card-body">
       <h5 class="card-title mb-1">
         <!-- Live's template puts whitespace between the title and the link. -->
-        <span v-if="notification.title">{{ notification.title }} </span>
+        <span v-if="notification.title">{{ notification.title }}</span>
+        {{ notification.title && notification.url ? ' ' : '' }}
         <a v-if="notification.url" :href="notification.url">{{ notification.name }}</a>
         <span v-else-if="notification.name">{{ notification.name }}</span>
       </h5>
