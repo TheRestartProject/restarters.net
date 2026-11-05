@@ -195,6 +195,22 @@ describe('components/groups/GroupForm', () => {
       expect(wrapper.emitted('created')).toEqual([[42]])
     })
 
+    it('offers timezone suggestions in a custom panel (not a datalist) and picks one', async () => {
+      const wrapper = mountForm()
+      await flushPromises()
+      expect(wrapper.find('datalist').exists()).toBe(false)
+
+      const input = wrapper.find('[data-testid="group-form-timezone"]')
+      await input.trigger('focus')
+      await input.setValue('lond')
+      const option = wrapper.find('[data-testid="group-form-timezone-option-Europe/London"]')
+      expect(option.exists()).toBe(true)
+
+      await option.trigger('mousedown')
+      expect(input.element.value).toBe('Europe/London')
+      expect(wrapper.find('[data-testid="group-form-timezone-suggestions"]').exists()).toBe(false)
+    })
+
     it('never shows the admin-only panel in create mode, even with isAdmin true', () => {
       const wrapper = mountForm({ isAdmin: true })
       expect(wrapper.find('[data-testid="group-form-networks"]').exists()).toBe(false)
