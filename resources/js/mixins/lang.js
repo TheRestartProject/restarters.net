@@ -30,8 +30,12 @@ export default {
                 }
                 return translate(key, values)
             } catch (error) {
-                Sentry.captureMessage("Missing translation " + key)
-                return key
+                // A null/undefined key is a component rendering before its data arrives, not a missing string -
+                // it was the single biggest source of production Sentry noise and says nothing actionable.
+                if (key) {
+                    Sentry.captureMessage("Missing translation " + key)
+                }
+                return key || ''
             }
         },
         // Translation strings can contain markup, and the translator interpolates

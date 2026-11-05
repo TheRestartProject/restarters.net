@@ -122,7 +122,7 @@ export default {
       this.currentType = newVal
     },
     currentType(newVal) {
-      if (!newVal.length) {
+      if (!newVal || !newVal.length) {
         this.$emit('update:type', null)
       } else {
         this.$emit('update:type', newVal)

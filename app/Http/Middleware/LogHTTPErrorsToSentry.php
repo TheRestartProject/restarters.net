@@ -16,9 +16,9 @@ class LogHTTPErrorsToSentry {
 
         $httpCode = $response->getStatusCode();
 
-        if ($httpCode >= 400 && $httpCode < 600) {
-            // Log all 4xx and 5xx errors to Sentry.  Once we do that we'll find out if there are any we should
-            // suppress.
+        if ($httpCode >= 400 && $httpCode < 600 && $httpCode !== 404) {
+            // Log 4xx and 5xx errors to Sentry.  404s are mostly crawlers and scanners, so only the ones that our
+            // own pages link to are reported, by ReportBrokenLinksToSentry.
             \Sentry\CaptureMessage("HTTP return code $httpCode");
         }
 

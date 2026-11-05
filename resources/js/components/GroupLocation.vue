@@ -95,7 +95,9 @@ export default {
     this.currentValue = this.value
     this.currentPostcode = this.postcode
     this.lastInputValue = this.value
-    this.$refs.autocomplete.update(this.currentValue)
+    if (this.$refs.autocomplete) {
+      this.$refs.autocomplete.update(this.currentValue)
+    }
     this.startLocationWatcher()
   },
   beforeDestroy() {
