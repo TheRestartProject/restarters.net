@@ -166,4 +166,8 @@ return [
   'search_title_placeholder' => 'Search title...',
   'search_start_placeholder' => 'From...',
   'search_end_placeholder' => 'To...',
+  'request_review_modal_heading' => 'Request review',
+  'request_review_message' => '<p>This will notify volunteers who attended this event that repair data has been added and that it could benefit from additional contributions and review.</p><p>It will also let volunteers know that photos (including of visitor book feedback) may have been posted.</p><p>Do you wish to send these notifications?</p>',
+  'cancel_requests' => 'Cancel',
+  'send_requests' => 'Send',
 ];

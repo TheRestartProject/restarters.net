@@ -270,9 +270,14 @@ async function onCancelRsvp() {
   }
 }
 
-// "Request reviews" — emails confirmed attendees asking them to review the
+// "Request review" — emails confirmed attendees asking them to review the
 // event's repairs (the old event-request-review modal / getContributions).
+// Choosing it only opens a confirmation modal, as on live: sending is a bulk
+// email to every attendee, so it must not fire on a single misclick.
+const confirmingReview = ref(false)
+
 async function onRequestReview() {
+  confirmingReview.value = false
   requestingReview.value = true
   try {
     await eventsStore.requestReview(id.value)
@@ -463,7 +468,7 @@ function closeAddVolunteer() {
                 :has-group="!!event.group"
                 @rsvp="onRsvp"
                 @invite="showInvite = true"
-                @request-review="onRequestReview"
+                @request-review="confirmingReview = true"
                 @share-stats="showShareStats = true"
                 @follow-group="joinHostingGroup"
                 @delete="askDelete"
@@ -665,6 +670,26 @@ function closeAddVolunteer() {
         :count="shareImageCount"
         @close="showShareImage = false"
       />
+
+      <BModal
+        :model-value="confirmingReview"
+        :title="t('events.request_review_modal_heading')"
+        no-footer
+        data-testid="event-view-request-review-modal"
+        @hide="confirmingReview = false"
+      >
+        <!-- The message is trusted translation HTML (paragraphs), as on live. -->
+        <!-- eslint-disable-next-line vue/no-v-html -->
+        <div data-testid="event-view-request-review-message" v-html="t('events.request_review_message')" />
+        <div class="d-flex justify-content-end gap-2">
+          <BButton variant="outline-secondary" data-testid="event-view-request-review-cancel" @click="confirmingReview = false">
+            {{ t('events.cancel_requests') }}
+          </BButton>
+          <BButton variant="primary" data-testid="event-view-request-review-confirm" :disabled="requestingReview" @click="onRequestReview">
+            {{ t('events.send_requests') }}
+          </BButton>
+        </div>
+      </BModal>
 
       <BModal
         :model-value="confirmingDelete"

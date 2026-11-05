@@ -1,4 +1,4 @@
-import { mount } from '@vue/test-utils'
+import { flushPromises, mount } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
 import { createI18n } from 'vue-i18n'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -793,6 +793,48 @@ describe('pages/party/view/[id]', () => {
       expect(wrapper.find('[data-testid="event-actions-request-review"]').exists()).toBe(true)
       expect(wrapper.find('[data-testid="event-actions-share-stats"]').exists()).toBe(true)
       expect(wrapper.find('[data-testid="event-actions-export"]').attributes('href')).toBe('/export/devices/event/5')
+    })
+
+    describe('request review confirmation', () => {
+      beforeEach(() => {
+        eventsStore.current.data = baseEvent({ start: '2020-01-01T10:00:00+00:00', end: '2020-01-01T12:00:00+00:00' })
+        authStore.user = { role_name: 'Administrator' }
+        authStore.token = 'a-token'
+        eventsStore.requestReview = vi.fn().mockResolvedValue()
+      })
+
+      it('asks for confirmation instead of sending straight away', async () => {
+        const wrapper = mountPage()
+        expect(wrapper.find('[data-testid="event-view-request-review-modal"]').exists()).toBe(false)
+
+        await wrapper.find('[data-testid="event-actions-request-review"]').trigger('click')
+
+        expect(eventsStore.requestReview).not.toHaveBeenCalled()
+        expect(wrapper.find('[data-testid="event-view-request-review-message"]').text()).toContain(
+          'Do you wish to send these notifications?',
+        )
+        expect(wrapper.find('[data-testid="event-view-request-review-cancel"]').text()).toBe('Cancel')
+        expect(wrapper.find('[data-testid="event-view-request-review-confirm"]').text()).toBe('Send')
+      })
+
+      it('sends the request only once Send is clicked', async () => {
+        const wrapper = mountPage()
+        await wrapper.find('[data-testid="event-actions-request-review"]').trigger('click')
+        await wrapper.find('[data-testid="event-view-request-review-confirm"]').trigger('click')
+        await flushPromises()
+
+        expect(eventsStore.requestReview).toHaveBeenCalledWith(5)
+        expect(wrapper.find('[data-testid="event-view-request-review-modal"]').exists()).toBe(false)
+      })
+
+      it('Cancel closes the modal without sending', async () => {
+        const wrapper = mountPage()
+        await wrapper.find('[data-testid="event-actions-request-review"]').trigger('click')
+        await wrapper.find('[data-testid="event-view-request-review-cancel"]').trigger('click')
+
+        expect(eventsStore.requestReview).not.toHaveBeenCalled()
+        expect(wrapper.find('[data-testid="event-view-request-review-modal"]').exists()).toBe(false)
+      })
     })
 
     it('offers an RSVP item for an upcoming event when not attending', () => {
