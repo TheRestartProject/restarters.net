@@ -9,6 +9,7 @@ use App\DeviceBarrier;
 use App\Events\DeviceCreatedOrUpdated;
 use App\Helpers\Fixometer;
 use App\Helpers\Tus;
+use App\Http\Controllers\ApiController;
 use App\Http\Controllers\Controller;
 use App\Notifications\AdminAbnormalDevices;
 use App\Party;
@@ -843,17 +844,17 @@ class DeviceController extends Controller {
      *      operationId="listDevicesv2",
      *      tags={"Devices"},
      *      summary="List/search devices, paginated",
-     *      description="v2 equivalent of GET /api/devices/{page}/{size} (v1, kept for the legacy client). Read ApiController::getDevices() for the query builder this mirrors - same filters, same join/LIKE semantics, same batch-loaded images.",
+     *      description="v2 equivalent of GET /api/devices/{page}/{size}. Both use ApiController::devicesQuery(), so they filter, join and sort identically; powered is optional (absent means both), status accepts Fixed/Repairable/End of life or 1/2/3, to_date is inclusive and events that have been deleted are excluded.",
      *      @OA\Parameter(name="page", in="query", @OA\Schema(type="integer", default=1)),
      *      @OA\Parameter(name="size", in="query", @OA\Schema(type="integer", default=20)),
-     *      @OA\Parameter(name="sortBy", in="query", @OA\Schema(type="string", default="event_start_utc")),
+     *      @OA\Parameter(name="sortBy", in="query", @OA\Schema(type="string", default="event_date")),
      *      @OA\Parameter(name="sortDesc", in="query", @OA\Schema(type="string", default="DESC")),
      *      @OA\Parameter(name="powered", in="query", @OA\Schema(type="string")),
      *      @OA\Parameter(name="category", in="query", @OA\Schema(type="integer")),
      *      @OA\Parameter(name="brand", in="query", @OA\Schema(type="string")),
      *      @OA\Parameter(name="model", in="query", @OA\Schema(type="string")),
      *      @OA\Parameter(name="item_type", in="query", @OA\Schema(type="string")),
-     *      @OA\Parameter(name="status", in="query", @OA\Schema(type="integer")),
+     *      @OA\Parameter(name="status", in="query", @OA\Schema(type="string")),
      *      @OA\Parameter(name="comments", in="query", @OA\Schema(type="string")),
      *      @OA\Parameter(name="wiki", in="query", @OA\Schema(type="boolean")),
      *      @OA\Parameter(name="group", in="query", @OA\Schema(type="string")),
@@ -875,103 +876,12 @@ class DeviceController extends Controller {
         $page = max(1, (int) $request->input('page', 1));
         $size = max(1, (int) $request->input('size', 20));
 
-        // Whitelist the sortable columns. The value comes from the client's
-        // clickable table headers (DevicesSearchTable.vue), so it must NOT be
-        // fed raw into orderBy(): the column argument is interpolated into the
-        // query grammar, so an un-whitelisted string is a SQL-injection vector.
-        // Keys are the field names the client sends per column; values are the
-        // qualified columns on the joined query. Default (and fallback for any
-        // unknown key) is the repair-event date, matching the legacy default.
-        $sortColumns = [
-            'event_start_utc' => 'events.event_start_utc',
-            'item_type' => 'devices.item_type',
-            'category' => 'categories.name',
-            'brand' => 'devices.brand',
-            'groupname' => 'groups.name',
-            'repair_status' => 'devices.repair_status',
-            'created_at' => 'devices.created_at',
-        ];
-        $sortKey = $request->input('sortBy');
-        // is_string guards against a non-scalar sortBy (e.g. ?sortBy[]=x), which
-        // would otherwise throw on the array-key lookup rather than fall back.
-        $sortColumn = (is_string($sortKey) && isset($sortColumns[$sortKey])) ? $sortColumns[$sortKey] : 'events.event_start_utc';
-        $sortDir = strtolower((string) $request->input('sortDesc', 'DESC')) === 'asc' ? 'asc' : 'desc';
-        $powered = $request->input('powered');
-        $category = $request->input('category');
-        $brand = $request->input('brand');
-        $model = $request->input('model');
-        $item_type = $request->input('item_type');
-        $status = $request->input('status');
-        $comments = $request->input('comments');
-        $wiki = filter_var($request->input('wiki', false), FILTER_VALIDATE_BOOLEAN);
-        $group = $request->input('group');
-        $from_date = $request->input('from_date');
-        $to_date = $request->input('to_date');
+        // The same query as the v1 list and the filtered download, so the three always agree.  The sort column is
+        // whitelisted there; anything unknown falls back to most recent event first.
+        $query = ApiController::devicesQuery($request);
 
-        // Same filter set as v1 ApiController::getDevices(), including its "powered defaults to
-        // unpowered when the param is absent" quirk - preserved for parity, not a new decision.
-        $wheres = [
-            ['categories.powered', '=', $powered == 'true' ? 1 : 0],
-        ];
-
-        if ($category) {
-            $wheres[] = ['idcategories', '=', $category];
-        }
-
-        if ($brand) {
-            $wheres[] = ['devices.brand', 'LIKE', '%'.$brand.'%'];
-        }
-
-        if ($model) {
-            $wheres[] = ['devices.model', 'LIKE', '%'.$model.'%'];
-        }
-
-        if ($item_type) {
-            $wheres[] = ['devices.item_type', 'LIKE', '%'.$item_type.'%'];
-        }
-
-        if ($comments) {
-            $wheres[] = ['devices.problem', 'LIKE', '%'.$comments.'%'];
-        }
-
-        if ($wiki) {
-            $wheres[] = ['devices.wiki', '=', 1];
-        }
-
-        if ($status) {
-            $wheres[] = ['repair_status', '=', $status];
-        }
-
-        if ($group) {
-            $wheres[] = ['groups.name', 'LIKE', '%'.$group.'%'];
-        }
-
-        if ($from_date) {
-            $wheres[] = ['events.event_start_utc', '>=', $from_date];
-        }
-
-        if ($to_date) {
-            $wheres[] = ['events.event_end_utc', '<=', $to_date];
-        }
-
-        // `groups` is joined ONLY when something needs it: the group-name
-        // filter, or a sort on a groups column. It used to be joined
-        // unconditionally, so every request paid for joining the whole devices
-        // table to groups even when no filter or sort referenced it - in both
-        // the COUNT and the fetch. Group data for the returned rows comes from
-        // the `deviceEvent.theGroup` eager load, not this join, so dropping it
-        // changes no output.
-        $needsGroupsJoin = $request->filled('group') || str_starts_with($sortColumn, 'groups.');
-
-        $query = Device::with(['deviceEvent.theGroup', 'deviceCategory', 'barriers'])
-            ->join('events', 'events.idevents', '=', 'devices.event')
-            ->when($needsGroupsJoin, fn ($q) => $q->join('groups', 'events.group', '=', 'groups.idgroups'))
-            ->join('categories', 'devices.category', '=', 'categories.idcategories')
-            ->where($wheres)
-            ->orderBy($sortColumn, $sortDir);
-
-        // Count without the ORDER BY: it cannot change the total, and it stops
-        // MySQL sorting the whole joined set just to count it.
+        // Count without the ORDER BY: it cannot change the total, and it stops MySQL sorting the whole joined set
+        // just to count it.
         $count = (clone $query)->reorder()->count();
 
         $items = $query->skip(($page - 1) * $size)

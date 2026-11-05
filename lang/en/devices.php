@@ -28,7 +28,6 @@ return [
   'add_data_button' => 'Add Data',
   'add_data_description' => 'Adding repair data helps show the impact of repair.',
   'search_text' => 'Browse or search our global database of repairs.',
-  'table_intro' => 'Press the ‘i’ icons for details.  Click a column head to sort by that column - click again to reverse sort order.',
   'repair_records' => 'Repair Records',
   'images' => 'Images',
   'model_or_type' => 'Item',
@@ -85,4 +84,9 @@ return [
   'items_seen' => 'items seen',
   'powered' => 'Powered',
   'unpowered' => 'Unpowered',
+  'powered_or_unpowered' => 'Powered or unpowered',
+  'both' => 'Both',
+  'view_event_for_repair' => 'View the event for this repair',
+  'view_record' => 'See the details of this repair',
+  'edit_record' => 'See and edit the details of this repair',
 ];

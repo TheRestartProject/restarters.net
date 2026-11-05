@@ -20,7 +20,7 @@ const BModalStub = {
   template: '<div v-if="modelValue" :data-modal-title="title"><slot /></div>',
 }
 const DeviceFormStub = {
-  props: ['eventId', 'device', 'powered', 'readonly', 'deleteButton', 'cancelButton'],
+  props: ['eventId', 'device', 'powered', 'readonly', 'deleteButton', 'cancelButton', 'showInfo'],
   emits: ['saved', 'cancel', 'deleted'],
   template:
     '<div data-testid="device-form-stub" :data-readonly="readonly" :data-delete-button="deleteButton" :data-cancel-button="cancelButton">{{ eventId }}:{{ device && device.id }}:{{ powered }}</div>',
@@ -37,6 +37,10 @@ const BPaginationStub = {
     '<button type="button" data-testid="pagination-next" @click="$emit(\'update:modelValue\', modelValue + 1)">next</button>' +
     '<button type="button" data-testid="pagination-prev" @click="$emit(\'update:modelValue\', modelValue - 1)">prev</button></div>',
 }
+
+// The query string the page was opened with, and the router the filters write back to.
+let routeQuery = {}
+let routerReplace
 
 function mountComponent() {
   const i18n = createI18n({
@@ -76,7 +80,8 @@ function device(overrides = {}) {
     short_problem: "Won't heat",
     groupname: 'Chiswick Restarters',
     repair_status: 'Fixed',
-    created_at: '2026-01-15T00:00:00Z',
+    event_date: '2026-01-15T10:00:00Z',
+    created_at: '2026-02-01T00:00:00Z',
     ...overrides,
   }
 }
@@ -108,17 +113,22 @@ describe('components/fixometer/DevicesSearchTable', () => {
       },
     }
 
+    routeQuery = {}
+    routerReplace = vi.fn()
     vi.stubGlobal('useNuxtApp', () => ({ $api: mockApi }))
+    vi.stubGlobal('useRoute', () => ({ query: routeQuery, hash: '' }))
+    vi.stubGlobal('useRouter', () => ({ replace: routerReplace }))
   })
 
-  it('searches on mount with the default (powered) filters', async () => {
+  it('searches on mount for both powered and unpowered items, most recent event first', async () => {
     mountComponent()
     await flushPromises()
 
     expect(mockApi.device.search).toHaveBeenCalledTimes(1)
-    expect(mockApi.device.search).toHaveBeenCalledWith(
-      expect.objectContaining({ page: 1, size: 20, powered: true, sortBy: 'event_start_utc', sortDesc: 'DESC' })
-    )
+    const params = mockApi.device.search.mock.calls[0][0]
+    expect(params).toEqual(expect.objectContaining({ page: 1, size: 20, sortDesc: 'DESC' }))
+    expect(params.powered).toBeUndefined()
+    expect(params.sortBy).toBeUndefined()
   })
 
   it('maps a category filter change to the category query param and resets to page 1', async () => {
@@ -132,45 +142,97 @@ describe('components/fixometer/DevicesSearchTable', () => {
     expect(mockApi.device.search).toHaveBeenCalledWith(expect.objectContaining({ category: 10, page: 1 }))
   })
 
-  it('sends brand/model only when powered, and item_type only when unpowered', async () => {
-    const wrapper = mountComponent()
-    await flushPromises()
-    mockApi.device.search.mockClear()
+  describe('filters', () => {
+    it('lists the filters in order, with no tabs, info icons or table intro', async () => {
+      const wrapper = mountComponent()
+      await flushPromises()
 
-    await wrapper.find('[data-testid="device-search-brand"]').setValue('Bosch')
-    await flushPromises()
-    expect(mockApi.device.search).toHaveBeenLastCalledWith(expect.objectContaining({ brand: 'Bosch' }))
+      const ids = wrapper.findAll('[data-testid="device-search-filters"] label').map((l) => l.attributes('for'))
+      expect(ids).toEqual([
+        'device-search-powered',
+        'device-search-category',
+        'device-search-item-type',
+        'device-search-brand',
+        'device-search-model',
+        'device-search-comments',
+        'device-search-status',
+      ])
+      const labels = wrapper.findAll('[data-testid="device-search-filters"] label').map((l) => l.text())
+      expect(labels[0]).toBe(en.devices.powered_or_unpowered)
+      expect(labels[2]).toBe(en.devices.model_or_type)
+      expect(labels[6]).toBe(en.devices.repair_status)
+      expect(wrapper.find('[data-testid="device-search-item-type"]').attributes('placeholder')).toBe(en.devices.item_type)
+      expect(wrapper.findComponent({ name: 'FieldInfoPopover' }).exists()).toBe(false)
+      expect(wrapper.find('.nav-tabs').exists()).toBe(false)
+      expect(wrapper.find('[data-testid="device-search-table-intro"]').exists()).toBe(false)
+      expect(wrapper.find('[data-testid="device-search-mobile-powered-toggle"]').exists()).toBe(false)
+    })
 
-    mockApi.device.search.mockClear()
-    await wrapper.find('[data-testid="device-search-powered-false"]').trigger('click')
-    await flushPromises()
+    it('offers Both, Powered and Unpowered, defaulting to Both', async () => {
+      const wrapper = mountComponent()
+      await flushPromises()
 
-    const lastCall = mockApi.device.search.mock.calls.at(-1)[0]
-    expect(lastCall.powered).toBe(false)
-    expect(lastCall.brand).toBeUndefined()
-    expect(lastCall.model).toBeUndefined()
+      const select = wrapper.find('[data-testid="device-search-powered"]')
+      expect(select.findAll('option').map((o) => o.text())).toEqual(['Both', 'Powered', 'Unpowered'])
+      expect(select.element.selectedIndex).toBe(0)
+    })
 
-    mockApi.device.search.mockClear()
-    await wrapper.find('[data-testid="device-search-item-type"]').setValue('Bicycle')
-    await flushPromises()
-    expect(mockApi.device.search).toHaveBeenLastCalledWith(expect.objectContaining({ item_type: 'Bicycle' }))
+    it('sends powered=true or false for the selected kind, and nothing for Both', async () => {
+      const wrapper = mountComponent()
+      await flushPromises()
+      const select = wrapper.find('[data-testid="device-search-powered"]')
+
+      mockApi.device.search.mockClear()
+      await select.setValue('false')
+      await flushPromises()
+      expect(mockApi.device.search.mock.calls.at(-1)[0].powered).toBe(false)
+
+      mockApi.device.search.mockClear()
+      await select.setValue('true')
+      await flushPromises()
+      expect(mockApi.device.search.mock.calls.at(-1)[0].powered).toBe(true)
+
+      mockApi.device.search.mockClear()
+      await select.setValue('')
+      await flushPromises()
+      expect(mockApi.device.search.mock.calls.at(-1)[0].powered).toBeUndefined()
+    })
+
+    it('offers the categories of the selected kind, or all of them for Both, and clears the category on a change', async () => {
+      const wrapper = mountComponent()
+      await flushPromises()
+      const category = () => wrapper.find('[data-testid="device-search-category"]')
+      const optionTexts = () => category().findAll('option').map((o) => o.text())
+
+      expect(optionTexts()).toEqual(expect.arrayContaining(['Toasters']))
+      expect(optionTexts().length).toBe(3)
+
+      await category().setValue('10')
+      await wrapper.find('[data-testid="device-search-powered"]').setValue('false')
+      await flushPromises()
+      expect(optionTexts()).not.toContain('Toasters')
+      expect(category().element.value).not.toBe('10')
+      expect(mockApi.device.search.mock.calls.at(-1)[0].category).toBeUndefined()
+    })
+
+    it('sends brand, model and item type whichever kind is selected', async () => {
+      const wrapper = mountComponent()
+      await flushPromises()
+      await wrapper.find('[data-testid="device-search-powered"]').setValue('false')
+      mockApi.device.search.mockClear()
+
+      await wrapper.find('[data-testid="device-search-brand"]').setValue('Bosch')
+      await wrapper.find('[data-testid="device-search-model"]').setValue('X1')
+      await wrapper.find('[data-testid="device-search-item-type"]').setValue('Bicycle')
+      await flushPromises()
+
+      expect(mockApi.device.search).toHaveBeenLastCalledWith(
+        expect.objectContaining({ brand: 'Bosch', model: 'X1', item_type: 'Bicycle', powered: false })
+      )
+    })
   })
 
-  // Gap fix: DeviceCategorySelect.vue's v-b-popover.html.left tooltip
-  // (devices.tooltip_category), same key/pattern DeviceForm.vue's category
-  // field already ports via FieldInfoPopover.
-  it('shows a category tooltip with the legacy tooltip_category copy', async () => {
-    const wrapper = mountComponent()
-    await flushPromises()
-
-    const popover = wrapper.findComponent({ name: 'FieldInfoPopover' })
-    expect(popover.exists()).toBe(true)
-    expect(popover.props('content')).toBe(en.devices.tooltip_category)
-  })
-
-  // Gap fix: DeviceBrand.vue's vue-typeahead-bootstrap suggestions, ported
-  // as the same custom suggestion panel DeviceForm.vue's own brand field
-  // uses (native <datalist> chrome doesn't match legacy's look), capped at 5.
+  // The same custom suggestion panel as DeviceForm.vue's brand field, capped at 5.
   it('suggests known brands via a suggestion panel sourced from the brands store, capped at 5', async () => {
     mockApi.device.brands.mockResolvedValue({
       data: [
@@ -224,15 +286,17 @@ describe('components/fixometer/DevicesSearchTable', () => {
     expect(wrapper.find('[data-testid="device-search-brand-suggestions"]').exists()).toBe(false)
   })
 
-  it('maps the status filter to the numeric Device::REPAIR_STATUS_* code, not the resource string', async () => {
+  it('sends the repair status by name, as the filtered download does', async () => {
     const wrapper = mountComponent()
     await flushPromises()
     mockApi.device.search.mockClear()
 
-    await wrapper.find('[data-testid="device-search-status"]').setValue('2')
+    const status = wrapper.find('[data-testid="device-search-status"]')
+    expect(status.findAll('option').map((o) => o.text())).toEqual(['Any status', 'Fixed', 'Repairable', 'End-of-life'])
+    await status.setValue('End of life')
     await flushPromises()
 
-    expect(mockApi.device.search).toHaveBeenLastCalledWith(expect.objectContaining({ status: 2 }))
+    expect(mockApi.device.search).toHaveBeenLastCalledWith(expect.objectContaining({ status: 'End of life' }))
   })
 
   it('maps from_date/to_date/group/comments filters straight through', async () => {
@@ -256,17 +320,6 @@ describe('components/fixometer/DevicesSearchTable', () => {
     expect(wrapper.find('[data-testid="device-search-empty"]').exists()).toBe(true)
   })
 
-  // Gap fix: a prior version also rendered a "N items found" count line
-  // above the table - legacy's FixometerRecordsTable.vue has no such line
-  // (just devices.table_intro's "Press the 'i' icons..." instructions).
-  it('does not render a results-count line - only the "i" icon instructions', async () => {
-    const wrapper = mountComponent()
-    await flushPromises()
-
-    expect(wrapper.find('[data-testid="device-search-count"]').exists()).toBe(false)
-    expect(wrapper.find('[data-testid="device-search-table-intro"]').exists()).toBe(true)
-  })
-
   it('still renders the table with column headers when there are no results', async () => {
     // Matches legacy b-table (show-empty): the column scaffold stays put on an
     // empty result set, rather than the whole table vanishing.
@@ -283,7 +336,7 @@ describe('components/fixometer/DevicesSearchTable', () => {
     expect(table.find('[data-testid="device-search-empty"]').exists()).toBe(true)
   })
 
-  it('renders result rows and reveals a link to the event in the info details panel', async () => {
+  it('renders result rows with the event date as a link to the repair on the event page', async () => {
     mockApi.device.search.mockResolvedValue({ data: { items: [device()], count: 1 } })
 
     const wrapper = mountComponent()
@@ -293,13 +346,32 @@ describe('components/fixometer/DevicesSearchTable', () => {
     expect(row.exists()).toBe(true)
     expect(row.text()).toContain('Toaster')
     expect(row.text()).toContain('Chiswick Restarters')
+    // The event's date, not the date the record was created.
+    expect(row.text()).toContain('15/01/2026')
+    expect(row.text()).not.toContain('01/02/2026')
 
-    // The event link lives in the 'i' info details panel (legacy row-details),
-    // hidden until the icon is clicked.
-    expect(wrapper.find('[data-testid="device-search-view-1"]').exists()).toBe(false)
-    await wrapper.find('[data-testid="device-search-info-1"]').trigger('click')
     const link = wrapper.find('[data-testid="device-search-view-1"]')
-    expect(link.attributes('href')).toBe('/party/view/55')
+    expect(link.attributes('href')).toBe('/party/view/55#devices-section')
+    expect(link.attributes('title')).toBe(en.devices.view_event_for_repair)
+  })
+
+  it('has the live column order and always shows Brand', async () => {
+    const wrapper = mountComponent()
+    await flushPromises()
+
+    const headers = wrapper.findAll('thead th').map((h) => h.text())
+    const order = ['Item', 'Category', 'Brand', 'Assessment', 'Status', 'Group', 'Date']
+    const positions = order.map((label) => headers.findIndex((h) => h.includes(label)))
+    expect(positions.every((p) => p >= 0)).toBe(true)
+    expect([...positions].sort((a, b) => a - b)).toEqual(positions)
+  })
+
+  it('has a white records panel and no powered/unpowered descriptions', async () => {
+    const wrapper = mountComponent()
+    await flushPromises()
+
+    expect(wrapper.find('.records.bg-white').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="device-search-powered-description"]').exists()).toBe(false)
   })
 
   it('sorts by a column ascending on first click and reverses on the next', async () => {
@@ -322,20 +394,29 @@ describe('components/fixometer/DevicesSearchTable', () => {
     )
   })
 
-  it('exposes sort controls for exactly the legacy-sortable columns (Assessment is not sortable)', async () => {
-    // powered=true by default, so the Brand column is present too.
+  it('exposes sort controls for the sortable columns only (Assessment is not sortable)', async () => {
     const wrapper = mountComponent()
     await flushPromises()
 
-    for (const key of ['item_type', 'category', 'brand', 'groupname', 'repair_status', 'created_at']) {
+    for (const key of ['item_type', 'category', 'brand', 'groupname', 'repair_status', 'event_date']) {
       expect(wrapper.find(`[data-testid="device-search-sort-${key}"]`).exists()).toBe(true)
     }
-    // Assessment renders as a header but carries no sort control (matching legacy).
     const headerTexts = wrapper.findAll('thead th').map((h) => h.text())
     expect(headerTexts.some((t) => t.includes('Assessment'))).toBe(true)
-    for (const notSortable of ['assessment', 'problem', 'short_problem']) {
+    for (const notSortable of ['assessment', 'problem', 'short_problem', 'created_at']) {
       expect(wrapper.find(`[data-testid="device-search-sort-${notSortable}"]`).exists()).toBe(false)
     }
+  })
+
+  it('sorts by the event date through the event_date key', async () => {
+    const wrapper = mountComponent()
+    await flushPromises()
+    mockApi.device.search.mockClear()
+
+    await wrapper.find('[data-testid="device-search-sort-event_date"]').trigger('click')
+    await flushPromises()
+
+    expect(mockApi.device.search).toHaveBeenLastCalledWith(expect.objectContaining({ sortBy: 'event_date', sortDesc: 'ASC' }))
   })
 
   it('expands details rows independently, so several can be open at once', async () => {
@@ -355,10 +436,8 @@ describe('components/fixometer/DevicesSearchTable', () => {
     expect(wrapper.find('[data-testid="device-search-details-2"]').exists()).toBe(true)
   })
 
-  // Gap fix (HIGH): the expanded row renders the real (read-only) DeviceForm
-  // now, not an abbreviated <dl> - field-level assertions belong to
-  // DeviceForm.spec.js, this just checks the row wires the right device
-  // through in the right (readonly, no delete/cancel) mode.
+  // The expanded row is the real DeviceForm: read-only for non-admins, editable with a delete for admins, with no
+  // help icons and the device's own powered flag.
   it('toggles a readonly DeviceForm details row via the info icon, for a non-admin', async () => {
     mockApi.device.search.mockResolvedValue({
       data: { items: [device({ model: 'AB-100', problem: 'Full assessment text' })], count: 1 },
@@ -376,14 +455,24 @@ describe('components/fixometer/DevicesSearchTable', () => {
     expect(form.props('readonly')).toBe(true)
     expect(form.props('deleteButton')).toBe(false)
     expect(form.props('cancelButton')).toBe(false)
+    expect(form.props('showInfo')).toBe(false)
 
     await wrapper.find('[data-testid="device-search-info-1"]').trigger('click')
     expect(wrapper.find('[data-testid="device-search-details-1"]').exists()).toBe(false)
   })
 
-  // Gap fix (HIGH): legacy's b-pagination, a numbered page-jump control,
-  // only rendered above one page - not a prev/next bar that stays visible
-  // with a single page.
+  it('passes the device\'s own powered flag to its form, whatever the filter says', async () => {
+    mockApi.device.search.mockResolvedValue({
+      data: { items: [device({ id: 2, category: { id: 20, name: 'devices.category_bikes', powered: false } })], count: 1 },
+    })
+    const wrapper = mountComponent()
+    await flushPromises()
+
+    await wrapper.find('[data-testid="device-search-info-2"]').trigger('click')
+    expect(wrapper.findComponent(DeviceFormStub).props('powered')).toBe(false)
+  })
+
+  // A numbered pager, only above one page.
   describe('pagination', () => {
     it('is hidden when there is only one page of results', async () => {
       mockApi.device.search.mockResolvedValue({ data: { items: [device()], count: 5 } })
@@ -422,12 +511,7 @@ describe('components/fixometer/DevicesSearchTable', () => {
     expect(wrapper.find('[data-testid="device-search-error"]').exists()).toBe(true)
   })
 
-  // Gap fix (HIGH): legacy FixometerRecordsTable.vue gives every row exactly
-  // ONE toggle - edit-pencil for admins, info for everyone else - opening
-  // the row into the SAME DeviceForm, readonly for non-admins or editable
-  // with an inline delete for admins. A prior version showed the read-only
-  // info toggle PLUS separate always-visible Edit/Delete text links for
-  // admins - three controls instead of one.
+  // Every row has one toggle: an edit pencil for admins, an info icon for everyone else.
   describe('admin edit/delete', () => {
     it('shows only the info icon (no edit-pencil) for a non-admin viewer', async () => {
       mockApi.device.search.mockResolvedValue({ data: { items: [device()], count: 1 } })
@@ -506,29 +590,7 @@ describe('components/fixometer/DevicesSearchTable', () => {
     })
   })
 
-  // Gap fix: legacy's b-tabs is `ourtabs ourtabs-brand` (assets/css/
-  // _tabs.scss's already-ported nav-tabs chrome, same pattern
-  // devices/EventDevicesPanel.vue's desktop tab strip uses) - Bootstrap
-  // nav/nav-tabs/nav-link markup, not a bespoke pill button-group.
-  describe('desktop Powered/Unpowered tabs (ourtabs pattern)', () => {
-    it('renders the toggle as nav-tabs, with the active tab carrying the nav-link active class', async () => {
-      const wrapper = mountComponent()
-      await flushPromises()
-
-      const poweredTab = wrapper.find('[data-testid="device-search-powered-true"]')
-      const unpoweredTab = wrapper.find('[data-testid="device-search-powered-false"]')
-      expect(poweredTab.classes()).toEqual(expect.arrayContaining(['nav-link', 'active']))
-      expect(unpoweredTab.classes()).toContain('nav-link')
-      expect(unpoweredTab.classes()).not.toContain('active')
-
-      await unpoweredTab.trigger('click')
-      expect(wrapper.find('[data-testid="device-search-powered-false"]').classes()).toContain('active')
-      expect(wrapper.find('[data-testid="device-search-powered-true"]').classes()).not.toContain('active')
-    })
-  })
-
-  // Gap fix: FixometerFilters.vue expands/collapses with an SVG icon image
-  // (add-icon-brand.svg/minus-icon-brand.svg), not a text +/− glyph.
+  // The sections expand and collapse with an SVG icon image.
   describe('filter section expand/collapse icons', () => {
     it('swaps the item-info toggle between add-icon-brand.svg and minus-icon-brand.svg', async () => {
       const wrapper = mountComponent()
@@ -544,84 +606,68 @@ describe('components/fixometer/DevicesSearchTable', () => {
     })
   })
 
-  // Gap fix (mobile parity, 05-fixometer mobile screenshot): legacy's
-  // mobile Repair Records UI (FixometerPage.vue's `d-block d-md-none`
-  // block) is a collapsed Powered/Unpowered accordion, not the desktop
-  // tabs+description+populated-table shown unconditionally at every width -
-  // a prior version never diverged for mobile at all.
-  describe('mobile Powered/Unpowered accordion (parity with legacy mobile)', () => {
-    it('renders the filter rail without a desktop-only class - legacy shows it at every width', () => {
+  describe('the query string', () => {
+    it('reads the filters from the query and opens the sections that hold them', async () => {
+      routeQuery = { powered: 'false', category: '20', status: 'Fixed', brand: 'Acme', model: 'M1', item_type: 'Bike', comments: 'chain', group: 'Chiswick', from_date: '2026-01-01', to_date: '2026-02-01' }
       const wrapper = mountComponent()
+      await flushPromises()
 
-      expect(wrapper.find('.device-search-layout__filters').classes()).not.toContain('d-none')
+      expect(mockApi.device.search).toHaveBeenCalledWith(
+        expect.objectContaining({ powered: false, category: 20, status: 'Fixed', brand: 'Acme', model: 'M1', item_type: 'Bike', comments: 'chain', group: 'Chiswick', from_date: '2026-01-01', to_date: '2026-02-01' })
+      )
+      expect(wrapper.find('[data-testid="device-search-filters"]').element.style.display === 'none').toBe(false)
+      expect(wrapper.find('[data-testid="device-search-event-info"] fieldset').element.style.display === 'none').toBe(false)
     })
 
-    it('starts with both mobile sections collapsed and the shared results body hidden', async () => {
+    it('leaves the sections closed when the query has no filters', async () => {
       const wrapper = mountComponent()
       await flushPromises()
 
-      const poweredToggle = wrapper.find('[data-testid="device-search-mobile-powered-toggle"]')
-      const unpoweredToggle = wrapper.find('[data-testid="device-search-mobile-unpowered-toggle"]')
-      expect(poweredToggle.attributes('aria-expanded')).toBe('false')
-      expect(unpoweredToggle.attributes('aria-expanded')).toBe('false')
-      expect(wrapper.find('[data-testid="device-search-results-body"]').classes()).toContain('d-none')
+      expect(wrapper.find('[data-testid="device-search-filters"]').element.style.display === 'none').toBe(true)
+      expect(wrapper.find('[data-testid="device-search-event-info"] fieldset').element.style.display === 'none').toBe(true)
     })
 
-    it('expanding the mobile Powered section reveals the results body (powered is already the default tab)', async () => {
+    it('opens only the section whose filter is set', async () => {
+      routeQuery = { group: 'Chiswick' }
       const wrapper = mountComponent()
       await flushPromises()
 
-      await wrapper.find('[data-testid="device-search-mobile-powered-toggle"]').trigger('click')
-      await flushPromises()
-
-      expect(wrapper.find('[data-testid="device-search-mobile-powered-toggle"]').attributes('aria-expanded')).toBe('true')
-      expect(wrapper.find('[data-testid="device-search-results-body"]').classes()).not.toContain('d-none')
+      expect(wrapper.find('[data-testid="device-search-filters"]').element.style.display === 'none').toBe(true)
+      expect(wrapper.find('[data-testid="device-search-event-info"] fieldset').element.style.display === 'none').toBe(false)
     })
 
-    it('switching from Unpowered back to Powered re-runs the search for powered items', async () => {
-      const wrapper = mountComponent()
-      await flushPromises()
-      await wrapper.find('[data-testid="device-search-mobile-unpowered-toggle"]').trigger('click')
-      await flushPromises()
-      mockApi.device.search.mockClear()
-
-      await wrapper.find('[data-testid="device-search-mobile-powered-toggle"]').trigger('click')
+    it('understands the older per-kind category links', async () => {
+      routeQuery = { category_unpowered: '20' }
+      mountComponent()
       await flushPromises()
 
-      expect(wrapper.find('[data-testid="device-search-mobile-powered-toggle"]').attributes('aria-expanded')).toBe('true')
-      expect(mockApi.device.search).toHaveBeenCalledWith(expect.objectContaining({ powered: true }))
+      expect(mockApi.device.search).toHaveBeenCalledWith(expect.objectContaining({ powered: false, category: 20 }))
     })
 
-    it('expanding Unpowered switches the shared search to unpowered and collapses Powered', async () => {
+    it('writes the filters back as they change, omitting a to date of today', async () => {
       const wrapper = mountComponent()
       await flushPromises()
-      await wrapper.find('[data-testid="device-search-mobile-powered-toggle"]').trigger('click')
-      await flushPromises()
-      mockApi.device.search.mockClear()
+      routerReplace.mockClear()
 
-      await wrapper.find('[data-testid="device-search-mobile-unpowered-toggle"]').trigger('click')
-      await flushPromises()
-
-      expect(wrapper.find('[data-testid="device-search-mobile-powered-toggle"]').attributes('aria-expanded')).toBe('false')
-      expect(wrapper.find('[data-testid="device-search-mobile-unpowered-toggle"]').attributes('aria-expanded')).toBe('true')
-      expect(mockApi.device.search).toHaveBeenCalledWith(expect.objectContaining({ powered: false }))
-    })
-
-    it('re-clicking an expanded mobile section collapses it and hides the results body again', async () => {
-      const wrapper = mountComponent()
-      await flushPromises()
-      await wrapper.find('[data-testid="device-search-mobile-powered-toggle"]').trigger('click')
+      await wrapper.find('[data-testid="device-search-powered"]').setValue('true')
+      await wrapper.find('[data-testid="device-search-brand"]').setValue('Acme')
       await flushPromises()
 
-      await wrapper.find('[data-testid="device-search-mobile-powered-toggle"]').trigger('click')
-      await flushPromises()
-
-      expect(wrapper.find('[data-testid="device-search-mobile-powered-toggle"]').attributes('aria-expanded')).toBe('false')
-      expect(wrapper.find('[data-testid="device-search-results-body"]').classes()).toContain('d-none')
+      expect(routerReplace).toHaveBeenLastCalledWith({ query: { powered: 'true', brand: 'Acme' }, hash: '' })
     })
   })
 
-  describe('clearing filters and the filtered download (develop #924)', () => {
+  describe('the total', () => {
+    it('reports the count of the list once a search lands', async () => {
+      mockApi.device.search.mockResolvedValue({ data: { items: [device()], count: 1234 } })
+      const wrapper = mountComponent()
+      await flushPromises()
+
+      expect(wrapper.emitted('update:total')?.at(-1)).toEqual([1234])
+    })
+  })
+
+  describe('clearing filters and the filtered download ', () => {
     const today = () => moment().format('YYYY-MM-DD')
     const lastDownload = (wrapper) => wrapper.emitted('update:filteredDownloadUrl')?.at(-1)?.[0]
 
@@ -633,10 +679,11 @@ describe('components/fixometer/DevicesSearchTable', () => {
       expect(lastDownload(wrapper)).toBeNull()
     })
 
-    it('clears the item filters without leaving the tab', async () => {
+    it('clears the item filters, including the powered selection', async () => {
       const wrapper = mountComponent()
       await flushPromises()
 
+      await wrapper.find('[data-testid="device-search-powered"]').setValue('false')
       await wrapper.find('[data-testid="device-search-brand"]').setValue('Acme')
       await wrapper.find('[data-testid="device-search-comments"]').setValue('fuse')
       await wrapper.find('[data-testid="device-search-group"]').setValue('Chiswick')
@@ -649,7 +696,7 @@ describe('components/fixometer/DevicesSearchTable', () => {
       const params = mockApi.device.search.mock.calls.at(-1)[0]
       expect(params.brand).toBeUndefined()
       expect(params.comments).toBeUndefined()
-      expect(params.powered).toBe(true)
+      expect(params.powered).toBeUndefined()
       // The event filters are left alone.
       expect(params.group).toBe('Chiswick')
     })
@@ -674,20 +721,40 @@ describe('components/fixometer/DevicesSearchTable', () => {
       expect(lastDownload(wrapper)).toBeNull()
     })
 
-    it('offers a download of just the filtered records, with the tab and the to date', async () => {
+    it('offers a download of just the filtered records, with the filters and the to date', async () => {
       const wrapper = mountComponent()
       await flushPromises()
 
+      await wrapper.find('[data-testid="device-search-powered"]').setValue('false')
       await wrapper.find('[data-testid="device-search-brand"]').setValue('Acme')
+      await wrapper.find('[data-testid="device-search-status"]').setValue('Fixed')
       await flushPromises()
 
       const url = new URL(lastDownload(wrapper), 'http://x')
       expect(url.pathname).toBe('/export/devices')
       expect(url.searchParams.get('brand')).toBe('Acme')
-      expect(url.searchParams.get('powered')).toBe('true')
+      expect(url.searchParams.get('powered')).toBe('false')
+      expect(url.searchParams.get('status')).toBe('Fixed')
       expect(url.searchParams.get('to_date')).toBe(today())
       expect(url.searchParams.has('page')).toBe(false)
       expect(url.searchParams.has('sortBy')).toBe(false)
+    })
+
+    it('does not offer a download for the default list, or for both kinds with only the to date', async () => {
+      const wrapper = mountComponent()
+      await flushPromises()
+
+      expect(lastDownload(wrapper)).toBeNull()
+    })
+
+    it('offers a download once the to date is changed', async () => {
+      const wrapper = mountComponent()
+      await flushPromises()
+
+      await wrapper.find('[data-testid="device-search-to-date"]').setValue('2020-01-01')
+      await flushPromises()
+
+      expect(new URL(lastDownload(wrapper), 'http://x').searchParams.get('to_date')).toBe('2020-01-01')
     })
   })
 })

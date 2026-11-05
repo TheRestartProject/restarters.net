@@ -457,6 +457,54 @@ class ApiController extends Controller
     }
 
     /**
+     * The device records query behind the repair records list, shared by the v1 and v2 device list endpoints so they
+     * filter, join and sort identically.
+     *
+     * The sort column is whitelisted: the client asks to sort by one of its table columns and anything else gets the
+     * default of most recent event first.  Only device columns are selected - the joined tables share column names
+     * such as created_at, which would otherwise overwrite the device's own.
+     */
+    #[NoStory(reason: 'Shared query helper, not a route')]
+    public static function devicesQuery(Request $request)
+    {
+        $request->validate([
+            'from_date' => 'nullable|date',
+            'to_date' => 'nullable|date',
+        ]);
+
+        $sortColumns = [
+            'item_type' => 'devices.item_type',
+            'category' => 'categories.name',
+            'device_category.name' => 'categories.name',
+            'brand' => 'devices.brand',
+            'groupname' => 'groups.name',
+            'repair_status' => 'devices.repair_status',
+            'event_date' => 'events.event_start_utc',
+            'event_start_utc' => 'events.event_start_utc',
+            'created_at' => 'devices.created_at',
+            'iddevices' => 'devices.iddevices',
+        ];
+
+        // is_string guards against a non-scalar sortBy (e.g. ?sortBy[]=x), which would throw on the array lookup.
+        $sortKey = $request->input('sortBy');
+        $sortColumn = (is_string($sortKey) && isset($sortColumns[$sortKey])) ? $sortColumns[$sortKey] : 'events.event_start_utc';
+        $sortDesc = strtolower((string) $request->input('sortDesc', 'desc')) === 'asc' ? 'asc' : 'desc';
+
+        // The groups table is only joined when a filter or the sort needs it.
+        $needsGroupsJoin = $request->filled('group') || str_starts_with($sortColumn, 'groups.');
+
+        return Device::with(['deviceEvent.theGroup', 'deviceCategory', 'barriers'])
+            ->select('devices.*')
+            ->join('events', 'events.idevents', '=', 'devices.event')
+            ->when($needsGroupsJoin, fn ($q) => $q->join('groups', 'events.group', '=', 'groups.idgroups'))
+            ->join('categories', 'devices.category', '=', 'categories.idcategories')
+            ->whereNull('events.deleted_at')
+            ->where(self::deviceFilters($request))
+            ->orderBy($sortColumn, $sortDesc)
+            ->orderBy('devices.iddevices', $sortDesc);
+    }
+
+    /**
      * @OA\Get(
      *      path="/api/devices/{page}/{size}",
      *      operationId="getDevicesLegacy",
@@ -492,44 +540,10 @@ class ApiController extends Controller
     #[UserStory('As a ThirdParty, I can search and retrieve device records via the API', persona: 'ThirdParty', theme: 'Data exports')]
     public static function getDevices(Request $request, $page, $size): JsonResponse
     {
-        $request->validate([
-            'from_date' => 'nullable|date',
-            'to_date' => 'nullable|date',
-        ]);
-
-        // The client asks to sort by one of its table columns; map those onto database columns.  Anything else
-        // gets the default of most recent event first.
-        $sortColumns = [
-            'item_type' => 'devices.item_type',
-            'category' => 'categories.name',
-            'device_category.name' => 'categories.name',
-            'brand' => 'devices.brand',
-            'groupname' => 'groups.name',
-            'repair_status' => 'devices.repair_status',
-            'event_date' => 'events.event_start_utc',
-            'created_at' => 'devices.created_at',
-            'iddevices' => 'devices.iddevices',
-        ];
-
-        $sortBy = $sortColumns[$request->input('sortBy')] ?? 'events.event_start_utc';
-        $sortDesc = strtolower($request->input('sortDesc', 'desc')) === 'asc' ? 'asc' : 'desc';
-
-        $wheres = self::deviceFilters($request);
-
-        // Get the items we want for this page.  Select only device columns - the joined tables share column names
-        // such as created_at, which would otherwise overwrite the device's own.
-        $query = Device::with(['deviceEvent.theGroup', 'deviceCategory', 'barriers'])
-            ->select('devices.*')
-            ->join('events', 'events.idevents', '=', 'devices.event')
-            ->join('groups', 'events.group', '=', 'groups.idgroups')
-            ->join('categories', 'devices.category', '=', 'categories.idcategories')
-            ->whereNull('events.deleted_at')
-            ->where($wheres)
-            ->orderBy($sortBy, $sortDesc)
-            ->orderBy('devices.iddevices', $sortDesc);
+        $query = self::devicesQuery($request);
 
         // Get total info across all pages.
-        $count = $query->count();
+        $count = (clone $query)->reorder()->count();
 
         $items = $query->skip(($page - 1) * $size)
             ->take($size)

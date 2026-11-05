@@ -28,7 +28,6 @@ return [
   'add_data_button' => 'Ajouter des données',
   'add_data_description' => 'Ajouter des données de réparation aide à démontrer l\'impact de la réparation',
   'search_text' => 'Parcourez  notre base de données de réparation',
-  'table_intro' => 'Cliquez sur la ligne pour plus de détails.  Cliquez sur l\'en-tête d\'une colonne pour trier par cette colonne - cliquez à nouveau pour inverser l\'ordre de tri.',
   'repair_records' => 'Données de réparation',
   'age_approx' => 'Années, approximatif si connu',
   'images' => 'Images',
@@ -87,4 +86,9 @@ return [
   'items_seen' => 'objets vus',
   'powered' => 'Électrique',
   'unpowered' => 'Non électrique',
+  'powered_or_unpowered' => 'Électrique ou non électrique',
+  'both' => 'Les deux',
+  'view_event_for_repair' => 'Voir l\'événement de cette réparation',
+  'view_record' => 'Voir les détails de cette réparation',
+  'edit_record' => 'Voir et modifier les détails de cette réparation',
 ];

@@ -1,54 +1,39 @@
 <script setup>
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useFixometerStore } from '~/stores/fixometer.js'
 import ImpactStats from '~/components/fixometer/ImpactStats.vue'
 import DevicesSearchTable from '~/components/fixometer/DevicesSearchTable.vue'
 import AddDataModal from '~/components/fixometer/AddDataModal.vue'
 
-// /fixometer - resources/views/fixometer/index.blade.php +
-// resources/js/components/FixometerPage.vue are the functional spec
-// (api-contracts-phase-c.md C6b; design.md §6.2 C6 task brief; git show
-// 07e6abd7cc^ for both, the commit before Phase F deleted the Blade + Vue 2
-// frontend).
+// /fixometer: the heading with its "Add Data" button, the global impact stats, and the Repair records - a download
+// link plus the filterable list of powered and unpowered items (DevicesSearchTable).
 //
-// AUTH-GATED. The legacy route sat inside
-// `Route::middleware('auth', 'verifyUserConsent', 'ensureAPIToken')`
-// (routes/web.php at 07e6abd7cc^), and the live site still 302s anonymous
-// visitors to /login. A previous comment here asserted this page was "public,
-// no auth gate" because DeviceController::index() tolerates guests - that
-// conflated "the API tolerates logged-out callers" with "the page was reachable
-// logged out", and left the page open to anonymous visitors.
+// Auth-gated: the live site redirects anonymous visitors to /login.
 definePageMeta({ auth: true })
-//
-// Legacy top-to-bottom structure, replicated here: FixometerHeading (h1 +
-// doodle + "Add Data" button), a thick <hr>, the "Our Global Impact" h2 +
-// intro paragraph, FixometerGlobalImpact's stat-card grid (ImpactStats.vue,
-// which nests the "Latest Data" card the same way the legacy component
-// did), then the Repair Records section - a "Download all data" export
-// link plus the powered/unpowered filterable table
-// (FixometerRecordsTable.vue via FixometerFilters.vue), embedded directly
-// on this page rather than switched by legacy's b-tabs. DevicesSearchTable
-// also exists standalone at /device/search (see that page's doc comment) -
-// this page embeds the same component inline to match the legacy's
-// single-page layout. Gap fix: a prior version also added a "Browse repair
-// records" button linking through to /device/search here, but legacy's
-// FixometerPage.vue header row has only the (Administrator-only) export
-// button - browsing already happens in place, via the embedded table below.
 const { t } = useI18n()
 useHead({ title: t('devices.fixometer') })
 
 const fixometerStore = useFixometerStore()
 
-// Gap fix (HIGH): FixometerHeading.vue's "Add Data" button is unconditional
-// (rendered even logged-out) and opens AddDataModal.vue, an in-page group/
-// event picker - a prior version gated the button on `loggedIn` and linked
-// straight to /dashboard instead. AddDataModal.vue itself handles the
-// logged-out/no-groups case (same warning branch legacy shows either way).
+// "Add Data" is offered to everyone and opens an in-page group/event picker; AddDataModal handles the logged-out
+// and no-groups cases.
 const showAddData = ref(false)
 
 // Set by DevicesSearchTable once its filters narrow the records; null otherwise.
 const filteredDownloadUrl = ref(null)
+
+// The live total of the list, once its search has landed; until then the sitewide total.
+const listTotal = ref(null)
+const total = computed(() => {
+  if (listTotal.value !== null) {
+    return listTotal.value
+  }
+
+  const data = fixometerStore.impactData.data
+
+  return (data?.total_powered || 0) + (data?.total_unpowered || 0)
+})
 
 function retry() {
   fixometerStore.fetchImpactData({ force: true })
@@ -110,14 +95,14 @@ onMounted(() => {
 
       <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
         <div>
-          <h2>{{ t('devices.repair_records') }}</h2>
+          <h2>
+            {{ t('devices.repair_records') }}
+            <span class="records-total" data-testid="records-total">({{ total.toLocaleString() }})</span>
+          </h2>
           <p>{{ t('devices.search_text') }}</p>
         </div>
         <div class="d-flex gap-2">
-          <!-- Everyone can download the repair data (develop #923): the
-               file built overnight when there is one, else the live export
-               (homepage_data's download_url). The export is filtered by what
-               the caller may see, so it is safe to offer to all. -->
+          <!-- Everyone can download the repair data: the file built overnight when there is one, else the live export. -->
           <a
             :href="fixometerStore.impactData.data?.download_url || '/export/devices'"
             class="btn btn-primary"
@@ -125,7 +110,7 @@ onMounted(() => {
           >
             {{ t('devices.export_device_data') }}
           </a>
-          <!-- The same export narrowed to the records the table's filters show (develop #924). -->
+          <!-- The same export narrowed to the records the table's filters show. -->
           <a
             v-if="filteredDownloadUrl"
             :href="filteredDownloadUrl"
@@ -139,8 +124,7 @@ onMounted(() => {
 
       <DevicesSearchTable
         v-model:filtered-download-url="filteredDownloadUrl"
-        :powered-count="fixometerStore.impactData.data?.total_powered ?? null"
-        :unpowered-count="fixometerStore.impactData.data?.total_unpowered ?? null"
+        v-model:total="listTotal"
       />
     </template>
   </div>

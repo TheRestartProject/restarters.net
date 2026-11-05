@@ -83,6 +83,11 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  // Whether each field shows its (i) help popover; the repair records list turns them off.
+  showInfo: {
+    type: Boolean,
+    default: true,
+  },
 })
 
 const emit = defineEmits(['saved', 'cancel', 'deleted'])
@@ -462,7 +467,7 @@ const SHOW_DEVICE_REFERENCE = false
         <BFormGroup label-for="device-form-item-type">
           <template #label>
             {{ t('devices.item_type') }}:
-            <FieldInfoPopover :content="itemTypeTooltip" :variant="infoIconVariant" />
+            <FieldInfoPopover v-if="showInfo" :content="itemTypeTooltip" :variant="infoIconVariant" />
           </template>
           <div class="position-relative typeahead-field">
             <input
@@ -502,7 +507,7 @@ const SHOW_DEVICE_REFERENCE = false
         <BFormGroup label-for="device-form-category">
           <template #label>
             {{ t('devices.category') }}:
-            <FieldInfoPopover :content="t('devices.tooltip_category')" :variant="infoIconVariant" />
+            <FieldInfoPopover v-if="showInfo" :content="t('devices.tooltip_category')" :variant="infoIconVariant" />
           </template>
           <div class="device-category" :class="{ suggested: categorySuggested, 'border-thick': missingCategory }">
             <div
@@ -600,7 +605,7 @@ const SHOW_DEVICE_REFERENCE = false
         <BFormGroup label-for="device-form-model">
           <template #label>
             {{ t('devices.model') }}:
-            <FieldInfoPopover :content="t('devices.tooltip_model')" :variant="infoIconVariant" />
+            <FieldInfoPopover v-if="showInfo" :content="t('devices.tooltip_model')" :variant="infoIconVariant" />
           </template>
           <input
             id="device-form-model"
@@ -617,7 +622,7 @@ const SHOW_DEVICE_REFERENCE = false
         <BFormGroup v-if="SHOW_DEVICE_REFERENCE" label-for="device-form-reference">
           <template #label>
             {{ t('devices.reference') }}:
-            <FieldInfoPopover :content="t('devices.tooltip_reference')" :variant="infoIconVariant" />
+            <FieldInfoPopover v-if="showInfo" :content="t('devices.tooltip_reference')" :variant="infoIconVariant" />
           </template>
           <input
             id="device-form-reference"
@@ -820,7 +825,7 @@ const SHOW_DEVICE_REFERENCE = false
         <BFormGroup label-for="device-form-problem">
           <template #label>
             {{ t('devices.devices_description') }}:
-            <FieldInfoPopover :content="t('devices.tooltip_problem')" :variant="infoIconVariant" />
+            <FieldInfoPopover v-if="showInfo" :content="t('devices.tooltip_problem')" :variant="infoIconVariant" />
           </template>
           <textarea
             id="device-form-problem"
@@ -836,7 +841,7 @@ const SHOW_DEVICE_REFERENCE = false
         <BFormGroup label-for="device-form-notes">
           <template #label>
             {{ t('client.devices.notes') }}:
-            <FieldInfoPopover :content="t('devices.tooltip_notes')" :variant="infoIconVariant" />
+            <FieldInfoPopover v-if="showInfo" :content="t('devices.tooltip_notes')" :variant="infoIconVariant" />
           </template>
           <textarea
             id="device-form-notes"

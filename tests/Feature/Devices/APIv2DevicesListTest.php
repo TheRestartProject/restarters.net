@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\Devices;
 
+use App\Device;
+use App\Party;
 use App\User;
 use Illuminate\Support\Str;
 use Tests\TestCase;
@@ -127,7 +129,7 @@ class APIv2DevicesListTest extends TestCase
         [, $idevents] = $this->createEventAsHost($host);
         $this->createDevice($idevents, 'fixed', null, 1.5, 100, '', null, null, null, 111);
 
-        $columns = ['event_start_utc', 'item_type', 'category', 'brand', 'groupname', 'repair_status', 'created_at'];
+        $columns = ['event_date', 'event_start_utc', 'item_type', 'category', 'brand', 'groupname', 'repair_status', 'created_at', 'iddevices'];
         foreach ($columns as $column) {
             foreach (['asc', 'desc'] as $direction) {
                 $this->get("/api/v2/devices?powered=false&size=20&sortBy={$column}&sortDesc={$direction}")
@@ -156,5 +158,109 @@ class APIv2DevicesListTest extends TestCase
         $response = $this->get('/api/v2/devices?powered=false&size=100&group='.$token.'&sortBy=not_a_column&sortDesc=desc');
         $response->assertSuccessful();
         $this->assertEquals([$lateDevice, $earlyDevice], array_column($response->json('data.items'), 'id'));
+    }
+
+    private function twoEventsWithDevices(string $token): array
+    {
+        $host = User::factory()->host()->create();
+        $this->actingAs($host);
+        $groupA = $this->createGroup('Alpha '.$token, 'https://therestartproject.org', 'London');
+        $groupB = $this->createGroup('Beta '.$token, 'https://therestartproject.org', 'London');
+
+        $early = Party::factory()->moderated()->create([
+            'group' => $groupA,
+            'event_start_utc' => '2024-03-10T13:00:00+00:00',
+            'event_end_utc' => '2024-03-10T15:00:00+00:00',
+        ]);
+        $late = Party::factory()->moderated()->create([
+            'group' => $groupB,
+            'event_start_utc' => '2024-05-20T13:00:00+00:00',
+            'event_end_utc' => '2024-05-20T15:00:00+00:00',
+        ]);
+
+        $make = fn ($event, $category, $status) => Device::factory()->create([
+            'category' => $category,
+            'category_creation' => $category,
+            'repair_status' => $status,
+            'event' => $event->idevents,
+        ])->iddevices;
+
+        return [
+            'powered' => $make($early, 222, Device::REPAIR_STATUS_FIXED),
+            'unpowered' => $make($late, 111, Device::REPAIR_STATUS_ENDOFLIFE),
+            'early' => $early,
+            'late' => $late,
+        ];
+    }
+
+    private function ids(string $query): array
+    {
+        $response = $this->get('/api/v2/devices?size=100&'.$query);
+        $response->assertSuccessful();
+
+        return array_column($response->json('data.items'), 'id');
+    }
+
+    public function testAbsentPoweredMeansBothPoweredAndUnpowered(): void
+    {
+        $token = 'Both'.Str::random(6);
+        $d = $this->twoEventsWithDevices($token);
+
+        $this->assertEqualsCanonicalizing([$d['powered'], $d['unpowered']], $this->ids('group='.$token));
+        $this->assertEquals([$d['unpowered']], $this->ids('group='.$token.'&powered=false'));
+        $this->assertEquals([$d['powered']], $this->ids('group='.$token.'&powered=true'));
+    }
+
+    public function testStatusAcceptsNamesAndNumbers(): void
+    {
+        $token = 'Status'.Str::random(6);
+        $d = $this->twoEventsWithDevices($token);
+
+        $this->assertEquals([$d['powered']], $this->ids('group='.$token.'&status='.urlencode(Device::REPAIR_STATUS_FIXED_STR)));
+        $this->assertEquals([$d['unpowered']], $this->ids('group='.$token.'&status='.urlencode(Device::REPAIR_STATUS_ENDOFLIFE_STR)));
+        $this->assertEquals([$d['unpowered']], $this->ids('group='.$token.'&status='.Device::REPAIR_STATUS_ENDOFLIFE));
+    }
+
+    public function testToDateIsInclusiveAndFromDateStartsTheDay(): void
+    {
+        $token = 'Dates'.Str::random(6);
+        $d = $this->twoEventsWithDevices($token);
+
+        $this->assertEquals([$d['powered']], $this->ids('group='.$token.'&to_date=2024-03-10'));
+        $this->assertEquals([$d['unpowered']], $this->ids('group='.$token.'&from_date=2024-05-20'));
+        $this->assertEqualsCanonicalizing([$d['powered'], $d['unpowered']], $this->ids('group='.$token.'&from_date=2024-03-10&to_date=2024-05-20'));
+    }
+
+    public function testDevicesOfDeletedEventsAreExcluded(): void
+    {
+        $token = 'Deleted'.Str::random(6);
+        $d = $this->twoEventsWithDevices($token);
+        $d['late']->delete();
+
+        $this->assertEquals([$d['powered']], $this->ids('group='.$token));
+    }
+
+    public function testSortsByEventDate(): void
+    {
+        $token = 'EventSort'.Str::random(6);
+        $d = $this->twoEventsWithDevices($token);
+
+        $this->assertEquals([$d['powered'], $d['unpowered']], $this->ids('group='.$token.'&sortBy=event_date&sortDesc=asc'));
+        $this->assertEquals([$d['unpowered'], $d['powered']], $this->ids('group='.$token.'&sortBy=event_date&sortDesc=desc'));
+        // The default is the most recent event first.
+        $this->assertEquals([$d['unpowered'], $d['powered']], $this->ids('group='.$token));
+    }
+
+    public function testItemsKeepTheirOwnCreatedAtAndCarryTheEventDate(): void
+    {
+        $token = 'Created'.Str::random(6);
+        $d = $this->twoEventsWithDevices($token);
+        $device = Device::find($d['powered']);
+        $device->created_at = '2024-03-11 10:00:00';
+        $device->save();
+
+        $items = $this->get('/api/v2/devices?size=100&group='.$token.'&powered=true')->json('data.items');
+        $this->assertEquals('2024-03-11', substr($items[0]['created_at'], 0, 10));
+        $this->assertEquals('2024-03-10', substr($items[0]['event_date'], 0, 10));
     }
 }

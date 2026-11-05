@@ -20,6 +20,8 @@ function mountPage() {
 describe('pages/device/search', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
+    vi.stubGlobal('useRoute', () => ({ query: {}, hash: '' }))
+    vi.stubGlobal('useRouter', () => ({ replace: vi.fn() }))
 
     vi.stubGlobal('useNuxtApp', () => ({
       $api: {
