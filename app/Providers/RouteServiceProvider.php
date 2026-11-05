@@ -48,7 +48,18 @@ class RouteServiceProvider extends ServiceProvider
     public function boot(): void
     {
         RateLimiter::for('api', function (Request $request) {
-            return Limit::perMinute(300)->by($request->user()?->id ?: $request->ip());
+            // Many API routes (e.g. devices) check api_token in the controller rather than via auth:api, so the
+            // default guard knows nothing about the user here.  Look them up via the token guard so that each user
+            // gets their own limit.
+            $user = $request->user('api');
+
+            if ($user) {
+                return Limit::perMinute(300)->by('user:' . $user->id);
+            }
+
+            // On Fly, X-Forwarded-For ends with Fly's edge IP, so $request->ip() is the same for every visitor and
+            // one busy client would use up the limit for everyone.  Fly-Client-IP is set by Fly to the real client.
+            return Limit::perMinute(300)->by('ip:' . ($request->header('Fly-Client-IP') ?: $request->ip()));
         });
 
         $this->routes(function () {
