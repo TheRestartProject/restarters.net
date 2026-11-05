@@ -78,6 +78,25 @@ $success: #3fce97;
 $danger: $brand-danger;
 $body-bg: $brand-grey;
 
+// Bootstrap 5 draws these in the page background colour (var(--bs-body-bg)),
+// where Bootstrap 4 - which the live site uses - drew them white, or left
+// tables transparent. With the page background set to brand grey above, every
+// input, dropdown, card, modal, popover, list, pager, active tab and table cell
+// came out grey, so put back Bootstrap 4's colours.
+$table-bg: transparent;
+$input-bg: #fff;
+$nav-tabs-link-active-bg: #fff;
+$dropdown-bg: #fff;
+$pagination-bg: #fff;
+$card-bg: #fff;
+$accordion-bg: #fff;
+$popover-bg: #fff;
+$modal-content-bg: #fff;
+$list-group-bg: #fff;
+$thumbnail-bg: #fff;
+$offcanvas-bg-color: #fff;
+$toast-background-color: rgba(#fff, .85);
+
 // Container widths: the legacy site was built on Bootstrap 4, whose largest
 // .container max-width was 1140px (xl). Bootstrap 5 added an xxl breakpoint with
 // a 1320px container, which made every .container noticeably wider than the

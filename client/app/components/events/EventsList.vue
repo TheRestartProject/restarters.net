@@ -189,15 +189,17 @@ function sortHint(key) {
     <!-- eslint-disable-next-line vue/no-v-html -->
     <p v-else-if="!events.length" data-testid="events-list-empty" v-html="emptyMessage" />
 
-    <div v-else class="table-responsive">
-      <table class="table align-middle" data-testid="events-list-items">
+    <!-- GroupEventScrollTable.vue's b-table: sticky-header="50vh", so a long
+         list scrolls inside its box under a header that stays in view. -->
+    <div v-else class="table-responsive events-scroll mt-2 ps-0 ps-md-3 pe-0 pe-md-3 pb-2 mb-2" data-testid="events-list-scroll">
+      <table class="table align-middle m-0" data-testid="events-list-items">
         <thead>
           <tr>
             <th scope="col" />
             <!-- Gap 1: date_long column header - GroupEventScrollTable.vue's
                  head(date_long) shows a clock icon rather than text. -->
             <th scope="col" v-bind="sortAttrs('date')">
-              <img :src="'/images/clock.svg'" alt="" class="col-icon-sm">
+              <img :src="'/images/clock.svg'" alt="" class="col-icon mt-3 ms-3">
               <span v-if="sortable" class="visually-hidden">{{ sortHint('date') }}</span>
               <span v-if="sortable" class="sort-carets" :class="sortCaretClass('date')" aria-hidden="true">
                 <span class="sort-caret sort-caret--up" />
@@ -218,14 +220,14 @@ function sortHint(key) {
               class="text-center"
               v-bind="sortAttrs(column.key)"
             >
-              <img :src="column.icon" alt="" class="col-icon" :title="column.title">
+              <img :src="column.icon" alt="" class="col-icon mt-3" :title="column.title">
               <span v-if="sortable" class="visually-hidden">{{ sortHint(column.key) }}</span>
               <span v-if="sortable" class="sort-carets" :class="sortCaretClass(column.key)" aria-hidden="true">
                 <span class="sort-caret sort-caret--up" />
                 <span class="sort-caret sort-caret--down" />
               </span>
             </th>
-            <th scope="col" />
+            <th scope="col" class="d-none d-md-table-cell" />
           </tr>
         </thead>
         <tbody>
@@ -246,13 +248,22 @@ function sortHint(key) {
 </template>
 
 <style scoped>
-.col-icon {
-  width: 24px;
-  height: 24px;
+.events-scroll {
+  max-height: 50vh;
+  overflow-y: auto;
 }
 
-.col-icon-sm {
-  width: 12px;
+/* bootstrap-vue's sticky header cells are white, so rows scroll under them. */
+.events-scroll thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background-color: #fff;
+}
+
+.col-icon {
+  width: 30px;
+  height: 30px;
 }
 
 .sortable {
