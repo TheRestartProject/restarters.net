@@ -138,7 +138,7 @@ async function confirmRemove(volunteer) {
               >
                 {{ t('partials.host') }}
               </span>
-              <div class="small text-muted d-flex align-items-center" :title="skillNames(volunteer)">
+              <div :id="`group-volunteer-skills-${volunteer.user}`" class="small text-muted d-flex align-items-center">
                 <svg
                   width="16"
                   height="16"
@@ -154,6 +154,14 @@ async function confirmRemove(volunteer) {
                 </svg>
                 {{ skillCount(volunteer) }} {{ t('partials.skills', skillCount(volunteer)) }}
               </div>
+              <!-- Live: v-b-tooltip.hover on the skills count, a styled tooltip. -->
+              <BTooltip
+                v-if="skillCount(volunteer)"
+                :target="`group-volunteer-skills-${volunteer.user}`"
+                :data-testid="`group-volunteer-skills-tooltip-${volunteer.user}`"
+              >
+                {{ skillNames(volunteer) }}
+              </BTooltip>
             </div>
           </div>
 

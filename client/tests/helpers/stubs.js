@@ -36,6 +36,7 @@ export const BTabStub = { props: ['title', 'active'], template: '<div><slot /></
 
 // GroupStats.vue's environmental-impact info popover.
 export const BPopoverStub = { props: ['target'], template: '<div><slot /></div>' }
+export const BTooltipStub = { props: ['target'], template: '<div v-bind="$attrs"><slot /></div>' }
 
 export const GROUP_VIEW_STUBS = {
   NuxtLink: NuxtLinkStub,
@@ -50,4 +51,5 @@ export const GROUP_VIEW_STUBS = {
   BTabs: BTabsStub,
   BTab: BTabStub,
   BPopover: BPopoverStub,
+  BTooltip: BTooltipStub,
 }

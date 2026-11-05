@@ -234,7 +234,7 @@ async function confirmRemove() {
                     <BPopover
                       v-if="skillCount(attendee)"
                       :target="`event-attendee-skills-${attendee.id}`"
-                      triggers="hover focus"
+                      click
                       :data-testid="`event-attendee-skills-popover-${attendee.id}`"
                     >
                       {{ skillNames(attendee) }}
