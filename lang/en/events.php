@@ -170,4 +170,6 @@ return [
   'request_review_message' => '<p>This will notify volunteers who attended this event that repair data has been added and that it could benefit from additional contributions and review.</p><p>It will also let volunteers know that photos (including of visitor book feedback) may have been posted.</p><p>Do you wish to send these notifications?</p>',
   'cancel_requests' => 'Cancel',
   'send_requests' => 'Send',
+  'pending_rsvp_message' => 'You have an invite pending for this event',
+  'pending_rsvp_button' => 'I am attending',
 ];

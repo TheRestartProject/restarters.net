@@ -660,6 +660,19 @@ class Party extends Model implements Auditable
         ])->exists();
     }
 
+    /**
+     * Whether the user holds an invitation they haven't accepted: an events_users
+     * row whose status is anything other than '1' (invites store a hash there).
+     * Mirrors events/view.blade.php's pending-invite banner condition.
+     */
+    public function hasPendingInvitationFor($userId): bool
+    {
+        return EventsUsers::where('event', $this->idevents)
+            ->where('user', $userId)
+            ->where('status', '!=', '1')
+            ->exists();
+    }
+
     // Set by callers that batch-load images to avoid N+1 (see FixometerFile::findImagesForMany).
     public ?array $preloadedImages = null;
 

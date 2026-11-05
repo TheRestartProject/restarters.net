@@ -783,6 +783,49 @@ describe('pages/party/view/[id]', () => {
   })
 
   // Gap 2: every event action lives in one EventActionsDropdown.
+  describe('pending invite banner', () => {
+    beforeEach(() => {
+      authStore.user = { role_name: 'Restarter' }
+      authStore.token = 'a-token'
+      eventsStore.attend = vi.fn().mockResolvedValue({ attending: true })
+    })
+
+    it('shows the banner for an unaccepted invite on an upcoming event', () => {
+      eventsStore.current.data = baseEvent({ attending: false, invitation_pending: true })
+
+      const wrapper = mountPage()
+      expect(wrapper.find('[data-testid="event-view-pending-invite-banner"]').text()).toContain(
+        'You have an invite pending for this event',
+      )
+      expect(wrapper.find('[data-testid="event-view-accept-invite"]').text()).toBe('I am attending')
+    })
+
+    it('accepts the invite through the RSVP call', async () => {
+      eventsStore.current.data = baseEvent({ attending: false, invitation_pending: true })
+
+      const wrapper = mountPage()
+      await wrapper.find('[data-testid="event-view-accept-invite"]').trigger('click')
+
+      expect(eventsStore.attend).toHaveBeenCalledWith(5)
+    })
+
+    it('is hidden when there is no pending invite, once attending, and after the event', () => {
+      eventsStore.current.data = baseEvent({ attending: false, invitation_pending: false })
+      expect(mountPage().find('[data-testid="event-view-pending-invite-banner"]').exists()).toBe(false)
+
+      eventsStore.current.data = baseEvent({ attending: true, invitation_pending: false })
+      expect(mountPage().find('[data-testid="event-view-pending-invite-banner"]').exists()).toBe(false)
+
+      eventsStore.current.data = baseEvent({
+        attending: false,
+        invitation_pending: true,
+        start: '2020-01-01T10:00:00+00:00',
+        end: '2020-01-01T12:00:00+00:00',
+      })
+      expect(mountPage().find('[data-testid="event-view-pending-invite-banner"]').exists()).toBe(false)
+    })
+  })
+
   describe('event actions dropdown (gap 2)', () => {
     it('offers Request review/Share stats/Export for a finished, editable event', () => {
       eventsStore.current.data = baseEvent({ start: '2020-01-01T10:00:00+00:00', end: '2020-01-01T12:00:00+00:00' })

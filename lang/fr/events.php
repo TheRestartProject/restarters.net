@@ -157,4 +157,6 @@ return [
   'request_review_message' => '<p>Cela permet d\'informer les bénévoles qui ont participé à cet événement que des données de réparation ont été ajoutées et qu\'ils peuvent les visualiser et ajouter des détails de réparation supplémentaires.</p><p> Cela permettra également aux bénévoles de savoir que des photos (y compris des commentaires sur le livre d\'or) ont peut-être été affichées.</p><p> Souhaitez-vous envoyer ces notifications?</p>',
   'cancel_requests' => 'Annuler demandes',
   'send_requests' => 'Envoyer',
+  'pending_rsvp_message' => 'Vous avez une invitation en attente pour cet événement',
+  'pending_rsvp_button' => 'Je participe',
 ];

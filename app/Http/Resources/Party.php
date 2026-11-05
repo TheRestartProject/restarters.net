@@ -236,6 +236,14 @@ use Illuminate\Support\Facades\Auth;
  *          nullable=true
  *     ),
  *     @OA\Property(
+ *          property="invitation_pending",
+ *          title="invitation_pending",
+ *          description="Whether the authenticated user has been invited to this event but hasn't accepted yet (an EventsUsers row with status other than '1'). POST /api/v2/events/{id}/attendees/me accepts it. Omitted when the caller is not authenticated.",
+ *          format="boolean",
+ *          example="false",
+ *          nullable=true
+ *     ),
+ *     @OA\Property(
  *         property="images",
  *         title="images",
  *         description="Any photos uploaded for this event",
@@ -317,6 +325,13 @@ class Party extends JsonResource
         $currentUser = Auth::user() ?? auth('sanctum')->user() ?? auth('api')->user();
         $isAttending = $currentUser !== null && $this->resource->isBeingAttendedBy($currentUser->id);
         $ret['attending'] = $this->when($currentUser !== null, fn () => $isAttending);
+
+        // events/view.blade.php's "You have an invite pending" banner: any non-confirmed
+        // EventsUsers row for the viewer. Accepting is the existing attendees/me RSVP.
+        $ret['invitation_pending'] = $this->when(
+            $currentUser !== null,
+            fn () => $this->resource->hasPendingInvitationFor($currentUser->id)
+        );
 
         // The invite modal's "invite via shareable link" tab (events.shareable_link).
         // Gated on the same permission that guards actually sending invites

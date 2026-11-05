@@ -106,6 +106,21 @@ describe('stores/events', () => {
       expect(store.myEvents.data[0].attending).toBe(true)
     })
 
+    it('accepting a pending invite clears invitation_pending on the current event, and a failure restores it', async () => {
+      const store = useEventsStore()
+      store.current.data = { id: 5, attending: false, invitation_pending: true }
+      mockApi.event.attend.mockResolvedValueOnce({ data: { attending: true } })
+
+      const promise = store.attend(5)
+      expect(store.current.data).toMatchObject({ attending: true, invitation_pending: false })
+      await promise
+
+      store.current.data = { id: 5, attending: false, invitation_pending: true }
+      mockApi.event.attend.mockRejectedValueOnce({ status: 500 })
+      await expect(store.attend(5)).rejects.toBeTruthy()
+      expect(store.current.data).toMatchObject({ attending: false, invitation_pending: true })
+    })
+
     it('reverts attending and pushes a toast on failure', async () => {
       const apiError = { status: 500, message: 'Nope' }
       mockApi.event.attend.mockRejectedValueOnce(apiError)

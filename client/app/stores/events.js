@@ -210,10 +210,10 @@ export const useEventsStore = defineStore('events', {
       const previousCurrent = this.current.data && this.current.data.id === id ? this.current.data : null
 
       if (previous) {
-        this.myEvents.data = this.myEvents.data.map((e) => (e.id === id ? { ...e, attending: true } : e))
+        this.myEvents.data = this.myEvents.data.map((e) => (e.id === id ? { ...e, attending: true, invitation_pending: false } : e))
       }
       if (previousCurrent) {
-        this.current.data = { ...previousCurrent, attending: true }
+        this.current.data = { ...previousCurrent, attending: true, invitation_pending: false }
       }
 
       const { $api } = useNuxtApp()
@@ -239,10 +239,10 @@ export const useEventsStore = defineStore('events', {
       const previousCurrent = this.current.data && this.current.data.id === id ? this.current.data : null
 
       if (previous) {
-        this.myEvents.data = this.myEvents.data.map((e) => (e.id === id ? { ...e, attending: false } : e))
+        this.myEvents.data = this.myEvents.data.map((e) => (e.id === id ? { ...e, attending: false, invitation_pending: false } : e))
       }
       if (previousCurrent) {
-        this.current.data = { ...previousCurrent, attending: false }
+        this.current.data = { ...previousCurrent, attending: false, invitation_pending: false }
       }
 
       const { $api } = useNuxtApp()

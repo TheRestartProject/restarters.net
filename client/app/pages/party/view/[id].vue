@@ -84,6 +84,9 @@ const { equivalentConsumer, popoverConsumer } = useCo2Equivalent()
 const { uploadedImageUrl } = useUploadedImageUrl()
 
 const isAttending = computed(() => !!event.value?.attending)
+// An invitation the viewer hasn't accepted yet (view.blade.php's pending
+// banner); accepting is the same RSVP call, which resolves the invite.
+const invitationPending = computed(() => !!event.value?.invitation_pending && !isAttending.value)
 const approved = computed(() => !!event.value?.approved)
 
 // --- Permissions --------------------------------------------------------
@@ -394,6 +397,15 @@ function closeAddVolunteer() {
           <span>{{ t('events.rsvp_message') }}</span>
           <BButton variant="secondary" :disabled="attendPending" data-testid="event-view-unattend" @click="onCancelRsvp">
             {{ t('events.rsvp_button') }}
+          </BButton>
+        </div>
+      </BAlert>
+
+      <BAlert v-if="invitationPending && !finished" :model-value="true" variant="info" data-testid="event-view-pending-invite-banner">
+        <div class="d-flex justify-content-between align-items-center flex-wrap">
+          <span>{{ t('events.pending_rsvp_message') }}</span>
+          <BButton variant="primary" :disabled="attendPending" data-testid="event-view-accept-invite" @click="onRsvp">
+            {{ t('events.pending_rsvp_button') }}
           </BButton>
         </div>
       </BAlert>
