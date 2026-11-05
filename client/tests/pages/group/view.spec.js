@@ -280,6 +280,9 @@ describe('pages/group/view/[id]', () => {
       expect(wrapper.find('[data-testid="group-actions-leave"]').exists()).toBe(true)
 
       await wrapper.find('[data-testid="group-actions-leave"]').trigger('click')
+      // Nothing happens until the confirm modal is confirmed (live's GroupActions).
+      expect(groupsStore.leave).not.toHaveBeenCalled()
+      await wrapper.find('[data-testid="group-view-leave-confirm"]').trigger('click')
       expect(groupsStore.leave).toHaveBeenCalledWith(5)
     })
 
@@ -294,6 +297,7 @@ describe('pages/group/view/[id]', () => {
       expect(wrapper.find('[data-testid="group-view-unfollowed"]').exists()).toBe(false)
 
       await wrapper.find('[data-testid="group-actions-leave"]').trigger('click')
+      await wrapper.find('[data-testid="group-view-leave-confirm"]').trigger('click')
       await flushPromises()
 
       const banner = wrapper.find('[data-testid="group-view-unfollowed"]')
@@ -310,6 +314,7 @@ describe('pages/group/view/[id]', () => {
 
       const wrapper = mountPage()
       await wrapper.find('[data-testid="group-actions-leave"]').trigger('click')
+      await wrapper.find('[data-testid="group-view-leave-confirm"]').trigger('click')
       await flushPromises()
 
       const banner = wrapper.find('[data-testid="group-view-unfollowed"]')
@@ -324,6 +329,7 @@ describe('pages/group/view/[id]', () => {
 
       const wrapper = mountPage()
       await wrapper.find('[data-testid="group-actions-leave"]').trigger('click')
+      await wrapper.find('[data-testid="group-view-leave-confirm"]').trigger('click')
       await flushPromises()
 
       expect(wrapper.find('[data-testid="group-view-unfollowed"]').exists()).toBe(false)

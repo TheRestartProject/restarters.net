@@ -5,6 +5,7 @@ import { useI18n } from 'vue-i18n'
 import { useUploadedImageUrl } from '../../composables/useUploadedImageUrl.js'
 import { useEventsStore } from '../../stores/events.js'
 import { EVENT_ROLE_HOST } from '../../composables/useEventAttendance.js'
+import ConfirmModal from '~/components/ConfirmModal.vue'
 import EventAttendanceCount from './EventAttendanceCount.vue'
 
 // GET /api/v2/events/{id}/attendees (api-contracts-phase-c.md C1b).
@@ -295,25 +296,14 @@ async function confirmRemove() {
       </div>
     </template>
 
-    <!-- Gap 22: real confirm modal instead of an inline confirm/cancel row. -->
-    <BModal
+    <!-- Live's EventAttendee.vue: ConfirmModal with the default title/message. -->
+    <ConfirmModal
       :model-value="!!removeTarget"
-      :title="t('partials.are_you_sure')"
-      no-footer
       data-testid="event-attendee-remove-modal"
-      @hide="cancelRemove"
-    >
-      <div class="d-flex justify-content-end gap-2">
-        <BButton variant="outline-secondary" @click="cancelRemove">{{ t('partials.cancel') }}</BButton>
-        <BButton
-          variant="danger"
-          :data-testid="removeTarget ? `event-attendee-remove-confirm-${removeTarget.id}` : 'event-attendee-remove-confirm'"
-          @click="confirmRemove"
-        >
-          {{ t('partials.yes') }}
-        </BButton>
-      </div>
-    </BModal>
+      :confirm-testid="removeTarget ? `event-attendee-remove-confirm-${removeTarget.id}` : 'event-attendee-remove-confirm'"
+      @update:model-value="(open) => { if (!open) cancelRemove() }"
+      @confirm="confirmRemove"
+    />
   </div>
 </template>
 

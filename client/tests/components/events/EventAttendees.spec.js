@@ -13,7 +13,7 @@ const BButtonStub = { template: '<button v-bind="$attrs"><slot /></button>' }
 const BModalStub = {
   props: ['modelValue', 'title'],
   emits: ['hide'],
-  template: '<div v-if="modelValue"><slot /></div>',
+  template: '<div v-if="modelValue"><slot /><slot name="footer" /></div>',
 }
 const BPopoverStub = { props: ['target', 'click', 'triggers'], template: '<div :data-click="click" :data-triggers="triggers"><slot /></div>' }
 

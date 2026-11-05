@@ -7,6 +7,7 @@ import { useGroupsStore } from '~/stores/groups.js'
 import { useSessionStore } from '~/stores/session.js'
 import { useUploadedImageUrl } from '~/composables/useUploadedImageUrl.js'
 import { escapeHtml } from '~/utils/escapeHtml.js'
+import ConfirmModal from '~/components/ConfirmModal.vue'
 import GroupActions from '~/components/groups/GroupActions.vue'
 import GroupStats from '~/components/groups/GroupStats.vue'
 import GroupDevicesSummary from '~/components/groups/GroupDevicesSummary.vue'
@@ -142,10 +143,6 @@ function askArchive() {
   confirmingArchive.value = true
 }
 
-function cancelArchive() {
-  confirmingArchive.value = false
-}
-
 async function confirmArchive() {
   confirmingArchive.value = false
   archiving.value = true
@@ -177,10 +174,6 @@ const deleting = ref(false)
 
 function askDelete() {
   confirmingDelete.value = true
-}
-
-function cancelDelete() {
-  confirmingDelete.value = false
 }
 
 async function confirmDelete() {
@@ -215,7 +208,14 @@ const unfollowedMessage = computed(() =>
   t('groups.now_unfollowed', { name: escapeHtml(group.value?.name ?? ''), link: `/group/view/${id.value}` })
 )
 
-async function onLeave() {
+// Live's GroupActions.vue asks for confirmation before leaving.
+const confirmingLeave = ref(false)
+
+function onLeave() {
+  confirmingLeave.value = true
+}
+
+async function leaveConfirmed() {
   try {
     await groupsStore.leave(id.value)
     haveLeft.value = true
@@ -340,36 +340,6 @@ onMounted(() => {
             />
           </div>
         </div>
-
-        <template v-if="canSeeDelete && confirmingDelete">
-          <div class="w-100 d-flex align-items-center gap-2 mt-2">
-            <span class="small">{{ t('groups.delete_group_confirm', { name: group.name }) }}</span>
-            <BButton
-              variant="danger"
-              :disabled="deleting"
-              data-testid="group-view-delete-confirm"
-              @click="confirmDelete"
-            >
-              {{ t('partials.yes') }}
-            </BButton>
-            <BButton variant="link" @click="cancelDelete">{{ t('partials.cancel') }}</BButton>
-          </div>
-        </template>
-
-        <template v-if="canPerformArchive && confirmingArchive">
-          <div class="w-100 d-flex align-items-center gap-2 mt-2">
-            <span class="small">{{ t('groups.archive_group_confirm', { name: group.name }) }}</span>
-            <BButton
-              variant="danger"
-              :disabled="archiving"
-              data-testid="group-view-archive-confirm"
-              @click="confirmArchive"
-            >
-              {{ t('partials.yes') }}
-            </BButton>
-            <BButton variant="link" @click="cancelArchive">{{ t('partials.cancel') }}</BButton>
-          </div>
-        </template>
       </header>
 
       <!-- About (left) | Volunteers (right) two-column, matching the live site. -->
@@ -510,6 +480,29 @@ onMounted(() => {
         :show="showShareImage"
         :count="shareImageCount"
         @close="showShareImage = false"
+      />
+
+      <!-- Live's GroupActions.vue: one ConfirmModal each for leave, delete
+           and archive. -->
+      <ConfirmModal
+        v-model="confirmingLeave"
+        :message="t('groups.leave_group_confirm')"
+        confirm-testid="group-view-leave-confirm"
+        @confirm="leaveConfirmed"
+      />
+      <ConfirmModal
+        v-model="confirmingDelete"
+        :message="t('groups.delete_group_confirm', { name: group.name })"
+        :pending="deleting"
+        confirm-testid="group-view-delete-confirm"
+        @confirm="confirmDelete"
+      />
+      <ConfirmModal
+        v-model="confirmingArchive"
+        :message="t('groups.archive_group_confirm', { name: group.name })"
+        :pending="archiving"
+        confirm-testid="group-view-archive-confirm"
+        @confirm="confirmArchive"
       />
     </template>
   </div>

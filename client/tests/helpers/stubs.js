@@ -12,7 +12,7 @@ export const BBadgeStub = { template: '<span v-bind="$attrs"><slot /></span>' }
 export const BModalStub = {
   props: ['modelValue'],
   emits: ['hide'],
-  template: '<div v-if="modelValue"><slot /></div>',
+  template: '<div v-if="modelValue"><slot /><slot name="footer" /></div>',
 }
 export const BFormStub = { template: '<form @submit.prevent="$emit(\'submit\', $event)"><slot /></form>' }
 export const BFormGroupStub = { template: '<div><slot name="label" /><slot /></div>' }

@@ -1,6 +1,7 @@
 <script setup>
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import ConfirmModal from '~/components/ConfirmModal.vue'
 import { useGroupsStore } from '../../stores/groups.js'
 
 // Self-join/leave toggle (api-contracts-phase-b.md B2: POST/DELETE
@@ -84,27 +85,13 @@ async function confirmLeave() {
     </span>
   </BButton>
 
-  <BModal
+  <ConfirmModal
     v-if="isMember"
-    :model-value="showConfirm"
-    :title="t('partials.are_you_sure')"
-    no-footer
+    v-model="showConfirm"
+    :message="t('groups.leave_group_confirm')"
+    :pending="pending"
     :data-testid="`group-leave-confirm-${groupId}`"
-    @hide="showConfirm = false"
-  >
-    <p>{{ t('groups.leave_group_confirm') }}</p>
-    <div class="d-flex justify-content-end gap-2">
-      <BButton variant="outline-secondary" @click="showConfirm = false">
-        {{ t('partials.cancel') }}
-      </BButton>
-      <BButton
-        variant="primary"
-        :disabled="pending"
-        :data-testid="`group-leave-confirm-button-${groupId}`"
-        @click="confirmLeave"
-      >
-        {{ t('groups.leave_group_button') }}
-      </BButton>
-    </div>
-  </BModal>
+    :confirm-testid="`group-leave-confirm-button-${groupId}`"
+    @confirm="confirmLeave"
+  />
 </template>

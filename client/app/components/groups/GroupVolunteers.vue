@@ -1,9 +1,10 @@
 <script setup>
 import LoadingPlaceholder from '~/components/LoadingPlaceholder.vue'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useGroupsStore } from '../../stores/groups.js'
 import GroupCollapsibleSection from './GroupCollapsibleSection.vue'
+import ConfirmModal from '~/components/ConfirmModal.vue'
 
 // GET /api/v2/groups/{id}/volunteers (already implemented server-side -
 // API\GroupController::getVolunteersForGroupv2). Functional spec:
@@ -39,8 +40,15 @@ const emit = defineEmits(['invite'])
 const { t } = useI18n()
 const groupsStore = useGroupsStore()
 
-// user id currently in the "remove this volunteer?" confirm state.
+// The volunteer pending removal; non-null while the confirm modal is open
+// (live: GroupVolunteer.vue's ConfirmModal).
 const confirmingRemove = ref(null)
+const removeModalOpen = computed({
+  get: () => confirmingRemove.value !== null,
+  set: (open) => {
+    if (!open) confirmingRemove.value = null
+  },
+})
 
 function skillCount(volunteer) {
   return volunteer.skills ? volunteer.skills.length : 0
@@ -68,15 +76,13 @@ async function removeHostRole(volunteer) {
 }
 
 function askRemove(volunteer) {
-  confirmingRemove.value = volunteer.user
+  confirmingRemove.value = volunteer
 }
 
-function cancelRemove() {
+async function confirmRemove() {
+  const volunteer = confirmingRemove.value
   confirmingRemove.value = null
-}
-
-async function confirmRemove(volunteer) {
-  confirmingRemove.value = null
+  if (!volunteer) return
   await groupsStore.removeVolunteer(props.groupId, volunteer.user).catch(() => {})
 }
 </script>
@@ -166,25 +172,10 @@ async function confirmRemove(volunteer) {
           </div>
 
           <div v-if="canedit" class="text-nowrap">
-            <template v-if="confirmingRemove === volunteer.user">
-              <span class="small me-2">{{ t('partials.are_you_sure') }}</span>
-              <BButton
-                size="sm"
-                variant="danger"
-                :data-testid="`group-volunteer-remove-confirm-${volunteer.user}`"
-                @click="confirmRemove(volunteer)"
-              >
-                {{ t('partials.yes') }}
-              </BButton>
-              <BButton size="sm" variant="link" @click="cancelRemove">
-                {{ t('partials.cancel') }}
-              </BButton>
-            </template>
             <!-- develop's GroupVolunteer.vue: a single no-caret pencil-icon
                  dropdown (edit_ico_green.svg) replaces the row of inline
                  buttons. -->
             <BDropdown
-              v-else
               variant="none"
               no-caret
               class="edit-dropdown"
@@ -224,6 +215,12 @@ async function confirmRemove(volunteer) {
         {{ t('groups.invite_to_group') }}
       </a>
     </div>
+
+    <ConfirmModal
+      v-model="removeModalOpen"
+      :confirm-testid="confirmingRemove ? `group-volunteer-remove-confirm-${confirmingRemove.user}` : 'group-volunteer-remove-confirm'"
+      @confirm="confirmRemove"
+    />
   </GroupCollapsibleSection>
 </template>
 
