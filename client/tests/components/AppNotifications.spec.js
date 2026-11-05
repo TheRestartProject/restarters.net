@@ -15,7 +15,7 @@ function mountComponent() {
   const i18n = createI18n({ legacy: false, locale: 'en', messages: { en: { ...en, ...clientEn } } })
 
   return mount(AppNotifications, {
-    global: { plugins: [i18n], stubs: { NuxtLink: NuxtLinkStub, BButton: BButtonStub } },
+    global: { plugins: [i18n], stubs: { NuxtLink: NuxtLinkStub, BButton: BButtonStub, teleport: true } },
   })
 }
 
@@ -95,6 +95,16 @@ describe('components/AppNotifications', () => {
     await flushPromises()
     return wrapper
   }
+
+  it('renders live\'s #notifications aside with scroll/inner wrappers and the view-all link inside', async () => {
+    const wrapper = await openPanel(cards)
+    const panel = wrapper.find('aside#notifications.notifications')
+
+    expect(panel.exists()).toBe(true)
+    expect(panel.attributes('data-testid')).toBe('notifications-restarters-panel')
+    expect(panel.find('.notifications__scroll .notifications__inner .cards').exists()).toBe(true)
+    expect(panel.find('.notifications__scroll > a.notifications__older').exists()).toBe(true)
+  })
 
   it('opening the bell shows the latest notification cards and a view-all link', async () => {
     const wrapper = await openPanel(cards)

@@ -118,23 +118,33 @@ onUnmounted(() => {
       <span class="notification-badge__count" data-testid="notifications-restarters-count">{{ pad(restarters) }}</span>
     </button>
 
-    <div v-if="open" class="notifications-panel" data-testid="notifications-restarters-panel">
-      <div v-if="panel.items.length" class="cards" data-testid="notifications-restarters-cards">
-        <NotificationCard v-for="n in panel.items" :key="n.id" :notification="n" @mark-read="markOne" />
-      </div>
-      <div v-else-if="!panel.loading" class="alert alert-secondary mb-2" role="alert" data-testid="notifications-restarters-empty">
-        <h3 class="h5">{{ t('general.alert_uptodate') }}</h3>
-        <p class="mb-0">{{ t('general.alert_uptodate_text') }}</p>
-      </div>
-      <NuxtLink
-        to="/notifications"
-        class="notifications__older d-block mt-2"
-        data-testid="notifications-view-all"
-        @click="open = false"
-      >
-        {{ t('notifications.view_all') }}
-      </NuxtLink>
-    </div>
+    <!-- Live's #notifications aside (navbar.blade.php): a full-height panel
+         under the navbar, not a dropdown of the bell. Teleported to the body
+         so the navbar's own positioning does not contain it; the layout is
+         the shared .notifications rules in assets/css/_notifications.scss. -->
+    <Teleport to="body">
+      <aside v-if="open" id="notifications" class="notifications" data-testid="notifications-restarters-panel">
+        <div class="notifications__scroll">
+          <div class="notifications__inner">
+            <div v-if="panel.items.length" class="cards" data-testid="notifications-restarters-cards">
+              <NotificationCard v-for="n in panel.items" :key="n.id" :notification="n" @mark-read="markOne" />
+            </div>
+            <div v-else-if="!panel.loading" class="alert alert-secondary" role="alert" data-testid="notifications-restarters-empty">
+              <h3>{{ t('general.alert_uptodate') }}</h3>
+              <p>{{ t('general.alert_uptodate_text') }}</p>
+            </div>
+          </div>
+          <NuxtLink
+            to="/notifications"
+            class="notifications__older"
+            data-testid="notifications-view-all"
+            @click="open = false"
+          >
+            {{ t('notifications.view_all') }}
+          </NuxtLink>
+        </div>
+      </aside>
+    </Teleport>
   </div>
 </template>
 
@@ -198,23 +208,5 @@ onUnmounted(() => {
     padding-left: 15px;
     padding-right: 15px;
   }
-}
-
-.notifications-panel {
-  position: absolute;
-  top: 100%;
-  right: 0;
-  width: 360px;
-  max-width: 90vw;
-  max-height: 70vh;
-  overflow-y: auto;
-  background: #fff;
-  border: 1px solid rgba(0, 0, 0, 0.15);
-  border-radius: 0.25rem;
-  padding: 0.75rem 1rem;
-  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-  z-index: 20;
-  margin-top: 0.5rem;
-
 }
 </style>

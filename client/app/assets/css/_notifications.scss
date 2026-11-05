@@ -17,7 +17,7 @@
     height: 100vh;
     z-index: 900;
     background-color: #f5f7fa;
-    @include media-breakpoint-down(xxl) {
+    @include media-breakpoint-down(lg) {
         right: 0;
     }
 }
@@ -35,7 +35,7 @@
     &__inner {
         border-top:1px solid #D9D9D9;
         padding: 20px 15px;
-        @include media-breakpoint-down(xxl) {
+        @include media-breakpoint-down(lg) {
             padding-bottom: 65px;
         }
     }
