@@ -64,7 +64,7 @@ function printableCount(value) {
 
 <template>
   <div class="devices-summary__row" :class="{ 'devices-summary__row--bare': compact }">
-    <section v-if="deviceStats" class="stats-worked-on" data-testid="group-stats-devices">
+    <section v-if="deviceStats" class="stats-worked-on statsborder" data-testid="group-stats-devices">
       <h2 class="mt-2 mb-2">{{ t('groups.total_devices') }}</h2>
       <div class="stat-cards">
         <div
@@ -74,15 +74,15 @@ function printableCount(value) {
           :class="{ 'stat-card--primary': card.primary }"
           :data-testid="card.testid"
         >
-          <img :src="`/images/${card.icon}.svg`" alt="" class="stat-card__icon">
+          <img :src="`/images/${card.icon}.svg`" alt="" class="stat-card__icon" :width="card.icon === 'drill' ? 50 : null">
           <div class="stat-card__count">{{ printableCount(card.count) }}</div>
           <div class="stat-card__label">{{ card.label }}</div>
         </div>
       </div>
     </section>
 
-    <section class="stats-most-repaired" data-testid="group-stats-top-devices">
-      <h2 class="mt-2 mb-2">{{ t('groups.most_repaired_devices') }}</h2>
+    <section class="stats-most-repaired statsborder" data-testid="group-stats-top-devices">
+      <h2 class="mt-2 mb-4">{{ t('groups.most_repaired_devices') }}</h2>
       <!-- GroupDevicesMostRepaired.vue's `.d-none.d-md-block`: the staggered
            2nd/1st/3rd podium is desktop-only. -->
       <div v-if="topDevices.length" class="podium d-none d-md-flex">
@@ -141,33 +141,47 @@ function printableCount(value) {
   min-width: 0;
 }
 
-.stat-cards {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
+// GroupStats.vue's .statsborder: a rule above each section from md.
+.statsborder {
+  margin-top: 20px;
+
+  @media (min-width: 768px) {
+    border-top: 1px solid #222;
+  }
 }
 
+// GroupDevicesWorkedOn.vue: two by two on mobile, four in a row from md.
+.stat-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 20px;
+  text-transform: lowercase;
+
+  @media (min-width: 768px) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+// StatsValue.vue's .impact-stat, 152px tall as GroupDevicesWorkedOn.vue's
+// .height, so the cards end level with the podium beside them.
 .stat-card {
-  flex: 1 1 0;
-  min-width: 90px;
-  padding: 1rem 0.5rem;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 55px 54px auto;
+  align-items: center;
+  justify-items: center;
+  height: 152px;
+  margin-top: 1rem;
+  padding: 5px;
   text-align: center;
   background: #fff;
   border: 1px solid #222;
-  box-shadow: 4px 4px 0 #222;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.35rem;
+  box-shadow: 5px 5px 0 0 #222;
 }
 
+// The total card is teal, with white text; the icon stays black, as on live.
 .stat-card--primary {
   background: #4aaebc;
-
-  .stat-card__icon {
-    filter: brightness(0) invert(1);
-  }
 
   .stat-card__count,
   .stat-card__label {
@@ -176,34 +190,31 @@ function printableCount(value) {
 }
 
 .stat-card__icon {
-  height: 40px;
+  align-self: start;
+  height: 46px;
+  margin-top: 0.5rem;
 }
 
-// StatsValue.vue's .impact-stat-count-secondary: $brand-light (#4aaebc), NOT
-// $brand/#0394a6 - that darker teal is reserved for the primary-variant
-// card (background #4aaebc, white text - see .stat-card--primary above).
 .stat-card__count {
-  font-size: 1.75rem;
+  font-family: 'Asap', sans-serif;
+  font-size: 36px;
   font-weight: bold;
   color: #4aaebc;
-  line-height: 1;
 }
 
 .stat-card__label {
-  line-height: 1.1;
-  /* GroupDevicesWorkedOn.vue wraps these cards in .text-lowercase - "total"
-     is already lowercase in the lang string, but "Fixed"/"Repairable"/
-     "End-of-life" need the CSS transform to match (partials.php keeps them
-     capitalised for reuse elsewhere, e.g. device tables). */
-  text-transform: lowercase;
+  font-family: 'Asap', sans-serif;
+  font-size: 18px;
+  font-weight: bold;
 }
 
-// GroupDeviceRepairPodium.vue: three boxes, 1st place tallest, laid out
-// left-to-right as 2nd/1st/3rd via the `order` style set above.
+// GroupDevicesMostRepaired.vue + GroupDeviceRepairPodium.vue: 2nd, 1st and
+// 3rd place standing on a 152px line, the rosette over the top of each.
 .podium {
   display: flex;
   align-items: flex-end;
-  gap: 1rem;
+  gap: 20px;
+  height: 152px;
 }
 
 .podium__slot {
@@ -212,36 +223,34 @@ function printableCount(value) {
 }
 
 .podium__box {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-end;
-  gap: 0.25rem;
-  padding: 0.75rem 0.5rem 1rem;
   background: #fff;
   border: 1px solid #222;
-  box-shadow: 5px 5px 0 #222;
+  box-shadow: 5px 5px 0 0 #222;
   text-align: center;
+  font-weight: bold;
 }
 
 .podium__rosette {
+  position: absolute;
+  top: 0;
+  left: 50%;
   width: 40px;
-  height: 40px;
-  margin-top: -1.75rem;
+  transform: translate(-20px, -22px);
 }
 
-// GroupDeviceRepairPodium.vue's `.text-brand.large`: $brand/#0394a6 (NOT
-// $brand-light/#4aaebc) - unlike the StatsValue-driven stat-cards above, the
-// podium count is intentionally the darker teal here, matching develop.
 .podium__count {
-  font-size: 1.75rem;
-  font-weight: bold;
-  color: var(--bs-primary, #0394a6);
+  font-size: 36px;
+  color: #0394a6;
 }
 
 .podium__name {
-  font-weight: bold;
-  font-size: 0.9rem;
+  font-size: 80%;
+  margin-bottom: 0.5rem;
 }
 
 // GroupDeviceRepairPodium.vue's `.mobile` grid + `.border-black`: a flat,
@@ -262,7 +271,7 @@ function printableCount(value) {
 }
 
 .podium-mobile__count {
-  font-size: 1.75rem;
+  font-size: 36px;
   font-weight: bold;
   color: var(--bs-primary, #0394a6);
 }

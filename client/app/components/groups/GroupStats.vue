@@ -95,7 +95,7 @@ const co2Description = computed(() => {
 
     <template v-else>
       <div class="group-stats__row" :class="{ 'group-stats__row--bare': compact }">
-        <section v-if="groupStats" class="group-stats__col stats-facts" data-testid="group-stats-facts">
+        <section v-if="groupStats" class="group-stats__col stats-facts statsborder" data-testid="group-stats-facts">
           <h2 class="mt-2 mb-2">{{ t('groups.group_facts') }}</h2>
           <div class="stat-cards stat-cards--facts">
             <div
@@ -112,8 +112,8 @@ const co2Description = computed(() => {
           </div>
         </section>
 
-        <section v-if="groupStats" class="group-stats__col stats-impact" data-testid="group-stats-impact">
-          <h2>
+        <section v-if="groupStats" class="group-stats__col stats-impact statsborder" data-testid="group-stats-impact">
+          <h2 class="mt-2 mb-2">
             {{ t('groups.environmental_impact') }}
             <button ref="infoButton" type="button" class="info-toggle" data-testid="group-stats-impact-info">
               <img :src="'/icons/info_ico_green.svg'" alt="" width="20" height="20">
@@ -140,7 +140,8 @@ const co2Description = computed(() => {
               </div>
               <div class="stat-card__aside">
                 <p v-if="co2Description" class="stat-card__description mb-0">
-                  <span data-testid="group-stats-co2-description">{{ co2Description }}</span>
+                  <!-- eslint-disable-next-line vue/no-v-html -->
+                  <span data-testid="group-stats-co2-description" v-html="co2Description" />
                   <button ref="co2InfoButton" type="button" class="info-toggle" data-testid="group-stats-co2-info">
                     <img :src="'/icons/info_ico_green.svg'" alt="" width="20" height="20">
                   </button>
@@ -185,17 +186,21 @@ const co2Description = computed(() => {
   display: contents;
 }
 
-.stat-cards {
-  display: grid;
-  gap: 1rem;
+// GroupStats.vue's .statsborder: a rule above each section from md.
+.statsborder {
+  margin-top: 20px;
+
+  @media (min-width: 768px) {
+    border-top: 1px solid #222;
+  }
 }
 
-// GroupStatsFacts.vue's mobile layout (findings: parity-shots/mobile/
-// 09-group-view): the primary "events" card spans the full row, with
-// participants/hours-volunteered sharing a 2-column row below it; all
-// three become equal columns in a single row from md (768px) up.
+// GroupStatsFacts.vue: the events card spans the row on mobile, with
+// participants and hours below it; three equal columns from md.
 .stat-cards--facts {
+  display: grid;
   grid-template-columns: 1fr 1fr;
+  column-gap: 20px;
 
   .stat-card--primary {
     grid-column: 1 / -1;
@@ -210,65 +215,72 @@ const co2Description = computed(() => {
   }
 }
 
-// StatsImpact.vue's mobile layout: waste/CO2 cards stack full-width, one
-// per row, only becoming a 1fr:2fr (not equal) side-by-side pair from md up.
+// StatsImpact.vue: waste and CO2 stacked on mobile, 1fr:2fr from md.
 .stat-cards--impact {
+  display: grid;
   grid-template-columns: 1fr;
+  column-gap: 20px;
 
   @media (min-width: 768px) {
     grid-template-columns: 1fr 2fr;
   }
 }
 
-// Neo-brutalist stat card (shared StatsValue.vue look; same as the fixometer
-// ImpactStats card): white box, near-black border + offset shadow, teal value.
-// Sizing comes from the parent .stat-cards--facts/--impact grid tracks
-// (not a flex-item property) - see those rules above.
+// StatsValue.vue's .impact-stat: icon, figure and title in fixed rows, so the
+// cards in a row line up; a 1rem gap above each card, under the heading.
 .stat-card {
-  min-width: 90px;
-  padding: 1rem 0.5rem;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 55px 54px auto;
+  align-items: center;
+  justify-items: center;
+  margin-top: 1rem;
+  padding: 5px;
   text-align: center;
   background: #fff;
   border: 1px solid #222;
-  box-shadow: 4px 4px 0 #222;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.35rem;
+  box-shadow: 5px 5px 0 0 #222;
 }
 
-// The first card of each group (events / total) is filled brand-teal, with a
-// white icon and light text - matching the live site's highlighted card.
+// The first card of each section is teal, with white text; the icon stays black, as on live.
 .stat-card--primary {
   background: #4aaebc;
-
-  .stat-card__icon {
-    filter: brightness(0) invert(1);
-  }
 
   .stat-card__count,
   .stat-card__label {
     color: #fff;
   }
+
+  // Horizontal below md, as StatsValue.vue's primary variant.
+  @media (max-width: 767.98px) {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .stat-card__icon,
+    .stat-card__count {
+      margin-right: 0.5rem;
+    }
+  }
 }
 
 .stat-card__icon {
-  height: 40px;
+  align-self: start;
+  height: 46px;
+  margin-top: 0.5rem;
 }
 
-// StatsValue.vue's .impact-stat-count-secondary: $brand-light (#4aaebc), NOT
-// $brand/#0394a6 - that darker teal is reserved for the primary-variant
-// cards (background #4aaebc, white text - see .stat-card--primary above).
 .stat-card__count {
-  font-size: 1.75rem;
+  font-family: 'Asap', sans-serif;
+  font-size: 36px;
   font-weight: bold;
   color: #4aaebc;
-  line-height: 1;
 }
 
 .stat-card__label {
-  line-height: 1.1;
+  font-family: 'Asap', sans-serif;
+  font-size: 18px;
+  font-weight: bold;
 }
 
 // StatsImpact.vue's info-icon popover trigger: an inline, borderless icon
@@ -277,22 +289,28 @@ const co2Description = computed(() => {
   border: 0;
   background: none;
   padding: 0;
-  margin-left: 0.35rem;
+  margin-left: 0.5rem;
   vertical-align: middle;
 }
 
-// develop #946's StatsValue .impact-stat-aside: the CO2e card has the icon, figure and title on the left, and the
-// comparison and share link on the right, split by a dashed line.  Stacked, with the line between them, below lg.
+// StatsValue.vue's .impact-stat-aside: the CO2e card has the icon, figure and
+// title on the left, and the comparison and share link on the right, split by
+// a dashed line.  Stacked, with the line between them, below lg.
 .stat-card--aside {
+  display: flex;
   flex-direction: column;
   align-items: stretch;
 
+  @media (min-width: 768px) {
+    margin-left: 0;
+  }
+
   .stat-card__main {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-rows: 55px 54px auto;
     align-items: center;
-    gap: 0.35rem;
-    padding-bottom: 0.75rem;
+    justify-items: center;
+    padding-bottom: 0.5rem;
   }
 
   .stat-card__aside {
@@ -300,38 +318,47 @@ const co2Description = computed(() => {
     flex-direction: column;
     justify-content: space-between;
     gap: 0.5rem;
-    padding-top: 0.75rem;
+    padding-top: 0.5rem;
     border-top: 3px dashed #222;
   }
 
   .stat-card__label {
-    // Let the title wrap, rather than squeeze the description.
     max-width: 170px;
   }
 
   @media (min-width: 992px) {
     flex-direction: row;
-    text-align: left;
 
     .stat-card__main {
       padding: 0 1rem 0 0;
       border-right: 3px dashed #222;
-      text-align: center;
     }
 
     .stat-card__aside {
       flex: 1;
+      justify-content: flex-end;
       padding: 0 0 0 1rem;
       border-top: none;
+    }
+
+    .stat-card__description {
+      flex: 1;
+      display: flex;
+      align-items: flex-end;
     }
   }
 }
 
 .stat-card__description {
+  font-family: 'Asap', sans-serif;
   font-size: 16px;
+  align-items: center;
 }
 
 .stat-card__share {
   align-self: flex-end;
+  padding: 0;
+  font-size: 0.875rem;
+  color: #0394a6;
 }
 </style>

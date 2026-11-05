@@ -29,7 +29,8 @@ export function useCo2Equivalent() {
       key = 'partials.emissions_equivalent_consume_low'
     }
 
-    return t(key, { value }, value)
+    // The figure stands out in bold brand teal, as co2equivalent.js does on live; it is a number, so safe as HTML.
+    return t(key, { value: `<span class="text-brand-light fw-bold">${value}</span>` }, value)
   }
 
   function popoverConsumer(co2) {
