@@ -187,12 +187,11 @@ class SessionController extends Controller
         ];
     }
 
-    #[NoStory(reason: 'Internal helper listing enabled locales; not a route')]
+    #[NoStory(reason: 'Internal helper listing the offered locales; not a route')]
     public static function availableLocales(): array
     {
-        return collect(scandir(base_path('lang')))
-            ->filter(fn ($entry) => is_dir(base_path('lang/'.$entry)) && ! str_starts_with($entry, '.'))
-            ->values()
-            ->all();
+        // The same set live's language menu offers (config/laravellocalization.php); lang/ also
+        // holds locales that aren't offered (ne, no).
+        return array_keys(\LaravelLocalization::getSupportedLocales());
     }
 }

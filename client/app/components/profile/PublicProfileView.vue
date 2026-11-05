@@ -53,7 +53,7 @@ const avatarUrl = computed(() => uploadedImageUrl(profile.value?.avatar_url))
 // nothing). Those JSON files translate every role name (en: Administrator ->
 // "Admin", Restarter -> "Repairer", NetworkCoordinator -> "Network
 // Coordinator"; fr/fr-BE: Administrator -> "Administrateur", etc) and are
-// already exported as flat top-level keys in i18n/locales/{en,fr,fr-BE}.json
+// already exported as flat top-level keys in i18n/locales/<code>.json
 // (php artisan translations:export-client) - t() resolves the role name
 // straight through those, matching @lang() exactly, in every locale.
 const roleLabel = computed(() => (profile.value?.role_name ? t(profile.value.role_name) : ''))

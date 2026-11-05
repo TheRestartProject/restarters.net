@@ -72,9 +72,15 @@ export default defineNuxtConfig({
       // translations:export-client` (CI-checked; never hand-edit).
       // client-<code>.json holds client-only keys (the 'client' group) with
       // no Laravel counterpart, and is hand-maintained.
+      // Same set and order as live's footer menu (config/laravellocalization.php).
+      { code: 'de', language: 'de-DE', files: ['de.json', 'client-de.json'] },
       { code: 'en', language: 'en-GB', files: ['en.json', 'client-en.json'] },
+      { code: 'es', language: 'es-ES', files: ['es.json', 'client-es.json'] },
       { code: 'fr', language: 'fr-FR', files: ['fr.json', 'client-fr.json'] },
       { code: 'fr-BE', language: 'fr-BE', files: ['fr-BE.json', 'client-fr-BE.json'] },
+      { code: 'it', language: 'it-IT', files: ['it.json', 'client-it.json'] },
+      { code: 'nl', language: 'nl-NL', files: ['nl.json', 'client-nl.json'] },
+      { code: 'nl-BE', language: 'nl-BE', files: ['nl-BE.json', 'client-nl-BE.json'] },
     ],
     detectBrowserLanguage: {
       useCookie: true,

@@ -64,8 +64,18 @@ class SessionTest extends TestCase
         $this->assertEquals('fr-BE', $response->json('data.user.language'));
         $this->assertEquals('fr-BE', $user->fresh()->language);
 
+        // Every language on live's menu is accepted.
+        foreach (['de', 'en', 'es', 'fr', 'fr-BE', 'it', 'nl', 'nl-BE'] as $locale) {
+            $this->patch('/api/v2/session', ['locale' => $locale], $headers)->assertOk();
+            app('auth')->forgetGuards();
+        }
+
         $bad = $this->patch('/api/v2/session', ['locale' => 'xx-XX'], $headers);
         $bad->assertStatus(422);
+
+        // lang/ has directories for languages live doesn't offer.
+        app('auth')->forgetGuards();
+        $this->patch('/api/v2/session', ['locale' => 'no'], $headers)->assertStatus(422);
 
         // The auth manager caches resolved guards between in-test requests.
         app('auth')->forgetGuards();

@@ -4,13 +4,18 @@ import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '~/stores/auth.js'
 import { useSessionStore } from '~/stores/session.js'
 
-// en/fr/fr-BE only (nuxt.config.ts i18n.locales - design.md §7); native
-// names are not translated (a French speaker still needs to see
-// "Français" while browsing in English to find it).
+// Live's language menu (config/laravellocalization.php order; nuxt.config.ts
+// i18n.locales). Native names are not translated (a French speaker still
+// needs to see "Français" while browsing in English to find it).
 const LOCALES = [
+  { code: 'de', native: 'Deutsch' },
   { code: 'en', native: 'English' },
+  { code: 'es', native: 'Español' },
   { code: 'fr', native: 'Français' },
   { code: 'fr-BE', native: 'Français (Belgique)' },
+  { code: 'it', native: 'Italiano' },
+  { code: 'nl', native: 'Nederlands' },
+  { code: 'nl-BE', native: 'Nederlands (België)' },
 ]
 
 // @nuxtjs/i18n extends the shared vue-i18n composer returned by useI18n()

@@ -51,7 +51,7 @@ function skillCount(volunteer) {
 // resolved via Laravel's JSON translation files (lang/en.json et al, NOT
 // lang/en/*.php), the same mechanism getRoleName()/@lang() uses for role
 // names (see PublicProfileView.vue's roleLabel doc comment) - and already
-// exported as flat top-level keys in i18n/locales/{en,fr,fr-BE}.json
+// exported as flat top-level keys in i18n/locales/<code>.json
 // (php artisan translations:export-client), so t(s.skill_name) resolves
 // each one per-locale exactly like develop's @lang() does (matching
 // pages/user/consent.vue and pages/user/register.vue's own skill lists).

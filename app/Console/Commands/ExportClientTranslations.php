@@ -6,7 +6,7 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\File;
 
 /**
- * Export lang/{en,fr,fr-BE} to vue-i18n JSON for the Nuxt client
+ * Export lang/{en,fr,fr-BE,de,es,it,nl,nl-BE} to vue-i18n JSON for the Nuxt client
  * (client/i18n/locales/<locale>.json). Laravel lang files remain the single
  * source of truth; the client JSONs are generated and committed, with a CI
  * check (--check) that they are in sync.
@@ -28,7 +28,7 @@ class ExportClientTranslations extends Command
 
     protected $description = 'Export lang/ PHP translations to vue-i18n JSON for the Nuxt client';
 
-    private const LOCALES = ['en', 'fr', 'fr-BE'];
+    private const LOCALES = ['en', 'fr', 'fr-BE', 'de', 'es', 'it', 'nl', 'nl-BE'];
 
     public function handle(): int
     {

@@ -11,16 +11,21 @@
 // on every change (plugins/moment-locale.client.js).
 import moment from 'moment'
 import 'moment/dist/locale/fr'
+import 'moment/dist/locale/de'
+import 'moment/dist/locale/es'
+import 'moment/dist/locale/it'
+import 'moment/dist/locale/nl'
+import 'moment/dist/locale/nl-be'
 
 // Each locale import above also switches moment's global locale as a side
 // effect, so applyMomentLocale() must always be called afterwards.
 
-// The app's locale codes are en, fr and fr-BE. moment has no fr-BE (it falls
-// back to the base language 'fr' when given the regional code), and 'en' is
-// built in.
+// The app's locale codes are en, de, es, fr, fr-BE, it, nl and nl-BE. moment
+// has no fr-BE (it falls back to the base language 'fr'), has its own nl-be
+// (case-insensitive lookup), and 'en' is built in.
 export function applyMomentLocale(code) {
   const wanted = String(code || 'en')
-  moment.locale(wanted === 'no' ? 'nb' : wanted)
+  moment.locale(wanted)
 
   return moment.locale()
 }
