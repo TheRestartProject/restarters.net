@@ -1,4 +1,5 @@
 <script setup>
+import LoadingPlaceholder from '~/components/LoadingPlaceholder.vue'
 import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import moment from 'moment'
@@ -543,9 +544,7 @@ function isPowered(device) {
       <div class="device-search-layout__results records bg-white" data-testid="device-search-results-body">
         <div class="px-md-3">
           <div v-if="loading" data-testid="device-search-loading">
-            <div class="placeholder-glow">
-              <span class="placeholder col-12" style="height: 8rem" />
-            </div>
+            <LoadingPlaceholder height="8rem" />
           </div>
 
           <div v-else-if="error" class="text-danger" data-testid="device-search-error">

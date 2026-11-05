@@ -1,4 +1,5 @@
 <script setup>
+import LoadingPlaceholder from '~/components/LoadingPlaceholder.vue'
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useEventsStore } from '~/stores/events.js'
@@ -85,9 +86,7 @@ async function onCreated(id) {
     <h1>{{ t('events.duplicate_event') }}</h1>
 
     <div v-if="groupsLoading || eventsStore.current.loading" data-testid="party-duplicate-loading">
-      <div class="placeholder-glow">
-        <span class="placeholder col-12" style="height: 6rem" />
-      </div>
+      <LoadingPlaceholder height="6rem" />
     </div>
 
     <BAlert

@@ -1,4 +1,5 @@
 <script setup>
+import LoadingPlaceholder from '~/components/LoadingPlaceholder.vue'
 import { computed, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAuth } from '~/composables/useAuth.js'
@@ -96,9 +97,7 @@ watch(targetId, load)
     </BAlert>
 
     <div v-else-if="checkingAccess" data-testid="profile-edit-checking-access">
-      <div class="placeholder-glow">
-        <span class="placeholder col-12" style="height: 6rem" />
-      </div>
+      <LoadingPlaceholder height="6rem" />
     </div>
 
     <BAlert v-else-if="!accessGranted" :model-value="true" variant="danger" data-testid="profile-edit-forbidden">

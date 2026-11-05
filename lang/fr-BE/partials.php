@@ -69,4 +69,5 @@ return [
   'please_confirm' => 'Veuillez confirmer que vous souhaitez continuer.',
   'confirm' => 'Confirmer',
   'see_further_reports' => 'Voir plus d\'analyses dans nos rapports détaillés.',
+  'loading' => 'Téléchargement',
 ];

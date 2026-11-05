@@ -1,4 +1,5 @@
 <script setup>
+import LoadingPlaceholder from '~/components/LoadingPlaceholder.vue'
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useEventsStore } from '~/stores/events.js'
@@ -148,9 +149,7 @@ async function removeImage(image) {
 <template>
   <div class="container py-4" data-testid="event-edit-page">
     <div v-if="eventsStore.current.loading" data-testid="event-edit-loading">
-      <div class="placeholder-glow">
-        <span class="placeholder col-12" style="height: 6rem" />
-      </div>
+      <LoadingPlaceholder height="6rem" />
     </div>
 
     <BAlert v-else-if="eventsStore.current.error" :model-value="true" variant="danger" data-testid="event-edit-error">

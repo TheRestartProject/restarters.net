@@ -1,4 +1,5 @@
 <script setup>
+import LoadingPlaceholder from '~/components/LoadingPlaceholder.vue'
 import { computed, onMounted, reactive, ref } from 'vue'
 import { sortAriaValue, sortHintKey } from '~/composables/useSortAria.js'
 import { useI18n } from 'vue-i18n'
@@ -331,9 +332,7 @@ onMounted(() => {
 
       <div class="col-md-8 col-lg-9">
         <div v-if="usersStore.list.loading" data-testid="user-all-loading">
-          <div class="placeholder-glow mb-3">
-            <span class="placeholder col-12" style="height: 6rem" />
-          </div>
+          <LoadingPlaceholder height="6rem" class="mb-3" />
         </div>
 
         <BAlert v-else-if="usersStore.list.error" :model-value="true" variant="danger" data-testid="user-all-error">

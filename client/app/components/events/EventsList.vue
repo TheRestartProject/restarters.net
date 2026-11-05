@@ -1,4 +1,5 @@
 <script setup>
+import LoadingPlaceholder from '~/components/LoadingPlaceholder.vue'
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { sortAriaValue, sortHintKey } from '~/composables/useSortAria.js'
@@ -175,9 +176,7 @@ function sortHint(key) {
 <template>
   <div data-testid="events-list">
     <div v-if="loading" data-testid="events-list-loading">
-      <div class="placeholder-glow">
-        <span class="placeholder col-12" style="height: 3rem" />
-      </div>
+      <LoadingPlaceholder height="3rem" />
     </div>
 
     <!-- Rendered as HTML: several of these strings carry markup in the lang

@@ -66,5 +66,6 @@ return [
   'please_choose' => 'Please choose...',
   'please_confirm' => 'Please confirm that you wish to proceed.',
   'confirm' => 'Confirm',
-  'see_further_reports' => 'See more analysis in our further reports.'
+  'see_further_reports' => 'See more analysis in our further reports.',
+  'loading' => 'Loading',
 ];

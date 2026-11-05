@@ -1,4 +1,5 @@
 <script setup>
+import LoadingPlaceholder from '~/components/LoadingPlaceholder.vue'
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useCo2Equivalent } from '../../composables/useCo2Equivalent.js'
@@ -66,18 +67,9 @@ const yearsVolunteered = computed(() => Math.round((10 * (props.impactData?.hour
 
 <template>
   <div data-testid="impact-stats">
-    <!-- Skeleton laid out in the SAME grid as the real content, one block per
-         grid-area, rather than a single short bar. A 4rem bar stood in for a
-         multi-row grid, so the page jumped by hundreds of pixels the moment
-         the stats arrived. Reusing the grid means the reserved space tracks
-         the real layout at every breakpoint without hard-coding a height. -->
-    <div v-if="loading" class="stat-grid placeholder-glow" data-testid="impact-stats-loading">
-      <span
-        v-for="area in ['latest', 'waste', 'co2', 'events', 'participants', 'years', 'items', 'powered', 'unpowered']"
-        :key="area"
-        class="placeholder"
-        :class="`stat-grid__${area}`"
-      />
+    <!-- fixometer/index.blade.php's .vue-placeholder-large: one 416px "Loading..." area. -->
+    <div v-if="loading" data-testid="impact-stats-loading">
+      <LoadingPlaceholder height="416px" />
     </div>
 
     <div v-else-if="error || !impactData" class="text-muted" data-testid="impact-stats-unavailable">
@@ -162,14 +154,6 @@ const yearsVolunteered = computed(() => Math.round((10 * (props.impactData?.hour
 // rather than added to assets/css (a parallel task also touches global
 // CSS). TODO: promote to global if a second stat-card grid emerges
 // elsewhere (e.g. a StatsImpact.vue-equivalent for event/group pages).
-// Skeleton blocks: a bare placeholder span has no content, so it would
-// collapse to zero height and reserve nothing. These match the stat cards'
-// rough height so the grid occupies its real footprint while loading.
-.placeholder-glow .placeholder {
-  min-height: 5.5rem;
-  border-radius: 0.25rem;
-}
-
 .stat-grid {
   display: grid;
   gap: 1.25rem;

@@ -1,4 +1,5 @@
 <script setup>
+import LoadingPlaceholder from '~/components/LoadingPlaceholder.vue'
 import { computed, onMounted, ref } from 'vue'
 import clip from 'text-clipper'
 import { useToastStore } from '~/stores/toast.js'
@@ -366,9 +367,7 @@ function closeAddVolunteer() {
 <template>
   <div class="container py-4" data-testid="event-view-page">
     <div v-if="eventsStore.current.loading" data-testid="event-view-loading">
-      <div class="placeholder-glow">
-        <span class="placeholder col-12" style="height: 6rem" />
-      </div>
+      <LoadingPlaceholder height="6rem" />
     </div>
 
     <BAlert

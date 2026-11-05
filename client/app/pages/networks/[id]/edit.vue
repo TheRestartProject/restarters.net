@@ -1,4 +1,5 @@
 <script setup>
+import LoadingPlaceholder from '~/components/LoadingPlaceholder.vue'
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAuth } from '~/composables/useAuth.js'
@@ -84,9 +85,7 @@ async function onLogoUploaded({ uploadKey }) {
 <template>
   <div class="container py-4" data-testid="network-edit-page">
     <div v-if="networksStore.current.loading" data-testid="network-edit-loading">
-      <div class="placeholder-glow">
-        <span class="placeholder col-12" style="height: 4rem" />
-      </div>
+      <LoadingPlaceholder height="4rem" />
     </div>
 
     <BAlert v-else-if="!network" :model-value="true" variant="danger" data-testid="network-edit-error">

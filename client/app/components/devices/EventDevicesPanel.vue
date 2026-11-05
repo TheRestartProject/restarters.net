@@ -1,4 +1,5 @@
 <script setup>
+import LoadingPlaceholder from '~/components/LoadingPlaceholder.vue'
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import EventDeviceTable from './EventDeviceTable.vue'
@@ -88,9 +89,7 @@ function onAdded() {
          unmount the table - that destroyed DeviceRow's editing state and
          closed the edit form mid-upload. -->
     <div v-if="loading && devices.length === 0" data-testid="event-devices-loading">
-      <div class="placeholder-glow">
-        <span class="placeholder col-12" style="height: 3rem" />
-      </div>
+      <LoadingPlaceholder height="3rem" />
     </div>
 
     <!-- Gap 23: EventDevices.vue's content is desktop tabs (one table

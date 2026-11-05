@@ -1,4 +1,5 @@
 <script setup>
+import LoadingPlaceholder from '~/components/LoadingPlaceholder.vue'
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useEventsStore } from '~/stores/events.js'
@@ -217,9 +218,7 @@ onMounted(load)
     <AlertsBanner />
 
     <div v-if="eventsStore.myEvents.loading || !eventsStore.myEvents.loaded" data-testid="party-mine-loading">
-      <div class="placeholder-glow mb-3">
-        <span class="placeholder col-12" style="height: 6rem" />
-      </div>
+      <LoadingPlaceholder height="6rem" class="mb-3" />
     </div>
 
     <BAlert

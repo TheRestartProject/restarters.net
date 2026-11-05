@@ -1,4 +1,5 @@
 <script setup>
+import LoadingPlaceholder from '~/components/LoadingPlaceholder.vue'
 import { computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useNotificationsStore } from '~/stores/notifications.js'
@@ -160,9 +161,8 @@ async function markOne(id) {
             </BButton>
           </div>
 
-          <div v-if="list.loading && list.items.length === 0" data-testid="notifications-loading" class="placeholder-glow">
-            <span class="placeholder col-12 mb-2" style="height: 3rem" />
-            <span class="placeholder col-12 mb-2" style="height: 3rem" />
+          <div v-if="list.loading && list.items.length === 0" data-testid="notifications-loading">
+            <LoadingPlaceholder height="6rem" />
           </div>
 
           <BAlert v-else-if="list.error" :model-value="true" variant="danger" data-testid="notifications-error">

@@ -1,4 +1,5 @@
 <script setup>
+import LoadingPlaceholder from '~/components/LoadingPlaceholder.vue'
 import { computed, onMounted, ref } from 'vue'
 import { sortAriaValue, sortHintKey } from '~/composables/useSortAria.js'
 import { useI18n } from 'vue-i18n'
@@ -177,9 +178,7 @@ onMounted(load)
     <h1 class="mb-3">{{ t('admin.roles') }}</h1>
 
     <div v-if="loading" data-testid="role-loading">
-      <div class="placeholder-glow">
-        <span class="placeholder col-12" style="height: 6rem" />
-      </div>
+      <LoadingPlaceholder height="6rem" />
     </div>
 
     <BAlert v-else-if="loadError" :model-value="true" variant="danger" data-testid="role-load-error">

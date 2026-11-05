@@ -1394,7 +1394,8 @@
         "please_choose": "Veuillez choisir...",
         "please_confirm": "Veuillez confirmer que vous souhaitez continuer.",
         "confirm": "Confirmer",
-        "see_further_reports": "Voir plus d'analyses dans nos rapports détaillés."
+        "see_further_reports": "Voir plus d'analyses dans nos rapports détaillés.",
+        "loading": "Téléchargement"
     },
     "passwords": {
         "reset": "Votre mot de passe a été réinitialisé!",

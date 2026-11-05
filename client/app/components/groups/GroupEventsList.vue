@@ -1,4 +1,5 @@
 <script setup>
+import LoadingPlaceholder from '~/components/LoadingPlaceholder.vue'
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useGroupsStore } from '~/stores/groups.js'
@@ -132,9 +133,7 @@ function openCalendar() {
     </div>
 
     <div v-if="loading" data-testid="group-events-loading">
-      <div class="placeholder-glow">
-        <span class="placeholder col-12" style="height: 3rem" />
-      </div>
+      <LoadingPlaceholder height="3rem" />
     </div>
 
     <!-- GroupEvents.vue's <b-tabs> sit in a bordered, drop-shadowed box with

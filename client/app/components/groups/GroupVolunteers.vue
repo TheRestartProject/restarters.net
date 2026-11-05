@@ -1,4 +1,5 @@
 <script setup>
+import LoadingPlaceholder from '~/components/LoadingPlaceholder.vue'
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useGroupsStore } from '../../stores/groups.js'
@@ -90,9 +91,7 @@ async function confirmRemove(volunteer) {
     </template>
 
     <div v-if="loading" data-testid="group-volunteers-loading">
-      <div class="placeholder-glow">
-        <span class="placeholder col-12" style="height: 3rem" />
-      </div>
+      <LoadingPlaceholder height="3rem" />
     </div>
 
     <p v-else-if="!volunteers.length" data-testid="group-volunteers-empty">

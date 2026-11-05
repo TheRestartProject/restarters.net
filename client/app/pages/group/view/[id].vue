@@ -1,4 +1,5 @@
 <script setup>
+import LoadingPlaceholder from '~/components/LoadingPlaceholder.vue'
 import { computed, onMounted, ref } from 'vue'
 import { useToastStore } from '~/stores/toast.js'
 import { useI18n } from 'vue-i18n'
@@ -273,9 +274,7 @@ onMounted(() => {
     </BAlert>
 
     <div v-if="groupsStore.current.loading" data-testid="group-view-loading">
-      <div class="placeholder-glow">
-        <span class="placeholder col-12" style="height: 6rem" />
-      </div>
+      <LoadingPlaceholder height="6rem" />
     </div>
 
     <BAlert

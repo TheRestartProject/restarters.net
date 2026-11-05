@@ -1,4 +1,5 @@
 <script setup>
+import LoadingPlaceholder from '~/components/LoadingPlaceholder.vue'
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useUploadedImageUrl } from '../../composables/useUploadedImageUrl.js'
@@ -127,9 +128,7 @@ async function confirmRemove() {
     </h2>
 
     <div v-if="loading" data-testid="event-attendees-loading">
-      <div class="placeholder-glow">
-        <span class="placeholder col-12" style="height: 3rem" />
-      </div>
+      <LoadingPlaceholder height="3rem" />
     </div>
 
     <template v-else>

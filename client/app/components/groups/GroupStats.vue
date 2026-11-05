@@ -1,4 +1,5 @@
 <script setup>
+import LoadingPlaceholder from '~/components/LoadingPlaceholder.vue'
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useCo2Equivalent } from '~/composables/useCo2Equivalent.js'
@@ -84,9 +85,7 @@ const co2Description = computed(() => {
 <template>
   <div data-testid="group-stats" :class="{ 'group-stats--bare': compact }">
     <div v-if="loading" data-testid="group-stats-loading">
-      <div class="placeholder-glow">
-        <span class="placeholder col-12" style="height: 4rem" />
-      </div>
+      <LoadingPlaceholder height="4rem" />
     </div>
 
     <div v-else-if="error || !stats" class="text-muted" data-testid="group-stats-unavailable">

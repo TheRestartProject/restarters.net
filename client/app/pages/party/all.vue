@@ -1,4 +1,5 @@
 <script setup>
+import LoadingPlaceholder from '~/components/LoadingPlaceholder.vue'
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useEventsStore } from '~/stores/events.js'
@@ -63,9 +64,7 @@ onMounted(() => {
     <h1>{{ t('client.events.all_upcoming_title') }}</h1>
 
     <div v-if="eventsStore.myEvents.loading" data-testid="party-all-loading">
-      <div class="placeholder-glow mb-3">
-        <span class="placeholder col-12" style="height: 6rem" />
-      </div>
+      <LoadingPlaceholder height="6rem" class="mb-3" />
     </div>
 
     <BAlert

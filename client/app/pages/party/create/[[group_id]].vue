@@ -1,4 +1,5 @@
 <script setup>
+import LoadingPlaceholder from '~/components/LoadingPlaceholder.vue'
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAuth } from '~/composables/useAuth.js'
@@ -102,9 +103,7 @@ async function onCreated(id) {
     <h1>{{ t('events.add_new_event') }}</h1>
 
     <div v-if="groupsLoading" data-testid="party-create-loading">
-      <div class="placeholder-glow">
-        <span class="placeholder col-12" style="height: 6rem" />
-      </div>
+      <LoadingPlaceholder height="6rem" />
     </div>
 
     <BAlert v-else-if="groupsError" :model-value="true" variant="danger" data-testid="party-create-groups-error">

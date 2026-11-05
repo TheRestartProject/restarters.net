@@ -1,4 +1,5 @@
 <script setup>
+import LoadingPlaceholder from '~/components/LoadingPlaceholder.vue'
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useGroupsStore } from '~/stores/groups.js'
@@ -242,9 +243,7 @@ onMounted(() => {
     <GroupsTabsNav active="map">
 
       <div v-if="loading" data-testid="group-map-loading">
-        <div class="placeholder-glow mb-3">
-          <span class="placeholder col-12" style="height: 400px" />
-        </div>
+        <LoadingPlaceholder height="400px" class="mb-3" />
       </div>
 
       <BAlert v-else-if="groupsStore.namesError" :model-value="true" variant="danger" data-testid="group-map-error">

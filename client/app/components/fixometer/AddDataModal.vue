@@ -1,4 +1,5 @@
 <script setup>
+import LoadingPlaceholder from '~/components/LoadingPlaceholder.vue'
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAuth } from '~/composables/useAuth.js'
@@ -104,9 +105,7 @@ function close() {
     <p>{{ t('devices.add_data_description') }}</p>
 
     <div v-if="fetching" data-testid="add-data-loading">
-      <div class="placeholder-glow">
-        <span class="placeholder col-12" style="height: 2rem" />
-      </div>
+      <LoadingPlaceholder height="2rem" />
     </div>
 
     <template v-else-if="!groupOptions.length">

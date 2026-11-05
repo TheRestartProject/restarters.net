@@ -1,4 +1,5 @@
 <script setup>
+import LoadingPlaceholder from '~/components/LoadingPlaceholder.vue'
 import { computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useSessionStore } from '~/stores/session.js'
@@ -69,10 +70,9 @@ onMounted(() => {
       <img src="/images/confetti_doodle.svg" alt="" class="d-none d-md-block doodle doodle--confetti">
     </div>
 
+    <!-- dashboard/index.blade.php's .vue-placeholder-large: one 416px "Loading..." area. -->
     <div v-if="dashboardStore.loading" data-testid="dashboard-loading" class="mt-4">
-      <div v-for="n in 3" :key="n" class="placeholder-glow mb-3">
-        <span class="placeholder col-12" style="height: 6rem" />
-      </div>
+      <LoadingPlaceholder height="416px" />
     </div>
 
     <BAlert v-else-if="dashboardStore.error" :model-value="true" variant="danger" data-testid="dashboard-error" class="mt-4">
