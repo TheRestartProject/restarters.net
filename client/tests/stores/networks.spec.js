@@ -51,12 +51,21 @@ describe('stores/networks', () => {
 
   describe('fetchCurrent', () => {
     it('populates current.data on success', async () => {
-      mockApi.network.get.mockResolvedValue({ data: { id: 1, name: 'Test London', stats: { parties: 3 } } })
+      mockApi.network.get.mockResolvedValue({ data: { id: 1, name: 'Test London' } })
 
       const store = useNetworksStore()
       await store.fetchCurrent(1)
 
-      expect(store.current.data).toEqual({ id: 1, name: 'Test London', stats: { parties: 3 } })
+      expect(store.current.data).toEqual({ id: 1, name: 'Test London' })
+    })
+
+    // The stats are slow to calculate for a large network; fetchStats gets them separately.
+    it('asks for the network without its stats', async () => {
+      mockApi.network.get.mockResolvedValue({ data: { id: 1, name: 'Test London' } })
+
+      await useNetworksStore().fetchCurrent(1)
+
+      expect(mockApi.network.get).toHaveBeenCalledWith(1, { includeStats: false })
     })
 
     it('records a 404 error so the page can render a not-found state', async () => {
@@ -67,6 +76,36 @@ describe('stores/networks', () => {
       await expect(store.fetchCurrent(999)).rejects.toStrictEqual(error)
       expect(store.current.error).toStrictEqual(error)
       expect(store.current.data).toBeNull()
+    })
+  })
+
+  describe('fetchStats', () => {
+    it('holds the stats, and clears the previous network\'s while loading', async () => {
+      const store = useNetworksStore()
+      store.stats.data = { groups: 99 }
+      let resolve
+      mockApi.network.stats.mockReturnValue(new Promise((r) => { resolve = r }))
+
+      const pending = store.fetchStats(1)
+      expect(store.stats.data).toBeNull()
+      expect(store.stats.loading).toBe(true)
+
+      resolve({ groups: 7, parties: 3 })
+      await pending
+
+      expect(mockApi.network.stats).toHaveBeenCalledWith(1, undefined)
+      expect(store.stats.data).toEqual({ groups: 7, parties: 3 })
+      expect(store.stats.loading).toBe(false)
+    })
+
+    it('records an error', async () => {
+      const error = new Error('boom')
+      mockApi.network.stats.mockRejectedValue(error)
+
+      const store = useNetworksStore()
+      await expect(store.fetchStats(1)).rejects.toBe(error)
+      expect(store.stats.error).toBe(error)
+      expect(store.stats.loading).toBe(false)
     })
   })
 

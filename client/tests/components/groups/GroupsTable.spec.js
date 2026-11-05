@@ -84,6 +84,42 @@ describe('components/groups/GroupsTable', () => {
 
   // develop's b-table renders no tbody content at all for zero matches (no
   // show-empty/empty-text prop) - not an invented "no results" row/message.
+  // The network page (develop #918): the first 25 groups, then one button for the rest.
+  describe('show all button', () => {
+    const many = Array.from({ length: 30 }, (_, i) => ({ id: i + 1, name: `Group ${String(i + 1).padStart(2, '0')}` }))
+
+    it('shows the first 25 groups and a button for the rest', async () => {
+      const wrapper = mountComponent({ groups: many, showAllButton: true })
+      expect(wrapper.findAll('tbody tr')).toHaveLength(25)
+
+      const button = wrapper.get('[data-testid="groups-show-all"]')
+      expect(button.text()).toBe('Show all 30 groups')
+
+      await button.trigger('click')
+      expect(wrapper.findAll('tbody tr')).toHaveLength(30)
+      expect(wrapper.find('[data-testid="groups-show-all"]').exists()).toBe(false)
+    })
+
+    it('has no button when every group fits', () => {
+      const wrapper = mountComponent({ groups: many.slice(0, 25), showAllButton: true })
+      expect(wrapper.findAll('tbody tr')).toHaveLength(25)
+      expect(wrapper.find('[data-testid="groups-show-all"]').exists()).toBe(false)
+    })
+
+    it('starts again from 25 when the set of groups changes', async () => {
+      const wrapper = mountComponent({ groups: many, showAllButton: true })
+      await wrapper.get('[data-testid="groups-show-all"]').trigger('click')
+
+      await wrapper.setProps({ groups: [...many.slice(1), { id: 99, name: 'Group 99' }] })
+      expect(wrapper.findAll('tbody tr')).toHaveLength(25)
+    })
+
+    it('shows every group without the prop', () => {
+      const wrapper = mountComponent({ groups: many })
+      expect(wrapper.findAll('tbody tr')).toHaveLength(30)
+    })
+  })
+
   it('renders no rows when there are no groups', () => {
     const wrapper = mountComponent({ groups: [] })
 

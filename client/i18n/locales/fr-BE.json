@@ -1096,7 +1096,8 @@
         "follow_group_first": "Les données de réparation sont ajoutées aux événements de réparation de la communauté. Veuillez d'abord suivre un Repair Café, puis choisir un événement afin d'ajouter des données de réparation.",
         "years_of_time_volunteered": "années de temps de bénévolat",
         "see_group_reports": "En savoir plus dans les rapports de votre groupe",
-        "view_reports": "Voir les rapports"
+        "view_reports": "Voir les rapports",
+        "show_all_groups": "Afficher les {total} groupes"
     },
     "landing": {
         "title": "Bienvenue chez Restarters !",

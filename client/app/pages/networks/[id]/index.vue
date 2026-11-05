@@ -85,16 +85,6 @@ function stripHtml(value) {
   return String(value).replace(/<[^>]*>/g, '')
 }
 
-// The tally comes from the network's own stats (App\Network::stats()), which
-// counts only non-archived groups. Until they arrive, fall back to the
-// non-archived rows of the groups list.
-const groupsCount = computed(() => {
-  const fromStats = network.value?.stats?.groups
-  if (fromStats !== undefined && fromStats !== null) return fromStats
-  if (networksStore.groups.loading) return null
-  return networksStore.groups.data.filter((g) => !g.archived_at).length
-})
-
 // Mirrors app/Network.php#groupsNotIn() exactly (parity-v2/networks.md gap
 // #9): every group not already in the network, archived or not - archived
 // groups are NOT excluded server-side, so they stay selectable here too.
@@ -111,6 +101,9 @@ function loadGroups() {
 
 function loadNetwork() {
   networksStore.fetchCurrent(id.value)
+  // Separately, and after the network: they are slow to calculate for a large network, so the page doesn't wait
+  // for them.
+  networksStore.fetchStats(id.value).catch(() => {})
   networksStore.fetchTags(id.value)
   loadGroups()
 }
@@ -187,7 +180,7 @@ function retry() {
 
       <section class="mb-4">
         <h2>{{ t('networks.general.impact') }}</h2>
-        <NetworkStats :stats="network.stats" :groups-count="groupsCount" />
+        <NetworkStats :stats="networksStore.stats.data" :error="!!networksStore.stats.error" />
         <p v-if="network.reporting_url" class="mt-3 mb-0 text-end">
           <a
             :href="network.reporting_url"

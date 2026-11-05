@@ -1078,7 +1078,8 @@
         "follow_group_first": "Repair data is added to community repair events. Please first follow a group and then choose an event in order to add repair data.",
         "years_of_time_volunteered": "years of time volunteered",
         "see_group_reports": "See more in your group's reports",
-        "view_reports": "View reports"
+        "view_reports": "View reports",
+        "show_all_groups": "Show all {total} groups"
     },
     "landing": {
         "title": "Welcome to Restarters!",

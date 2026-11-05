@@ -116,6 +116,15 @@ class NetworkController extends Controller
      *              type="integer"
      *          )
      *      ),
+     *      @OA\Parameter(
+     *          name="includeStats",
+     *          description="Include the network's stats (the default).  Pass false to get the network quickly and fetch the stats separately from /api/v2/networks/{id}/stats, since calculating them for a large network is slow.",
+     *          required=false,
+     *          in="query",
+     *          @OA\Schema(
+     *              type="boolean"
+     *          )
+     *      ),
      *      @OA\Response(
      *          response=200,
      *          description="Successful operation",

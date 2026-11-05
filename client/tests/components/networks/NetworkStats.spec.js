@@ -25,7 +25,7 @@ function mountComponent(props = {}) {
   const i18n = createI18n({ legacy: false, locale: 'en', messages })
 
   return mount(NetworkStats, {
-    props: { stats: null, groupsCount: null, ...props },
+    props: { stats: null, ...props },
     global: { plugins: [i18n] },
   })
 }
@@ -35,67 +35,57 @@ function stats(overrides = {}) {
     co2_total: 6000,
     waste_total: 1500,
     parties: 12,
+    groups: 4,
     ...overrides,
   }
 }
 
+const TILES = ['groups', 'parties', 'waste', 'co2']
+
+function values(wrapper) {
+  return TILES.map((tile) => wrapper.get(`[data-testid="network-stats-${tile}"] .stat-value`).text())
+}
+
 describe('components/networks/NetworkStats', () => {
-  it('shows a loading state', () => {
-    const wrapper = mountComponent({ loading: true })
-    expect(wrapper.find('[data-testid="network-stats-loading"]').exists()).toBe(true)
-    expect(wrapper.find('[data-testid="network-stats-groups"]').exists()).toBe(false)
+  // The stats arrive after the rest of the page (they are slow for a large network), so the tiles are there from
+  // the start with an ellipsis in place of each figure, as develop's NetworkPage.vue.
+  it('shows the tiles with an ellipsis until the stats arrive', () => {
+    const wrapper = mountComponent({ stats: null })
+    expect(values(wrapper)).toEqual(['…', '…', '…', '…'])
+    expect(wrapper.text()).toContain('Waste Diverted')
   })
 
-  it('shows the unavailable state on error or missing stats', () => {
-    const wrapper = mountComponent({ error: true })
-    expect(wrapper.find('[data-testid="network-stats-unavailable"]').exists()).toBe(true)
-
-    const wrapper2 = mountComponent({ stats: null })
-    expect(wrapper2.find('[data-testid="network-stats-unavailable"]').exists()).toBe(true)
+  it('shows a dash in each tile if the stats fail to load', () => {
+    const wrapper = mountComponent({ stats: null, error: true })
+    expect(values(wrapper)).toEqual(['–', '–', '–', '–'])
   })
 
-  // Legacy NetworkPage.vue's Impact section is ONE unified 4-tile grid -
-  // Groups / Events / Waste diverted / CO2 prevented - not the
-  // Fixometer-wide participants/years-volunteered/powered-unpowered tiles
-  // (parity-v2/networks.md gap #5).
-  it('renders exactly the 4 legacy tiles: groups, events, waste diverted, CO2 prevented', () => {
-    const wrapper = mountComponent({ stats: stats(), groupsCount: 4 })
+  it('renders exactly the 4 tiles: groups, events, waste diverted, CO2 prevented', () => {
+    const wrapper = mountComponent({ stats: stats() })
 
-    expect(wrapper.find('[data-testid="network-stats-groups"]').text()).toContain('4')
-    expect(wrapper.find('[data-testid="network-stats-parties"]').text()).toContain('12')
-
-    const waste = wrapper.find('[data-testid="network-stats-waste"]')
-    expect(waste.text()).toContain('1.5 t')
-    expect(waste.text()).toContain('Waste Diverted')
-
-    const co2 = wrapper.find('[data-testid="network-stats-co2"]')
-    expect(co2.text()).toContain('6.0 t')
-    expect(co2.text()).toContain('CO2 Prevented')
-
-    // No longer reuses the Fixometer-wide ImpactStats component (which
-    // pulled in participants/years-volunteered/powered-unpowered tiles and
-    // a "Latest Repairs" banner with no place on this page).
+    expect(values(wrapper)).toEqual(['4', '12', '1.5 t', '6.0 t'])
+    expect(wrapper.get('[data-testid="network-stats-waste"]').text()).toContain('Waste Diverted')
+    expect(wrapper.get('[data-testid="network-stats-co2"]').text()).toContain('CO2 Prevented')
     expect(wrapper.find('[data-testid="impact-stats"]').exists()).toBe(false)
   })
 
   it('formats weights under 1000kg in kg, not tonnes', () => {
-    const wrapper = mountComponent({ stats: stats({ waste_total: 400, co2_total: 0 }), groupsCount: 1 })
+    const wrapper = mountComponent({ stats: stats({ waste_total: 400, co2_total: 0 }) })
 
     expect(wrapper.find('[data-testid="network-stats-waste"]').text()).toContain('400 kg')
     expect(wrapper.find('[data-testid="network-stats-co2"]').text()).toContain('0 kg')
   })
 
-  it('defaults groupsCount to 0 when not supplied', () => {
-    const wrapper = mountComponent({ stats: stats(), groupsCount: null })
-    expect(wrapper.find('[data-testid="network-stats-groups"]').text()).toContain('0')
+  it('counts no groups as 0', () => {
+    const wrapper = mountComponent({ stats: stats({ groups: 0 }) })
+    expect(wrapper.get('[data-testid="network-stats-groups"] .stat-value').text()).toBe('0')
   })
 
   it('renders all 4 tiles as uniform bordered stat-box cards', () => {
-    const wrapper = mountComponent({ stats: stats(), groupsCount: 4 })
+    const wrapper = mountComponent({ stats: stats() })
 
-    expect(wrapper.get('[data-testid="network-stats-groups"]').classes()).toContain('stat-box')
-    expect(wrapper.get('[data-testid="network-stats-parties"]').classes()).toContain('stat-box')
-    expect(wrapper.get('[data-testid="network-stats-waste"]').classes()).toContain('stat-box')
-    expect(wrapper.get('[data-testid="network-stats-co2"]').classes()).toContain('stat-box')
+    for (const tile of TILES) {
+      expect(wrapper.get(`[data-testid="network-stats-${tile}"]`).classes()).toContain('stat-box')
+    }
   })
 })

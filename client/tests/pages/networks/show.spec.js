@@ -20,8 +20,8 @@ const BModalStub = {
   template: '<div v-if="modelValue" :data-title="title"><slot /></div>',
 }
 const NetworkStatsStub = {
-  props: ['stats', 'groupsCount'],
-  template: '<div data-testid="stub-network-stats" :data-groups-count="groupsCount" />',
+  props: ['stats', 'error'],
+  template: '<div data-testid="stub-network-stats" :data-groups="stats ? stats.groups : \'none\'" :data-error="String(error)" />',
 }
 const AssociateGroupsModalStub = {
   props: ['show', 'networkId', 'networkName', 'candidates'],
@@ -110,8 +110,9 @@ const NETWORK = {
   logo: null,
   website: 'https://example.com',
   description: '<p>A description.</p>',
-  stats: { groups: 7, parties: 3, co2_total: 100, waste_total: 50, participants: 10, hours_volunteered: 20, fixed_powered: 1, fixed_unpowered: 1 },
 }
+
+const STATS = { groups: 7, parties: 3, co2_total: 100, waste_total: 50, participants: 10, hours_volunteered: 20, fixed_powered: 1, fixed_unpowered: 1 }
 
 async function flushPromises() {
   await Promise.resolve()
@@ -132,6 +133,9 @@ describe('pages/networks/[id]', () => {
     networksStore = useNetworksStore()
     networksStore.fetchCurrent = vi.fn().mockImplementation(async () => {
       networksStore.current.data = NETWORK
+    })
+    networksStore.fetchStats = vi.fn().mockImplementation(async () => {
+      networksStore.stats.data = STATS
     })
     networksStore.fetchTags = vi.fn().mockImplementation(async () => {
       networksStore.tags.data = [{ id: 1, name: 'Existing Tag', groups_count: 0 }]
@@ -194,23 +198,30 @@ describe('pages/networks/[id]', () => {
       await flushPromises()
 
       expect(wrapper.find('[data-testid="network-show-name"]').text()).toBe('Test London')
-      expect(wrapper.find('[data-testid="stub-network-stats"]').attributes('data-groups-count')).toBe('7')
+      expect(networksStore.fetchStats).toHaveBeenCalledWith(1)
+      expect(wrapper.find('[data-testid="stub-network-stats"]').attributes('data-groups')).toBe('7')
     })
 
-    it('falls back to the non-archived groups in the list when stats carry no group tally', async () => {
-      networksStore.fetchCurrent = vi.fn().mockImplementation(async () => {
-        networksStore.current.data = { ...NETWORK, stats: { parties: 3 } }
-      })
-      networksStore.fetchGroups = vi.fn().mockImplementation(async () => {
-        networksStore.groups.data = [
-          { id: 9, name: 'Live', archived_at: null },
-          { id: 10, name: 'Gone', archived_at: '2024-01-01T00:00:00+00:00' },
-        ]
+    // Stats are slow to calculate for a large network, so the page doesn't wait for them.
+    it('shows the network while its stats are still loading', async () => {
+      networksStore.fetchStats = vi.fn().mockReturnValue(new Promise(() => {}))
+      const wrapper = mountPage()
+      await flushPromises()
+
+      expect(wrapper.find('[data-testid="network-show-name"]').text()).toBe('Test London')
+      expect(wrapper.find('[data-testid="stub-network-stats"]').attributes('data-groups')).toBe('none')
+    })
+
+    it('tells the stats tiles when the stats fail to load', async () => {
+      networksStore.fetchStats = vi.fn().mockImplementation(async () => {
+        networksStore.stats.error = new Error('boom')
+        throw networksStore.stats.error
       })
       const wrapper = mountPage()
       await flushPromises()
 
-      expect(wrapper.find('[data-testid="stub-network-stats"]').attributes('data-groups-count')).toBe('1')
+      expect(wrapper.find('[data-testid="network-show-name"]').text()).toBe('Test London')
+      expect(wrapper.find('[data-testid="stub-network-stats"]').attributes('data-error')).toBe('true')
     })
 
     // develop's NetworkPage.vue embeds a map and filterable list of the

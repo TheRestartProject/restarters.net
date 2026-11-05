@@ -15,8 +15,10 @@ export default class NetworkAPI extends BaseAPI {
     return this.$get('/api/v2/networks', params)
   }
 
-  get(id) {
-    return this.$get(`/api/v2/networks/${id}`)
+  // includeStats=false leaves out the network's stats, which are slow to calculate for a large network; fetch them
+  // separately with stats().
+  get(id, params) {
+    return this.$get(`/api/v2/networks/${id}`, params)
   }
 
   // includeNextEvent/includeDetails/includeStats/includeArchived/group_tag
@@ -50,10 +52,7 @@ export default class NetworkAPI extends BaseAPI {
     return this.$del(`/api/v2/networks/${id}/tags/${tagId}`)
   }
 
-  // group_tag query param filters stats to groups carrying that tag
-  // (getNetworkStatsv2). The plain GET /api/v2/networks/{id} response
-  // already embeds unfiltered stats (App\Http\Resources\Network#stats) -
-  // this dedicated call is only needed for the tag-filtered case.
+  // The network's stats (getNetworkStatsv2); the group_tag query param narrows them to groups carrying that tag.
   stats(id, params) {
     return this.$get(`/api/v2/networks/${id}/stats`, params)
   }

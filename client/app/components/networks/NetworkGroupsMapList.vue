@@ -156,6 +156,7 @@ onMounted(() => {
         :show-tags="canManageTags"
         :filter-tags="tags"
         :optional-columns="{ location: true, next_event: true }"
+        show-all-button
         @update:filters="onFilters"
       />
     </template>

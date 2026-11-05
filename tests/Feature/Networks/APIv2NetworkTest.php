@@ -101,6 +101,25 @@ class APIv2NetworkTest extends TestCase
     }
 
     /**
+     * The network page shows the network first and fetches its stats separately, because calculating them for a
+     * large network is slow.  Other callers still get the stats by default.
+     */
+    public function testGetWithoutStats(): void {
+        $network = Network::factory()->create();
+
+        $json = $this->get('/api/v2/networks/' . $network->id . '?includeStats=false')->assertSuccessful()->json('data');
+        $this->assertEquals($network->id, $json['id']);
+        $this->assertArrayNotHasKey('stats', $json);
+
+        $json = $this->get('/api/v2/networks/' . $network->id . '?includeStats=true')->assertSuccessful()->json('data');
+        $this->assertArrayHasKey('stats', $json);
+
+        $stats = $this->get('/api/v2/networks/' . $network->id . '/stats')->assertSuccessful()->json();
+        $this->assertArrayHasKey('waste_total', $stats);
+        $this->assertArrayHasKey('groups', $stats);
+    }
+
+    /**
      * App\Http\Resources\Network - the "Network Coordinators" section on
      * client/app/pages/networks/[id].vue (avatar + name cards, matching
      * legacy resources/js/components/NetworkPage.vue) needs `coordinators`
