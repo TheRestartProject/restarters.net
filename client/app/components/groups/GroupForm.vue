@@ -19,6 +19,8 @@ import LocationPicker from '../forms/LocationPicker.vue'
 import TusImageUpload from '../forms/TusImageUpload.vue'
 import GroupMultiSelect from './GroupMultiSelect.vue'
 import GroupNetworkData from './GroupNetworkData.vue'
+import SpinIcon from '../forms/SpinIcon.vue'
+import { useSpinButton } from '../../composables/useSpinButton.js'
 
 const leafletTiles = useLeafletTiles()
 
@@ -159,7 +161,7 @@ const duplicateName = computed(() => {
   return groupsStore.names.some((g) => (creating.value || g.id !== props.groupId) && g.name.toLowerCase() === name)
 })
 
-const submitting = ref(false)
+const spin = useSpinButton()
 const generalError = ref('')
 const fieldErrors = ref({})
 
@@ -270,7 +272,8 @@ async function submit() {
     return
   }
 
-  submitting.value = true
+  spin.start()
+  let saved = false
 
   const payload = {
     name: form.name,
@@ -327,10 +330,12 @@ async function submit() {
         }
       }
 
+      saved = true
       emit('created', id)
     } else {
       const id = await groupsStore.updateGroup(props.groupId, payload)
       approved.value = approved.value || form.moderate === 'approve'
+      saved = true
       emit('updated', id)
     }
   } catch (err) {
@@ -339,7 +344,7 @@ async function submit() {
     }
     generalError.value = creating.value ? t('groups.create_failed') : t('groups.edit_failed')
   } finally {
-    submitting.value = false
+    spin.finish(saved)
   }
 }
 
@@ -528,11 +533,8 @@ defineExpose({ submit })
           <div v-if="creating" class="flex-grow-1">
             {{ t('groups.groups_approval_text') }}
           </div>
-          <BButton type="submit" variant="primary" :disabled="submitting" data-testid="group-form-submit">
-            <svg v-if="!submitting" width="14" height="14" viewBox="0 0 16 16" fill="currentColor" class="me-1" aria-hidden="true">
-              <path d="M2 1a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4.414a1 1 0 0 0-.293-.707l-2.414-2.414A1 1 0 0 0 11.586 1H2zm0 1h9.586L14 4.414V14H2V2zm2 0h5v3H4V2zm-1 5h10v7H3V7z" />
-            </svg>
-            <span v-else class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true" />
+          <BButton type="submit" variant="primary" :disabled="spin.state.value === 'spinning'" data-testid="group-form-submit">
+            <SpinIcon :state="spin.state.value" />
             {{ creating ? t('groups.create_group') : t('groups.edit_group_save_changes') }}
           </BButton>
         </div>

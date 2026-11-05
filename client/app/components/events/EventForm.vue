@@ -19,6 +19,8 @@ import 'vue-datepicker-next/index.css'
 import GroupNetworkData from '../groups/GroupNetworkData.vue'
 import EventDuplicateModal from './EventDuplicateModal.vue'
 import { findDuplicateEvents } from '../../utils/duplicateEvents.js'
+import SpinIcon from '../forms/SpinIcon.vue'
+import { useSpinButton } from '../../composables/useSpinButton.js'
 
 // Shared by /party/create/[[group_id]], /party/edit/[id] and
 // /party/duplicate/[id] (design.md §6.2 section 4 C4 task brief).
@@ -204,7 +206,7 @@ const venueLat = ref(typeof props.initialEvent?.lat === 'number' ? props.initial
 const venueLng = ref(typeof props.initialEvent?.lng === 'number' ? props.initialEvent.lng : null)
 const showVenueMap = computed(() => !form.online && venueLat.value !== null && venueLng.value !== null)
 
-const submitting = ref(false)
+const spin = useSpinButton()
 const generalError = ref('')
 
 // Duplicate check: groups kept ending up with the same event posted twice.
@@ -395,7 +397,8 @@ async function submit() {
     }
   }
 
-  submitting.value = true
+  spin.start()
+  let saved = false
 
   const payload = {
     start: toUtcIso(form.eventDate, form.startTime, form.timezone),
@@ -423,10 +426,12 @@ async function submit() {
   try {
     if (creating.value) {
       const id = await eventsStore.createEvent(payload)
+      saved = true
       emit('created', id)
     } else {
       const id = await eventsStore.updateEvent(props.eventId, payload)
       approved.value = approved.value || form.moderate === 'approve'
+      saved = true
       emit('updated', id)
     }
   } catch (err) {
@@ -435,7 +440,7 @@ async function submit() {
     }
     generalError.value = creating.value ? t('events.create_failed') : t('events.edit_failed')
   } finally {
-    submitting.value = false
+    spin.finish(saved)
   }
 }
 
@@ -735,7 +740,8 @@ defineExpose({ submit })
           >
             {{ t('events.duplicate_event') }}
           </BButton>
-          <BButton type="submit" variant="primary" :disabled="submitting" data-testid="event-form-submit">
+          <BButton type="submit" variant="primary" :disabled="spin.state.value === 'spinning'" data-testid="event-form-submit">
+            <SpinIcon :state="spin.state.value" />
             {{ creating ? t('events.create_event') : t('events.save_event') }}
           </BButton>
         </div>
