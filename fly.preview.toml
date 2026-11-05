@@ -75,6 +75,7 @@ primary_region = "lhr"
   # Tigris credentials are read-only anyway).
   FEATURE__IMAGE_UPLOAD = "false"
   SENTRY_ENVIRONMENT = "__SENTRY_ENV__"
+  NUXT_PUBLIC_SENTRY_ENVIRONMENT = "__SENTRY_ENV__"
   # Mail goes to the shared Mailpit instance, never to real inboxes.
   MAIL_MAILER = "smtp"
   MAIL_HOST = "restarters-dev-mail.internal"

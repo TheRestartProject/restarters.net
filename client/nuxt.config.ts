@@ -34,6 +34,11 @@ export default defineNuxtConfig({
       // CARTO_API_KEY, which the Laravel side already has as a Fly secret and
       // Nitro shares the machine environment with - no second secret needed.
       cartoApiKey: process.env.NUXT_PUBLIC_CARTO_API_KEY || process.env.CARTO_API_KEY || '',
+      // Browser errors go to the same Sentry project as Laravel.  Reporting is
+      // off unless the deployment names an environment (the Fly configs set it
+      // alongside SENTRY_ENVIRONMENT), so local development and CI never report.
+      sentryDsn: process.env.NUXT_PUBLIC_SENTRY_DSN || 'https://50fd2fa440af4bb4a230f40ca8d8cf90@o879179.ingest.sentry.io/5831645',
+      sentryEnvironment: process.env.NUXT_PUBLIC_SENTRY_ENVIRONMENT || '',
       // Reserved for the future Capacitor build (design.md §1).
       isApp: process.env.NUXT_PUBLIC_IS_APP === 'true',
     },
