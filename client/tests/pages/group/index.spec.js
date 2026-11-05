@@ -71,14 +71,14 @@ describe('pages/group/index (mine)', () => {
     expect(groupsStore.fetchMine).toHaveBeenCalledTimes(2)
   })
 
-  it('shows the empty state, with a link to /group/nearby, when there are no groups', () => {
+  it('shows the empty state, with the link to find a group (/group/other), when there are no groups', () => {
     groupsStore.mine.data = []
 
     const wrapper = mountPage()
 
     const empty = wrapper.find('[data-testid="group-mine-empty"]')
     expect(empty.exists()).toBe(true)
-    expect(empty.html()).toContain('/group/nearby')
+    expect(empty.html()).toContain('/group/other')
   })
 
   // Develop's list has no per-row follow button (ece9aed10e): following belongs
