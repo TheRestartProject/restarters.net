@@ -45,7 +45,7 @@ async function submit() {
 </script>
 
 <template>
-  <section class="login-page">
+  <section>
     <div class="container">
       <div class="entry-panel card card__login col-12 mt-5 text-left" data-testid="recover-page">
         <h1>{{ t('auth.forgotten_pw') }}</h1>

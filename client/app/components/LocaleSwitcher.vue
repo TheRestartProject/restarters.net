@@ -242,7 +242,6 @@ async function choose(code) {
       position: relative;
       z-index: 1;
       left: -2px;
-      margin-right: 4px;
     }
   }
 

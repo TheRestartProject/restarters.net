@@ -15,11 +15,12 @@ import CookieConsent from '~/components/CookieConsent.vue'
 </script>
 
 <template>
-  <div class="d-flex flex-column min-vh-100">
-    <header class="container container-nav py-3">
-      <LogoStatsHeader />
-    </header>
-    <main class="flex-grow-1">
+  <div class="plain-layout d-flex flex-column">
+    <!-- .login-page: live's wrapper (top padding, entry-form styling) - _entry.scss -->
+    <main class="login-page flex-grow-1">
+      <div class="container">
+        <LogoStatsHeader />
+      </div>
       <slot />
     </main>
     <!-- No .container: live's fixed .language-bar spans the full viewport. -->

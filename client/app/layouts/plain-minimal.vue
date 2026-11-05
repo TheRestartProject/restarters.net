@@ -15,13 +15,13 @@ import CookieConsent from '~/components/CookieConsent.vue'
 </script>
 
 <template>
-  <div class="d-flex flex-column min-vh-100">
-    <header class="container container-nav py-3 d-flex justify-content-center">
-      <NuxtLink to="/" data-testid="plain-minimal-logo">
-        <IconLogo />
-      </NuxtLink>
-    </header>
-    <main class="flex-grow-1">
+  <div class="plain-layout d-flex flex-column">
+    <main class="login-page flex-grow-1">
+      <header class="container d-flex justify-content-center">
+        <NuxtLink to="/" data-testid="plain-minimal-logo">
+          <IconLogo />
+        </NuxtLink>
+      </header>
       <slot />
     </main>
     <!-- No .container: live's fixed .language-bar spans the full viewport. -->

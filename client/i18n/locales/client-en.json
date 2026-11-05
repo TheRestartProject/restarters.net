@@ -253,7 +253,7 @@
       "reveal_filters": "Reveal filters"
     },
     "cookies": {
-      "banner_text": "We use cookies to help our website function, and analytical cookies to improve our website. Please click Cookie Settings to amend cookie settings or click OK to accept all.",
+      "banner_text": "We use cookies to help our website function, and analytical cookies to improve our website. Please click <strong>Cookie Settings</strong> to amend cookie settings or click OK to accept all.",
       "settings": "Cookie settings",
       "accept": "OK",
       "save": "Save settings",

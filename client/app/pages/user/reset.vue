@@ -4,7 +4,8 @@ import { onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '~/stores/auth.js'
 
-definePageMeta({ layout: 'plain' })
+// Live's reset page shows just the centred logo (no stats bar), like recover.
+definePageMeta({ layout: 'plain-minimal' })
 
 const { t } = useI18n()
 useHead({ title: t('auth.reset_password') })

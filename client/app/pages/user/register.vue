@@ -478,13 +478,36 @@ async function submit() {
    separate, narrower cap. */
 .registration-step {
   position: relative;
+  /* live renders this panel's border and shadow pure black */
+  border-color: #000;
+  box-shadow: 6px 6px 0 0 #000;
+}
+
+@media (min-width: 992px) {
+  .registration-step__status {
+    top: 40px;
+  }
+}
+
+/* Skill groups: live spaces the headings 27px above and uses 15px row gutters. */
+.registration-step fieldset > .mb-3 {
+  margin-bottom: 0 !important;
+}
+
+.registration-step h5 {
+  margin-top: 27px;
+}
+
+.registration-step .row-compressed {
+  margin-left: -15px;
+  margin-right: -15px;
 }
 
 .registration-step__status {
   font-family: 'Open Sans', sans-serif;
   position: absolute;
   top: 20px;
-  right: 25px;
+  right: 35px;
   font-size: 14px;
   color: #757575;
 }
@@ -494,7 +517,7 @@ async function submit() {
    Open Sans. Without these, Bootstrap 5's reboot makes the legend ~1.5rem
    and floated, and the h3 falls back to the global heading size. */
 .registration-wizard {
-  padding: 44px 0 50px;
+  padding: 30px 0 50px; /* the 44px top lives on the layout's .login-page */
 }
 
 .registration-step h3 {

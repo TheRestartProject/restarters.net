@@ -254,7 +254,7 @@
       "reveal_filters": "Afficher les filtres"
     },
     "cookies": {
-      "banner_text": "Nous utilisons des cookies pour faire fonctionner notre site web et des cookies analytiques pour l’améliorer. Cliquez sur Paramètres des cookies pour les modifier, ou sur OK pour tout accepter.",
+      "banner_text": "Nous utilisons des cookies pour faire fonctionner notre site web et des cookies analytiques pour l’améliorer. Cliquez sur <strong>Paramètres des cookies</strong> pour les modifier, ou sur OK pour tout accepter.",
       "settings": "Paramètres des cookies",
       "accept": "OK",
       "save": "Enregistrer les paramètres",

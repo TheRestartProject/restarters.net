@@ -44,42 +44,64 @@ const stats = computed(() => {
 </script>
 
 <template>
-  <div
-    id="logostats-header"
-    class="d-flex align-items-center justify-content-center justify-content-md-between"
-    data-testid="logo-stats-header"
-  >
-    <NuxtLink to="/" data-testid="logo-stats-logo">
-      <IconLogo />
-    </NuxtLink>
-
-    <div v-if="stats.length" class="stats d-none d-md-flex align-items-center" data-testid="logo-stats-figures">
-      <div v-for="s in stats" :key="s.labelKey" class="stats__stat text-center">
-        <div class="stat-figure">{{ s.figure }}</div>
-        <!-- eslint-disable-next-line vue/no-v-html — fixed lang strings (CO2 <sub>, <br>) -->
-        <p class="stat-header" v-html="t(s.labelKey)" />
+  <!-- Live's includes/info.blade.php markup: offset logo column + right-floated stats. -->
+  <div id="logostats-header" class="row row-expanded" data-testid="logo-stats-header">
+    <div class="col-md-3 offset-2 p-0">
+      <header>
+        <NuxtLink to="/" data-testid="logo-stats-logo">
+          <IconLogo />
+        </NuxtLink>
+      </header>
+    </div>
+    <div class="col-md-6 d-none d-md-block p-0">
+      <div v-if="stats.length" class="row row-compressed stats float-end text-center" data-testid="logo-stats-figures">
+        <div v-for="s in stats" :key="s.labelKey" class="stats__stat">
+          <div class="stat-figure">{{ s.figure }}</div>
+          <!-- eslint-disable-next-line vue/no-v-html — fixed lang strings (CO2 <sub>, <br>) -->
+          <div class="stat-header" v-html="t(s.labelKey)" />
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <style scoped lang="scss">
-// Ported from legacy resources/sass/_login-page.scss (#logostats-header + .stats).
+// Ported from live's resources/sass/_login-page.scss (#logostats-header + .stats).
+#logostats-header {
+  margin: 0 -15px;
+
+  header :deep(svg) {
+    width: 204px;
+    height: auto;
+    display: block;
+
+    @media (max-width: 767.98px) {
+      margin: auto;
+    }
+  }
+}
+
 .stats {
+  // Row margins/padding: live's .row-compressed (10px gutters) inside a 15px-gutter header.
+  flex-wrap: nowrap;
+  margin: 0 -15px 30px;
+
   &__stat {
-    border-right: 1px solid #222;
+    border-right: 1px solid #000;
     padding: 0 10px;
     white-space: nowrap;
+    width: auto;
+    flex: 0 0 auto;
 
     &:last-child {
-      border-right: 0;
+      border-right: 1px solid #000;
     }
   }
 
   .stat-header {
     font-family: 'Open Sans', sans-serif;
     margin: 0;
-    color: #0394a6;
+    color: #222;
     font-size: 14px;
     line-height: 1;
     white-space: nowrap;
