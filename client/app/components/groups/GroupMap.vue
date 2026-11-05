@@ -43,6 +43,12 @@ const leafletTiles = useLeafletTiles()
 //    handler emits `select` with the group id instead, and the page renders
 //    GroupInfoModal for it (components/groups/GroupInfoModal.vue).
 const props = defineProps({
+  // Below this many groups, draw every pin rather than clustering (live's
+  // GroupMap.vue minCluster, default 10).
+  minCluster: {
+    type: Number,
+    default: 10,
+  },
   // Names-index entries: {id, name, lat, lng, network_ids, ...}.
   groups: {
     type: Array,
@@ -125,6 +131,7 @@ const hasUserPoint = computed(
 const containerEl = ref(null)
 let mapObject = null
 let clusterGroup = null
+let plainGroup = null
 let resizeObserver = null
 let zoomedToGroups = false
 let moved = false
@@ -187,6 +194,7 @@ function rebuildMarkers() {
   if (!clusterGroup) return
 
   clusterGroup.clearLayers()
+  if (plainGroup) plainGroup.clearLayers()
   markersById.clear()
 
   // Nudged copies for display only - bounds reporting and zoom framing
@@ -210,7 +218,17 @@ function rebuildMarkers() {
     return marker
   })
 
-  clusterGroup.addLayers(markers)
+  // Live's GroupMap.vue (minCluster = 10) draws every pin as-is below this
+  // many groups and only clusters from 10 up.
+  if (markers.length < props.minCluster) {
+    if (!plainGroup) {
+      plainGroup = L.layerGroup()
+      mapObject.addLayer(plainGroup)
+    }
+    markers.forEach((m) => plainGroup.addLayer(m))
+  } else {
+    clusterGroup.addLayers(markers)
+  }
 }
 
 function idle() {

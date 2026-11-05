@@ -88,7 +88,8 @@ function mountMap(props = {}) {
   const i18n = createI18n({ legacy: false, locale: 'en', messages: { en } })
 
   return mount(GroupMap, {
-    props: { groups: [], ...props },
+    // minCluster 0 so small fixtures still go through the cluster group.
+    props: { groups: [], minCluster: 0, ...props },
     global: {
       plugins: [i18n],
     },
@@ -125,6 +126,30 @@ describe('components/groups/GroupMap', () => {
 
     const tiles = wrapper.findComponent(LTileLayerStub)
     expect(tiles.props('url')).toContain('cartocdn.com')
+  })
+
+  describe('clustering threshold', () => {
+    const group = (id) => ({ id, name: `G${id}`, lat: 51 + id / 10, lng: 0 })
+
+    async function ready(groups, props = {}) {
+      const wrapper = mountMap({ groups, ...props })
+      const map = fakeLeafletMap()
+      wrapper.findComponent(LMapStub).vm.$emit('ready', map)
+      await wrapper.vm.$nextTick()
+      return map
+    }
+
+    it('draws pins individually below 10 groups', async () => {
+      const map = await ready([1, 2, 3].map(group), { minCluster: 10 })
+      expect(fakeClusterGroup.addLayers).not.toHaveBeenCalled()
+      // The cluster layer plus the plain layer holding the pins.
+      expect(map.addLayer).toHaveBeenCalledTimes(2)
+    })
+
+    it('clusters from 10 groups up', async () => {
+      await ready([1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(group), { minCluster: 10 })
+      expect(fakeClusterGroup.addLayers.mock.calls[0][0]).toHaveLength(10)
+    })
   })
 
   describe('mapOptions', () => {
