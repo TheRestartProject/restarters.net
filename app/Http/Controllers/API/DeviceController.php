@@ -463,9 +463,11 @@ class DeviceController extends Controller {
 
         event(new DeviceCreatedOrUpdated($device));
 
+        // We only allow one barrier now, so delete any old ones.  An update without a barrier clears it, like the
+        // other fields: it was taken off, or the item is no longer end of life.
+        DeviceBarrier::where('device_id', $iddevices)->delete();
+
         if ($barrier) {
-            // We only allow one barrier now, so delete any old ones.
-            DeviceBarrier::where('device_id', $iddevices)->delete();
             DeviceBarrier::create([
                 'device_id' => $iddevices,
                 'barrier_id' => $barrier

@@ -286,29 +286,36 @@ const statusOptions = computed(() => [
   { value: STATUS_END_OF_LIFE, label: t('partials.end_of_life') },
 ])
 const statusSelectedLabel = computed(() => statusOptions.value.find((o) => o.value === form.repairStatus)?.label || '')
+
+// Choosing the option that is already selected clears it, as vue-multiselect does when empty is allowed, so a
+// wrong choice can be undone.  The category is required, so it can't be cleared.
+function chooseOrClear(current, value) {
+  return current === value ? '' : value
+}
+
 function selectStatus(value) {
-  form.repairStatus = value
+  form.repairStatus = chooseOrClear(form.repairStatus, value)
   openDropdown.value = null
 }
 
 const nextStepsOptions = computed(() => (options.value.next_steps || []).map((n) => ({ value: n, label: t(nextStepLabel(n)) })))
 const nextStepsSelectedLabel = computed(() => nextStepsOptions.value.find((o) => o.value === form.nextSteps)?.label || '')
 function selectNextSteps(value) {
-  form.nextSteps = value
+  form.nextSteps = chooseOrClear(form.nextSteps, value)
   openDropdown.value = null
 }
 
 const sparePartsOptions = computed(() => (options.value.spare_parts || []).map((p) => ({ value: p, label: t(sparePartsLabel(p)) })))
 const sparePartsSelectedLabel = computed(() => sparePartsOptions.value.find((o) => o.value === form.spareParts)?.label || '')
 function selectSpareParts(value) {
-  form.spareParts = value
+  form.spareParts = chooseOrClear(form.spareParts, value)
   openDropdown.value = null
 }
 
 const barrierOptions = computed(() => (options.value.barriers || []).map((b) => ({ value: b.name, label: t(b.name) })))
 const barrierSelectedLabel = computed(() => barrierOptions.value.find((o) => o.value === form.barrier)?.label || '')
 function selectBarrier(value) {
-  form.barrier = value
+  form.barrier = chooseOrClear(form.barrier, value)
   openDropdown.value = null
 }
 

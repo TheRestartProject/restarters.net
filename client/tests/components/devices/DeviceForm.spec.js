@@ -493,6 +493,28 @@ describe('components/devices/DeviceForm', () => {
       expect(wrapper.find('[data-testid="device-form-status-option-Repairable"]').exists()).toBe(false)
     })
 
+    // Neil's testing: a wrong choice could not be undone.  Choosing the selected option again clears it.
+    it('choosing the selected repair status or barrier again clears it', async () => {
+      const wrapper = mountForm()
+
+      await chooseOption(wrapper, 'device-form-status', 'End of life')
+      expect(wrapper.find('[data-testid="device-form-status"]').text()).toBe('End-of-life')
+
+      const barrier = wrapper.find('[data-testid="device-form-barrier"]')
+      await barrier.trigger('click')
+      const option = wrapper.find('[data-testid^="device-form-barrier-option-"]')
+      const value = option.attributes('data-testid').replace('device-form-barrier-option-', '')
+      await option.trigger('mousedown')
+      expect(wrapper.find('[data-testid="device-form-barrier"]').text()).not.toBe('')
+
+      await chooseOption(wrapper, 'device-form-barrier', value)
+      expect(wrapper.find('[data-testid="device-form-barrier"]').text()).not.toContain(option.text())
+
+      await chooseOption(wrapper, 'device-form-status', 'End of life')
+      expect(wrapper.find('[data-testid="device-form-status"]').text()).not.toBe('End-of-life')
+      expect(wrapper.find('[data-testid="device-form-barrier"]').exists()).toBe(false)
+    })
+
     it('item type shows a filtered suggestion list as you type, and clicking one fills the field', async () => {
       const wrapper = mountForm({ powered: true })
 
