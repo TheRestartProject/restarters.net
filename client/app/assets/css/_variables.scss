@@ -97,6 +97,11 @@ $thumbnail-bg: #fff;
 $offcanvas-bg-color: #fff;
 $toast-background-color: rgba(#fff, .85);
 
+// Bootstrap 5 underlines every link; Bootstrap 4, on live, only on hover.
+// Links live underlines have their own rules.
+$link-decoration: none;
+$link-hover-decoration: underline;
+
 // Container widths: the legacy site was built on Bootstrap 4, whose largest
 // .container max-width was 1140px (xl). Bootstrap 5 added an xxl breakpoint with
 // a 1320px container, which made every .container noticeably wider than the
