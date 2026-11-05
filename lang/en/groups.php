@@ -108,6 +108,8 @@ return [
   'repairable_items' => 'Repairable items',
   'end_of_life_items' => 'End-of-life items',
   'create_groups_mobile2' => 'Add new',
+  'groups_title1_mobile' => 'Yours',
+  'groups_title2_mobile' => 'Find',
   'no_groups_mine' => '<b>If you can\'t see any here yet, why not <a href="/group/other">find a group near you</a>?</b>',
   'no_groups_nearest_no_location' => '<b><p>You do not currently have a town/city set.  You can set one in <a href="/profile/edit">your profile</a>.</p><p>You can also <a href="/group/all">view all groups</a>.</p></b>',
   'group_count' => 'There is <b>:count group</b>.|There are <b>:count groups</b>.',

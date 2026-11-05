@@ -44,6 +44,7 @@ return [
   'cancel_invites_link' => 'Annuler invitation',
   'follow_hosting_group' => 'Cet événement est organisé par :group. Voulez-vous le suivre?',
   'online_event' => 'VISIOCONFÉRENCE',
+  'create_new_event_mobile' => 'Créer',
   'no_upcoming_for_your_groups' => 'Il n\'y a actuellement aucun événement à venir pour votre Repair Café',
   'online_event_question' => 'Visioconférence?',
   'add_new_event' => 'Ajouter nouvel événement',

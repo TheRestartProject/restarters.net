@@ -202,7 +202,9 @@ onMounted(load)
         class="btn btn-primary"
         data-testid="party-add-event"
       >
-        {{ t('events.add_event') }}
+        <!-- events/index.blade.php: "Create" below lg, "Add event" from lg up. -->
+        <span class="d-none d-lg-block">{{ t('events.add_event') }}</span>
+        <span class="d-block d-lg-none">{{ t('events.create_new_event_mobile') }}</span>
       </NuxtLink>
     </div>
 

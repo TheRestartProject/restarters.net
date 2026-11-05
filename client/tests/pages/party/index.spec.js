@@ -7,6 +7,7 @@ import EventCard from '../../../app/components/events/EventCard.vue'
 import { useEventsStore } from '../../../app/stores/events.js'
 import { useDashboardStore } from '../../../app/stores/dashboard.js'
 import { useProfileStore } from '../../../app/stores/profile.js'
+import { useGroupsStore } from '../../../app/stores/groups.js'
 import en from '../../../i18n/locales/en.json'
 import clientEn from '../../../i18n/locales/client-en.json'
 
@@ -111,6 +112,17 @@ describe('pages/party/index (mine)', () => {
   it('mounts the AlertsBanner above the events list', () => {
     const wrapper = mountPage()
     expect(wrapper.find('[data-testid="stub-alerts-banner"]').exists()).toBe(true)
+  })
+
+  // events/index.blade.php: "Create" below lg, "Add event" from lg up.
+  it('gives the create button a short mobile label next to the full one', () => {
+    const groupsStore = useGroupsStore()
+    groupsStore.memberships = [{ id: 1, role: 3 }]
+    groupsStore.fetchMemberships = vi.fn().mockResolvedValue()
+
+    const button = mountPage().find('[data-testid="party-add-event"]')
+    expect(button.find('span.d-lg-block').text()).toBe('Add event')
+    expect(button.find('span.d-lg-none').text()).toBe('Create')
   })
 
   it('shows a loading skeleton while loading', () => {

@@ -47,6 +47,7 @@ return [
   'field_event_venue' => 'Venue address',
   'follow_hosting_group' => 'This event is being hosted by :group.  Would you like to follow them?',
   'online_event' => 'ONLINE EVENT',
+  'create_new_event_mobile' => 'Create',
   'no_upcoming_for_your_groups' => 'There are currently no upcoming events for your groups',
   'online_event_question' => 'Online event?',
   'organised_by' => 'Organised by :group',
