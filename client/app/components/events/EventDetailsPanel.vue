@@ -71,8 +71,9 @@ const discourseThread = computed(() => {
       <BDropdown
         v-if="upcoming && calendarLinks"
         :text="t('calendars.add_to_calendar')"
-        size="sm"
-        variant="outline-secondary"
+        variant="white"
+        no-caret
+        class="linkdrop"
         data-testid="event-view-calendar-dropdown"
       >
         <BDropdownItem :href="calendarLinks.google" target="_blank" rel="noopener" data-testid="event-view-calendar-google">{{ t('events.calendar_google') }}</BDropdownItem>

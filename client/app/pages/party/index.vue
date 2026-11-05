@@ -352,6 +352,7 @@ onMounted(load)
 
     <BModal
       :model-value="showCalendarModal"
+      size="lg"
       :title="t('groups.calendar_copy_title', { group: t('groups.groups_title1').toLowerCase() })"
       no-footer
       data-testid="party-calendar-modal"

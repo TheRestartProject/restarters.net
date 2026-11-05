@@ -170,7 +170,7 @@ function close() {
 </script>
 
 <template>
-  <BModal :model-value="show" data-testid="event-invite-modal" :title="t('events.invite_restarters_modal_heading')" no-footer @hide="close">
+  <BModal :model-value="show" size="lg" data-testid="event-invite-modal" :title="t('events.invite_restarters_modal_heading')" no-footer @hide="close">
     <BAlert v-if="successMessage" :model-value="true" variant="success" data-testid="event-invite-success">
       {{ successMessage }}
     </BAlert>

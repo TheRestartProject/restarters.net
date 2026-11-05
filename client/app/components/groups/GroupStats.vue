@@ -117,7 +117,7 @@ const co2Description = computed(() => {
             <button ref="infoButton" type="button" class="info-toggle" data-testid="group-stats-impact-info">
               <img :src="'/icons/info_ico_green.svg'" alt="" width="20" height="20">
             </button>
-            <BPopover :target="infoButton" triggers="hover focus click" html data-testid="group-stats-impact-popover">
+            <BPopover :target="infoButton" click html data-testid="group-stats-impact-popover">
               <!-- eslint-disable-next-line vue/no-v-html -->
               <div v-html="t('groups.impact_calculation')" />
             </BPopover>
@@ -144,7 +144,7 @@ const co2Description = computed(() => {
                   <button ref="co2InfoButton" type="button" class="info-toggle" data-testid="group-stats-co2-info">
                     <img :src="'/icons/info_ico_green.svg'" alt="" width="20" height="20">
                   </button>
-                  <BPopover :target="co2InfoButton" triggers="hover focus click" data-testid="group-stats-co2-popover">
+                  <BPopover :target="co2InfoButton" click data-testid="group-stats-co2-popover">
                     {{ popoverConsumer(Math.round(groupStats.co2_total)) }}
                   </BPopover>
                 </p>

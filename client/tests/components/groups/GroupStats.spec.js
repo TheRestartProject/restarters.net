@@ -6,12 +6,18 @@ import en from '../../../i18n/locales/en.json'
 import clientEn from '../../../i18n/locales/client-en.json'
 import { GROUP_VIEW_STUBS } from '../../helpers/stubs.js'
 
-function mountComponent(props = {}) {
+// Exposes the trigger props so the click-only behaviour can be asserted.
+const PropsPopoverStub = {
+  props: ['target', 'click', 'triggers'],
+  template: '<div :data-click="click" :data-triggers="triggers"><slot /></div>',
+}
+
+function mountComponent(props = {}, popoverStub = null) {
   const i18n = createI18n({ legacy: false, locale: 'en', messages: { en: { ...en, ...clientEn } } })
 
   return mount(GroupStats, {
     props,
-    global: { plugins: [i18n], stubs: GROUP_VIEW_STUBS },
+    global: { plugins: [i18n], stubs: popoverStub ? { ...GROUP_VIEW_STUBS, BPopover: popoverStub } : GROUP_VIEW_STUBS },
   })
 }
 
@@ -64,6 +70,18 @@ describe('components/groups/GroupStats', () => {
 
     expect(wrapper.find('[data-testid="group-stats-impact-info"]').exists()).toBe(true)
     expect(wrapper.find('[data-testid="group-stats-impact-popover"]').text()).toContain('How do we calculate environmental impact?')
+  })
+
+  it('opens the impact popovers on click only, as the live v-b-popover default', () => {
+    const wrapper = mountComponent({ stats: STATS }, PropsPopoverStub)
+    const popovers = ['group-stats-impact-popover', 'group-stats-co2-popover']
+      .map((id) => wrapper.find(`[data-testid="${id}"]`))
+
+    for (const p of popovers) {
+      expect(p.exists()).toBe(true)
+      expect(p.attributes('data-triggers')).toBeUndefined()
+      expect(p.attributes('data-click')).toBeDefined()
+    }
   })
 
   it('emits share-stats when the CO2 card\'s Share this link is clicked (gap 9)', async () => {

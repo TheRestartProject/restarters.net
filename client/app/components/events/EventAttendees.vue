@@ -173,7 +173,7 @@ async function confirmRemove() {
              - a white panel with a 1px black border and a 5px offset black
              shadow. Without it the tabs and the volunteer list float loose on
              the page background, which is how this rendered before. -->
-        <div class="ourtabs">
+        <div class="ourtabs attendance-tabs">
           <ul class="nav nav-tabs">
             <li class="nav-item">
               <button
@@ -203,7 +203,7 @@ async function confirmRemove() {
             <p v-if="!confirmed.length" data-testid="event-attendees-empty-confirmed" class="text-muted">
               {{ t('events.confirmed_none') }}
             </p>
-            <ul v-else class="list-unstyled">
+            <ul v-else class="list-unstyled maxheight">
               <li
                 v-for="attendee in confirmed"
                 :key="attendee.id"
@@ -273,7 +273,7 @@ async function confirmRemove() {
             <p v-if="!invited.length" data-testid="event-attendees-empty-invited" class="text-muted">
               {{ t('events.invited_none') }}
             </p>
-            <ul v-else class="list-unstyled">
+            <ul v-else class="list-unstyled maxheight">
               <li
                 v-for="attendee in invited"
                 :key="attendee.id"
@@ -330,6 +330,19 @@ async function confirmRemove() {
     grid-template-columns: 1fr 2fr;
     column-gap: 1.5rem;
   }
+}
+
+/* EventAttendance.vue: a fixed 380px tab box whose lists keep a 240px
+   scrolling area, so a long attendee list scrolls instead of growing the page. */
+.attendance-tabs {
+  height: 380px;
+}
+
+.maxheight {
+  max-height: 240px;
+  min-height: 240px;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 /* Gap 22: black divider (not Bootstrap's default light grey), matching

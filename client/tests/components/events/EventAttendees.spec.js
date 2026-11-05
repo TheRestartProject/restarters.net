@@ -57,6 +57,13 @@ describe('components/events/EventAttendees', () => {
     setActivePinia(createPinia())
   })
 
+  it('caps the attendee lists at a scrolling height inside the fixed-height tab box', () => {
+    const wrapper = mountComponent({ confirmed: [confirmedAttendee()], invited: [confirmedAttendee({ id: 2, confirmed: false })] })
+
+    expect(wrapper.find('.ourtabs').classes()).toContain('attendance-tabs')
+    expect(wrapper.find('[data-testid="event-attendee-1"]').element.closest('ul').classList.contains('maxheight')).toBe(true)
+  })
+
   it('shows a loading skeleton and no tabs while loading', () => {
     const wrapper = mountComponent({ loading: true })
     expect(wrapper.find('[data-testid="event-attendees-loading"]').exists()).toBe(true)

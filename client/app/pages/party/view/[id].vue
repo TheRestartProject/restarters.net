@@ -576,7 +576,7 @@ function closeAddVolunteer() {
             <button ref="co2InfoButton" type="button" class="info-toggle" data-testid="event-view-impact-info">
               <img src="/icons/info_ico_green.svg" alt="" width="20" height="20">
             </button>
-            <BPopover :target="co2InfoButton" triggers="hover focus click" html data-testid="event-view-impact-popover">
+            <BPopover :target="co2InfoButton" click html data-testid="event-view-impact-popover">
               <!-- eslint-disable-next-line vue/no-v-html -->
               <div v-html="t('events.impact_calculation')" />
             </BPopover>
@@ -603,7 +603,7 @@ function closeAddVolunteer() {
                 <button ref="co2EquivalentInfoButton" type="button" class="info-toggle" data-testid="event-view-impact-equivalent-info">
                   <img src="/icons/info_ico_green.svg" alt="" width="20" height="20">
                 </button>
-                <BPopover :target="co2EquivalentInfoButton" triggers="hover focus click" data-testid="event-view-impact-equivalent-popover">
+                <BPopover :target="co2EquivalentInfoButton" click data-testid="event-view-impact-equivalent-popover">
                   {{ popoverConsumer(Math.round(event.stats.co2_total)) }}
                 </BPopover>
               </div>

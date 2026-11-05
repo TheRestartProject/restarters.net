@@ -194,6 +194,7 @@ function openCalendar() {
 
     <BModal
       :model-value="showCalendarModal"
+      size="lg"
       data-testid="group-events-calendar-modal"
       :title="t('groups.calendar_copy_title')"
       no-footer
