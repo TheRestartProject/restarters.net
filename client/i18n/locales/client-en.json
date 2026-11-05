@@ -221,8 +221,7 @@
       "discourse_aria": "Talk notifications",
       "empty": "You have no notifications.",
       "load_error": "Sorry, we couldn't load your notifications.",
-      "restarters_aria": "Restarters notifications",
-      "unread": "{count} unread notification | {count} unread notifications"
+      "restarters_aria": "Restarters notifications"
     },
     "profile": {
       "access_denied": "You don't have permission to edit any settings for this user.",

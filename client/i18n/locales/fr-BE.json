@@ -866,6 +866,7 @@
         "logout": "Se déconnecter",
         "new_group": "Créer un nouveau Repair Café",
         "alert_uptodate": "Merci ! Vous êtes à jour",
+        "alert_uptodate_text": "Vous n'avez rien à faire. Quand vous devrez, nous vous préviendrons.",
         "general": "Général",
         "your_name": "Prénom & Nom",
         "repair_skills": "Compétences",
@@ -1315,7 +1316,8 @@
         "admin_no_devices_subject": "Événement récent sans appareil ajouté",
         "admin_no_devices_title": "Modération nécessaire pour un événement sans appareil:",
         "admin_no_devices_line1": "Votre modération est nécessaire pour '{name}'.",
-        "admin_no_devices_line2": "Aucun appareil n'a été ajouté pour cet événement."
+        "admin_no_devices_line2": "Aucun appareil n'a été ajouté pour cet événement.",
+        "view_all": "Voir toutes les notifications"
     },
     "onboarding": {
         "slide1_heading": "Bienvenue!",

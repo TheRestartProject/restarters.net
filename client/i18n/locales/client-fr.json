@@ -222,8 +222,7 @@
       "discourse_aria": "Notifications Talk",
       "empty": "Vous n'avez aucune notification.",
       "load_error": "Désolé, nous n'avons pas pu charger vos notifications.",
-      "restarters_aria": "Notifications Restarters",
-      "unread": "{count} notification non lue | {count} notifications non lues"
+      "restarters_aria": "Notifications Restarters"
     },
     "profile": {
       "access_denied": "Vous n'avez pas la permission de modifier les paramètres de cet utilisateur.",

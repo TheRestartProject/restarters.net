@@ -853,6 +853,7 @@
         "logout": "Logout",
         "new_group": "Create a new group",
         "alert_uptodate": "Thanks! You are up to date",
+        "alert_uptodate_text": "You have nothing to action now. When you do, we'll let you know.",
         "your_name": "Your name",
         "repair_skills": "Skills",
         "repair_skills_content": "This is optional but helps us improve your experience - which skills do you have and would like to share with others? Ctrl-click to select multiple skills.",
@@ -1296,7 +1297,8 @@
         "admin_no_devices_subject": "Recent event with no devices added",
         "admin_no_devices_title": "Moderation needed on event with no devices:",
         "admin_no_devices_line1": "Your moderation is needed for '{name}'.",
-        "admin_no_devices_line2": "No devices have been added against this event."
+        "admin_no_devices_line2": "No devices have been added against this event.",
+        "view_all": "View all notifications"
     },
     "onboarding": {
         "slide1_content": "<p>Thank you for joining our community space.</p>",

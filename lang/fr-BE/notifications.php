@@ -98,4 +98,5 @@ return [
     'admin_no_devices_title' => 'Modération nécessaire pour un événement sans appareil:',
     'admin_no_devices_line1' => 'Votre modération est nécessaire pour \':name\'.',
     'admin_no_devices_line2' => 'Aucun appareil n\'a été ajouté pour cet événement.',
+    'view_all' => 'Voir toutes les notifications',
 ];

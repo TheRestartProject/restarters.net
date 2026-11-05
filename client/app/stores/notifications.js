@@ -10,6 +10,9 @@ import { useAuthStore } from './auth.js'
  * on screen rather than surfacing an error UI (there is nothing useful to
  * show the user about a background badge failing to refresh).
  */
+// Live shows the user's 10 most recent notifications in the navbar panel.
+export const PANEL_SIZE = 10
+
 export const useNotificationsStore = defineStore('notifications', {
   state: () => ({
     restarters: null,
@@ -18,6 +21,10 @@ export const useNotificationsStore = defineStore('notifications', {
     error: null,
     // The /notifications page: the paginated in-app notification list.
     list: { items: [], page: 1, lastPage: 1, total: 0, unread: 0, loading: false, error: null },
+    // The navbar bell's dropdown: the latest PANEL_SIZE notifications. Kept
+    // apart from `list` so opening the panel never disturbs the page the
+    // /notifications page is on.
+    panel: { items: [], loading: false, error: null },
   }),
 
   actions: {
@@ -68,13 +75,32 @@ export const useNotificationsStore = defineStore('notifications', {
       }
     },
 
+    // Load the latest PANEL_SIZE notifications for the navbar panel (the API
+    // pages at 20, newest first, so the first page is enough).
+    async fetchPanel() {
+      const { $api } = useNuxtApp()
+      this.panel.loading = true
+
+      try {
+        const res = await $api.user.myNotifications({ page: 1 })
+        this.panel.items = res.data.slice(0, PANEL_SIZE)
+        this.panel.error = null
+      } catch (error) {
+        this.panel.error = error
+      } finally {
+        this.panel.loading = false
+      }
+    },
+
     // Mark one notification (by id) or all (id omitted) as read, then reflect
     // the change locally and refresh the navbar badge count.
     async markRead(id = null) {
       const { $api } = useNuxtApp()
       const res = await $api.user.markNotificationsRead(id)
 
-      this.list.items = this.list.items.map((n) => (id === null || n.id === id ? { ...n, read: true } : n))
+      const mark = (n) => (id === null || n.id === id ? { ...n, read: true } : n)
+      this.list.items = this.list.items.map(mark)
+      this.panel.items = this.panel.items.map(mark)
       this.list.unread = res.data.unread
       this.restarters = res.data.unread
       return res.data

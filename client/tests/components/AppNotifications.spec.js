@@ -1,4 +1,4 @@
-import { mount } from '@vue/test-utils'
+import { flushPromises, mount } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
 import { createI18n } from 'vue-i18n'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -8,11 +8,14 @@ import { useSessionStore } from '../../app/stores/session.js'
 import en from '../../i18n/locales/en.json'
 import clientEn from '../../i18n/locales/client-en.json'
 
+const NuxtLinkStub = { props: ['to'], template: '<a :href="to" @click="$emit(\'click\')"><slot /></a>' }
+const BButtonStub = { template: '<button v-bind="$attrs" @click="$emit(\'click\')"><slot /></button>' }
+
 function mountComponent() {
   const i18n = createI18n({ legacy: false, locale: 'en', messages: { en: { ...en, ...clientEn } } })
 
   return mount(AppNotifications, {
-    global: { plugins: [i18n] },
+    global: { plugins: [i18n], stubs: { NuxtLink: NuxtLinkStub, BButton: BButtonStub } },
   })
 }
 
@@ -28,7 +31,7 @@ describe('components/AppNotifications', () => {
     useSessionStore().config = { discourse_url: 'https://talk.example.com' }
 
     mockApi = {
-      user: { notifications: vi.fn() },
+      user: { notifications: vi.fn(), myNotifications: vi.fn(), markNotificationsRead: vi.fn() },
       auth: { ssoTicket: vi.fn() },
     }
     vi.stubGlobal('useNuxtApp', () => ({ $api: mockApi }))
@@ -76,18 +79,68 @@ describe('components/AppNotifications', () => {
     expect(mockApi.user.notifications).toHaveBeenCalledTimes(3)
   })
 
-  it('clicking the restarters badge toggles the panel', async () => {
-    mockApi.user.notifications.mockResolvedValue({ success: 'success', restarters: 3, discourse: 0 })
+  const cards = [
+    { id: 'a', type: 'JoinGroup', title: 'Joined', name: 'Group A', url: '/group/view/1', read: false, created_at: '2026-01-01T00:00:00Z' },
+    { id: 'b', type: 'EventConfirmed', title: '', name: 'Event B', url: null, read: true, created_at: '2026-01-02T00:00:00Z' },
+  ]
 
+  async function openPanel(items) {
+    mockApi.user.notifications.mockResolvedValue({ success: 'success', restarters: 1, discourse: 0 })
+    mockApi.user.myNotifications.mockResolvedValue({ data: items, meta: {} })
     const wrapper = mountComponent()
     await vi.waitFor(() => expect(mockApi.user.notifications).toHaveBeenCalledTimes(1))
-    await wrapper.vm.$nextTick()
-
     expect(wrapper.find('[data-testid="notifications-restarters-panel"]').exists()).toBe(false)
+    await wrapper.find('[data-testid="notifications-restarters-badge"]').trigger('click')
+    await vi.waitFor(() => expect(mockApi.user.myNotifications).toHaveBeenCalledTimes(1))
+    await flushPromises()
+    return wrapper
+  }
+
+  it('opening the bell shows the latest notification cards and a view-all link', async () => {
+    const wrapper = await openPanel(cards)
+
+    expect(wrapper.find('[data-testid="notifications-restarters-panel"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="notification-a"]').text()).toContain('Group A')
+    expect(wrapper.find('[data-testid="notification-b"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="notifications-restarters-empty"]').exists()).toBe(false)
+    const link = wrapper.find('[data-testid="notifications-view-all"]')
+    expect(link.text()).toBe('View all notifications')
+    expect(link.attributes('href')).toBe('/notifications')
+  })
+
+  it('shows at most 10 cards', async () => {
+    const many = Array.from({ length: 20 }, (_, i) => ({ ...cards[0], id: `n${i}` }))
+    const wrapper = await openPanel(many)
+
+    expect(wrapper.findAll('.notification-card')).toHaveLength(10)
+  })
+
+  it('shows the up-to-date message when there are no notifications', async () => {
+    const wrapper = await openPanel([])
+
+    const empty = wrapper.find('[data-testid="notifications-restarters-empty"]')
+    expect(empty.text()).toContain('Thanks! You are up to date')
+    expect(empty.text()).toContain("You have nothing to action now. When you do, we'll let you know.")
+    expect(wrapper.find('[data-testid="notifications-view-all"]').exists()).toBe(true)
+  })
+
+  it('marking a card read calls the API and updates the card and bell count', async () => {
+    mockApi.user.markNotificationsRead.mockResolvedValue({ data: { unread: 0 } })
+    const wrapper = await openPanel(cards)
+
+    await wrapper.find('[data-testid="notification-mark-a"]').trigger('click')
+    await flushPromises()
+
+    expect(mockApi.user.markNotificationsRead).toHaveBeenCalledWith('a')
+    expect(wrapper.find('[data-testid="notification-marked-a"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="notifications-restarters-count"]').text()).toBe('0')
+  })
+
+  it('clicking the bell again closes the panel', async () => {
+    const wrapper = await openPanel(cards)
 
     await wrapper.find('[data-testid="notifications-restarters-badge"]').trigger('click')
-    expect(wrapper.find('[data-testid="notifications-restarters-panel"]').exists()).toBe(true)
-    expect(wrapper.find('[data-testid="notifications-restarters-text"]').text()).toContain('3')
+    expect(wrapper.find('[data-testid="notifications-restarters-panel"]').exists()).toBe(false)
   })
 
   it('clicking the discourse badge routes through the SSO bridge to Discourse\'s notifications page', async () => {
