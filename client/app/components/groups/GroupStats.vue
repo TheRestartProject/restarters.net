@@ -321,8 +321,9 @@ const co2Description = computed(() => {
     border-top: 3px dashed #222;
   }
 
+  // Live's 170px includes the title's 1rem right padding, which here is on the whole left side.
   .stat-card__label {
-    max-width: 170px;
+    max-width: 154px;
   }
 
   @media (min-width: 992px) {
