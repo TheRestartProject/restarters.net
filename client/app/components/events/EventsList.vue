@@ -72,7 +72,7 @@ const numberColumns = computed(() =>
   props.past
     ? [
         { key: 'participants', icon: '/images/participants.svg', title: t('groups.participants_attended') },
-        { key: 'volunteers', icon: '/icons/volunteer_ico.svg', title: t('groups.volunteers_attended') },
+        { key: 'volunteers', icon: '/icons/volunteer_ico-thick.svg', title: t('groups.volunteers_attended') },
         { key: 'waste', icon: '/images/trash.svg', title: t('events.stat-7') },
         { key: 'co2', icon: '/images/cloud-empty.svg', title: t('events.stat-6') },
         { key: 'fixed', icon: '/images/fixed.svg', title: t('groups.fixed_items') },

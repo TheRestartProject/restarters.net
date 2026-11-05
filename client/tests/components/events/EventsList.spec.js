@@ -97,6 +97,7 @@ describe('components/events/EventsList', () => {
 
     expect(icons[1].attributes('title')).toBe(en.groups.participants_attended)
     expect(icons[2].attributes('title')).toBe(en.groups.volunteers_attended)
+    expect(icons[2].attributes('src')).toBe('/icons/volunteer_ico-thick.svg')
     expect(icons[5].attributes('title')).toBe(en.groups.fixed_items)
     expect(icons[6].attributes('title')).toBe(en.groups.repairable_items)
     expect(icons[7].attributes('title')).toBe(en.groups.end_of_life_items)
