@@ -53,6 +53,7 @@ const EXPECTED_GATES = {
   '/group/invite/{code}': 'public',
   '/group/map': 'auth',
   '/group/nearby': 'auth',
+  '/group/other': 'auth',
   '/group/view/{id}': 'auth',
   '/login': 'guest',
   '/networks': 'auth',
