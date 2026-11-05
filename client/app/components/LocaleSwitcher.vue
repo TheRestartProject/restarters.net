@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '~/stores/auth.js'
 import { useSessionStore } from '~/stores/session.js'
@@ -42,6 +42,31 @@ function close() {
   open.value = false
 }
 
+// As Bootstrap's dropdown on live: a click anywhere else, or Escape, closes the menu.
+const root = ref(null)
+
+function onDocumentClick(event) {
+  if (open.value && root.value && !root.value.contains(event.target)) {
+    close()
+  }
+}
+
+function onKeydown(event) {
+  if (open.value && event.key === 'Escape') {
+    close()
+  }
+}
+
+onMounted(() => {
+  document.addEventListener('click', onDocumentClick)
+  document.addEventListener('keydown', onKeydown)
+})
+
+onBeforeUnmount(() => {
+  document.removeEventListener('click', onDocumentClick)
+  document.removeEventListener('keydown', onKeydown)
+})
+
 async function choose(code) {
   close()
 
@@ -68,7 +93,7 @@ async function choose(code) {
 </script>
 
 <template>
-  <div class="language-bar" :class="{ show: open }" data-testid="locale-switcher">
+  <div ref="root" class="language-bar" :class="{ show: open }" data-testid="locale-switcher">
     <div class="d-none" data-testid="locale-current">{{ current }}</div>
 
     <button
@@ -142,8 +167,10 @@ async function choose(code) {
       width: 190px;
     }
 
+    // Above the bar, so the whole menu is on screen and the toggle stays
+    // visible to close it again.
     &.show {
-      bottom: 0;
+      bottom: 100%;
     }
   }
 
