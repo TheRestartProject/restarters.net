@@ -37,4 +37,5 @@ return [
   'menu_events' => 'Arrangementer',
   'menu_groups' => 'Grupper',
   'change_photo' => 'Endre bilde',
+  'error_occurred' => 'Det oppstod en feil. Vennligst prøv igjen.',
 ];

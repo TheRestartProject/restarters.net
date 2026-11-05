@@ -97,4 +97,9 @@ return [
   'share_modal_planting_around' => "het aanplanten van ongeveer",
   'share_modal_hectares' => "hectare bomen.*|hectare bomen.*",
   'impact_estimates' => 'Impactcijfers zijn schattingen op basis van gegevens ingevoerd door groepen in Restarters.net.',
+  'dragmap' => 'Staat de speld niet helemaal op de juiste plek?  Sleep hem naar de juiste plaats.',
+  'see_further_reports' => 'Bekijk meer analyses in onze verdere rapporten.',
+  'share_modal_footnote' => '*naald- of loofbomen met gemiddelde groei, geplant in een stedelijke omgeving en 10 jaar lang gekweekt',
+  'share_modal_footnote_hectares' => '*jonge loofboompjes, gedurende 1 jaar gekweekt in een plantage of bosperceel in Engeland',
+  'share_modal_generated_by' => 'gegenereerd door :site',
 ];

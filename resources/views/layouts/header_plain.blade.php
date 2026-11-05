@@ -19,10 +19,6 @@
 
         @yield('extra-css')
 
-        @if( isset($iframe) && $iframe )
-        <script>window.restartersIframe = true</script>
-        @endif
-
         @if( !isset($iframe) || !$iframe )
         <!-- Load jQuery first to ensure it's available for all scripts -->
         <script src="https://cdn.jsdelivr.net/npm/jquery@3.4.1/dist/jquery.min.js"></script>
@@ -39,7 +35,7 @@
         @endif
 
         <!-- Styles -->
-        @vite(['resources/sass/app.scss', 'resources/global/css/app.scss'])
+        @vite(['resources/global/css/app.scss'])
         @if( isset($iframe) )
           <link href="{{ asset('css/iframe.css') }}" rel="stylesheet">
         @endif
@@ -67,6 +63,7 @@
         <script>
          window.restarters = {};
          restarters.cookie_domain = '{{ env('SESSION_DOMAIN') }}';
+         restarters.tusEndpoint = '{{ config('services.tus.endpoint') }}';
          // Passed through at runtime rather than baked into the built JS: the
          // production key only exists as a Fly secret, long after the asset build.
          restarters.cartoApiKey = @json(config('restarters.carto.api_key'));

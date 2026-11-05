@@ -97,4 +97,9 @@ return [
   'share_modal_planting_around' => "plante rundt",
   'share_modal_hectares' => "hektar med trær.*|hektar med trær.*",
   'impact_estimates' => 'Påvirkningsberegninger er estimater basert på data lagt inn av grupper i Restarters.net.',
+  'dragmap' => 'Er nålen ikke helt på rett sted?  Dra den til riktig sted.',
+  'see_further_reports' => 'Se flere analyser i våre videre rapporter.',
+  'share_modal_footnote' => '*middels raskt voksende bartrær eller løvtrær plantet i urbane omgivelser og dyrket i 10 år',
+  'share_modal_footnote_hectares' => '*løvtreplanter dyrket på en plantasje eller i en skogteig i England i 1 år',
+  'share_modal_generated_by' => 'generert av :site',
 ];

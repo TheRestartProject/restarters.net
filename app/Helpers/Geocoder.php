@@ -37,6 +37,8 @@ class Geocoder
 
                     $latitude = $decoded->{'geometry'}->{'location'}->lat;
                     $longitude = $decoded->{'geometry'}->{'location'}->lng;
+                    // Not every result has a country component (e.g. some bodies of water / disputed areas).
+                    $country_code = null;
 
                     foreach ($decoded->{'address_components'} as $component) {
                         if ($component->types && count($component->types) && $component->types[0] === 'country') {

@@ -30,4 +30,5 @@ return [
   'assigned_groups' => 'Toegekend aan groepen',
   'save_user' => 'Gebruiker opslaan',
   'login_before_using_shareable_link' => 'Om je uitnodiging te voltooien, maak hieronder een account aan, of als je al een account hebt <a href=":login_url">log dan hier in</a>.',
+  'choose_role' => 'Kies een rol',
 ];

@@ -151,4 +151,13 @@ return [
   'geocode_failed' => 'Sted ikke funnet. Hvis du ikke kan finne stedet for arrangementet ditt, prøv et mer generelt sted (som landsby/by) eller en spesifikk gateadresse, i stedet for et bygningsnavn.',
   'create_failed' => 'Arrangementet kunne <strong>ikke</strong> opprettes. Se på feilene som er rapportert, korriger dem, og prøv igjen.',
   'edit_failed' => 'Arrangementet kunne ikke redigeres.',
+  'add_a_device' => 'Legg til en enhet',
+  'already_member' => 'Du er allerede medlem av dette arrangementet.',
+  'copied_to_clipboard' => 'Kopiert til utklippstavlen.',
+  'image_upload_error' => 'Beklager, men bildet kunne ikke lastes opp.',
+  'no_date_selected' => 'Ingen dato valgt',
+  'no_devices_added' => 'Ingen enheter lagt til',
+  'no_weight' => ':value diverse eller ikke-elektrisk gjenstand uten vektestimat|:value diverse eller ikke-elektriske gjenstander uten vektestimat',
+  'to_be_recycled' => ':value gjenstand skal resirkuleres|:value gjenstander skal resirkuleres',
+  'to_be_repaired' => ':value gjenstand skal repareres|:value gjenstander skal repareres',
 ];

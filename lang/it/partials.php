@@ -97,4 +97,9 @@ return [
   'share_modal_planting_around' => "piantare circa",
   'share_modal_hectares' => "ettaro di alberi.*|ettari di alberi.*",
   'impact_estimates' => 'Le stime sull\'impatto sono basate sui dati inseriti dai gruppi in Restarters.net.',
+  'dragmap' => 'Il segnaposto non è nel punto giusto?  Trascinalo nella posizione corretta.',
+  'see_further_reports' => 'Scopri altre analisi nei nostri report di approfondimento.',
+  'share_modal_footnote' => '*alberi di conifere o latifoglie di media crescita piantati in ambiente urbano e cresciuti per 10 anni',
+  'share_modal_footnote_hectares' => '*piantine di latifoglie coltivate in una piantagione o in un bosco in Inghilterra per 1 anno',
+  'share_modal_generated_by' => 'generato da :site',
 ];

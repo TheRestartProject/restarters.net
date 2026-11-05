@@ -2,6 +2,9 @@
 
 namespace App\Exceptions;
 
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Auth\AuthenticationException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Validation\ValidationException;
 use Throwable;
 use Exception;
@@ -28,11 +31,30 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Throwable $exception)
     {
-        if ($request->wantsJson()) {
+        // /api/v2 is an API-only surface (the Nuxt SPA + documented OpenAPI
+        // contract): always render errors as JSON there, even when the caller
+        // didn't send an Accept: application/json header, so the response shape
+        // matches the documented #/components/responses/* error schemas.
+        if ($request->wantsJson() || $request->is('api/v2/*')) {
             if ($exception instanceof ValidationException) {
                 return response()->json(
                     ['message' => $exception->getMessage(), 'errors' => $exception->errors()],
                     422);
+            }
+
+            // AuthenticationException / AuthorizationException don't implement
+            // getStatusCode(), so without these the generic branch below rendered
+            // them as 500 instead of the correct 401/403 for JSON API requests.
+            if ($exception instanceof AuthenticationException) {
+                return response()->json(['message' => 'Unauthenticated.'], 401);
+            }
+
+            if ($exception instanceof AuthorizationException) {
+                return response()->json(['message' => 'Unauthorized.'], 403);
+            }
+
+            if ($exception instanceof ModelNotFoundException) {
+                return response()->json(['message' => 'Resource not found.'], 404);
             }
 
             return response()->json(

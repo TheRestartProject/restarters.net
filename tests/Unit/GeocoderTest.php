@@ -73,4 +73,21 @@ class GeocoderTest extends TestCase
     {
         $this->assertFalse($this->geocoderReturning($this->cannedResponse())->geocode('ForceGeocodeFailure'));
     }
+
+    public function testGeocodeWithoutACountryComponent(): void
+    {
+        // Seen in production as "Undefined variable $country_code": some results have no country component.
+        $body = json_encode([
+            'status' => 'OK',
+            'results' => [[
+                'geometry' => ['location' => ['lat' => 50.1, 'lng' => -1.2]],
+                'address_components' => [['short_name' => 'English Channel', 'types' => ['natural_feature']]],
+            ]],
+        ]);
+
+        $ret = $this->geocoderReturning($body)->geocode('English Channel');
+
+        $this->assertEquals(50.1, $ret['latitude']);
+        $this->assertNull($ret['country_code']);
+    }
 }

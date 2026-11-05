@@ -2,7 +2,6 @@
 
 return [
     'notifications' => 'Notifications',
-    'view_all' => 'View all notifications',
     'mark_as_read' => 'Mark as read',
     'marked_as_read' => 'Marked as read',
     'mark_all_as_read' => 'Mark all notifications as read',
@@ -99,4 +98,5 @@ return [
     'admin_no_devices_title' => 'Moderation needed on event with no devices:',
     'admin_no_devices_line1' => 'Your moderation is needed for \':name\'.',
     'admin_no_devices_line2' => 'No devices have been added against this event.',
+    'view_all' => 'View all notifications',
 ];

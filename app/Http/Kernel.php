@@ -20,6 +20,7 @@ class Kernel extends HttpKernel
         \App\Http\Middleware\TrimStrings::class,
         \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
         \App\Http\Middleware\TrustProxies::class,
+        \Illuminate\Http\Middleware\HandleCors::class,
         \App\Http\Middleware\HttpsProtocol::class,
     ];
 
@@ -46,7 +47,6 @@ class Kernel extends HttpKernel
             \App\Http\Middleware\VerifyTranslationAccess::class,
         ],
         'api' => [
-            \App\Http\Middleware\AddCorsHeaders::class,
             \Illuminate\Routing\Middleware\ThrottleRequests::class.':api',
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ],
@@ -69,10 +69,6 @@ class Kernel extends HttpKernel
         'precognitive' => \Illuminate\Foundation\Http\Middleware\HandlePrecognitiveRequests::class,
         'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
-        'verifyUserConsent' => \App\Http\Middleware\VerifyUserConsent::class,
-        'AcceptUserInvites' => \App\Http\Middleware\AcceptUserInvites::class,
-        'ensureAPIToken' => \App\Http\Middleware\EnsureAPIToken::class,
-
         /**** OTHER MIDDLEWARE ****/
         'localize' => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRoutes::class,
         'localizationRedirect' => \Mcamara\LaravelLocalization\Middleware\LaravelLocalizationRedirectFilter::class,
