@@ -305,6 +305,8 @@
       "item_weight_help": "Chaque objet a une case de poids. Désactivé, seuls les objets Divers en ont une.",
       "custom_fields": "Champs personnalisés des objets",
       "custom_fields_help": "Champs supplémentaires pour les objets enregistrés lors des événements de ce groupe.",
+      "item_weight_network_help": "Chaque objet a une case de poids. Désactivé, seuls les objets Divers en ont une.",
+      "custom_fields_network_help": "Chaque groupe peut ajouter ses propres champs au formulaire des objets.",
       "network_not_set": "Non défini",
       "network_on": "Toujours activé",
       "network_off": "Toujours désactivé",

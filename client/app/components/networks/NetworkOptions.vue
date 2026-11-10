@@ -57,7 +57,7 @@ async function save() {
       <select :id="`network-option-${key}`" v-model="values[key]" class="form-select" :data-testid="`network-option-${key}`">
         <option v-for="c in CHOICES" :key="c.value" :value="c.value">{{ t(`client.features.${c.label}`) }}</option>
       </select>
-      <small class="form-text text-muted">{{ t(`client.features.${key}_help`) }}</small>
+      <small class="form-text text-muted">{{ t(`client.features.${key}_network_help`) }}</small>
     </div>
 
     <BAlert v-if="failed" :model-value="true" variant="danger" data-testid="network-options-error">

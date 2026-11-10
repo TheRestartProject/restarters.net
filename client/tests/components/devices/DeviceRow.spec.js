@@ -175,6 +175,16 @@ describe('components/devices/DeviceRow', () => {
       expect(wrapper.text()).not.toContain('old')
     })
 
+    it('adds no colon after a label that ends in punctuation', () => {
+      const wrapper = mountRow({
+        device: device({ custom_values: { visit: 'Yes' } }),
+        groupFeatures: ON,
+        groupCustomFields: [{ key: 'visit', label: 'First visit?', type: 'choice', options: ['Yes', 'No'] }],
+      })
+
+      expect(wrapper.find('[data-testid="event-device-custom-1-visit"]').text()).toBe('First visit? Yes')
+    })
+
     it('shows nothing when custom fields are switched off', () => {
       const wrapper = mountRow({
         device: device({ custom_values: { town: 'Leeds' } }),

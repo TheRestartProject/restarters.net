@@ -4,6 +4,7 @@ import { useI18n } from 'vue-i18n'
 import { useDevicesStore } from '../../stores/devices.js'
 import { deviceStatusKey, deviceStatusVariant, deviceSparePartsNeeded } from '../../composables/useDeviceDisplay.js'
 import DeviceForm from './DeviceForm.vue'
+import { fieldLabel } from '../../composables/useFeatureSwitches.js'
 
 // One device's summary row, with inline edit/delete for canedit viewers -
 // api-contracts-phase-c.md C5. Functional spec: EventDeviceSummary.vue.
@@ -115,7 +116,7 @@ const SHOW_DEVICE_REFERENCE = false
         :key="cv.key"
         class="text-muted d-block small"
         :data-testid="`event-device-custom-${device.id}-${cv.key}`"
-      >{{ cv.label }}: {{ cv.value }}</span>
+      >{{ fieldLabel(cv.label) }} {{ cv.value }}</span>
     </td>
     <td>{{ device.category ? t(device.category.name) : '-' }}</td>
     <!-- Gap fix (MEDIUM): legacy hides Brand/Age/Assessment/Status/Spare-parts

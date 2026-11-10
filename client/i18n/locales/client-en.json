@@ -304,6 +304,8 @@
       "item_weight_help": "Every item has a weight box. When off, only Misc items do.",
       "custom_fields": "Custom item fields",
       "custom_fields_help": "Extra fields for items recorded at this group's events.",
+      "item_weight_network_help": "Every item has a weight box. When off, only Misc items do.",
+      "custom_fields_network_help": "Each group can add fields of its own to the item form.",
       "network_not_set": "Not set",
       "network_on": "Always on",
       "network_off": "Always off",

@@ -3,6 +3,7 @@ import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useDevicesStore } from '../../stores/devices.js'
 import { suggestDeviceCategory } from '../../composables/useDeviceCategorySuggestion.js'
+import { fieldLabel } from '../../composables/useFeatureSwitches.js'
 import DevicePhotos from './DevicePhotos.vue'
 import FieldInfoPopover from '../forms/FieldInfoPopover.vue'
 
@@ -981,7 +982,7 @@ const SHOW_DEVICE_REFERENCE = false
 
     <div v-if="customFields.length" class="device-form-card" data-testid="device-form-custom-fields">
       <h3>{{ t('client.devices.custom_fields_heading') }}</h3>
-      <BFormGroup v-for="f in customFields" :key="f.key" :label="`${f.label}:`" :label-for="`device-form-custom-${f.key}`">
+      <BFormGroup v-for="f in customFields" :key="f.key" :label="fieldLabel(f.label)" :label-for="`device-form-custom-${f.key}`">
         <select
           v-if="f.type === 'choice'"
           :id="`device-form-custom-${f.key}`"
