@@ -42,8 +42,6 @@ return [
   'powered_items' => 'elektrische items',
   'unpowered_items' => 'niet-elektrische items',
   'weight' => 'Gewicht',
-  'required_impact' => 'kg - vereist voor berekening van milieu-impact',
-  'optional_impact' => 'kg - gebruikt om de berekening van de milieu-impact te verfijnen (optioneel)',
   'age_approx' => 'jaar (bij benadering indien onbekend)',
   'tooltip_category' => 'Kies de categorie die het beste bij dit item past. <a target=\'_blank\' rel=\'noopener noreferrer\' href=\'https://talk.restarters.net/t/fixometer-how-to-log-repair-data-from-your-event/1028#heading--category\'>Meer informatie over deze categorieën...</a>',
   'tooltip_model' => 'Voeg hier zoveel mogelijk informatie toe over het specifieke model van het apparaat (bijv. \'Galaxy S10 5G\'). Laat leeg als je het model niet weet.',
