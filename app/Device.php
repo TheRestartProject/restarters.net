@@ -2,6 +2,8 @@
 
 namespace App;
 
+use App\Services\ItemImpact;
+
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -67,7 +69,10 @@ class Device extends Model implements Auditable
      *
      * @var array
      */
-    protected $fillable = ['event', 'category', 'category_creation', 'estimate', 'repair_status', 'spare_parts', 'parts_provider', 'brand', 'item_type', 'model', 'age', 'problem', 'notes', 'reference', 'repaired_by', 'do_it_yourself', 'professional_help', 'more_time_needed', 'wiki', 'fault_type'];
+    // Values of the group's custom item fields (App\Services\CustomFields).
+    protected $casts = ['custom_values' => 'array'];
+
+    protected $fillable = ['event', 'category', 'category_creation', 'estimate', 'repair_status', 'spare_parts', 'parts_provider', 'brand', 'item_type', 'model', 'age', 'problem', 'notes', 'reference', 'repaired_by', 'do_it_yourself', 'professional_help', 'more_time_needed', 'wiki', 'fault_type', 'custom_values'];
 
     /**
      * The attributes that should be hidden for arrays.
@@ -273,100 +278,78 @@ class Device extends Model implements Auditable
     }
 
     /**
-     * Powered estimate only takes precedence over category weight when Misc and if not 0.
+     * The category, cached briefly because exports call this for every item.
+     */
+    private function impactCategory(): Category
+    {
+        if (self::isCircleCI()) {
+            return $this->deviceCategory;
+        }
+
+        return \Cache::remember('category-' . $this->category, 300, function () {
+            return $this->deviceCategory;
+        });
+    }
+
+    private function enteredWeight(): ?float
+    {
+        return $this->estimate === null ? null : (float) $this->estimate;
+    }
+
+    /**
+     * CO2e prevented by a fixed powered item, after displacement. See ItemImpact for the rule.
      */
     public function eCo2Diverted($emissionRatio, $displacementFactor)
     {
-        $footprint = 0;
+        $category = $this->impactCategory();
 
-        if ($this->isFixed()) {
-            if ($this->category == env('MISC_CATEGORY_ID_POWERED') && $this->estimate > 0) {
-                $footprint = $this->estimate * $emissionRatio;
-            } else {
-                if (self::isCircleCI()) {
-                    $footprint = $this->deviceCategory->footprint;
-                } else {
-                    $footprint = \Cache::remember('category-' . $this->category, 300, function() {
-                        return $this->deviceCategory;
-                    })->footprint;
-                }
-            }
+        if (! $this->isFixed() || ! $category->powered) {
+            return 0;
         }
 
-        return $footprint * $displacementFactor;
+        return ItemImpact::co2($this->enteredWeight(), (float) $category->weight, (float) $category->footprint, true, (float) $emissionRatio) * $displacementFactor;
     }
 
     /**
-     * Unpowered estimate always takes precedence over category weight unless is is 0.
-     *
+     * CO2e prevented by a fixed unpowered item, after displacement. See ItemImpact for the rule.
      */
     public function uCo2Diverted($emissionRatio, $displacementFactor)
     {
-        $footprint = 0;
+        $category = $this->impactCategory();
 
-        if ($this->isFixed()) {
-            if ($this->estimate > 0) {
-                $footprint = ($this->estimate * $emissionRatio);
-            } else {
-                $footprint = $this->deviceCategory->footprint;
-            }
+        if (! $this->isFixed() || $category->powered) {
+            return 0;
         }
 
-        return $footprint * $displacementFactor;
+        return ItemImpact::co2($this->enteredWeight(), (float) $category->weight, (float) $category->footprint, false, (float) $emissionRatio) * $displacementFactor;
     }
 
     /**
-     * Powered estimate only takes precedence over category weight when Misc and if not 0.
-     *
+     * Waste prevented by a fixed powered item. See ItemImpact for the rule.
      */
     public function eWasteDiverted()
     {
-        $ewasteDiverted = 0;
+        $category = $this->impactCategory();
 
-        if (self::isCircleCI()) {
-            $powered = $this->deviceCategory->powered;
-        } else {
-            $powered = \Cache::remember('category-powered-' . $this->category, 300, function() {
-                return $this->deviceCategory->powered;
-            });
+        if (! $this->isFixed() || ! $category->powered) {
+            return 0;
         }
 
-        if ($this->isFixed() && $powered) {
-            if ($this->category == env('MISC_CATEGORY_ID_POWERED') && $this->estimate > 0) {
-                $ewasteDiverted = $this->estimate;
-            } else {
-                if (self::isCircleCI()) {
-                    $category = $this->deviceCategory;
-                } else {
-                    $category = \Cache::remember('category-' . $this->category, 300, function() {
-                        return $this->deviceCategory;
-                    });
-                }
-
-                $ewasteDiverted = $category->weight;
-            }
-        }
-
-        return $ewasteDiverted;
+        return ItemImpact::waste($this->enteredWeight(), (float) $category->weight, true);
     }
 
     /**
-     * Unpowered estimate always takes precedence over category weight unless it is 0.
-     *
+     * Waste prevented by a fixed unpowered item. See ItemImpact for the rule.
      */
     public function uWasteDiverted()
     {
-        $wasteDiverted = 0;
+        $category = $this->impactCategory();
 
-        if ($this->isFixed() && $this->deviceCategory->isUnpowered()) {
-            if ($this->estimate > 0) {
-                $wasteDiverted = $this->estimate;
-            } else {
-                $wasteDiverted = $this->deviceCategory->weight;
-            }
+        if (! $this->isFixed() || $category->powered) {
+            return 0;
         }
 
-        return $wasteDiverted;
+        return ItemImpact::waste($this->enteredWeight(), (float) $category->weight, false);
     }
 
     public function isFixed()
