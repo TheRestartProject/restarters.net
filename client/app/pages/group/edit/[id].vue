@@ -5,6 +5,7 @@ import { useI18n } from 'vue-i18n'
 import { useSessionStore } from '~/stores/session.js'
 import { useGroupsStore } from '~/stores/groups.js'
 import GroupForm from '~/components/groups/GroupForm.vue'
+import GroupOptions from '~/components/groups/GroupOptions.vue'
 
 // /group/edit/[id] - resources/views/group/edit.blade.php +
 // GroupAddEditPage.vue (design.md §6.2 B6 task brief). Image upload (tus,
@@ -195,6 +196,8 @@ function onUpdated() {
             @updated="onUpdated"
           />
         </div>
+
+        <GroupOptions v-show="activeTab === 'details'" :group="group" />
       </div>
     </div>
   </div>

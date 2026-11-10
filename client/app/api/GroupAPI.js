@@ -30,6 +30,12 @@ export default class GroupAPI extends BaseAPI {
     return this.$patch(`/api/v2/groups/${id}`, payload)
   }
 
+  // PATCH /api/v2/groups/{id}/options {features: {key: true|false|null}, custom_fields: [...]}
+  // -> {data: {features, custom_fields}}.
+  updateOptions(id, payload) {
+    return this.$patch(`/api/v2/groups/${id}/options`, payload)
+  }
+
   // GET /api/v2/groups/names - {id, name, archived_at} for every group.
   // Currently the only field set (api-contracts-phase-b.md client notes);
   // the location/hosts/restarters/tags/next_event summary fields land with

@@ -155,4 +155,34 @@ describe('components/devices/DeviceRow', () => {
 
     expect(wrapper.text()).toContain("Sorry, we couldn't delete that item")
   })
+
+  describe('custom item field values', () => {
+    const FIELDS = [
+      { key: 'town', label: 'Town', type: 'text', options: [] },
+      { key: 'visits', label: 'Visits', type: 'number', options: [] },
+    ]
+    const ON = { item_weight: true, custom_fields: true }
+
+    it('shows label: value for active fields that have a value', () => {
+      const wrapper = mountRow({
+        device: device({ custom_values: { town: 'Leeds', removed: 'old' } }),
+        groupFeatures: ON,
+        groupCustomFields: FIELDS,
+      })
+
+      expect(wrapper.find('[data-testid="event-device-custom-1-town"]').text()).toBe('Town: Leeds')
+      expect(wrapper.find('[data-testid="event-device-custom-1-visits"]').exists()).toBe(false)
+      expect(wrapper.text()).not.toContain('old')
+    })
+
+    it('shows nothing when custom fields are switched off', () => {
+      const wrapper = mountRow({
+        device: device({ custom_values: { town: 'Leeds' } }),
+        groupFeatures: { item_weight: true, custom_fields: false },
+        groupCustomFields: FIELDS,
+      })
+
+      expect(wrapper.find('[data-testid="event-device-custom-1-town"]').exists()).toBe(false)
+    })
+  })
 })

@@ -35,6 +35,14 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  groupFeatures: {
+    type: Object,
+    default: null,
+  },
+  groupCustomFields: {
+    type: Array,
+    default: () => [],
+  },
   variant: {
     type: String,
     default: 'desktop',
@@ -81,6 +89,8 @@ const colspan = computed(() => {
             :event-id="eventId"
             :powered="powered"
             :canedit="canedit"
+            :group-features="groupFeatures"
+            :group-custom-fields="groupCustomFields"
           />
           <tr v-if="devices.length === 0">
             <td :colspan="colspan" class="text-muted" :data-testid="emptyTestId">
@@ -95,7 +105,15 @@ const colspan = computed(() => {
       <img :src="'/images/add-icon.svg'" alt="" class="add-device-icon">
       {{ powered ? t('partials.add_device_powered') : t('partials.add_device_unpowered') }}
     </BButton>
-    <DeviceForm v-if="adding" :event-id="eventId" :powered="powered" @saved="emit('saved')" @cancel="emit('toggle-add')" />
+    <DeviceForm
+      v-if="adding"
+      :event-id="eventId"
+      :powered="powered"
+      :group-features="groupFeatures"
+      :group-custom-fields="groupCustomFields"
+      @saved="emit('saved')"
+      @cancel="emit('toggle-add')"
+    />
   </div>
 </template>
 

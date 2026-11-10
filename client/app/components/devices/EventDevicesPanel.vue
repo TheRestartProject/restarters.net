@@ -45,6 +45,14 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  groupFeatures: {
+    type: Object,
+    default: null,
+  },
+  groupCustomFields: {
+    type: Array,
+    default: () => [],
+  },
 })
 
 const { t } = useI18n()
@@ -174,6 +182,8 @@ function onAdded() {
           powered
           :event-id="eventId"
           :canedit="canedit"
+          :group-features="groupFeatures"
+          :group-custom-fields="groupCustomFields"
           :adding="addingPowered"
           @toggle-add="addingPowered = !addingPowered"
           @saved="onAdded"
@@ -184,6 +194,8 @@ function onAdded() {
           :powered="false"
           :event-id="eventId"
           :canedit="canedit"
+          :group-features="groupFeatures"
+          :group-custom-fields="groupCustomFields"
           :adding="addingUnpowered"
           @toggle-add="addingUnpowered = !addingUnpowered"
           @saved="onAdded"
@@ -216,6 +228,8 @@ function onAdded() {
             powered
             :event-id="eventId"
             :canedit="canedit"
+          :group-features="groupFeatures"
+          :group-custom-fields="groupCustomFields"
             :adding="addingPowered"
             variant="mobile"
             @toggle-add="addingPowered = !addingPowered"
@@ -248,6 +262,8 @@ function onAdded() {
             :powered="false"
             :event-id="eventId"
             :canedit="canedit"
+          :group-features="groupFeatures"
+          :group-custom-fields="groupCustomFields"
             :adding="addingUnpowered"
             variant="mobile"
             @toggle-add="addingUnpowered = !addingUnpowered"
