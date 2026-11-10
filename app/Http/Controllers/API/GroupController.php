@@ -31,6 +31,8 @@ use Notification;
 use Illuminate\Validation\ValidationException;
 use App\Attributes\Feature;
 use App\Attributes\UserStory;
+use App\Services\CustomFields;
+use App\Services\GroupFeatures;
 use App\Attributes\NoStory;
 
 #[Feature('Groups', description: 'Community repair group management and membership')]
@@ -1164,6 +1166,88 @@ class GroupController extends Controller
         return response()->json([
             'id' => $idGroup,
         ]);
+    }
+
+    /**
+     * Change the group's Options: which optional features it uses and its custom item fields (RES-2063).
+     *
+     * Body (JSON, both optional): features {key: true|false|null}, where null goes back to the default, and
+     * custom_fields, the full list of fields in use [{key?, label, type, options?}].
+     *
+     * @OA\Patch(
+     *      path="/api/v2/groups/{id}/options",
+     *      operationId="updateGroupOptions",
+     *      tags={"Groups"},
+     *      summary="Change a group's options",
+     *      description="Switches optional features on or off for the group, and sets its custom item fields. Administrators, hosts of the group and coordinators of one of its networks. A feature a network has set to always on or always off stays as the network set it.",
+     *      security={{"apiToken":{}}},
+     *      @OA\Parameter(name="id", description="Group id", required=true, in="path", @OA\Schema(type="integer")),
+     *      @OA\RequestBody(
+     *          @OA\JsonContent(
+     *              @OA\Property(property="features", type="object", description="Feature key (item_weight, custom_fields) to true, false, or null to follow the default.", example={"item_weight": false}),
+     *              @OA\Property(property="custom_fields", type="array", description="The full list of custom item fields in use, at most 10. Send a field's key to keep it; fields left out are removed (their values are kept, hidden).",
+     *                  @OA\Items(
+     *                      @OA\Property(property="key", type="string", nullable=true, example="town"),
+     *                      @OA\Property(property="label", type="string", example="Town the visitor came from"),
+     *                      @OA\Property(property="type", type="string", enum={"text", "number", "choice"}),
+     *                      @OA\Property(property="options", type="array", @OA\Items(type="string"))
+     *                  )
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="data", type="object",
+     *                  @OA\Property(property="features", ref="#/components/schemas/Group/properties/features"),
+     *                  @OA\Property(property="custom_fields", ref="#/components/schemas/Group/properties/custom_fields")
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(response=403, description="Not allowed to change this group"),
+     *      @OA\Response(response=422, description="Unknown feature or invalid field")
+     * )
+     */
+    #[UserStory('As a Host, I can choose which optional features my group uses and add item fields of our own', persona: 'Host', theme: 'Create & manage groups')]
+    public function updateGroupOptionsv2(Request $request, $idGroup): JsonResponse
+    {
+        $user = $this->getUser();
+        $group = Group::findOrFail($idGroup);
+
+        if (! Fixometer::hasRole($user, 'Administrator')
+            && ! Fixometer::userHasEditGroupPermission($idGroup, $user->id)
+            && ! $user->isCoordinatorForGroup($group)) {
+            abort(403);
+        }
+
+        $request->validate([
+            'features' => ['sometimes', 'array', function ($attribute, $value, $fail) {
+                foreach ($value as $key => $setting) {
+                    if (! array_key_exists($key, GroupFeatures::FEATURES)) {
+                        $fail("There is no feature called $key.");
+                    } elseif ($setting !== null && ! is_bool($setting)) {
+                        $fail("$key must be true, false or null.");
+                    }
+                }
+            }],
+        ] + CustomFields::rules());
+
+        if ($request->has('features')) {
+            $group->features = GroupFeatures::apply($group->features, $request->input('features'));
+        }
+
+        if ($request->has('custom_fields')) {
+            $group->custom_fields = CustomFields::update($group->custom_fields, $request->input('custom_fields'));
+        }
+
+        $group->save();
+        $group = $group->fresh();
+
+        return response()->json(['data' => [
+            'features' => GroupFeatures::resolve($group),
+            'custom_fields' => CustomFields::active($group),
+        ]]);
     }
 
     /**

@@ -1,5 +1,5 @@
 {
-    "generatedAt": "2026-10-23T17:48:00Z",
+    "generatedAt": "2026-11-10T18:10:38Z",
     "features": {
         "Administration": {
             "description": "Platform administration and configuration",
@@ -411,6 +411,14 @@
                             "test": "testCategoryChange"
                         },
                         {
+                            "file": "tests/Feature/Devices/DeviceCustomValuesTest.php",
+                            "test": "test_values_are_saved_and_returned"
+                        },
+                        {
+                            "file": "tests/Feature/Devices/DeviceCustomValuesTest.php",
+                            "test": "test_values_are_checked_against_the_group_fields"
+                        },
+                        {
                             "file": "tests/Feature/Devices/EditTest.php",
                             "test": "testEdit"
                         },
@@ -425,6 +433,18 @@
                         {
                             "file": "tests/Feature/Devices/NullEstimateProblemTest.php",
                             "test": "testNullEstimateCreate"
+                        },
+                        {
+                            "file": "tests/Feature/Devices/NullEstimateProblemTest.php",
+                            "test": "testBlankEstimateIsStoredAsNull"
+                        },
+                        {
+                            "file": "tests/Feature/Devices/NullEstimateProblemTest.php",
+                            "test": "testDecimalCommaIsAccepted"
+                        },
+                        {
+                            "file": "tests/Feature/Devices/NullEstimateProblemTest.php",
+                            "test": "testEnteredZeroIsKept"
                         },
                         {
                             "file": "tests/Feature/Devices/NullProblemTest.php",
@@ -512,6 +532,14 @@
                         {
                             "file": "tests/Feature/Devices/CategoryTest.php",
                             "test": "testCategoryChange"
+                        },
+                        {
+                            "file": "tests/Feature/Devices/DeviceCustomValuesTest.php",
+                            "test": "test_an_update_keeps_values_not_sent_and_clears_blank_ones"
+                        },
+                        {
+                            "file": "tests/Feature/Devices/DeviceCustomValuesTest.php",
+                            "test": "test_an_update_without_custom_values_leaves_them_alone"
                         },
                         {
                             "file": "tests/Feature/Devices/EditTest.php",
@@ -1757,6 +1785,44 @@
                     ]
                 },
                 {
+                    "story": "As a Host, I can choose which optional features my group uses and add item fields of our own",
+                    "persona": "Host",
+                    "theme": "Create & manage groups",
+                    "method": "GroupController::updateGroupOptionsv2",
+                    "class": "App\\Http\\Controllers\\API\\GroupController",
+                    "file": "app/Http/Controllers/API/GroupController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Groups/GroupOptionsTest.php",
+                            "test": "test_a_host_switches_features_for_their_group"
+                        },
+                        {
+                            "file": "tests/Feature/Groups/GroupOptionsTest.php",
+                            "test": "test_null_goes_back_to_the_default"
+                        },
+                        {
+                            "file": "tests/Feature/Groups/GroupOptionsTest.php",
+                            "test": "test_unknown_features_and_values_are_rejected"
+                        },
+                        {
+                            "file": "tests/Feature/Groups/GroupOptionsTest.php",
+                            "test": "test_only_people_who_can_edit_the_group_change_options"
+                        },
+                        {
+                            "file": "tests/Feature/Groups/GroupOptionsTest.php",
+                            "test": "test_a_host_defines_custom_item_fields"
+                        },
+                        {
+                            "file": "tests/Feature/Groups/GroupOptionsTest.php",
+                            "test": "test_renaming_keeps_the_key_and_removing_never_reuses_it"
+                        },
+                        {
+                            "file": "tests/Feature/Groups/GroupOptionsTest.php",
+                            "test": "test_custom_fields_are_checked"
+                        }
+                    ]
+                },
+                {
                     "story": "As a Host, I can update my group via the API",
                     "persona": "Host",
                     "theme": "Create & manage groups",
@@ -2259,7 +2325,7 @@
                     ]
                 }
             ],
-            "storyCount": 48,
+            "storyCount": 49,
             "personas": [
                 "Admin",
                 "Guest",
@@ -2434,6 +2500,32 @@
                     ]
                 },
                 {
+                    "story": "As a NetworkCoordinator, I can choose which optional features my network's groups use, or set a default they can change",
+                    "persona": "NetworkCoordinator",
+                    "theme": "Network management",
+                    "method": "NetworkController::updateNetworkOptionsv2",
+                    "class": "App\\Http\\Controllers\\API\\NetworkController",
+                    "file": "app/Http/Controllers/API/NetworkController.php",
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Networks/NetworkOptionsTest.php",
+                            "test": "test_a_coordinator_sets_options_for_the_network_groups"
+                        },
+                        {
+                            "file": "tests/Feature/Networks/NetworkOptionsTest.php",
+                            "test": "test_null_clears_a_network_setting"
+                        },
+                        {
+                            "file": "tests/Feature/Networks/NetworkOptionsTest.php",
+                            "test": "test_unknown_features_and_values_are_rejected"
+                        },
+                        {
+                            "file": "tests/Feature/Networks/NetworkOptionsTest.php",
+                            "test": "test_only_admins_and_this_network_coordinators_change_options"
+                        }
+                    ]
+                },
+                {
                     "story": "As a NetworkCoordinator, I can edit a group tag belonging to my network via the API",
                     "persona": "NetworkCoordinator",
                     "theme": "Network tags",
@@ -2543,7 +2635,7 @@
                     ]
                 }
             ],
-            "storyCount": 22,
+            "storyCount": 23,
             "personas": [
                 "Admin",
                 "Guest",
@@ -3673,7 +3765,7 @@
                 "Events",
                 "Groups"
             ],
-            "storyCount": 33
+            "storyCount": 34
         },
         "NetworkCoordinator": {
             "features": [
@@ -3681,7 +3773,7 @@
                 "Groups",
                 "Networks"
             ],
-            "storyCount": 12
+            "storyCount": 13
         },
         "RepairDirectoryAdmin": {
             "features": [
@@ -3713,7 +3805,7 @@
         }
     },
     "coverage": {
-        "annotatedStories": 256,
-        "storiesWithTests": 107
+        "annotatedStories": 258,
+        "storiesWithTests": 109
     }
 }

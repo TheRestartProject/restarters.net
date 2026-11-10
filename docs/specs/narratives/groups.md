@@ -5,7 +5,7 @@ Repair groups are the organisational unit of Restarters. Each group represents a
 
 ## What Hosts can do
 
-Hosts manage their group's details, settings, and membership. They edit group information, upload images, send email invitations to join, manage volunteer roles (promoting members to Host or demoting them), and remove volunteers. Hosts can also update their group via the API.
+Hosts manage their group's details, settings, and membership. They edit group information, upload images, send email invitations to join, manage volunteer roles (promoting members to Host or demoting them), and remove volunteers. Hosts can also update their group via the API. In the group's Options they choose which optional features the group uses, such as a weight box for every item, and add item fields of their own, such as the town a visitor came from.
 
 ## What NetworkCoordinators can do
 
