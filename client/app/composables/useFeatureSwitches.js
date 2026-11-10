@@ -4,7 +4,10 @@ export const FEATURE_KEYS = ['item_weight', 'custom_fields']
 
 export const MAX_CUSTOM_FIELDS = 10
 
-// A custom field's label followed by a colon, unless it already ends in punctuation ("First visit?").
+// A custom field's label followed by a colon, unless it already ends in
+// punctuation ("First visit?", "Pourquoi ?", full-width "？" or "：").
 export function fieldLabel(label) {
-  return /[?!:.]$/.test(label) ? label : `${label}:`
+  const text = String(label ?? '').trim()
+  if (!text) return ''
+  return /[?!:.…？！：。]$/.test(text) ? text : `${text}:`
 }

@@ -9,8 +9,8 @@ use Illuminate\Support\Facades\DB;
 /**
  * The typical weight of a Misc item: the median of the weights entered for Misc items at events in the last
  * 12 months, worked out separately for powered and unpowered Misc. Misc is any category without a weight of its
- * own. It is cached for a day (an hour while there are no Misc weights yet), and held for up to an hour in a
- * long-running process once read.
+ * own. It is cached for a day (an hour while powered or unpowered Misc has no weights yet), and held for up to
+ * an hour in a long-running process once read.
  */
 class TypicalMiscWeights
 {
@@ -32,9 +32,9 @@ class TypicalMiscWeights
 
             if ($this->weights === null) {
                 $this->weights = $this->calculate();
-                // Until there are Misc weights to take a median of, check again soon.
-                $empty = ! array_filter($this->weights);
-                Cache::put(self::CACHE_KEY, $this->weights, $empty ? Carbon::now()->addHour() : Carbon::now()->addDay());
+                // Until there are Misc weights to take a median of, powered and unpowered, check again soon.
+                $missing = min($this->weights) <= 0;
+                Cache::put(self::CACHE_KEY, $this->weights, $missing ? Carbon::now()->addHour() : Carbon::now()->addDay());
             }
 
             $this->readAt = time();
@@ -60,7 +60,8 @@ class TypicalMiscWeights
             $weights = DB::table('devices')
                 ->join('categories', 'categories.idcategories', '=', 'devices.category')
                 ->join('events', 'events.idevents', '=', 'devices.event')
-                ->where('categories.weight', 0)
+                // Misc is a category without a weight of its own, to the gram, as in ItemImpact.
+                ->whereRaw('ROUND(categories.weight, 3) = 0')
                 ->where('categories.powered', $powered)
                 ->where('devices.estimate', '>', 0)
                 ->whereNull('events.deleted_at')

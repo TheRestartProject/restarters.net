@@ -107,6 +107,41 @@ describe('components/groups/GroupOptions', () => {
     expect(wrapper.find('[data-testid="group-custom-field-row-0"] input').element.value).toBe('Town')
   })
 
+  it('keeps unsaved edits when the group is refreshed', async () => {
+    const g = group({
+      features: { item_weight: feature(), custom_fields: feature({ group_setting: true, enabled: true }) },
+      custom_fields: [{ key: 'town', label: 'Town', type: 'text', options: [] }],
+    })
+    const wrapper = mountOptions(g)
+    await wrapper.find('[data-testid="group-custom-field-label-0"]').setValue('Home town')
+    await sel(wrapper, 'item_weight').setValue('off')
+
+    // The same group, fetched again (for example after the main group form is saved).
+    await wrapper.setProps({ group: JSON.parse(JSON.stringify(g)) })
+    await wrapper.vm.$nextTick()
+
+    expect(wrapper.find('[data-testid="group-custom-field-label-0"]').element.value).toBe('Home town')
+    expect(sel(wrapper, 'item_weight').element.value).toBe('off')
+  })
+
+  it('shows the group as saved after saving, even when what applies has changed', async () => {
+    const wrapper = mountOptions(group({ features: { item_weight: feature(), custom_fields: feature({ enabled: false, inherited: false }) } }))
+    store.updateOptions = vi.fn().mockImplementation(async () => {
+      // The store merges the response into the group: a network has since set item weights to always off.
+      await wrapper.setProps({
+        group: group({ features: { item_weight: feature({ enabled: false, source: 'network', locked: true, set_by: ['Strict'] }), custom_fields: feature({ enabled: false, inherited: false }) } }),
+      })
+    })
+    await sel(wrapper, 'item_weight').setValue('on')
+
+    await wrapper.find('[data-testid="group-options-form"]').trigger('submit')
+    await flushPromises()
+    await wrapper.vm.$nextTick()
+
+    expect(sel(wrapper, 'item_weight').element.value).toBe('off')
+    expect(sel(wrapper, 'item_weight').attributes('disabled')).toBeDefined()
+  })
+
   it('shows an error when saving fails', async () => {
     store.updateOptions = vi.fn().mockRejectedValue(new Error('422'))
     const wrapper = mountOptions()

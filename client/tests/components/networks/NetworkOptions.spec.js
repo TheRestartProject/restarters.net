@@ -6,6 +6,9 @@ import NetworkOptions from '../../../app/components/networks/NetworkOptions.vue'
 import { useNetworksStore } from '../../../app/stores/networks.js'
 import en from '../../../i18n/locales/en.json'
 import clientEn from '../../../i18n/locales/client-en.json'
+import clientFr from '../../../i18n/locales/client-fr.json'
+import clientFrBe from '../../../i18n/locales/client-fr-BE.json'
+import { FEATURE_KEYS } from '../../../app/composables/useFeatureSwitches.js'
 
 const NETWORK = {
   id: 1,
@@ -68,5 +71,14 @@ describe('components/networks/NetworkOptions', () => {
 
     expect(wrapper.find('[data-testid="network-options-error"]').exists()).toBe(true)
     expect(wrapper.find('[data-testid="network-options-saved"]').exists()).toBe(false)
+  })
+
+  it('has network help, written for networks, for every feature in every translated language', () => {
+    for (const messages of [clientEn, clientFr, clientFrBe]) {
+      for (const key of FEATURE_KEYS) {
+        expect(messages.client.features[`${key}_network_help`], key).toBeTruthy()
+        expect(messages.client.features[`${key}_network_help`]).not.toBe(messages.client.features[`${key}_help`])
+      }
+    }
   })
 })

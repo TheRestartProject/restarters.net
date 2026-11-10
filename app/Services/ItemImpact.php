@@ -60,16 +60,14 @@ class ItemImpact
     {
         $categoryWeight = self::kg($categoryWeight);
 
+        // The same floating-point arithmetic as the SQL in sqlCounts(), so the two agree at the edges.
         if ($categoryWeight > 0) {
-            return [
-                round($categoryWeight / self::LOWER_FACTOR, 6),
-                round($categoryWeight * self::UPPER_FACTOR, 6),
-            ];
+            return [$categoryWeight / self::LOWER_FACTOR, $categoryWeight * self::UPPER_FACTOR];
         }
 
         $typical = self::typicalMiscWeight($powered);
 
-        return [self::MISC_MIN, $typical > 0 ? round($typical * self::MISC_UPPER_FACTOR, 6) : null];
+        return [self::MISC_MIN, $typical > 0 ? $typical * self::MISC_UPPER_FACTOR : null];
     }
 
     public static function counts(?float $entered, float $categoryWeight, bool $powered): bool

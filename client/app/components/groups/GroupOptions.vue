@@ -1,5 +1,5 @@
 <script setup>
-import { computed, reactive, ref, watch } from 'vue'
+import { computed, nextTick, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useGroupsStore } from '../../stores/groups.js'
 import { FEATURE_KEYS, MAX_CUSTOM_FIELDS } from '../../composables/useFeatureSwitches.js'
@@ -70,13 +70,22 @@ function fieldRows() {
 }
 const rows = ref(fieldRows())
 
-// Show the group as it is now whenever it changes, for example after saving,
-// when a network may have changed what applies.
+// What the card showed when it last matched the group, to tell unsaved edits apart.
+const editState = () => JSON.stringify({ values, rows: rows.value })
+let syncedState = editState()
+
+function showGroup() {
+  Object.assign(values, selectValues())
+  rows.value = fieldRows()
+  syncedState = editState()
+}
+
+// When the group is fetched again (for example after the main group form is
+// saved), show it as it is now, unless the host has unsaved edits here.
 watch(
   () => [props.group.features, props.group.custom_fields],
   () => {
-    Object.assign(values, selectValues())
-    rows.value = fieldRows()
+    if (editState() === syncedState) showGroup()
   }
 )
 
@@ -118,6 +127,9 @@ async function save() {
 
   try {
     await groupsStore.updateOptions(props.group.id, payload)
+    // Show the group as saved: a network may have changed what applies.
+    await nextTick()
+    showGroup()
     saved.value = true
   } catch {
     failed.value = true
