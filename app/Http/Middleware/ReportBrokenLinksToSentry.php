@@ -111,7 +111,7 @@ class ReportBrokenLinksToSentry
     {
         $day = now()->format('Y-m-d');
 
-        if (! Cache::add("broken-link:$day:" . sha1("$host $shape"), true, now()->addDay())) {
+        if (! Cache::add("broken-link:$day:" . hash('sha256', "$host $shape"), true, now()->addDay())) {
             return;
         }
 

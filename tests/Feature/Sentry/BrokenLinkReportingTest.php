@@ -73,7 +73,7 @@ class BrokenLinkReportingTest extends TestCase
         $this->fetch('/global/js/app.js', 'https://example.com/')->assertNotFound();
 
         // Our hosts over http, which our https-only sites never send: a faked referrer.
-        $this->fetch('/global/js/app.js', 'http://restarters.net/')->assertNotFound();
+        $this->fetch('/global/js/app.js', 'http://restarters.net/')->assertNotFound(); // NOSONAR: an http referrer is the case under test
 
         // A look-alike host.
         $this->fetch('/global/js/app.js', 'https://notrestarters.net/')->assertNotFound();
