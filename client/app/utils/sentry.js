@@ -10,11 +10,12 @@ export const IGNORE_ERRORS = [
   'originalCreateNotification',
   'canvas.contentDocument',
   'MyApp_RemoveAllHighlights',
-  'http://tt.epicplay.com',
+  // Sentry matches these as substrings, so the host alone catches the same errors.
+  'tt.epicplay.com',
   "Can't find variable: ZiteReader",
   'jigsaw is not defined',
   'ComboSearch is not defined',
-  'http://loading.retry.widdit.com/',
+  'loading.retry.widdit.com/',
   'atomicFindClose',
   'fb_xd_fragment',
   'bmi_SafeAddOnload',
@@ -45,9 +46,14 @@ function isOurs(host, currentHost) {
 
 // Generalise a path so that each broken link is one Sentry issue however many
 // ids or builds it covers.  Matches app/Http/Middleware/ReportBrokenLinksToSentry.php.
+// The path without its query string or fragment.
+function withoutQuery(path) {
+  const end = path.search(/[?#]/)
+  return end === -1 ? path : path.slice(0, end)
+}
+
 export function pathShape(path) {
-  return path
-    .replace(/[?#].*$/, '')
+  return withoutQuery(path)
     .replace(/-[A-Za-z0-9_]{6,}\.(js|css)$/, '-HASH.$1')
     .replace(/\/[A-Za-z0-9_-]{16,}(\.\w+)?$/, '/HASH$1')
     .replace(/\d+/g, 'N')
@@ -73,7 +79,7 @@ export function brokenLink({ path, previousPath, referrer, location }) {
 
   // All our sites are https only, so only a faked referrer is http.
   if (from.protocol !== 'https:' || !isOurs(from.hostname, location.hostname)) return null
-  if (from.host === location.host && from.pathname === path.replace(/[?#].*$/, '')) return null
+  if (from.host === location.host && from.pathname === withoutQuery(path)) return null
 
   return [from.hostname, pathShape(path)]
 }
