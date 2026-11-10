@@ -24,6 +24,9 @@ class ItemImpact
     public const MISC_UPPER_FACTOR = 20;
     public const MISC_MIN = 0.001;
 
+    // Decimal places of the numbers written into SQL.
+    private const SQL_DECIMALS = 8;
+
     // Stands in for "no upper limit" in SQL.
     private const NO_LIMIT = 1000000;
 
@@ -67,7 +70,8 @@ class ItemImpact
 
         $typical = self::typicalMiscWeight($powered);
 
-        return [self::MISC_MIN, $typical > 0 ? $typical * self::MISC_UPPER_FACTOR : null];
+        // The Misc cap goes into the SQL as a decimal number (see number()), so PHP uses it rounded the same way.
+        return [self::MISC_MIN, $typical > 0 ? round($typical * self::MISC_UPPER_FACTOR, self::SQL_DECIMALS) : null];
     }
 
     public static function counts(?float $entered, float $categoryWeight, bool $powered): bool
@@ -167,6 +171,6 @@ class ItemImpact
 
     private static function number(float $value): string
     {
-        return sprintf('%.8F', $value);
+        return sprintf('%.' . self::SQL_DECIMALS . 'F', $value);
     }
 }

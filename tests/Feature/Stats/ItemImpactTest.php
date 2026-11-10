@@ -205,4 +205,14 @@ class ItemImpactTest extends StatsTestCase
 
         $this->assertEquals(4, (new TypicalMiscWeights())->calculate()['powered']);
     }
+    public function test_php_and_sql_agree_at_the_misc_cap(): void
+    {
+        // 0.1235 x 20 is 2.4699999999999998 in floating point; the cap is 2.47 in PHP and in SQL alike.
+        $this->_setTypicalMiscWeights(0.1235, 0.75);
+        $event = Party::factory()->create();
+        $device = Device::factory()->fixed()->create(['event' => $event->idevents, 'category' => $this->_idPoweredMisc, 'category_creation' => $this->_idPoweredMisc, 'estimate' => 2.47]);
+
+        $this->assertEquals(2.47, $device->eWasteDiverted());
+        $this->assertEqualsWithDelta(2.47, LcaStats::getWasteStats()[0]->powered_waste, 0.00001);
+    }
 }

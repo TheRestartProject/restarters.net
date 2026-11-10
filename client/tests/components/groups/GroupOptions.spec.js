@@ -142,6 +142,21 @@ describe('components/groups/GroupOptions', () => {
     expect(sel(wrapper, 'item_weight').attributes('disabled')).toBeDefined()
   })
 
+  it('shows what was saved, from the response, even if the group passed in is not refreshed', async () => {
+    const wrapper = mountOptions(group({ features: { item_weight: feature(), custom_fields: feature({ group_setting: true, enabled: true }) } }))
+    store.updateOptions = vi.fn().mockResolvedValue({
+      features: { item_weight: feature({ group_setting: false, enabled: false, source: 'group' }), custom_fields: feature({ group_setting: true, enabled: true }) },
+      custom_fields: [{ key: 'town', label: 'Town', type: 'text', options: [] }],
+    })
+    await sel(wrapper, 'item_weight').setValue('off')
+
+    await wrapper.find('[data-testid="group-options-form"]').trigger('submit')
+    await flushPromises()
+
+    expect(sel(wrapper, 'item_weight').element.value).toBe('off')
+    expect(wrapper.find('[data-testid="group-custom-field-label-0"]').element.value).toBe('Town')
+  })
+
   it('shows an error when saving fails', async () => {
     store.updateOptions = vi.fn().mockRejectedValue(new Error('422'))
     const wrapper = mountOptions()

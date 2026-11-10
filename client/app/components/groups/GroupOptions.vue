@@ -29,10 +29,10 @@ function settingToValue(setting) {
 
 // What each select shows: the group's own setting, or, when a network has
 // locked it, what the network has decided.
-function selectValues() {
+function selectValues(source = props.group) {
   return Object.fromEntries(
     FEATURE_KEYS.map((k) => {
-      const f = features.value[k] || {}
+      const f = (source.features || {})[k] || {}
       return [k, f.locked ? (f.enabled ? 'on' : 'off') : settingToValue(f.group_setting ?? null)]
     })
   )
@@ -60,8 +60,8 @@ const customFieldsEnabled = computed(() => {
   return !!features.value.custom_fields?.inherited
 })
 
-function fieldRows() {
-  return (props.group.custom_fields || []).map((f) => ({
+function fieldRows(source = props.group) {
+  return (source.custom_fields || []).map((f) => ({
     key: f.key,
     label: f.label,
     type: f.type,
@@ -74,9 +74,9 @@ const rows = ref(fieldRows())
 const editState = () => JSON.stringify({ values, rows: rows.value })
 let syncedState = editState()
 
-function showGroup() {
-  Object.assign(values, selectValues())
-  rows.value = fieldRows()
+function showGroup(source = props.group) {
+  Object.assign(values, selectValues(source))
+  rows.value = fieldRows(source)
   syncedState = editState()
 }
 
@@ -126,10 +126,10 @@ async function save() {
   if (customFieldsEnabled.value) payload.custom_fields = fieldsPayload()
 
   try {
-    await groupsStore.updateOptions(props.group.id, payload)
-    // Show the group as saved: a network may have changed what applies.
+    const savedGroup = await groupsStore.updateOptions(props.group.id, payload)
+    // Show the group as saved, from the response: a network may have changed what applies.
     await nextTick()
-    showGroup()
+    showGroup(savedGroup?.features ? savedGroup : props.group)
     saved.value = true
   } catch {
     failed.value = true
