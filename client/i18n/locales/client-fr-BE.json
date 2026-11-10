@@ -87,6 +87,7 @@
       "weight_warning_low": "Cela ne comptera pas dans les chiffres d'impact : c'est moins d'un centième du poids habituel pour {category} ({typical} kg). Les poids sont en kg.",
       "weight_did_you_mean": "Vouliez-vous dire {value} kg ?",
       "weight_invalid": "Saisissez le poids sous forme de nombre, en kg.",
+      "weight_too_heavy": "Les poids sont en kg et ne peuvent pas dépasser 999,999 kg.",
       "custom_fields_heading": "Détails supplémentaires"
     },
     "events": {

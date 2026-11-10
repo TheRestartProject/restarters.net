@@ -940,6 +940,10 @@ class NetworkController extends Controller
 
         $request->validate([
             'features' => ['required', 'array', function ($attribute, $value, $fail) {
+                if (! is_array($value)) {
+                    return; // The array rule reports it.
+                }
+
                 foreach ($value as $key => $setting) {
                     if (! array_key_exists($key, GroupFeatures::FEATURES)) {
                         $fail("There is no feature called $key.");

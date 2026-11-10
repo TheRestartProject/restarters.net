@@ -212,6 +212,8 @@ function parseWeight(raw) {
 }
 const enteredWeight = computed(() => parseWeight(form.estimate))
 const weightInvalid = ref(false)
+// The most the database can store (devices.estimate is DECIMAL(6,3)).
+const MAX_STORABLE_WEIGHT = 999.999
 
 function formatKg(n) {
   return String(parseFloat(Number(n).toFixed(3)))
@@ -233,6 +235,23 @@ const weightHint = computed(() => {
     : ''
 })
 
+// Grams typed as kilograms: a weight whose thousandth is within 3 times the
+// usual weight (the same test used to spot them in live data).
+function gramsSuggestion(v) {
+  const grams = v / 1000
+  const typicalKg = typicalWeight.value
+  if (!typicalKg || grams < typicalKg / 3 || grams > typicalKg * 3) return ''
+  return ` ${t('client.devices.weight_did_you_mean', { value: formatKg(grams) })}`
+}
+
+// A weight the database can't store blocks saving; it is shown as soon as it is typed.
+const weightTooHeavy = computed(() => {
+  const v = enteredWeight.value
+  if (!showWeight.value || v === null || Number.isNaN(v) || v <= MAX_STORABLE_WEIGHT) return ''
+  return t('client.devices.weight_too_heavy') + gramsSuggestion(v)
+})
+const weightError = computed(() => (weightInvalid.value ? t('client.devices.weight_invalid') : weightTooHeavy.value))
+
 // A weight outside the category's range will not count towards impact figures.
 // It is a warning only: the item can still be saved.
 const weightWarning = computed(() => {
@@ -252,14 +271,10 @@ const weightWarning = computed(() => {
   } else if (!isMisc.value && min !== null && v < min) {
     message = t('client.devices.weight_warning_low', { category: categoryName.value, typical })
   }
-  if (!message) return ''
+  if (!message || v > MAX_STORABLE_WEIGHT) return ''
 
-  // Grams typed as kilograms: a high weight whose thousandth is within 3 times
-  // the usual weight (the same test used to spot them in live data).
-  const grams = v / 1000
-  const typicalKg = typicalWeight.value
-  if (max !== null && v > max && grams >= typicalKg / 3 && grams <= typicalKg * 3) {
-    message += ` ${t('client.devices.weight_did_you_mean', { value: formatKg(grams) })}`
+  if (max !== null && v > max) {
+    message += gramsSuggestion(v)
   }
   return message
 })
@@ -487,7 +502,7 @@ async function submit() {
   missingCategory.value = false
 
   weightInvalid.value = showWeight.value && Number.isNaN(enteredWeight.value)
-  if (weightInvalid.value) return
+  if (weightInvalid.value || weightTooHeavy.value) return
 
   submitting.value = true
 
@@ -760,12 +775,12 @@ const SHOW_DEVICE_REFERENCE = false
             type="text"
             inputmode="decimal"
             class="form-control"
-            :class="{ 'is-invalid': weightInvalid }"
+            :class="{ 'is-invalid': weightError }"
             :disabled="readonly"
             data-testid="device-form-weight"
           >
-          <small v-if="weightInvalid" class="form-text text-danger" data-testid="device-form-weight-error">
-            {{ t('client.devices.weight_invalid') }}
+          <small v-if="weightError" class="form-text text-danger d-block" data-testid="device-form-weight-error">
+            {{ weightError }}
           </small>
           <small v-if="weightHint" class="form-text text-muted d-block" data-testid="device-form-weight-hint">
             {{ weightHint }}

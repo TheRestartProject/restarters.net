@@ -88,6 +88,25 @@ describe('components/groups/GroupOptions', () => {
     expect(wrapper.find('[data-testid="group-options-saved"]').exists()).toBe(true)
   })
 
+  it('shows the group as it is now when the group changes, as it does after saving', async () => {
+    const wrapper = mountOptions(group({ features: { item_weight: feature({ group_setting: true }), custom_fields: feature({ group_setting: true, enabled: true }) } }))
+
+    await wrapper.setProps({
+      group: group({
+        features: {
+          item_weight: feature({ enabled: false, source: 'network', locked: true, set_by: ['Strict'] }),
+          custom_fields: feature({ group_setting: true, enabled: true }),
+        },
+        custom_fields: [{ key: 'town', label: 'Town', type: 'text', options: [] }],
+      }),
+    })
+    await wrapper.vm.$nextTick()
+
+    expect(sel(wrapper, 'item_weight').element.value).toBe('off')
+    expect(sel(wrapper, 'item_weight').attributes('disabled')).toBeDefined()
+    expect(wrapper.find('[data-testid="group-custom-field-row-0"] input').element.value).toBe('Town')
+  })
+
   it('shows an error when saving fails', async () => {
     store.updateOptions = vi.fn().mockRejectedValue(new Error('422'))
     const wrapper = mountOptions()

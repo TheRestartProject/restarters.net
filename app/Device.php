@@ -280,7 +280,7 @@ class Device extends Model implements Auditable
     /**
      * The category, cached briefly because exports call this for every item.
      */
-    private function impactCategory(): Category
+    private function impactCategory(): ?Category
     {
         if (self::isCircleCI()) {
             return $this->deviceCategory;
@@ -301,9 +301,9 @@ class Device extends Model implements Auditable
      */
     public function eCo2Diverted($emissionRatio, $displacementFactor)
     {
-        $category = $this->impactCategory();
+        $category = $this->isFixed() ? $this->impactCategory() : null;
 
-        if (! $this->isFixed() || ! $category->powered) {
+        if (! $category || ! $category->powered) {
             return 0;
         }
 
@@ -315,9 +315,9 @@ class Device extends Model implements Auditable
      */
     public function uCo2Diverted($emissionRatio, $displacementFactor)
     {
-        $category = $this->impactCategory();
+        $category = $this->isFixed() ? $this->impactCategory() : null;
 
-        if (! $this->isFixed() || $category->powered) {
+        if (! $category || $category->powered) {
             return 0;
         }
 
@@ -329,9 +329,9 @@ class Device extends Model implements Auditable
      */
     public function eWasteDiverted()
     {
-        $category = $this->impactCategory();
+        $category = $this->isFixed() ? $this->impactCategory() : null;
 
-        if (! $this->isFixed() || ! $category->powered) {
+        if (! $category || ! $category->powered) {
             return 0;
         }
 
@@ -343,9 +343,9 @@ class Device extends Model implements Auditable
      */
     public function uWasteDiverted()
     {
-        $category = $this->impactCategory();
+        $category = $this->isFixed() ? $this->impactCategory() : null;
 
-        if (! $this->isFixed() || $category->powered) {
+        if (! $category || $category->powered) {
             return 0;
         }
 

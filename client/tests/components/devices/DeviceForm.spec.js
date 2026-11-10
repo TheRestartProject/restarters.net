@@ -786,13 +786,23 @@ describe('components/devices/DeviceForm', () => {
     it('suggests grams were meant when a thousandth is close to the usual weight', async () => {
       const wrapper = mountForm({ powered: true, groupFeatures: ON })
       await chooseOption(wrapper, 'device-form-category', '10')
-      await weight(wrapper).setValue('1500')
-      expect(warning(wrapper).text()).toContain('Did you mean 1.5 kg?')
+      await weight(wrapper).setValue('900')
+      expect(warning(wrapper).text()).toContain('Did you mean 0.9 kg?')
       // Within 3 times the usual weight either way, the same test used to spot grams typed as kg on live.
-      await weight(wrapper).setValue('3840')
-      expect(warning(wrapper).text()).toContain('Did you mean 3.84 kg?')
-      await weight(wrapper).setValue('3900')
+      await weight(wrapper).setValue('430')
+      expect(warning(wrapper).text()).toContain('Did you mean 0.43 kg?')
+      await weight(wrapper).setValue('420')
       expect(warning(wrapper).text()).not.toContain('Did you mean')
+    })
+
+    it('does not save a weight over 999.999 kg, the most that can be stored, and suggests kilograms', async () => {
+      const wrapper = mountForm({ powered: true, groupFeatures: ON })
+      await chooseOption(wrapper, 'device-form-category', '10')
+      await weight(wrapper).setValue('1500')
+      await wrapper.find('[data-testid="device-form"]').trigger('submit')
+      const error = wrapper.find('[data-testid="device-form-weight-error"]')
+      expect(error.text()).toBe("Weights are in kg and can't be more than 999.999 kg. Did you mean 1.5 kg?")
+      expect(store.addDevice).not.toHaveBeenCalled()
     })
 
     it('warns about a weight under a hundredth of the usual', async () => {

@@ -140,4 +140,41 @@ class ItemImpactTest extends StatsTestCase
         $this->assertEqualsWithDelta($php['waste'], $stats['waste_total'], 0.001);
         $this->assertEqualsWithDelta($php['co2'], $stats['co2_total'], 0.001);
     }
+    public function test_php_and_sql_agree_at_the_band_edge_for_a_category_weight_stored_as_a_float(): void
+    {
+        $this->_setTypicalMiscWeights(2, 0.75);
+        \App\Category::factory()->create(['idcategories' => 10, 'revision' => 1, 'name' => 'Coffee maker', 'powered' => 1, 'weight' => 1.28, 'footprint' => 17.5]);
+        $event = Party::factory()->create();
+        $device = Device::factory()->fixed()->create(['event' => $event->idevents, 'category' => 10, 'category_creation' => 10, 'estimate' => 12.8]);
+
+        // 12.8 kg is exactly 10 times 1.28 kg, so it counts, in PHP and in SQL alike.
+        $this->assertEquals(12.8, $device->eWasteDiverted());
+        $this->assertEqualsWithDelta(12.8, LcaStats::getWasteStats()[0]->powered_waste, 0.0001);
+    }
+
+    public function test_an_item_without_a_category_prevents_nothing(): void
+    {
+        $device = new Device(['category' => 99999, 'repair_status' => Device::REPAIR_STATUS_FIXED]);
+
+        $this->assertEquals(0, $device->eWasteDiverted());
+        $this->assertEquals(0, $device->uWasteDiverted());
+        $this->assertEquals(0, $device->eCo2Diverted(1, 0.5));
+        $this->assertEquals(0, $device->uCo2Diverted(1, 0.5));
+    }
+
+    public function test_no_typical_misc_weight_yet_is_only_held_for_an_hour(): void
+    {
+        $typical = new TypicalMiscWeights();
+        $this->assertEquals(0, $typical->get(true));
+
+        // A Misc weight is entered; within the hour the cached 0 still applies, after it the median does.
+        $event = Party::factory()->create(['event_start_utc' => \Carbon\Carbon::now()->subDay()->toIso8601String(), 'event_end_utc' => \Carbon\Carbon::now()->subDay()->addHour()->toIso8601String()]);
+        Device::factory()->create(['event' => $event->idevents, 'category' => $this->_idPoweredMisc, 'category_creation' => $this->_idPoweredMisc, 'estimate' => 3]);
+
+        \Carbon\Carbon::setTestNow(\Carbon\Carbon::now()->addMinutes(30));
+        $this->assertEquals(0, (new TypicalMiscWeights())->get(true));
+        \Carbon\Carbon::setTestNow(\Carbon\Carbon::now()->addMinutes(31));
+        $this->assertEquals(3, (new TypicalMiscWeights())->get(true));
+        \Carbon\Carbon::setTestNow();
+    }
 }

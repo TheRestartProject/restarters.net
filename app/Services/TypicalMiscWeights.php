@@ -9,7 +9,8 @@ use Illuminate\Support\Facades\DB;
 /**
  * The typical weight of a Misc item: the median of the weights entered for Misc items at events in the last
  * 12 months, worked out separately for powered and unpowered Misc. Misc is any category without a weight of its
- * own. It is cached for a day, and held for the rest of the request once read.
+ * own. It is cached for a day (an hour while there are no Misc weights yet), and held for up to an hour in a
+ * long-running process once read.
  */
 class TypicalMiscWeights
 {
@@ -27,7 +28,15 @@ class TypicalMiscWeights
     public function get(bool $powered): float
     {
         if ($this->weights === null || time() - $this->readAt > self::HOLD_SECONDS) {
-            $this->weights = Cache::remember(self::CACHE_KEY, Carbon::now()->addDay(), fn () => $this->calculate());
+            $this->weights = Cache::get(self::CACHE_KEY);
+
+            if ($this->weights === null) {
+                $this->weights = $this->calculate();
+                // Until there are Misc weights to take a median of, check again soon.
+                $empty = ! array_filter($this->weights);
+                Cache::put(self::CACHE_KEY, $this->weights, $empty ? Carbon::now()->addHour() : Carbon::now()->addDay());
+            }
+
             $this->readAt = time();
         }
 

@@ -37,7 +37,18 @@ class ItemImpact
      */
     public static function typicalWeight(float $categoryWeight, bool $powered): float
     {
+        $categoryWeight = self::kg($categoryWeight);
+
         return $categoryWeight > 0 ? $categoryWeight : self::typicalMiscWeight($powered);
+    }
+
+    /**
+     * Category weights are stored as FLOAT, so 1.28 reads back as 1.2799999713897705. They are used to the gram,
+     * as SQL does with ROUND(c.weight, 3), so PHP and SQL agree at the edges of the band.
+     */
+    private static function kg(float $weight): float
+    {
+        return round($weight, 3);
     }
 
     /**
@@ -47,6 +58,8 @@ class ItemImpact
      */
     public static function countedRange(float $categoryWeight, bool $powered): array
     {
+        $categoryWeight = self::kg($categoryWeight);
+
         if ($categoryWeight > 0) {
             return [
                 round($categoryWeight / self::LOWER_FACTOR, 6),
@@ -88,6 +101,7 @@ class ItemImpact
     public static function co2(?float $entered, float $categoryWeight, float $footprint, bool $powered, ?float $generalRatio = null): float
     {
         $generalRatio ??= self::generalRatio($powered);
+        $categoryWeight = self::kg($categoryWeight);
         $ratio = $categoryWeight > 0 ? $footprint / $categoryWeight : $generalRatio;
 
         if (self::counts($entered, $categoryWeight, $powered)) {
@@ -117,8 +131,10 @@ class ItemImpact
         $general = self::sqlGeneralRatio($c);
         $typicalMisc = self::sqlTypicalMiscWeight($c);
 
-        return "(CASE WHEN $counts THEN $d.estimate * (CASE WHEN $c.weight > 0 THEN $c.footprint / $c.weight ELSE $general END)"
-            . " ELSE (CASE WHEN $c.weight > 0 THEN $c.footprint ELSE $typicalMisc * $general END) END)";
+        $weight = "ROUND($c.weight, 3)";
+
+        return "(CASE WHEN $counts THEN $d.estimate * (CASE WHEN $weight > 0 THEN $c.footprint / $weight ELSE $general END)"
+            . " ELSE (CASE WHEN $weight > 0 THEN $c.footprint ELSE $typicalMisc * $general END) END)";
     }
 
     private static function sqlCounts(string $d, string $c): string
@@ -127,14 +143,16 @@ class ItemImpact
         $upper = self::UPPER_FACTOR;
         $cap = fn (bool $powered) => self::number(self::countedRange(0, $powered)[1] ?? self::NO_LIMIT);
 
-        return "($d.estimate > 0 AND (CASE WHEN $c.weight > 0"
-            . " THEN $d.estimate BETWEEN $c.weight / $lower AND $c.weight * $upper"
+        $weight = "ROUND($c.weight, 3)";
+
+        return "($d.estimate > 0 AND (CASE WHEN $weight > 0"
+            . " THEN $d.estimate BETWEEN $weight / $lower AND $weight * $upper"
             . " ELSE $d.estimate <= (CASE WHEN $c.powered = 1 THEN {$cap(true)} ELSE {$cap(false)} END) END))";
     }
 
     private static function sqlTypicalWeight(string $c): string
     {
-        return "(CASE WHEN $c.weight > 0 THEN $c.weight ELSE " . self::sqlTypicalMiscWeight($c) . ' END)';
+        return "(CASE WHEN ROUND($c.weight, 3) > 0 THEN ROUND($c.weight, 3) ELSE " . self::sqlTypicalMiscWeight($c) . ' END)';
     }
 
     private static function sqlTypicalMiscWeight(string $c): string

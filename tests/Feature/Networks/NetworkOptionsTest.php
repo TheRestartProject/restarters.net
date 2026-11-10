@@ -69,6 +69,7 @@ class NetworkOptionsTest extends TestCase
         $this->actingAs(User::factory()->administrator()->create());
 
         $this->patchOptions(['features' => ['photos' => 'on']])->assertStatus(422);
+        $this->patchOptions(['features' => 'abc'])->assertStatus(422);
         $this->patchOptions(['features' => ['item_weight' => true]])->assertStatus(422);
         $this->patchOptions(['features' => ['item_weight' => 'maybe']])->assertStatus(422);
     }

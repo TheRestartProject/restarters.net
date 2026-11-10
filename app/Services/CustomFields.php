@@ -61,15 +61,17 @@ class CustomFields
     public static function update(?array $stored, array $sent): array
     {
         $stored = $stored ?? [];
-        $storedKeys = array_column($stored, 'key');
-        $taken = $storedKeys;
+        // Only a field in use keeps its key. A removed field's key is never reused, so its old values (perhaps
+        // of another type) stay hidden.
+        $activeKeys = array_column(array_filter($stored, fn ($field) => empty($field['removed'])), 'key');
+        $taken = array_column($stored, 'key');
         $kept = [];
         $result = [];
 
         foreach ($sent as $field) {
             $key = $field['key'] ?? null;
 
-            if (! $key || ! in_array($key, $storedKeys, true) || in_array($key, $kept, true)) {
+            if (! $key || ! in_array($key, $activeKeys, true) || in_array($key, $kept, true)) {
                 $key = self::newKey($field['label'], $taken);
                 $taken[] = $key;
             }
@@ -86,7 +88,7 @@ class CustomFields
 
         foreach ($stored as $field) {
             if (! in_array($field['key'], $kept, true)) {
-                $result[] = ['removed' => true] + $field;
+                $result[] = array_merge($field, ['removed' => true]);
             }
         }
 

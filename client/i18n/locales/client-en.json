@@ -87,6 +87,7 @@
       "weight_warning_low": "This won't count towards impact figures: it's less than a hundredth of the usual {category} weight ({typical} kg). Weights are in kg.",
       "weight_did_you_mean": "Did you mean {value} kg?",
       "weight_invalid": "Enter the weight as a number, in kg.",
+      "weight_too_heavy": "Weights are in kg and can't be more than 999.999 kg.",
       "custom_fields_heading": "Extra details"
     },
     "events": {

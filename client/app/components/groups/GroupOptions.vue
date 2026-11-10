@@ -1,5 +1,5 @@
 <script setup>
-import { computed, reactive, ref } from 'vue'
+import { computed, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useGroupsStore } from '../../stores/groups.js'
 import { FEATURE_KEYS, MAX_CUSTOM_FIELDS } from '../../composables/useFeatureSwitches.js'
@@ -29,14 +29,15 @@ function settingToValue(setting) {
 
 // What each select shows: the group's own setting, or, when a network has
 // locked it, what the network has decided.
-const values = reactive(
-  Object.fromEntries(
+function selectValues() {
+  return Object.fromEntries(
     FEATURE_KEYS.map((k) => {
       const f = features.value[k] || {}
       return [k, f.locked ? (f.enabled ? 'on' : 'off') : settingToValue(f.group_setting ?? null)]
     })
   )
-)
+}
+const values = reactive(selectValues())
 
 function isLocked(key) {
   return !!features.value[key]?.locked
@@ -59,13 +60,24 @@ const customFieldsEnabled = computed(() => {
   return !!features.value.custom_fields?.inherited
 })
 
-const rows = ref(
-  (props.group.custom_fields || []).map((f) => ({
+function fieldRows() {
+  return (props.group.custom_fields || []).map((f) => ({
     key: f.key,
     label: f.label,
     type: f.type,
     optionsText: (f.options || []).join('\n'),
   }))
+}
+const rows = ref(fieldRows())
+
+// Show the group as it is now whenever it changes, for example after saving,
+// when a network may have changed what applies.
+watch(
+  () => [props.group.features, props.group.custom_fields],
+  () => {
+    Object.assign(values, selectValues())
+    rows.value = fieldRows()
+  }
 )
 
 function addField() {
@@ -121,8 +133,10 @@ async function save() {
 
     <div v-for="key in FEATURE_KEYS" :key="key" class="mb-3">
       <label class="form-label" :for="`group-option-${key}`">{{ t(`client.features.${key}`) }}</label>
+      <!-- Keyed on the lock, so the select is rebuilt (with the right options) when a network starts or stops deciding. -->
       <select
         :id="`group-option-${key}`"
+        :key="`${key}-${isLocked(key)}`"
         v-model="values[key]"
         class="form-select"
         :disabled="isLocked(key)"

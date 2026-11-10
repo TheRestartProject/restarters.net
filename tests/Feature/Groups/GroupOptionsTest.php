@@ -66,6 +66,7 @@ class GroupOptionsTest extends TestCase
         $this->actingAs($this->host);
 
         $this->patchOptions(['features' => ['photos' => true]])->assertStatus(422);
+        $this->patchOptions(['features' => 'abc'])->assertStatus(422);
         $this->patchOptions(['features' => ['item_weight' => 'sometimes']])->assertStatus(422);
     }
 
@@ -122,8 +123,16 @@ class GroupOptionsTest extends TestCase
         ]]);
         $this->assertEquals('smell_2', $response->json('data.custom_fields.1.key'));
 
+        // Sending a removed field's key again does not bring it back: it is a new field with a new key.
+        $response = $this->patchOptions(['custom_fields' => [
+            ['key' => 'town', 'label' => 'Home town', 'type' => 'text'],
+            ['key' => 'smell_2', 'label' => 'Smell', 'type' => 'text'],
+            ['key' => 'smell', 'label' => 'Odour', 'type' => 'number'],
+        ]]);
+        $this->assertEquals(['town', 'smell_2', 'odour'], array_column($response->json('data.custom_fields'), 'key'));
+
         // The group resource shows the active fields only.
-        $this->assertEquals(['town', 'smell_2'], array_column($this->getJson("/api/v2/groups/{$this->group->idgroups}")->json('data.custom_fields'), 'key'));
+        $this->assertEquals(['town', 'smell_2', 'odour'], array_column($this->getJson("/api/v2/groups/{$this->group->idgroups}")->json('data.custom_fields'), 'key'));
     }
 
     /** @story:App\Http\Controllers\API\GroupController::updateGroupOptionsv2 */
