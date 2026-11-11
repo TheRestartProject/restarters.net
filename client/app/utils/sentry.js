@@ -23,6 +23,23 @@ export const IGNORE_ERRORS = [
   'conduitPage',
 ]
 
+// Errors thrown by code that isn't in any script file - code that the browser or
+// an app (the Google app on iOS does this) has put into the page - are reported
+// with the page itself as the file, at lines that hold markup.  There is nothing
+// of ours to fix in them.
+export function thrownByAScript(event) {
+  const frames = (event?.exception?.values || []).flatMap((v) => v.stacktrace?.frames || [])
+
+  return !frames.length || frames.some((f) => /\.[cm]?js$/.test((f.filename || '').split(/[?#]/)[0]))
+}
+
+// A request that got no response at all: the visitor's connection dropped, or
+// they left the page while it was in flight.  The server's own failures come
+// back with a status, and the server reports them.
+export function unanswered(error) {
+  return error?.name === 'APIError' && (error.status === null || error.status === undefined)
+}
+
 // Sentry options, or null when this deployment shouldn't report.  Only deployed
 // apps set an environment, so local development, CI and tests never report.
 // hasConsent is called for each event: as on the old frontend, only visitors who
@@ -34,7 +51,8 @@ export function sentryOptions({ sentryDsn, sentryEnvironment } = {}, hasConsent 
     dsn: sentryDsn,
     environment: sentryEnvironment,
     ignoreErrors: IGNORE_ERRORS,
-    beforeSend: (event) => (hasConsent() ? event : null),
+    beforeSend: (event, hint) =>
+      hasConsent() && thrownByAScript(event) && !unanswered(hint?.originalException) ? event : null,
   }
 }
 
