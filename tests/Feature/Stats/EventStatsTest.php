@@ -186,6 +186,21 @@ class EventStatsTest extends StatsTestCase
 
     /**
      * @test
+     * @story:PartyController::stats
+     */
+    public function event_stats_widget_for_a_deleted_event_is_not_found(): void {
+        // Sites keep embedding the widget after the event has gone.
+        $this->withExceptionHandling();
+        $this->loginAsTestUser(Role::ADMINISTRATOR);
+        $idevents = $this->createEvent($this->createGroup(), 'yesterday');
+        Party::findOrFail($idevents)->delete();
+
+        $this->get('/party/stats/'.$idevents.'/wide')->assertNotFound();
+        $this->get('/party/stats/99999999/wide')->assertNotFound();
+    }
+
+    /**
+     * @test
      * @story:PartyController::view
      * @story:GroupController::view
      */

@@ -8,10 +8,10 @@ use Illuminate\Auth\Events\Login;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Addwiki\Mediawiki\Api\Client\Action\ActionApi;
+use Addwiki\Mediawiki\Api\Client\Action\Exception\UsageException;
 use Addwiki\Mediawiki\Api\Client\Auth\UserAndPassword;
-use Addwiki\Mediawiki\Api\Client\MediaWiki;
-use Addwiki\Mediawiki\Api\Guzzle\ClientFactory;
 use Addwiki\Mediawiki\Api\Service\UserCreator;
+use App\Services\WikiHttpClient;
 use GuzzleHttp\Cookie\CookieJar;
 
 // Don't extend BaseEvent - we don't want to queue because this needs to happen before we return to the client.
@@ -60,7 +60,7 @@ class LogInToWiki
             }
         } catch (\Exception $ex) {
             // Log the error but don't let it break the user's login
-            Log::error("Wiki login failed but user login will continue: " . $ex->getMessage());
+            Log::error('Wiki login failed but user login will continue', ['error' => $ex->getMessage()]);
         }
     }
 
@@ -68,7 +68,7 @@ class LogInToWiki
     {
         try {
             if (!$this->wikiUserCreator) {
-                Log::error("Wiki UserCreator not available - cannot create user '".$user->username."' in mediawiki");
+                Log::error('Wiki UserCreator not available - cannot create the user in mediawiki', ['user' => $user->id]);
                 return;
             }
 
@@ -80,7 +80,7 @@ class LogInToWiki
             $user->mediawiki = $mediawikiUsername;
             $user->save();
         } catch (\Throwable $ex) {
-            Log::error("Failed to create new account for user '".$user->username."' in mediawiki: ".$ex->getMessage());
+            Log::error('Failed to create a new account in mediawiki', ['user' => $user->id, 'username' => $user->username, 'error' => $ex->getMessage()]);
         }
     }
 
@@ -88,10 +88,10 @@ class LogInToWiki
     {
         try {
             Log::info("Log in to wiki $user->mediawiki");
+
             $cookieJar = new CookieJar();
-            $guzzleClient = (new ClientFactory(['cookies' => $cookieJar, 'timeout' => 10, 'connect_timeout' => 5]))->getClient();
             $auth = new UserAndPassword($user->mediawiki, $user->password);
-            $api = new ActionApi(env('WIKI_URL').'/api.php', $auth, $guzzleClient);
+            $api = new ActionApi(env('WIKI_URL').'/api.php', $auth, WikiHttpClient::make($cookieJar));
             $api->getToken('csrf');
             Log::info("Logged in to wiki $user->mediawiki");
 
@@ -103,7 +103,43 @@ class LogInToWiki
                 }
             }
         } catch (\Throwable $ex) {
-            Log::error("Failed to log user '".$user->mediawiki."' in to mediawiki: ".$ex->getMessage());
+            if (self::isWrongPassword($ex) && ChangeWikiPassword::isPending($user)) {
+                // The wiki has the old password until the queued change reaches it.
+                Log::info("Wiki password change for $user->mediawiki not done yet - not logging in to the wiki");
+            } elseif (self::isWrongPassword($ex)) {
+                self::passwordOutOfSync($user);
+            } else {
+                Log::error('Failed to log user in to the wiki', ['wiki_user' => $user->mediawiki, 'error' => $ex->getMessage()]);
+            }
         }
+    }
+
+    /**
+     * The wiki turned down the password, which is the user's password hash here.
+     */
+    public static function isWrongPassword(\Throwable $ex): bool
+    {
+        return $ex instanceof UsageException && $ex->getApiCode() === 'login-Failed';
+    }
+
+    /**
+     * The user's wiki password is no longer the hash of their password here: a change of password didn't reach
+     * the wiki. We can't put it right from here (the API only lets a user change their own password, and that
+     * needs the old one), so it's reported once and the user is left out of wiki login and password sync until
+     * the password is reset on the wiki - rather than failing again at every login.
+     */
+    public static function passwordOutOfSync($user): void
+    {
+        if ($user->wiki_sync_status == WikiSyncStatus::PasswordOutOfSync) {
+            return;
+        }
+
+        $user->wiki_sync_status = WikiSyncStatus::PasswordOutOfSync;
+        $user->save();
+
+        Log::error('Wiki password out of sync: reset it on the wiki to the password hash here, then set wiki_sync_status back to '.WikiSyncStatus::Created, [
+            'user' => $user->id,
+            'wiki_user' => $user->mediawiki,
+        ]);
     }
 }

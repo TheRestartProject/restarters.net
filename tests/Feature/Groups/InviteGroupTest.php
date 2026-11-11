@@ -118,6 +118,18 @@ class InviteGroupTest extends TestCase
         $this->assertNotFalse(strpos($redirectTo, '/group/view/'.$group->idgroups));
         $response3->assertSessionHas('success');
 
+        // Following the link again finds the code spent, but they're a member, so there's nothing to warn about.
+        $again = $this->get($invitation);
+        $again->assertRedirect('/group/view/'.$group->idgroups);
+        $again->assertSessionMissing('warning');
+
+        // Someone who isn't in it, with a code that was never sent, still gets the warning.
+        $this->actingAs(User::factory()->restarter()->create());
+        $bogus = $this->get('/group/accept-invite/'.$group->idgroups.'/notacode');
+        $bogus->assertRedirect('/group/view/'.$group->idgroups);
+        $bogus->assertSessionHas('warning', __('groups.invite_invalid'));
+        $this->actingAs($user);
+
         // Acceptance should notify the host.
         Notification::assertSentTo(
             [$host],

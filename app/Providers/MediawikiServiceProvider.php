@@ -6,9 +6,9 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
 use Addwiki\Mediawiki\Api\Client\Action\ActionApi;
 use Addwiki\Mediawiki\Api\Client\Auth\UserAndPassword;
-use Addwiki\Mediawiki\Api\Guzzle\ClientFactory;
 use Addwiki\Mediawiki\Api\MediawikiFactory;
 use Addwiki\Mediawiki\Api\Service\UserCreator;
+use App\Services\WikiHttpClient;
 
 class MediawikiServiceProvider extends ServiceProvider
 {
@@ -32,7 +32,7 @@ class MediawikiServiceProvider extends ServiceProvider
         $this->app->singleton(MediawikiFactory::class, function () {
             try {
                 Log::debug('Connect to Mediawiki');
-                $guzzleClient = (new ClientFactory(['timeout' => 10, 'connect_timeout' => 5]))->getClient();
+                $guzzleClient = WikiHttpClient::make();
                 $api = new ActionApi(
                     env('WIKI_URL').'/api.php',
                     new UserAndPassword(env('WIKI_APIUSER'), env('WIKI_APIPASSWORD')),

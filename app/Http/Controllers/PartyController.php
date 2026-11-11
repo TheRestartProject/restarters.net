@@ -514,7 +514,11 @@ class PartyController extends Controller
     #[UserStory('As a Guest, I can view an event\'s repair impact statistics', persona: 'Guest', theme: 'Stats & data')]
     public static function stats($id): View
     {
+        // Sites embed this widget, and keep showing it after the event is deleted.
         $event = Party::where('idevents', $id)->first();
+        if (! $event) {
+            abort(404, 'Invalid event id');
+        }
 
         $eventStats = $event->getEventStats();
 
@@ -751,7 +755,13 @@ class PartyController extends Controller
             return redirect('/party/view/'.$user_event->event);
         }
 
-        \Sentry\CaptureMessage(__('events.invite_invalid'));
+        // Accepting an invite spends its code, so following the link again (a second click, a mail client opening
+        // it as well) lands here.  If that user is already going, there's nothing wrong to tell them.
+        if (Auth::check() && EventsUsers::where('event', $event_id)->where('user', Auth::id())->where('status', '1')->exists()) {
+            return redirect('/party/view/'.intval($event_id));
+        }
+
+        // Otherwise the invite was withdrawn or the link is wrong: the user's problem, not a bug, so not reported.
         return redirect('/party/view/'.intval($event_id))->with('warning', __('events.invite_invalid'));
     }
 

@@ -8,7 +8,13 @@ use Closure;
 
 class LogHTTPErrorsToSentry {
     /**
-     * Handle an incoming request.
+     * Report 4xx and 5xx responses to Sentry, one issue per status code and route.
+     *
+     * Not reported:
+     * - 404s: mostly crawlers and scanners, so only the ones our own pages link to are reported, by
+     *   ReportBrokenLinksToSentry.
+     * - Error responses rendered from an exception the exception handler reports: the exception is already in
+     *   Sentry with its stack trace, and this message would be a second copy of it.
      */
     public function handle(Request $request, Closure $next): Response
     {
@@ -16,12 +22,19 @@ class LogHTTPErrorsToSentry {
 
         $httpCode = $response->getStatusCode();
 
-        if ($httpCode >= 400 && $httpCode < 600 && $httpCode !== 404) {
-            // Log 4xx and 5xx errors to Sentry.  404s are mostly crawlers and scanners, so only the ones that our
-            // own pages link to are reported, by ReportBrokenLinksToSentry.
-            \Sentry\CaptureMessage("HTTP return code $httpCode");
+        if ($httpCode >= 400 && $httpCode < 600 && $httpCode !== 404 && ! $this->alreadyReported($response)) {
+            $route = $request->route() ? '/'.ltrim($request->route()->uri(), '/') : '/'.$request->path();
+            \Sentry\captureMessage("HTTP return code $httpCode from $route");
         }
 
         return $response;
+    }
+
+    private function alreadyReported(Response $response): bool
+    {
+        $exception = $response->exception ?? null;
+
+        return $exception instanceof \Throwable
+            && app(\Illuminate\Contracts\Debug\ExceptionHandler::class)->shouldReport($exception);
     }
 }

@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Events\UserUpdated;
+use App\Network;
 use App\User;
 use App\UsersPermissions;
 use Carbon\Carbon;
@@ -80,11 +81,14 @@ class MenusTest extends TestCase
             $up->save();
         }
 
+        $user->mediawiki = 'Wiki-'.$user->id;
+        $user->save();
+
+        // The wiki's server asks, so nobody is logged in.
         Auth::logout();
         session()->flush();
-        $this->actingAs($user);
 
-        $response = $this->get('/user/menus');
+        $response = $this->get('/user/menus?wiki_username='.urlencode($user->mediawiki));
         $menus = json_decode($response->getContent(), true);
 
         $this->assertEquals($present, array_keys($menus));
@@ -94,9 +98,34 @@ class MenusTest extends TestCase
         }
     }
 
-    public function testLoggedOut(): void
+    public function testUnknownWikiUser(): void
     {
         $this->expectException(NotFoundHttpException::class);
+        $this->get('/user/menus?wiki_username=Nobody');
+    }
+
+    public function testNoWikiUserNamed(): void
+    {
+        // Without a name the lookup used to match the first user who had no wiki account.
+        User::factory()->administrator()->create(['mediawiki' => null]);
+
+        $this->expectException(NotFoundHttpException::class);
         $this->get('/user/menus');
+    }
+
+    public function testCoordinatorOfOneNetwork(): void
+    {
+        // The menu links straight to their network. Looking that up on the logged-in user failed, because the
+        // wiki's server asks without logging in.
+        $network = Network::factory()->create(['name' => 'Repair Network']);
+        $user = User::factory()->networkCoordinator()->create(['mediawiki' => 'Coordinator-Wiki']);
+        $network->addCoordinator($user);
+
+        $response = $this->get('/user/menus?wiki_username=Coordinator-Wiki');
+
+        $response->assertSuccessful();
+        $items = $response->json('Administrator.items');
+        $label = __('networks.general.particular_network', ['networkName' => 'Repair Network']);
+        $this->assertEquals(route('networks.show', $network->id), $items[$label]);
     }
 }

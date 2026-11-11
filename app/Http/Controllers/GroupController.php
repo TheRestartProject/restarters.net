@@ -381,7 +381,13 @@ class GroupController extends Controller
         // Find user/group relationship based on the invitation hash.
         $user_group = UserGroups::where('status', $hash)->where('group', $group_id)->first();
         if (empty($user_group)) {
-            \Sentry\CaptureMessage(__('groups.invite_invalid'));
+            // Accepting an invite spends its code, so following the link again lands here.  If that user is
+            // already a member there's nothing wrong to tell them; otherwise the invite was withdrawn or the link
+            // is wrong, which is the user's problem rather than a bug, so it isn't reported.
+            if (Auth::check() && UserGroups::where('group', $group_id)->where('user', Auth::id())->where('status', 1)->exists()) {
+                return redirect('/group/view/'.intval($group_id));
+            }
+
             return redirect('/group/view/'.intval($group_id))->with('warning', __('groups.invite_invalid'));
         }
 

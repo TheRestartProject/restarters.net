@@ -1085,7 +1085,10 @@ class UserController extends Controller
     #[NoStory(reason: 'MediaWiki thumbnail integration')]
     public static function getThumbnail(Request $request): JsonResponse
     {
-        $user = User::where('mediawiki', $request->input('wiki_username'))->first();
+        // Called by the wiki's server, so there is no logged-in user: the menus are for the named wiki user.  A
+        // missing name would otherwise match the first user who has no wiki account.
+        $wikiUsername = $request->input('wiki_username');
+        $user = $wikiUsername ? User::where('mediawiki', $wikiUsername)->first() : null;
 
         if (! $user) {
             abort('404', 'Wiki user not found');
@@ -1103,7 +1106,10 @@ class UserController extends Controller
     #[NoStory(reason: 'MediaWiki menu integration')]
     public function getUserMenus(Request $request): JsonResponse
     {
-        $user = User::where('mediawiki', $request->input('wiki_username'))->first();
+        // Called by the wiki's server, so there is no logged-in user: the menus are for the named wiki user.  A
+        // missing name would otherwise match the first user who has no wiki account.
+        $wikiUsername = $request->input('wiki_username');
+        $user = $wikiUsername ? User::where('mediawiki', $wikiUsername)->first() : null;
 
         if (! $user) {
             abort('404', 'Wiki user not found');
@@ -1130,7 +1136,7 @@ class UserController extends Controller
 
             if ($user->hasRole('NetworkCoordinator')) {
                 if (count($user->networks) == 1) {
-                    $network = Auth::user()->networks->first();
+                    $network = $user->networks->first();
                     $items[Lang::get('networks.general.particular_network', ['networkName' => $network->name])] = route('networks.show', $network->id);
                 } else {
                     $items[Lang::get('networks.general.networks')] = route('networks.index');

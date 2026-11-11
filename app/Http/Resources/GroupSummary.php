@@ -144,47 +144,49 @@ class GroupSummary extends JsonResource
             // Only approved events count, matching Group::getNextUpcomingEvent() which the group's own page uses.
             // Without this an event still awaiting moderation would be advertised as the group's next event on
             // the public map while the group's page ignored it.
-            if (Cache::has('future_approved_events')) {
-                $upcoming = Cache::get('future_approved_events');
-            } else {
-                $future = \App\Party::future()->where('approved', true)->get();
-
-                // Can't serialise the whole event, and we only need a few fields.
-                $upcoming = [];
-
-                foreach ($future as $event) {
-                    $upcoming[] = [
-                        'id' => $event->idevents,
-                        'group_id' => $event->group,
-                        'start' => $event->event_start_utc,
-                        'end' => $event->event_end_utc,
-                        'timezone' => $event->timezone,
-                        'title' => $event->venue ?? $event->location,
-                        'location' => $event->location,
-                        'online' => $event->online,
-                        'lat' => $event->latitude,
-                        'lng' => $event->longitude,
-                        'updated_at' => $event->updated_at->toIso8601String(),
-                        'summary' => true
-                    ];
-                }
-
-                Cache::put('future_approved_events', $upcoming, 60);
-            }
-
-            // Find the next event for this group.
-            $nextevent = null;
-
-            foreach ($upcoming as $event) {
-                if ($event['group_id'] == $this->idgroups) {
-                    $nextevent = $event;
-                    break;
-                }
-            }
-
-           $ret['next_event'] = $nextevent;
+            $ret['next_event'] = self::nextEvents($request)[$this->idgroups] ?? null;
         }
 
         return($ret);
+    }
+
+    /**
+     * The next approved event of every group that has one, by group id. Worked out once per request, rather than
+     * once per group in the list.
+     */
+    private static function nextEvents($request): array
+    {
+        $next = $request->attributes->get('group_summary_next_events');
+
+        if ($next === null) {
+            $upcoming = Cache::remember('future_approved_events', 60, function () {
+                // Can't serialise the whole event, and we only need a few fields.
+                return \App\Party::future()->where('approved', true)->get()->map(fn ($event) => [
+                    'id' => $event->idevents,
+                    'group_id' => $event->group,
+                    'start' => $event->event_start_utc,
+                    'end' => $event->event_end_utc,
+                    'timezone' => $event->timezone,
+                    'title' => $event->venue ?? $event->location,
+                    'location' => $event->location,
+                    'online' => $event->online,
+                    'lat' => $event->latitude,
+                    'lng' => $event->longitude,
+                    'updated_at' => $event->updated_at->toIso8601String(),
+                    'summary' => true
+                ])->all();
+            });
+
+            // The first of a group's events is its next one.
+            $next = [];
+
+            foreach ($upcoming as $event) {
+                $next[$event['group_id']] ??= $event;
+            }
+
+            $request->attributes->set('group_summary_next_events', $next);
+        }
+
+        return $next;
     }
 }
