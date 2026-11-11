@@ -39,6 +39,8 @@ class ChangeWikiPassword extends BaseEvent
         $this->request = $request;
     }
 
+    // In the cache, so the web side and the queue worker must share one: they do while live runs both on one
+    // machine with the file cache.
     public static function markPending(User $user): void
     {
         Cache::put(self::pendingKey($user), true, self::PENDING_SECONDS);

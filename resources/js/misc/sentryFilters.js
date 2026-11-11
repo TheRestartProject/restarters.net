@@ -10,7 +10,7 @@ export function thrownByAScript (event) {
     frames.push(...((v.stacktrace && v.stacktrace.frames) || []))
   })
 
-  return !frames.length || frames.some(f => /\.js$/.test((f.filename || '').split(/[?#]/)[0]))
+  return !frames.length || frames.some(f => /\.[cm]?js$/.test((f.filename || '').split(/[?#]/)[0]))
 }
 
 // The old pages put the user's API token in request URLs; it shouldn't be sent to Sentry with them.
