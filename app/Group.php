@@ -485,6 +485,15 @@ class Group extends Model implements Auditable
             });
     }
 
+    public function refresh()
+    {
+        // Re-read from the database, so don't keep a next event preloaded from before.
+        $this->nextEventPreloaded = false;
+        $this->preloadedNextEvent = null;
+
+        return parent::refresh();
+    }
+
     public function getNextUpcomingEvent()
     {
         // Set by preloadNextUpcomingEvents() when many groups are being rendered together.
