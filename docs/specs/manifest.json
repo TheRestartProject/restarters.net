@@ -1,5 +1,5 @@
 {
-    "generatedAt": "2026-11-11T10:57:25Z",
+    "generatedAt": "2026-11-11T11:01:22Z",
     "features": {
         "Administration": {
             "description": "Platform administration and configuration",
@@ -698,6 +698,10 @@
                         {
                             "file": "tests/Feature/Events/APIv2EventTest.php",
                             "test": "testGetEventsForGroup"
+                        },
+                        {
+                            "file": "tests/Feature/Performance/ModerationQueryCountTest.php",
+                            "test": "testModerateEventsQueryCountDoesNotGrow"
                         }
                     ]
                 },
@@ -1268,6 +1272,10 @@
                         {
                             "file": "tests/Feature/Events/APIv2EventTest.php",
                             "test": "testGetEventsForGroup"
+                        },
+                        {
+                            "file": "tests/Feature/Performance/ModerationQueryCountTest.php",
+                            "test": "testModerateEventsQueryCountDoesNotGrow"
                         }
                     ]
                 },
@@ -1562,6 +1570,10 @@
                         {
                             "file": "tests/Feature/Groups/APIv2GroupTest.php",
                             "test": "testNetworkCoordinatorApprove"
+                        },
+                        {
+                            "file": "tests/Feature/Performance/ModerationQueryCountTest.php",
+                            "test": "testModerateGroupsQueryCountDoesNotGrow"
                         }
                     ]
                 },
@@ -1961,6 +1973,10 @@
                         {
                             "file": "tests/Feature/Groups/APIv2GroupTest.php",
                             "test": "testNetworkCoordinatorApprove"
+                        },
+                        {
+                            "file": "tests/Feature/Performance/ModerationQueryCountTest.php",
+                            "test": "testModerateGroupsQueryCountDoesNotGrow"
                         }
                     ]
                 },
@@ -2559,6 +2575,14 @@
                         {
                             "file": "tests/Feature/Networks/NetworkTest.php",
                             "test": "network_stats_can_be_queried"
+                        },
+                        {
+                            "file": "tests/Feature/Performance/ModerationQueryCountTest.php",
+                            "test": "testNetworkStatsQueryCountDoesNotGrow"
+                        },
+                        {
+                            "file": "tests/Feature/Performance/ModerationQueryCountTest.php",
+                            "test": "testNetworkStatsDoesNotLoadGroupsPerChunk"
                         }
                     ]
                 },
