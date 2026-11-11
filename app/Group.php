@@ -25,6 +25,10 @@ class Group extends Model implements Auditable
     // Eager-loading reduces N+1 queries.
     protected $with = ['networks', 'group_tags'];
 
+    // Not attributes: filled by preloadNextUpcomingEvents().
+    protected bool $nextEventPreloaded = false;
+    protected ?Party $preloadedNextEvent = null;
+
     /**
      * The attributes that are mass assignable.
      *
@@ -480,6 +484,11 @@ class Group extends Model implements Auditable
 
     public function getNextUpcomingEvent()
     {
+        // Set by preloadNextUpcomingEvents() when many groups are being rendered together.
+        if ($this->nextEventPreloaded) {
+            return $this->preloadedNextEvent;
+        }
+
         $event = $this->parties()
             ->where('approved', true)
             ->where('event_start_utc', '>=', date('Y-m-d H:i:s'))
@@ -490,6 +499,36 @@ class Group extends Model implements Auditable
         }
 
         return $event->first();
+    }
+
+    /**
+     * Fetch the next upcoming approved event for all of the given groups in a single query, so that
+     * getNextUpcomingEvent() doesn't cost two queries per group.
+     */
+    public static function preloadNextUpcomingEvents(iterable $groups): void
+    {
+        $groups = collect($groups);
+
+        if ($groups->isEmpty()) {
+            return;
+        }
+
+        $next = [];
+
+        Party::where('approved', true)
+            ->where('event_start_utc', '>=', date('Y-m-d H:i:s'))
+            ->whereIn('events.group', $groups->pluck('idgroups')->all())
+            ->orderBy('event_start_utc', 'asc')
+            ->get()
+            ->each(function ($event) use (&$next) {
+                // Ordered by start, so the first one seen per group is the next one.
+                $next[$event->group] = $next[$event->group] ?? $event;
+            });
+
+        foreach ($groups as $group) {
+            $group->nextEventPreloaded = true;
+            $group->preloadedNextEvent = $next[$group->idgroups] ?? null;
+        }
     }
 
     public function networks(): BelongsToMany
@@ -796,11 +835,11 @@ class Group extends Model implements Auditable
 
         if ($u->hasRole('Administrator')) {
             // Can see all.
-            $ret = $this->unapproved()->get();
+            $ret = $this->unapproved()->with('groupImage.image')->get();
         } else if ($u->hasRole('NetworkCoordinator')) {
             // Can see groups for this network.  Logic doesn't scale well, but we will have few unapproved
             // groups at any one time.
-            $groups = $this->unapproved()->get();
+            $groups = $this->unapproved()->with('groupImage.image')->get();
 
             foreach ($groups as $group) {
                 foreach ($group->networks as $network) {
@@ -815,6 +854,9 @@ class Group extends Model implements Auditable
 
             $ret = array_unique($ret);
         }
+
+        // The resource asks each group for its next event; fetch them all at once.
+        self::preloadNextUpcomingEvents($ret);
 
         return $ret;
     }

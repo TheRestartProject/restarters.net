@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Group;
+use App\Party;
 use Illuminate\Database\Eloquent\Model;
 
 class Network extends Model
@@ -70,11 +71,29 @@ class Network extends Model
 
     public function eventsRequiringModeration()
     {
+        // One query for all of the network's groups rather than one per group.  Events are ordered by group
+        // (in the network's group order) to match the previous per-group concatenation.
         $groups = $this->groups;
+        $groupIds = $groups->pluck('idgroups')->all();
+
+        if (empty($groupIds)) {
+            return [];
+        }
+
+        $byGroup = Party::where('approved', false)
+            ->whereNull('deleted_at')
+            ->whereIn('events.group', $groupIds)
+            ->with(['theGroup.groupImage.image', 'allDevices'])
+            ->withCount('allInvited')
+            ->get()
+            ->groupBy('group');
+
         $events = [];
 
         foreach ($groups as $group) {
-            $events = array_merge($events, $group->parties()->where('approved', false)->whereNull('deleted_at')->get()->all());
+            foreach ($byGroup->get($group->idgroups, []) as $event) {
+                $events[] = $event;
+            }
         }
 
         return $events;
