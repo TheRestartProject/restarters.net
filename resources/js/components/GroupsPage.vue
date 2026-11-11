@@ -170,14 +170,9 @@ export default {
     }
   },
   mounted() {
-    if (this.currentTab === 0) {
-      // Fetch our own groups.  We fetch them individually because there aren't that many.
-      this.yourGroups.forEach((g) => {
-        this.$store.dispatch('groups/fetch', {
-          id: g,
-          includeStats: false
-        })
-      })
+    if (this.currentTab === 0 && this.yourGroups.length) {
+      // Fetch our own groups, in one request: fetching them one at a time was a request per group.
+      this.$store.dispatch('groups/hydrate', { ids: this.yourGroups })
     }
   }
 }

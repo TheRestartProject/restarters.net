@@ -42,12 +42,17 @@ export default {
   },
   methods: {
     update(value) {
+      // Set from outside, e.g. when the form is reset: a lookup queued for what was typed before is now stale.
+      clearTimeout(this.debounceTimer)
       this.inputValue = value || ''
+    },
+    searchText() {
+      return (this.inputValue || '').trim()
     },
     onInput() {
       this.$emit('change', this.inputValue)
       clearTimeout(this.debounceTimer)
-      if (!this.inputValue || this.inputValue.length < 3) {
+      if (this.searchText().length < 3) {
         this.suggestions = []
         return
       }
@@ -57,9 +62,15 @@ export default {
       setTimeout(() => { this.suggestions = [] }, 200)
     },
     async fetchSuggestions() {
+      // The server turns away a blank search (422).
+      if (this.searchText().length < 3) {
+        this.suggestions = []
+        return
+      }
+
       try {
         const resp = await fetch(
-          `/maps/autocomplete?input=${encodeURIComponent(this.inputValue)}&types=${encodeURIComponent(this.types)}`,
+          `/maps/autocomplete?input=${encodeURIComponent(this.searchText())}&types=${encodeURIComponent(this.types)}`,
           { headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' } }
         )
         if (resp.ok) {

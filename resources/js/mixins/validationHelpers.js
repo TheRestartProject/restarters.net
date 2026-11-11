@@ -28,7 +28,6 @@ export default {
         return
       }
 
-      console.log("First error", JSON.stringify(error))
       const {ref} = error
       const el = ref.$el
       el.scrollIntoView()

@@ -146,6 +146,12 @@ export default {
     onOpen() {
       this.$emit('open')
       const select = this.$refs.multiselect
+
+      // A new item has no category yet, so there's nothing to scroll to.
+      if (!select || !select.value) {
+        return
+      }
+
       let position = select.filteredOptions.findIndex(
           option => option[select.trackBy] === select.value[select.trackBy]
       )
