@@ -351,7 +351,10 @@ class Group extends Model implements Auditable
         //
         // withCount('allInvited') pre-loads the invited tally as an aggregate column, avoiding
         // an N+1 query (one COUNT per event) inside getEventStats().
+        // without('theGroup'): Party eager-loads its group by default, which would reload the chunk's groups
+        // (with member counts, networks and tags) for every chunk.  The stats don't use the group.
         Party::past()
+            ->without('theGroup')
             ->with('allDevices')
             ->withCount('allInvited')
             ->whereIn('events.group', $groupIds)

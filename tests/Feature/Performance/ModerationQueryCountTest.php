@@ -142,4 +142,59 @@ class ModerationQueryCountTest extends TestCase
         fwrite(STDERR, "network stats queries: N=2 -> $small, N=6 -> $large\n");
         $this->assertEquals($small, $large, 'network stats query count grows with the number of groups');
     }
+
+    /**
+     * bulkGroupStats pages past events in chunks of 200.  Each chunk must not also load the events' groups
+     * (and their networks/tags/member counts), which Party eager-loads by default.
+     *
+     * @story:NetworkController::stats
+     */
+    public function testNetworkStatsDoesNotLoadGroupsPerChunk(): void
+    {
+        $user = User::factory()->networkCoordinator()->create(['api_token' => 'n1chunk']);
+        $network = Network::factory()->create();
+        $network->addCoordinator($user);
+
+        $groups = [];
+        for ($i = 0; $i < 3; $i++) {
+            $groups[$i] = Group::factory()->create();
+            $network->addGroup($groups[$i]);
+        }
+
+        $rows = [];
+        $start = now()->subDays(30)->toDateTimeString();
+        $end = now()->subDays(30)->addHours(2)->toDateTimeString();
+        for ($i = 0; $i < 450; $i++) {
+            $rows[] = [
+                'group' => $groups[$i % 3]->idgroups,
+                'approved' => true,
+                'location' => 'London',
+                'venue' => 'Venue',
+                'timezone' => 'Europe/London',
+                'event_start_utc' => $start,
+                'event_end_utc' => $end,
+                'free_text' => 'x',
+            ];
+        }
+        foreach (array_chunk($rows, 100) as $chunk) {
+            DB::table('events')->insert($chunk);
+        }
+
+        $tables = [];
+        $count = 0;
+        DB::listen(function ($q) use (&$tables, &$count) {
+            $count++;
+            if (preg_match('/from `(groups|group_network|grouptags_groups)`/', $q->sql, $m)) {
+                $tables[] = $m[1];
+            }
+        });
+
+        $json = $this->get("/api/networks/{$network->id}/stats?api_token=n1chunk")->assertSuccessful()->json();
+
+        fwrite(STDERR, "network stats multi-chunk: $count queries, group-table loads: " . count($tables) . "\n");
+        $this->assertEquals(450, $json['parties']);
+        $this->assertEquals(3, $json['groups']);
+        // At most the single up-front query for the network's groups (via group_network).
+        $this->assertLessThanOrEqual(1, count($tables), 'groups loaded per chunk: ' . implode(',', $tables));
+    }
 }
