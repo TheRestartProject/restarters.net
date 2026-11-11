@@ -220,7 +220,7 @@ class ProfileTest extends TestCase
         self::assertEquals($user->email, $ret['email']);
         self::assertEquals($user->name, $ret['name']);
 
-        $response = $this->get('/api/users');
+        $response = $this->get('/api/users?api_token=1234');
         $response->assertSuccessful();
         $ret = json_decode($response->getContent(), TRUE);
         self::assertEquals(1, count($ret));

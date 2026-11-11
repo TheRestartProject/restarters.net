@@ -84,13 +84,17 @@ class GroupController extends Controller
             }
         }
 
-        $groups = [];
+        $groups = new \Illuminate\Database\Eloquent\Collection();
 
-        foreach ($authenticatedUser->networks as $network) {
+        foreach ($authenticatedUser->networks()->with('groups')->get() as $network) {
             foreach ($network->groups as $group) {
-                $groups[] = $group;
+                $groups->push($group);
             }
         }
+
+        // One query each for the images and events of all the groups, rather than three per group.
+        $groups->load(['groupImage.image', 'parties']);
+        $now = date('Y-m-d H:i:s');
 
         $allGroupStats = Group::bulkGroupStats($groups);
 
@@ -140,7 +144,7 @@ class GroupController extends Controller
                                       'network_data' => $group->network_data
                                   ]);
 
-                foreach ($group->upcomingParties() as $event) {
+                foreach ($group->parties->filter(fn ($event) => $event->event_end_utc > $now) as $event) {
                     $upcoming_parties_collection->push([
                                                            'event_id' => $event->idevents,
                                                            'event_date' => $event->event_date_local,
@@ -161,7 +165,7 @@ class GroupController extends Controller
                                                        ]);
                 }
 
-                foreach ($group->pastParties() as $key => $event) {
+                foreach ($group->parties->filter(fn ($event) => $event->event_end_utc < $now) as $event) {
                     $past_parties_collection->push([
                                                        'event_id' => $event->idevents,
                                                        'event_date' => $event->event_date_local,
