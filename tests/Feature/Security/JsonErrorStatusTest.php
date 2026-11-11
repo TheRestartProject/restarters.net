@@ -18,20 +18,21 @@ class JsonErrorStatusTest extends TestCase
     public function provider(): array
     {
         return [
-            'not logged in' => [new AuthenticationException(), 401],
-            'not allowed' => [new AuthorizationException(), 403],
-            'no such record' => [new ModelNotFoundException(), 404],
-            'session expired with the page open' => [new TokenMismatchException('CSRF token mismatch.'), 419],
+            // Class names: data sets are serialised under process isolation, and exceptions can't be.
+            'not logged in' => [AuthenticationException::class, 401],
+            'not allowed' => [AuthorizationException::class, 403],
+            'no such record' => [ModelNotFoundException::class, 404],
+            'session expired with the page open' => [TokenMismatchException::class, 419],
         ];
     }
 
     /**
      * @dataProvider provider
      */
-    public function testStatus(\Throwable $exception, int $status): void
+    public function testStatus(string $exception, int $status): void
     {
         $this->withExceptionHandling();
-        Route::middleware('web')->post('/_json_status_test', fn () => throw $exception);
+        Route::middleware('web')->post('/_json_status_test', fn () => throw new $exception());
 
         $this->postJson('/_json_status_test')->assertStatus($status);
     }
