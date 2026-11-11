@@ -6,11 +6,13 @@ use App\WikiSyncStatus;
 use Cookie;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Addwiki\Mediawiki\Api\Client\Action\ActionApi;
 use Addwiki\Mediawiki\Api\Client\Action\Exception\UsageException;
 use Addwiki\Mediawiki\Api\Client\Auth\UserAndPassword;
 use Addwiki\Mediawiki\Api\Service\UserCreator;
+use Addwiki\Mediawiki\Api\Service\UserGetter;
 use App\Services\WikiHttpClient;
 use GuzzleHttp\Cookie\CookieJar;
 
@@ -74,13 +76,69 @@ class LogInToWiki
 
             // Mediawiki does strange things with underscores.
             $mediawikiUsername = str_replace('_', '-', $user->username);
-            $this->wikiUserCreator->create($mediawikiUsername, $user->password, $user->email);
+            $users = app()->bound(UserGetter::class) ? app(UserGetter::class) : null;
 
-            $user->wiki_sync_status = WikiSyncStatus::Created;
-            $user->mediawiki = $mediawikiUsername;
+            // A name can already be taken - and the wiki upper-cases the first letter, so our "matt" is its "Matt".
+            // Taking it anyway left two of our users sharing one wiki account, which can only have one of their
+            // passwords. So a name someone else has falls back to one with the user's id in it.
+            foreach ([$mediawikiUsername, $mediawikiUsername.'-'.$user->id] as $name) {
+                if ($users && $users->getFromUsername($name)->getId()) {
+                    // Taken - perhaps by this user, from a creation we didn't get to record.
+                    if (self::passwordWorks($name, $user->password)) {
+                        self::linked($user, $name);
+
+                        return;
+                    }
+
+                    continue;
+                }
+
+                if ($this->wikiUserCreator->create($name, $user->password, $user->email)) {
+                    self::linked($user, $name);
+
+                    return;
+                }
+
+                // Turned down for some other reason - a throttle, a block, the email address. Try again at the
+                // next login, without reporting every one.
+                if (Cache::add('wiki_account_refused_'.$user->id, true, 86400)) {
+                    Log::error('The wiki turned down a new account', ['user' => $user->id, 'username' => $name]);
+                }
+
+                return;
+            }
+
+            // Both names belong to other people. Not again at every login.
+            $user->wiki_sync_status = WikiSyncStatus::DoNotCreate;
             $user->save();
+            Log::error('Both wiki names for a new account belong to someone else', ['user' => $user->id, 'username' => $mediawikiUsername]);
         } catch (\Throwable $ex) {
             Log::error('Failed to create a new account in mediawiki', ['user' => $user->id, 'username' => $user->username, 'error' => $ex->getMessage()]);
+        }
+    }
+
+    private static function linked($user, string $name): void
+    {
+        $user->wiki_sync_status = WikiSyncStatus::Created;
+        $user->mediawiki = $name;
+        $user->save();
+    }
+
+    /**
+     * Whether the wiki account takes this password. Any failure other than a wrong password is thrown.
+     */
+    public static function passwordWorks(string $name, string $password): bool
+    {
+        try {
+            (new ActionApi(env('WIKI_URL').'/api.php', new UserAndPassword($name, $password), WikiHttpClient::make()))->getToken('csrf');
+
+            return true;
+        } catch (\Throwable $ex) {
+            if (self::isWrongPassword($ex)) {
+                return false;
+            }
+
+            throw $ex;
         }
     }
 

@@ -1,5 +1,5 @@
 {
-    "generatedAt": "2026-11-11T11:03:18Z",
+    "generatedAt": "2026-11-11T15:24:47Z",
     "features": {
         "Administration": {
             "description": "Platform administration and configuration",
@@ -3324,6 +3324,26 @@
                         {
                             "file": "tests/Feature/Admin/Users/WikiLoginTests.php",
                             "test": "a_wiki_password_out_of_sync_is_reported_once"
+                        },
+                        {
+                            "file": "tests/Feature/Admin/Users/WikiLoginTests.php",
+                            "test": "a_free_wiki_name_is_created"
+                        },
+                        {
+                            "file": "tests/Feature/Admin/Users/WikiLoginTests.php",
+                            "test": "a_wiki_name_someone_else_has_gets_the_users_id_added"
+                        },
+                        {
+                            "file": "tests/Feature/Admin/Users/WikiLoginTests.php",
+                            "test": "a_wiki_name_that_is_already_the_users_own_is_linked"
+                        },
+                        {
+                            "file": "tests/Feature/Admin/Users/WikiLoginTests.php",
+                            "test": "a_wiki_account_turned_down_for_another_reason_is_tried_again_later"
+                        },
+                        {
+                            "file": "tests/Feature/Admin/Users/WikiLoginTests.php",
+                            "test": "when_both_wiki_names_belong_to_others_it_is_reported_once"
                         },
                         {
                             "file": "tests/Feature/Users/RecoverTest.php",

@@ -8,6 +8,7 @@ use Addwiki\Mediawiki\Api\Client\Action\ActionApi;
 use Addwiki\Mediawiki\Api\Client\Auth\UserAndPassword;
 use Addwiki\Mediawiki\Api\MediawikiFactory;
 use Addwiki\Mediawiki\Api\Service\UserCreator;
+use Addwiki\Mediawiki\Api\Service\UserGetter;
 use App\Services\WikiHttpClient;
 
 class MediawikiServiceProvider extends ServiceProvider
@@ -44,6 +45,19 @@ class MediawikiServiceProvider extends ServiceProvider
             } catch (\Throwable $ex) {
                 Log::error('Failed to instantiate Wiki API classes: '.$ex->getMessage());
             }
+        });
+
+        $this->app->bind(UserGetter::class, function ($app) {
+            try {
+                $mw = $app->make(MediawikiFactory::class);
+                if ($mw) {
+                    return $mw->newUserGetter();
+                }
+            } catch (\Throwable $ex) {
+                Log::error('Failed to create Wiki UserGetter: '.$ex->getMessage());
+            }
+
+            return null;
         });
 
         $this->app->bind(UserCreator::class, function ($app) {
