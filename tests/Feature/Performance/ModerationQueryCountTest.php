@@ -3,6 +3,7 @@
 namespace Tests\Feature\Performance;
 
 use App\Group;
+use App\GroupTags;
 use App\Network;
 use App\Party;
 use App\User;
@@ -74,7 +75,6 @@ class ModerationQueryCountTest extends TestCase
             $this->assertArrayHasKey('group', $json[0]);
         });
 
-        fwrite(STDERR, "moderate/events queries: N=2 -> $small, N=6 -> $large\n");
         $this->assertEquals($small, $large, 'moderate/events query count grows with the number of events');
     }
 
@@ -112,7 +112,6 @@ class ModerationQueryCountTest extends TestCase
             $this->assertArrayHasKey('networks', $json[0]);
         });
 
-        fwrite(STDERR, "moderate/groups queries: N=2 -> $small, N=6 -> $large\n");
         $this->assertEquals($small, $large, 'moderate/groups query count grows with the number of groups');
     }
 
@@ -139,7 +138,6 @@ class ModerationQueryCountTest extends TestCase
             $this->assertEquals(12, $json['parties']);
         });
 
-        fwrite(STDERR, "network stats queries: N=2 -> $small, N=6 -> $large\n");
         $this->assertEquals($small, $large, 'network stats query count grows with the number of groups');
     }
 
@@ -191,10 +189,72 @@ class ModerationQueryCountTest extends TestCase
 
         $json = $this->get("/api/networks/{$network->id}/stats?api_token=n1chunk")->assertSuccessful()->json();
 
-        fwrite(STDERR, "network stats multi-chunk: $count queries, group-table loads: " . count($tables) . "\n");
         $this->assertEquals(450, $json['parties']);
         $this->assertEquals(3, $json['groups']);
         // At most the single up-front query for the network's groups (via group_network).
         $this->assertLessThanOrEqual(1, count($tables), 'groups loaded per chunk: ' . implode(',', $tables));
+    }
+
+    /**
+     * @story:GroupController::moderateGroupsv2
+     */
+    public function testModeratedGroupsShowTheirNextApprovedEvent(): void
+    {
+        // The next events are now fetched for all the groups at once; each group must still get its own.
+        $user = User::factory()->networkCoordinator()->create(['api_token' => 'n1next']);
+        $network = Network::factory()->create();
+        $network->addCoordinator($user);
+
+        $withEvents = Group::factory()->create(['approved' => false]);
+        $without = Group::factory()->create(['approved' => false]);
+        $network->addGroup($withEvents);
+        $network->addGroup($without);
+
+        $event = function (int $days, bool $approved) use ($withEvents) {
+            return Party::factory()->create([
+                'group' => $withEvents->idgroups,
+                'approved' => $approved,
+                'event_start_utc' => now()->addDays($days)->toIso8601String(),
+                'event_end_utc' => now()->addDays($days)->addHours(2)->toIso8601String(),
+            ]);
+        };
+
+        $event(-3, true);                     // past
+        $event(1, false);                     // sooner, but not approved
+        $event(2, true)->delete();            // sooner, but deleted
+        $next = $event(5, true);
+        $event(10, true);                     // later
+
+        $json = collect($this->get('/api/v2/moderate/groups?api_token=n1next')->assertSuccessful()->json())->keyBy('id');
+
+        $this->assertEquals($next->idevents, $json[$withEvents->idgroups]['next_event']['id']);
+        $this->assertArrayNotHasKey('next_event', $json[$without->idgroups]);
+    }
+
+    /**
+     * @story:NetworkController::stats
+     */
+    public function testTagFilteredNetworkStats(): void
+    {
+        $user = User::factory()->networkCoordinator()->create(['api_token' => 'n1tag']);
+        $network = Network::factory()->create();
+        $network->addCoordinator($user);
+        $tag = GroupTags::factory()->create();
+
+        $tagged = $this->addGroupsWithEvents($network, 1, 2, true, true);
+        $archived = $this->addGroupsWithEvents($network, 1, 1, true, true);
+        $this->addGroupsWithEvents($network, 1, 3, true, true);
+
+        $taggedGroup = Party::find($tagged[0])->group;
+        $archivedGroup = Party::find($archived[0])->group;
+        Group::find($taggedGroup)->group_tags()->attach($tag->id);
+        Group::find($archivedGroup)->group_tags()->attach($tag->id);
+        Group::where('idgroups', $archivedGroup)->update(['archived_at' => now()]);
+
+        $json = $this->get("/api/networks/{$network->id}/stats?api_token=n1tag&group_tag={$tag->id}")->assertSuccessful()->json();
+
+        // An archived group's past events still count; the group itself doesn't.
+        $this->assertEquals(3, $json['parties']);
+        $this->assertEquals(1, $json['groups']);
     }
 }

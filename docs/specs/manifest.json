@@ -1,5 +1,5 @@
 {
-    "generatedAt": "2026-11-11T11:01:22Z",
+    "generatedAt": "2026-11-11T11:03:18Z",
     "features": {
         "Administration": {
             "description": "Platform administration and configuration",
@@ -1574,6 +1574,10 @@
                         {
                             "file": "tests/Feature/Performance/ModerationQueryCountTest.php",
                             "test": "testModerateGroupsQueryCountDoesNotGrow"
+                        },
+                        {
+                            "file": "tests/Feature/Performance/ModerationQueryCountTest.php",
+                            "test": "testModeratedGroupsShowTheirNextApprovedEvent"
                         }
                     ]
                 },
@@ -1977,6 +1981,10 @@
                         {
                             "file": "tests/Feature/Performance/ModerationQueryCountTest.php",
                             "test": "testModerateGroupsQueryCountDoesNotGrow"
+                        },
+                        {
+                            "file": "tests/Feature/Performance/ModerationQueryCountTest.php",
+                            "test": "testModeratedGroupsShowTheirNextApprovedEvent"
                         }
                     ]
                 },
@@ -2583,6 +2591,10 @@
                         {
                             "file": "tests/Feature/Performance/ModerationQueryCountTest.php",
                             "test": "testNetworkStatsDoesNotLoadGroupsPerChunk"
+                        },
+                        {
+                            "file": "tests/Feature/Performance/ModerationQueryCountTest.php",
+                            "test": "testTagFilteredNetworkStats"
                         }
                     ]
                 },
