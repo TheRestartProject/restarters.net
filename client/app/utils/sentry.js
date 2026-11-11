@@ -30,7 +30,7 @@ export const IGNORE_ERRORS = [
 export function thrownByAScript(event) {
   const frames = (event?.exception?.values || []).flatMap((v) => v.stacktrace?.frames || [])
 
-  return !frames.length || frames.some((f) => (f.filename || '').split(/[?#]/)[0].endsWith('.js'))
+  return !frames.length || frames.some((f) => /\.[cm]?js$/.test((f.filename || '').split(/[?#]/)[0]))
 }
 
 // A request that got no response at all: the visitor's connection dropped, or
