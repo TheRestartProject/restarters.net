@@ -21,6 +21,7 @@ import GroupMultiSelect from './GroupMultiSelect.vue'
 import GroupNetworkData from './GroupNetworkData.vue'
 import SpinIcon from '../forms/SpinIcon.vue'
 import { useSpinButton } from '../../composables/useSpinButton.js'
+import { useLeafletUnmountGuard } from '../../composables/useLeafletUnmountGuard.js'
 
 const leafletTiles = useLeafletTiles()
 
@@ -52,6 +53,8 @@ const props = defineProps({
     default: false,
   },
 })
+
+useLeafletUnmountGuard()
 
 const emit = defineEmits(['created', 'updated'])
 

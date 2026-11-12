@@ -57,7 +57,7 @@ vi.mock('leaflet-control-geocoder', () => {
 const { LMapStub, LTileLayerStub } = vi.hoisted(() => ({
   LMapStub: {
     name: 'LMap',
-    props: ['minZoom', 'maxZoom', 'bounds', 'options', 'useGlobalLeaflet'],
+    props: ['minZoom', 'maxZoom', 'bounds', 'center', 'zoom', 'options', 'useGlobalLeaflet'],
     emits: ['ready', 'moveend', 'zoomend', 'dragend'],
     template: '<div class="stub-lmap"><slot /></div>',
   },
@@ -70,17 +70,26 @@ const { LMapStub, LTileLayerStub } = vi.hoisted(() => ({
 
 vi.mock('@vue-leaflet/vue-leaflet', () => ({ LMap: LMapStub, LTileLayer: LTileLayerStub }))
 
-function fakeLeafletMap({ size = { x: 688, y: 400 }, bounds } = {}) {
+function fakeLeafletMap({ size = { x: 688, y: 400 }, bounds, hasView = true } = {}) {
   return {
+    // Leaflet sets _loaded once the map has a centre and zoom; until then
+    // getBounds() and getCenter() throw.
+    _loaded: hasView,
     addLayer: vi.fn(),
     invalidateSize: vi.fn(),
     fitBounds: vi.fn(),
     flyToBounds: vi.fn(),
     flyTo: vi.fn(),
     getSize: () => size,
-    getBounds: () => bounds ?? L.latLngBounds([50, -1], [52, 1]),
+    getBounds: () => {
+      if (!hasView) throw new Error('Set map center and zoom first.')
+      return bounds ?? L.latLngBounds([50, -1], [52, 1])
+    },
     getZoom: () => 5,
-    getCenter: () => ({ lat: 51, lng: 0 }),
+    getCenter: () => {
+      if (!hasView) throw new Error('Set map center and zoom first.')
+      return { lat: 51, lng: 0 }
+    },
   }
 }
 
@@ -115,6 +124,29 @@ describe('components/groups/GroupMap', () => {
   it('defaults to street-level max zoom (18)', () => {
     const wrapper = mountMap()
     expect(wrapper.findComponent(LMapStub).props('maxZoom')).toBe(18)
+  })
+
+  // With nothing to frame (no box, and groups with no location) the map had no
+  // view, and asking what was in view failed the page: "Set map center and
+  // zoom first".
+  it('starts on the whole world when it has no box to frame', () => {
+    const lmap = mountMap().findComponent(LMapStub)
+    expect(lmap.props('center')).toEqual([20, 0])
+    expect(lmap.props('zoom')).toBe(2)
+
+    const framed = mountMap({ initialBounds: [[50, -1], [52, 1]] }).findComponent(LMapStub)
+    expect(framed.props('center')).toBeUndefined()
+    expect(framed.props('bounds')).toEqual([[50, -1], [52, 1]])
+  })
+
+  it('does not ask what is in view before the map has a view', async () => {
+    const wrapper = mountMap({ groups: [] })
+    const map = fakeLeafletMap({ hasView: false, size: { x: 0, y: 0 } })
+
+    expect(() => wrapper.findComponent(LMapStub).vm.$emit('ready', map)).not.toThrow()
+    await wrapper.setProps({ groups: [{ id: 1, name: 'G1', lat: null, lng: null }] })
+
+    expect(wrapper.emitted('update:groupIdsInBounds')).toBeUndefined()
   })
 
   it('passes zoom bounds and CARTO tiles through to the underlying map/tile layer', () => {

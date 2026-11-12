@@ -11,6 +11,7 @@ import markerShadowUrl from 'leaflet/dist/images/marker-shadow.png'
 import L from '../../utils/leafletGlobal.js'
 import { LEAFLET_ATTRIBUTION } from '../../utils/mapConstants.js'
 import { useLeafletTiles } from '../../composables/useLeafletTiles.js'
+import { useLeafletUnmountGuard } from '../../composables/useLeafletUnmountGuard.js'
 
 const leafletTiles = useLeafletTiles()
 
@@ -41,6 +42,8 @@ const props = defineProps({
     default: 16,
   },
 })
+
+useLeafletUnmountGuard()
 
 const center = computed(() => [props.lat, props.lng])
 

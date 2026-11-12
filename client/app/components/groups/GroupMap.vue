@@ -21,6 +21,7 @@ import { useLeafletTiles } from '../../composables/useLeafletTiles.js'
 
 import { boundingBoxFor, filterMappableGroups, hasLocation as computeHasLocation, idsInBounds, markerClassName, nearestGroups, separateIdenticalLocations } from '../../composables/useGroupMapGeometry.js'
 import { buildPlaceSearchGeocoder, PLACE_LAYERS } from '../../utils/placeSearchGeocoder.js'
+import { useLeafletUnmountGuard } from '../../composables/useLeafletUnmountGuard.js'
 
 const leafletTiles = useLeafletTiles()
 
@@ -108,6 +109,8 @@ const props = defineProps({
   },
 })
 
+useLeafletUnmountGuard()
+
 const emit = defineEmits(['update:groupIdsInBounds', 'update:hoveredId', 'select', 'searched', 'update:centre'])
 
 const { t } = useI18n()
@@ -129,6 +132,12 @@ const hasUserPoint = computed(
 )
 
 const containerEl = ref(null)
+
+// Without a box to frame, start on the whole world, so that the map always has
+// a view - one with no groups to frame (a network whose groups have no
+// location) would otherwise have none, and nothing could ask what's in view.
+const WORLD_CENTRE = [20, 0]
+const startView = computed(() => (props.initialBounds ? {} : { center: WORLD_CENTRE, zoom: Math.max(props.minZoom, 2) }))
 let mapObject = null
 let clusterGroup = null
 let plainGroup = null
@@ -231,8 +240,14 @@ function rebuildMarkers() {
   }
 }
 
+// Leaflet can't say what's in view until the map has a centre and zoom:
+// getBounds() and getCenter() throw "Set map center and zoom first".
+function hasView() {
+  return !!mapObject?._loaded
+}
+
 function idle() {
-  if (!mapObject) return
+  if (!hasView()) return
 
   const bounds = mapObject.getBounds()
   emit('update:groupIdsInBounds', idsInBounds(mappableGroups.value, bounds))
@@ -390,7 +405,7 @@ watch(
 
     // A filter changes what is drawn without moving the map, so the list that
     // follows the viewport must be told what is now in view.
-    if (mapObject) emit('update:groupIdsInBounds', idsInBounds(newVal, mapObject.getBounds()))
+    if (hasView()) emit('update:groupIdsInBounds', idsInBounds(newVal, mapObject.getBounds()))
 
     const hadGroups = oldVal && oldVal.length
     const hasGroups = newVal && newVal.length
@@ -433,6 +448,8 @@ onBeforeUnmount(() => {
       :min-zoom="minZoom"
       :max-zoom="maxZoom"
       :bounds="initialBounds || undefined"
+      :center="startView.center"
+      :zoom="startView.zoom"
       :options="mapOptions"
       use-global-leaflet
       style="width: 100%; height: 400px"
