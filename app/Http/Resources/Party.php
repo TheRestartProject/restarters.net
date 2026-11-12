@@ -2,6 +2,9 @@
 
 namespace App\Http\Resources;
 
+use App\Services\CustomFields;
+use App\Services\GroupFeatures;
+
 use App\Helpers\Fixometer;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
@@ -89,6 +92,20 @@ use Illuminate\Support\Facades\Auth;
  *          title="group",
  *          description="The group which is hosting this event.",
  *          ref="#/components/schemas/GroupSummary"
+ *     ),
+ *     @OA\Property(
+ *          property="group_features",
+ *          title="group_features",
+ *          description="Whether each optional feature is on for the hosting group: item_weight (every item has a weight box) and custom_fields (the group's own item fields).",
+ *          type="object",
+ *          @OA\AdditionalProperties(type="boolean"),
+ *          example={"item_weight": true, "custom_fields": false}
+ *     ),
+ *     @OA\Property(
+ *          property="group_custom_fields",
+ *          title="group_custom_fields",
+ *          description="The hosting group's custom item fields in use.",
+ *          ref="#/components/schemas/Group/properties/custom_fields"
  *     ),
  *     @OA\Property(
  *         property="link",
@@ -303,6 +320,9 @@ class Party extends JsonResource
             'lat' => $this->latitude,
             'lng' => $this->longitude,
             'group' => GroupSummary::make($this->theGroup),
+            // What the item form shows for this group's events (RES-2063).
+            'group_features' => $this->theGroup ? GroupFeatures::enabled($this->theGroup) : null,
+            'group_custom_fields' => $this->theGroup ? CustomFields::active($this->theGroup) : [],
             'description' => $this->free_text,
             'stats' => $this->resource->getEventStats(),
             'updated_at' => Carbon::parse($this->updated_at)->toIso8601String(),

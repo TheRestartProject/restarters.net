@@ -180,4 +180,68 @@ class EventStatsTest extends StatsTestCase
         $response->assertSuccessful();
         $response->assertSee('<span id="ewaste-diverted-value">23</span>', false);
     }
+    /** @test */
+    public function a_weight_entered_on_a_powered_item_outside_misc_counts(): void
+    {
+        $this->_setupCategoriesWithUnpoweredWeights();
+        $event = Party::factory()->create();
+        Device::factory()->fixed()->create([
+            'category' => $this->_idPoweredNonMisc,
+            'category_creation' => $this->_idPoweredNonMisc,
+            'event' => $event->idevents,
+            'estimate' => 3,
+        ]);
+
+        $stats = $event->getEventStats();
+
+        // 14.4 kg CO2e for a 4 kg item is 3.6 kg CO2e per kg.
+        $this->assertEquals(3, $stats['waste_powered']);
+        $this->assertEqualsWithDelta(3 * 3.6 * $this->_displacementFactor, $stats['co2_powered'], 0.0001);
+    }
+
+    /** @test */
+    public function a_weight_far_from_the_category_weight_does_not_count(): void
+    {
+        $this->_setupCategoriesWithUnpoweredWeights();
+        $event = Party::factory()->create();
+        Device::factory()->fixed()->create([
+            'category' => $this->_idUnpoweredNonMisc,
+            'category_creation' => $this->_idUnpoweredNonMisc,
+            'event' => $event->idevents,
+            'estimate' => 600,
+        ]);
+
+        $stats = $event->getEventStats();
+
+        $this->assertEquals(5, $stats['waste_unpowered']);
+        $this->assertEqualsWithDelta(15.5 * $this->_displacementFactor, $stats['co2_unpowered'], 0.0001);
+    }
+
+    /** @test */
+    public function a_misc_item_with_no_weight_counts_at_the_typical_misc_weight(): void
+    {
+        $this->_setupCategoriesWithUnpoweredWeights();
+        $this->_setTypicalMiscWeights(2, 0.75);
+        $event = Party::factory()->create();
+        Device::factory()->fixed()->create([
+            'category' => $this->_idPoweredMisc,
+            'category_creation' => $this->_idPoweredMisc,
+            'event' => $event->idevents,
+        ]);
+        Device::factory()->fixed()->create([
+            'category' => $this->_idUnpoweredMisc,
+            'category_creation' => $this->_idUnpoweredMisc,
+            'event' => $event->idevents,
+        ]);
+
+        $stats = $event->getEventStats();
+
+        $this->assertEquals(2, $stats['waste_powered']);
+        $this->assertEquals(0.75, $stats['waste_unpowered']);
+        $this->assertEqualsWithDelta(2 * $this->_ratioPowered * $this->_displacementFactor, $stats['co2_powered'], 0.0001);
+        $this->assertEqualsWithDelta(0.75 * $this->_ratioUnpowered * $this->_displacementFactor, $stats['co2_unpowered'], 0.0001);
+        // They still count as items with no weight entered.
+        $this->assertEquals(1, $stats['no_weight_powered']);
+        $this->assertEquals(1, $stats['no_weight_unpowered']);
+    }
 }

@@ -650,6 +650,8 @@ function closeAddVolunteer() {
         :loading="devicesStore.listLoading(id)"
         :stats="event.stats"
         :canedit="canedit"
+        :group-features="event.group_features || null"
+        :group-custom-fields="event.group_custom_fields || []"
       />
 
       <EventInviteModal

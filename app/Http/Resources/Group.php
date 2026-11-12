@@ -2,6 +2,9 @@
 
 namespace App\Http\Resources;
 
+use App\Services\CustomFields;
+use App\Services\GroupFeatures;
+
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -276,6 +279,33 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *          format="date-time",
  *     ),
  *     @OA\Property(
+ *          property="features",
+ *          title="features",
+ *          description="Each optional feature (item_weight, custom_fields) with whether it is on for this group and why.",
+ *          type="object",
+ *          @OA\AdditionalProperties(
+ *              type="object",
+ *              @OA\Property(property="enabled", type="boolean"),
+ *              @OA\Property(property="source", type="string", enum={"network", "group", "network_default", "default"}, description="network: a network has set it always on or off; group: the group's own choice; network_default: a network's default; default: the feature's own default."),
+ *              @OA\Property(property="locked", type="boolean", description="A network decides, so the group cannot change it."),
+ *              @OA\Property(property="group_setting", type="boolean", nullable=true, description="The group's own choice, if any."),
+ *              @OA\Property(property="inherited", type="boolean", description="What applies if the group has no choice of its own."),
+ *              @OA\Property(property="set_by", type="array", @OA\Items(type="string"), description="Names of the networks behind a network or network_default source.")
+ *          )
+ *     ),
+ *     @OA\Property(
+ *          property="custom_fields",
+ *          title="custom_fields",
+ *          description="The group's own item fields in use, shown in the item form when the custom_fields feature is on.",
+ *          type="array",
+ *          @OA\Items(
+ *              @OA\Property(property="key", type="string", description="Never changes, even if the label does.", example="town"),
+ *              @OA\Property(property="label", type="string", example="Town the visitor came from"),
+ *              @OA\Property(property="type", type="string", enum={"text", "number", "choice"}),
+ *              @OA\Property(property="options", type="array", @OA\Items(type="string"), description="The choices, for a choice field.")
+ *          )
+ *     ),
+ *     @OA\Property(
  *          property="discourse_group",
  *          title="discourse_group",
  *          description="The slug of this group's linked Discourse group, if any. Combine with the session config's discourse_url as {discourse_url}/g/{discourse_group} to link to the group's conversation. Null if the group has no linked Discourse group.",
@@ -395,6 +425,9 @@ class Group extends JsonResource
             'email' => $this->email,
             'archived_at' => $this->archived_at ? Carbon::parse($this->archived_at)->toIso8601String() : null,
             'discourse_group' => $this->discourse_group,
+            // Which optional features apply and why, and the group's custom item fields in use (RES-2063).
+            'features' => GroupFeatures::resolve($this->resource),
+            'custom_fields' => CustomFields::active($this->resource),
         ];
 
         $ret['hosts'] = $this->resource->all_confirmed_hosts_count;

@@ -512,6 +512,18 @@ export const useGroupsStore = defineStore('groups', {
       return returnedId
     },
 
+    // PATCH /api/v2/groups/{id}/options: the group's feature switches and custom
+    // item fields. Reflects the resolved values on the loaded group.
+    async updateOptions(id, payload) {
+      const { $api } = useNuxtApp()
+      const { data } = await $api.group.updateOptions(id, payload)
+      delete this.details[id]
+      if (this.current.data && this.current.data.id === id) {
+        this.current.data = { ...this.current.data, features: data.features, custom_fields: data.custom_fields }
+      }
+      return data
+    },
+
     // GET /api/v2/groups/tags (already implemented server-side -
     // API\GroupController::listTagsv2). Role-filtered server-side.
     async fetchTags() {

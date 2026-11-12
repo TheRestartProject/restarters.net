@@ -130,6 +130,7 @@ Route::prefix('v2')->middleware(\App\Http\Middleware\VerifyUserConsentApi::class
             Route::get('{id}/audits', [API\GroupController::class, 'auditsv2']);
             Route::post('', [API\GroupController::class, 'createGroupv2']);
             Route::patch('{id}', [API\GroupController::class, 'updateGroupv2']);
+            Route::middleware('auth:sanctum,api')->patch('{id}/options', [API\GroupController::class, 'updateGroupOptionsv2']);
 
             Route::get('{id}/volunteers', [API\GroupController::class, 'getVolunteersForGroupv2']);
             Route::middleware('auth:sanctum,api')->group(function ()
@@ -237,6 +238,7 @@ Route::prefix('v2')->middleware(\App\Http\Middleware\VerifyUserConsentApi::class
                 Route::put('{id}/tags/{tagId}', [API\NetworkController::class, 'updateNetworkTagv2']);
                 Route::delete('{id}/tags/{tagId}', [API\NetworkController::class, 'deleteNetworkTagv2']);
                 Route::patch('{id}', [API\NetworkController::class, 'updateNetworkv2']);
+                Route::patch('{id}/options', [API\NetworkController::class, 'updateNetworkOptionsv2']);
                 Route::post('{id}/logo', [API\NetworkController::class, 'uploadLogov2']);
                 Route::post('{id}/groups', [API\NetworkController::class, 'associateGroupsv2']);
             });

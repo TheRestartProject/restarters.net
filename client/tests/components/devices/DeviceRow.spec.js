@@ -17,7 +17,7 @@ const BModalStub = {
   template: '<div v-if="modelValue" :data-modal-title="title"><slot /></div>',
 }
 const DeviceFormStub = {
-  props: ['eventId', 'device', 'powered'],
+  props: ['eventId', 'device', 'powered', 'groupFeatures', 'groupCustomFields'],
   emits: ['saved', 'cancel'],
   template: '<div data-testid="device-form-stub">{{ device && device.id }}</div>',
 }
@@ -154,5 +154,26 @@ describe('components/devices/DeviceRow', () => {
     await wrapper.vm.$nextTick()
 
     expect(wrapper.text()).toContain("Sorry, we couldn't delete that item")
+  })
+
+  describe('custom item field values', () => {
+    const FIELDS = [{ key: 'town', label: 'Town', type: 'text', options: [] }]
+    const ON = { item_weight: true, custom_fields: true }
+
+    it('are not in the item list: they show when the item is opened', async () => {
+      const wrapper = mountRow({
+        device: device({ custom_values: { town: 'Leeds' } }),
+        groupFeatures: ON,
+        groupCustomFields: FIELDS,
+        canedit: true,
+      })
+
+      expect(wrapper.text()).not.toContain('Leeds')
+
+      await wrapper.find('[data-testid="event-device-edit-1"]').trigger('click')
+      const form = wrapper.findComponent(DeviceFormStub)
+      expect(form.props('groupFeatures')).toEqual(ON)
+      expect(form.props('groupCustomFields')).toEqual(FIELDS)
+    })
   })
 })

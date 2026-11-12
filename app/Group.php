@@ -50,6 +50,8 @@ class Group extends Model implements Auditable
         'timezone',
         'phone',
         'network_data',
+        'features',
+        'custom_fields',
         'email',
         'archived_at'
     ];
@@ -58,7 +60,10 @@ class Group extends Model implements Auditable
 
     protected $casts = [
         // JSON fields in the database should be converted to/from arrays.
-        'network_data' => 'array'
+        'network_data' => 'array',
+        // Feature switches (App\Services\GroupFeatures) and custom item fields (App\Services\CustomFields).
+        'features' => 'array',
+        'custom_fields' => 'array',
     ];
 
     // The distance is not in the groups table; we add it on some queries from the select.

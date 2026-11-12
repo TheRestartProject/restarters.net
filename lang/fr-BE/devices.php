@@ -34,8 +34,6 @@ return [
   'model_or_type' => 'Type d\'objet',
   'placeholder_notes' => 'Notes. Exemples : difficultés de réparation, perception du propriétaire du problème, etc. Vous aidez à la fin de Windows 10 ? Ajoutez le hashtag #EndOf10 dans les notes.',
   'powered_items' => 'Appareils électriques',
-  'required_impact' => 'kg - nécessaire pour calculer l\'impact sur l\'environnement',
-  'optional_impact' => 'kg - utilisé pour affiner le calcul de l\'impact environnemental (facultatif)',
   'title_assessment' => 'Evaluation',
   'title_items' => 'Objet',
   'title_items_at_event' => 'Objets à cet événement',

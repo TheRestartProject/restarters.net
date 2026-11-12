@@ -184,7 +184,7 @@ describe('components/devices/DeviceForm', () => {
       brand: 'Acme',
       model: '9000',
       age: 2,
-      estimate: 0,
+      estimate: null,
       problem: 'Would not toast',
       notes: 'Needed a new element',
       repair_status: 'Fixed',
@@ -292,7 +292,7 @@ describe('components/devices/DeviceForm', () => {
     })
 
     it('is hidden for powered devices unless the misc category (46) is chosen', async () => {
-      const wrapper = mountForm({ powered: true })
+      const wrapper = mountForm({ powered: true, groupFeatures: { item_weight: false, custom_fields: false } })
       await chooseOption(wrapper, 'device-form-category', '10')
       expect(wrapper.find('[data-testid="device-form-weight"]').exists()).toBe(false)
 
@@ -678,6 +678,204 @@ describe('components/devices/DeviceForm', () => {
 
       expect(store.deleteDevice).not.toHaveBeenCalled()
       expect(wrapper.find('[data-modal-title]').exists()).toBe(false)
+    })
+  })
+  describe('item weights and custom fields (RES-2063)', () => {
+    const WEIGHTS = [
+      { id: 10, name: 'Coffee maker', powered: true, cluster: 1, cluster_name: 'Kitchen', typical_weight: 1.28, weight_min: 0.0128, weight_max: 12.8 },
+      { id: 20, name: 'Bicycle', powered: false, cluster: 2, cluster_name: 'Outdoors', typical_weight: 15, weight_min: 0.15, weight_max: 150 },
+      { id: 46, name: 'Misc', powered: true, cluster: 1, cluster_name: 'Kitchen', typical_weight: 2, weight_min: 0.001, weight_max: 40 },
+      { id: 50, name: 'Misc', powered: false, cluster: 2, cluster_name: 'Outdoors', typical_weight: null, weight_min: 0.001, weight_max: null },
+    ]
+    const ON = { item_weight: true, custom_fields: false }
+    const OFF = { item_weight: false, custom_fields: false }
+
+    beforeEach(() => {
+      store.categories.data = WEIGHTS
+      store.addDevice = vi.fn().mockResolvedValue({ device: { id: 42 } })
+      store.updateDevice = vi.fn().mockResolvedValue({ device: { id: 7 } })
+    })
+
+    const weight = (w) => w.find('[data-testid="device-form-weight"]')
+    const hint = (w) => w.find('[data-testid="device-form-weight-hint"]')
+    const warning = (w) => w.find('[data-testid="device-form-weight-warning"]')
+
+    it('shows the weight box for a powered non-Misc item when the switch is on', async () => {
+      const wrapper = mountForm({ powered: true, groupFeatures: ON })
+      await chooseOption(wrapper, 'device-form-category', '10')
+      expect(weight(wrapper).exists()).toBe(true)
+    })
+
+    it('with the switch off, shows it only for Misc, powered or unpowered', async () => {
+      const powered = mountForm({ powered: true, groupFeatures: OFF })
+      await chooseOption(powered, 'device-form-category', '10')
+      expect(weight(powered).exists()).toBe(false)
+      await chooseOption(powered, 'device-form-category', '46')
+      expect(weight(powered).exists()).toBe(true)
+
+      const unpowered = mountForm({ powered: false, groupFeatures: OFF })
+      await chooseOption(unpowered, 'device-form-category', '20')
+      expect(weight(unpowered).exists()).toBe(false)
+      await chooseOption(unpowered, 'device-form-category', '50')
+      expect(weight(unpowered).exists()).toBe(true)
+    })
+
+    it('never pre-fills the weight and sends null when blank', async () => {
+      const wrapper = mountForm({ powered: true, groupFeatures: ON })
+      await chooseOption(wrapper, 'device-form-category', '10')
+      expect(weight(wrapper).element.value).toBe('')
+      await wrapper.find('[data-testid="device-form"]').trigger('submit')
+      expect(store.addDevice.mock.calls[0][1].estimate).toBeNull()
+    })
+
+    it('shows an item with no weight as an empty box, and an item with a weight as that weight', () => {
+      const none = mountForm({ powered: true, groupFeatures: ON, device: { id: 7, category: { id: 10 }, estimate: null, images: [] } })
+      expect(weight(none).element.value).toBe('')
+      const some = mountForm({ powered: true, groupFeatures: ON, device: { id: 7, category: { id: 10 }, estimate: 1.5, images: [] } })
+      expect(weight(some).element.value).toBe('1.5')
+    })
+
+    it('accepts a decimal comma', async () => {
+      const wrapper = mountForm({ powered: true, groupFeatures: ON })
+      await chooseOption(wrapper, 'device-form-category', '10')
+      await weight(wrapper).setValue('1,5')
+      await wrapper.find('[data-testid="device-form"]').trigger('submit')
+      expect(store.addDevice.mock.calls[0][1].estimate).toBe(1.5)
+    })
+
+    it('does not save text that is not a number', async () => {
+      const wrapper = mountForm({ powered: true, groupFeatures: ON })
+      await chooseOption(wrapper, 'device-form-category', '10')
+      await weight(wrapper).setValue('heavy')
+      await wrapper.find('[data-testid="device-form"]').trigger('submit')
+      expect(store.addDevice).not.toHaveBeenCalled()
+      expect(wrapper.find('[data-testid="device-form-weight-error"]').exists()).toBe(true)
+    })
+
+    it('hints at the category average, and for Misc at the typical Misc item', async () => {
+      const wrapper = mountForm({ powered: true, groupFeatures: ON })
+      await chooseOption(wrapper, 'device-form-category', '10')
+      expect(hint(wrapper).text()).toBe('Leave blank to use 1.28 kg, the Coffee maker average.')
+      await chooseOption(wrapper, 'device-form-category', '46')
+      expect(hint(wrapper).text()).toBe('Leave blank to use 2 kg, the typical Misc item.')
+    })
+
+    it('for Misc with no typical weight just asks for a weighing', async () => {
+      const wrapper = mountForm({ powered: false, groupFeatures: ON })
+      await chooseOption(wrapper, 'device-form-category', '50')
+      expect(hint(wrapper).text()).toBe('Weigh it if you can.')
+    })
+
+    it('no longer says the Misc weight is required', async () => {
+      const wrapper = mountForm({ powered: true, groupFeatures: ON })
+      await chooseOption(wrapper, 'device-form-category', '46')
+      expect(wrapper.text()).not.toContain('required to calculate')
+    })
+
+    it('warns, without blocking, about a weight over 10 times the usual', async () => {
+      const wrapper = mountForm({ powered: true, groupFeatures: ON })
+      await chooseOption(wrapper, 'device-form-category', '10')
+      await weight(wrapper).setValue('13')
+      expect(warning(wrapper).text()).toBe(
+        "This won't count towards impact figures: it's more than 10 times the usual Coffee maker weight (1.28 kg). Weights are in kg."
+      )
+      await wrapper.find('[data-testid="device-form"]').trigger('submit')
+      expect(store.addDevice.mock.calls[0][1].estimate).toBe(13)
+    })
+
+    it('suggests grams were meant when a thousandth is close to the usual weight', async () => {
+      const wrapper = mountForm({ powered: true, groupFeatures: ON })
+      await chooseOption(wrapper, 'device-form-category', '10')
+      await weight(wrapper).setValue('900')
+      expect(warning(wrapper).text()).toContain('Did you mean 0.9 kg?')
+      // Within 3 times the usual weight either way, the same test used to spot grams typed as kg on live.
+      await weight(wrapper).setValue('430')
+      expect(warning(wrapper).text()).toContain('Did you mean 0.43 kg?')
+      await weight(wrapper).setValue('420')
+      expect(warning(wrapper).text()).not.toContain('Did you mean')
+    })
+
+    it('does not save a weight over 999.999 kg, the most that can be stored, and suggests kilograms', async () => {
+      const wrapper = mountForm({ powered: true, groupFeatures: ON })
+      await chooseOption(wrapper, 'device-form-category', '10')
+      await weight(wrapper).setValue('1500')
+      await wrapper.find('[data-testid="device-form"]').trigger('submit')
+      const error = wrapper.find('[data-testid="device-form-weight-error"]')
+      expect(error.text()).toBe("Weights are in kg and can't be more than 999.999 kg. Did you mean 1.5 kg?")
+      expect(store.addDevice).not.toHaveBeenCalled()
+    })
+
+    it('warns about a weight under a hundredth of the usual', async () => {
+      const wrapper = mountForm({ powered: true, groupFeatures: ON })
+      await chooseOption(wrapper, 'device-form-category', '10')
+      await weight(wrapper).setValue('0.01')
+      expect(warning(wrapper).text()).toBe(
+        "This won't count towards impact figures: it's less than a hundredth of the usual Coffee maker weight (1.28 kg). Weights are in kg."
+      )
+    })
+
+    it('uses the Misc wording, and has no upper limit when weight_max is null', async () => {
+      const wrapper = mountForm({ powered: true, groupFeatures: ON })
+      await chooseOption(wrapper, 'device-form-category', '46')
+      await weight(wrapper).setValue('41')
+      expect(warning(wrapper).text()).toContain('more than 20 times the typical Misc weight (2 kg)')
+
+      const noMax = mountForm({ powered: false, groupFeatures: ON })
+      await chooseOption(noMax, 'device-form-category', '50')
+      await weight(noMax).setValue('9999')
+      expect(warning(noMax).exists()).toBe(false)
+    })
+
+    it('shows no warning for a weight in range, or a blank box', async () => {
+      const wrapper = mountForm({ powered: true, groupFeatures: ON })
+      await chooseOption(wrapper, 'device-form-category', '10')
+      expect(warning(wrapper).exists()).toBe(false)
+      await weight(wrapper).setValue('2')
+      expect(warning(wrapper).exists()).toBe(false)
+    })
+
+    describe('custom fields', () => {
+      const FIELDS = [
+        { key: 'town', label: 'Town', type: 'text', options: [] },
+        { key: 'visits', label: 'Visits', type: 'number', options: [] },
+        { key: 'first', label: 'First visit?', type: 'choice', options: ['Yes', 'No'] },
+      ]
+      const CF = { item_weight: true, custom_fields: true }
+
+      it('renders nothing when the switch is off or there are no fields', () => {
+        expect(mountForm({ groupFeatures: ON, groupCustomFields: FIELDS }).find('[data-testid="device-form-custom-fields"]').exists()).toBe(false)
+        expect(mountForm({ groupFeatures: CF, groupCustomFields: [] }).find('[data-testid="device-form-custom-fields"]').exists()).toBe(false)
+      })
+
+      it('renders text, number and choice inputs, and sends custom_values', async () => {
+        const wrapper = mountForm({ groupFeatures: CF, groupCustomFields: FIELDS })
+        await chooseOption(wrapper, 'device-form-category', '10')
+        await wrapper.find('[data-testid="device-form-custom-town"]').setValue('Leeds')
+        await wrapper.find('[data-testid="device-form-custom-visits"]').setValue('3')
+        await wrapper.find('[data-testid="device-form-custom-first"]').setValue('Yes')
+        expect(wrapper.findAll('[data-testid="device-form-custom-first"] option').map((o) => o.text())).toEqual(['', 'Yes', 'No'])
+        await wrapper.find('[data-testid="device-form"]').trigger('submit')
+        expect(store.addDevice.mock.calls[0][1].custom_values).toEqual({ town: 'Leeds', visits: 3, first: 'Yes' })
+      })
+
+      it('shows recorded values and sends null for a value that was cleared, leaving others alone', async () => {
+        const wrapper = mountForm({
+          groupFeatures: CF,
+          groupCustomFields: FIELDS,
+          device: { id: 7, category: { id: 10 }, images: [], custom_values: { town: 'Leeds', gone: 'x' } },
+        })
+        expect(wrapper.find('[data-testid="device-form-custom-town"]').element.value).toBe('Leeds')
+        await wrapper.find('[data-testid="device-form-custom-town"]').setValue('')
+        await wrapper.find('[data-testid="device-form"]').trigger('submit')
+        expect(store.updateDevice.mock.calls[0][2].custom_values).toEqual({ town: null })
+      })
+
+      it('omits custom_values when the fields are not shown', async () => {
+        const wrapper = mountForm({ groupFeatures: ON, groupCustomFields: FIELDS })
+        await chooseOption(wrapper, 'device-form-category', '10')
+        await wrapper.find('[data-testid="device-form"]').trigger('submit')
+        expect(store.addDevice.mock.calls[0][1]).not.toHaveProperty('custom_values')
+      })
     })
   })
 })

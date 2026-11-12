@@ -12,6 +12,11 @@ class Network extends Model
 {
     use HasFactory;
 
+    // Feature switches for the network's groups (App\Services\GroupFeatures).
+    protected $fillable = ['features'];
+
+    protected $casts = ['features' => 'array'];
+
     /**
      * The network description is rendered with v-html in NetworkPage.vue, so sanitise it
      * on write for the same reason as Group::setFreeTextAttribute().

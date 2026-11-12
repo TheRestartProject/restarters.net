@@ -16,6 +16,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Attributes\Feature;
 use App\Attributes\UserStory;
+use App\Services\GroupFeatures;
 
 #[Feature('Networks', description: 'Regional network management and coordination')]
 class NetworkController extends Controller
@@ -893,6 +894,73 @@ class NetworkController extends Controller
         }
 
         return response()->json(['data' => ['associated' => $associated]]);
+    }
+
+    /**
+     * Set the network's options for its groups (RES-2063). Body (JSON): features {key: value|null}, where the
+     * value is on or off (always, for every group), default_on or default_off (a default groups can change),
+     * or null (not set).
+     *
+     * @OA\Patch(
+     *      path="/api/v2/networks/{id}/options",
+     *      operationId="updateNetworkOptions",
+     *      tags={"Networks"},
+     *      summary="Set a network's options for its groups",
+     *      description="For each optional feature: on or off (always, for every group in the network), default_on or default_off (a default groups can change), or null (not set). Administrators and the network's coordinators.",
+     *      security={{"apiToken":{}}},
+     *      @OA\Parameter(name="id", description="Network id", required=true, in="path", @OA\Schema(type="integer")),
+     *      @OA\RequestBody(
+     *          @OA\JsonContent(
+     *              @OA\Property(property="features", type="object", example={"item_weight": "default_off", "custom_fields": null})
+     *          )
+     *      ),
+     *      @OA\Response(
+     *          response=200,
+     *          description="Successful operation",
+     *          @OA\JsonContent(
+     *              @OA\Property(property="data", type="object",
+     *                  @OA\Property(property="features", ref="#/components/schemas/Network/properties/features"),
+     *                  @OA\Property(property="feature_defaults", ref="#/components/schemas/Network/properties/feature_defaults")
+     *              )
+     *          )
+     *      ),
+     *      @OA\Response(response=403, description="Not allowed to change this network"),
+     *      @OA\Response(response=422, description="Unknown feature or value")
+     * )
+     */
+    #[UserStory('As a NetworkCoordinator, I can choose which optional features my network\'s groups use, or set a default they can change', persona: 'NetworkCoordinator', theme: 'Network management')]
+    public function updateNetworkOptionsv2(Request $request, $id): JsonResponse
+    {
+        $network = Network::findOrFail($id);
+        $user = Auth::user();
+
+        if (! $user->hasRole('Administrator') && ! $user->isCoordinatorOf($network)) {
+            return response()->json(['message' => 'You do not have permission to change this network\'s options'], 403);
+        }
+
+        $request->validate([
+            'features' => ['required', 'array', function ($attribute, $value, $fail) {
+                if (! is_array($value)) {
+                    return; // The array rule reports it.
+                }
+
+                foreach ($value as $key => $setting) {
+                    if (! array_key_exists($key, GroupFeatures::FEATURES)) {
+                        $fail("There is no feature called $key.");
+                    } elseif ($setting !== null && ! in_array($setting, GroupFeatures::NETWORK_VALUES, true)) {
+                        $fail("$key must be one of " . implode(', ', GroupFeatures::NETWORK_VALUES) . ', or null.');
+                    }
+                }
+            }],
+        ]);
+
+        $network->features = GroupFeatures::apply($network->features, $request->input('features'));
+        $network->save();
+
+        return response()->json(['data' => [
+            'features' => GroupFeatures::networkSettings($network),
+            'feature_defaults' => GroupFeatures::FEATURES,
+        ]]);
     }
 
     /**

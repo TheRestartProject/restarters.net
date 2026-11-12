@@ -3,6 +3,7 @@ import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useDevicesStore } from '../../stores/devices.js'
 import { suggestDeviceCategory } from '../../composables/useDeviceCategorySuggestion.js'
+import { fieldLabel } from '../../composables/useFeatureSwitches.js'
 import DevicePhotos from './DevicePhotos.vue'
 import FieldInfoPopover from '../forms/FieldInfoPopover.vue'
 
@@ -88,6 +89,17 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  // The group's resolved feature switches and active custom item fields (the
+  // event resource's group_features / group_custom_fields). Without them
+  // (e.g. the repair records list) weights are on and there are no custom fields.
+  groupFeatures: {
+    type: Object,
+    default: null,
+  },
+  groupCustomFields: {
+    type: Array,
+    default: () => [],
+  },
 })
 
 const emit = defineEmits(['saved', 'cancel', 'deleted'])
@@ -123,7 +135,8 @@ const form = reactive({
   brand: props.device?.brand || '',
   model: props.device?.model || '',
   age: props.device?.age ? String(props.device.age) : '',
-  estimate: props.device?.estimate ? String(props.device.estimate) : '',
+  // Never pre-filled with the category weight; no weight is an empty box.
+  estimate: Number(props.device?.estimate) > 0 ? String(props.device.estimate) : '',
   problem: props.device?.problem || '',
   notes: props.device?.notes || '',
   reference: props.device?.reference || '',
@@ -132,6 +145,7 @@ const form = reactive({
   spareParts: props.device?.spare_parts || '',
   barrier: props.device?.barrier || '',
   quantity: 1,
+  custom: { ...(props.device?.custom_values || {}) },
 })
 
 const quantities = Array.from({ length: 11 }, (_, i) => i)
@@ -182,11 +196,104 @@ watch([itemTypes, clusters], () => {
   if (form.itemType) runSuggestion(form.itemType, { allowClear: false })
 })
 
-// Powered devices only allow editing the weight for the "None of the
-// above" misc category; unpowered devices always allow it
-// (EventDevice.vue's `showWeight`/`weightRequired` computeds).
-const showWeight = computed(() => !props.powered || form.category === miscCategoryId.value)
-const weightRequired = computed(() => form.category === miscCategoryId.value)
+// The weight box is shown for every item when the group's item-weight switch
+// is on (the default), otherwise only for Misc items (powered or unpowered).
+const isMisc = computed(() => form.category === miscCategoryId.value)
+const weightSwitchOn = computed(() => props.groupFeatures?.item_weight !== false)
+const showWeight = computed(() => weightSwitchOn.value || isMisc.value)
+
+const selectedCategory = computed(() => devicesStore.categories.data.find((c) => c.id === form.category) || null)
+const categoryName = computed(() => (selectedCategory.value ? t(selectedCategory.value.name) : ''))
+
+// Accepts a decimal comma. null = blank, NaN = not a number.
+function parseWeight(raw) {
+  const text = String(raw ?? '').trim().replace(',', '.')
+  if (text === '') return null
+  return /^\d*\.?\d+$|^\d+\.$/.test(text) ? parseFloat(text) : NaN
+}
+const enteredWeight = computed(() => parseWeight(form.estimate))
+const weightInvalid = ref(false)
+// The most the database can store (devices.estimate is DECIMAL(6,3)).
+const MAX_STORABLE_WEIGHT = 999.999
+
+function formatKg(n) {
+  return String(parseFloat(Number(n).toFixed(3)))
+}
+
+const typicalWeight = computed(() => {
+  const w = Number(selectedCategory.value?.typical_weight)
+  return w > 0 ? w : null
+})
+const weightHint = computed(() => {
+  if (!selectedCategory.value) return ''
+  if (isMisc.value) {
+    return typicalWeight.value
+      ? t('client.devices.weight_hint_misc', { weight: formatKg(typicalWeight.value) })
+      : t('client.devices.weight_hint_misc_none')
+  }
+  return typicalWeight.value
+    ? t('client.devices.weight_hint', { weight: formatKg(typicalWeight.value), category: categoryName.value })
+    : ''
+})
+
+// Grams typed as kilograms: a weight whose thousandth is within 3 times the
+// usual weight (the same test used to spot them in live data).
+function gramsSuggestion(v) {
+  const grams = v / 1000
+  const typicalKg = typicalWeight.value
+  if (!typicalKg || grams < typicalKg / 3 || grams > typicalKg * 3) return ''
+  return ` ${t('client.devices.weight_did_you_mean', { value: formatKg(grams) })}`
+}
+
+// A weight the database can't store blocks saving; it is shown as soon as it is typed.
+const weightTooHeavy = computed(() => {
+  const v = enteredWeight.value
+  if (!showWeight.value || v === null || Number.isNaN(v) || v <= MAX_STORABLE_WEIGHT) return ''
+  return t('client.devices.weight_too_heavy') + gramsSuggestion(v)
+})
+const weightError = computed(() => (weightInvalid.value ? t('client.devices.weight_invalid') : weightTooHeavy.value))
+
+// A weight outside the category's range will not count towards impact figures.
+// It is a warning only: the item can still be saved.
+const weightWarning = computed(() => {
+  const cat = selectedCategory.value
+  const v = enteredWeight.value
+  if (!cat || v === null || Number.isNaN(v) || v <= 0 || !typicalWeight.value) return ''
+
+  const min = cat.weight_min ?? null
+  const max = cat.weight_max ?? null
+  const typical = formatKg(typicalWeight.value)
+  let message = ''
+
+  if (max !== null && v > max) {
+    message = isMisc.value
+      ? t('client.devices.weight_warning_high_misc', { typical })
+      : t('client.devices.weight_warning_high', { category: categoryName.value, typical })
+  } else if (!isMisc.value && min !== null && v < min) {
+    message = t('client.devices.weight_warning_low', { category: categoryName.value, typical })
+  }
+  if (!message || v > MAX_STORABLE_WEIGHT) return ''
+
+  if (max !== null && v > max) {
+    message += gramsSuggestion(v)
+  }
+  return message
+})
+
+// Custom item fields come after the standard fields, when the group has them switched on.
+const customFields = computed(() => (props.groupFeatures?.custom_fields ? props.groupCustomFields || [] : []))
+const originalCustom = props.device?.custom_values || {}
+
+function customValuesPayload() {
+  const out = {}
+  for (const f of customFields.value) {
+    const raw = form.custom[f.key]
+    const value = raw === '' || raw === undefined || raw === null ? null : raw
+    if (value !== null) out[f.key] = value
+    else if (originalCustom[f.key] !== undefined && originalCustom[f.key] !== null) out[f.key] = null
+  }
+  return out
+}
 
 const showNextSteps = computed(() => form.repairStatus === STATUS_REPAIRABLE)
 const showSpareParts = computed(() => form.repairStatus === STATUS_REPAIRABLE || form.repairStatus === STATUS_FIXED)
@@ -363,7 +470,7 @@ function buildPayload() {
   const payload = {
     category: form.category,
     age: form.age ? parseFloat(form.age) : 0,
-    estimate: form.estimate ? parseFloat(form.estimate) : 0,
+    estimate: enteredWeight.value,
   }
 
   const optional = {
@@ -381,6 +488,7 @@ function buildPayload() {
   for (const [key, value] of Object.entries(optional)) {
     if (value) payload[key] = value
   }
+  if (customFields.value.length) payload.custom_values = customValuesPayload()
 
   return payload
 }
@@ -393,6 +501,9 @@ async function submit() {
     return
   }
   missingCategory.value = false
+
+  weightInvalid.value = showWeight.value && Number.isNaN(enteredWeight.value)
+  if (weightInvalid.value || weightTooHeavy.value) return
 
   submitting.value = true
 
@@ -658,20 +769,25 @@ const SHOW_DEVICE_REFERENCE = false
           <small class="form-text text-muted">{{ t('devices.age_approx') }}</small>
         </BFormGroup>
 
-        <BFormGroup v-if="showWeight" :label="`${t('devices.weight')}:`" label-for="device-form-weight">
+        <BFormGroup v-if="showWeight" :label="`${t('devices.weight')} (kg):`" label-for="device-form-weight">
           <input
             id="device-form-weight" v-model="form.estimate"
             :aria-label="`${t('devices.weight')}`"
-            type="number"
-            min="0"
-            step="0.1"
-            max="500"
+            type="text"
+            inputmode="decimal"
             class="form-control"
+            :class="{ 'is-invalid': weightError }"
             :disabled="readonly"
             data-testid="device-form-weight"
           >
-          <small class="form-text text-muted">
-            {{ weightRequired ? t('devices.required_impact') : t('devices.optional_impact') }}
+          <small v-if="weightError" class="form-text text-danger d-block" data-testid="device-form-weight-error">
+            {{ weightError }}
+          </small>
+          <small v-if="weightHint" class="form-text text-muted d-block" data-testid="device-form-weight-hint">
+            {{ weightHint }}
+          </small>
+          <small v-if="weightWarning" class="form-text text-warning-emphasis d-block" role="alert" data-testid="device-form-weight-warning">
+            {{ weightWarning }}
           </small>
         </BFormGroup>
 
@@ -862,6 +978,43 @@ const SHOW_DEVICE_REFERENCE = false
           />
         </BFormGroup>
       </div>
+    </div>
+
+    <div v-if="customFields.length" class="device-form-card" data-testid="device-form-custom-fields">
+      <h3>{{ t('client.devices.custom_fields_heading') }}</h3>
+      <BFormGroup v-for="f in customFields" :key="f.key" :label="fieldLabel(f.label)" :label-for="`device-form-custom-${f.key}`">
+        <select
+          v-if="f.type === 'choice'"
+          :id="`device-form-custom-${f.key}`"
+          v-model="form.custom[f.key]"
+          class="form-select"
+          :disabled="readonly"
+          :data-testid="`device-form-custom-${f.key}`"
+        >
+          <option value="" />
+          <option v-for="o in f.options" :key="o" :value="o">{{ o }}</option>
+        </select>
+        <input
+          v-else-if="f.type === 'number'"
+          :id="`device-form-custom-${f.key}`"
+          v-model.number="form.custom[f.key]"
+          type="number"
+          step="any"
+          class="form-control"
+          :disabled="readonly"
+          :data-testid="`device-form-custom-${f.key}`"
+        >
+        <input
+          v-else
+          :id="`device-form-custom-${f.key}`"
+          v-model="form.custom[f.key]"
+          type="text"
+          maxlength="255"
+          class="form-control"
+          :disabled="readonly"
+          :data-testid="`device-form-custom-${f.key}`"
+        >
+      </BFormGroup>
     </div>
 
     <BFormGroup v-if="!editing" :label="`${t('client.devices.quantity')}:`" label-for="device-form-quantity">
