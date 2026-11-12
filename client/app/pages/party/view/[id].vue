@@ -1,6 +1,6 @@
 <script setup>
 import LoadingPlaceholder from '~/components/LoadingPlaceholder.vue'
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import clip from 'text-clipper'
 import { useToastStore } from '~/stores/toast.js'
 import { useI18n } from 'vue-i18n'
@@ -229,6 +229,27 @@ function retry() {
   load()
 }
 
+// Following an emailed invite again finds its code spent, and the server can't tell that it's someone
+// already going (the client signs in with a token, not the session the link arrives in). So wait for the
+// event to load, and only warn someone who isn't.
+function warnOfInvalidInviteUnlessGoing() {
+  let done = false
+  let stop = null
+  stop = watch(
+    () => (event.value?.id === id.value ? event.value : null),
+    (loaded) => {
+      if (done || !loaded) return
+      done = true
+      if (!loaded.attending) {
+        useToastStore().error(t('events.invite_invalid'))
+      }
+      stop?.()
+    },
+    { immediate: true },
+  )
+  if (done) stop()
+}
+
 onMounted(() => {
   load()
 
@@ -238,7 +259,7 @@ onMounted(() => {
   if (route.query.joined === '1') {
     useToastStore().success(t('client.events.invite_confirmed'))
   } else if (route.query.invite === 'invalid') {
-    useToastStore().error(t('events.invite_invalid'))
+    warnOfInvalidInviteUnlessGoing()
   }
   if (route.query.joined || route.query.invite) {
     const { joined, invite, ...rest } = route.query

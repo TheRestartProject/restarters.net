@@ -519,9 +519,10 @@ class Group extends Model implements Auditable
 
     public function refresh()
     {
-        // Re-read from the database, so don't keep a next event preloaded from before.
+        // Re-read from the database, so don't keep a next event or membership preloaded from before.
         $this->nextEventPreloaded = false;
         $this->preloadedNextEvent = null;
+        $this->preloadedViewerMembership = null;
 
         return parent::refresh();
     }
@@ -602,7 +603,8 @@ class Group extends Model implements Auditable
 
             $group->preloadedViewerMembership = [
                 'is_member' => $mine->contains(fn ($row) => $row->status === null || (string) $row->status === '1'),
-                'pending_invite' => $pending ? $pending->status : null,
+                // As the resource's lookup, which turns an empty status into null.
+                'pending_invite' => $pending ? ($pending->status ?: null) : null,
             ];
         }
     }

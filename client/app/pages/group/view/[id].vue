@@ -1,6 +1,6 @@
 <script setup>
 import LoadingPlaceholder from '~/components/LoadingPlaceholder.vue'
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useToastStore } from '~/stores/toast.js'
 import { useI18n } from 'vue-i18n'
 import { useGroupsStore } from '~/stores/groups.js'
@@ -231,6 +231,27 @@ function load() {
   groupsStore.fetchVolunteers(id.value)
 }
 
+// Following an emailed invite again finds its code spent, and the server can't tell that it's someone
+// already a member (the client signs in with a token, not the session the link arrives in). So wait for the
+// group to load, and only warn someone who isn't.
+function warnOfInvalidInviteUnlessMember() {
+  let done = false
+  let stop = null
+  stop = watch(
+    () => (group.value?.id === id.value ? group.value : null),
+    (loaded) => {
+      if (done || !loaded) return
+      done = true
+      if (!loaded.is_member) {
+        useToastStore().error(t('groups.invite_invalid'))
+      }
+      stop?.()
+    },
+    { immediate: true },
+  )
+  if (done) stop()
+}
+
 onMounted(() => {
   load()
 
@@ -240,7 +261,7 @@ onMounted(() => {
   if (route.query.joined === '1') {
     useToastStore().success(t('groups.invite_confirmed'))
   } else if (route.query.invite === 'invalid') {
-    useToastStore().error(t('groups.invite_invalid'))
+    warnOfInvalidInviteUnlessMember()
   }
   if (route.query.joined || route.query.invite) {
     const { joined, invite, ...rest } = route.query

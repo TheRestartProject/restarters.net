@@ -10,6 +10,7 @@ import { useGroupsStore } from '../../../app/stores/groups.js'
 import { useDevicesStore } from '../../../app/stores/devices.js'
 import { useAuthStore } from '../../../app/stores/auth.js'
 import { useSessionStore } from '../../../app/stores/session.js'
+import { useToastStore } from '../../../app/stores/toast.js'
 import en from '../../../i18n/locales/en.json'
 import clientEn from '../../../i18n/locales/client-en.json'
 
@@ -194,6 +195,40 @@ describe('pages/party/view/[id]', () => {
     authStore = useAuthStore()
 
     useSessionStore().config = { discourse_url: 'https://talk.example.com' }
+  })
+
+  // Following an emailed invite again finds its code spent. The server can't tell it's someone already going (the
+  // client signs in with a token, not the session the link arrives in), so the page checks once the event loads.
+  describe('an invite link that has been used (?invite=invalid)', () => {
+    beforeEach(() => {
+      vi.stubGlobal('useRoute', () => ({ params: { id: '5' }, query: { invite: 'invalid' }, fullPath: '/party/view/5?invite=invalid' }))
+    })
+
+    it('says nothing to someone already going', async () => {
+      const toast = useToastStore()
+      toast.error = vi.fn()
+      eventsStore.current.data = baseEvent({ attending: true })
+
+      mountPage()
+      await flushPromises()
+
+      expect(toast.error).not.toHaveBeenCalled()
+    })
+
+    it('warns someone who is not going, once the event has loaded', async () => {
+      const toast = useToastStore()
+      toast.error = vi.fn()
+      eventsStore.current.data = { ...baseEvent(), id: 99 }
+
+      mountPage()
+      await flushPromises()
+      expect(toast.error).not.toHaveBeenCalled()
+
+      eventsStore.current.data = baseEvent({ attending: false })
+      await flushPromises()
+      expect(toast.error).toHaveBeenCalledTimes(1)
+      expect(toast.error).toHaveBeenCalledWith(en.events.invite_invalid)
+    })
   })
 
   it('fetches the event, attendees and devices for the routed id on mount', () => {

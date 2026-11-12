@@ -653,10 +653,11 @@ class Party extends Model implements Auditable
 
     public function isBeingAttendedBy($userId)
     {
+        // '1' as a string: compared as a number, MySQL takes an invite hash that starts with 1 (1a3f...) for 1.
         return EventsUsers::where([
             ['event', '=', $this->idevents],
             ['user', '=', $userId],
-            ['status', '=', 1],
+            ['status', '=', '1'],
         ])->exists();
     }
 
@@ -707,7 +708,9 @@ class Party extends Model implements Auditable
             ->groupBy('event');
 
         foreach ($events as $event) {
-            $statuses = $rows->get($event->idevents, collect())->pluck('status')->map(fn ($s) => (string) $s);
+            // A row with no status (from before invitations were stored) is neither, as in SQL.
+            $statuses = $rows->get($event->idevents, collect())->pluck('status')->filter(fn ($s) => $s !== null)
+                ->map(fn ($s) => (string) $s);
             $event->preloadedAttending = $statuses->contains('1');
             $event->preloadedInvitationPending = $statuses->contains(fn ($s) => $s !== '1');
         }

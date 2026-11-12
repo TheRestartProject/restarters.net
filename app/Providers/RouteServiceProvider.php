@@ -64,8 +64,20 @@ class RouteServiceProvider extends ServiceProvider
 
         // Login/register/password endpoints. Env-configurable so test runs
         // (Playwright bursts) can relax it without editing source files.
+        // Per real client (Fly-Client-IP, as above) and email address, so the
+        // volunteers at a venue, sharing its wifi, don't share one limit; and
+        // a looser limit per client, so trying one password across many
+        // accounts is limited too.
         RateLimiter::for('auth', function (Request $request) {
-            return Limit::perMinute((int) config('restarters.auth_rate_limit'))->by($request->ip());
+            $perMinute = (int) config('restarters.auth_rate_limit');
+            $client = $request->header('Fly-Client-IP') ?: $request->ip();
+            $email = $request->input('email');
+            $email = is_string($email) ? strtolower(trim($email)) : '';
+
+            return [
+                Limit::perMinute($perMinute)->by('auth:'.$client.'|'.$email),
+                Limit::perMinute($perMinute * 3)->by('auth-client:'.$client),
+            ];
         });
 
         $this->routes(function () {

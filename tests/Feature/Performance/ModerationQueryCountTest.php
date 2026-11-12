@@ -274,7 +274,10 @@ class ModerationQueryCountTest extends TestCase
         $network->addCoordinator($user);
         [$going, $invited, $neither] = $this->addGroupsWithEvents($network, 3, 1);
         EventsUsers::create(['event' => $going, 'user' => $user->id, 'status' => '1', 'role' => 4]);
-        EventsUsers::create(['event' => $invited, 'user' => $user->id, 'status' => 'invite-hash', 'role' => 4]);
+        // An invite hash that starts with 1, which MySQL would take for 1 if compared as a number.
+        EventsUsers::create(['event' => $invited, 'user' => $user->id, 'status' => '1a3f9c0invitehash', 'role' => 4]);
+        // Rows from before invitations were stored have no status: neither going nor invited.
+        EventsUsers::create(['event' => $neither, 'user' => $user->id, 'status' => null, 'role' => 4]);
 
         $member = Group::factory()->create(['approved' => false]);
         $asked = Group::factory()->create(['approved' => false]);

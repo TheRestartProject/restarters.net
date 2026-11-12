@@ -81,7 +81,7 @@ class WikiLoginTests extends TestCase
 
     /**
      * @test
-     * @story:AuthController::loginv2
+     * @story:BridgeController::bridge
      */
     public function if_not_flagged_for_creation(): void
     {
@@ -107,7 +107,7 @@ class WikiLoginTests extends TestCase
 
     /**
      * @test
-     * @story:AuthController::loginv2
+     * @story:BridgeController::bridge
      */
     public function if_already_created(): void
     {
@@ -204,7 +204,7 @@ class WikiLoginTests extends TestCase
 
     /**
      * @test
-     * @story:AuthController::loginv2
+     * @story:BridgeController::bridge
      */
     public function logs_in_to_the_wiki_when_its_rate_limit_turns_the_first_tries_away(): void
     {
@@ -223,7 +223,7 @@ class WikiLoginTests extends TestCase
 
     /**
      * @test
-     * @story:AuthController::loginv2
+     * @story:BridgeController::bridge
      */
     public function a_wiki_password_out_of_sync_is_reported_once(): void
     {
@@ -431,7 +431,7 @@ class WikiLoginTests extends TestCase
 
     /**
      * @test
-     * @story:AuthController::loginv2
+     * @story:BridgeController::bridge
      */
     public function a_free_wiki_name_is_created(): void
     {
@@ -443,7 +443,7 @@ class WikiLoginTests extends TestCase
 
     /**
      * @test
-     * @story:AuthController::loginv2
+     * @story:BridgeController::bridge
      */
     public function a_wiki_name_someone_else_has_gets_the_users_id_added(): void
     {
@@ -458,7 +458,7 @@ class WikiLoginTests extends TestCase
 
     /**
      * @test
-     * @story:AuthController::loginv2
+     * @story:BridgeController::bridge
      */
     public function a_wiki_name_that_is_already_the_users_own_is_linked(): void
     {
@@ -477,7 +477,7 @@ class WikiLoginTests extends TestCase
 
     /**
      * @test
-     * @story:AuthController::loginv2
+     * @story:BridgeController::bridge
      */
     public function a_wiki_account_turned_down_for_another_reason_is_tried_again_later(): void
     {
@@ -494,7 +494,7 @@ class WikiLoginTests extends TestCase
 
     /**
      * @test
-     * @story:AuthController::loginv2
+     * @story:BridgeController::bridge
      */
     public function when_both_wiki_names_belong_to_others_it_is_reported_once(): void
     {
