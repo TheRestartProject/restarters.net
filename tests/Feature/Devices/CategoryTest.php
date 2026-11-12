@@ -90,8 +90,8 @@ class CategoryTest extends TestCase
     {
         $cat = Category::where('powered', true)->first();
 
-        // Counts that put them in neither alphabetical order, with or without case.
-        foreach (['KETTLE LEAD' => 3, 'Kettle' => 1, 'kettle base' => 2] as $type => $times) {
+        // Counts that match no alphabetical order, either way round, with or without case.
+        foreach (['kettle base' => 3, 'KETTLE LEAD' => 2, 'Kettle' => 1] as $type => $times) {
             for ($i = 0; $i < $times; $i++) {
                 Device::factory()->fixed()->create(['category' => $cat->idcategories, 'item_type' => $type]);
             }
@@ -101,7 +101,7 @@ class CategoryTest extends TestCase
         $types = array_column($this->get('/api/v2/items')->assertSuccessful()->json('data'), 'type');
         $kettles = array_values(array_filter($types, fn ($t) => stripos($t, 'kettle') !== false));
 
-        self::assertEquals(['KETTLE LEAD', 'kettle base', 'Kettle'], $kettles);
+        self::assertEquals(['kettle base', 'KETTLE LEAD', 'Kettle'], $kettles);
     }
 
     public function testCategorySuggestionLogic(): void

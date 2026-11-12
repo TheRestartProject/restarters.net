@@ -132,6 +132,19 @@ describe('stores/auth', () => {
     })
   })
 
+  // The wiki's Logout link brings people here whose Restarters login may have lapsed; the API still clears the
+  // wiki's login cookies for them.
+  it('logout calls the API without a token too', async () => {
+    const store = useAuthStore()
+    store.token = null
+    mockApi.auth.logout.mockResolvedValueOnce({ message: 'Logged out.' })
+
+    await store.logout()
+
+    expect(mockApi.auth.logout).toHaveBeenCalledTimes(1)
+    expect(store.token).toBeNull()
+  })
+
   it('clear() removes local state without calling the API', () => {
     const store = useAuthStore()
     store.token = 'tok-1'

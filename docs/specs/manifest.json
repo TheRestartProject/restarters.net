@@ -1,5 +1,5 @@
 {
-    "generatedAt": "2026-11-12T18:39:46Z",
+    "generatedAt": "2026-11-12T18:45:34Z",
     "features": {
         "Administration": {
             "description": "Platform administration and configuration",
@@ -3362,6 +3362,14 @@
                         {
                             "file": "tests/Feature/Auth/AuthEndpointsTest.php",
                             "test": "testLogoutLogsOutOfTheWiki"
+                        },
+                        {
+                            "file": "tests/Feature/Auth/AuthEndpointsTest.php",
+                            "test": "testLogoutWithoutATokenStillLogsOutOfTheWiki"
+                        },
+                        {
+                            "file": "tests/Feature/Auth/AuthEndpointsTest.php",
+                            "test": "testLogoutWithAnExpiredTokenStillLogsOutOfTheWiki"
                         }
                     ]
                 },

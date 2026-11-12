@@ -107,10 +107,11 @@ Route::prefix('v2')->middleware(\App\Http\Middleware\VerifyUserConsentApi::class
                 Route::get('/password/recovery/{token}', [API\AuthController::class, 'recoveryInfov2']);
             });
             Route::get('/email-available', [API\AuthController::class, 'emailAvailablev2']);
+            // Open to anyone, so a lapsed login still logs out of the wiki. The cookie middleware sends the wiki's
+            // cookies, which LogOutOfWiki clears; the api group has none.
+            Route::post('/logout', [API\AuthController::class, 'logoutv2'])
+                ->middleware(\Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class);
             Route::middleware('auth:sanctum,api')->group(function() {
-                // The cookie middleware sends the wiki's cookies, which LogOutOfWiki clears; the api group has none.
-                Route::post('/logout', [API\AuthController::class, 'logoutv2'])
-                    ->middleware(\Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class);
                 Route::post('/sso-ticket', [API\AuthController::class, 'ssoTicketv2']);
             });
         });

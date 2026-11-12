@@ -124,19 +124,27 @@ class AuthController extends Controller
      *      operationId="logoutv2",
      *      tags={"Auth"},
      *      summary="Revoke the current token and sync logout to Discourse/Wiki",
-     *      security={{"apiToken":{}}},
+     *      description="Works without a valid token too, so it declares no security: it then only clears the wiki's login cookies, for someone whose Restarters login has lapsed while the wiki's has not.",
      *      @OA\Response(
      *          response=200,
      *          description="Logged out",
      *          @OA\JsonContent(@OA\Property(property="message", type="string"))
-     *      ),
-     *      @OA\Response(response=401, ref="#/components/responses/Unauthenticated")
+     *      )
      * )
      */
     #[UserStory('As a Restarter, I can log out and end my session', persona: 'Restarter', theme: 'Authentication')]
     public function logoutv2(Request $request): JsonResponse
     {
-        $user = $request->user();
+        // Open to anyone, as live's /logout was: someone whose Restarters
+        // login has lapsed can still be logged in to the wiki, and the wiki's
+        // Logout link brings them here.
+        $user = auth('sanctum')->user() ?? auth('api')->user();
+
+        if (! $user) {
+            \App\Listeners\LogOutOfWiki::forgetWikiCookies();
+
+            return response()->json(['message' => 'Logged out.']);
+        }
 
         // Sanctum-issued tokens are revoked; legacy api_token credentials have
         // no revocation (they are not per-session), so there is nothing to do
