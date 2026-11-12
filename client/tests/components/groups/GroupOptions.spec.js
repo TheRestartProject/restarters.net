@@ -145,6 +145,42 @@ describe('components/groups/GroupOptions', () => {
     expect(sel(wrapper, 'item_weight').element.value).toBe('off')
   })
 
+  it('keeps a valid choice when the group is refreshed during unsaved edits', async () => {
+    const g = group({
+      features: { item_weight: feature({ locked: true, enabled: true, set_by: ['N'] }), custom_fields: feature({ group_setting: true, enabled: true, inherited: false }) },
+      custom_fields: [{ key: 'town', label: 'Town', type: 'text', options: [] }],
+    })
+    const wrapper = mountOptions(g)
+    await wrapper.find('[data-testid="group-custom-field-label-0"]').setValue('Home town')
+
+    // The network stops deciding item weights, and makes custom fields on by default.
+    await wrapper.setProps({
+      group: group({
+        features: { item_weight: feature(), custom_fields: feature({ group_setting: true, enabled: true, inherited: true }) },
+        custom_fields: [{ key: 'town', label: 'Town', type: 'text', options: [] }],
+      }),
+    })
+    await wrapper.vm.$nextTick()
+
+    // Not blank (an option is selected): what applies now, and the host's edit is kept.
+    expect(sel(wrapper, 'item_weight').element.selectedIndex).toBeGreaterThanOrEqual(0)
+    expect(sel(wrapper, 'item_weight').element.value).toBe('')
+    expect(sel(wrapper, 'custom_fields').element.selectedIndex).toBeGreaterThanOrEqual(0)
+    expect(sel(wrapper, 'custom_fields').element.value).toBe('')
+    expect(wrapper.find('[data-testid="group-custom-field-label-0"]').element.value).toBe('Home town')
+
+    // And a feature that becomes locked shows what the network decided.
+    await wrapper.setProps({
+      group: group({
+        features: { item_weight: feature({ locked: true, enabled: false, set_by: ['N'] }), custom_fields: feature({ group_setting: true, enabled: true, inherited: true }) },
+        custom_fields: [{ key: 'town', label: 'Town', type: 'text', options: [] }],
+      }),
+    })
+    await wrapper.vm.$nextTick()
+    expect(sel(wrapper, 'item_weight').element.selectedIndex).toBe(0)
+    expect(sel(wrapper, 'item_weight').element.value).toBe('locked')
+  })
+
   it('shows the group as saved after saving, even when what applies has changed', async () => {
     const wrapper = mountOptions(group({ features: { item_weight: feature(), custom_fields: feature({ enabled: false, inherited: false }) } }))
     store.updateOptions = vi.fn().mockImplementation(async () => {

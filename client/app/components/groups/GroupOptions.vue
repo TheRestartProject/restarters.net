@@ -95,9 +95,31 @@ function showGroup(source = props.group) {
 watch(
   () => [props.group.features, props.group.custom_fields],
   () => {
-    if (editState() === syncedState) showGroup()
+    if (editState() === syncedState) {
+      showGroup()
+    } else {
+      keepChoicesValid()
+    }
   }
 )
+
+// With unsaved edits the card keeps what the host chose, but a network may
+// meanwhile have locked or unlocked a feature, or changed its default, so a
+// choice may no longer be on offer. Show what applies instead of a blank
+// select, which saving would turn into "follow the default".
+function keepChoicesValid() {
+  const now = selectValues()
+
+  for (const key of FEATURE_KEYS) {
+    const offered = choices(key).map((c) => c.value)
+
+    if (offered.includes(values[key])) continue
+
+    // 'on' or 'off' that has become the default is now the default choice.
+    const byDefault = !!features.value[key]?.inherited
+    values[key] = !isLocked(key) && values[key] === (byDefault ? 'on' : 'off') ? '' : now[key]
+  }
+}
 
 function addField() {
   if (rows.value.length >= MAX_CUSTOM_FIELDS) return
