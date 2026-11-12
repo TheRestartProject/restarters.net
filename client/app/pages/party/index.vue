@@ -211,7 +211,7 @@ onMounted(load)
     <!-- events/index.blade.php:55 renders <EventsRequiringModeration/>, the
          full events table, not the plain name-only list. Same substitution
          already corrected on /group and the network page. -->
-    <EventsRequiringModeration v-if="showModeration" class="mb-3" />
+    <EventsRequiringModeration v-if="showModeration" class="mb-3" hide-when-empty />
 
     <!-- Gap 20: AlertsBanner sits after the moderation queue, matching
          GroupEvents.vue's slot order (h1/add-event row + moderation queue
@@ -257,6 +257,9 @@ onMounted(load)
           </h2>
         </template>
 
+        <!-- The same tabs box as the group page's events (develop's
+             GroupEvents.vue renders both). -->
+        <div class="events-tabs" data-testid="party-mine-tabs">
         <ul class="nav nav-tabs">
           <li class="nav-item">
             <button
@@ -282,14 +285,14 @@ onMounted(load)
           </li>
         </ul>
 
-        <div v-if="mineTab === 'upcoming'" class="pt-3" data-testid="party-mine-panel-upcoming">
+        <div v-if="mineTab === 'upcoming'" class="events-tabs__content" data-testid="party-mine-panel-upcoming">
           <EventsList
             :events="upcomingMine"
             :hosted-group-ids="hostedGroupIds"
             :empty-message="t('groups.no_upcoming_events')"
           />
         </div>
-        <div v-else class="pt-3" data-testid="party-mine-panel-past">
+        <div v-else class="events-tabs__content" data-testid="party-mine-panel-past">
           <EventsList
             :events="pastMine"
             :hosted-group-ids="hostedGroupIds"
@@ -297,6 +300,7 @@ onMounted(load)
             :empty-message="t('groups.no_past_events')"
             past
           />
+        </div>
         </div>
       </EventCollapsibleSection>
 
@@ -306,6 +310,7 @@ onMounted(load)
             <h2 class="mb-0">{{ t('events.other_events') }}</h2>
           </template>
 
+          <div class="events-tabs" data-testid="party-other-tabs">
           <ul class="nav nav-tabs">
             <li class="nav-item">
               <button
@@ -331,10 +336,10 @@ onMounted(load)
             </li>
           </ul>
 
-          <div v-if="otherTab === 'nearby'" class="pt-3" data-testid="party-other-panel-nearby">
+          <div v-if="otherTab === 'nearby'" class="events-tabs__content" data-testid="party-other-panel-nearby">
             <EventsList :events="nearbyEvents" :empty-message="nearbyEmptyMessage" />
           </div>
-          <div v-else class="pt-3" data-testid="party-other-panel-all">
+          <div v-else class="events-tabs__content" data-testid="party-other-panel-all">
             <EventFilters
               v-model:search="allSearch"
               v-model:country="allCountry"
@@ -347,6 +352,7 @@ onMounted(load)
               :events="filteredOtherEvents"
               :empty-message="hasAllFilters ? t('client.events.no_search_results') : t('groups.no_other_events')"
             />
+          </div>
           </div>
         </EventCollapsibleSection>
       </template>

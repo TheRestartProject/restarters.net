@@ -43,6 +43,19 @@ describe('components/networks/NetworkEventsModerationTable', () => {
     expect(wrapper.get('[data-testid="network-events-moderation-empty"]').text()).toBe('None')
   })
 
+  // /party has no heading over this list, and develop shows nothing there when
+  // there's nothing to moderate - a bare "None" made no sense.
+  it('renders nothing when empty, if asked to', async () => {
+    store.fetchEvents = vi.fn(async () => {
+      store.events.data = []
+    })
+
+    const wrapper = mountComponent({ networkId: null, hideWhenEmpty: true })
+    await flushPromises()
+
+    expect(wrapper.find('[data-testid="network-events-moderation-table"]').exists()).toBe(false)
+  })
+
   it('scopes to events via their nested group.networks array', async () => {
     store.fetchEvents = vi.fn(async () => {
       store.events.data = [
