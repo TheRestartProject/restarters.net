@@ -509,6 +509,7 @@ const SHOW_DEVICE_REFERENCE = false
                 id="device-form-item-type"
                 ref="itemTypeInput"
                 v-model="form.itemType"
+                :aria-label="t('devices.item_type')"
                 type="text"
                 class="form-control form-control-lg"
                 autocomplete="off"
@@ -660,6 +661,7 @@ const SHOW_DEVICE_REFERENCE = false
             <input
               id="device-form-model"
               v-model="form.model"
+              :aria-label="t('devices.model')"
               type="text"
               class="form-control form-control-lg"
               :placeholder="t('devices.model_if_known')"
@@ -677,6 +679,7 @@ const SHOW_DEVICE_REFERENCE = false
             <input
               id="device-form-reference"
               v-model="form.reference"
+              :aria-label="t('devices.reference')"
               type="text"
               maxlength="255"
               autocomplete="off"
@@ -907,6 +910,7 @@ const SHOW_DEVICE_REFERENCE = false
             <textarea
               id="device-form-problem"
               v-model="form.problem"
+              :aria-label="t('devices.devices_description')"
               rows="6"
               class="form-control"
               :placeholder="t('devices.devices_description')"
@@ -924,6 +928,7 @@ const SHOW_DEVICE_REFERENCE = false
             <textarea
               id="device-form-notes"
               v-model="form.notes"
+              :aria-label="t('client.devices.notes')"
               rows="6"
               class="form-control"
               :placeholder="t('devices.placeholder_notes')"
