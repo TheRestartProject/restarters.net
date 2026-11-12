@@ -106,8 +106,10 @@ label.form-check-label {
   }
 }
 
+// develop's _edit.scss, loaded on every page: `.form-control { font-size: 15px; font-family: $font-family-second }`.
 .form-control {
-  font-size: 0.9rem;
+  font-size: 15px;
+  font-family: $font-family-second;
   border-radius: 0;
   border: 1px solid $black;
 

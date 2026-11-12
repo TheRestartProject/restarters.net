@@ -112,7 +112,7 @@ const SHOW_DEVICE_REFERENCE = false
       <!-- Gap fix (MEDIUM): legacy uses small icon buttons
            (edit_ico_green.svg/delete_ico_red.svg), not text links. -->
       <button type="button" class="device-row-icon-btn me-2" :data-testid="`event-device-edit-${device.id}`" @click="edit">
-        <img src="/icons/edit_ico_green.svg" class="device-row-icon-btn__icon" alt="">
+        <img src="/icons/edit_ico_green.svg" class="icon device-row-icon-btn__icon" alt="">
         <span class="visually-hidden">{{ t('client.devices.edit') }}</span>
       </button>
       <button
@@ -121,7 +121,7 @@ const SHOW_DEVICE_REFERENCE = false
         :data-testid="`event-device-delete-${device.id}`"
         @click="askDelete"
       >
-        <img src="/icons/delete_ico_red.svg" class="device-row-icon-btn__icon" alt="">
+        <img src="/icons/delete_ico_red.svg" class="icon device-row-icon-btn__icon" alt="">
         <span class="visually-hidden">{{ t('devices.delete_device') }}</span>
       </button>
       <div v-if="deleteError" class="small text-danger" :data-testid="`event-device-delete-error-${device.id}`">

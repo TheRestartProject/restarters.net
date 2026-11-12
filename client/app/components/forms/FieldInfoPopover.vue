@@ -42,7 +42,8 @@ const button = ref(null)
       :aria-label="t('client.common.more_information')"
       data-testid="field-info-toggle"
     >
-      <img :src="`/icons/info_ico_${variant === 'brand' ? 'green' : 'black'}.svg`" alt="">
+      <!-- .icon keeps it out of the table rule that frames photo thumbnails (_tables.scss). -->
+      <img class="icon" :src="`/icons/info_ico_${variant === 'brand' ? 'green' : 'black'}.svg`" alt="">
     </button>
     <BPopover :target="button" placement="left" click html data-testid="field-info-popover">
       <!-- eslint-disable-next-line vue/no-v-html -->

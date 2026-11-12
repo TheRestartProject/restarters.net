@@ -8,7 +8,10 @@ import en from '../../../i18n/locales/en.json'
 import clientEn from '../../../i18n/locales/client-en.json'
 
 const BFormStub = { emits: ['submit'], template: '<form @submit.prevent="$emit(\'submit\', $event)"><slot /></form>' }
-const BFormGroupStub = { template: '<div><slot name="label" /><slot /></div>' }
+const BFormGroupStub = {
+  props: ['label', 'labelFor', 'labelClass'],
+  template: '<div><label v-if="label" :for="labelFor" :class="labelClass">{{ label }}</label><slot name="label" /><slot /></div>',
+}
 const BAlertStub = { template: '<div><slot /></div>' }
 const BButtonStub = { template: '<button v-bind="$attrs"><slot /></button>' }
 const DevicePhotosStub = {
@@ -61,7 +64,7 @@ function seedMeta(store) {
   store.options.loaded = true
 }
 
-function mountForm(props = {}) {
+function mountForm(props = {}, options = {}) {
   // devices.title_repair/unknown_item_type/unknown_brand (gaps 7 and 13)
   // and devices.repair_outcome (control-substitution finding: the repair
   // status multiselect's placeholder) aren't in the checked-in
@@ -92,6 +95,7 @@ function mountForm(props = {}) {
       plugins: [i18n],
       stubs: GLOBAL_STUBS,
     },
+    ...options,
   })
 }
 
@@ -141,9 +145,8 @@ describe('components/devices/DeviceForm', () => {
   // DeviceBrand.vue/DeviceModel.vue prompt with "Brand (if known)" /
   // "Model (if known)". That "(if known)" is the only thing telling anyone
   // the fields are optional, so dropping it loses information rather than
-  // just styling. Kept as a placeholder ALONGSIDE the real <label>, not
-  // instead of it - develop has placeholder-only, which leaves the field
-  // unnamed once anything is typed into it.
+  // just styling. Like develop, the placeholder is what people see; each
+  // field keeps a <label> for screen readers.
   it('prompts that brand and model are optional', () => {
     const wrapper = mountForm()
 
@@ -409,6 +412,92 @@ describe('components/devices/DeviceForm', () => {
       expect(assessment.find('h3').text()).toBe('ASSESSMENT')
       expect(assessment.find('[data-testid="device-form-problem"]').exists()).toBe(true)
       expect(assessment.find('[data-testid="device-form-notes"]').exists()).toBe(true)
+    })
+  })
+
+  // Neil (10 Nov): "can it be made to match more closely to live? e.g. the size and placement of the (i)
+  // indicators looks odd. The quantity field is in a random place. I think the background colour is changed."
+  describe('laid out as live', () => {
+    const device = { id: 7, item_type: 'Kettle', category: { id: 10, name: 'Toaster', powered: true }, images: [] }
+
+    it('is a teal panel while adding and a grey one while editing', () => {
+      expect(mountForm().find('[data-testid="device-form"]').classes()).toContain('add-device')
+      expect(mountForm({ device }).find('[data-testid="device-form"]').classes()).toContain('edit-device')
+    })
+
+    it('prompts with placeholders and keeps each label for screen readers', () => {
+      const wrapper = mountForm()
+
+      expect(wrapper.find('[data-testid="device-form-item-type"]').attributes('placeholder')).toBe(en.devices.item_type)
+      const label = wrapper.find('label[for="device-form-item-type"]')
+      expect(label.text()).toBe(en.devices.item_type)
+      expect(label.classes()).toContain('visually-hidden')
+    })
+
+    it('puts each (i) in the column to the right of its own field', () => {
+      const wrapper = mountForm()
+
+      const toggles = wrapper.findAll('[data-testid="field-info-toggle"]')
+      expect(toggles).toHaveLength(5)
+      for (const toggle of toggles) {
+        const row = toggle.element.closest('.device-select-row')
+        expect(row).not.toBeNull()
+        expect(row.querySelector('input, textarea, .multiselect__tags')).not.toBeNull()
+      }
+    })
+
+    it('shows age on one row: label, box and hint', () => {
+      const wrapper = mountForm()
+
+      const row = wrapper.find('[data-testid="device-form-age"]').element.closest('.device-field-row')
+      expect(row).not.toBeNull()
+      expect(row.querySelector('label').textContent.trim()).toBe(en.devices.age)
+      expect(row.textContent).toContain(en.devices.age_approx)
+    })
+
+    it('puts the quantity between Add item and Cancel', () => {
+      const wrapper = mountForm()
+
+      const order = [...wrapper.find('.device-form-buttons').element.children]
+        .map((el) => el.dataset.testid)
+        .filter(Boolean)
+      expect(order).toEqual(['device-form-submit', 'device-form-quantity', 'device-form-cancel'])
+    })
+
+    it('starts with "What is it?" focused when adding, and not when editing', () => {
+      const adding = mountForm({}, { attachTo: document.body })
+      expect(document.activeElement).toBe(adding.find('[data-testid="device-form-item-type"]').element)
+      adding.unmount()
+
+      const editing = mountForm({ device }, { attachTo: document.body })
+      expect(document.activeElement).not.toBe(editing.find('[data-testid="device-form-item-type"]').element)
+      editing.unmount()
+    })
+  })
+
+  // Neil (10 Nov), on clearing a dropdown: "You can deselect it now by clicking on it, but it's not clear
+  // visually that you can do that."
+  describe('taking a choice off', () => {
+    it('labels the chosen repair status "remove", and only that option', async () => {
+      const wrapper = mountForm()
+
+      await chooseOption(wrapper, 'device-form-status', 'Fixed')
+      await wrapper.find('[data-testid="device-form-status"]').trigger('click')
+
+      const hints = wrapper.findAll('[data-testid="device-form-option-remove"]')
+      expect(hints).toHaveLength(1)
+      expect(hints[0].text()).toBe(en.partials.remove)
+      expect(hints[0].element.closest('[data-testid="device-form-status-option-Fixed"]')).not.toBeNull()
+    })
+
+    it('does not offer to remove the category, which is required', async () => {
+      const wrapper = mountForm()
+
+      await chooseOption(wrapper, 'device-form-category', '10')
+      await wrapper.find('[data-testid="device-form-category"]').trigger('click')
+
+      expect(wrapper.find('[data-testid="device-form-category-option-10"]').classes()).toContain('multiselect__option--selected')
+      expect(wrapper.find('[data-testid="device-form-option-remove"]').exists()).toBe(false)
     })
   })
 

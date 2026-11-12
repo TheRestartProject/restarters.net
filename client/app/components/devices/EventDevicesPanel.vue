@@ -159,7 +159,7 @@ function onAdded() {
              its powered/unpowered toggle, reusing the fixometer's existing
              devices.description_powered/description_unpowered lang keys
              (contain a <b> tag, hence v-html). -->
-        <p class="text-brand small" data-testid="event-devices-description">
+        <p class="event-devices-description" data-testid="event-devices-description">
           <!-- eslint-disable-next-line vue/no-v-html -->
           <span v-html="activeTab === 'powered' ? t('devices.description_powered') : t('devices.description_unpowered')" />
         </p>
@@ -207,7 +207,7 @@ function onAdded() {
               </div>
             </div>
           </template>
-          <p class="text-brand small" data-testid="event-devices-description-powered-mobile">
+          <p data-testid="event-devices-description-powered-mobile">
             <!-- eslint-disable-next-line vue/no-v-html -->
             <span v-html="t('devices.description_powered')" />
           </p>
@@ -239,7 +239,7 @@ function onAdded() {
               </div>
             </div>
           </template>
-          <p class="text-brand small" data-testid="event-devices-description-unpowered-mobile">
+          <p data-testid="event-devices-description-unpowered-mobile">
             <!-- eslint-disable-next-line vue/no-v-html -->
             <span v-html="t('devices.description_unpowered')" />
           </p>
@@ -262,6 +262,11 @@ function onAdded() {
 <style scoped lang="scss">
 .devices-title-icon {
   width: 20px;
+}
+
+// _events.scss: `.tab-content p { padding-left: 45px }` in the items tabs.
+.event-devices-description {
+  padding-left: 45px;
 }
 
 .event-devices-tab-impact {
