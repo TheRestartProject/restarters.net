@@ -159,6 +159,17 @@ class InviteEventTest extends TestCase
         $frontend = rtrim(config('restarters.frontend_url'), '/');
         $this->assertEquals($frontend.'/party/view/'.$event->idevents.'?joined=1', $redirectTo);
 
+        // Following the link again (a second click, or the mail client opening it too) finds the code spent, but
+        // they're going, so there's nothing to warn them about.
+        $again = $this->get($invitation);
+        $this->assertEquals($frontend.'/party/view/'.$event->idevents, $again->getTargetUrl());
+
+        // Someone who isn't in it, with a code that was never sent, still gets the warning.
+        $this->actingAs(User::factory()->restarter()->create());
+        $bogus = $this->get('/party/accept-invite/'.$event->idevents.'/notacode');
+        $this->assertEquals($frontend.'/party/view/'.$event->idevents.'?invite=invalid', $bogus->getTargetUrl());
+        $this->actingAs($user);
+
         // Count should now include them.
         $event->refresh();
         assertEquals(2, $event->volunteers);

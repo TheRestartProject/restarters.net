@@ -64,6 +64,7 @@ class EventServiceProvider extends ServiceProvider
         ],
 
         \App\Events\PasswordChanged::class => [
+            \App\Listeners\NoteWikiPasswordChange::class,
             \App\Listeners\ChangeWikiPassword::class,
         ],
 

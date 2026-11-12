@@ -323,14 +323,15 @@ class Party extends JsonResource
         // Mirrors expandEvent()'s Auth::user() && $event->isBeingAttendedBy(...) check (strict
         // status==='1'). Optional-auth chain matches Volunteer resource / API\EventController::getUser().
         $currentUser = Auth::user() ?? auth('sanctum')->user() ?? auth('api')->user();
-        $isAttending = $currentUser !== null && $this->resource->isBeingAttendedBy($currentUser->id);
+        $isAttending = $currentUser !== null
+            && ($this->resource->preloadedAttending ?? $this->resource->isBeingAttendedBy($currentUser->id));
         $ret['attending'] = $this->when($currentUser !== null, fn () => $isAttending);
 
         // events/view.blade.php's "You have an invite pending" banner: any non-confirmed
         // EventsUsers row for the viewer. Accepting is the existing attendees/me RSVP.
         $ret['invitation_pending'] = $this->when(
             $currentUser !== null,
-            fn () => $this->resource->hasPendingInvitationFor($currentUser->id)
+            fn () => $this->resource->preloadedInvitationPending ?? $this->resource->hasPendingInvitationFor($currentUser->id)
         );
 
         // The invite modal's "invite via shareable link" tab (events.shareable_link).
@@ -340,7 +341,8 @@ class Party extends JsonResource
         // there, the link grants exactly what the public join button already
         // does, so there is nothing to gate.
         $ret['shareable_link'] = $this->when(
-            $currentUser !== null && Fixometer::userHasEditPartyPermission($this->idevents, $currentUser->id),
+            $currentUser !== null
+                && ($this->resource->preloadedCanEdit ?? Fixometer::userHasEditPartyPermission($this->idevents, $currentUser->id)),
             fn () => $this->resource->shareable_link
         );
 

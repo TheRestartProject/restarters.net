@@ -564,7 +564,7 @@ class DeviceController extends Controller {
         $request->validate([
             'eventid' => 'required|integer',
             'item_type' => 'string',  // Some of the tests, at least, treat this as optional.
-            'category' => 'required|integer',
+            'category' => 'required|integer|exists:categories,idcategories',
             'brand' => 'string',
             'model' => 'string',
             'age' => [ 'numeric', 'max:500' ],

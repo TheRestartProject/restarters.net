@@ -681,6 +681,38 @@ class Party extends Model implements Auditable
     // PartySummary returns it as 'attending' when set.
     public ?bool $preloadedAttending = null;
 
+    // Set with $preloadedAttending by preloadViewerState(): whether the viewer holds an invitation they haven't
+    // accepted, saving the Party resource a hasPendingInvitationFor() query per event.
+    public ?bool $preloadedInvitationPending = null;
+
+    // Set by callers that already know the viewer may edit every event in a list (the moderation queue), saving the
+    // Party resource a permission check per event.
+    public ?bool $preloadedCanEdit = null;
+
+    /**
+     * Fetch the viewer's attendance and invitations for all of the given events in a single query.  Same
+     * conditions as isBeingAttendedBy() and hasPendingInvitationFor().
+     */
+    public static function preloadViewerState(iterable $events, User $user): void
+    {
+        $events = collect($events);
+
+        if ($events->isEmpty()) {
+            return;
+        }
+
+        $rows = EventsUsers::whereIn('event', $events->pluck('idevents')->all())
+            ->where('user', $user->id)
+            ->get(['event', 'status'])
+            ->groupBy('event');
+
+        foreach ($events as $event) {
+            $statuses = $rows->get($event->idevents, collect())->pluck('status')->map(fn ($s) => (string) $s);
+            $event->preloadedAttending = $statuses->contains('1');
+            $event->preloadedInvitationPending = $statuses->contains(fn ($s) => $s !== '1');
+        }
+    }
+
     // Mirrors Device::getImages() - event photos are a gallery (multiple per event), same
     // xref-backed images table the upload/delete endpoints already use.
     public function getImages()

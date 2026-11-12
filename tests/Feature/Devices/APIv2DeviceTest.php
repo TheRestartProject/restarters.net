@@ -167,6 +167,29 @@ class APIv2DeviceTest extends TestCase
     }
 
     /**
+     * @story:DeviceController::createDevicev2
+     */
+    public function testCreateWithUnknownCategory(): void {
+        // An API client sent category 1, which doesn't exist; that failed on the foreign key with a 500.
+        $this->withExceptionHandling();
+        $this->loginAsTestUser(Role::ADMINISTRATOR);
+        $idEvents = $this->createEvent($this->createGroup(), 'yesterday');
+
+        $response = $this->postJson('/api/v2/devices', [
+            'eventid' => $idEvents,
+            'category' => 999999,
+            'brand' => 'Dell',
+            'model' => 'Inspiron 15',
+            'problem' => 'Will not power on',
+            'repair_status' => 'Fixed',
+        ]);
+
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors('category');
+        $this->assertEquals(0, Device::where('event', $idEvents)->count());
+    }
+
+    /**
      * Create a device over the API and check it retrieves as expected.
      *
      * @story:DeviceController::createDevicev2

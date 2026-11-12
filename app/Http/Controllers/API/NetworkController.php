@@ -46,10 +46,11 @@ class NetworkController extends Controller
         $uEmissionratio = \App\Helpers\LcaStats::getEmissionRatioUnpowered();
 
         // Get groups in this network that have the specified tag
-        $groups = $network->groups()
+        // Only the id and archived flag are needed, so skip the member-count scopes and eager loads.
+        $groups = $network->groups()->withoutGlobalScopes()->without(['networks', 'group_tags'])
             ->join('grouptags_groups', 'grouptags_groups.group', '=', 'groups.idgroups')
             ->where('grouptags_groups.group_tag', $tagId)
-            ->get();
+            ->get(['groups.idgroups', 'groups.archived_at']);
 
         $allStats = \App\Group::bulkGroupStats($groups, $eEmissionRatio, $uEmissionratio);
 

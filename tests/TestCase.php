@@ -501,6 +501,20 @@ abstract class TestCase extends BaseTestCase
         }
     }
 
+    // Production serves each request in a fresh process, but a test's requests share one app: the token guards
+    // remember the user they resolved from the first request's api_token or Sanctum token, and auth:api leaves the
+    // api guard as the default (shouldUse() writes it into auth.defaults.guard, so the config can't be used to
+    // restore it).  Reset them so that each request authenticates as it would in production - from its own token,
+    // or from the web session set up by actingAs() or logging in.
+    public function call($method, $uri, $parameters = [], $cookies = [], $files = [], $server = [], $content = null)
+    {
+        $this->app['auth']->guard('api')->forgetUser();
+        $this->app['auth']->guard('sanctum')->forgetUser();
+        $this->app['auth']->shouldUse('web');
+
+        return parent::call($method, $uri, $parameters, $cookies, $files, $server, $content);
+    }
+
     // We override the methods to make HTTP requests so that we can automatically validate them against our OpenAPI
     // definition where appropriate.
     public function get($uri, array $headers = [])
