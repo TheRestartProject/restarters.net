@@ -5,6 +5,7 @@ import { useI18n } from 'vue-i18n'
 import { useAuth } from '~/composables/useAuth.js'
 import { useDashboardStore } from '~/stores/dashboard.js'
 import { useEventsStore } from '~/stores/events.js'
+import moment from 'moment-timezone'
 
 // Gap fix (HIGH): legacy's AddDataModal.vue - a group -> event picker
 // launched by FixometerHeading.vue's unconditional "Add Data" button
@@ -45,7 +46,12 @@ const groupEvents = computed(() =>
     .slice()
     .sort((a, b) => new Date(b.start) - new Date(a.start))
 )
-const eventOptions = computed(() => groupEvents.value.map((e) => ({ value: e.id, text: e.title })))
+// Develop's AddDataModal labels each event "08 Dec 26 / Croftlands Community
+// Centre": a group's events usually share a venue, so the title alone can't
+// tell them apart.
+const eventOptions = computed(() =>
+  groupEvents.value.map((e) => ({ value: e.id, text: `${moment(e.start).format('DD MMM YY')} / ${e.title}` }))
+)
 const selectedEventId = ref(null)
 
 // Keep the selections valid as the data loads/changes - same idiom as
