@@ -1,5 +1,5 @@
 {
-    "generatedAt": "2026-10-23T17:48:00Z",
+    "generatedAt": "2026-11-12T17:48:27Z",
     "features": {
         "Administration": {
             "description": "Platform administration and configuration",
@@ -1419,7 +1419,12 @@
                     "method": "GroupController::auditsv2",
                     "class": "App\\Http\\Controllers\\API\\GroupController",
                     "file": "app/Http/Controllers/API/GroupController.php",
-                    "tests": []
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Groups/GroupAuditsLimitTest.php",
+                            "test": "testOnlyTheLatestHundredChangesAreSent"
+                        }
+                    ]
                 },
                 {
                     "story": "As an Admin, I can delete a group that has no device records",
@@ -3714,6 +3719,6 @@
     },
     "coverage": {
         "annotatedStories": 256,
-        "storiesWithTests": 107
+        "storiesWithTests": 108
     }
 }
