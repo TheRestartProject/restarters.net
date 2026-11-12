@@ -515,6 +515,13 @@ abstract class TestCase extends BaseTestCase
         return parent::call($method, $uri, $parameters, $cookies, $files, $server, $content);
     }
 
+    // A request through auth:api leaves the api guard as the default, so actingAs() without a guard would then log in
+    // to the token guard, which call() resets before each request.  Log in to the web session, as in a fresh test.
+    public function actingAs(\Illuminate\Contracts\Auth\Authenticatable $user, $guard = null)
+    {
+        return parent::actingAs($user, $guard ?? 'web');
+    }
+
     // We override the methods to make HTTP requests so that we can automatically validate them against our OpenAPI
     // definition where appropriate.
     public function get($uri, array $headers = [])

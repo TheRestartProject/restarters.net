@@ -112,8 +112,8 @@ class BasicTest extends TestCase
         $this->post('/api/v2/groups/' . $this->idgroups . '/members/me?api_token=' . $host->api_token)
             ->assertSuccessful();
 
-        // Should not show in upcoming as not yet approved.
-        $response1 = $this->get('/api/v2/dashboard');
+        // Should not show in upcoming as not yet approved.  Each request sends its token, as the client does.
+        $response1 = $this->get('/api/v2/dashboard?api_token=' . $host->api_token);
         $response1->assertSuccessful();
         $upcomingEvents = $response1->json('data.upcoming_events');
         $this->assertFalse(collect($upcomingEvents)->contains('id', $event->idevents));
@@ -131,7 +131,7 @@ class BasicTest extends TestCase
 
         // Should now show as an upcoming event on the dashboard.
         $this->actingAs($host);
-        $response2 = $this->get('/api/v2/dashboard');
+        $response2 = $this->get('/api/v2/dashboard?api_token=' . $host->api_token);
         $response2->assertSuccessful();
         $upcomingEvents = $response2->json('data.upcoming_events');
         $this->assertEquals($event->idevents, $upcomingEvents[0]['id']);
@@ -155,7 +155,7 @@ class BasicTest extends TestCase
         // Should not show in upcoming as not yet a confirmed member.
         $this->actingAs($host2);
 
-        $response5 = $this->get('/api/v2/dashboard');
+        $response5 = $this->get('/api/v2/dashboard?api_token=' . $host2->api_token);
         $response5->assertSuccessful();
         $upcomingEvents = $response5->json('data.upcoming_events');
         $this->assertEquals(0, count($upcomingEvents));
