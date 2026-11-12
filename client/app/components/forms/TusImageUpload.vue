@@ -67,6 +67,11 @@ const emit = defineEmits(['uploaded', 'upload-error', 'remove'])
 
 const { t } = useI18n()
 
+// PR previews read photos from the live bucket and can't write to it, so the
+// API turns every upload away there. Say so, rather than let someone pick a
+// photo and get "Sorry, we couldn't upload that photo".
+const uploadsOn = useRuntimeConfig().public.imageUpload !== false
+
 const dashboardEl = ref(null)
 const fileInputEl = ref(null)
 // compact mode only: an instant local preview of the just-picked file
@@ -78,6 +83,8 @@ const uploading = ref(false)
 let uppy = null
 
 onMounted(async () => {
+  if (!uploadsOn) return
+
   const runtimeConfig = useRuntimeConfig()
   const tusEndpoint = `${runtimeConfig.public.apiBase}/api/tus`
 
@@ -225,7 +232,10 @@ function removeCompactFile(event) {
 </script>
 
 <template>
-  <div v-if="compact" class="tus-image-upload tus-image-upload--compact" data-testid="tus-image-upload">
+  <p v-if="!uploadsOn" class="tus-image-upload tus-image-upload--off text-muted" data-testid="tus-image-upload-off">
+    {{ t('client.uploads.off') }}
+  </p>
+  <div v-else-if="compact" class="tus-image-upload tus-image-upload--compact" data-testid="tus-image-upload">
     <div
       class="tus-image-upload__thumb"
       role="button"
@@ -315,6 +325,16 @@ function removeCompactFile(event) {
   .dz-message {
     margin: 2em 0;
     text-align: center;
+
+    // The hint on its own line under the message. Live's _dropzone.scss means
+    // to do this, but its rules never apply (see above), so live runs the two
+    // together: "Add event images hereChoose an image for your event".
+    small {
+      display: block;
+      padding-top: 15px;
+      font-size: 13px;
+      color: #5a5a5a;
+    }
   }
 
   .spinner-border {

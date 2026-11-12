@@ -286,6 +286,9 @@
       "slide1_alt": "Deux Restarters tentant une réparation",
       "slide2_alt": "Un·e bénévole aidant un membre du public avec son téléphone",
       "slide3_alt": "Un·e Restarter réparant un appareil lors d’un de nos événements"
+    },
+    "uploads": {
+      "off": "L'envoi de photos est désactivé sur ce site."
     }
   }
 }

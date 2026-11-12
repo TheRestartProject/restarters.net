@@ -62,8 +62,8 @@ vi.mock('@uppy/dashboard', () => ({ default: class Dashboard {} }))
 vi.mock('@uppy/tus', () => ({ default: class Tus {} }))
 vi.mock('@uppy/compressor', () => ({ default: class Compressor {} }))
 
-async function mountUpload(props = {}) {
-  vi.stubGlobal('useRuntimeConfig', () => ({ public: { apiBase: 'http://localhost:8001' } }))
+async function mountUpload(props = {}, publicConfig = {}) {
+  vi.stubGlobal('useRuntimeConfig', () => ({ public: { apiBase: 'http://localhost:8001', ...publicConfig } }))
   const i18n = createI18n({ legacy: false, locale: 'en', messages: { en: { ...en, ...clientEn } } })
   const wrapper = mount(TusImageUpload, { props, global: { plugins: [i18n] } })
   // Flush the dynamic import()s + the state Vue sets afterwards.
@@ -120,6 +120,18 @@ describe('components/forms/TusImageUpload', () => {
   // 100x100 thumbnail picker, matching legacy GroupImage.vue's vue-dropzone
   // - a separate render path from the default Dashboard one above, so none
   // of those tests (or their consumers) are affected by this.
+  describe('where uploads are switched off (PR previews)', () => {
+    it.each([{}, { compact: true }, { dropzone: true, message: 'Add event images here' }])('says so instead of offering an upload (%o)', async (props) => {
+      lastUppyInstance = null
+      const wrapper = await mountUpload(props, { imageUpload: false })
+
+      expect(wrapper.find('[data-testid="tus-image-upload-off"]').text()).toBe('Photo uploads are switched off on this site.')
+      expect(wrapper.find('[data-testid="tus-image-upload-dropzone"]').exists()).toBe(false)
+      expect(wrapper.find('[data-testid="tus-image-upload-dashboard"]').exists()).toBe(false)
+      expect(lastUppyInstance).toBeNull()
+    })
+  })
+
   describe('compact mode', () => {
     it('does not mount a Dashboard panel', async () => {
       const wrapper = await mountUpload({ compact: true })

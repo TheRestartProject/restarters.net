@@ -74,6 +74,8 @@ primary_region = "lhr"
   # Reads come from the shared live bucket; writes are disabled (and the
   # Tigris credentials are read-only anyway).
   FEATURE__IMAGE_UPLOAD = "false"
+  # ...so the Nuxt client says uploads are off instead of offering them.
+  NUXT_PUBLIC_IMAGE_UPLOAD = "false"
   SENTRY_ENVIRONMENT = "__SENTRY_ENV__"
   NUXT_PUBLIC_SENTRY_ENVIRONMENT = "__SENTRY_ENV__"
   # Mail goes to the shared Mailpit instance, never to real inboxes.

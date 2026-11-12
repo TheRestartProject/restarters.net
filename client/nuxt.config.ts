@@ -39,6 +39,9 @@ export default defineNuxtConfig({
       // alongside SENTRY_ENVIRONMENT), so local development and CI never report.
       sentryDsn: process.env.NUXT_PUBLIC_SENTRY_DSN || 'https://50fd2fa440af4bb4a230f40ca8d8cf90@o879179.ingest.sentry.io/5831645',
       sentryEnvironment: process.env.NUXT_PUBLIC_SENTRY_ENVIRONMENT || '',
+      // Off on PR previews (fly.preview.toml), which can't write photos to the
+      // live bucket they read from; the upload widgets then say so.
+      imageUpload: process.env.NUXT_PUBLIC_IMAGE_UPLOAD !== 'false',
       // Reserved for the future Capacitor build (design.md §1).
       isApp: process.env.NUXT_PUBLIC_IS_APP === 'true',
     },
