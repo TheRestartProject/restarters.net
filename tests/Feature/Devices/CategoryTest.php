@@ -80,6 +80,29 @@ class CategoryTest extends TestCase
         self::assertEquals('Flat screen 22-24"', $json['data'][0]['categoryname']);
     }
 
+    /**
+     * The item form shows suggestions in this order among names that match equally well, so the most used come
+     * first: "Kettle" before "KETTLE LEAD". Without an order it was whatever MySQL's grouping produced.
+     *
+     * @story:ItemController::listItemsv2
+     */
+    public function testItemTypesMostUsedFirst(): void
+    {
+        $cat = Category::where('powered', true)->first();
+
+        foreach (['KETTLE LEAD' => 1, 'Kettle' => 3, 'kettle base' => 2] as $type => $times) {
+            for ($i = 0; $i < $times; $i++) {
+                Device::factory()->fixed()->create(['category' => $cat->idcategories, 'item_type' => $type]);
+            }
+        }
+
+        \Cache::forget('item_types');
+        $types = array_column($this->get('/api/v2/items')->assertSuccessful()->json('data'), 'type');
+        $kettles = array_values(array_filter($types, fn ($t) => stripos($t, 'kettle') !== false));
+
+        self::assertEquals(['Kettle', 'kettle base', 'KETTLE LEAD'], $kettles);
+    }
+
     public function testCategorySuggestionLogic(): void
     {
         // Use existing categories from seed data

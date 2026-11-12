@@ -1,5 +1,5 @@
 {
-    "generatedAt": "2026-11-12T17:48:27Z",
+    "generatedAt": "2026-11-12T17:53:40Z",
     "features": {
         "Administration": {
             "description": "Platform administration and configuration",
@@ -359,6 +359,10 @@
                         {
                             "file": "tests/Feature/Devices/CategoryTest.php",
                             "test": "testListItems"
+                        },
+                        {
+                            "file": "tests/Feature/Devices/CategoryTest.php",
+                            "test": "testItemTypesMostUsedFirst"
                         }
                     ]
                 },

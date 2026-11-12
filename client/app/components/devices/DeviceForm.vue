@@ -337,6 +337,30 @@ function typeaheadMatches(list, query) {
     .map((m) => m.text)
 }
 
+// The suggestion split into what was typed (shown bold, as live's typeahead
+// shows it) and the rest. Plain text parts rather than v-html, as suggestions
+// are other people's typing.
+function highlightParts(text, query) {
+  const term = (query || '').trim().toLowerCase()
+  if (!term) return [{ text, match: false }]
+
+  const parts = []
+  const lower = text.toLowerCase()
+  let from = 0
+  let at = lower.indexOf(term)
+
+  while (at !== -1) {
+    if (at > from) parts.push({ text: text.slice(from, at), match: false })
+    parts.push({ text: text.slice(at, at + term.length), match: true })
+    from = at + term.length
+    at = lower.indexOf(term, from)
+  }
+
+  if (from < text.length) parts.push({ text: text.slice(from), match: false })
+
+  return parts
+}
+
 const itemTypeMatches = computed(() => typeaheadMatches(itemTypeSuggestions.value, form.itemType))
 function selectItemType(value) {
   form.itemType = value
@@ -501,7 +525,9 @@ const SHOW_DEVICE_REFERENCE = false
                   :data-testid="`device-form-item-type-option-${s}`"
                   @mousedown.prevent="selectItemType(s)"
                 >
-                  {{ s }}
+                  <template v-for="(part, pi) in highlightParts(s, form.itemType)" :key="pi">
+                    <strong v-if="part.match">{{ part.text }}</strong><template v-else>{{ part.text }}</template>
+                  </template>
                 </li>
               </ul>
             </div>
@@ -599,7 +625,9 @@ const SHOW_DEVICE_REFERENCE = false
                   :data-testid="`device-form-brand-option-${b}`"
                   @mousedown.prevent="selectBrand(b)"
                 >
-                  {{ b }}
+                  <template v-for="(part, pi) in highlightParts(b, form.brand)" :key="pi">
+                    <strong v-if="part.match">{{ part.text }}</strong><template v-else>{{ part.text }}</template>
+                  </template>
                 </li>
               </ul>
             </div>

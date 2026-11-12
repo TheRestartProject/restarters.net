@@ -560,6 +560,21 @@ describe('components/devices/DeviceForm', () => {
 
       expect(shown).toEqual(['KETTLE LEAD', 'Kettle', 'Ceramic kettle', 'Electric Kettle', 'Iron with kettle'])
     })
+
+    // Live's typeahead shows what you typed in bold in each suggestion.
+    it('shows the typed text in bold in each suggestion', async () => {
+      store.itemTypes.data = ['Smeg Kettle', 'Kettle base'].map((type) => ({ type, powered: true }))
+      const wrapper = mountForm({ powered: true })
+      const input = wrapper.find('[data-testid="device-form-item-type"]')
+
+      await input.trigger('focus')
+      await input.setValue('kettle')
+
+      const option = wrapper.find('[data-testid="device-form-item-type-option-Smeg Kettle"]')
+      expect(option.text()).toBe('Smeg Kettle')
+      expect(option.findAll('strong').map((b) => b.text())).toEqual(['Kettle'])
+      expect(wrapper.find('[data-testid="device-form-item-type-option-Kettle base"] strong').text()).toBe('Kettle')
+    })
   })
 
   // DeviceCategorySelect.vue: only the device's own powered/unpowered
