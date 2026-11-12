@@ -92,16 +92,18 @@ function download() {
    border-color, so the button keeps whatever border its Bootstrap variant
    sets - `variant="primary"` on the BButton above renders that border as
    $primary/brand teal, not `outline-dark`'s near-black. */
+/* !important as in develop: the global .btn-primary sets its white background
+   with !important, so without it the selected platform was white on white. */
 .stats-share-buttons :deep(.btn) {
   font-size: 12px;
-  color: #000;
-  background-color: #fff;
+  color: #000 !important;
+  background-color: #fff !important;
 }
 
 .stats-share-buttons :deep(.btn.active) {
-  color: #fff;
-  background-color: #222;
-  box-shadow: 5px 5px 0 0 #222;
+  color: #fff !important;
+  background-color: #000 !important;
+  box-shadow: 5px 5px 0 0 #222 !important;
 }
 
 @media (max-width: 575.98px) {
