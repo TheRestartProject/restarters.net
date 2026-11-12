@@ -8,6 +8,37 @@
 // Vue3 story (see docs/nuxt-migration/findings/styles.md) and is being
 // replaced by a native/Vue-native select component, not ported as CSS
 // that would target markup this app never renders.
+// develop styles every <select class="form-control"> like the inputs beside it:
+// square, with a 1px black border and its own arrow (select.form-control in
+// resources/global/css/components/_forms.scss). Bootstrap 5's selects are
+// .form-select, which kept Bootstrap's grey rounded border instead.
+.form-select {
+  border-radius: 0;
+  border: 1px solid $black;
+  background-image: url('/images/dropdown-arrow.svg');
+  background-position: 96% 50%;
+  background-size: auto;
+
+  &:focus {
+    border: 3px solid $black;
+    box-shadow: none;
+  }
+
+  // A list box has no arrow.
+  &[multiple],
+  &[size]:not([size='1']) {
+    background-image: none;
+  }
+}
+
+// Bootstrap 4's .form-group gave every field group a 1rem bottom margin, and
+// live's forms rely on it to keep each label next to its own field. Bootstrap 5
+// dropped it, so bootstrap-vue-next's groups had none, and each label sat
+// against the field above it. Forms that set their own spacing still win.
+.b-form-group {
+  margin-bottom: 1rem;
+}
+
 .form-group {
   &__offset {
     @include media-breakpoint-up(lg) {

@@ -466,7 +466,9 @@ defineExpose({ submit })
     </BAlert>
 
     <div class="event-form-layout">
-      <div class="event-form-venue d-flex flex-wrap align-items-end gap-3">
+      <!-- mb-3: the same space below as every other field group (the group
+           inside has mb-0 so the checkbox lines up with its input). -->
+      <div class="event-form-venue d-flex flex-wrap align-items-end gap-3 mb-3">
         <BFormGroup class="flex-grow-1 mb-0" :label="`${t('events.field_event_name')}:`" label-for="event-form-venue">
           <input
             id="event-form-venue" v-model="form.venue"

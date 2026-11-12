@@ -49,8 +49,11 @@
 
   // Two equal-height side-by-side panels (e.g. Skills/Photo on the
   // profile page) are wrapped in a `.d-flex` column - stretch to fill it
-  // instead of the default bottom margin/shrink-to-content.
-  .d-flex & {
+  // instead of the default bottom margin/shrink-to-content. Only a panel
+  // whose own column is the flex box: develop writes `.d-flex &`, but the
+  // profile page here sits inside a flex layout, which took the gap away
+  // from every panel on it and left them touching.
+  .d-flex > & {
     margin-bottom: 0;
     flex: 1;
   }
