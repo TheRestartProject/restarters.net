@@ -11,6 +11,7 @@ import './bootstrap';
 
 // Import all other dependencies first
 import './misc/notifications';
+import { thrownByAScript, scrubEvent, scrubBreadcrumb } from './misc/sentryFilters';
 import 'leaflet';
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
@@ -272,15 +273,21 @@ function initializeJQuery() {
           'bmi_SafeAddOnload',
           'EBCallBackMessageReceived',
           // See http://toolbar.conduit.com/Developer/HtmlAndGadget/Methods/JSInjection.aspx
-          'conduitPage'
+          'conduitPage',
+          // The request got no response at all: the user's connection dropped, or they left the page while it was
+          // in flight. Our server's own errors come back as status codes, and are reported by the server.
+          'AxiosError: Network Error',
+          'AxiosError: Request aborted',
         ],
         beforeSend: function beforeSend (event) {
-          if (window.restarters.analyticsCookieEnabled) {
-            return event;
-          } else {
+          if (!window.restarters.analyticsCookieEnabled || !thrownByAScript(event)) {
             return null;
           }
-        }
+
+          return scrubEvent(event);
+        },
+        beforeSendTransaction: scrubEvent,
+        beforeBreadcrumb: scrubBreadcrumb,
       });
       // Sentry initialized
 

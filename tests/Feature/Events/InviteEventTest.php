@@ -186,6 +186,19 @@ class InviteEventTest extends TestCase
         $redirectTo = $response4->getTargetUrl();
         $this->assertNotFalse(strpos($redirectTo, '/party/view/'.$event->idevents));
 
+        // Following the link again (a second click, or the mail client opening it too) finds the code spent, but
+        // they're going, so there's nothing to warn them about.
+        $again = $this->get($invitation);
+        $again->assertRedirect('/party/view/'.$event->idevents);
+        $again->assertSessionMissing('warning');
+
+        // Someone who isn't in it, with a code that was never sent, still gets the warning.
+        $this->actingAs(User::factory()->restarter()->create());
+        $bogus = $this->get('/party/accept-invite/'.$event->idevents.'/notacode');
+        $bogus->assertRedirect('/party/view/'.$event->idevents);
+        $bogus->assertSessionHas('warning', __('events.invite_invalid'));
+        $this->actingAs($user);
+
         // Now should show.
         $response5 = $this->get('/party');
         $events = $this->getVueProperties($response5)[1][':initial-events'];

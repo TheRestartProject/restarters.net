@@ -10,13 +10,13 @@ import GroupsPage from './GroupsPage.vue'
 const localVue = createLocalVue()
 localVue.use(Vuex)
 
-function makeStore() {
+function makeStore(actions = {}) {
   return new Vuex.Store({
     modules: {
       groups: {
         namespaced: true,
         getters: { list: () => [] },
-        actions: { fetch: () => Promise.resolve() },
+        actions: { fetch: () => Promise.resolve(), hydrate: () => Promise.resolve(), ...actions },
       },
     },
   })
@@ -50,10 +50,10 @@ const groupMapStub = {
   template: '<div class="stub-map" />',
 }
 
-function makeWrapper(props = {}) {
+function makeWrapper(props = {}, store = makeStore()) {
   return mount(GroupsPage, {
     localVue,
-    store: makeStore(),
+    store,
     mixins: [LangMixin],
     propsData: {
       yourGroups: [1, 2],
@@ -139,4 +139,16 @@ test('keeps the map mounted when switching back to Your Groups', async () => {
   wrapper.vm.currentTab = 0
   await flushTabs(wrapper)
   expect(wrapper.find('.stub-map').exists()).toBe(true)
+})
+
+// Fetching each of the user's groups separately was a request per group (Sentry: N+1 API call on /group).
+test('fetches your groups in one request', async () => {
+  const fetch = jest.fn(() => Promise.resolve())
+  const hydrate = jest.fn(() => Promise.resolve())
+  makeWrapper({ yourGroups: [1, 2, 3] }, makeStore({ fetch, hydrate }))
+  await Promise.resolve()
+
+  expect(fetch).not.toHaveBeenCalled()
+  expect(hydrate).toHaveBeenCalledTimes(1)
+  expect(hydrate.mock.calls[0][1]).toEqual({ ids: [1, 2, 3] })
 })

@@ -54,7 +54,8 @@ export default {
   },
   computed: {
     groupVolunteers() {
-      return this.groupId ? this.$store.getters['volunteers/byGroup'](this.groupId) : []
+      // Until the group's volunteers have been fetched the store has nothing for it.
+      return (this.groupId && this.$store.getters['volunteers/byGroup'](this.groupId)) || []
     },
     options() {
       const ret = [
