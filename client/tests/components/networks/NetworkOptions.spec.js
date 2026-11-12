@@ -40,11 +40,11 @@ describe('components/networks/NetworkOptions', () => {
     expect(wrapper.find('[data-testid="network-options-title"]').text()).toBe('Options for groups in this network')
     const select = wrapper.find('[data-testid="network-option-item_weight"]')
     expect(select.findAll('option').map((o) => o.text())).toEqual([
-      'Not set',
-      'Always on',
-      'Always off',
-      'On by default (groups can change)',
-      'Off by default (groups can change)',
+      'Leave it to each group',
+      'All groups collect item weights',
+      'No group collects item weights',
+      'Groups collect item weights, unless they choose not to',
+      "Groups don't collect item weights, unless they choose to",
     ])
     expect(wrapper.find('[data-testid="network-option-item_weight"]').element.value).toBe('')
     expect(wrapper.find('[data-testid="network-option-custom_fields"]').element.value).toBe('default_on')
@@ -71,6 +71,18 @@ describe('components/networks/NetworkOptions', () => {
 
     expect(wrapper.find('[data-testid="network-options-error"]').exists()).toBe(true)
     expect(wrapper.find('[data-testid="network-options-saved"]').exists()).toBe(false)
+  })
+
+  it('words every choice for every feature in every translated language', () => {
+    for (const messages of [clientEn, clientFr, clientFrBe]) {
+      const f = messages.client.features
+      expect(f.network_not_set).toBeTruthy()
+      expect(f.is_default).toContain('{choice}')
+      for (const key of FEATURE_KEYS) {
+        for (const c of ['on', 'off', 'default_on', 'default_off']) expect(f[`${key}_network_${c}`], `${key}_network_${c}`).toBeTruthy()
+        for (const c of ['on', 'off']) expect(f[`${key}_${c}`], `${key}_${c}`).toBeTruthy()
+      }
+    }
   })
 
   it('has network help, written for networks, for every feature in every translated language', () => {

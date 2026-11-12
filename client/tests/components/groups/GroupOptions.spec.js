@@ -42,20 +42,29 @@ describe('components/groups/GroupOptions', () => {
     store.updateOptions = vi.fn().mockResolvedValue({})
   })
 
-  it('titles the card Options and offers On, Off and Use the default (state)', () => {
+  it('titles the card Options and offers each feature or not, worded by what it does, with the default marked', () => {
     const wrapper = mountOptions()
 
     expect(wrapper.find('[data-testid="group-options-title"]').text()).toBe('Options')
-    expect(sel(wrapper, 'item_weight').findAll('option').map((o) => o.text())).toEqual(['Use the default (On)', 'On', 'Off'])
-    expect(sel(wrapper, 'custom_fields').findAll('option')[0].text()).toBe('Use the default (Off)')
+    expect(sel(wrapper, 'item_weight').findAll('option').map((o) => o.text())).toEqual([
+      'Collect item weights (the default)',
+      "Don't collect item weights",
+    ])
+    expect(sel(wrapper, 'custom_fields').findAll('option').map((o) => o.text())).toEqual([
+      'Add fields of our own to the item form',
+      'Use the standard item form only (the default)',
+    ])
     expect(sel(wrapper, 'item_weight').element.value).toBe('')
   })
 
-  it('shows the group\'s own setting', () => {
-    const wrapper = mountOptions(group({ features: { item_weight: feature({ group_setting: false, enabled: false }), custom_fields: feature({ group_setting: true, enabled: true }) } }))
+  it('shows the group\'s own setting, and one that is the same as the default as the default', () => {
+    const wrapper = mountOptions(group({ features: { item_weight: feature({ group_setting: false, enabled: false }), custom_fields: feature({ group_setting: true, enabled: true, inherited: false }) } }))
 
     expect(sel(wrapper, 'item_weight').element.value).toBe('off')
     expect(sel(wrapper, 'custom_fields').element.value).toBe('on')
+
+    const same = mountOptions(group({ features: { item_weight: feature({ group_setting: true }), custom_fields: feature({ enabled: false, inherited: false }) } }))
+    expect(sel(same, 'item_weight').element.value).toBe('')
   })
 
   it('disables a locked feature and says which network set it', () => {
@@ -67,12 +76,12 @@ describe('components/groups/GroupOptions', () => {
     }))
 
     expect(sel(wrapper, 'item_weight').attributes('disabled')).toBeDefined()
-    expect(sel(wrapper, 'item_weight').element.value).toBe('off')
+    expect(sel(wrapper, 'item_weight').findAll('option').map((o) => o.text())).toEqual(["Don't collect item weights"])
     expect(wrapper.find('[data-testid="group-option-item_weight-locked"]').text()).toBe('Set by Repair Together, Other Net')
     expect(sel(wrapper, 'custom_fields').attributes('disabled')).toBeUndefined()
   })
 
-  it('saves the features, mapping use-default to null, and leaves locked ones out', async () => {
+  it('saves the features, leaving locked ones out', async () => {
     const wrapper = mountOptions(group({
       features: {
         item_weight: feature({ locked: true, enabled: true, set_by: ['N'] }),
@@ -80,12 +89,24 @@ describe('components/groups/GroupOptions', () => {
       },
     }))
 
-    await sel(wrapper, 'custom_fields').setValue('off')
+    await sel(wrapper, 'custom_fields').setValue('on')
     await wrapper.find('[data-testid="group-options-form"]').trigger('submit')
     await flushPromises()
 
-    expect(store.updateOptions).toHaveBeenCalledWith(3, { features: { custom_fields: false } })
+    // Turning custom fields on brings the (so far empty) list of fields with it.
+    expect(store.updateOptions).toHaveBeenCalledWith(3, { features: { custom_fields: true }, custom_fields: [] })
     expect(wrapper.find('[data-testid="group-options-saved"]').exists()).toBe(true)
+  })
+
+  it('saves the default choice as following the default', async () => {
+    // So a network that changes its default changes the group too.
+    const wrapper = mountOptions(group({ features: { item_weight: feature({ group_setting: false, enabled: false }), custom_fields: feature({ enabled: false, inherited: false }) } }))
+
+    await sel(wrapper, 'item_weight').setValue('')
+    await wrapper.find('[data-testid="group-options-form"]').trigger('submit')
+    await flushPromises()
+
+    expect(store.updateOptions).toHaveBeenCalledWith(3, { features: { item_weight: null, custom_fields: null } })
   })
 
   it('shows the group as it is now when the group changes, as it does after saving', async () => {
@@ -102,7 +123,7 @@ describe('components/groups/GroupOptions', () => {
     })
     await wrapper.vm.$nextTick()
 
-    expect(sel(wrapper, 'item_weight').element.value).toBe('off')
+    expect(sel(wrapper, 'item_weight').element.value).toBe('locked')
     expect(sel(wrapper, 'item_weight').attributes('disabled')).toBeDefined()
     expect(wrapper.find('[data-testid="group-custom-field-row-0"] input').element.value).toBe('Town')
   })
@@ -132,13 +153,13 @@ describe('components/groups/GroupOptions', () => {
         group: group({ features: { item_weight: feature({ enabled: false, source: 'network', locked: true, set_by: ['Strict'] }), custom_fields: feature({ enabled: false, inherited: false }) } }),
       })
     })
-    await sel(wrapper, 'item_weight').setValue('on')
+    await sel(wrapper, 'item_weight').setValue('off')
 
     await wrapper.find('[data-testid="group-options-form"]').trigger('submit')
     await flushPromises()
     await wrapper.vm.$nextTick()
 
-    expect(sel(wrapper, 'item_weight').element.value).toBe('off')
+    expect(sel(wrapper, 'item_weight').element.value).toBe('locked')
     expect(sel(wrapper, 'item_weight').attributes('disabled')).toBeDefined()
   })
 

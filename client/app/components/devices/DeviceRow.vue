@@ -4,7 +4,6 @@ import { useI18n } from 'vue-i18n'
 import { useDevicesStore } from '../../stores/devices.js'
 import { deviceStatusKey, deviceStatusVariant, deviceSparePartsNeeded } from '../../composables/useDeviceDisplay.js'
 import DeviceForm from './DeviceForm.vue'
-import { fieldLabel } from '../../composables/useFeatureSwitches.js'
 
 // One device's summary row, with inline edit/delete for canedit viewers -
 // api-contracts-phase-c.md C5. Functional spec: EventDeviceSummary.vue.
@@ -55,15 +54,6 @@ const statusLabel = computed(() => {
 const statusVariant = computed(() => deviceStatusVariant(props.device))
 const sparePartsNeeded = computed(() => deviceSparePartsNeeded(props.device))
 
-// Recorded custom values, for the group's active fields only.
-const customValues = computed(() => {
-  if (!props.groupFeatures?.custom_fields) return []
-  const values = props.device.custom_values || {}
-  return props.groupCustomFields
-    .filter((f) => values[f.key] !== undefined && values[f.key] !== null && values[f.key] !== '')
-    .map((f) => ({ key: f.key, label: f.label, value: values[f.key] }))
-})
-
 function edit() {
   editing.value = true
 }
@@ -111,12 +101,6 @@ const SHOW_DEVICE_REFERENCE = false
         {{ device.reference }}
       </span>
       {{ device.item_type || '-' }}
-      <span
-        v-for="cv in customValues"
-        :key="cv.key"
-        class="text-muted d-block small"
-        :data-testid="`event-device-custom-${device.id}-${cv.key}`"
-      >{{ fieldLabel(cv.label) }} {{ cv.value }}</span>
     </td>
     <td>{{ device.category ? t(device.category.name) : '-' }}</td>
     <!-- Gap fix (MEDIUM): legacy hides Brand/Age/Assessment/Status/Spare-parts

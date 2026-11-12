@@ -17,7 +17,7 @@ const BModalStub = {
   template: '<div v-if="modelValue" :data-modal-title="title"><slot /></div>',
 }
 const DeviceFormStub = {
-  props: ['eventId', 'device', 'powered'],
+  props: ['eventId', 'device', 'powered', 'groupFeatures', 'groupCustomFields'],
   emits: ['saved', 'cancel'],
   template: '<div data-testid="device-form-stub">{{ device && device.id }}</div>',
 }
@@ -157,42 +157,23 @@ describe('components/devices/DeviceRow', () => {
   })
 
   describe('custom item field values', () => {
-    const FIELDS = [
-      { key: 'town', label: 'Town', type: 'text', options: [] },
-      { key: 'visits', label: 'Visits', type: 'number', options: [] },
-    ]
+    const FIELDS = [{ key: 'town', label: 'Town', type: 'text', options: [] }]
     const ON = { item_weight: true, custom_fields: true }
 
-    it('shows label: value for active fields that have a value', () => {
-      const wrapper = mountRow({
-        device: device({ custom_values: { town: 'Leeds', removed: 'old' } }),
-        groupFeatures: ON,
-        groupCustomFields: FIELDS,
-      })
-
-      expect(wrapper.find('[data-testid="event-device-custom-1-town"]').text()).toBe('Town: Leeds')
-      expect(wrapper.find('[data-testid="event-device-custom-1-visits"]').exists()).toBe(false)
-      expect(wrapper.text()).not.toContain('old')
-    })
-
-    it('adds no colon after a label that ends in punctuation', () => {
-      const wrapper = mountRow({
-        device: device({ custom_values: { visit: 'Yes' } }),
-        groupFeatures: ON,
-        groupCustomFields: [{ key: 'visit', label: 'First visit?', type: 'choice', options: ['Yes', 'No'] }],
-      })
-
-      expect(wrapper.find('[data-testid="event-device-custom-1-visit"]').text()).toBe('First visit? Yes')
-    })
-
-    it('shows nothing when custom fields are switched off', () => {
+    it('are not in the item list: they show when the item is opened', async () => {
       const wrapper = mountRow({
         device: device({ custom_values: { town: 'Leeds' } }),
-        groupFeatures: { item_weight: true, custom_fields: false },
+        groupFeatures: ON,
         groupCustomFields: FIELDS,
+        canedit: true,
       })
 
-      expect(wrapper.find('[data-testid="event-device-custom-1-town"]').exists()).toBe(false)
+      expect(wrapper.text()).not.toContain('Leeds')
+
+      await wrapper.find('[data-testid="event-device-edit-1"]').trigger('click')
+      const form = wrapper.findComponent(DeviceFormStub)
+      expect(form.props('groupFeatures')).toEqual(ON)
+      expect(form.props('groupCustomFields')).toEqual(FIELDS)
     })
   })
 })

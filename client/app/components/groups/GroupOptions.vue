@@ -4,8 +4,8 @@ import { useI18n } from 'vue-i18n'
 import { useGroupsStore } from '../../stores/groups.js'
 import { FEATURE_KEYS, MAX_CUSTOM_FIELDS } from '../../composables/useFeatureSwitches.js'
 
-// The group's "Options" card (RES-2063): each feature On / Off / use the
-// default, locked (and explained) when a network decides it, plus the custom
+// The group's "Options" card (RES-2063): for each feature, doing it or not,
+// with the default marked; locked (and explained) when a network decides it, plus the custom
 // item fields editor when custom fields are enabled. Has its own Save button:
 // PATCH /api/v2/groups/{id}/options.
 const props = defineProps({
@@ -21,19 +21,37 @@ const groupsStore = useGroupsStore()
 
 const features = computed(() => props.group.features || {})
 
-function settingToValue(setting) {
-  if (setting === true) return 'on'
-  if (setting === false) return 'off'
-  return ''
+// Each feature is a choice between what it does and what not having it does,
+// worded that way ("Collect item weights" / "Don't collect item weights").
+// The one that's the default is marked, and choosing it means following the
+// default: '' rather than 'on' or 'off', so a network that changes its default
+// changes this group too.
+function choiceLabel(key, on) {
+  return t(`client.features.${key}_${on ? 'on' : 'off'}`)
+}
+
+function choices(key) {
+  if (isLocked(key)) {
+    return [{ value: 'locked', label: choiceLabel(key, !!features.value[key]?.enabled) }]
+  }
+
+  const byDefault = !!features.value[key]?.inherited
+
+  return [true, false].map((on) => on === byDefault
+    ? { value: '', label: t('client.features.is_default', { choice: choiceLabel(key, on) }) }
+    : { value: on ? 'on' : 'off', label: choiceLabel(key, on) })
 }
 
 // What each select shows: the group's own setting, or, when a network has
-// locked it, what the network has decided.
+// locked it, what the network has decided. A setting that's the same as the
+// default shows as the default.
 function selectValues(source = props.group) {
   return Object.fromEntries(
     FEATURE_KEYS.map((k) => {
       const f = (source.features || {})[k] || {}
-      return [k, f.locked ? (f.enabled ? 'on' : 'off') : settingToValue(f.group_setting ?? null)]
+      if (f.locked) return [k, 'locked']
+      if (f.group_setting === null || f.group_setting === undefined || f.group_setting === !!f.inherited) return [k, '']
+      return [k, f.group_setting ? 'on' : 'off']
     })
   )
 }
@@ -41,14 +59,6 @@ const values = reactive(selectValues())
 
 function isLocked(key) {
   return !!features.value[key]?.locked
-}
-
-function stateLabel(on) {
-  return t(on ? 'client.features.state_on' : 'client.features.state_off')
-}
-
-function defaultLabel(key) {
-  return t('client.features.group_use_default', { state: stateLabel(!!features.value[key]?.inherited) })
 }
 
 // The editor follows the select as it is now, so turning custom fields on
@@ -154,9 +164,7 @@ async function save() {
         :disabled="isLocked(key)"
         :data-testid="`group-option-${key}`"
       >
-        <option v-if="!isLocked(key)" value="">{{ defaultLabel(key) }}</option>
-        <option value="on">{{ t('client.features.group_on') }}</option>
-        <option value="off">{{ t('client.features.group_off') }}</option>
+        <option v-for="c in choices(key)" :key="c.value" :value="c.value">{{ c.label }}</option>
       </select>
       <small v-if="isLocked(key)" class="form-text text-muted d-block" :data-testid="`group-option-${key}-locked`">{{ t('client.features.set_by', { networks: (features[key].set_by || []).join(', ') }) }}</small>
       <small v-else class="form-text text-muted d-block">{{ t(`client.features.${key}_help`) }}</small>
