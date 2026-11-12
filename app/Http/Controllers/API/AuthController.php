@@ -146,8 +146,9 @@ class AuthController extends Controller
             $token->delete();
         }
 
-        // Fires LogOutOfWiki (cookie forget; harmless on XHR) and the queued
-        // Discourse force-logout listener.
+        // Fires LogOutOfWiki, which clears the wiki's login cookies (the route
+        // adds the middleware that sends them), and the queued Discourse
+        // force-logout listener.
         event(new Logout('web', $user));
 
         return response()->json(['message' => 'Logged out.']);

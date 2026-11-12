@@ -108,7 +108,9 @@ Route::prefix('v2')->middleware(\App\Http\Middleware\VerifyUserConsentApi::class
             });
             Route::get('/email-available', [API\AuthController::class, 'emailAvailablev2']);
             Route::middleware('auth:sanctum,api')->group(function() {
-                Route::post('/logout', [API\AuthController::class, 'logoutv2']);
+                // The cookie middleware sends the wiki's cookies, which LogOutOfWiki clears; the api group has none.
+                Route::post('/logout', [API\AuthController::class, 'logoutv2'])
+                    ->middleware(\Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class);
                 Route::post('/sso-ticket', [API\AuthController::class, 'ssoTicketv2']);
             });
         });

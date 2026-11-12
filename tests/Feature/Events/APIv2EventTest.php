@@ -85,11 +85,6 @@ class APIv2EventTest extends TestCase
     }
 
     /**
-     * @story:GroupController::getEventsForGroupv2
-     * @story:EventController::getEventv2
-     * @story:NetworkController::getNetworkEventsv2
-     */
-    /**
      * therestartproject.org's WordPress site, the API's busiest client, asks for /api/v2/events/{id}&api_token=...
      * and /api/v2/groups/{id}&api_token=... (an & where the ? belongs), so the token ends up in the id. Live answers
      * with the event or group; so must this.
@@ -112,6 +107,11 @@ class APIv2EventTest extends TestCase
         $this->assertEquals($idgroups, $response->json('data.id'));
     }
 
+    /**
+     * @story:GroupController::getEventsForGroupv2
+     * @story:EventController::getEventv2
+     * @story:NetworkController::getNetworkEventsv2
+     */
     public function testGetEventsForUnapprovedGroup(): void {
         $user = User::factory()->administrator()->create([
                                                                           'api_token' => '1234',

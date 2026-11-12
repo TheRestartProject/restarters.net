@@ -437,6 +437,15 @@
   border-bottom-color: #fff;
 }
 
+// Bootstrap's `.nav-tabs .nav-link:hover/:focus` recolours the borders and outranks the rules above.
+.events-tabs .nav-tabs .nav-link:hover,
+.events-tabs .nav-tabs .nav-link:focus {
+  border-bottom-color: #222;
+}
+.events-tabs .nav-tabs .nav-link.active:hover,
+.events-tabs .nav-tabs .nav-link.active:focus {
+  border-bottom-color: #fff;
+}
 .events-tabs .nav-link.active::before {
   content: '';
   position: absolute;

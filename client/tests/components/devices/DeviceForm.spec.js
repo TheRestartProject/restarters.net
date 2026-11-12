@@ -434,6 +434,22 @@ describe('components/devices/DeviceForm', () => {
       expect(label.classes()).toContain('visually-hidden')
     })
 
+    it('names each dropdown for screen readers, as its label is hidden', async () => {
+      const wrapper = mountForm()
+      await chooseOption(wrapper, 'device-form-status', 'End of life')
+
+      const names = {
+        'device-form-category': en.devices.category,
+        'device-form-status': en.devices.repair_status,
+        'device-form-barrier': en.partials.choose_barriers,
+      }
+      for (const [testid, name] of Object.entries(names)) {
+        const control = wrapper.find(`[data-testid="${testid}"]`)
+        expect(control.attributes('role')).toBe('combobox')
+        expect(control.attributes('aria-label')).toBe(name)
+      }
+    })
+
     it('puts each (i) in the column to the right of its own field', () => {
       const wrapper = mountForm()
 
@@ -663,6 +679,19 @@ describe('components/devices/DeviceForm', () => {
       expect(option.text()).toBe('Smeg Kettle')
       expect(option.findAll('strong').map((b) => b.text())).toEqual(['Kettle'])
       expect(wrapper.find('[data-testid="device-form-item-type-option-Kettle base"] strong').text()).toBe('Kettle')
+    })
+
+    it('bolds typed text holding brackets or dots as it is', async () => {
+      store.itemTypes.data = ['Hi-Fi (stereo) amp'].map((type) => ({ type, powered: true }))
+      const wrapper = mountForm({ powered: true })
+      const input = wrapper.find('[data-testid="device-form-item-type"]')
+
+      await input.trigger('focus')
+      await input.setValue('(STEREO)')
+
+      const option = wrapper.find('[data-testid="device-form-item-type-option-Hi-Fi (stereo) amp"]')
+      expect(option.text()).toBe('Hi-Fi (stereo) amp')
+      expect(option.findAll('strong').map((b) => b.text())).toEqual(['(stereo)'])
     })
   })
 

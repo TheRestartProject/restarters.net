@@ -1,5 +1,5 @@
 {
-    "generatedAt": "2026-11-12T18:23:32Z",
+    "generatedAt": "2026-11-12T18:39:46Z",
     "features": {
         "Administration": {
             "description": "Platform administration and configuration",
@@ -663,7 +663,7 @@
                         },
                         {
                             "file": "tests/Feature/Events/APIv2EventTest.php",
-                            "test": "testGetWithTheTokenInThePath"
+                            "test": "testGetEventsForUnapprovedGroup"
                         },
                         {
                             "file": "tests/Feature/Events/APIv2EventTest.php",
@@ -1378,7 +1378,7 @@
                         },
                         {
                             "file": "tests/Feature/Events/APIv2EventTest.php",
-                            "test": "testGetWithTheTokenInThePath"
+                            "test": "testGetEventsForUnapprovedGroup"
                         },
                         {
                             "file": "tests/Feature/Events/APIv2EventTest.php",
@@ -1547,7 +1547,7 @@
                         },
                         {
                             "file": "tests/Feature/Events/APIv2EventTest.php",
-                            "test": "testGetWithTheTokenInThePath"
+                            "test": "testGetEventsForUnapprovedGroup"
                         }
                     ]
                 },
@@ -2182,7 +2182,7 @@
                         },
                         {
                             "file": "tests/Feature/Events/APIv2EventTest.php",
-                            "test": "testGetWithTheTokenInThePath"
+                            "test": "testGetEventsForUnapprovedGroup"
                         }
                     ]
                 },
@@ -2337,7 +2337,7 @@
                     "tests": [
                         {
                             "file": "tests/Feature/Events/APIv2EventTest.php",
-                            "test": "testGetWithTheTokenInThePath"
+                            "test": "testGetEventsForUnapprovedGroup"
                         },
                         {
                             "file": "tests/Feature/Networks/APIv2NetworkTest.php",
@@ -2500,7 +2500,7 @@
                     "tests": [
                         {
                             "file": "tests/Feature/Events/APIv2EventTest.php",
-                            "test": "testGetWithTheTokenInThePath"
+                            "test": "testGetEventsForUnapprovedGroup"
                         },
                         {
                             "file": "tests/Feature/Networks/APIv2NetworkTest.php",
@@ -3358,7 +3358,12 @@
                     "method": "AuthController::logoutv2",
                     "class": "App\\Http\\Controllers\\API\\AuthController",
                     "file": "app/Http/Controllers/API/AuthController.php",
-                    "tests": []
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Auth/AuthEndpointsTest.php",
+                            "test": "testLogoutLogsOutOfTheWiki"
+                        }
+                    ]
                 },
                 {
                     "story": "As a Restarter, I stay logged in when moving between Restarters, Talk and the wiki",
@@ -3739,6 +3744,6 @@
     },
     "coverage": {
         "annotatedStories": 256,
-        "storiesWithTests": 108
+        "storiesWithTests": 109
     }
 }

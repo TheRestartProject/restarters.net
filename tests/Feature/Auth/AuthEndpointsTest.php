@@ -429,4 +429,22 @@ class AuthEndpointsTest extends TestCase
 
         $this->getJson('/api/users/me', $headers)->assertStatus(401);
     }
+
+    /**
+     * @story:AuthController::logoutv2
+     */
+    public function testLogoutLogsOutOfTheWiki(): void
+    {
+        // Live's /logout cleared the wiki's login cookies, so logging out of Restarters, on the site or from the
+        // wiki's own menu, logged you out of the wiki too.
+        $user = $this->makeUser('wikileaver@restarters.test');
+        $token = $user->createToken('spa')->plainTextToken;
+
+        $response = $this->post('/api/v2/auth/logout', [], ['Authorization' => 'Bearer '.$token, 'Accept' => 'application/json']);
+
+        $response->assertOk();
+        foreach (['mw__session', 'mw_Token', 'mw_UserID', 'mw_UserName'] as $name) {
+            $response->assertCookieExpired(config('restarters.wiki.cookie_prefix').'_'.$name);
+        }
+    }
 }

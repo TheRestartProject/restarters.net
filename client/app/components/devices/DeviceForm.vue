@@ -347,23 +347,22 @@ function typeaheadMatches(list, query) {
 // shows it) and the rest. Plain text parts rather than v-html, as suggestions
 // are other people's typing.
 function highlightParts(text, query) {
-  const term = (query || '').trim().toLowerCase()
+  const term = (query || '').trim()
   if (!term) return [{ text, match: false }]
 
+  // Searched case-insensitively in the text itself, so the positions are the
+  // text's own: lowercasing can change a string's length ("İ").
+  const pattern = new RegExp(term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi')
   const parts = []
-  const lower = text.toLowerCase()
   let from = 0
-  let at = lower.indexOf(term)
 
-  while (at !== -1) {
-    if (at > from) parts.push({ text: text.slice(from, at), match: false })
-    parts.push({ text: text.slice(at, at + term.length), match: true })
-    from = at + term.length
-    at = lower.indexOf(term, from)
+  for (const found of text.matchAll(pattern)) {
+    if (found.index > from) parts.push({ text: text.slice(from, found.index), match: false })
+    parts.push({ text: found[0], match: true })
+    from = found.index + found[0].length
   }
 
   if (from < text.length) parts.push({ text: text.slice(from), match: false })
-
   return parts
 }
 
@@ -560,6 +559,9 @@ const SHOW_DEVICE_REFERENCE = false
                   class="multiselect__tags"
                   :class="{ 'multiselect__tags--empty': !categorySelectedLabel }"
                   tabindex="0"
+                  role="combobox"
+                  :aria-label="t('devices.category')"
+                  :aria-expanded="openDropdown === 'category'"
                   :disabled="readonly"
                   data-testid="device-form-category"
                   :data-value="form.category === null ? '' : String(form.category)"
@@ -742,6 +744,9 @@ const SHOW_DEVICE_REFERENCE = false
               class="multiselect__tags"
               :class="{ 'multiselect__tags--empty': !statusSelectedLabel }"
               tabindex="0"
+              role="combobox"
+              :aria-label="t('devices.repair_status')"
+              :aria-expanded="openDropdown === 'status'"
               :disabled="readonly"
               data-testid="device-form-status"
               :data-value="form.repairStatus"
@@ -780,6 +785,9 @@ const SHOW_DEVICE_REFERENCE = false
               class="multiselect__tags"
               :class="{ 'multiselect__tags--empty': !nextStepsSelectedLabel }"
               tabindex="0"
+              role="combobox"
+              :aria-label="t('devices.repair_details')"
+              :aria-expanded="openDropdown === 'nextSteps'"
               :disabled="readonly"
               data-testid="device-form-next-steps"
               :data-value="form.nextSteps"
@@ -818,6 +826,9 @@ const SHOW_DEVICE_REFERENCE = false
               class="multiselect__tags"
               :class="{ 'multiselect__tags--empty': !sparePartsSelectedLabel }"
               tabindex="0"
+              role="combobox"
+              :aria-label="t('devices.spare_parts')"
+              :aria-expanded="openDropdown === 'spareParts'"
               :disabled="readonly"
               data-testid="device-form-spare-parts"
               :data-value="form.spareParts"
@@ -856,6 +867,9 @@ const SHOW_DEVICE_REFERENCE = false
               class="multiselect__tags"
               :class="{ 'multiselect__tags--empty': !barrierSelectedLabel }"
               tabindex="0"
+              role="combobox"
+              :aria-label="t('partials.choose_barriers')"
+              :aria-expanded="openDropdown === 'barrier'"
               :disabled="readonly"
               data-testid="device-form-barrier"
               :data-value="form.barrier"
