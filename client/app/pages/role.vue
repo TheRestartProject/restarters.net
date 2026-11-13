@@ -163,7 +163,7 @@ async function load() {
 }
 
 function retry() {
-  load()
+  void load()
 }
 
 onMounted(load)

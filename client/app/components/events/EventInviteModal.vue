@@ -96,7 +96,7 @@ function toggleAllMembers(checked) {
 watch(
   () => props.show,
   (visible) => {
-    if (visible) loadMembers()
+    if (visible) void loadMembers()
   },
   { immediate: true }
 )

@@ -70,7 +70,7 @@ async function load() {
 onMounted(load)
 
 function retry() {
-  load()
+  void load()
 }
 
 // Same post-create navigation choice as pages/party/create/[[group_id]].vue

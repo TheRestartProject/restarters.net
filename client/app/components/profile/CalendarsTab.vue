@@ -46,7 +46,7 @@ onMounted(async () => {
 
 function copy(text) {
   if (navigator.clipboard) {
-    navigator.clipboard.writeText(text)
+    void navigator.clipboard.writeText(text)
   }
 }
 </script>

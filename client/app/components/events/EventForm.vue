@@ -452,7 +452,7 @@ function closeDuplicates() {
 function postAnyway() {
   showDuplicates.value = false
   duplicatesAccepted.value = true
-  submit()
+  void submit()
 }
 
 defineExpose({ submit })

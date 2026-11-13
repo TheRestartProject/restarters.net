@@ -65,7 +65,7 @@ async function load() {
 onMounted(load)
 
 function retry() {
-  load()
+  void load()
 }
 
 // PartyController::create() shows events.cantcreate instead of the form
