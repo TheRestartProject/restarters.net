@@ -113,24 +113,26 @@ function closeZoom() {
 </script>
 
 <template>
-  <div data-testid="device-photos">
-    <label class="fw-bold">{{ t('devices.images') }}</label>
+  <div data-testid="device-photos" role="group" :aria-label="t('devices.images')">
+    <span class="fw-bold d-inline-block" aria-hidden="true">{{ t('devices.images') }}</span>
 
     <div class="d-flex flex-wrap gap-2 mb-2">
       <div v-for="image in images" :key="image.idxref" class="position-relative" data-testid="device-photo">
-        <img
-          :src="uploadedImageUrl(image.path)"
-          width="100"
-          height="100"
-          style="object-fit: cover; cursor: pointer"
-          alt=""
-          role="button"
-          data-testid="device-photo-thumb"
-          tabindex="0"
+        <button
+          type="button"
+          class="p-0 border-0 bg-transparent"
+          :aria-label="t('devices.images')"
           @click="zoom(image)"
-          @keydown.enter.prevent="zoom(image)"
-          @keydown.space.prevent="zoom(image)"
         >
+          <img
+            :src="uploadedImageUrl(image.path)"
+            width="100"
+            height="100"
+            style="object-fit: cover; cursor: pointer"
+            alt=""
+            data-testid="device-photo-thumb"
+          >
+        </button>
         <button
           v-if="!readonly"
           type="button"

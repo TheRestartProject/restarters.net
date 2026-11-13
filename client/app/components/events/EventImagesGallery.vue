@@ -54,19 +54,21 @@ function closeZoom() {
     </template>
 
     <div class="d-flex flex-wrap">
-      <img
+      <button
         v-for="image in images"
         :key="image.id"
-        :src="thumbnailUrl(image)"
-        alt=""
-        class="event-image-thumb me-2 mb-2"
-        data-testid="event-image-thumb"
-        role="button"
-        tabindex="0"
+        type="button"
+        class="event-image-button p-0 border-0 bg-transparent me-2 mb-2"
+        :aria-label="t('events.event_photos')"
         @click="zoom(image)"
-        @keydown.enter.prevent="zoom(image)"
-        @keydown.space.prevent="zoom(image)"
       >
+        <img
+          :src="thumbnailUrl(image)"
+          alt=""
+          class="event-image-thumb"
+          data-testid="event-image-thumb"
+        >
+      </button>
     </div>
 
     <BModal
@@ -86,6 +88,7 @@ function closeZoom() {
 
 <style scoped>
 .event-image-thumb {
+  display: block;
   width: 100px;
   height: 100px;
   object-fit: cover;

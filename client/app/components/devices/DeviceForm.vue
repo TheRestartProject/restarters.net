@@ -561,6 +561,7 @@ const SHOW_DEVICE_REFERENCE = false
                   :class="{ 'multiselect__tags--empty': !categorySelectedLabel }"
                   tabindex="0"
                   role="combobox"
+                  aria-controls="device-form-category-options"
                   :aria-label="t('devices.category')"
                   :aria-expanded="openDropdown === 'category'"
                   :disabled="readonly"
@@ -574,7 +575,7 @@ const SHOW_DEVICE_REFERENCE = false
                   {{ categorySelectedLabel || t('devices.category') }}
                 </div>
                 <div v-if="openDropdown === 'category'" class="multiselect__content-wrapper">
-                  <ul class="multiselect__content">
+                  <ul id="device-form-category-options" class="multiselect__content">
                     <template v-for="cluster in clusters" :key="cluster.id">
                       <li
                         v-if="categoryOptionsForCluster(cluster).length"
@@ -748,6 +749,7 @@ const SHOW_DEVICE_REFERENCE = false
               :class="{ 'multiselect__tags--empty': !statusSelectedLabel }"
               tabindex="0"
               role="combobox"
+              aria-controls="device-form-status-options"
               :aria-label="t('devices.repair_status')"
               :aria-expanded="openDropdown === 'status'"
               :disabled="readonly"
@@ -761,7 +763,7 @@ const SHOW_DEVICE_REFERENCE = false
               {{ statusSelectedLabel || t('devices.repair_outcome') }}
             </div>
             <div v-if="openDropdown === 'status'" class="multiselect__content-wrapper">
-              <ul class="multiselect__content">
+              <ul id="device-form-status-options" class="multiselect__content">
                 <li
                   v-for="o in statusOptions"
                   :key="o.value"
@@ -789,6 +791,7 @@ const SHOW_DEVICE_REFERENCE = false
               :class="{ 'multiselect__tags--empty': !nextStepsSelectedLabel }"
               tabindex="0"
               role="combobox"
+              aria-controls="device-form-next-steps-options"
               :aria-label="t('devices.repair_details')"
               :aria-expanded="openDropdown === 'nextSteps'"
               :disabled="readonly"
@@ -802,7 +805,7 @@ const SHOW_DEVICE_REFERENCE = false
               {{ nextStepsSelectedLabel || t('devices.repair_details') }}
             </div>
             <div v-if="openDropdown === 'nextSteps'" class="multiselect__content-wrapper">
-              <ul class="multiselect__content">
+              <ul id="device-form-next-steps-options" class="multiselect__content">
                 <li
                   v-for="o in nextStepsOptions"
                   :key="o.value"
@@ -830,6 +833,7 @@ const SHOW_DEVICE_REFERENCE = false
               :class="{ 'multiselect__tags--empty': !sparePartsSelectedLabel }"
               tabindex="0"
               role="combobox"
+              aria-controls="device-form-spare-parts-options"
               :aria-label="t('devices.spare_parts')"
               :aria-expanded="openDropdown === 'spareParts'"
               :disabled="readonly"
@@ -843,7 +847,7 @@ const SHOW_DEVICE_REFERENCE = false
               {{ sparePartsSelectedLabel || t('devices.spare_parts') }}
             </div>
             <div v-if="openDropdown === 'spareParts'" class="multiselect__content-wrapper">
-              <ul class="multiselect__content">
+              <ul id="device-form-spare-parts-options" class="multiselect__content">
                 <li
                   v-for="o in sparePartsOptions"
                   :key="o.value"
@@ -871,6 +875,7 @@ const SHOW_DEVICE_REFERENCE = false
               :class="{ 'multiselect__tags--empty': !barrierSelectedLabel }"
               tabindex="0"
               role="combobox"
+              aria-controls="device-form-barrier-options"
               :aria-label="t('partials.choose_barriers')"
               :aria-expanded="openDropdown === 'barrier'"
               :disabled="readonly"
@@ -884,7 +889,7 @@ const SHOW_DEVICE_REFERENCE = false
               {{ barrierSelectedLabel || t('partials.choose_barriers') }}
             </div>
             <div v-if="openDropdown === 'barrier'" class="multiselect__content-wrapper">
-              <ul class="multiselect__content">
+              <ul id="device-form-barrier-options" class="multiselect__content">
                 <li
                   v-for="o in barrierOptions"
                   :key="o.value"

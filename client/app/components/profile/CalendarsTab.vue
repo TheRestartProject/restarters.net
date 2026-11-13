@@ -89,7 +89,7 @@ function copy(text) {
              included before this admin-only heading's text in develop's
              calendars.blade.php. -->
         <h5 class="mb-3">
-          <svg width="18" height="18" viewBox="0 0 50 50" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" class="me-1" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;">
+          <svg aria-hidden="true" width="18" height="18" viewBox="0 0 50 50" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" class="me-1" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;">
             <g transform="matrix(3.17512,0,0,3.17512,-578.372,-70.5275)">
               <g transform="matrix(1,0,0,1,-1.664,0.023296)">
                 <path d="M191.695,23.848C195.136,23.848 197.929,26.641 197.929,30.082C197.929,33.523 195.136,36.317 191.695,36.317C188.254,36.317 185.46,33.523 185.46,30.082C185.46,26.641 188.254,23.848 191.695,23.848ZM191.695,27.04C193.374,27.04 194.737,28.403 194.737,30.082C194.737,31.761 193.374,33.124 191.695,33.125C190.016,33.125 188.653,31.762 188.653,30.082C188.653,28.403 190.016,27.04 191.695,27.04Z" style="fill:rgb(3,148,166);" />
