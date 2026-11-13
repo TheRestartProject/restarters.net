@@ -1,4 +1,5 @@
 <script setup>
+import { trimTrailing } from '~/utils/safeText.js'
 import { computed, nextTick, ref, useId } from 'vue'
 
 // Tag-chip multi-select, replacing the native <select multiple> that stood in
@@ -102,7 +103,7 @@ function remove(value) {
 // Free text becomes a value of its own. Emitted as well as committed so a
 // caller can validate it (the invite modals flag malformed addresses).
 function addTag() {
-  const raw = search.value.trim().replace(/,+$/, '')
+  const raw = trimTrailing(search.value.trim(), ',')
   if (!raw) return
 
   if (!selected.value.includes(raw)) {

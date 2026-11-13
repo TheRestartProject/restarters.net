@@ -1,4 +1,5 @@
 <script setup>
+import { trimTrailing } from '~/utils/safeText.js'
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import 'quill/dist/quill.snow.css'
 
@@ -136,7 +137,7 @@ function magicPasteLinks(node, delta) {
       }
       // Trailing punctuation (sentence-ending '.', ')', etc.) isn't part of
       // the URL.
-      const url = match[0].replace(/[.,;:!?)]+$/, '')
+      const url = trimTrailing(match[0], '.,;:!?)')
       const trailing = match[0].slice(url.length)
       const href = url.startsWith('www.') ? `https://${url}` : url
       ops.push({ insert: url, attributes: { ...op.attributes, link: href } })

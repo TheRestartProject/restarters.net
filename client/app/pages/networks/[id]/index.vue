@@ -1,4 +1,5 @@
 <script setup>
+import { stripTags } from '~/utils/safeText.js'
 import LoadingPlaceholder from '~/components/LoadingPlaceholder.vue'
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -83,7 +84,7 @@ const showReadMore = computed(() => {
 })
 
 function stripHtml(value) {
-  return String(value).replace(/<[^>]*>/g, '')
+  return stripTags(value)
 }
 
 // Mirrors app/Network.php#groupsNotIn() exactly (parity-v2/networks.md gap

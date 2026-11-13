@@ -1,4 +1,5 @@
 <script setup>
+import { isEmailLike } from '~/utils/safeText.js'
 import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { LMap, LMarker, LTileLayer } from '@vue-leaflet/vue-leaflet'
@@ -267,7 +268,7 @@ function validate() {
   if (form.website && !/^https?:\/\/.+/i.test(form.website)) {
     errors.website = [t('groups.groups_website_invalid')]
   }
-  if (form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+  if (form.email && !isEmailLike(form.email)) {
     errors.email = [t('client.groups.email_invalid')]
   }
   if (!timezoneValid.value) {

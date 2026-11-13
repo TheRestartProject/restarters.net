@@ -1,4 +1,5 @@
 <script setup>
+import { stripTags } from '~/utils/safeText.js'
 import LoadingPlaceholder from '~/components/LoadingPlaceholder.vue'
 import { computed, onMounted, ref, watch } from 'vue'
 import { useToastStore } from '~/stores/toast.js'
@@ -96,7 +97,7 @@ const DESCRIPTION_LIMIT = 440
 const showFullDescription = ref(false)
 
 function stripHtml(value) {
-  return String(value).replace(/<[^>]*>/g, '')
+  return stripTags(value)
 }
 
 const strippedDescription = computed(() => {

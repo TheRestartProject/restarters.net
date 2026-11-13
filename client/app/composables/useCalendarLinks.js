@@ -1,4 +1,5 @@
 import { computed, toValue } from 'vue'
+import { stripTags as stripMarkup } from '~/utils/safeText.js'
 
 // Client-side port of PartyController::generateAddToCalendarLinks(), which
 // wraps spatie/calendar-links (vendor/spatie/calendar-links/src/Generators/
@@ -25,7 +26,7 @@ import { computed, toValue } from 'vue'
 
 function stripTags(html) {
   if (!html) return ''
-  return html.replace(/<[^>]*>/g, '')
+  return stripMarkup(html)
 }
 
 function pad(n) {
