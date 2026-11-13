@@ -226,7 +226,7 @@ if [ "$RESTORE_OK" = "true" ]; then
         # Errors with no SQLSTATE (class not found, bad config, PHP fatal) cannot
         # quote database rows, so their first line is safe to publish.
         PHP_ERR=""
-        if [ -z "$SQL_STATE" ]; then
+        if [[ -z $SQL_STATE ]]; then
             PHP_ERR=$(grep -vE '^\s*$|vendor/' "$MIGRATE_OUT" | head -12 | tr '\n' ' ' | cut -c1-900)
         fi
         MIGRATE_DETAIL="${PHP_ERR:+$PHP_ERR - }migrate failed at ${FAILED_MIGRATION:-unknown} ${EXC_CLASS} ${SQL_STATE} ${SQL_CODE:+driver $SQL_CODE} - see machine logs"
