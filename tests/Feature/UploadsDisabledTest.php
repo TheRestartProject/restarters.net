@@ -3,19 +3,37 @@
 namespace Tests\Feature;
 
 use App\Group;
-use App\Network;
+use App\Helpers\Tus;
 use App\User;
-use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Testing\TestResponse;
 use Tests\TestCase;
+use TusPhp\Cache\Cacheable;
 
 /**
  * The image_upload feature flag exists so that preview/staging environments
- * sharing the production Tigris bucket can disable writes to it.
+ * sharing the production Tigris bucket can disable writes to it. The flag is
+ * enforced in FixometerFile::uploadLocalFile, which every image endpoint
+ * (group/event/device) funnels through, so disabling it makes the API image
+ * upload fail.
+ *
+ * Network-logo upload is not (yet) exposed over /api/v2 — the old
+ * PUT /networks/{network} web route was removed at the Nuxt cutover, so the
+ * two network-logo cases were dropped (see cutover-checklist GAPS).
  */
 class UploadsDisabledTest extends TestCase
 {
+    /** @var string[] */
+    private array $tmpTusFiles = [];
+
+    protected function tearDown(): void
+    {
+        foreach ($this->tmpTusFiles as $path) {
+            if (is_file($path)) {
+                @unlink($path);
+            }
+        }
+        parent::tearDown();
+    }
+
     /** @test */
     public function image_upload_flag_defaults_to_enabled(): void
     {
@@ -25,15 +43,17 @@ class UploadsDisabledTest extends TestCase
     /** @test */
     public function group_image_upload_rejected_when_uploads_disabled(): void
     {
+        // The base TestCase disables exception handling; re-enable it so the
+        // rejection surfaces as a 422 response rather than a raised exception.
+        $this->withExceptionHandling();
+
         config(['restarters.features.image_upload' => false]);
 
         $imagesBefore = \DB::table('images')->count();
 
-        $response = $this->postGroupImage('UT_disabled.jpg');
-        $response->assertOk();
-        $this->assertStringStartsWith('fail - image could not be uploaded', $response->getContent());
-        $this->assertStringContainsString('disabled', $response->getContent());
-
+        $response = $this->postGroupImage();
+        // FixometerFile refuses the write, so uploadImagev2 rejects the upload.
+        $response->assertStatus(422);
         $this->assertEquals($imagesBefore, \DB::table('images')->count());
     }
 
@@ -42,41 +62,16 @@ class UploadsDisabledTest extends TestCase
     {
         config(['restarters.features.image_upload' => true]);
 
-        $response = $this->postGroupImage('UT_enabled.jpg');
-        $response->assertOk();
-        $this->assertEquals('success - image uploaded', $response->getContent());
-    }
-
-    /** @test */
-    public function network_logo_upload_rejected_when_uploads_disabled(): void
-    {
-        config(['restarters.features.image_upload' => false]);
-
-        [$network, $response] = $this->putNetworkLogo();
-
-        $response->assertRedirect(route('networks.edit', $network));
-        $response->assertSessionHas('warning');
-        $this->assertNull($network->fresh()->logo);
-    }
-
-    /** @test */
-    public function network_logo_upload_allowed_when_uploads_enabled(): void
-    {
-        config(['restarters.features.image_upload' => true]);
-
-        [$network, $response] = $this->putNetworkLogo();
-
-        $response->assertRedirect(route('networks.edit', $network));
-        $logo = $network->fresh()->logo;
-        $this->assertNotNull($logo);
-        $this->assertStringStartsWith('network_logos/', $logo);
+        $response = $this->postGroupImage();
+        $response->assertSuccessful();
+        $response->assertJsonStructure(['data' => ['image_url']]);
     }
 
     /**
-     * Post an image to the group image-upload endpoint as a host, using the
-     * legacy $_FILES mechanism the endpoint expects.
+     * Upload a group image through the API as a host of the group, staging a
+     * completed tus upload the way the SPA uploader would.
      */
-    private function postGroupImage(string $filename): TestResponse
+    private function postGroupImage(): \Illuminate\Testing\TestResponse
     {
         $group = Group::factory()->create();
         $host = User::factory()->host()->create();
@@ -84,40 +79,45 @@ class UploadsDisabledTest extends TestCase
         $group->makeMemberAHost($host);
         $this->actingAs($host);
 
+        // FixometerFile::uploadLocalFile writes relative to DOCUMENT_ROOT.
         $_SERVER['DOCUMENT_ROOT'] = getcwd();
         \FixometerFile::$uploadTesting = true;
-        file_put_contents('/tmp/' . $filename, file_get_contents(public_path() . '/images/community.jpg'));
+        $key = $this->seedCompletedTusUpload(public_path().'/images/community.jpg');
 
-        $_FILES = [
-            'file' => [
-                'error' => '0',
-                'name' => $filename,
-                'size' => 123,
-                'tmp_name' => ['/tmp/' . $filename],
-                'type' => 'image/jpg',
-            ],
-        ];
-
-        return $this->json('POST', '/group/image-upload/' . $group->idgroups, []);
+        // v2 endpoints authenticate via the token guard (auth:sanctum,api).
+        return $this->postJson('/api/v2/groups/'.$group->idgroups.'/images?api_token='.$host->api_token, ['upload_key' => $key]);
     }
 
-    /**
-     * Upload a network logo as an administrator.
-     *
-     * @return array{0: Network, 1: TestResponse}
-     */
-    private function putNetworkLogo(): array
+    private function seedCompletedTusUpload(string $sourcePath): string
     {
-        Storage::fake('public_uploads');
+        $key = 'ud-'.uniqid();
 
-        $network = Network::factory()->create();
-        $admin = User::factory()->administrator()->create();
-        $this->actingAs($admin);
+        $uploadDir = Tus::uploadDir();
+        if (! is_dir($uploadDir)) {
+            mkdir($uploadDir, 0775, true);
+        }
 
-        $response = $this->put(route('networks.update', $network), [
-            'network_logo' => UploadedFile::fake()->image('logo.png'),
+        $destPath = $uploadDir.'/'.$key;
+        copy($sourcePath, $destPath);
+        $this->tmpTusFiles[] = $destPath;
+
+        $size = filesize($destPath);
+        $cache = Tus::buildCache();
+        $now = new \DateTime();
+
+        $cache->set($key, [
+            'name' => $key,
+            'size' => $size,
+            'offset' => $size,
+            'checksum' => null,
+            'location' => 'http://localhost/api/tus/'.$key,
+            'file_path' => $destPath,
+            'metadata' => [],
+            'upload_type' => 'normal',
+            'created_at' => $now->format(Cacheable::RFC_7231),
+            'expires_at' => $now->modify('+1 day')->format(Cacheable::RFC_7231),
         ]);
 
-        return [$network, $response];
+        return $key;
     }
 }

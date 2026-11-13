@@ -1,18 +1,17 @@
 <?php
 
 return [
+    'notifications' => 'Notifications',
+    'mark_as_read' => 'Marquer comme lu',
+    'marked_as_read' => 'Marqué comme lu',
+    'mark_all_as_read' => 'Marquer toutes les notifications comme lues',
     'greeting' => 'Bonjour !',
     'email_footer' => 'Si vous avez des questions ou des problèmes, veuillez contacter <a href="mailto:community@therestartproject.org">community@therestartproject.org</a>.',
     'new_event_photos_subject' => 'Nouvelles photos de l\'événement téléchargées sur l\'événement : :event',
     'email_preferences' => 'Si vous souhaitez ne plus recevoir ces courriels, veuillez consulter <a href=":url">vos préférences</a> sur votre compte.',
-    'marked_as_read' => 'Marqué comme lu',
-    'mark_all_as_read' => 'Marquer toutes les notifications comme lues',
-    'mark_as_read' => 'Marquer comme lu',
-    'notifications' => 'Notifications',
     'view_event' => 'Voir l\'événement',
     'view_group' => 'Voir le Repair Café',
     'view_profile' => 'Voir profil',
-    'view_all' => 'Voir toutes les notifications',
     'event_confirmed_title' => 'Événement confirmé',
     'event_confirmed_subject' => 'Événement confirmé :time',
     'event_confirmed_line1' => 'Votre événement :name a été confirmé par un administrateur. Il est désormais accessible au public sur <a href=":url">:url.</a>',
@@ -99,4 +98,5 @@ return [
     'admin_no_devices_title' => 'Modération nécessaire pour un événement sans appareil:',
     'admin_no_devices_line1' => 'Votre modération est nécessaire pour \':name\'.',
     'admin_no_devices_line2' => 'Aucun appareil n\'a été ajouté pour cet événement.',
+    'view_all' => 'Voir toutes les notifications',
 ];

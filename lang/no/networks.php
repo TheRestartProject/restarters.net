@@ -12,6 +12,8 @@ return [
     'actions' => 'Nettverkshandlinger',
     'coordinators' => 'Nettverkskoordinatorer',
     'impact' => 'Påvirkning',
+    'see_network_reports' => 'Se mer i nettverkets rapporter',
+    'view_reports' => 'Vis rapporter',
   ],
   'stats' => [
     'groups' => '{1} Gruppe|[0,*] Grupper',
@@ -63,5 +65,12 @@ return [
     'add_new_field' => 'Legg til nytt felt',
     'new_field_name' => 'Navn på nytt felt',
     'add_field' => 'Legg til felt',
+    'help_reporting_url' => 'Der nettverkets rapporter publiseres. La stå tomt hvis nettverket ikke har rapporter.',
+    'label_reporting_url' => 'Adresse til rapporteringsdashbord',
+  ],
+  'moderation' => [
+    'events_title' => 'Arrangementer som skal modereres',
+    'group_requires_moderation' => 'Gruppen krever moderering',
+    'groups_title' => 'Grupper som skal modereres',
   ],
 ];

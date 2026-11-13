@@ -32,6 +32,15 @@ class UserPolicy
     }
 
     /**
+     * Determine whether the acting user may create new user accounts (mirrors the legacy
+     * "Administrators can add users" gate on UserController::create).
+     */
+    public function create(User $user): bool
+    {
+        return Fixometer::hasRole($user, 'Administrator');
+    }
+
+    /**
      * Determine whether one user can change the Repair Directory role of another to a specific value.
      *
      * @param  \App\User  $user

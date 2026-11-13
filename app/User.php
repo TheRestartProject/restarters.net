@@ -25,6 +25,7 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
     use HasFactory;
     use Notifiable;
     use SoftDeletes;
+    use \Laravel\Sanctum\HasApiTokens;
     use \OwenIt\Auditing\Auditable;
     // Use the Authorizable trait so that we can call can() on a user to evaluation policies.
     use \Illuminate\Foundation\Auth\Access\Authorizable;
@@ -341,6 +342,47 @@ class User extends Authenticatable implements Auditable, HasLocalePreference
                           ->whereNotNull('latitude')
                             ->whereNotNull('longitude')
                               ->having('distance', '<=', $radius);
+    }
+
+    /**
+     * Look up a user by recovery token, but only when the token has not expired. Shared by
+     * AuthController::resetPasswordv2 (which consumes the token) and ::recoveryInfov2 (which
+     * previews it for the reset-password page on load), so the validity check can't drift
+     * between the two.
+     */
+    public static function findByValidRecoveryToken(string $token): ?self
+    {
+        $user = self::where('recovery', $token)->first();
+
+        if (! $user || strtotime($user->recovery_expires) <= time()) {
+            return null;
+        }
+
+        return $user;
+    }
+
+    /**
+     * Stamp the given consent columns with "now", and opt the user into the newsletter when
+     * requested. Shared by AuthController::registerv2 and ::consentv2, which each stamp their
+     * own (different) set of consent_* columns but must capture the newsletter checkbox
+     * identically.
+     *
+     * @param string[] $consentColumns consent_* column names to stamp, e.g. ['consent_gdpr', 'consent_future_data']
+     * @param bool $newsletter when true, opts the user in; false/omitted leaves any existing
+     *     value untouched (registerv2's brand-new row already defaults newsletter to 0 in the
+     *     DB migration, so this is behaviour-preserving there too)
+     */
+    public function recordConsent(array $consentColumns, bool $newsletter = false): void
+    {
+        $timestamp = date('Y-m-d H:i:s');
+
+        foreach ($consentColumns as $column) {
+            $this->$column = $timestamp;
+        }
+
+        if ($newsletter) {
+            $this->newsletter = 1;
+        }
     }
 
     /*

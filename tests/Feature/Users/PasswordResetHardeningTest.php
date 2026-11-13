@@ -2,22 +2,20 @@
 
 namespace Tests\Feature\Users;
 
-use App\Role;
 use App\User;
 use DB;
 use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
 /**
- * Hardening of the custom password-recovery flow (UserController::recover/reset).
+ * Hardening of the password-recovery flow (POST /api/v2/auth/password/reset and the
+ * emailed-link redirector GET /user/reset).
  *
- * The headline issue is a type-juggling flaw: `reset()` passed the request value
- * straight to filter_var(), which returns false for an array. Laravel casts a
- * false binding to integer 0, and MySQL compares a VARCHAR column to 0
- * numerically — coercing every non-numeric string to 0 — so
- * `where('recovery', 0)` matched real recovery tokens instead of nothing.
- *
- * Written before the fix; these should fail on the unpatched code.
+ * The headline issue in the original flow was a type-juggling flaw: the recovery code
+ * was passed through filter_var(), which returns false for an array. Laravel casts a
+ * false binding to integer 0, and MySQL compares a VARCHAR column to 0 numerically -
+ * coercing every non-numeric string to 0 - so `where('recovery', 0)` matched real
+ * recovery tokens instead of nothing.
  */
 class PasswordResetHardeningTest extends TestCase
 {
@@ -48,14 +46,13 @@ class PasswordResetHardeningTest extends TestCase
 
         $originalHash = $victim->fresh()->password;
 
-        // The exploit: recovery as an array makes filter_var() return false,
-        // which becomes the integer 0 in the SQL binding.
-        $this->post('/user/reset', [
+        $response = $this->post('/api/v2/auth/password/reset', [
             'recovery' => ['1'],
             'password' => 'attacker-chosen',
-            'confirm_password' => 'attacker-chosen',
-        ]);
+            'password_confirmation' => 'attacker-chosen',
+        ], ['Accept' => 'application/json']);
 
+        $response->assertStatus(422);
         $this->assertEquals(
             $originalHash,
             $victim->fresh()->password,
@@ -65,7 +62,7 @@ class PasswordResetHardeningTest extends TestCase
     }
 
     /** @test */
-    public function array_recovery_code_does_not_disclose_a_users_email(): void
+    public function array_recovery_code_does_not_break_or_disclose_via_the_emailed_link_redirector(): void
     {
         $this->withExceptionHandling();
 
@@ -74,6 +71,9 @@ class PasswordResetHardeningTest extends TestCase
 
         $response = $this->get('/user/reset?recovery[]=1');
 
+        // Redirected on to the SPA without a code, not a 500 from urlencode(array).
+        $response->assertRedirect();
+        $this->assertStringNotContainsString('recovery=', $response->headers->get('Location'));
         $response->assertDontSee($victim->email, false);
     }
 
@@ -89,21 +89,21 @@ class PasswordResetHardeningTest extends TestCase
         $this->giveLiveRecoveryToken($user, $token);
 
         // First use succeeds.
-        $this->post('/user/reset', [
+        $this->post('/api/v2/auth/password/reset', [
             'recovery' => $token,
             'password' => 'first-reset',
-            'confirm_password' => 'first-reset',
-        ]);
+            'password_confirmation' => 'first-reset',
+        ], ['Accept' => 'application/json'])->assertOk();
         $this->assertTrue(Hash::check('first-reset', $user->fresh()->password));
 
         // The token must now be spent.
         $this->assertNull($user->fresh()->recovery, 'recovery must be cleared after a successful reset');
 
-        $this->post('/user/reset', [
+        $this->post('/api/v2/auth/password/reset', [
             'recovery' => $token,
             'password' => 'second-reset',
-            'confirm_password' => 'second-reset',
-        ]);
+            'password_confirmation' => 'second-reset',
+        ], ['Accept' => 'application/json'])->assertStatus(422);
 
         $this->assertTrue(
             Hash::check('first-reset', $user->fresh()->password),
@@ -116,6 +116,7 @@ class PasswordResetHardeningTest extends TestCase
     {
         $user = User::factory()->restarter()->create([
             'password' => Hash::make('current-password'),
+            'api_token' => 'tok-change',
         ]);
         DB::table('users')->where('id', $user->id)->update([
             'recovery' => null,
@@ -124,12 +125,11 @@ class PasswordResetHardeningTest extends TestCase
 
         $this->actingAs($user);
 
-        $this->post('/profile/edit-password', [
-            'id' => $user->id,
-            'current-password' => 'current-password',
-            'new-password' => 'brand-new-password',
-            'new-password-repeat' => 'brand-new-password',
-        ]);
+        $this->patchJson('/api/v2/users/me/password?api_token=tok-change', [
+            'current_password' => 'current-password',
+            'new_password' => 'brand-new-password',
+            'new_password_confirmation' => 'brand-new-password',
+        ])->assertOk();
 
         $this->assertTrue(Hash::check('brand-new-password', $user->fresh()->password));
         $this->assertNull(
@@ -149,21 +149,28 @@ class PasswordResetHardeningTest extends TestCase
         $user->ensureAPIToken();
         $stolenToken = $user->fresh()->api_token;
         $this->assertNotEmpty($stolenToken);
+        $stolenBearer = $user->createToken('spa')->plainTextToken;
 
         $token = 'd2e4f6a8b0c2345d6e7f';
         $this->giveLiveRecoveryToken($user, $token);
 
-        $this->post('/user/reset', [
+        $this->post('/api/v2/auth/password/reset', [
             'recovery' => $token,
             'password' => 'new-password',
-            'confirm_password' => 'new-password',
-        ]);
+            'password_confirmation' => 'new-password',
+        ], ['Accept' => 'application/json'])->assertOk();
 
         $this->assertNotEquals(
             $stolenToken,
             $user->fresh()->api_token,
             'Resetting the password must invalidate an API token that may have been stolen.'
         );
+        $this->assertSame(
+            0,
+            $user->fresh()->tokens()->count(),
+            'Resetting the password must revoke the bearer tokens issued before it.'
+        );
+        $this->assertNotEmpty($stolenBearer);
     }
 
     /** @test */
@@ -171,18 +178,17 @@ class PasswordResetHardeningTest extends TestCase
     {
         $user = User::factory()->restarter()->create([
             'password' => Hash::make('current-password'),
+            'api_token' => 'tok-rotate',
         ]);
-        $user->ensureAPIToken();
-        $stolenToken = $user->fresh()->api_token;
+        $stolenToken = 'tok-rotate';
 
         $this->actingAs($user);
 
-        $this->post('/profile/edit-password', [
-            'id' => $user->id,
-            'current-password' => 'current-password',
-            'new-password' => 'brand-new-password',
-            'new-password-repeat' => 'brand-new-password',
-        ]);
+        $this->patchJson('/api/v2/users/me/password?api_token=tok-rotate', [
+            'current_password' => 'current-password',
+            'new_password' => 'brand-new-password',
+            'new_password_confirmation' => 'brand-new-password',
+        ])->assertOk();
 
         $this->assertNotEquals($stolenToken, $user->fresh()->api_token);
     }

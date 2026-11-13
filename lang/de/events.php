@@ -151,4 +151,13 @@ return [
   'geocode_failed' => 'Standort nicht gefunden. Falls Sie den Standort Ihrer Veranstaltung nicht finden können, versuchen Sie bitte einen allgemeineren Standort (wie Ort/Stadt) oder eine spezifische Straßenadresse anstelle eines Gebäudenamens.',
   'create_failed' => 'Veranstaltung konnte <strong>nicht</strong> erstellt werden. Bitte überprüfen Sie die gemeldeten Fehler, korrigieren Sie diese und versuchen Sie es erneut.',
   'edit_failed' => 'Veranstaltung konnte nicht bearbeitet werden.',
+  'add_a_device' => 'Ein Gerät hinzufügen',
+  'already_member' => 'Sie sind bereits Mitglied dieser Veranstaltung.',
+  'copied_to_clipboard' => 'In die Zwischenablage kopiert.',
+  'image_upload_error' => 'Das Bild konnte leider nicht hochgeladen werden.',
+  'no_date_selected' => 'Kein Datum ausgewählt',
+  'no_devices_added' => 'Keine Geräte hinzugefügt',
+  'no_weight' => ':value sonstiger oder nicht-elektrischer Gegenstand ohne Gewichtsschätzung|:value sonstige oder nicht-elektrische Gegenstände ohne Gewichtsschätzung',
+  'to_be_recycled' => ':value Gegenstand zum Recycling|:value Gegenstände zum Recycling',
+  'to_be_repaired' => ':value Gegenstand zu reparieren|:value Gegenstände zu reparieren',
 ];

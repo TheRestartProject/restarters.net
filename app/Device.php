@@ -67,7 +67,7 @@ class Device extends Model implements Auditable
      *
      * @var array
      */
-    protected $fillable = ['event', 'category', 'category_creation', 'estimate', 'repair_status', 'spare_parts', 'parts_provider', 'brand', 'item_type', 'model', 'age', 'problem', 'notes', 'repaired_by', 'do_it_yourself', 'professional_help', 'more_time_needed', 'wiki', 'fault_type'];
+    protected $fillable = ['event', 'category', 'category_creation', 'estimate', 'repair_status', 'spare_parts', 'parts_provider', 'brand', 'item_type', 'model', 'age', 'problem', 'notes', 'reference', 'repaired_by', 'do_it_yourself', 'professional_help', 'more_time_needed', 'wiki', 'fault_type'];
 
     /**
      * The attributes that should be hidden for arrays.
@@ -456,6 +456,10 @@ class Device extends Model implements Auditable
         // This is a beast of a query, but the basic idea is to return a list of the categories most commonly
         // used by the item types.
         //
+        // Most used first. The item form's suggestions keep this order among names that match equally well, so
+        // "Kettle" comes before "KETTLE LEAD". Without an ORDER BY the order was whatever MySQL's grouping
+        // produced, which differed between servers.
+        //
         // This is slow and the results don't change much, so we use a cache.
         if (!self::isCircleCI() && Cache::has('item_types')) {
             $types = Cache::get('item_types');
@@ -486,7 +490,8 @@ class Device extends Model implements Auditable
               ) t
               WHERE t.count = t.max_count
                 AND LENGTH(t.item_type) > 0
-              GROUP BY t.item_type, t.powered;
+              GROUP BY t.item_type, t.powered
+              ORDER BY MAX(t.count) DESC, t.item_type;
 ");
             if (!self::isCircleCI()) {
                 \Cache::put('item_types', $types, 24 * 3600);

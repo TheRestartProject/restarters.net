@@ -28,17 +28,23 @@ class LogOutOfWiki
         $user = $event->user;
 
         try {
-            foreach ($this->mediawikiCookieNames as $cookieName) {
-                $cookieFullName = config('restarters.wiki.cookie_prefix').'_'.$cookieName;
-                \Cookie::queue(\Cookie::forget($cookieFullName));
-            }
+            self::forgetWikiCookies();
         } catch (\Exception $ex) {
             Log::error("Failed to log user '".$user->mediawiki."' out of mediawiki: ".$ex->getMessage());
         }
     }
 
+    // Queues the removal of the wiki's login cookies; the response must go through AddQueuedCookiesToResponse.
+    public static function forgetWikiCookies(): void
+    {
+        foreach (self::MEDIAWIKI_COOKIE_NAMES as $cookieName) {
+            $cookieFullName = config('restarters.wiki.cookie_prefix').'_'.$cookieName;
+            \Cookie::queue(\Cookie::forget($cookieFullName));
+        }
+    }
+
     // Mediawiki sets these cookies at login, prefixed by the name of the wiki DB.
-    private $mediawikiCookieNames = [
+    private const MEDIAWIKI_COOKIE_NAMES = [
         'mw__session',
         'mw_Token',
         'mw_UserID',

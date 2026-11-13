@@ -1,0 +1,21 @@
+// Card base
+// =========
+// resources/global/css/components/_cards.scss is almost entirely
+// page/component-specific (.card-summary, .card-event-add-item,
+// .card-info-box, .slick-your-groups carousel cards) — those belong as
+// scoped styles on the Vue components that render them, not the global
+// brand layer, and were dropped. What's kept here is the one
+// site-wide "brutalist" card convention every card variant in the source
+// shares: square corners, a solid black border. Component-level styling
+// (padding, the .box-shadow-offset hover per _type.scss, etc.) stays with
+// the component.
+.card {
+  border-radius: 0;
+  border: 1px solid $black;
+}
+
+.card-img-top {
+  border: 0;
+  border-radius: 0;
+  border-bottom: 1px solid $black;
+}

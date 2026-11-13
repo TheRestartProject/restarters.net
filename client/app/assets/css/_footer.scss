@@ -1,0 +1,45 @@
+// Site footer
+// ===========
+// resources/global/css has no footer partial at all — the umbrella brand
+// layer's footer chrome only exists in the legacy
+// resources/sass/_footer.scss (the "Fixometer-only" stylesheet the rest of
+// this file deliberately avoids seeding from). Ported from there as the
+// only available source, translating its one @extend(.Font-PatuaOne) into
+// a direct font-family declaration (see _type.scss's note on why
+// cross-partial @extend of utility classes doesn't survive the move to
+// separate scss entry files) and keeping its $blue usage exactly as-is —
+// $blue is pinned to #007bff in _variables.scss for this reason.
+#main-footer {
+  background-color: #f3f3f5;
+  color: #4d4d52; // darken(#f3f3f5, 40%)
+  position: relative;
+  bottom: 0;
+  width: 100%;
+  height: 190px;
+  font-size: 0.8em;
+  padding-top: 25px;
+  padding-bottom: 25px;
+
+  h3 {
+    color: $blue;
+    font-family: 'Patua One', serif;
+    font-weight: 400;
+  }
+
+  a {
+    color: $blue;
+
+    &:hover {
+      color: darken($blue, 10%);
+    }
+  }
+
+  .blue {
+    color: $blue;
+  }
+
+  .footer-logo {
+    display: block;
+    padding: 35px;
+  }
+}

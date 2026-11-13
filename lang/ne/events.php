@@ -151,4 +151,13 @@ return [
   'geocode_failed' => 'Locatie niet gevonden. Als je de locatie van je evenement niet kunt vinden, probeer dan een algemenere locatie (zoals dorp/stad), of een specifiek straatadres in plaats van een gebouwnaam.',
   'create_failed' => 'Evenement kon <strong>niet</strong> worden aangemaakt. Bekijk de gerapporteerde fouten, corrigeer ze en probeer het opnieuw.',
   'edit_failed' => 'Evenement kon niet worden bewerkt.',
+  'add_a_device' => 'Een apparaat toevoegen',
+  'already_member' => 'Je bent al lid van dit evenement.',
+  'copied_to_clipboard' => 'Gekopieerd naar het klembord.',
+  'image_upload_error' => 'Sorry, de afbeelding kon niet worden geüpload.',
+  'no_date_selected' => 'Geen datum geselecteerd',
+  'no_devices_added' => 'Geen apparaten toegevoegd',
+  'no_weight' => ':value diverse of niet-elektrisch item zonder gewichtsschatting|:value diverse of niet-elektrische items zonder gewichtsschatting',
+  'to_be_recycled' => ':value item om te recyclen|:value items om te recyclen',
+  'to_be_repaired' => ':value item om te repareren|:value items om te repareren',
 ];

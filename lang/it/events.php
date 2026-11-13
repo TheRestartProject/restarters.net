@@ -151,4 +151,13 @@ return [
   'geocode_failed' => 'Sede non trovata. Se non riesci a trovare la sede del tuo evento, prova una posizione più generica (come paese/città) o un indirizzo stradale specifico, anziché il nome di un edificio.',
   'create_failed' => 'L\'evento <strong>non</strong> ha potuto essere creato. Controlla gli errori segnalati, correggili e riprova.',
   'edit_failed' => 'L\'evento non ha potuto essere modificato.',
+  'add_a_device' => 'Aggiungi un dispositivo',
+  'already_member' => 'Sei già membro di questo evento.',
+  'copied_to_clipboard' => 'Copiato negli appunti.',
+  'image_upload_error' => 'Spiacenti, non è stato possibile caricare l\'immagine.',
+  'no_date_selected' => 'Nessuna data selezionata',
+  'no_devices_added' => 'Nessun dispositivo aggiunto',
+  'no_weight' => ':value oggetto vario o non alimentato senza stima del peso|:value oggetti vari o non alimentati senza stima del peso',
+  'to_be_recycled' => ':value oggetto da riciclare|:value oggetti da riciclare',
+  'to_be_repaired' => ':value oggetto da riparare|:value oggetti da riparare',
 ];

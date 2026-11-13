@@ -6,4 +6,7 @@ return [
     'delete_success' => 'Groepstag verwijderd!',
     'title' => 'Groepstags',
     'edit_tag' => 'Groepstag bewerken',
+  'create_error' => 'Het groepslabel kon niet worden aangemaakt.',
+  'delete_error' => 'Het groepslabel kon niet worden verwijderd.',
+  'update_error' => 'Het groepslabel kon niet worden opgeslagen.',
 ];

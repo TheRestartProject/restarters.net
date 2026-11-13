@@ -17,10 +17,12 @@ RUN pecl install channel://pecl.php.net/xmlrpc-1.0.0RC3 && docker-php-ext-enable
 # Install composer
 COPY --from=composer/composer:2-bin /composer /usr/bin/composer
 
-# Install Node 18
-RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
-    && apt-get install -y nodejs \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
+# Install Node 22 (Nuxt 4 / nuxi require Node >=22; matches client/Dockerfile
+# node:22 and CI cimg/node:22.16. Vite 4 root build is Node-22-compatible too.)
+COPY --from=node:22-bookworm-slim /usr/local/bin/node /usr/local/bin/node
+COPY --from=node:22-bookworm-slim /usr/local/lib/node_modules /usr/local/lib/node_modules
+RUN ln -s ../lib/node_modules/npm/bin/npm-cli.js /usr/local/bin/npm \
+    && ln -s ../lib/node_modules/npm/bin/npx-cli.js /usr/local/bin/npx
 
 WORKDIR /build
 
@@ -53,6 +55,19 @@ RUN php artisan package:discover --ansi || true
 RUN php artisan lang:js --no-lib resources/js/translations.js 2>/dev/null || true
 RUN npm run production && rm -f public/hot
 
+# Build the Nuxt SPA (the separate app in client/). `nuxt build` emits a
+# standalone Nitro Node server at client/.output that bundles its own runtime
+# deps, so production serves the SPA origin via
+# `node client/.output/server/index.mjs` (see docker/supervisord-fly.conf).
+# apiBase is runtime-overridable (NUXT_PUBLIC_API_BASE), so no API URL is baked
+# in here. Drop client/node_modules afterwards — .output is self-contained, and
+# this keeps the final-stage `COPY /build` from dragging the dev install in.
+WORKDIR /build/client
+RUN npm ci --legacy-peer-deps --ignore-scripts
+RUN npm run build
+RUN rm -rf node_modules
+WORKDIR /build
+
 # Generate swagger docs (non-fatal if it fails)
 RUN php artisan l5-swagger:generate 2>/dev/null || true
 
@@ -78,6 +93,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     util-linux \
     default-mysql-client \
     rclone \
+    curl ca-certificates gnupg \
     libpng-dev libjpeg62-turbo-dev libfreetype6-dev libzip-dev libicu-dev libxml2-dev \
     && if [ "$STARTUP_SCRIPT" != "startup.sh" ]; then apt-get install -y --no-install-recommends default-mysql-server; fi \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
@@ -86,6 +102,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # Install xmlrpc
 RUN pecl install channel://pecl.php.net/xmlrpc-1.0.0RC3 && docker-php-ext-enable xmlrpc
+
+# Node 22 (runtime only) — runs the Nuxt Nitro server that serves the SPA origin
+# (client/.output, started by supervisord). The .output targets Node >=22, same
+# as the builder. This image only needs the node binary to run it.
+COPY --from=node:22-bookworm-slim /usr/local/bin/node /usr/local/bin/node
 
 # Configure PHP-FPM to use unix socket.
 # The base image ships docker.conf (formerly zz-docker.conf) with:

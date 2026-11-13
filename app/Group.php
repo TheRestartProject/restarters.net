@@ -114,7 +114,7 @@ class Group extends Model implements Auditable
      */
     public function getFilteredTagsForUser()
     {
-        $user = auth()->user() ?? auth('api')->user();
+        $user = auth()->user() ?? auth('sanctum')->user() ?? auth('api')->user();
 
         // No user or admin - return all tags
         if (!$user || $user->hasRole('Administrator')) {
@@ -420,7 +420,10 @@ class Group extends Model implements Auditable
     public function getShareableLinkAttribute()
     {
         if (! empty($this->shareable_code)) {
-            return url("group/invite/{$this->shareable_code}");
+            // Points at the SPA, not this Laravel app: the client claims it statelessly via
+            // POST /api/v2/invites/claim (or the invite_code param on login/register) - see
+            // App\Http\Controllers\API\AuthController::claimShareableCode().
+            return rtrim(config('restarters.frontend_url'), '/')."/group/invite/{$this->shareable_code}";
         }
 
         return '';
@@ -476,6 +479,35 @@ class Group extends Model implements Auditable
         return url('/uploads/mid_1474993329ef38d3a4b9478841cc2346f8e131842fdcfd073b307.jpg');
     }
 
+    /**
+     * Unlike groupImagePath(), returns null (rather than a placeholder image) when the group
+     * has no image of its own - callers that want to distinguish "no image" from "has an image"
+     * (e.g. the v2 dashboard/nearby-groups API shapes) should use this instead.
+     */
+    public function realImageUrl(): ?string
+    {
+        if (is_object($this->groupImage) && is_object($this->groupImage->image)) {
+            return url('/uploads/mid_'.$this->groupImage->image->path);
+        }
+
+        return null;
+    }
+
+    /**
+     * The {id, name, distance, location, image_url} shape used by the v2 dashboard/nearby-groups
+     * endpoints. Requires $this->distance to have been set (see User::groupsNearby()).
+     */
+    public function toNearbySummary(): array
+    {
+        return [
+            'id' => $this->idgroups,
+            'name' => $this->name,
+            'distance' => $this->distance,
+            'location' => $this->location,
+            'image_url' => $this->realImageUrl(),
+        ];
+    }
+
     public function nextUpcomingParty(): HasOne
     {
         return $this->hasOne(Party::class, 'group', 'idgroups')
@@ -487,9 +519,10 @@ class Group extends Model implements Auditable
 
     public function refresh()
     {
-        // Re-read from the database, so don't keep a next event preloaded from before.
+        // Re-read from the database, so don't keep a next event or membership preloaded from before.
         $this->nextEventPreloaded = false;
         $this->preloadedNextEvent = null;
+        $this->preloadedViewerMembership = null;
 
         return parent::refresh();
     }
@@ -540,6 +573,39 @@ class Group extends Model implements Auditable
         foreach ($groups as $group) {
             $group->nextEventPreloaded = true;
             $group->preloadedNextEvent = $next[$group->idgroups] ?? null;
+        }
+    }
+
+    // Set by preloadViewerMembership() for list endpoints: ['is_member' => bool, 'pending_invite' => ?string].
+    public ?array $preloadedViewerMembership = null;
+
+    /**
+     * Fetch the viewer's membership of all of the given groups in a single query, so that the Group resource's
+     * is_member and has_pending_invite don't cost two queries per group.  Same conditions as isVolunteer() and the
+     * resource's pending-invite lookup.
+     */
+    public static function preloadViewerMembership(iterable $groups, User $user): void
+    {
+        $groups = collect($groups);
+
+        if ($groups->isEmpty()) {
+            return;
+        }
+
+        $rows = UserGroups::whereIn('group', $groups->pluck('idgroups')->all())
+            ->where('user', $user->id)
+            ->get(['group', 'status'])
+            ->groupBy('group');
+
+        foreach ($groups as $group) {
+            $mine = $rows->get($group->idgroups, collect());
+            $pending = $mine->first(fn ($row) => $row->status !== null && (string) $row->status !== '1');
+
+            $group->preloadedViewerMembership = [
+                'is_member' => $mine->contains(fn ($row) => $row->status === null || (string) $row->status === '1'),
+                // As the resource's lookup, which turns an empty status into null.
+                'pending_invite' => $pending ? ($pending->status ?: null) : null,
+            ];
         }
     }
 
@@ -867,8 +933,9 @@ class Group extends Model implements Auditable
             $ret = array_unique($ret);
         }
 
-        // The resource asks each group for its next event; fetch them all at once.
+        // The resource asks each group for its next event and the viewer's membership; fetch them all at once.
         self::preloadNextUpcomingEvents($ret);
+        self::preloadViewerMembership($ret, $u);
 
         return $ret;
     }

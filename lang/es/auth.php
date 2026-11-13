@@ -32,4 +32,5 @@ esta acción es permanente.',
   'assigned_groups' => 'Asignado a grupos',
   'save_user' => 'Guardar usuario',
   'login_before_using_shareable_link' => 'Para completar tu invitación, crea una cuenta a continuación, o si ya tienes una cuenta <a href=":login_url">inicia sesión aquí</a>.',
+  'choose_role' => 'Elige un rol',
 ];

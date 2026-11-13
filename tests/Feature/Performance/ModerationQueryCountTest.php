@@ -5,7 +5,9 @@ namespace Tests\Feature\Performance;
 use App\Group;
 use App\GroupTags;
 use App\Network;
+use App\EventsUsers;
 use App\Party;
+use App\UserGroups;
 use App\User;
 use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
@@ -256,5 +258,53 @@ class ModerationQueryCountTest extends TestCase
         // An archived group's past events still count; the group itself doesn't.
         $this->assertEquals(3, $json['parties']);
         $this->assertEquals(1, $json['groups']);
+    }
+
+    /**
+     * The moderation lists fetch the viewer's own state for every item at once; it must match what the single
+     * event and group endpoints say.
+     *
+     * @story:EventController::moderateEventsv2
+     * @story:GroupController::moderateGroupsv2
+     */
+    public function testModerationListsShowTheViewersOwnState(): void
+    {
+        $user = User::factory()->networkCoordinator()->create(['api_token' => 'n1own']);
+        $network = Network::factory()->create();
+        $network->addCoordinator($user);
+        [$going, $invited, $neither] = $this->addGroupsWithEvents($network, 3, 1);
+        EventsUsers::create(['event' => $going, 'user' => $user->id, 'status' => '1', 'role' => 4]);
+        // An invite hash that starts with 1, which MySQL would take for 1 if compared as a number.
+        EventsUsers::create(['event' => $invited, 'user' => $user->id, 'status' => '1a3f9c0invitehash', 'role' => 4]);
+        // Rows from before invitations were stored have no status: neither going nor invited.
+        EventsUsers::create(['event' => $neither, 'user' => $user->id, 'status' => null, 'role' => 4]);
+
+        $member = Group::factory()->create(['approved' => false]);
+        $asked = Group::factory()->create(['approved' => false]);
+        $other = Group::factory()->create(['approved' => false]);
+        foreach ([$member, $asked, $other] as $group) {
+            $network->addGroup($group);
+        }
+        UserGroups::create(['group' => $member->idgroups, 'user' => $user->id, 'status' => '1', 'role' => 4]);
+        UserGroups::create(['group' => $asked->idgroups, 'user' => $user->id, 'status' => 'group-hash', 'role' => 4]);
+
+        $events = collect($this->get('/api/v2/moderate/events?api_token=n1own')->assertSuccessful()->json())->keyBy('id');
+        foreach ([$going, $invited, $neither] as $id) {
+            $single = $this->get("/api/v2/events/$id?api_token=n1own")->json('data');
+            $this->assertSame($single['attending'], $events[$id]['attending'], "attending, event $id");
+            $this->assertSame($single['invitation_pending'], $events[$id]['invitation_pending'], "invitation_pending, event $id");
+            $this->assertSame($single['shareable_link'] ?? null, $events[$id]['shareable_link'] ?? null, "shareable_link, event $id");
+        }
+        $this->assertSame([true, false, false], [$events[$going]['attending'], $events[$invited]['attending'], $events[$neither]['attending']]);
+        $this->assertSame([false, true, false], [$events[$going]['invitation_pending'], $events[$invited]['invitation_pending'], $events[$neither]['invitation_pending']]);
+
+        $groups = collect($this->get('/api/v2/moderate/groups?api_token=n1own')->assertSuccessful()->json())->keyBy('id');
+        foreach ([$member, $asked, $other] as $group) {
+            $single = $this->get("/api/v2/groups/{$group->idgroups}?api_token=n1own")->json('data');
+            $this->assertSame($single['is_member'], $groups[$group->idgroups]['is_member'], "is_member, group {$group->idgroups}");
+            $this->assertSame($single['has_pending_invite'], $groups[$group->idgroups]['has_pending_invite'], "has_pending_invite, group {$group->idgroups}");
+        }
+        $this->assertTrue($groups[$member->idgroups]['is_member']);
+        $this->assertSame('group-hash', $groups[$asked->idgroups]['has_pending_invite']);
     }
 }

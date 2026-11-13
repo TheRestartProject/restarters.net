@@ -2,12 +2,20 @@
 
 return [
 
+    // Only a real http(s) DSN is passed on. A blank or whitespace secret (as an
+    // older preview app can carry) is not a valid DSN and makes Sentry throw
+    // InvalidOptionsException while the app boots or reports an exception,
+    // hiding the original error. Anything else means "no DSN", which disables
+    // reporting.
+    //
     // Test runs and local development don't report. Most of what they raise is expected (no Discourse, no
     // geocoder, deliberately bad input), and from CI and developers' machines it outnumbered production several
     // times over. SENTRY_REPORT_LOCAL=true turns it back on for checking the integration itself.
-    'dsn' => in_array(env('APP_ENV'), ['testing', 'local'], true) && ! env('SENTRY_REPORT_LOCAL', false)
+    'dsn' => (in_array(env('APP_ENV'), ['testing', 'local'], true) && ! env('SENTRY_REPORT_LOCAL', false))
         ? null
-        : env('SENTRY_LARAVEL_DSN', env('SENTRY_DSN')),
+        : (preg_match('#^https?://#', trim((string) env('SENTRY_LARAVEL_DSN', env('SENTRY_DSN'))))
+            ? trim((string) env('SENTRY_LARAVEL_DSN', env('SENTRY_DSN')))
+            : null),
 
     // capture release as git sha
     // 'release' => trim(exec('git --git-dir ' . base_path('.git') . ' log --pretty="%h" -n1 HEAD')),

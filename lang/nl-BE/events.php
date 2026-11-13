@@ -151,4 +151,13 @@ return [
   'geocode_failed' => 'Locatie niet gevonden. Als je de locatie van je activiteit niet kunt vinden, probeer dan een algemenere locatie (zoals dorp/stad), of een specifiek straatadres, in plaats van een gebouwnaam.',
   'create_failed' => 'Activiteit kon <strong>niet</strong> worden aangemaakt. Bekijk de gemelde fouten, corrigeer ze en probeer opnieuw.',
   'edit_failed' => 'Activiteit kon niet worden bewerkt.',
+  'add_a_device' => 'Een toestel toevoegen',
+  'already_member' => 'Je bent al lid van deze activiteit.',
+  'copied_to_clipboard' => 'Gekopieerd naar het klembord.',
+  'image_upload_error' => 'Sorry, de afbeelding kon niet worden geüpload.',
+  'no_date_selected' => 'Geen datum geselecteerd',
+  'no_devices_added' => 'Geen toestellen toegevoegd',
+  'no_weight' => ':value diverse of niet-elektrisch voorwerp zonder gewichtsschatting|:value diverse of niet-elektrische voorwerpen zonder gewichtsschatting',
+  'to_be_recycled' => ':value item te recycleren|:value items te recycleren',
+  'to_be_repaired' => ':value item te herstellen|:value items te herstellen',
 ];

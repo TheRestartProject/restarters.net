@@ -49,4 +49,5 @@ return [
   'picture_error' => 'Uploaden van profielfoto mislukt!',
   'admin_success' => 'Beheerdersinstellingen bijgewerkt',
   'create_success' => 'Gebruiker succesvol aangemaakt!',
+  'other_profile' => 'Profiel van :name',
 ];
