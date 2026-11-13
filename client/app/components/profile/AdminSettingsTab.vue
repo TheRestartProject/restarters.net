@@ -115,7 +115,7 @@ async function save() {
 
       <div class="row">
         <div class="col-lg-6" role="group" aria-labelledby="admin-preferences-label">
-          <span id="admin-preferences-label" class="d-inline-block">{{ t('client.profile.preferences_label') }}</span>
+          <span id="admin-preferences-label" class="d-inline-block fw-bold">{{ t('client.profile.preferences_label') }}</span>
           <div v-for="preference in data.preferences_options" :key="preference.id" class="form-check">
             <input
               :id="`preference-${preference.id}`"
@@ -131,7 +131,7 @@ async function save() {
         </div>
 
         <div class="col-lg-6" role="group" aria-labelledby="admin-permissions-label">
-          <span id="admin-permissions-label" class="d-inline-block">{{ t('client.profile.permissions_label') }}</span>
+          <span id="admin-permissions-label" class="d-inline-block fw-bold">{{ t('client.profile.permissions_label') }}</span>
           <div v-for="permission in data.permissions_options" :key="permission.id" class="form-check">
             <input
               :id="`permission-${permission.id}`"
