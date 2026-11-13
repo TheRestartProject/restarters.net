@@ -170,7 +170,7 @@ export function useStatsShareImage() {
   // a latent crash bug in production for a case so large it's never been
   // hit, fixed here defensively rather than reproduced.
   function rangeIndex(count) {
-    const parsed = parseInt(count, 10) || 0
+    const parsed = Number.parseInt(count, 10) || 0
     let ix = 0
     while (ix < RANGES.length - 1 && parsed > RANGES[ix].upperBoundary) {
       ix++
@@ -193,7 +193,7 @@ export function useStatsShareImage() {
   function getCount(count) {
     const range = rangeForCount(count)
     if (range.type === 'Square of seedlings') {
-      return Math.round(parseInt(count, 10) / 60)
+      return Math.round(Number.parseInt(count, 10) / 60)
     }
     return range.increment
   }

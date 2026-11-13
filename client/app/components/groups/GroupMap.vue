@@ -128,7 +128,7 @@ const mapOptions = {
 const mappableGroups = computed(() => filterMappableGroups(props.groups, props.network))
 const hasLocationValue = computed(() => computeHasLocation(props.initialBounds))
 const hasUserPoint = computed(
-  () => props.yourLat !== null && props.yourLng !== null && !isNaN(+props.yourLat) && !isNaN(+props.yourLng)
+  () => props.yourLat !== null && props.yourLng !== null && !Number.isNaN(+props.yourLat) && !Number.isNaN(+props.yourLng)
 )
 
 const containerEl = ref(null)

@@ -56,7 +56,7 @@ function dec() {
 // Legacy's set(): fires on keyup rather than waiting for blur/change, since
 // a plain `change` event doesn't fire while still focused in the field.
 function onInput(event) {
-  const parsed = parseInt(event.target.value, 10)
+  const parsed = Number.parseInt(event.target.value, 10)
   current.value = Number.isNaN(parsed) || parsed < 0 ? 0 : parsed
   emit('change', current.value)
 }

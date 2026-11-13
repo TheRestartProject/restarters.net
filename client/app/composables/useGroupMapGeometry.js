@@ -16,7 +16,7 @@
 export function filterMappableGroups(groups, network = null) {
   const byNetwork = network ? (groups || []).filter((g) => (g.network_ids || []).includes(network)) : groups || []
 
-  return byNetwork.filter((g) => g.lat != null && g.lng != null && !isNaN(+g.lat) && !isNaN(+g.lng))
+  return byNetwork.filter((g) => g.lat != null && g.lng != null && !Number.isNaN(+g.lat) && !Number.isNaN(+g.lng))
 }
 
 // The groups page sends the inverted whole-world box [[90,180],[-90,-180]]
@@ -108,7 +108,7 @@ export function separateIdenticalLocations(mappableGroups) {
 // a genuine distance. Null when either point is missing or unplaceable.
 export function haversineKm(a, b) {
   // `+null` is 0, so the null check has to come before coercion.
-  const placeable = (p) => p && p.lat != null && p.lng != null && !isNaN(+p.lat) && !isNaN(+p.lng)
+  const placeable = (p) => p && p.lat != null && p.lng != null && !Number.isNaN(+p.lat) && !Number.isNaN(+p.lng)
   if (!placeable(a) || !placeable(b)) return null
 
   const lat1 = +a.lat

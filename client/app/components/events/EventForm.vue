@@ -282,7 +282,7 @@ function onStartTimeChange() {
   if (!form.startTime) return
 
   const [hoursStr, minsStr] = form.startTime.split(':')
-  const hours = parseInt(hoursStr, 10)
+  const hours = Number.parseInt(hoursStr, 10)
 
   if (!form.endTime || form.endTime <= form.startTime) {
     if (hours < 21) {

@@ -32,7 +32,7 @@ const emit = defineEmits(['update:modelValue'])
 // exact behaviour the native `v-model.number` input this replaces had.
 function onNumberInput(event) {
   const raw = event.target.value
-  const parsed = parseFloat(raw)
+  const parsed = Number.parseFloat(raw)
   emit('update:modelValue', Number.isNaN(parsed) ? raw : parsed)
 }
 </script>

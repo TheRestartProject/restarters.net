@@ -391,8 +391,8 @@ function buildPayload() {
   // empties uniformly is simplest and matches what the legacy client sent.
   const payload = {
     category: form.category,
-    age: form.age ? parseFloat(form.age) : 0,
-    estimate: form.estimate ? parseFloat(form.estimate) : 0,
+    age: form.age ? Number.parseFloat(form.age) : 0,
+    estimate: form.estimate ? Number.parseFloat(form.estimate) : 0,
   }
 
   const optional = {
