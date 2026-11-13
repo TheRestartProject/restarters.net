@@ -58,7 +58,7 @@ function closeZoom() {
         v-for="image in images"
         :key="image.id"
         type="button"
-        class="event-image-button p-0 border-0 bg-transparent me-2 mb-2"
+        class="event-image-button p-0 border-0 bg-transparent align-middle me-2 mb-2"
         :aria-label="t('events.event_photos')"
         @click="zoom(image)"
       >

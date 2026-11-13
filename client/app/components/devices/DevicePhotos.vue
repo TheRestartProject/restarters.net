@@ -118,9 +118,10 @@ function closeZoom() {
 
     <div class="d-flex flex-wrap gap-2 mb-2">
       <div v-for="image in images" :key="image.idxref" class="position-relative" data-testid="device-photo">
+        <!-- align-middle: sits on the line as the image did (Bootstrap gives img vertical-align: middle). -->
         <button
           type="button"
-          class="p-0 border-0 bg-transparent"
+          class="p-0 border-0 bg-transparent align-middle"
           :aria-label="t('devices.images')"
           @click="zoom(image)"
         >
@@ -128,6 +129,7 @@ function closeZoom() {
             :src="uploadedImageUrl(image.path)"
             width="100"
             height="100"
+            class="d-block"
             style="object-fit: cover; cursor: pointer"
             alt=""
             data-testid="device-photo-thumb"
