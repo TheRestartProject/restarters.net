@@ -63,7 +63,10 @@ primary_region = "lhr"
   QUEUE_CONNECTION = "database"
   SESSION_DOMAIN = ""
   LOG_CHANNEL = "stderr"
-  FILESYSTEM_DISK = "s3"
+  # Uploads stay on this machine's disk (public/uploads) rather than going to
+  # the bucket; existing images are still read from the shared live bucket.
+  # They go when the machine cold-boots, along with the restored database.
+  FILESYSTEM_DISK = "local"
   AWS_DEFAULT_REGION = "auto"
   AWS_ENDPOINT = "https://fly.storage.tigris.dev"
   AWS_USE_PATH_STYLE_ENDPOINT = "true"
@@ -71,11 +74,10 @@ primary_region = "lhr"
   FEATURE__WIKI_INTEGRATION = "false"
   FEATURE__DISCOURSE_INTEGRATION = "false"
   FEATURE__WORDPRESS_INTEGRATION = "false"
-  # Reads come from the shared live bucket; writes are disabled (and the
-  # Tigris credentials are read-only anyway).
-  FEATURE__IMAGE_UPLOAD = "false"
-  # ...so the Nuxt client says uploads are off instead of offering them.
-  NUXT_PUBLIC_IMAGE_UPLOAD = "false"
+  # Uploads work, onto local disk (FILESYSTEM_DISK above). Nothing can reach
+  # the live bucket: the Tigris credentials are read-only.
+  FEATURE__IMAGE_UPLOAD = "true"
+  NUXT_PUBLIC_IMAGE_UPLOAD = "true"
   SENTRY_ENVIRONMENT = "__SENTRY_ENV__"
   NUXT_PUBLIC_SENTRY_ENVIRONMENT = "__SENTRY_ENV__"
   # Mail goes to the shared Mailpit instance, never to real inboxes.

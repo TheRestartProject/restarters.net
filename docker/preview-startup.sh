@@ -126,6 +126,14 @@ else
     : > /etc/nginx/auth-gate.conf
 fi
 
+# Uploads made on this preview stay on its own disk (public/uploads), since
+# its bucket key is read-only. nginx serves them from there and falls back to
+# the shared bucket for everything else (nginx-fly.conf, location /uploads/).
+# They go when the machine cold-boots, along with the restored database.
+if [ "${FILESYSTEM_DISK:-}" != "s3" ]; then
+    echo 'set $local_upload $uri;' > /etc/nginx/uploads-local.conf
+fi
+
 if [ -n "$AWS_BUCKET" ]; then
     export TIGRIS_BUCKET_URL="https://${AWS_BUCKET}.fly.storage.tigris.dev"
     export TIGRIS_BUCKET_HOST="${AWS_BUCKET}.fly.storage.tigris.dev"

@@ -90,8 +90,9 @@ What to expect:
   may reset at any time. Log in with real production credentials (the
   database is an exact copy of live, behind the login gate).
 - **Emails** go to shared Mailpit (https://restarters-dev-mail.fly.dev),
-  never to real recipients. **Image uploads are disabled** (image reads come
-  from the live bucket). Discourse/wiki/WordPress integrations are off.
+  never to real recipients. **Image uploads work** but stay on the preview
+  machine, and go when it restarts along with the data; existing images come
+  from the live bucket. Discourse/wiki/WordPress integrations are off.
 - A red **PR-\<N\>** banner marks the preview, linking to Mailpit.
 - ❌ *migrate failed* in the PR comment means the PR's migrations broke
   against real data — usually a signal to rebase; check
