@@ -91,6 +91,15 @@ describe('components/devices/DeviceRow', () => {
       expect(wrapper.find('[data-testid="event-device-spare-parts-1"]').exists()).toBe(true)
     })
 
+    // develop's tick is `class="icon spare-parts-tick"`: the icon class keeps
+    // it out of the 50px bordered table-thumbnail rule (.table td img:not(.icon)).
+    it("renders live's tick icon, exempt from the thumbnail styling", () => {
+      const wrapper = mountRow({ device: device({ spare_parts: 'Manufacturer' }) })
+      const tick = wrapper.find('[data-testid="event-device-spare-parts-1"]')
+      expect(tick.element.tagName).toBe('IMG')
+      expect(tick.classes()).toContain('icon')
+    })
+
     it('shows the tick for Third party', () => {
       const wrapper = mountRow({ device: device({ spare_parts: 'Third party' }) })
       expect(wrapper.find('[data-testid="event-device-spare-parts-1"]').exists()).toBe(true)
