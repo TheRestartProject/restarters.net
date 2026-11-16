@@ -361,17 +361,22 @@
     padding-left: calc(10% + 1px);
     text-align: left;
     text-transform: uppercase;
-    color: inherit;
-    background: none;
+    // Inactive tabs are grey (.nav-tabs .nav-link in develop's _events.scss), the active one white.
+    color: #555;
+    background-color: #f9f9f9;
   }
 
   .nav-item:last-child .nav-link {
     border-right: none;
   }
 
+  // A thick top border marks the tab you are on (develop's .ourtabs .nav-link.active).
   .nav-link.active {
-    border-bottom-color: transparent;
+    color: #000;
     background-color: #fff;
+    border-top: 5px solid #000;
+    padding-top: 5px;
+    border-bottom-color: transparent;
   }
 
   // The panel supplies its own padding; the tab content sits inside it.
@@ -388,6 +393,11 @@
   .nav-link {
     border-right-color: #0394a6;
     border-bottom-color: #0394a6;
+  }
+
+  .nav-link.active {
+    border-top-color: #0394a6;
+    border-bottom-color: transparent;
   }
 }
 
