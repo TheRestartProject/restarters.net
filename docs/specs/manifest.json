@@ -1,5 +1,5 @@
 {
-    "generatedAt": "2026-11-16T17:15:40Z",
+    "generatedAt": "2026-11-16T17:33:21Z",
     "features": {
         "Administration": {
             "description": "Platform administration and configuration",
@@ -228,7 +228,12 @@
                     "method": "SkillController::getSkillv2",
                     "class": "App\\Http\\Controllers\\API\\SkillController",
                     "file": "app/Http/Controllers/API/SkillController.php",
-                    "tests": []
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Skills/APIv2SkillsTest.php",
+                            "test": "testSkillsKeepTheirOriginalNameField"
+                        }
+                    ]
                 },
                 {
                     "story": "As an Admin, I can view all skills",
@@ -3866,6 +3871,6 @@
     },
     "coverage": {
         "annotatedStories": 256,
-        "storiesWithTests": 111
+        "storiesWithTests": 112
     }
 }

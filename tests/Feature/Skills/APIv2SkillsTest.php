@@ -43,6 +43,21 @@ class APIv2SkillsTest extends TestCase
         $this->assertEquals(['Astronomy', 'Mead brewing', 'Zucchini growing'], $filtered);
     }
 
+    /**
+     * Skills were sent with `name` before `skill_name` was added; existing API clients may still read it.
+     *
+     * @story:SkillController::getSkillv2
+     */
+    public function testSkillsKeepTheirOriginalNameField(): void
+    {
+        $skill = Skills::factory()->create(['skill_name' => 'Soldering']);
+
+        $data = $this->getJson("/api/v2/skills/{$skill->id}")->assertSuccessful()->json('data');
+
+        $this->assertEquals('Soldering', $data['name']);
+        $this->assertEquals('Soldering', $data['skill_name']);
+    }
+
     public function testGetSingleSkill(): void
     {
         $skill = Skills::factory()->create([
