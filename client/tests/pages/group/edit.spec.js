@@ -37,7 +37,7 @@ const BASE_GROUP = {
   },
 }
 
-function mountPage() {
+function mountNow() {
   const i18n = createI18n({
     legacy: false,
     locale: 'en',
@@ -50,6 +50,13 @@ function mountPage() {
       stubs: GLOBAL_STUBS,
     },
   })
+}
+
+// Mounted once the page's own fetch has settled, as a visitor sees it.
+async function mountPage() {
+  const wrapper = mountNow()
+  await flushPromises()
+  return wrapper
 }
 
 describe('pages/group/edit/[id]', () => {
@@ -73,55 +80,79 @@ describe('pages/group/edit/[id]', () => {
     sessionStore.user = { role: 4 }
   })
 
-  it('fetches the group for the routed id on mount', () => {
-    mountPage()
+  it('fetches the group for the routed id on mount', async () => {
+    await mountPage()
     expect(groupsStore.fetchCurrent).toHaveBeenCalledWith(5)
   })
 
-  it('shows a loading skeleton while loading', () => {
+  it('shows a loading skeleton while loading', async () => {
     groupsStore.current.loading = true
-    const wrapper = mountPage()
+    const wrapper = await mountPage()
     expect(wrapper.find('[data-testid="group-edit-loading"]').exists()).toBe(true)
   })
 
-  it('shows a loading skeleton while a different group is still in the store', () => {
+  it('shows a loading skeleton while a different group is still in the store', async () => {
     groupsStore.current.data = { ...BASE_GROUP, id: 99 }
     groupsStore.current.loading = true
-    const wrapper = mountPage()
+    const wrapper = await mountPage()
     expect(wrapper.find('[data-testid="group-edit-loading"]').exists()).toBe(true)
   })
 
-  // Arriving from the group page's Edit group action, the form used to mount
-  // and then be swapped for the placeholder mid-mount, which left Quill
-  // without its container ("Invalid Quill container", a 500 page).
-  it('keeps the form while it refreshes a group it already holds', () => {
-    groupsStore.current.data = BASE_GROUP
-    groupsStore.current.loading = true
-    const wrapper = mountPage()
+  // The form copies the group once, when it mounts. Seeded from the copy the
+  // group's own page fetched earlier, a save would write back stale values.
+  it('waits for its own fetch before showing the form, even when the store already holds the group', async () => {
+    let finishFetch
+    groupsStore.current.data = { ...BASE_GROUP, name: 'Old name' }
+    groupsStore.fetchCurrent = vi.fn(
+      () =>
+        new Promise((resolve) => {
+          finishFetch = () => {
+            groupsStore.current.data = BASE_GROUP
+            resolve(BASE_GROUP)
+          }
+        }),
+    )
+    const wrapper = mountNow()
+    await flushPromises()
+    expect(wrapper.find('[data-testid="group-edit-loading"]').exists()).toBe(true)
+    expect(wrapper.findComponent(GroupFormStub).exists()).toBe(false)
+
+    finishFetch()
+    await flushPromises()
     expect(wrapper.find('[data-testid="group-edit-loading"]').exists()).toBe(false)
-    expect(wrapper.findComponent(GroupFormStub).exists()).toBe(true)
+    expect(wrapper.findComponent(GroupFormStub).props('initialGroup')).toEqual(BASE_GROUP)
+  })
+
+  it('shows the error rather than the placeholder when its fetch fails', async () => {
+    groupsStore.fetchCurrent = vi.fn(() => {
+      groupsStore.current.error = { status: 500 }
+      return Promise.reject(new Error('boom'))
+    })
+    const wrapper = await mountPage()
+    expect(wrapper.find('[data-testid="group-edit-loading"]').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="group-edit-error"]').exists()).toBe(true)
   })
 
   it('shows an error state with a retry button', async () => {
     groupsStore.current.error = { status: 404 }
-    const wrapper = mountPage()
+    const wrapper = await mountPage()
 
     expect(wrapper.find('[data-testid="group-edit-error"]').exists()).toBe(true)
     await wrapper.find('[data-testid="group-edit-retry"]').trigger('click')
     expect(groupsStore.fetchCurrent).toHaveBeenCalledTimes(2)
   })
 
-  it('shows a forbidden message instead of the form when can_edit is false', () => {
+  it('shows a forbidden message instead of the form when can_edit is false', async () => {
     groupsStore.current.data = { ...BASE_GROUP, permissions: { ...BASE_GROUP.permissions, can_edit: false } }
-    const wrapper = mountPage()
+    const wrapper = await mountPage()
 
     expect(wrapper.find('[data-testid="group-edit-forbidden"]').exists()).toBe(true)
     expect(wrapper.find('[data-testid="stub-updated"]').exists()).toBe(false)
   })
 
-  it('renders the form pre-wired to the fetched group when can_edit is true', () => {
+  it('renders the form pre-wired to the fetched group when can_edit is true', async () => {
     groupsStore.current.data = BASE_GROUP
-    const wrapper = mountPage()
+    const wrapper = await mountPage()
 
     const form = wrapper.findComponent(GroupFormStub)
     expect(form.exists()).toBe(true)
@@ -129,15 +160,15 @@ describe('pages/group/edit/[id]', () => {
     expect(form.props('initialGroup')).toEqual(BASE_GROUP)
   })
 
-  it('treats Root (role 1) and Administrator (role 2) as isAdmin, others as not', () => {
+  it('treats Root (role 1) and Administrator (role 2) as isAdmin, others as not', async () => {
     groupsStore.current.data = BASE_GROUP
 
     sessionStore.user = { role: 2 }
-    let wrapper = mountPage()
+    let wrapper = await mountPage()
     expect(wrapper.findComponent(GroupFormStub).props('isAdmin')).toBe(true)
 
     sessionStore.user = { role: 4 }
-    wrapper = mountPage()
+    wrapper = await mountPage()
     expect(wrapper.findComponent(GroupFormStub).props('isAdmin')).toBe(false)
   })
 
@@ -145,7 +176,7 @@ describe('pages/group/edit/[id]', () => {
   // so - reloading would swap the form for the loading placeholder.
   it('shows a success banner and keeps the form when GroupForm emits updated', async () => {
     groupsStore.current.data = BASE_GROUP
-    const wrapper = mountPage()
+    const wrapper = await mountPage()
 
     await wrapper.find('[data-testid="stub-updated"]').trigger('click')
 
@@ -157,9 +188,9 @@ describe('pages/group/edit/[id]', () => {
   // gap 4: an always-present "Group details" tab strip above the form, so
   // the page's chrome matches develop even without a "Group log" audit tab
   // (no API for that - see this page's own doc comment).
-  it('shows the always-present Group details tab', () => {
+  it('shows the always-present Group details tab', async () => {
     groupsStore.current.data = BASE_GROUP
-    const wrapper = mountPage()
+    const wrapper = await mountPage()
 
     expect(wrapper.find('[data-testid="group-edit-tabs"]').text()).toContain('Group details')
   })
@@ -168,12 +199,12 @@ describe('pages/group/edit/[id]', () => {
   // page, regardless of can_perform_archive - archiving is only reachable
   // from the group VIEW page's Group Actions dropdown (see
   // tests/pages/group/view.spec.js's archive coverage).
-  it('never shows an archive control here, even when can_perform_archive is true', () => {
+  it('never shows an archive control here, even when can_perform_archive is true', async () => {
     groupsStore.current.data = {
       ...BASE_GROUP,
       permissions: { ...BASE_GROUP.permissions, can_perform_archive: true },
     }
-    const wrapper = mountPage()
+    const wrapper = await mountPage()
     expect(wrapper.find('[data-testid="group-edit-archive"]').exists()).toBe(false)
   })
   // group/edit.blade.php:11-15 - Group log tab, Administrator only, fetched
@@ -182,7 +213,7 @@ describe('pages/group/edit/[id]', () => {
     it('is hidden from a non-administrator', async () => {
       groupsStore.current.data = BASE_GROUP
       sessionStore.user = { role: 4 }
-      const wrapper = mountPage()
+      const wrapper = await mountPage()
       await flushPromises()
 
       expect(wrapper.find('[data-testid="group-edit-tab-log"]').exists()).toBe(false)
@@ -191,7 +222,7 @@ describe('pages/group/edit/[id]', () => {
     it('shows for an administrator and fetches only on open', async () => {
       groupsStore.current.data = BASE_GROUP
       sessionStore.user = { role: 2 }
-      const wrapper = mountPage()
+      const wrapper = await mountPage()
       await flushPromises()
 
       expect(wrapper.find('[data-testid="group-edit-tab-log"]').exists()).toBe(true)

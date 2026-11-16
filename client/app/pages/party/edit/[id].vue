@@ -28,10 +28,12 @@ const eventsStore = useEventsStore()
 
 const id = computed(() => Number(route.params.id))
 const event = computed(() => eventsStore.current.data)
-// Arriving from the event's own page, the store already holds it: show the
-// form straight away while it refreshes, rather than mounting the form and
-// then swapping it for the placeholder.
-const showLoading = computed(() => eventsStore.current.loading && event.value?.id !== id.value)
+// The form copies the event once, when it mounts, so it waits for this page's
+// own fetch even when the store already holds the event: seeded from the copy
+// the event's page fetched earlier, a save would write back stale values.
+// A save refreshes the store without setting `loading`, so the form stays.
+const fetched = ref(false)
+const showLoading = computed(() => !fetched.value || eventsStore.current.loading)
 const { uploadedImageUrl } = useUploadedImageUrl()
 
 // No permissions object on the v2 Event resource (unlike Group's) - approximate
@@ -96,7 +98,13 @@ onMounted(() => {
 useHead({ title: computed(() => (event.value ? `${t('events.editing', { event: event.value.title })}` : t('events.editing', { event: '' }))) })
 
 function load() {
-  eventsStore.fetchEvent(id.value)
+  // A failure is shown from the store's error.
+  eventsStore
+    .fetchEvent(id.value)
+    .catch(() => {})
+    .finally(() => {
+      fetched.value = true
+    })
   ensureEventPerms().catch(() => {})
 }
 

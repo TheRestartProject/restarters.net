@@ -41,10 +41,12 @@ const groupsStore = useGroupsStore()
 
 const id = computed(() => Number(route.params.id))
 const group = computed(() => groupsStore.current.data)
-// Arriving from the group's own page, the store already holds it: show the
-// form straight away while it refreshes, rather than mounting the form and
-// then swapping it for the placeholder.
-const showLoading = computed(() => groupsStore.current.loading && group.value?.id !== id.value)
+// The form copies the group once, when it mounts, so it waits for this page's
+// own fetch even when the store already holds the group: seeded from the copy
+// the group's page fetched earlier, a save would write back stale values.
+// A save refreshes the store without setting `loading`, so the form stays.
+const fetched = ref(false)
+const showLoading = computed(() => !fetched.value || groupsStore.current.loading)
 const permissions = computed(() => group.value?.permissions || {})
 const canEdit = computed(() => !!permissions.value.can_edit)
 
@@ -83,7 +85,13 @@ const updatedMessage = ref('')
 useHead({ title: computed(() => (group.value ? `${t('groups.editing')} ${group.value.name}` : t('groups.editing'))) })
 
 function load() {
-  groupsStore.fetchCurrent(id.value)
+  // A failure is shown from the store's error.
+  groupsStore
+    .fetchCurrent(id.value)
+    .catch(() => {})
+    .finally(() => {
+      fetched.value = true
+    })
 }
 
 onMounted(load)
