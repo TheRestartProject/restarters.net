@@ -1,5 +1,5 @@
 {
-    "generatedAt": "2026-11-12T19:45:47Z",
+    "generatedAt": "2026-11-16T17:15:40Z",
     "features": {
         "Administration": {
             "description": "Platform administration and configuration",
@@ -582,7 +582,12 @@
                     "method": "EventController::auditsv2",
                     "class": "App\\Http\\Controllers\\API\\EventController",
                     "file": "app/Http/Controllers/API/EventController.php",
-                    "tests": []
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Events/EventAuditUserTest.php",
+                            "test": "testChangesMadeWithATokenRecordWhoMadeThem"
+                        }
+                    ]
                 },
                 {
                     "story": "As an Admin, I can view all events pending moderation",
@@ -3861,6 +3866,6 @@
     },
     "coverage": {
         "annotatedStories": 256,
-        "storiesWithTests": 110
+        "storiesWithTests": 111
     }
 }

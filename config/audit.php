@@ -36,7 +36,11 @@ return [
 
     'user' => [
         'morph_prefix' => 'user',
+        // The client authenticates with Sanctum tokens. Without that guard
+        // here, its changes are audited with no user, and the logs read
+        // ":user_name updated record".
         'guards'       => [
+            'sanctum',
             'web',
             'api',
         ],
