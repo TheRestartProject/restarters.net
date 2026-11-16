@@ -134,7 +134,7 @@ const SHOW_DEVICE_REFERENCE = false
                 </BBadge>
               </td>
               <td>
-                <span v-if="sparePartsNeeded(device)" :data-testid="`event-device-spare-parts-${device.id}`">&#10003;</span>
+                <img v-if="sparePartsNeeded(device)" src="/images/tick.svg" class="spare-parts-tick" alt="" :data-testid="`event-device-spare-parts-${device.id}`">
               </td>
             </tr>
             <tr v-if="(activeTab === 'powered' ? powered : unpowered).length === 0">
@@ -150,6 +150,11 @@ const SHOW_DEVICE_REFERENCE = false
 </template>
 
 <style scoped>
+/* EventDeviceSummary.vue's .icon: 21px wide. */
+.spare-parts-tick {
+  width: 21px;
+}
+
 .device-reference-cell {
   line-height: normal;
 }

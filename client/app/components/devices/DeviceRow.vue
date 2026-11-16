@@ -106,7 +106,7 @@ const SHOW_DEVICE_REFERENCE = false
       </BBadge>
     </td>
     <td class="text-center d-none d-md-table-cell">
-      <span v-if="sparePartsNeeded" :data-testid="`event-device-spare-parts-${device.id}`">&#10003;</span>
+      <img v-if="sparePartsNeeded" src="/images/tick.svg" class="spare-parts-tick" alt="" :data-testid="`event-device-spare-parts-${device.id}`">
     </td>
     <td v-if="canedit" class="text-end">
       <!-- Gap fix (MEDIUM): legacy uses small icon buttons
@@ -170,6 +170,11 @@ const SHOW_DEVICE_REFERENCE = false
   background: none;
   line-height: 1;
   cursor: pointer;
+}
+
+/* EventDeviceSummary.vue's .icon: 21px wide. */
+.spare-parts-tick {
+  width: 21px;
 }
 
 .device-row-icon-btn__icon {
