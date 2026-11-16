@@ -503,28 +503,16 @@ describe('pages/party/view/[id]', () => {
       expect(wrapper.find('[data-testid="event-view-impact"]').exists()).toBe(false)
     })
 
-    it('lists dead/repairable/no-weight devices excluded from the totals', () => {
+    it('does not show a "not counting" note, as on the group page', () => {
       eventsStore.current.data = baseEvent({
         ...finishedRange,
         stats: { ...baseEvent().stats, dead_devices: 2, repairable_devices: 1, no_weight_powered: 1, no_weight_unpowered: 2 },
       })
       const wrapper = mountPage()
 
-      const note = wrapper.find('[data-testid="event-view-impact-notincluded"]').text()
-      // Exact, not toContain: the strings begin with the count, so a stray
-      // manual prefix produced "2 2 items to be recycled" - which still
-      // CONTAINS "2 items to be recycled", so the substring assertions here
-      // passed all the way through that bug reaching a screenshot.
-      expect(note.replace(/\s+/g, ' ')).toBe(
-        "Not counting toward this event's environmental impact are 2 items to be recycled, " +
-        '1 item to be repaired, 3 misc or unpowered items with no weight estimate.'
-      )
-    })
-
-    it('omits the notincluded note when nothing is excluded', () => {
-      eventsStore.current.data = baseEvent({ ...finishedRange })
-      const wrapper = mountPage()
+      expect(wrapper.find('[data-testid="event-view-impact"]').exists()).toBe(true)
       expect(wrapper.find('[data-testid="event-view-impact-notincluded"]').exists()).toBe(false)
+      expect(wrapper.text()).not.toContain('Not counting')
     })
   })
 

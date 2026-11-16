@@ -136,40 +136,6 @@ function kg(value) {
   return `${Math.round(value ?? 0).toLocaleString()} kg`
 }
 
-// "Not counting..." note (StatsImpact.vue's `notincluded`): lists the device
-// categories excluded from the two totals above. Unlike develop's version
-// (partials.to_be_recycled/to_be_repaired/no_weight with Oxford-comma
-// joining), the new lang keys here live under events.php per this task's
-// scope, and the categories are joined with plain commas - a simpler
-// rendering of the same "not counting N dead / N repairable / N no-weight
-// devices" note, not a fabrication of new stats fields.
-const notIncludedParts = computed(() => {
-  const stats = event.value?.stats
-  if (!stats) return []
-
-  // No manual count prefix: events.to_be_recycled/_repaired/no_weight already
-  // start with ":value", so prefixing rendered "23 23 items to be repaired".
-  // GroupStats.vue builds the same sentence from the same strings without one.
-  const parts = []
-  if (stats.dead_devices) {
-    parts.push(t('events.to_be_recycled', { value: stats.dead_devices }, stats.dead_devices))
-  }
-  if (stats.repairable_devices) {
-    parts.push(t('events.to_be_repaired', { value: stats.repairable_devices }, stats.repairable_devices))
-  }
-  const noWeight = (stats.no_weight_powered || 0) + (stats.no_weight_unpowered || 0)
-  if (noWeight) {
-    parts.push(t('events.no_weight', { value: noWeight }, noWeight))
-  }
-  return parts
-})
-
-const notIncludedNote = computed(() => {
-  const parts = notIncludedParts.value
-  if (!parts.length) return null
-  return `${t('events.not_counting', parts.length)} ${parts.join(', ')}.`
-})
-
 // Gap 12: develop truncates the description to 440 characters behind a
 // Read more/Read less toggle (EventDescription.vue's ReadMore, max-chars
 // 440), using text-clipper for mid-tag-safe HTML clipping (a plain
@@ -583,9 +549,9 @@ function closeAddVolunteer() {
            2-column grid with a divider, both using the same icon-card
            treatment. -->
       <div v-if="finished && event.stats" class="stats-grid mb-4">
-        <section data-testid="event-view-stats">
+        <section class="statsborder" data-testid="event-view-stats">
           <h2 class="mt-2 mb-2">{{ t('events.items_fixed') }}</h2>
-          <div class="d-flex flex-wrap gap-3 stat-cards stat-cards--fixed">
+          <div class="stat-cards stat-cards--fixed">
             <!-- EventStatsItems.vue:5 - the fixed-devices card is
                  `variant="primary"` with NO `title` prop, i.e. a $brand-light
                  filled card showing the count alone. The other two are plain
@@ -608,8 +574,8 @@ function closeAddVolunteer() {
           </div>
         </section>
 
-        <section data-testid="event-view-impact">
-          <h2>
+        <section class="statsborder" data-testid="event-view-impact">
+          <h2 class="mt-2 mb-2">
             {{ t('events.environmental_impact') }}
             <button ref="co2InfoButton" type="button" class="info-toggle" data-testid="event-view-impact-info">
               <img src="/icons/info_ico_green.svg" alt="" width="20" height="20">
@@ -619,13 +585,13 @@ function closeAddVolunteer() {
               <div v-html="t('events.impact_calculation')" />
             </BPopover>
           </h2>
-          <div class="d-flex flex-wrap gap-3 stat-cards stat-cards--impact">
+          <div class="stat-cards stat-cards--impact">
             <div class="stat-card" data-testid="event-view-impact-waste">
               <img src="/images/trash.svg" alt="" class="stat-card__icon">
               <div class="stat-card__count">{{ kg(event.stats.waste_total) }}</div>
               <div class="stat-card__label">{{ t('partials.waste_prevented') }}</div>
             </div>
-            <div class="stat-card" data-testid="event-view-impact-co2">
+            <div class="stat-card stat-card--co2" data-testid="event-view-impact-co2">
               <img src="/images/cloud-empty.svg" alt="" class="stat-card__icon">
               <div class="stat-card__count">{{ kg(event.stats.co2_total) }}</div>
               <!-- eslint-disable-next-line vue/no-v-html -->
@@ -635,7 +601,7 @@ function closeAddVolunteer() {
                    with no CO2 recorded. We rendered it unconditionally,
                    producing "that's like growing 0 tree seedlings for 10
                    years" on every zero-impact event. -->
-              <div v-if="event.stats.co2_total > 0" class="small" data-testid="event-view-impact-equivalent">
+              <div v-if="event.stats.co2_total > 0" class="stat-card__description" data-testid="event-view-impact-equivalent">
                 <!-- eslint-disable-next-line vue/no-v-html -->
                 <span v-html="equivalentConsumer(event.stats.co2_total)" />
                 <button ref="co2EquivalentInfoButton" type="button" class="info-toggle" data-testid="event-view-impact-equivalent-info">
@@ -650,7 +616,7 @@ function closeAddVolunteer() {
                    dropdown's "Share event stats" embed-code modal above. -->
               <button
                 type="button"
-                class="btn btn-link p-0 small"
+                class="btn btn-link p-0 stat-card__share"
                 data-testid="event-view-impact-share"
                 @click="showShareImage = true"
               >
@@ -658,10 +624,7 @@ function closeAddVolunteer() {
               </button>
             </div>
           </div>
-          <p v-if="notIncludedNote" class="small text-muted mt-2 mb-0" data-testid="event-view-impact-notincluded">
-            {{ notIncludedNote }}
-          </p>
-        </section>
+</section>
       </div>
 
       <!-- Devices (C5: add/edit/delete for canedit viewers, read-only rows for everyone else) -->
@@ -813,75 +776,95 @@ function closeAddVolunteer() {
   }
 }
 
-/* Gap 15: items-fixed/environmental-impact side by side with a divider. */
+/* EventStats.vue: items fixed and environmental impact side by side, a 20px
+   gutter between, each half with its own 1px rule above it (from md) and no
+   vertical divider. The cards in each half stretch to the same height. */
 .stats-grid {
   display: grid;
   grid-template-columns: 1fr;
-  row-gap: 1.5rem;
+}
+
+.statsborder {
+  display: flex;
+  flex-direction: column;
+  margin-top: 20px;
+
+  @media (min-width: 768px) {
+    border-top: 1px solid #000;
+  }
 }
 
 @media (min-width: 768px) {
   .stats-grid {
     grid-template-columns: 1fr 1fr;
-    column-gap: 2rem;
-  }
-
-  .stats-grid > section:last-child {
-    border-left: 1px solid #000;
-    padding-left: 2rem;
+    column-gap: 20px;
   }
 }
 
-/* Mobile stacking, matching how the live site breaks these down below md.
-   There, "items fixed" puts the fixed count on its own full-width row with
-   powered/unpowered side by side underneath, and the two environmental-impact
-   cards each take the full width.
+.stat-cards {
+  display: grid;
+  flex: 1;
+  column-gap: 20px;
+}
 
-   Ours let all three items-fixed cards share one row, which at 390px is 109px
-   per card - narrow enough that the icon, count and label stack into a tall
-   thin column and stop lining up with each other across cards. */
-@media (max-width: 767.98px) {
-  .stat-cards--fixed .stat-card--primary,
-  .stat-cards--impact .stat-card {
-    flex: 0 0 100%;
+/* EventStatsItems.vue: the fixed count on its own row below md, with powered
+   and unpowered under it; 1fr 2fr 2fr from md. */
+.stat-cards--fixed {
+  grid-template-columns: 1fr 1fr;
+
+  .stat-card--primary {
+    grid-column: 1 / -1;
+  }
+
+  @media (min-width: 768px) {
+    grid-template-columns: 1fr 2fr 2fr;
+
+    .stat-card--primary {
+      grid-column: auto;
+    }
   }
 }
 
-/* Neo-brutalist stat card - same look as components/groups/GroupStats.vue's
-   .stat-card (white box, near-black border + offset shadow, teal value), for
-   visual consistency across the group/event environmental-impact sections. */
+/* StatsImpact.vue: waste and CO2 stacked below md, 1fr 2fr from md. */
+.stat-cards--impact {
+  grid-template-columns: 1fr;
+
+  @media (min-width: 768px) {
+    grid-template-columns: 1fr 2fr;
+  }
+}
+
+/* StatsValue.vue's .impact-stat: icon, figure and title in fixed rows. */
 .stat-card {
-  flex: 1 1 0;
-  min-width: 90px;
-  padding: 1rem 0.5rem;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 55px 54px auto;
+  align-content: center;
+  align-items: center;
+  justify-items: center;
+  margin-top: 1rem;
+  padding: 5px;
   text-align: center;
   background: #fff;
   border: 1px solid #222;
-  box-shadow: 4px 4px 0 #222;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.35rem;
+  box-shadow: 5px 5px 0 0 #222;
 }
 
 .stat-card__icon {
-  height: 40px;
+  align-self: start;
+  height: 46px;
+  margin-top: 0.5rem;
 }
 
 .stat-card__count {
-  font-size: 1.75rem;
+  font-family: 'Asap', sans-serif;
+  font-size: 36px;
   font-weight: bold;
-  color: var(--bs-primary, #0394a6);
-  line-height: 1;
+  color: #4aaebc;
 }
 
-/* StatsValue.vue's `.impact-stat-primary` / `.impact-stat-count-primary`:
-   $brand-light ground with white text; only the fixed-devices card uses it.
-   Deliberately declared AFTER `.stat-card` and doubled up on the class:
-   `.stat-card` sets `background: #fff` at the same specificity, so a
-   single-class rule placed earlier lost the cascade and rendered a white
-   card with white-on-white text - i.e. no visible count at all. */
+/* $brand-light ground with white text; only the fixed-devices card uses it.
+   Doubled up on the class so it beats `.stat-card`'s white background. */
 .stat-card.stat-card--primary {
   background: #4aaebc;
   color: #fff;
@@ -891,8 +874,47 @@ function closeAddVolunteer() {
   color: #fff;
 }
 
+/* Horizontal below md, as StatsValue.vue's primary variant. */
+@media (max-width: 767.98px) {
+  .stat-card.stat-card--primary {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 80px;
+
+    .stat-card__icon,
+    .stat-card__count {
+      margin: 0 0.5rem 0 0;
+    }
+  }
+}
+
+/* The CO2 card: the comparison and share link under the figure, split from it
+   by a dashed line (.impact-stat-description). */
+.stat-card--co2 {
+  grid-template-rows: 55px 54px auto auto auto;
+  align-content: start;
+}
+
+.stat-card__description {
+  width: calc(100% - 2rem);
+  margin: 1rem;
+  padding-top: 1rem;
+  border-top: 3px dashed #222;
+  font-family: 'Asap', sans-serif;
+  font-size: 18px;
+}
+
+.stat-card__share {
+  justify-self: end;
+  margin: 0 1rem 0.5rem 0;
+  font-size: 0.875rem;
+}
+
 .stat-card__label {
-  line-height: 1.1;
+  font-family: 'Asap', sans-serif;
+  font-size: 18px;
+  font-weight: bold;
 }
 
 /* StatsImpact.vue's info-icon popover trigger: an inline, borderless icon
