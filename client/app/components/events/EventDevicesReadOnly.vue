@@ -134,7 +134,7 @@ const SHOW_DEVICE_REFERENCE = false
                 </BBadge>
               </td>
               <td>
-                <img v-if="sparePartsNeeded(device)" src="/images/tick.svg" class="spare-parts-tick" alt="" :data-testid="`event-device-spare-parts-${device.id}`">
+                <img v-if="sparePartsNeeded(device)" src="/images/tick.svg" class="spare-parts-tick" :alt="t('partials.yes')" :data-testid="`event-device-spare-parts-${device.id}`">
               </td>
             </tr>
             <tr v-if="(activeTab === 'powered' ? powered : unpowered).length === 0">

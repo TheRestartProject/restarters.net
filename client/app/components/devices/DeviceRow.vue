@@ -106,7 +106,7 @@ const SHOW_DEVICE_REFERENCE = false
       </BBadge>
     </td>
     <td class="text-center d-none d-md-table-cell">
-      <img v-if="sparePartsNeeded" src="/images/tick.svg" class="spare-parts-tick" alt="" :data-testid="`event-device-spare-parts-${device.id}`">
+      <img v-if="sparePartsNeeded" src="/images/tick.svg" class="spare-parts-tick" :alt="t('partials.yes')" :data-testid="`event-device-spare-parts-${device.id}`">
     </td>
     <td v-if="canedit" class="text-end">
       <!-- Gap fix (MEDIUM): legacy uses small icon buttons
