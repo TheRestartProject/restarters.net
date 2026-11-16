@@ -75,6 +75,24 @@ describe('AppNavbar', () => {
     expect(toggle.find('img.avatar').attributes('alt')).toBe('Jane Profile Picture')
   })
 
+  // navbar.blade.php:106-110 shows the user's profile thumbnail when they
+  // have one; the placeholder only when they don't.
+  it("shows the user's profile photo in the account toggle", () => {
+    setLoggedInUser({ id: 5, name: 'Jane', role_name: 'Restarter', networks: [], avatar_url: 'https://api.example.com/uploads/thumbnail_jane.jpg' })
+
+    const wrapper = mountNavbar()
+
+    expect(wrapper.find('[data-testid="nav-user-menu"] img.avatar').attributes('src')).toBe('https://api.example.com/uploads/thumbnail_jane.jpg')
+  })
+
+  it('shows the placeholder avatar when the user has no profile photo', () => {
+    setLoggedInUser({ id: 5, name: 'Jane', role_name: 'Restarter', networks: [], avatar_url: null })
+
+    const wrapper = mountNavbar()
+
+    expect(wrapper.find('[data-testid="nav-user-menu"] img.avatar').attributes('src')).toBe('/images/placeholder-avatar.webp')
+  })
+
   // develop's toggle also carries aria-label="Toggle account navigation" on
   // the element itself (navbar.blade.php:107) - since an explicit
   // aria-label wins the accessible-name computation over any descendant

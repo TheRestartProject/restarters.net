@@ -5,6 +5,7 @@ import { useSessionStore } from '~/stores/session.js'
 import { useAuthStore } from '~/stores/auth.js'
 import { useAuth } from '~/composables/useAuth.js'
 import { useSsoBridge } from '~/composables/useSsoBridge.js'
+import { useUploadedImageUrl } from '~/composables/useUploadedImageUrl.js'
 import IconLogo from './icons/IconLogo.vue'
 import IconTalk from './icons/IconTalk.vue'
 import IconFixometer from './icons/IconFixometer.vue'
@@ -30,11 +31,12 @@ const { goTo } = useSsoBridge()
 const user = computed(() => sessionStore.user)
 const config = computed(() => sessionStore.config || {})
 
-// Bound (not static) so Vite's SFC asset-URL transform doesn't try to
-// resolve it as a build-time module import - it's a runtime request for a
-// public/ asset (design.md's Stylesheet-stage note: /images/* assets land
-// in client/public/images/ in a later asset-migration stage).
-const avatarSrc = '/images/placeholder-avatar.webp'
+// navbar.blade.php:106-110 - the user's profile thumbnail, or the
+// placeholder when they have none. The placeholder is bound (not static) so
+// Vite's SFC asset-URL transform doesn't try to resolve it as a build-time
+// module import - it's a runtime request for a public/ asset.
+const { uploadedImageUrl } = useUploadedImageUrl()
+const avatarSrc = computed(() => uploadedImageUrl(user.value?.avatar_url) || '/images/placeholder-avatar.webp')
 
 const menuOpen = ref(false)
 
