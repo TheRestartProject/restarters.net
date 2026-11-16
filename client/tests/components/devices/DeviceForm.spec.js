@@ -647,6 +647,64 @@ describe('components/devices/DeviceForm', () => {
       expect(wrapper.find('[data-testid="device-form-brand"]').element.value).toBe('Acme')
     })
 
+    // Neil's testing: "Sometimes I can get the list of item suggestions to stop working."  The list opened on focus
+    // only, so anything that closed it while the field kept focus (choosing a suggestion, Escape, opening another
+    // panel) left it shut however much was typed afterwards.
+    describe.each([
+      ['item-type', 'Blen', 'Blender'],
+      ['brand', 'Ac', 'Acme'],
+    ])('%s suggestions keep coming while the field has focus', (field, typed, suggestion) => {
+      const input = (wrapper) => wrapper.find(`[data-testid="device-form-${field}"]`)
+      const option = (wrapper) => wrapper.find(`[data-testid="device-form-${field}-option-${suggestion}"]`)
+
+      it('reappear when you edit the text after choosing a suggestion', async () => {
+        const wrapper = mountForm({ powered: true })
+        await input(wrapper).trigger('focus')
+        await input(wrapper).setValue(typed)
+        await option(wrapper).trigger('mousedown')
+        expect(option(wrapper).exists()).toBe(false)
+
+        await input(wrapper).setValue(typed)
+        expect(option(wrapper).exists()).toBe(true)
+      })
+
+      it('reappear when you type after pressing Escape', async () => {
+        const wrapper = mountForm({ powered: true })
+        await input(wrapper).trigger('focus')
+        await input(wrapper).setValue(typed)
+        await input(wrapper).trigger('keydown', { key: 'Escape' })
+        expect(option(wrapper).exists()).toBe(false)
+
+        await input(wrapper).setValue(typed.slice(0, -1))
+        await input(wrapper).setValue(typed)
+        expect(option(wrapper).exists()).toBe(true)
+      })
+
+      it('reappear when you click into the field you are already in', async () => {
+        const wrapper = mountForm({ powered: true })
+        await input(wrapper).trigger('focus')
+        await input(wrapper).setValue(typed)
+        await option(wrapper).trigger('mousedown')
+        await input(wrapper).setValue(typed)
+        await input(wrapper).trigger('keydown', { key: 'Escape' })
+        expect(option(wrapper).exists()).toBe(false)
+
+        await input(wrapper).trigger('click')
+        expect(option(wrapper).exists()).toBe(true)
+      })
+
+      it('reappear when you type after another panel was opened without leaving the field', async () => {
+        const wrapper = mountForm({ powered: true })
+        await input(wrapper).trigger('focus')
+        await input(wrapper).setValue(typed)
+        await wrapper.find('[data-testid="device-form-category"]').trigger('click')
+        expect(option(wrapper).exists()).toBe(false)
+
+        await input(wrapper).setValue(typed)
+        expect(option(wrapper).exists()).toBe(true)
+      })
+    })
+
     // vue-typeahead-bootstrap (DeviceType.vue, `:minMatchingChars="1"
     // :maxMatches="5"`): nothing until typed, then a stable sort by match
     // position, capped at 5.

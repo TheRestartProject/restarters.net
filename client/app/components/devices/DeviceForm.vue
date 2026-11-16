@@ -264,6 +264,14 @@ function toggleDropdownFor(key) {
   if (opening && key === 'category') categorySuggested.value = false
 }
 
+// The suggestions are shown whenever the field is being used, not only when it gains focus: choosing a suggestion,
+// Escape or opening another panel closes the list while the field keeps focus, and no further focus event comes
+// to open it again.
+function openSuggestions(key) {
+  if (props.readonly) return
+  openDropdown.value = key
+}
+
 function closeDropdown(key) {
   if (openDropdown.value === key) openDropdown.value = null
 }
@@ -519,7 +527,10 @@ const SHOW_DEVICE_REFERENCE = false
                 :placeholder="t('devices.item_type')"
                 :disabled="readonly"
                 data-testid="device-form-item-type"
-                @focus="openDropdown = 'itemType'"
+                @focus="openSuggestions('itemType')"
+                @click="openSuggestions('itemType')"
+                @input="openSuggestions('itemType')"
+                @keydown.esc="closeDropdown('itemType')"
                 @blur="onFieldBlur('itemType', $event)"
               >
               <div
@@ -630,7 +641,10 @@ const SHOW_DEVICE_REFERENCE = false
                 :placeholder="t('devices.brand_if_known')"
                 :disabled="readonly"
                 data-testid="device-form-brand"
-                @focus="openDropdown = 'brand'"
+                @focus="openSuggestions('brand')"
+                @click="openSuggestions('brand')"
+                @input="openSuggestions('brand')"
+                @keydown.esc="closeDropdown('brand')"
                 @blur="onFieldBlur('brand', $event)"
               >
               <div
