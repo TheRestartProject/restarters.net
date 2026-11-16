@@ -150,9 +150,8 @@ class ExportTest extends TestCase
         $row2 = fgetcsv($fh);
         self::assertEquals($event2->getEventName(), $row2[1]);
         self::assertEquals($group2->name, $row2[10]);
-        $row2 = fgetcsv($fh);
-        self::assertEquals($event3->getEventName(), $row2[1]);
-        self::assertEquals($group3->name, $row2[10]);
+        // The unapproved group3's event must not be in the network export.
+        self::assertFalse(fgetcsv($fh));
 
         // Export devices.
         $response = $this->get("/export/devices");
