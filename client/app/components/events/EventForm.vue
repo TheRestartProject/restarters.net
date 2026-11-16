@@ -722,13 +722,17 @@ defineExpose({ submit })
         <div v-if="creating" class="flex-grow-1 text-end pe-3" data-testid="event-form-notice">
           {{ autoApprove ? t('events.before_submit_text_autoapproved') : t('events.before_submit_text') }}
         </div>
-        <div v-else-if="!justCreated" class="flex-grow-1 text-end pe-3">
-          <span v-if="autoApprove" data-testid="event-form-notice">
-            {{ t('events.before_submit_text_autoapproved') }}
-          </span>
-          <span v-else-if="!canApprove && form.moderate !== 'approve'" data-testid="event-form-notice">
-            {{ t('events.before_submit_text') }}
-          </span>
+        <!-- The slot stays even when empty, as develop's does, so the buttons
+             keep to the right after a create. -->
+        <div v-else class="flex-grow-1 text-end pe-3">
+          <template v-if="!justCreated">
+            <span v-if="autoApprove" data-testid="event-form-notice">
+              {{ t('events.before_submit_text_autoapproved') }}
+            </span>
+            <span v-else-if="!canApprove && form.moderate !== 'approve'" data-testid="event-form-notice">
+              {{ t('events.before_submit_text') }}
+            </span>
+          </template>
         </div>
 
         <div class="d-flex align-items-center gap-2">
