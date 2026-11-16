@@ -80,7 +80,7 @@ function onAdded() {
              (desktop only - `d-none d-md-block` on the b-img itself). -->
         <img :src="'/images/tv.svg'" alt="" class="devices-title-icon d-none d-md-block me-2">
         {{ t('devices.title_items_at_event') }}
-        <span class="fw-normal">({{ devices.length }})</span>
+        <span class="fw-normal ms-1">({{ devices.length }})</span>
       </h2>
     </template>
 
