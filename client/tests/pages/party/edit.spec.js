@@ -92,6 +92,24 @@ describe('pages/party/edit/[id]', () => {
     expect(wrapper.find('[data-testid="event-edit-loading"]').exists()).toBe(true)
   })
 
+  it('shows a loading skeleton while a different event is still in the store', () => {
+    eventsStore.current.data = { ...BASE_EVENT, id: 99 }
+    eventsStore.current.loading = true
+    const wrapper = mountPage()
+    expect(wrapper.find('[data-testid="event-edit-loading"]').exists()).toBe(true)
+  })
+
+  // Arriving from the event page, the form used to mount and then be swapped
+  // for the placeholder mid-mount, which left Quill without its container
+  // ("Invalid Quill container", a 500 page).
+  it('keeps the form while it refreshes an event it already holds', () => {
+    eventsStore.current.data = BASE_EVENT
+    eventsStore.current.loading = true
+    const wrapper = mountPage()
+    expect(wrapper.find('[data-testid="event-edit-loading"]').exists()).toBe(false)
+    expect(wrapper.findComponent(EventFormStub).exists()).toBe(true)
+  })
+
   it('shows an error state with a retry button', async () => {
     eventsStore.current.error = { status: 404 }
     const wrapper = mountPage()
@@ -137,14 +155,17 @@ describe('pages/party/edit/[id]', () => {
     expect(wrapper.find('[data-testid="event-edit-forbidden"]').exists()).toBe(false)
   })
 
-  it('shows a success message and re-fetches when EventForm emits updated', async () => {
+  // The store refreshes the event itself (updateEvent); reloading here would
+  // swap the form for the placeholder.
+  it('shows a success message and keeps the form when EventForm emits updated', async () => {
     eventsStore.current.data = BASE_EVENT
     const wrapper = mountPage()
 
     await wrapper.find('[data-testid="stub-updated"]').trigger('click')
 
     expect(wrapper.find('[data-testid="event-edit-success"]').exists()).toBe(true)
-    expect(eventsStore.fetchEvent).toHaveBeenCalledTimes(2)
+    expect(eventsStore.fetchEvent).toHaveBeenCalledTimes(1)
+    expect(wrapper.findComponent(EventFormStub).exists()).toBe(true)
   })
 
   it('calls uploadEventImage with the emitted upload key', async () => {

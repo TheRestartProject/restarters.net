@@ -424,8 +424,10 @@ describe('stores/events', () => {
   })
 
   describe('updateEvent', () => {
-    it('returns the bare id and invalidates the cached current entry', async () => {
+    // Emptying `current` instead blanked the edit page after a save.
+    it('returns the bare id and refreshes the cached current entry in place', async () => {
       mockApi.event.update.mockResolvedValueOnce({ id: 5 })
+      mockApi.event.get.mockResolvedValueOnce({ data: { id: 5, title: 'Fresh' } })
 
       const store = useEventsStore()
       store.current.data = { id: 5, title: 'Stale' }
@@ -434,7 +436,32 @@ describe('stores/events', () => {
 
       expect(mockApi.event.update).toHaveBeenCalledWith(5, { title: 'Fresh' })
       expect(id).toBe(5)
-      expect(store.current.data).toBeNull()
+      expect(store.current.data).toEqual({ id: 5, title: 'Fresh' })
+      expect(store.current.loading).toBe(false)
+    })
+
+    it('keeps the current entry when the refresh after a save fails', async () => {
+      mockApi.event.update.mockResolvedValueOnce({ id: 5 })
+      mockApi.event.get.mockRejectedValueOnce({ status: 500 })
+
+      const store = useEventsStore()
+      store.current.data = { id: 5, title: 'Stale' }
+
+      await store.updateEvent(5, { title: 'Fresh' })
+
+      expect(store.current.data).toEqual({ id: 5, title: 'Stale' })
+    })
+
+    it('leaves current alone when it belongs to a different event', async () => {
+      mockApi.event.update.mockResolvedValueOnce({ id: 5 })
+
+      const store = useEventsStore()
+      store.current.data = { id: 99, title: 'Other' }
+
+      await store.updateEvent(5, { title: 'Fresh' })
+
+      expect(mockApi.event.get).not.toHaveBeenCalled()
+      expect(store.current.data).toEqual({ id: 99, title: 'Other' })
     })
 
     it('rethrows on failure without toasting', async () => {

@@ -49,6 +49,7 @@ const emit = defineEmits(['update:modelValue'])
 const editorEl = ref(null)
 let quill = null
 let applyingExternalValue = false
+let unmounted = false
 
 function normalize(html) {
   // Same fixup the legacy editor applies for the Linux <p><br> artifact.
@@ -159,6 +160,12 @@ onMounted(async () => {
     import('quill-html-edit-button'),
   ])
 
+  // Quill loads asynchronously. If the editor was unmounted meanwhile (the
+  // edit page re-rendering as it loads, or leaving it straight away) its
+  // element is gone, and Quill would throw "Invalid Quill container", which
+  // Nuxt shows as a 500 page.
+  if (unmounted || !editorEl.value) return
+
   Quill.register('modules/htmlEditButton', htmlEditButton)
 
   quill = new Quill(editorEl.value, {
@@ -206,6 +213,7 @@ watch(
 )
 
 onBeforeUnmount(() => {
+  unmounted = true
   quill = null
 })
 </script>

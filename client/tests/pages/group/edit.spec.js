@@ -84,6 +84,24 @@ describe('pages/group/edit/[id]', () => {
     expect(wrapper.find('[data-testid="group-edit-loading"]').exists()).toBe(true)
   })
 
+  it('shows a loading skeleton while a different group is still in the store', () => {
+    groupsStore.current.data = { ...BASE_GROUP, id: 99 }
+    groupsStore.current.loading = true
+    const wrapper = mountPage()
+    expect(wrapper.find('[data-testid="group-edit-loading"]').exists()).toBe(true)
+  })
+
+  // Arriving from the group page's Edit group action, the form used to mount
+  // and then be swapped for the placeholder mid-mount, which left Quill
+  // without its container ("Invalid Quill container", a 500 page).
+  it('keeps the form while it refreshes a group it already holds', () => {
+    groupsStore.current.data = BASE_GROUP
+    groupsStore.current.loading = true
+    const wrapper = mountPage()
+    expect(wrapper.find('[data-testid="group-edit-loading"]').exists()).toBe(false)
+    expect(wrapper.findComponent(GroupFormStub).exists()).toBe(true)
+  })
+
   it('shows an error state with a retry button', async () => {
     groupsStore.current.error = { status: 404 }
     const wrapper = mountPage()

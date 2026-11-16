@@ -41,6 +41,10 @@ const groupsStore = useGroupsStore()
 
 const id = computed(() => Number(route.params.id))
 const group = computed(() => groupsStore.current.data)
+// Arriving from the group's own page, the store already holds it: show the
+// form straight away while it refreshes, rather than mounting the form and
+// then swapping it for the placeholder.
+const showLoading = computed(() => groupsStore.current.loading && group.value?.id !== id.value)
 const permissions = computed(() => group.value?.permissions || {})
 const canEdit = computed(() => !!permissions.value.can_edit)
 
@@ -97,7 +101,7 @@ function onUpdated() {
 
 <template>
   <div class="container py-4" data-testid="group-edit-page">
-    <div v-if="groupsStore.current.loading" data-testid="group-edit-loading">
+    <div v-if="showLoading" data-testid="group-edit-loading">
       <LoadingPlaceholder height="6rem" />
     </div>
 

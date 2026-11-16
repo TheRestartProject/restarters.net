@@ -81,6 +81,18 @@ describe('components/forms/RichTextEditor', () => {
     expect(lastInstance.options.modules.htmlEditButton).toEqual({})
   })
 
+  // Quill is imported asynchronously; an editor unmounted before it arrives
+  // has no element left, and Quill throws "Invalid Quill container" (shown
+  // as a 500 page on the event and group edit pages).
+  it('does not create Quill when unmounted before Quill has loaded', async () => {
+    lastInstance = null
+    const wrapper = mount(RichTextEditor, { props: { modelValue: '<p>Hi</p>' } })
+    wrapper.unmount()
+    await flushMounted()
+
+    expect(lastInstance).toBeNull()
+  })
+
   it('pastes the initial modelValue into Quill on mount', async () => {
     await mountEditor({ modelValue: '<p>Hello</p>' })
     expect(lastInstance.root.innerHTML).toBe('<p>Hello</p>')

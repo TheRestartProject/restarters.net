@@ -28,6 +28,10 @@ const eventsStore = useEventsStore()
 
 const id = computed(() => Number(route.params.id))
 const event = computed(() => eventsStore.current.data)
+// Arriving from the event's own page, the store already holds it: show the
+// form straight away while it refreshes, rather than mounting the form and
+// then swapping it for the placeholder.
+const showLoading = computed(() => eventsStore.current.loading && event.value?.id !== id.value)
 const { uploadedImageUrl } = useUploadedImageUrl()
 
 // No permissions object on the v2 Event resource (unlike Group's) - approximate
@@ -102,13 +106,14 @@ function retry() {
   load()
 }
 
+// The store has already refreshed the event (updateEvent). Reloading here
+// would swap the form for the loading placeholder, as develop never does.
 function onUpdated() {
   updatedMessage.value = t('events.save_event')
   // EventAddEditPage.vue:11 - `@edited="justCreated = false"`. Once saved the
   // event is no longer merely "just created", and the pre-submit notice the
   // banner was suppressing becomes relevant again.
   justCreated.value = false
-  load()
 }
 
 async function onImageUploaded({ uploadKey }) {
@@ -148,7 +153,7 @@ async function removeImage(image) {
 
 <template>
   <div class="container py-4" data-testid="event-edit-page">
-    <div v-if="eventsStore.current.loading" data-testid="event-edit-loading">
+    <div v-if="showLoading" data-testid="event-edit-loading">
       <LoadingPlaceholder height="6rem" />
     </div>
 
