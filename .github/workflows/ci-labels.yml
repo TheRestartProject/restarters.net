@@ -1,0 +1,48 @@
+# Labels each open PR "CI: Running", "CI: Passed" or "CI: Failed" from the CircleCI statuses on its head commit, so
+# the PR list shows how CI is getting on, as Freegle's does.
+#
+# - status: CircleCI reporting on a commit relabels the PRs whose head it is. GitHub runs this from the default
+#   branch's copy of the file, so it covers every PR whatever its base, fork PRs included.
+# - pull_request_target: a new push drops the last commit's label, and a PR opened after CI finished gets one.
+#   GitHub runs the PR's base branch's copy of this file, so PRs into another base (nuxt-client) get this once that
+#   branch has the file. It runs with a write token, so it must never check out or run the PR's code: the checkout
+#   below is always the default branch, and the PR only supplies its number and head SHA.
+# - workflow_dispatch: labels all the open PRs at once.
+#
+# It must use github.token: label changes made with that token don't trigger other workflows, so they can't set off
+# pr-preview.yml's `labeled` deploy.
+
+name: CI labels
+
+on:
+  status:
+  pull_request_target:
+    types: [opened, reopened, synchronize]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  statuses: read
+  pull-requests: read
+  issues: write
+
+jobs:
+  label:
+    if: github.event_name != 'status' || startsWith(github.event.context, 'ci/circleci')
+    runs-on: ubuntu-latest
+    # Statuses for one commit arrive close together; take them one at a time so the label ends up matching the last.
+    # At job level, so that statuses from anything but CircleCI never hold the queue.
+    concurrency:
+      group: ci-labels-${{ github.event.sha || github.event.pull_request.head.sha || 'all' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          sparse-checkout: .github/scripts
+      - name: Label PRs
+        run: bash .github/scripts/ci-labels.sh "$SHA" "$PR"
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          SHA: ${{ github.event.sha || github.event.pull_request.head.sha }}
+          PR: ${{ github.event.pull_request.number }}
