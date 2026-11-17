@@ -100,8 +100,12 @@ fi
 
     # Clear stale compiled assets from previous deploy, then rebuild
     php /var/www/artisan view:clear 2>/dev/null || true
-    php /var/www/artisan config:cache 2>/dev/null || true
-    php /var/www/artisan route:cache 2>/dev/null || true
+    # config:cache and route:cache have never succeeded here - config/sentry.php's before_send is a
+    # closure and routes/api.php has closure routes - and each failed attempt was reported to Sentry.
+    # The app runs uncached; enabling caching needs the 60-odd direct env() calls outside config/
+    # auditing first. Clear instead so nothing stale can be picked up.
+    php /var/www/artisan config:clear 2>/dev/null || true
+    php /var/www/artisan route:clear 2>/dev/null || true
     php /var/www/artisan view:cache 2>/dev/null || true
     php /var/www/artisan queue:restart 2>/dev/null || true
 

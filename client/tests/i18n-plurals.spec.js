@@ -1,3 +1,6 @@
+import { readFileSync } from 'node:fs'
+import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { createI18n } from 'vue-i18n'
 import { generateJSON } from '@intlify/bundle-utils'
 import { describe, expect, it } from 'vitest'
@@ -151,5 +154,32 @@ describe('exported plural strings survive the production (unplugin-vue-i18n) mes
       }
     }
     expect(empty).toEqual([])
+  })
+})
+
+// Every locale live offers must compile under the production compiler (a bad
+// message fails the build) and keep the English placeholders in each plural
+// form it translates.
+describe('every shipped locale compiles and keeps its placeholders', () => {
+  const codes = ['fr', 'fr-BE', 'de', 'es', 'it', 'nl', 'nl-BE']
+
+  it.each(codes)('%s.json compiles through the production compiler', (code) => {
+    const messages = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), `../i18n/locales/${code}.json`), 'utf8'))
+    const { code: js } = generateJSON(JSON.stringify(messages), {
+      type: 'plain',
+      filename: `${code}.json`,
+      env: 'production',
+      jit: true,
+      strictMessage: false,
+    })
+    expect(js.length).toBeGreaterThan(1000)
+  })
+
+  it.each(['de', 'es', 'it', 'nl', 'nl-BE'])('%s renders dashboard.newly_added with the count at 1, 2 and 0', (code) => {
+    const messages = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), `../i18n/locales/${code}.json`), 'utf8'))
+    const i18n = createI18n({ legacy: false, locale: code, messages: { [code]: messages } })
+    for (const count of [0, 1, 2]) {
+      expect(i18n.global.t('dashboard.newly_added', { count }, count)).toContain(String(count))
+    }
   })
 })

@@ -97,7 +97,6 @@ return [
   'add_new_event' => 'Neue Veranstaltung hinzufügen',
   'created_success_message' => 'Veranstaltung erstellt! Sie wird in Kürze von einem Koordinator genehmigt. In der Zwischenzeit können Sie sie weiter bearbeiten.',
   'items_fixed' => 'Reparierte Artikel',
-  'not_counting' => 'Nicht in der Umweltwirkung dieser Veranstaltung enthalten ist|Nicht in der Umweltwirkung dieser Veranstaltung enthalten sind',
   'impact_calculation' => '<p><strong>Wie berechnen wir die Umweltwirkung?</strong></p>
 <p>Wir haben das durchschnittliche Gewicht und den CO<sub>2</sub>e-Fußabdruck von Produkten in verschiedenen Kategorien erforscht, von Smartphones bis hin zu T-Shirts. Wenn Sie einen reparierten Artikel eingeben, verwenden wir diese Durchschnittswerte, um die Wirkung der Reparatur basierend auf der Kategorie des Artikels zu schätzen.</p>
 <p>Bei Sonstigen Artikeln wenden wir ein allgemeines CO<sub>2</sub>e-zu-Gewichts-Verhältnis an, um die Wirkung jeder erfolgreichen Reparatur zu schätzen.</p>
@@ -151,4 +150,10 @@ return [
   'geocode_failed' => 'Standort nicht gefunden. Falls Sie den Standort Ihrer Veranstaltung nicht finden können, versuchen Sie bitte einen allgemeineren Standort (wie Ort/Stadt) oder eine spezifische Straßenadresse anstelle eines Gebäudenamens.',
   'create_failed' => 'Veranstaltung konnte <strong>nicht</strong> erstellt werden. Bitte überprüfen Sie die gemeldeten Fehler, korrigieren Sie diese und versuchen Sie es erneut.',
   'edit_failed' => 'Veranstaltung konnte nicht bearbeitet werden.',
+  'add_a_device' => 'Ein Gerät hinzufügen',
+  'already_member' => 'Sie sind bereits Mitglied dieser Veranstaltung.',
+  'copied_to_clipboard' => 'In die Zwischenablage kopiert.',
+  'image_upload_error' => 'Das Bild konnte leider nicht hochgeladen werden.',
+  'no_date_selected' => 'Kein Datum ausgewählt',
+  'no_devices_added' => 'Keine Geräte hinzugefügt',
 ];

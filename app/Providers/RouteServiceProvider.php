@@ -48,13 +48,36 @@ class RouteServiceProvider extends ServiceProvider
     public function boot(): void
     {
         RateLimiter::for('api', function (Request $request) {
-            return Limit::perMinute(300)->by($request->user()?->id ?: $request->ip());
+            // Many API routes (e.g. devices) check api_token in the controller rather than via auth:api, so the
+            // default guard knows nothing about the user here.  Look them up via the token guards (Sanctum for the
+            // Nuxt client, api_token for the rest) so that each user gets their own limit.
+            $user = $request->user('sanctum') ?? $request->user('api');
+
+            if ($user) {
+                return Limit::perMinute(300)->by('user:' . $user->id);
+            }
+
+            // On Fly, X-Forwarded-For ends with Fly's edge IP, so $request->ip() is the same for every visitor and
+            // one busy client would use up the limit for everyone.  Fly-Client-IP is set by Fly to the real client.
+            return Limit::perMinute(300)->by('ip:' . ($request->header('Fly-Client-IP') ?: $request->ip()));
         });
 
         // Login/register/password endpoints. Env-configurable so test runs
         // (Playwright bursts) can relax it without editing source files.
+        // Per real client (Fly-Client-IP, as above) and email address, so the
+        // volunteers at a venue, sharing its wifi, don't share one limit; and
+        // a looser limit per client, so trying one password across many
+        // accounts is limited too.
         RateLimiter::for('auth', function (Request $request) {
-            return Limit::perMinute((int) config('restarters.auth_rate_limit'))->by($request->ip());
+            $perMinute = (int) config('restarters.auth_rate_limit');
+            $client = $request->header('Fly-Client-IP') ?: $request->ip();
+            $email = $request->input('email');
+            $email = is_string($email) ? strtolower(trim($email)) : '';
+
+            return [
+                Limit::perMinute($perMinute)->by('auth:'.$client.'|'.$email),
+                Limit::perMinute($perMinute * 3)->by('auth-client:'.$client),
+            ];
         });
 
         $this->routes(function () {

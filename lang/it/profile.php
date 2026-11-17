@@ -49,4 +49,5 @@ return [
   'picture_error' => 'Impossibile caricare l\'immagine del profilo!',
   'admin_success' => 'Impostazioni admin aggiornate',
   'create_success' => 'Utente creato con successo!',
+  'other_profile' => 'Profilo di :name',
 ];

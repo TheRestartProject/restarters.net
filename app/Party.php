@@ -653,15 +653,68 @@ class Party extends Model implements Auditable
 
     public function isBeingAttendedBy($userId)
     {
+        // '1' as a string: compared as a number, MySQL takes an invite hash that starts with 1 (1a3f...) for 1.
         return EventsUsers::where([
             ['event', '=', $this->idevents],
             ['user', '=', $userId],
-            ['status', '=', 1],
+            ['status', '=', '1'],
         ])->exists();
+    }
+
+    /**
+     * Whether the user holds an invitation they haven't accepted: an events_users
+     * row whose status is anything other than '1' (invites store a hash there).
+     * Mirrors events/view.blade.php's pending-invite banner condition.
+     */
+    public function hasPendingInvitationFor($userId): bool
+    {
+        return EventsUsers::where('event', $this->idevents)
+            ->where('user', $userId)
+            ->where('status', '!=', '1')
+            ->exists();
     }
 
     // Set by callers that batch-load images to avoid N+1 (see FixometerFile::findImagesForMany).
     public ?array $preloadedImages = null;
+
+    // Set by callers that batch-load whether the current user is attending each event in a list, to
+    // avoid an isBeingAttendedBy() query per event (see API\GroupController::getEventsForGroupv2).
+    // PartySummary returns it as 'attending' when set.
+    public ?bool $preloadedAttending = null;
+
+    // Set with $preloadedAttending by preloadViewerState(): whether the viewer holds an invitation they haven't
+    // accepted, saving the Party resource a hasPendingInvitationFor() query per event.
+    public ?bool $preloadedInvitationPending = null;
+
+    // Set by callers that already know the viewer may edit every event in a list (the moderation queue), saving the
+    // Party resource a permission check per event.
+    public ?bool $preloadedCanEdit = null;
+
+    /**
+     * Fetch the viewer's attendance and invitations for all of the given events in a single query.  Same
+     * conditions as isBeingAttendedBy() and hasPendingInvitationFor().
+     */
+    public static function preloadViewerState(iterable $events, User $user): void
+    {
+        $events = collect($events);
+
+        if ($events->isEmpty()) {
+            return;
+        }
+
+        $rows = EventsUsers::whereIn('event', $events->pluck('idevents')->all())
+            ->where('user', $user->id)
+            ->get(['event', 'status'])
+            ->groupBy('event');
+
+        foreach ($events as $event) {
+            // A row with no status (from before invitations were stored) is neither, as in SQL.
+            $statuses = $rows->get($event->idevents, collect())->pluck('status')->filter(fn ($s) => $s !== null)
+                ->map(fn ($s) => (string) $s);
+            $event->preloadedAttending = $statuses->contains('1');
+            $event->preloadedInvitationPending = $statuses->contains(fn ($s) => $s !== '1');
+        }
+    }
 
     // Mirrors Device::getImages() - event photos are a gallery (multiple per event), same
     // xref-backed images table the upload/delete endpoints already use.

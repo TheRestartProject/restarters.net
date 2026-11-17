@@ -96,22 +96,29 @@ class CreateDiscourseThreadForEvent extends BaseEvent
                 Log::info('Response status: '.$response->getStatusCode());
                 Log::info('Response body: '.$response->getBody());
 
-                if (! $response->getStatusCode() === 200) {
-                    Log::error('Could not create event ('.$partyId.') thread: '.$response->getReasonPhrase());
-                } else {
-                    // We want to save the discourse thread id in the event, so that we can invite people to it later
-                    // when they RSVP.
-                    $json = json_decode($response->getBody(), true);
-                    if (empty($json['topic_id'])) {
-                        Log::error('Topic id not found in create response ' . $response->getBody());
-                        throw new \Exception('Topic id not found in create response');
-                    }
+                // We want to save the discourse thread id in the event, so that we can invite people to it later
+                // when they RSVP.
+                $json = json_decode($response->getBody(), true);
 
+                if ($response->getStatusCode() !== 200 || empty($json['topic_id'])) {
+                    // Discourse says why, e.g. "you cannot send a personal message to that user", and which host
+                    // and event it was is what's needed to follow it up.
+                    Log::error('Could not create event thread on Discourse', [
+                        'event' => $partyId,
+                        'host' => $host->username,
+                        'status' => $response->getStatusCode(),
+                        'response' => substr((string) $response->getBody(), 0, 500),
+                    ]);
+                } else {
                     $theParty->discourse_thread = $json['topic_id'];
                     $theParty->save();
                 }
             } catch (\Exception $ex) {
-                Log::error('Could not create event ('.$partyId.') thread: '.$ex->getMessage());
+                Log::error('Could not create event thread on Discourse', [
+                    'event' => $partyId,
+                    'host' => $host->username ?? null,
+                    'error' => $ex->getMessage(),
+                ]);
             }
         }
     }

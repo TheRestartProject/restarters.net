@@ -39,6 +39,11 @@ Route::get('party/accept-invite/{id}/{hash}', [PartyController::class, 'confirmI
 Route::get('party/invite/{code}', [PartyController::class, 'confirmCodeInvite']);
 Route::get('group/invite/{code}', [GroupController::class, 'confirmCodeInvite']);
 
+// Called by the wiki's server (wiki.restarters.net) to build its header: the user's avatar and menus, for the
+// wiki user named in ?wiki_username=.
+Route::get('user/thumbnail', [UserController::class, 'getThumbnail']);
+Route::get('user/menus', [UserController::class, 'getUserMenus']);
+
 // Device export is also called from https://therestartproject.org/download-dataset,
 // so we allow anonymous access.
 Route::prefix('export')->group(function () {

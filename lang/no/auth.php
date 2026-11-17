@@ -31,4 +31,5 @@ at dette er en permanent handling.',
   'assigned_groups' => 'Tildelt grupper',
   'save_user' => 'Lagre bruker',
   'login_before_using_shareable_link' => 'For å fullføre invitasjonen, vennligst opprett en konto nedenfor, eller hvis du allerede har en konto, <a href=":login_url">logg inn her</a>.',
+  'choose_role' => 'Velg rolle',
 ];

@@ -1,11 +1,15 @@
 <script setup>
-import { computed, onMounted, ref } from 'vue'
+import { stripTags } from '~/utils/safeText.js'
+import LoadingPlaceholder from '~/components/LoadingPlaceholder.vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useToastStore } from '~/stores/toast.js'
 import { useI18n } from 'vue-i18n'
 import { useGroupsStore } from '~/stores/groups.js'
 import { useSessionStore } from '~/stores/session.js'
+import { useSsoBridge } from '~/composables/useSsoBridge.js'
 import { useUploadedImageUrl } from '~/composables/useUploadedImageUrl.js'
 import { escapeHtml } from '~/utils/escapeHtml.js'
+import ConfirmModal from '~/components/ConfirmModal.vue'
 import GroupActions from '~/components/groups/GroupActions.vue'
 import GroupStats from '~/components/groups/GroupStats.vue'
 import GroupDevicesSummary from '~/components/groups/GroupDevicesSummary.vue'
@@ -77,6 +81,8 @@ const location = computed(() => {
   return typeof loc === 'string' ? loc : loc.location
 })
 
+const { followTalkLink } = useSsoBridge()
+
 // GroupDescription.vue's discourseGroup (view.blade.php: $group->discourse_group
 // ? DISCOURSE_URL.'/g/'.$group->discourse_group : null). The v2 Group
 // resource doesn't carry discourse_group yet, so this stays null (the link
@@ -94,7 +100,7 @@ const DESCRIPTION_LIMIT = 440
 const showFullDescription = ref(false)
 
 function stripHtml(value) {
-  return String(value).replace(/<[^>]*>/g, '')
+  return stripTags(value)
 }
 
 const strippedDescription = computed(() => {
@@ -141,10 +147,6 @@ function askArchive() {
   confirmingArchive.value = true
 }
 
-function cancelArchive() {
-  confirmingArchive.value = false
-}
-
 async function confirmArchive() {
   confirmingArchive.value = false
   archiving.value = true
@@ -176,10 +178,6 @@ const deleting = ref(false)
 
 function askDelete() {
   confirmingDelete.value = true
-}
-
-function cancelDelete() {
-  confirmingDelete.value = false
 }
 
 async function confirmDelete() {
@@ -214,7 +212,14 @@ const unfollowedMessage = computed(() =>
   t('groups.now_unfollowed', { name: escapeHtml(group.value?.name ?? ''), link: `/group/view/${id.value}` })
 )
 
-async function onLeave() {
+// Live's GroupActions.vue asks for confirmation before leaving.
+const confirmingLeave = ref(false)
+
+function onLeave() {
+  confirmingLeave.value = true
+}
+
+async function leaveConfirmed() {
   try {
     await groupsStore.leave(id.value)
     haveLeft.value = true
@@ -230,6 +235,27 @@ function load() {
   groupsStore.fetchVolunteers(id.value)
 }
 
+// Following an emailed invite again finds its code spent, and the server can't tell that it's someone
+// already a member (the client signs in with a token, not the session the link arrives in). So wait for the
+// group to load, and only warn someone who isn't.
+function warnOfInvalidInviteUnlessMember() {
+  let done = false
+  let stop = null
+  stop = watch(
+    () => (group.value?.id === id.value ? group.value : null),
+    (loaded) => {
+      if (done || !loaded) return
+      done = true
+      if (!loaded.is_member) {
+        useToastStore().error(t('groups.invite_invalid'))
+      }
+      stop?.()
+    },
+    { immediate: true },
+  )
+  if (done) stop()
+}
+
 onMounted(() => {
   load()
 
@@ -239,7 +265,7 @@ onMounted(() => {
   if (route.query.joined === '1') {
     useToastStore().success(t('groups.invite_confirmed'))
   } else if (route.query.invite === 'invalid') {
-    useToastStore().error(t('groups.invite_invalid'))
+    warnOfInvalidInviteUnlessMember()
   }
   if (route.query.joined || route.query.invite) {
     const { joined, invite, ...rest } = route.query
@@ -273,9 +299,7 @@ onMounted(() => {
     </BAlert>
 
     <div v-if="groupsStore.current.loading" data-testid="group-view-loading">
-      <div class="placeholder-glow">
-        <span class="placeholder col-12" style="height: 6rem" />
-      </div>
+      <LoadingPlaceholder height="6rem" />
     </div>
 
     <BAlert
@@ -341,36 +365,6 @@ onMounted(() => {
             />
           </div>
         </div>
-
-        <template v-if="canSeeDelete && confirmingDelete">
-          <div class="w-100 d-flex align-items-center gap-2 mt-2">
-            <span class="small">{{ t('groups.delete_group_confirm', { name: group.name }) }}</span>
-            <BButton
-              variant="danger"
-              :disabled="deleting"
-              data-testid="group-view-delete-confirm"
-              @click="confirmDelete"
-            >
-              {{ t('partials.yes') }}
-            </BButton>
-            <BButton variant="link" @click="cancelDelete">{{ t('partials.cancel') }}</BButton>
-          </div>
-        </template>
-
-        <template v-if="canPerformArchive && confirmingArchive">
-          <div class="w-100 d-flex align-items-center gap-2 mt-2">
-            <span class="small">{{ t('groups.archive_group_confirm', { name: group.name }) }}</span>
-            <BButton
-              variant="danger"
-              :disabled="archiving"
-              data-testid="group-view-archive-confirm"
-              @click="confirmArchive"
-            >
-              {{ t('partials.yes') }}
-            </BButton>
-            <BButton variant="link" @click="cancelArchive">{{ t('partials.cancel') }}</BButton>
-          </div>
-        </template>
       </header>
 
       <!-- About (left) | Volunteers (right) two-column, matching the live site. -->
@@ -432,7 +426,7 @@ onMounted(() => {
                  shown once the group has a linked discourse_group. -->
             <p v-if="discourseGroup" class="d-flex align-items-center gap-2" data-testid="group-view-talk">
               <img :src="'/icons/talk_ico.svg'" alt="" width="30" height="30" class="flex-shrink-0">
-              <a :href="discourseGroup">{{ t('groups.talk_group') }}</a>
+              <a :href="discourseGroup" @click="followTalkLink($event, discourseGroup)">{{ t('groups.talk_group') }}</a>
             </p>
           </GroupCollapsibleSection>
         </section>
@@ -479,7 +473,9 @@ onMounted(() => {
         :show-calendar="showCalendar"
       />
 
-      <div v-if="statsLayout === 'after'" class="stats-after-events" data-testid="group-stats-layout-after">
+      <!-- Spaced off the events box (and its drop shadow) as develop's
+           events section's own bottom margin did. -->
+      <div v-if="statsLayout === 'after'" class="stats-after-events mt-4" data-testid="group-stats-layout-after">
         <GroupStats
           :stats="groupsStore.stats.data"
           :loading="groupsStore.stats.loading"
@@ -510,6 +506,29 @@ onMounted(() => {
         :count="shareImageCount"
         @close="showShareImage = false"
       />
+
+      <!-- Live's GroupActions.vue: one ConfirmModal each for leave, delete
+           and archive. -->
+      <ConfirmModal
+        v-model="confirmingLeave"
+        :message="t('groups.leave_group_confirm')"
+        confirm-testid="group-view-leave-confirm"
+        @confirm="leaveConfirmed"
+      />
+      <ConfirmModal
+        v-model="confirmingDelete"
+        :message="t('groups.delete_group_confirm', { name: group.name })"
+        :pending="deleting"
+        confirm-testid="group-view-delete-confirm"
+        @confirm="confirmDelete"
+      />
+      <ConfirmModal
+        v-model="confirmingArchive"
+        :message="t('groups.archive_group_confirm', { name: group.name })"
+        :pending="archiving"
+        confirm-testid="group-view-archive-confirm"
+        @confirm="confirmArchive"
+      />
     </template>
   </div>
 </template>
@@ -526,7 +545,7 @@ onMounted(() => {
 
 @media (min-width: 768px) {
   .stats-compact {
-    column-gap: 1.5rem;
+    column-gap: 20px;
     grid-template-columns: 1fr 1fr;
     grid-template-areas:
       'facts impact'

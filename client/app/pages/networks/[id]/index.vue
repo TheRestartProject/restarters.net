@@ -1,4 +1,6 @@
 <script setup>
+import { stripTags } from '~/utils/safeText.js'
+import LoadingPlaceholder from '~/components/LoadingPlaceholder.vue'
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAuth } from '~/composables/useAuth.js'
@@ -69,17 +71,20 @@ const network = computed(() => networksStore.current.data)
 
 useHead({ title: computed(() => network.value?.name || t('networks.general.networks')) })
 
-// Impact figures: all time (already embedded in the network) or the last 12
-// completed calendar months (GET /api/v2/networks/{id}/stats?period=
-// last_12_months, which also says which months it covered). Fetched once per
-// period, so switching back is instant.
+// Impact figures: all time (networksStore.stats, loaded after the network) or
+// the last 12 completed calendar months (GET /api/v2/networks/{id}/stats?
+// period=last_12_months, which also says which months it covered). Each
+// period is fetched once, so switching back is instant. Until a period's
+// figures arrive NetworkStats shows "…", and "–" if they fail to load.
 const period = ref('all')
 const statsByPeriod = ref({})
-const periodLoading = ref(false)
 const periodError = ref(false)
 
 const displayedStats = computed(() =>
-  period.value === 'all' ? network.value?.stats : statsByPeriod.value[period.value]
+  period.value === 'all' ? networksStore.stats.data : statsByPeriod.value[period.value]
+)
+const statsError = computed(() =>
+  period.value === 'all' ? !!networksStore.stats.error : periodError.value
 )
 
 const periodLabel = computed(() => {
@@ -94,16 +99,11 @@ async function setPeriod(next) {
   periodError.value = false
   if (next === 'all' || statsByPeriod.value[next]) return
 
-  periodLoading.value = true
   try {
-    const stats = await networksStore.fetchStats(id.value, { period: next })
+    const stats = await networksStore.fetchPeriodStats(id.value, next)
     statsByPeriod.value = { ...statsByPeriod.value, [next]: stats }
   } catch {
     periodError.value = true
-  } finally {
-    // A later toggle may have moved on; only the current period's request
-    // controls the spinner.
-    if (period.value === next) periodLoading.value = false
   }
 }
 
@@ -133,18 +133,8 @@ const showReadMore = computed(() => {
 })
 
 function stripHtml(value) {
-  return String(value).replace(/<[^>]*>/g, '')
+  return stripTags(value)
 }
-
-// The tally comes from the network's own stats (App\Network::stats()), which
-// counts only non-archived groups. Until they arrive, fall back to the
-// non-archived rows of the groups list.
-const groupsCount = computed(() => {
-  const fromStats = network.value?.stats?.groups
-  if (fromStats !== undefined && fromStats !== null) return fromStats
-  if (networksStore.groups.loading) return null
-  return networksStore.groups.data.filter((g) => !g.archived_at).length
-})
 
 // Mirrors app/Network.php#groupsNotIn() exactly (parity-v2/networks.md gap
 // #9): every group not already in the network, archived or not - archived
@@ -162,6 +152,9 @@ function loadGroups() {
 
 function loadNetwork() {
   networksStore.fetchCurrent(id.value)
+  // Separately, and after the network: they are slow to calculate for a large network, so the page doesn't wait
+  // for them.
+  networksStore.fetchStats(id.value).catch(() => {})
   networksStore.fetchTags(id.value)
   loadGroups()
 }
@@ -184,9 +177,7 @@ function retry() {
 <template>
   <div class="container py-4" data-testid="network-show-page">
     <div v-if="networksStore.current.loading" data-testid="network-show-loading">
-      <div class="placeholder-glow">
-        <span class="placeholder col-12" style="height: 6rem" />
-      </div>
+      <LoadingPlaceholder height="6rem" />
     </div>
 
     <BAlert
@@ -262,10 +253,7 @@ function retry() {
         <h2>{{ t('networks.general.impact') }}</h2>
         <PeriodToggle class="mb-2" :model-value="period" @update:model-value="setPeriod" />
         <p v-if="periodLabel" class="text-muted small" data-testid="network-show-period-label">{{ periodLabel }}</p>
-        <BAlert v-if="periodError" :model-value="true" variant="danger" data-testid="network-show-period-error">
-          {{ t('client.networks.stats_unavailable') }}
-        </BAlert>
-        <NetworkStats :stats="displayedStats" :groups-count="groupsCount" :loading="periodLoading" />
+        <NetworkStats :stats="displayedStats" :error="statsError" />
         <p v-if="network.reporting_url" class="mt-3 mb-0 text-end">
           <a
             :href="network.reporting_url"
@@ -326,7 +314,7 @@ function retry() {
            groups, starting zoomed out so every group is in view. -->
       <section class="groups-section mb-4">
         <h2>{{ t('networks.general.groups') }}</h2>
-        <NetworkGroupsMapList :network-id="id" :can-manage-tags="canManage" />
+        <NetworkGroupsMapList :network-id="id" :can-manage-tags="canManage" :tags="networksStore.tags.data" />
       </section>
 
       <!-- Tag management uses the full width (legacy NetworkPage.vue

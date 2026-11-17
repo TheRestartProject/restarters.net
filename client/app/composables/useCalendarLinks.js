@@ -1,4 +1,5 @@
 import { computed, toValue } from 'vue'
+import { stripTags as stripMarkup } from '~/utils/safeText.js'
 
 // Client-side port of PartyController::generateAddToCalendarLinks(), which
 // wraps spatie/calendar-links (vendor/spatie/calendar-links/src/Generators/
@@ -25,7 +26,7 @@ import { computed, toValue } from 'vue'
 
 function stripTags(html) {
   if (!html) return ''
-  return html.replace(/<[^>]*>/g, '')
+  return stripMarkup(html)
 }
 
 function pad(n) {
@@ -50,7 +51,7 @@ function base64Utf8(str) {
   const bytes = new TextEncoder().encode(str)
   let binary = ''
   bytes.forEach((b) => {
-    binary += String.fromCharCode(b)
+    binary += String.fromCodePoint(b)
   })
   return btoa(binary)
 }
@@ -60,8 +61,8 @@ function base64Utf8(str) {
 function icsEscape(str) {
   return String(str)
     .replace(/\r\n|\r|\n/g, '\\n')
-    .replace(/,/g, '\\,')
-    .replace(/;/g, '\\;')
+    .replaceAll(',', '\\,')
+    .replaceAll(';', '\\;')
 }
 
 function buildIcs({ id, title, description, address, start, end }) {

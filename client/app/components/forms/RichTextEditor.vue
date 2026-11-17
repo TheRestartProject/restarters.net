@@ -1,4 +1,5 @@
 <script setup>
+import { trimTrailing } from '~/utils/safeText.js'
 import { onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import 'quill/dist/quill.snow.css'
 
@@ -48,6 +49,7 @@ const emit = defineEmits(['update:modelValue'])
 const editorEl = ref(null)
 let quill = null
 let applyingExternalValue = false
+let unmounted = false
 
 function normalize(html) {
   // Same fixup the legacy editor applies for the Linux <p><br> artifact.
@@ -136,7 +138,7 @@ function magicPasteLinks(node, delta) {
       }
       // Trailing punctuation (sentence-ending '.', ')', etc.) isn't part of
       // the URL.
-      const url = match[0].replace(/[.,;:!?)]+$/, '')
+      const url = trimTrailing(match[0], '.,;:!?)')
       const trailing = match[0].slice(url.length)
       const href = url.startsWith('www.') ? `https://${url}` : url
       ops.push({ insert: url, attributes: { ...op.attributes, link: href } })
@@ -157,6 +159,12 @@ onMounted(async () => {
     import('quill'),
     import('quill-html-edit-button'),
   ])
+
+  // Quill loads asynchronously. If the editor was unmounted meanwhile (the
+  // edit page re-rendering as it loads, or leaving it straight away) its
+  // element is gone, and Quill would throw "Invalid Quill container", which
+  // Nuxt shows as a 500 page.
+  if (unmounted || !editorEl.value) return
 
   Quill.register('modules/htmlEditButton', htmlEditButton)
 
@@ -205,6 +213,7 @@ watch(
 )
 
 onBeforeUnmount(() => {
+  unmounted = true
   quill = null
 })
 </script>

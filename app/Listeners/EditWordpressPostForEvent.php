@@ -100,7 +100,7 @@ class EditWordpressPostForEvent extends BaseEvent
                 $this->wpClient->editPost($theParty->wordpress_post_id, $content);
             }
         } catch (\Exception $e) {
-            Log::error('An error occurred during Wordpress event update: '.$e->getMessage());
+            Log::error('An error occurred during Wordpress event update', ['event' => $id, 'error' => $e->getMessage()]);
             $notify_users = Fixometer::usersWhoHavePreference('admin-edit-wordpress-event-failure');
             Notification::send($notify_users, new AdminWordPressEditEventFailure([
                 'event_venue' => $theParty->venue,

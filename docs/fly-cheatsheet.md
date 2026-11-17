@@ -190,4 +190,7 @@ flyctl proxy 8080:80 --app restarters-pma
 - `/var/log` is a **persistent volume** (`app_logs_dev`) — logs and file cache survive redeploys.
 - Uploaded images are written to `/var/www/public/uploads/` temporarily, then synced to **Tigris S3**.  
   Nginx proxies `/uploads/*` → Tigris, so images are served from S3, not local disk.
+- Previews (`restarters-dev`, `restarters-pr-*`) are the exception: their uploads stay in
+  `/var/www/public/uploads/` (`FILESYSTEM_DISK=local`), nginx serves them from there and gets
+  everything else from Tigris, and they go when the machine cold-boots.
 - `public/uploads/` is created at build time (Dockerfile.fly) and on each container start (startup.sh).

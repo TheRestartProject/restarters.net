@@ -69,7 +69,7 @@ const emailErrors = computed(() => fieldErrors.value.email || [])
 </script>
 
 <template>
-  <section class="login-page">
+  <section>
     <div class="container">
       <div class="row row-expanded pb-3">
         <div class="col-lg-6 d-flex">

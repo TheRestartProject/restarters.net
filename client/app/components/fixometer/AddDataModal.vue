@@ -1,9 +1,11 @@
 <script setup>
+import LoadingPlaceholder from '~/components/LoadingPlaceholder.vue'
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAuth } from '~/composables/useAuth.js'
 import { useDashboardStore } from '~/stores/dashboard.js'
 import { useEventsStore } from '~/stores/events.js'
+import moment from 'moment-timezone'
 
 // Gap fix (HIGH): legacy's AddDataModal.vue - a group -> event picker
 // launched by FixometerHeading.vue's unconditional "Add Data" button
@@ -44,7 +46,12 @@ const groupEvents = computed(() =>
     .slice()
     .sort((a, b) => new Date(b.start) - new Date(a.start))
 )
-const eventOptions = computed(() => groupEvents.value.map((e) => ({ value: e.id, text: e.title })))
+// Develop's AddDataModal labels each event "08 Dec 26 / Croftlands Community
+// Centre": a group's events usually share a venue, so the title alone can't
+// tell them apart.
+const eventOptions = computed(() =>
+  groupEvents.value.map((e) => ({ value: e.id, text: `${moment(e.start).format('DD MMM YY')} / ${e.title}` }))
+)
 const selectedEventId = ref(null)
 
 // Keep the selections valid as the data loads/changes - same idiom as
@@ -104,9 +111,7 @@ function close() {
     <p>{{ t('devices.add_data_description') }}</p>
 
     <div v-if="fetching" data-testid="add-data-loading">
-      <div class="placeholder-glow">
-        <span class="placeholder col-12" style="height: 2rem" />
-      </div>
+      <LoadingPlaceholder height="2rem" />
     </div>
 
     <template v-else-if="!groupOptions.length">

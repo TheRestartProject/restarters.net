@@ -97,7 +97,6 @@ return [
   'add_new_event' => 'Nieuwe activiteit toevoegen',
   'created_success_message' => 'Activiteit aangemaakt! Ze wordt binnenkort goedgekeurd door een coördinator. Je kunt ze ondertussen nog steeds bewerken.',
   'items_fixed' => 'Herstelde items',
-  'not_counting' => 'Telt niet mee voor de milieu-impact van deze activiteit is|Tellen niet mee voor de milieu-impact van deze activiteit zijn',
   'impact_calculation' => '<p><strong>Hoe berekenen we de milieu-impact?</strong></p>
 <p>We hebben het gemiddelde gewicht en de CO<sub>2</sub>e-voetafdruk van producten onderzocht over een reeks categorieën, van smartphones tot t-shirts. Wanneer je een item invoert dat je hebt gerepareerd, gebruiken we deze gemiddelden om de impact van die herstelling te schatten op basis van de categorie van het item.</p>
 <p>Voor overige items passen we een generieke CO<sub>2</sub>e-gewichtsverhouding toe om de impact van elke succesvolle herstelling te schatten.</p>
@@ -151,4 +150,10 @@ return [
   'geocode_failed' => 'Locatie niet gevonden. Als je de locatie van je activiteit niet kunt vinden, probeer dan een algemenere locatie (zoals dorp/stad), of een specifiek straatadres, in plaats van een gebouwnaam.',
   'create_failed' => 'Activiteit kon <strong>niet</strong> worden aangemaakt. Bekijk de gemelde fouten, corrigeer ze en probeer opnieuw.',
   'edit_failed' => 'Activiteit kon niet worden bewerkt.',
+  'add_a_device' => 'Een toestel toevoegen',
+  'already_member' => 'Je bent al lid van deze activiteit.',
+  'copied_to_clipboard' => 'Gekopieerd naar het klembord.',
+  'image_upload_error' => 'Sorry, de afbeelding kon niet worden geüpload.',
+  'no_date_selected' => 'Geen datum geselecteerd',
+  'no_devices_added' => 'Geen toestellen toegevoegd',
 ];

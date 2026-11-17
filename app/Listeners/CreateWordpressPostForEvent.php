@@ -57,7 +57,7 @@ class CreateWordpressPostForEvent extends BaseEvent
         try {
             $this->createEventOnWordpress($theParty);
         } catch (\Exception $e) {
-            Log::error('An error occurred during Wordpress event creation: '.$e->getMessage());
+            Log::error('An error occurred during Wordpress event creation', ['event' => $partyId, 'error' => $e->getMessage()]);
             $notify_users = Fixometer::usersWhoHavePreference('admin-approve-wordpress-event-failure');
             Notification::send($notify_users, new AdminWordPressCreateEventFailure([
                 'event_venue' => $theParty->venue,

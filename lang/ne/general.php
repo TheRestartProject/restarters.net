@@ -36,4 +36,5 @@ return [
   'menu_fixometer' => 'Fixometer',
   'menu_events' => 'Evenementen',
   'menu_groups' => 'Groepen',
+  'error_occurred' => 'Er is een fout opgetreden. Probeer het opnieuw.',
 ];

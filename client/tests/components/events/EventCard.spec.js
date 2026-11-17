@@ -94,13 +94,13 @@ describe('components/events/EventCard', () => {
     expect(wrapper.find('[data-testid="event-card-venue-42"]').exists()).toBe(false)
   })
 
-  it('shows an attending badge only when attending', () => {
-    expect(mountComponent({ event: baseEvent({ attending: true }) }).find('[data-testid="event-card-attending-42"]').exists()).toBe(true)
+  it('shows no attending badge (live has none)', () => {
+    expect(mountComponent({ event: baseEvent({ attending: true }) }).find('[data-testid="event-card-attending-42"]').exists()).toBe(false)
     expect(mountComponent({ event: baseEvent({ attending: false }) }).find('[data-testid="event-card-attending-42"]').exists()).toBe(false)
   })
 
-  it('shows a hosting badge only when the hosting prop is set', () => {
-    expect(mountComponent({ hosting: true }).find('[data-testid="event-card-hosting-42"]').exists()).toBe(true)
+  it('shows no hosting badge (live has none)', () => {
+    expect(mountComponent({ hosting: true }).find('[data-testid="event-card-hosting-42"]').exists()).toBe(false)
     expect(mountComponent({ hosting: false }).find('[data-testid="event-card-hosting-42"]').exists()).toBe(false)
   })
 
@@ -157,6 +157,8 @@ describe('components/events/EventCard', () => {
     await button.trigger('click')
 
     expect(store.attend).toHaveBeenCalledWith(42)
+    await flushPromises()
+    expect(wrapper.emitted('attendance')).toEqual([[{ id: 42, attending: true }]])
   })
 
   it('offers no actions at all on a past event', () => {
@@ -177,6 +179,17 @@ describe('components/events/EventCard', () => {
     await flushPromises()
 
     expect(store.attend).toHaveBeenCalledTimes(1)
+    expect(wrapper.emitted('attendance')).toBeUndefined()
+  })
+
+  // GroupEventScrollTable.vue's addGroupName off (a group's own page): just the
+  // title, with EventTitle.vue's online pill.
+  it('leaves out the group and venue line when showGroup is off, keeping an online pill', () => {
+    const wrapper = mountComponent({ event: baseEvent({ online: true, group: { id: 5, name: 'G' } }), showGroup: false })
+
+    expect(wrapper.find('[data-testid="event-card-group-42"]').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="event-card-online-42"]').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="event-card-online-badge-42"]').exists()).toBe(true)
   })
 
   // Gap 17: a full-row highlight for events you're attending, in addition

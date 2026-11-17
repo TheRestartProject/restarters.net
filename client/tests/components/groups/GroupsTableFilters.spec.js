@@ -88,4 +88,18 @@ describe('components/groups/GroupsTableFilters', () => {
     const emitted = wrapper.emitted('update:filters').at(-1)[0]
     expect(emitted.tags).toEqual([5, 6])
   })
+
+  // A network page offers that network's own tags (develop's NetworkPage.vue
+  // groupFilterTags), not the role-filtered list - which for an admin is every
+  // tag there is.
+  it('offers the given tags instead of fetching the role-filtered list', async () => {
+    groupsStore.tags.data = [{ id: 5, name: 'Someone else\'s' }]
+
+    const wrapper = mountComponent({ showTags: true, tags: [{ id: 9, name: 'Ours' }] })
+    await wrapper.find('[data-testid="groups-table-filter-tags-search"]').trigger('focus')
+
+    expect(groupsStore.fetchTags).not.toHaveBeenCalled()
+    expect(wrapper.find('[data-testid="groups-table-filter-tags-option-9"]').text()).toBe('Ours')
+    expect(wrapper.find('[data-testid="groups-table-filter-tags-option-5"]').exists()).toBe(false)
+  })
 })

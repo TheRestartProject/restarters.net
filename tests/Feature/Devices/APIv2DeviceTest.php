@@ -167,6 +167,29 @@ class APIv2DeviceTest extends TestCase
     }
 
     /**
+     * @story:DeviceController::createDevicev2
+     */
+    public function testCreateWithUnknownCategory(): void {
+        // An API client sent category 1, which doesn't exist; that failed on the foreign key with a 500.
+        $this->withExceptionHandling();
+        $this->loginAsTestUser(Role::ADMINISTRATOR);
+        $idEvents = $this->createEvent($this->createGroup(), 'yesterday');
+
+        $response = $this->postJson('/api/v2/devices', [
+            'eventid' => $idEvents,
+            'category' => 999999,
+            'brand' => 'Dell',
+            'model' => 'Inspiron 15',
+            'problem' => 'Will not power on',
+            'repair_status' => 'Fixed',
+        ]);
+
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors('category');
+        $this->assertEquals(0, Device::where('event', $idEvents)->count());
+    }
+
+    /**
      * Create a device over the API and check it retrieves as expected.
      *
      * @story:DeviceController::createDevicev2
@@ -240,6 +263,40 @@ class APIv2DeviceTest extends TestCase
         if ($next_steps_str) {
             $this->assertEquals($next_steps_str, $json['data']['next_steps']);
         }
+    }
+
+    /**
+     * An update without a barrier takes it off, as it does the other optional fields: the barrier was cleared on the
+     * form, or the item is no longer end of life.
+     */
+    public function testUpdateWithoutBarrierClearsIt(): void {
+        $this->loginAsTestUser(Role::ADMINISTRATOR);
+        $idEvents = $this->createEvent($this->createGroup(), 'yesterday');
+
+        $iddevices = $this->post('/api/v2/devices', [
+            'eventid' => $idEvents,
+            'category' => 11,
+            'repair_status' => 'End of life',
+            'barrier' => 'Spare parts not available',
+        ])->assertSuccessful()->json('id');
+        $this->assertEquals('Spare parts not available', $this->get("/api/v2/devices/$iddevices")->json('data.barrier'));
+
+        $this->patch("/api/v2/devices/$iddevices", [
+            'eventid' => $idEvents,
+            'category' => 11,
+            'repair_status' => 'End of life',
+            'barrier' => 'Lack of equipment',
+        ])->assertSuccessful();
+        $this->assertEquals('Lack of equipment', $this->get("/api/v2/devices/$iddevices")->json('data.barrier'));
+        $this->assertEquals(1, \App\DeviceBarrier::where('device_id', $iddevices)->count());
+
+        $this->patch("/api/v2/devices/$iddevices", [
+            'eventid' => $idEvents,
+            'category' => 11,
+            'repair_status' => 'End of life',
+        ])->assertSuccessful();
+        $this->assertNull($this->get("/api/v2/devices/$iddevices")->json('data.barrier'));
+        $this->assertEquals(0, \App\DeviceBarrier::where('device_id', $iddevices)->count());
     }
 
     public function providerDevice(): array

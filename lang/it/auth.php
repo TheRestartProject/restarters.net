@@ -30,4 +30,5 @@ return [
   'assigned_groups' => 'Gruppi assegnati',
   'save_user' => 'Salva utente',
   'login_before_using_shareable_link' => 'Per completare il tuo invito per favore crea un account qui sotto, o se hai già un account <a href=":login_url">fai login qui</a>.',
+  'choose_role' => 'Scegli il ruolo',
 ];

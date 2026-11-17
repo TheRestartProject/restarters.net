@@ -18,6 +18,7 @@ const EventFormStub = {
   template: '<button data-testid="stub-updated" @click="$emit(\'updated\', eventId)" />',
 }
 const TusImageUploadStub = {
+  props: { dropzone: Boolean, message: String, hint: String, inputId: String },
   emits: ['uploaded', 'upload-error'],
   template:
     '<div><button data-testid="stub-upload-ok" @click="$emit(\'uploaded\', { uploadKey: \'key123\' })" /><button data-testid="stub-upload-fail" @click="$emit(\'upload-error\', \'boom\')" /></div>',
@@ -37,7 +38,7 @@ const BASE_EVENT = {
   group: { id: 9, name: 'Acme Restarters' },
 }
 
-function mountPage() {
+function mountNow() {
   const i18n = createI18n({ legacy: false, locale: 'en', messages: { en: { ...en, ...clientEn } } })
 
   return mount(EventEditPage, {
@@ -46,6 +47,13 @@ function mountPage() {
       stubs: GLOBAL_STUBS,
     },
   })
+}
+
+// Mounted once the page's own fetch has settled, as a visitor sees it.
+async function mountPage() {
+  const wrapper = mountNow()
+  await flushPromises()
+  return wrapper
 }
 
 describe('pages/party/edit/[id]', () => {
@@ -80,43 +88,85 @@ describe('pages/party/edit/[id]', () => {
     authStore.user = { role_name: 'Administrator' }
   })
 
-  it('fetches the event for the routed id on mount', () => {
-    mountPage()
+  it('fetches the event for the routed id on mount', async () => {
+    await mountPage()
     expect(eventsStore.fetchEvent).toHaveBeenCalledWith(5)
   })
 
-  it('shows a loading skeleton while loading', () => {
+  it('shows a loading skeleton while loading', async () => {
     eventsStore.current.loading = true
-    const wrapper = mountPage()
+    const wrapper = await mountPage()
     expect(wrapper.find('[data-testid="event-edit-loading"]').exists()).toBe(true)
+  })
+
+  it('shows a loading skeleton while a different event is still in the store', async () => {
+    eventsStore.current.data = { ...BASE_EVENT, id: 99 }
+    eventsStore.current.loading = true
+    const wrapper = await mountPage()
+    expect(wrapper.find('[data-testid="event-edit-loading"]').exists()).toBe(true)
+  })
+
+  // The form copies the event once, when it mounts. Seeded from the copy the
+  // event's own page fetched earlier, a save would write back stale values.
+  it('waits for its own fetch before showing the form, even when the store already holds the event', async () => {
+    let finishFetch
+    eventsStore.current.data = { ...BASE_EVENT, title: 'Old title' }
+    eventsStore.fetchEvent = vi.fn(
+      () =>
+        new Promise((resolve) => {
+          finishFetch = () => {
+            eventsStore.current.data = BASE_EVENT
+            resolve(BASE_EVENT)
+          }
+        }),
+    )
+    const wrapper = mountNow()
+    await flushPromises()
+    expect(wrapper.find('[data-testid="event-edit-loading"]').exists()).toBe(true)
+    expect(wrapper.findComponent(EventFormStub).exists()).toBe(false)
+
+    finishFetch()
+    await flushPromises()
+    expect(wrapper.find('[data-testid="event-edit-loading"]').exists()).toBe(false)
+    expect(wrapper.findComponent(EventFormStub).props('initialEvent')).toEqual(BASE_EVENT)
+  })
+
+  it('shows the error rather than the placeholder when its fetch fails', async () => {
+    eventsStore.fetchEvent = vi.fn(() => {
+      eventsStore.current.error = { status: 500 }
+      return Promise.reject(new Error('boom'))
+    })
+    const wrapper = await mountPage()
+    expect(wrapper.find('[data-testid="event-edit-loading"]').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="event-edit-error"]').exists()).toBe(true)
   })
 
   it('shows an error state with a retry button', async () => {
     eventsStore.current.error = { status: 404 }
-    const wrapper = mountPage()
+    const wrapper = await mountPage()
 
     expect(wrapper.find('[data-testid="event-edit-error"]').exists()).toBe(true)
     await wrapper.find('[data-testid="event-edit-retry"]').trigger('click')
     expect(eventsStore.fetchEvent).toHaveBeenCalledTimes(2)
   })
 
-  it('shows a forbidden message instead of the form when the user neither administers nor hosts the group', () => {
+  it('shows a forbidden message instead of the form when the user neither administers nor hosts the group', async () => {
     authStore.user = { role_name: 'Host' }
     groupsStore.memberships = [{ id: 1, name: 'Other', role: 3, archived: false }]
     eventsStore.current.data = BASE_EVENT
 
-    const wrapper = mountPage()
+    const wrapper = await mountPage()
 
     expect(wrapper.find('[data-testid="event-edit-forbidden"]').exists()).toBe(true)
     expect(wrapper.find('[data-testid="stub-updated"]').exists()).toBe(false)
   })
 
-  it('renders the form when the user hosts the event group (role 3 in memberships)', () => {
+  it('renders the form when the user hosts the event group (role 3 in memberships)', async () => {
     authStore.user = { role_name: 'Host' }
     groupsStore.memberships = [{ id: 9, name: 'Hosted', role: 3, archived: false }]
     eventsStore.current.data = BASE_EVENT
 
-    const wrapper = mountPage()
+    const wrapper = await mountPage()
 
     const form = wrapper.findComponent(EventFormStub)
     expect(form.exists()).toBe(true)
@@ -125,30 +175,33 @@ describe('pages/party/edit/[id]', () => {
     expect(form.props('isAdmin')).toBe(false)
   })
 
-  it('renders the form for an Administrator regardless of hosted groups', () => {
+  it('renders the form for an Administrator regardless of hosted groups', async () => {
     authStore.user = { role_name: 'Administrator' }
     groupsStore.memberships = []
     eventsStore.current.data = BASE_EVENT
 
-    const wrapper = mountPage()
+    const wrapper = await mountPage()
 
     expect(wrapper.findComponent(EventFormStub).props('isAdmin')).toBe(true)
     expect(wrapper.find('[data-testid="event-edit-forbidden"]').exists()).toBe(false)
   })
 
-  it('shows a success message and re-fetches when EventForm emits updated', async () => {
+  // The store refreshes the event itself (updateEvent); reloading here would
+  // swap the form for the placeholder.
+  it('shows a success message and keeps the form when EventForm emits updated', async () => {
     eventsStore.current.data = BASE_EVENT
-    const wrapper = mountPage()
+    const wrapper = await mountPage()
 
     await wrapper.find('[data-testid="stub-updated"]').trigger('click')
 
     expect(wrapper.find('[data-testid="event-edit-success"]').exists()).toBe(true)
-    expect(eventsStore.fetchEvent).toHaveBeenCalledTimes(2)
+    expect(eventsStore.fetchEvent).toHaveBeenCalledTimes(1)
+    expect(wrapper.findComponent(EventFormStub).exists()).toBe(true)
   })
 
   it('calls uploadEventImage with the emitted upload key', async () => {
     eventsStore.current.data = BASE_EVENT
-    const wrapper = mountPage()
+    const wrapper = await mountPage()
 
     await wrapper.find('[data-testid="stub-upload-ok"]').trigger('click')
 
@@ -158,7 +211,7 @@ describe('pages/party/edit/[id]', () => {
 
   it('shows an image upload error message from TusImageUpload', async () => {
     eventsStore.current.data = BASE_EVENT
-    const wrapper = mountPage()
+    const wrapper = await mountPage()
 
     await wrapper.find('[data-testid="stub-upload-fail"]').trigger('click')
 
@@ -168,7 +221,7 @@ describe('pages/party/edit/[id]', () => {
   it('shows an image upload error message when uploadEventImage itself rejects', async () => {
     eventsStore.current.data = BASE_EVENT
     eventsStore.uploadEventImage = vi.fn().mockRejectedValue(new Error('server error'))
-    const wrapper = mountPage()
+    const wrapper = await mountPage()
 
     await wrapper.find('[data-testid="stub-upload-ok"]').trigger('click')
 
@@ -180,14 +233,14 @@ describe('pages/party/edit/[id]', () => {
   // `$audits && Administrator` and has no API endpoint yet, so it is absent
   // here by necessity rather than by choice.
   describe('tabs', () => {
-    function mountEditable() {
+    async function mountEditable() {
       authStore.user = { role_name: 'Administrator' }
       eventsStore.current.data = BASE_EVENT
-      return mountPage()
+      return await mountPage()
     }
 
-    it('shows Details and Photos tabs, with Details active and Photos hidden', () => {
-      const wrapper = mountEditable()
+    it('shows Details and Photos tabs, with Details active and Photos hidden', async () => {
+      const wrapper = await mountEditable()
 
       expect(wrapper.find('[data-testid="event-edit-tab-details"]').exists()).toBe(true)
       expect(wrapper.find('[data-testid="event-edit-tab-photos"]').exists()).toBe(true)
@@ -198,17 +251,17 @@ describe('pages/party/edit/[id]', () => {
     // edit.blade.php:40 gates the Event log tab on Administrator. It fetches
     // lazily on first open - it is an admin-only panel most page loads never
     // show - so the endpoint must not be called just by landing on the page.
-    it('hides the Event log tab from a non-administrator', () => {
+    it('hides the Event log tab from a non-administrator', async () => {
       authStore.user = { role_name: 'Host' }
       groupsStore.memberships = [{ id: 9, name: 'Hosted', role: 3, archived: false }]
       eventsStore.current.data = BASE_EVENT
-      const wrapper = mountPage()
+      const wrapper = await mountPage()
 
       expect(wrapper.find('[data-testid="event-edit-tab-log"]').exists()).toBe(false)
     })
 
     it('shows the Event log tab for an administrator and fetches only on open', async () => {
-      const wrapper = mountEditable()
+      const wrapper = await mountEditable()
 
       expect(wrapper.find('[data-testid="event-edit-tab-log"]').exists()).toBe(true)
       expect(mockApi.event.audits).not.toHaveBeenCalled()
@@ -221,7 +274,7 @@ describe('pages/party/edit/[id]', () => {
     })
 
     it('switches to the Photos pane on click', async () => {
-      const wrapper = mountEditable()
+      const wrapper = await mountEditable()
 
       await wrapper.find('[data-testid="event-edit-tab-photos"]').trigger('click')
 
@@ -241,11 +294,38 @@ describe('pages/party/edit/[id]', () => {
       eventsStore.fetchEvent = vi.fn().mockResolvedValue(WITH_IMAGES)
       eventsStore.current.data = WITH_IMAGES
 
-      const wrapper = mountPage()
+      const wrapper = await mountPage()
       await flushPromises()
 
       expect(wrapper.findAll('[data-testid="event-edit-photo"]')).toHaveLength(2)
       expect(wrapper.find('[data-testid="event-edit-photo-remove-11"]').exists()).toBe(true)
+    })
+
+    it('shows each photo as its thumbnail linking to the full image, with a "Remove file" link, as legacy', async () => {
+      eventsStore.fetchEvent = vi.fn().mockResolvedValue(WITH_IMAGES)
+      eventsStore.current.data = WITH_IMAGES
+
+      const wrapper = await mountPage()
+      await flushPromises()
+
+      const photo = wrapper.findAll('[data-testid="event-edit-photo"]')[0]
+      expect(photo.find('img').attributes('src')).toMatch(/\/uploads\/thumbnail_a\.jpg$/)
+      expect(photo.find('a').attributes('href')).toMatch(/\/uploads\/a\.jpg$/)
+      expect(wrapper.find('[data-testid="event-edit-photo-remove-11"]').text()).toBe('Remove file')
+    })
+
+    it('uses the uploader in dropzone mode with the legacy text, labelled "Add images:"', async () => {
+      eventsStore.fetchEvent = vi.fn().mockResolvedValue(WITH_IMAGES)
+      eventsStore.current.data = WITH_IMAGES
+
+      const wrapper = await mountPage()
+      await flushPromises()
+
+      const upload = wrapper.findComponent(TusImageUploadStub)
+      expect(upload.props('dropzone')).toBe(true)
+      expect(upload.props('message')).toBe('Add event images here')
+      expect(upload.props('hint')).toBe('Choose an image for your event')
+      expect(wrapper.find(`label[for="${upload.props('inputId')}"]`).text()).toBe('Add images:')
     })
 
     it('deletes the photo it was clicked on', async () => {
@@ -253,7 +333,7 @@ describe('pages/party/edit/[id]', () => {
       eventsStore.current.data = WITH_IMAGES
       eventsStore.deleteEventImage = vi.fn().mockResolvedValue({})
 
-      const wrapper = mountPage()
+      const wrapper = await mountPage()
       await flushPromises()
 
       await wrapper.find('[data-testid="event-edit-photo-remove-12"]').trigger('click')
@@ -267,7 +347,7 @@ describe('pages/party/edit/[id]', () => {
       eventsStore.current.data = WITH_IMAGES
       eventsStore.deleteEventImage = vi.fn().mockRejectedValue(new Error('nope'))
 
-      const wrapper = mountPage()
+      const wrapper = await mountPage()
       await flushPromises()
 
       await wrapper.find('[data-testid="event-edit-photo-remove-11"]').trigger('click')
@@ -277,7 +357,7 @@ describe('pages/party/edit/[id]', () => {
     })
 
     it('shows no photo grid when the event has none', async () => {
-      const wrapper = mountPage()
+      const wrapper = await mountPage()
       await flushPromises()
 
       expect(wrapper.find('[data-testid="event-edit-photo"]').exists()).toBe(false)

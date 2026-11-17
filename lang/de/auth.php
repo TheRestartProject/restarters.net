@@ -31,4 +31,5 @@ return [
   'save_user' => 'Nutzer speichern',
   'throttle' => 'Zu viele Anmeldeversuche. Bitte versuchen Sie es in :seconds Sekunden erneut.',
   'login_before_using_shareable_link' => 'Um Ihre Einladung abzuschließen, erstellen Sie bitte unten ein Konto, oder falls Sie bereits ein Konto haben, <a href=":login_url">melden Sie sich hier an</a>.',
+  'choose_role' => 'Rolle auswählen',
 ];

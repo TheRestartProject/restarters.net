@@ -8,13 +8,14 @@ import { useSessionStore } from '../../app/stores/session.js'
 import en from '../../i18n/locales/en.json'
 import clientEn from '../../i18n/locales/client-en.json'
 
-function mountComponent(fakeI18n) {
+function mountComponent(fakeI18n, options = {}) {
   const i18n = createI18n({ legacy: false, locale: 'en', messages: { en: { ...en, ...clientEn } } })
 
   vi.stubGlobal('useNuxtApp', () => ({ $i18n: fakeI18n }))
 
   return mount(LocaleSwitcher, {
     global: { plugins: [i18n] },
+    ...options,
   })
 }
 
@@ -46,6 +47,31 @@ describe('components/LocaleSwitcher', () => {
     expect(wrapper.find('[data-testid="locale-option-en"]').exists()).toBe(true)
     expect(wrapper.find('[data-testid="locale-option-fr"]').exists()).toBe(true)
     expect(wrapper.find('[data-testid="locale-option-fr-BE"]').exists()).toBe(true)
+  })
+
+  // As Bootstrap's dropdown on live.
+  it('closes on a click elsewhere on the page, but not on a click inside it', async () => {
+    const wrapper = mountComponent(fakeI18n, { attachTo: document.body })
+    await wrapper.find('[data-testid="locale-toggle"]').trigger('click')
+
+    wrapper.find('[data-testid="locale-menu"]').element.click()
+    await wrapper.vm.$nextTick()
+    expect(wrapper.find('[data-testid="locale-menu"]').exists()).toBe(true)
+
+    document.body.click()
+    await wrapper.vm.$nextTick()
+    expect(wrapper.find('[data-testid="locale-menu"]').exists()).toBe(false)
+    wrapper.unmount()
+  })
+
+  it('closes on Escape', async () => {
+    const wrapper = mountComponent(fakeI18n, { attachTo: document.body })
+    await wrapper.find('[data-testid="locale-toggle"]').trigger('click')
+
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }))
+    await wrapper.vm.$nextTick()
+    expect(wrapper.find('[data-testid="locale-menu"]').exists()).toBe(false)
+    wrapper.unmount()
   })
 
   it('choosing a locale calls setLocale and does not touch the session when logged out', async () => {

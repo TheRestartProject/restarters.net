@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { sortAriaValue, sortHintKey } from '../../composables/useSortAria.js'
 import { useI18n } from 'vue-i18n'
 import { useGroupRole } from '../../composables/useGroupRole.js'
@@ -37,6 +37,12 @@ const props = defineProps({
   showTags: {
     type: Boolean,
     default: false,
+  },
+  // Tag options for the filter bar, when not the role-filtered list (see
+  // GroupsTableFilters.vue).
+  filterTags: {
+    type: Array,
+    default: null,
   },
   // Develop's list has no per-row follow button ("the follow button on every
   // row invites following groups you haven't read about"): following belongs
@@ -77,7 +83,15 @@ const props = defineProps({
     type: String,
     default: 'name',
   },
+  // Show the first PAGE_SIZE groups and a button that reveals the rest, for pages with more below the list (the
+  // network page, develop #918).
+  showAllButton: {
+    type: Boolean,
+    default: false,
+  },
 })
+
+const PAGE_SIZE = 25
 
 const emit = defineEmits(['update:hoveredId', 'update:filters'])
 
@@ -173,6 +187,18 @@ const sortedGroups = computed(() => {
   return rows
 })
 
+const shown = ref(PAGE_SIZE)
+
+const visibleGroups = computed(() => (props.showAllButton ? sortedGroups.value.slice(0, shown.value) : sortedGroups.value))
+
+// A different set of groups (the map moved, or the filters changed) starts the list again from the top.
+watch(
+  () => filteredGroups.value.map((g) => g.id).join(','),
+  () => {
+    shown.value = PAGE_SIZE
+  }
+)
+
 function dateLabel(iso) {
   return new Date(iso).toLocaleDateString(locale.value, { day: 'numeric', month: 'short', year: 'numeric' })
 }
@@ -209,6 +235,7 @@ function sortCaretClass(key) {
     <GroupsTableFilters
       v-if="showFilters"
       :show-tags="showTags"
+      :tags="filterTags"
       @update:filters="onFilters"
     />
     <table class="table groups-table">
@@ -321,7 +348,7 @@ function sortCaretClass(key) {
       </thead>
       <tbody>
         <tr
-          v-for="row in sortedGroups"
+          v-for="row in visibleGroups"
           :key="row.id"
           :data-testid="`group-row-${row.id}`"
           :class="{ 'group-row-hovered': hoveredId === row.id }"
@@ -395,6 +422,11 @@ function sortCaretClass(key) {
         </tr>
       </tbody>
     </table>
+    <div v-if="showAllButton && shown < sortedGroups.length" class="text-center mt-2">
+      <button type="button" class="btn btn-link groups-show-all" data-testid="groups-show-all" @click="shown = Infinity">
+        {{ t('groups.show_all_groups', { total: sortedGroups.length }) }}
+      </button>
+    </div>
   </div>
 </template>
 

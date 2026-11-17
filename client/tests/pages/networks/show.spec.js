@@ -20,8 +20,8 @@ const BModalStub = {
   template: '<div v-if="modelValue" :data-title="title"><slot /></div>',
 }
 const NetworkStatsStub = {
-  props: ['stats', 'groupsCount', 'loading'],
-  template: '<div data-testid="stub-network-stats" :data-groups-count="groupsCount" :data-parties="stats && stats.parties" :data-loading="String(loading)" />',
+  props: ['stats', 'error'],
+  template: '<div data-testid="stub-network-stats" :data-groups="stats ? stats.groups : \'none\'" :data-parties="stats && stats.parties" :data-error="String(error)" />',
 }
 const AssociateGroupsModalStub = {
   props: ['show', 'networkId', 'networkName', 'candidates'],
@@ -41,8 +41,8 @@ const NetworkEventsModerationTableStub = {
   template: '<div data-testid="stub-network-events-moderation-table" :data-network-id="networkId" />',
 }
 const NetworkGroupsMapListStub = {
-  props: ['networkId', 'canManageTags'],
-  template: '<div data-testid="stub-network-groups-map-list" :data-network-id="networkId" :data-can-manage-tags="String(canManageTags)" />',
+  props: ['networkId', 'canManageTags', 'tags'],
+  template: '<div data-testid="stub-network-groups-map-list" :data-network-id="networkId" :data-can-manage-tags="String(canManageTags)" :data-tag-ids="(tags || []).map(t => t.id).join(\',\')" />',
 }
 const NetworkEventsStub = {
   props: ['networkId'],
@@ -115,8 +115,9 @@ const NETWORK = {
   logo: null,
   website: 'https://example.com',
   description: '<p>A description.</p>',
-  stats: { groups: 7, parties: 3, co2_total: 100, waste_total: 50, participants: 10, hours_volunteered: 20, fixed_powered: 1, fixed_unpowered: 1 },
 }
+
+const STATS = { groups: 7, parties: 3, co2_total: 100, waste_total: 50, participants: 10, hours_volunteered: 20, fixed_powered: 1, fixed_unpowered: 1 }
 
 async function flushPromises() {
   await Promise.resolve()
@@ -138,6 +139,10 @@ describe('pages/networks/[id]', () => {
     networksStore.fetchCurrent = vi.fn().mockImplementation(async () => {
       networksStore.current.data = NETWORK
     })
+    networksStore.fetchStats = vi.fn().mockImplementation(async () => {
+      networksStore.stats.data = STATS
+    })
+    networksStore.fetchPeriodStats = vi.fn()
     networksStore.fetchTags = vi.fn().mockImplementation(async () => {
       networksStore.tags.data = [{ id: 1, name: 'Existing Tag', groups_count: 0 }]
     })
@@ -199,23 +204,30 @@ describe('pages/networks/[id]', () => {
       await flushPromises()
 
       expect(wrapper.find('[data-testid="network-show-name"]').text()).toBe('Test London')
-      expect(wrapper.find('[data-testid="stub-network-stats"]').attributes('data-groups-count')).toBe('7')
+      expect(networksStore.fetchStats).toHaveBeenCalledWith(1)
+      expect(wrapper.find('[data-testid="stub-network-stats"]').attributes('data-groups')).toBe('7')
     })
 
-    it('falls back to the non-archived groups in the list when stats carry no group tally', async () => {
-      networksStore.fetchCurrent = vi.fn().mockImplementation(async () => {
-        networksStore.current.data = { ...NETWORK, stats: { parties: 3 } }
-      })
-      networksStore.fetchGroups = vi.fn().mockImplementation(async () => {
-        networksStore.groups.data = [
-          { id: 9, name: 'Live', archived_at: null },
-          { id: 10, name: 'Gone', archived_at: '2024-01-01T00:00:00+00:00' },
-        ]
+    // Stats are slow to calculate for a large network, so the page doesn't wait for them.
+    it('shows the network while its stats are still loading', async () => {
+      networksStore.fetchStats = vi.fn().mockReturnValue(new Promise(() => {}))
+      const wrapper = mountPage()
+      await flushPromises()
+
+      expect(wrapper.find('[data-testid="network-show-name"]').text()).toBe('Test London')
+      expect(wrapper.find('[data-testid="stub-network-stats"]').attributes('data-groups')).toBe('none')
+    })
+
+    it('tells the stats tiles when the stats fail to load', async () => {
+      networksStore.fetchStats = vi.fn().mockImplementation(async () => {
+        networksStore.stats.error = new Error('boom')
+        throw networksStore.stats.error
       })
       const wrapper = mountPage()
       await flushPromises()
 
-      expect(wrapper.find('[data-testid="stub-network-stats"]').attributes('data-groups-count')).toBe('1')
+      expect(wrapper.find('[data-testid="network-show-name"]').text()).toBe('Test London')
+      expect(wrapper.find('[data-testid="stub-network-stats"]').attributes('data-error')).toBe('true')
     })
 
     // develop's NetworkPage.vue embeds a map and filterable list of the
@@ -228,6 +240,15 @@ describe('pages/networks/[id]', () => {
       expect(embed.attributes('data-network-id')).toBe('1')
       expect(embed.attributes('data-can-manage-tags')).toBe('true')
       expect(wrapper.find('[data-testid="network-show-groups-info"]').exists()).toBe(false)
+    })
+
+    // develop's NetworkPage.vue filtered by this network's own tags
+    // (groupFilterTags), not every tag the viewer can see.
+    it('offers this network\'s own tags in the groups filter', async () => {
+      const wrapper = mountPage()
+      await flushPromises()
+
+      expect(wrapper.find('[data-testid="stub-network-groups-map-list"]').attributes('data-tag-ids')).toBe('1')
     })
 
     it('has no View groups item in the actions menu', async () => {
@@ -314,7 +335,8 @@ describe('pages/networks/[id]', () => {
 
     describe('impact period', () => {
       it('defaults to all time, then fetches and shows the last 12 months with the months covered', async () => {
-        networksStore.fetchStats = vi.fn().mockResolvedValue({
+        networksStore.fetchPeriodStats = vi.fn().mockResolvedValue({
+          groups: 7,
           parties: 2,
           period: { start: '2025-10-01', end: '2026-09-30' },
         })
@@ -328,37 +350,44 @@ describe('pages/networks/[id]', () => {
         await wrapper.get('[data-testid="period-last12"]').trigger('click')
         await flushPromises()
 
-        expect(networksStore.fetchStats).toHaveBeenCalledWith(1, { period: 'last_12_months' })
+        expect(networksStore.fetchPeriodStats).toHaveBeenCalledWith(1, 'last_12_months')
         expect(wrapper.get('[data-testid="stub-network-stats"]').attributes('data-parties')).toBe('2')
         expect(wrapper.get('[data-testid="network-show-period-label"]').text()).toBe('October 2025 to September 2026')
         // The group tally is the current one whichever period is shown.
-        expect(wrapper.get('[data-testid="stub-network-stats"]').attributes('data-groups-count')).toBe('7')
+        expect(wrapper.get('[data-testid="stub-network-stats"]').attributes('data-groups')).toBe('7')
+        // The all-time figures are still there for switching back.
+        expect(networksStore.stats.data).toEqual(STATS)
       })
 
       it('goes back to all time without refetching, and remembers last 12 months once fetched', async () => {
-        networksStore.fetchStats = vi.fn().mockResolvedValue({ parties: 2, period: { start: '2025-10-01', end: '2026-09-30' } })
+        networksStore.fetchPeriodStats = vi.fn().mockResolvedValue({ groups: 7, parties: 2, period: { start: '2025-10-01', end: '2026-09-30' } })
         const wrapper = mountPage()
         await flushPromises()
 
         await wrapper.get('[data-testid="period-last12"]').trigger('click')
         await flushPromises()
         await wrapper.get('[data-testid="period-all"]').trigger('click')
+        expect(wrapper.get('[data-testid="stub-network-stats"]').attributes('data-parties')).toBe('3')
         await wrapper.get('[data-testid="period-last12"]').trigger('click')
         await flushPromises()
 
+        expect(networksStore.fetchPeriodStats).toHaveBeenCalledTimes(1)
         expect(networksStore.fetchStats).toHaveBeenCalledTimes(1)
         expect(wrapper.get('[data-testid="stub-network-stats"]').attributes('data-parties')).toBe('2')
       })
 
-      it('says so when the last 12 months cannot be loaded', async () => {
-        networksStore.fetchStats = vi.fn().mockRejectedValue({ status: 500 })
+      it('tells the stats tiles when the last 12 months cannot be loaded', async () => {
+        networksStore.fetchPeriodStats = vi.fn().mockRejectedValue({ status: 500 })
         const wrapper = mountPage()
         await flushPromises()
 
         await wrapper.get('[data-testid="period-last12"]').trigger('click')
         await flushPromises()
+        expect(wrapper.get('[data-testid="stub-network-stats"]').attributes('data-error')).toBe('true')
 
-        expect(wrapper.find('[data-testid="network-show-period-error"]').exists()).toBe(true)
+        await wrapper.get('[data-testid="period-all"]').trigger('click')
+        expect(wrapper.get('[data-testid="stub-network-stats"]').attributes('data-error')).toBe('false')
+        expect(wrapper.get('[data-testid="stub-network-stats"]').attributes('data-parties')).toBe('3')
       })
     })
 

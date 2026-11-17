@@ -57,4 +57,40 @@ describe('stores/notifications', () => {
     expect(store.error).toEqual({ status: 500 })
     expect(store.loading).toBe(false)
   })
+
+  it('fetchPanel() keeps the first 10 notifications and leaves the page list alone', async () => {
+    mockApi.user.myNotifications = vi.fn().mockResolvedValueOnce({
+      data: Array.from({ length: 20 }, (_, i) => ({ id: `n${i}`, read: false })),
+      meta: {},
+    })
+
+    const store = useNotificationsStore()
+    store.list.page = 3
+    await store.fetchPanel()
+
+    expect(mockApi.user.myNotifications).toHaveBeenCalledWith({ page: 1 })
+    expect(store.panel.items).toHaveLength(10)
+    expect(store.list.page).toBe(3)
+    expect(store.panel.loading).toBe(false)
+  })
+
+  it('fetchPanel() records a failure without rethrowing', async () => {
+    mockApi.user.myNotifications = vi.fn().mockRejectedValueOnce({ status: 500 })
+
+    const store = useNotificationsStore()
+    await expect(store.fetchPanel()).resolves.toBeUndefined()
+
+    expect(store.panel.error).toEqual({ status: 500 })
+  })
+
+  it('markRead() marks panel cards read too', async () => {
+    mockApi.user.markNotificationsRead = vi.fn().mockResolvedValueOnce({ data: { unread: 1 } })
+
+    const store = useNotificationsStore()
+    store.panel.items = [{ id: 'a', read: false }, { id: 'b', read: false }]
+    await store.markRead('a')
+
+    expect(store.panel.items.map((n) => n.read)).toEqual([true, false])
+    expect(store.restarters).toBe(1)
+  })
 })

@@ -563,19 +563,56 @@ describe('stores/groups', () => {
   })
 
   describe('updateGroup', () => {
-    it('returns the bare id and invalidates the cached details/current entry', async () => {
+    it('returns the bare id and drops a cached details entry for another page', async () => {
       mockApi.group.update.mockResolvedValueOnce({ id: 5 })
 
       const store = useGroupsStore()
       store.details = { 5: { id: 5, name: 'Stale' } }
-      store.current.data = { id: 5, name: 'Stale' }
 
       const id = await store.updateGroup(5, { name: 'Fresh' })
 
       expect(mockApi.group.update).toHaveBeenCalledWith(5, { name: 'Fresh' })
       expect(id).toBe(5)
       expect(store.details[5]).toBeUndefined()
-      expect(store.current.data).toBeNull()
+      expect(mockApi.group.get).not.toHaveBeenCalled()
+    })
+
+    // The edit page renders from current: clearing it unmounted the form
+    // mid-save and the page went blank.
+    it('refreshes the current group in place, never clearing it or flagging loading', async () => {
+      mockApi.group.update.mockResolvedValueOnce({ id: 5 })
+      const store = useGroupsStore()
+      store.current.data = { id: 5, name: 'Stale' }
+      const seen = []
+      mockApi.group.get.mockImplementationOnce(async () => {
+        seen.push({ data: store.current.data, loading: store.current.loading })
+        return { data: { id: 5, name: 'Fresh' } }
+      })
+
+      await store.updateGroup(5, { name: 'Fresh' })
+
+      expect(seen).toEqual([{ data: { id: 5, name: 'Stale' }, loading: false }])
+      expect(store.current.data).toEqual({ id: 5, name: 'Fresh' })
+      expect(store.details[5]).toEqual({ id: 5, name: 'Fresh' })
+    })
+
+    it('keeps the current group if the refresh fails after a successful save', async () => {
+      mockApi.group.update.mockResolvedValueOnce({ id: 5 })
+      mockApi.group.get.mockRejectedValueOnce(new Error('offline'))
+      const store = useGroupsStore()
+      store.current.data = { id: 5, name: 'Stale' }
+
+      await expect(store.updateGroup(5, {})).resolves.toBe(5)
+      expect(store.current.data).toEqual({ id: 5, name: 'Stale' })
+    })
+
+    it('updates the attending flag on the group page\'s events list', () => {
+      const store = useGroupsStore()
+      store.events.data = [{ id: 1, attending: false }, { id: 2, attending: false }]
+
+      store.setEventAttending(2, true)
+
+      expect(store.events.data).toEqual([{ id: 1, attending: false }, { id: 2, attending: true }])
     })
 
     it('rethrows on failure without toasting', async () => {

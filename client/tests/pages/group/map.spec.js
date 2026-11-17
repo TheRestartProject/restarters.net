@@ -87,6 +87,15 @@ describe('pages/group/map', () => {
     expect(groupsStore.fetchMine).toHaveBeenCalledTimes(1)
   })
 
+  // The map and list are the "Find a group" tab's content, so they sit inside
+  // the tab panel's box rather than below an empty one.
+  it('renders the map and list inside the tab panel', async () => {
+    const wrapper = await mountPage()
+
+    expect(wrapper.find('[data-testid="groups-tabs-panel"] [data-testid="stub-group-map"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="groups-tabs-panel"] [data-testid="group-map-count"]').exists()).toBe(true)
+  })
+
   // /group/all?network=N (linked from the networks page) now forwards here
   // with its query intact - the map must apply it as its network filter.
   it('applies a ?network= query as the map network filter', async () => {

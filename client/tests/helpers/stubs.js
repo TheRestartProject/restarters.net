@@ -12,7 +12,7 @@ export const BBadgeStub = { template: '<span v-bind="$attrs"><slot /></span>' }
 export const BModalStub = {
   props: ['modelValue'],
   emits: ['hide'],
-  template: '<div v-if="modelValue"><slot /></div>',
+  template: '<div v-if="modelValue"><slot /><slot name="footer" /></div>',
 }
 export const BFormStub = { template: '<form @submit.prevent="$emit(\'submit\', $event)"><slot /></form>' }
 export const BFormGroupStub = { template: '<div><slot name="label" /><slot /></div>' }
@@ -36,6 +36,7 @@ export const BTabStub = { props: ['title', 'active'], template: '<div><slot /></
 
 // GroupStats.vue's environmental-impact info popover.
 export const BPopoverStub = { props: ['target'], template: '<div><slot /></div>' }
+export const BTooltipStub = { props: ['target'], template: '<div v-bind="$attrs"><slot /></div>' }
 
 export const GROUP_VIEW_STUBS = {
   NuxtLink: NuxtLinkStub,
@@ -50,4 +51,5 @@ export const GROUP_VIEW_STUBS = {
   BTabs: BTabsStub,
   BTab: BTabStub,
   BPopover: BPopoverStub,
+  BTooltip: BTooltipStub,
 }

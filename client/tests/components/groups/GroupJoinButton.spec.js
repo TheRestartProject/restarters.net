@@ -15,7 +15,7 @@ const BButtonStub = { template: '<button v-bind="$attrs"><slot /></button>' }
 const BModalStub = {
   props: ['modelValue'],
   emits: ['hide'],
-  template: '<div v-if="modelValue" data-testid="stub-modal"><slot /></div>',
+  template: '<div v-if="modelValue" data-testid="stub-modal"><slot /><slot name="footer" /></div>',
 }
 
 // groups.leave_group_confirm/leave_group_button_mobile/join_group_button_mobile

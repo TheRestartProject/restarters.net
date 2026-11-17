@@ -153,7 +153,7 @@ describe('components/groups/GroupVolunteers', () => {
   it('reads skill_name (the field the API actually returns), not name', () => {
     const wrapper = mountComponent({ volunteers: VOLUNTEERS })
 
-    const tooltip = wrapper.find('[data-testid="group-volunteer-10"] .text-muted').attributes('title')
+    const tooltip = wrapper.find('[data-testid="group-volunteer-skills-tooltip-10"]').text()
     expect(tooltip).not.toBe('')
     expect(tooltip).toContain('Publicising events')
   })
@@ -167,7 +167,7 @@ describe('components/groups/GroupVolunteers', () => {
   it('translates skill names via i18n in French too, not a raw passthrough', () => {
     const wrapper = mountComponentFr({ volunteers: VOLUNTEERS })
 
-    const tooltip = wrapper.find('[data-testid="group-volunteer-10"] .text-muted').attributes('title')
+    const tooltip = wrapper.find('[data-testid="group-volunteer-skills-tooltip-10"]').text()
     expect(tooltip).toContain('Promouvoir des événements')
   })
 })

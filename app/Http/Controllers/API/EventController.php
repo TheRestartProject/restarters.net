@@ -675,14 +675,21 @@ class EventController extends Controller
             return strtotime($a->event_start_utc) - strtotime($b->event_start_utc);
         });
 
-        // One query for every event's invited count, rather than one per event
-        // (see the Party resource's `invited` field).
-        // Eloquent's collection, not the base one - loadCount only exists on
-        // the former, and collect() returns the latter.
-        $collection = new \Illuminate\Database\Eloquent\Collection($events);
-        $collection->loadCount('allInvited');
+        // eventsRequiringModeration() has already counted each event's
+        // invitations (the Party resource's `invited` field). Fetch the rest of
+        // what the resource asks of each event in one query apiece: images,
+        // the viewer's attendance and invitations. The viewer can edit every
+        // event here - an administrator, or the coordinator of the network it
+        // was found through - so the resource needn't check each one.
+        $images = (new \FixometerFile)->findImagesForMany(env('TBL_EVENTS'), array_map(fn ($e) => $e->idevents, $events));
+        \App\Party::preloadViewerState($events, $user);
 
-        $ret = \App\Http\Resources\Party::collection($collection);
+        foreach ($events as $event) {
+            $event->preloadedImages = $images[$event->idevents] ?? [];
+            $event->preloadedCanEdit = true;
+        }
+
+        $ret = \App\Http\Resources\Party::collection(collect($events));
 
         return response()->json($ret);
     }

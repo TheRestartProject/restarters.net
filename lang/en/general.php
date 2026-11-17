@@ -8,6 +8,7 @@ return [
   'logout' => 'Logout',
   'new_group' => 'Create a new group',
   'alert_uptodate' => 'Thanks! You are up to date',
+  'alert_uptodate_text' => 'You have nothing to action now. When you do, we\'ll let you know.',
   'your_name' => 'Your name',
   'repair_skills' => 'Skills',
   'repair_skills_content' => 'This is optional but helps us improve your experience - which skills do you have and would like to share with others? Ctrl-click to select multiple skills.',

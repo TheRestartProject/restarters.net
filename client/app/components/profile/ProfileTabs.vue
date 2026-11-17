@@ -85,6 +85,19 @@ watch(
   },
   { immediate: true },
 )
+
+// The navbar's "Change password" link, and the wiki's, end in #change-password. Live opened the account tab for
+// it (develop's resources/js/app.js).
+const route = useRoute()
+watch(
+  () => route.hash,
+  (hash) => {
+    if (hash === '#change-password' && visibleTabIds.value.includes('account')) {
+      activeTab.value = 'account'
+    }
+  },
+  { immediate: true },
+)
 </script>
 
 <template>

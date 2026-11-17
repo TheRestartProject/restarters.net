@@ -1,9 +1,11 @@
 <script setup>
+import LoadingPlaceholder from '~/components/LoadingPlaceholder.vue'
 import { onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '~/stores/auth.js'
 
-definePageMeta({ layout: 'plain' })
+// Live's reset page shows just the centred logo (no stats bar), like recover.
+definePageMeta({ layout: 'plain-minimal' })
 
 const { t } = useI18n()
 useHead({ title: t('auth.reset_password') })
@@ -80,9 +82,7 @@ async function submit() {
   <section class="entry-wrapper align-items-center justify-content-center">
     <div class="container">
       <div v-if="loading" class="entry-panel card card__login col-12 mt-5 text-left" data-testid="reset-loading">
-        <div class="placeholder-glow">
-          <span class="placeholder col-12" style="height: 6rem" />
-        </div>
+        <LoadingPlaceholder height="6rem" />
       </div>
 
       <div v-else-if="!valid" class="entry-panel card card__login col-12 mt-5 text-left" data-testid="reset-invalid-code">

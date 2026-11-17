@@ -2,7 +2,9 @@
 
 namespace Tests\Feature\Events;
 
+use App\EventsUsers;
 use App\Party;
+use App\Role;
 use App\User;
 use Auth;
 use Illuminate\Support\Str;
@@ -160,5 +162,47 @@ class APIv2EventResourceFieldsTest extends TestCase
         $response->assertSuccessful();
 
         $this->assertNull($response->json('data.discourse_thread'));
+    }
+
+    public function testInvitationPendingReflectsUnacceptedInvite(): void
+    {
+        $host = User::factory()->host()->create();
+        [, $idevents] = $this->createEventAsHost($host);
+
+        $invitee = User::factory()->restarter()->create(['api_token' => 'erf-tok-6']);
+        $this->app['auth']->forgetGuards();
+        $this->actingAs($invitee);
+
+        // Not invited: false, and still false once attending.
+        $response = $this->get("/api/v2/events/$idevents?api_token=erf-tok-6");
+        $this->assertFalse($response->json('data.invitation_pending'));
+
+        // Invited: invites store a hash in status until accepted.
+        EventsUsers::create([
+            'event' => $idevents,
+            'user' => $invitee->id,
+            'status' => 'abc123hash',
+            'role' => Role::RESTARTER,
+        ]);
+        $response = $this->get("/api/v2/events/$idevents?api_token=erf-tok-6");
+        $this->assertTrue($response->json('data.invitation_pending'));
+        $this->assertFalse($response->json('data.attending'));
+
+        // Accepting through the RSVP endpoint clears it.
+        $this->post("/api/v2/events/$idevents/attendees/me?api_token=erf-tok-6")->assertSuccessful();
+        $response = $this->get("/api/v2/events/$idevents?api_token=erf-tok-6");
+        $this->assertFalse($response->json('data.invitation_pending'));
+        $this->assertTrue($response->json('data.attending'));
+    }
+
+    public function testInvitationPendingOmittedForAnonymous(): void
+    {
+        $host = User::factory()->host()->create();
+        [, $idevents] = $this->createEventAsHost($host);
+        $this->app['auth']->forgetGuards();
+
+        $response = $this->get("/api/v2/events/$idevents");
+        $response->assertSuccessful();
+        $this->assertArrayNotHasKey('invitation_pending', $response->json('data'));
     }
 }

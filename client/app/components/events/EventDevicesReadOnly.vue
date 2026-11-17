@@ -1,4 +1,5 @@
 <script setup>
+import LoadingPlaceholder from '~/components/LoadingPlaceholder.vue'
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { deviceStatusKey, deviceStatusVariant, deviceSparePartsNeeded } from '../../composables/useDeviceDisplay.js'
@@ -48,6 +49,11 @@ function sparePartsNeeded(device) {
 function round(n) {
   return Math.round(n || 0)
 }
+
+// The device reference (PR #907) isn't on the live site yet; hidden until the
+// rest of the Nuxt client matches live. Flip to true to bring it back -
+// stored values are untouched either way.
+const SHOW_DEVICE_REFERENCE = false
 </script>
 
 <template>
@@ -58,9 +64,7 @@ function round(n) {
     </h2>
 
     <div v-if="loading" data-testid="event-devices-loading">
-      <div class="placeholder-glow">
-        <span class="placeholder col-12" style="height: 3rem" />
-      </div>
+      <LoadingPlaceholder height="3rem" />
     </div>
 
     <template v-else>
@@ -115,7 +119,7 @@ function round(n) {
               :data-testid="`event-device-${device.id}`"
             >
               <td class="device-reference-cell">
-                <span v-if="device.reference" class="device-reference text-muted d-block" :data-testid="`event-device-reference-${device.id}`">
+                <span v-if="SHOW_DEVICE_REFERENCE && device.reference" class="device-reference text-muted d-block" :data-testid="`event-device-reference-${device.id}`">
                   {{ device.reference }}
                 </span>
                 {{ device.item_type || '-' }}
@@ -130,7 +134,7 @@ function round(n) {
                 </BBadge>
               </td>
               <td>
-                <span v-if="sparePartsNeeded(device)" :data-testid="`event-device-spare-parts-${device.id}`">&#10003;</span>
+                <img v-if="sparePartsNeeded(device)" src="/images/tick.svg" class="icon spare-parts-tick" :alt="t('partials.yes')" :data-testid="`event-device-spare-parts-${device.id}`">
               </td>
             </tr>
             <tr v-if="(activeTab === 'powered' ? powered : unpowered).length === 0">
@@ -146,6 +150,11 @@ function round(n) {
 </template>
 
 <style scoped>
+/* EventDeviceSummary.vue's .icon: 21px wide. */
+.spare-parts-tick {
+  width: 21px;
+}
+
 .device-reference-cell {
   line-height: normal;
 }

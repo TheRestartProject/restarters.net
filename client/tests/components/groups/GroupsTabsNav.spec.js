@@ -50,8 +50,19 @@ describe('components/groups/GroupsTabsNav', () => {
     // (groups_title2), not a generic "Map".
     const wrapper = mountNav('mine')
 
-    expect(wrapper.find('[data-testid="groups-tab-mine"]').text()).toBe('Your Groups')
-    expect(wrapper.find('[data-testid="groups-tab-map"]').text()).toBe('Find a group')
+    expect(wrapper.find('[data-testid="groups-tab-mine"] b.d-md-block').text()).toBe('Your Groups')
+    expect(wrapper.find('[data-testid="groups-tab-map"] b.d-lg-block').text()).toBe('Find a group')
+  })
+
+  // Live's GroupsPage.vue: short titles on narrow screens (tab 1 below md,
+  // tab 2 below lg), toggled with the d-*-none / d-*-block utilities.
+  it('carries the short mobile titles next to the full ones', () => {
+    const wrapper = mountNav('mine')
+
+    expect(wrapper.find('[data-testid="groups-tab-mine-short"]').text()).toBe('Yours')
+    expect(wrapper.find('[data-testid="groups-tab-mine-short"]').classes()).toContain('d-md-none')
+    expect(wrapper.find('[data-testid="groups-tab-map-short"]').text()).toBe('Find')
+    expect(wrapper.find('[data-testid="groups-tab-map-short"]').classes()).toContain('d-lg-none')
   })
 
   // gap #2: legacy's .ourtabs border/shadow box wraps the tab-content as

@@ -46,13 +46,13 @@ export const useAuthStore = defineStore('auth', {
     async logout() {
       const { $api } = useNuxtApp()
 
-      if (this.token) {
-        try {
-          await $api.auth.logout()
-        } catch {
-          // Already logged out server-side (e.g. expired token) - fine,
-          // we're clearing local state regardless.
-        }
+      // Called with or without a token: without one, the API still clears
+      // the wiki's login cookies (the wiki's Logout link comes via /logout).
+      try {
+        await $api.auth.logout()
+      } catch {
+        // Already logged out server-side (e.g. expired token) - fine,
+        // we're clearing local state regardless.
       }
 
       this.clear()

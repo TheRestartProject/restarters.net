@@ -34,6 +34,14 @@ export default defineNuxtConfig({
       // CARTO_API_KEY, which the Laravel side already has as a Fly secret and
       // Nitro shares the machine environment with - no second secret needed.
       cartoApiKey: process.env.NUXT_PUBLIC_CARTO_API_KEY || process.env.CARTO_API_KEY || '',
+      // Browser errors go to the same Sentry project as Laravel.  Reporting is
+      // off unless the deployment names an environment (the Fly configs set it
+      // alongside SENTRY_ENVIRONMENT), so local development and CI never report.
+      sentryDsn: process.env.NUXT_PUBLIC_SENTRY_DSN || 'https://50fd2fa440af4bb4a230f40ca8d8cf90@o879179.ingest.sentry.io/5831645',
+      sentryEnvironment: process.env.NUXT_PUBLIC_SENTRY_ENVIRONMENT || '',
+      // Off on PR previews (fly.preview.toml), which can't write photos to the
+      // live bucket they read from; the upload widgets then say so.
+      imageUpload: process.env.NUXT_PUBLIC_IMAGE_UPLOAD !== 'false',
       // Reserved for the future Capacitor build (design.md §1).
       isApp: process.env.NUXT_PUBLIC_IS_APP === 'true',
     },
@@ -67,9 +75,15 @@ export default defineNuxtConfig({
       // translations:export-client` (CI-checked; never hand-edit).
       // client-<code>.json holds client-only keys (the 'client' group) with
       // no Laravel counterpart, and is hand-maintained.
+      // Same set and order as live's footer menu (config/laravellocalization.php).
+      { code: 'de', language: 'de-DE', files: ['de.json', 'client-de.json'] },
       { code: 'en', language: 'en-GB', files: ['en.json', 'client-en.json'] },
+      { code: 'es', language: 'es-ES', files: ['es.json', 'client-es.json'] },
       { code: 'fr', language: 'fr-FR', files: ['fr.json', 'client-fr.json'] },
       { code: 'fr-BE', language: 'fr-BE', files: ['fr-BE.json', 'client-fr-BE.json'] },
+      { code: 'it', language: 'it-IT', files: ['it.json', 'client-it.json'] },
+      { code: 'nl', language: 'nl-NL', files: ['nl.json', 'client-nl.json'] },
+      { code: 'nl-BE', language: 'nl-BE', files: ['nl-BE.json', 'client-nl-BE.json'] },
     ],
     detectBrowserLanguage: {
       useCookie: true,

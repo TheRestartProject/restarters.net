@@ -1,4 +1,5 @@
 <script setup>
+import LoadingPlaceholder from '~/components/LoadingPlaceholder.vue'
 import { computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAuth } from '~/composables/useAuth.js'
@@ -75,9 +76,7 @@ function retry() {
     <h1>{{ t('networks.general.networks') }}</h1>
 
     <div v-if="networksStore.list.loading" data-testid="networks-index-loading">
-      <div class="placeholder-glow">
-        <span class="placeholder col-12" style="height: 6rem" />
-      </div>
+      <LoadingPlaceholder height="6rem" />
     </div>
 
     <BAlert v-else-if="networksStore.list.error" :model-value="true" variant="danger" data-testid="networks-index-load-error">

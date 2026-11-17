@@ -97,7 +97,6 @@ return [
   'add_new_event' => 'Añadir nuevo evento',
   'created_success_message' => '¡Evento creado! Será aprobado por un coordinador en breve. Puedes continuar editándolo mientras tanto.',
   'items_fixed' => 'Artículos reparados',
-  'not_counting' => 'No se cuenta para el impacto ambiental de este evento|No se cuentan para el impacto ambiental de este evento',
   'impact_calculation' => '<p><strong>¿Cómo calculamos el impacto ambiental?</strong></p>
 <p>Hemos investigado el peso promedio y la huella de CO<sub>2</sub>e de los productos en una serie de categorías, desde teléfonos inteligentes hasta camisetas. Cuando introduces un artículo que has reparado, usamos estos promedios para estimar el impacto de esa reparación según la categoría del artículo.</p>
 <p>Para los artículos varios, aplicamos un ratio genérico de CO<sub>2</sub>e al peso para estimar el impacto de cada reparación exitosa.</p>
@@ -151,4 +150,10 @@ return [
   'geocode_failed' => 'No se encontró la ubicación. Si no puedes encontrar la ubicación de tu evento, prueba con una ubicación más general (como pueblo/ciudad) o una dirección específica de calle en lugar de un nombre de edificio.',
   'create_failed' => 'El evento <strong>no</strong> pudo ser creado. Por favor, revisa los errores reportados, corrígelos e inténtalo de nuevo.',
   'edit_failed' => 'El evento no pudo ser editado.',
+  'add_a_device' => 'Añadir un dispositivo',
+  'already_member' => 'Ya eres miembro de este evento.',
+  'copied_to_clipboard' => 'Copiado al portapapeles.',
+  'image_upload_error' => 'Lo sentimos, no se pudo subir la imagen.',
+  'no_date_selected' => 'Ninguna fecha seleccionada',
+  'no_devices_added' => 'No se han añadido dispositivos',
 ];

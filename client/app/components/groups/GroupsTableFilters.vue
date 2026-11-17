@@ -19,6 +19,13 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  // The tags to offer, when the page knows better than the role-filtered
+  // list - a network page offers that network's own tags, as develop's
+  // NetworkPage.vue did (groupFilterTags), not every tag an admin can see.
+  tags: {
+    type: Array,
+    default: null,
+  },
 })
 
 const emit = defineEmits(['update:filters'])
@@ -43,11 +50,11 @@ const toggleLabel = computed(() => (expanded.value ? t('groups.hide_filters') : 
 // tag multiselect uses. Only fetched when the dropdown is actually shown.
 const groupsStore = useGroupsStore()
 const tagOptions = computed(() =>
-  groupsStore.tags.data.map((tag) => ({ value: tag.id, text: tag.tag_name ?? tag.name })),
+  (props.tags ?? groupsStore.tags.data).map((tag) => ({ value: tag.id, text: tag.tag_name ?? tag.name })),
 )
 
 onMounted(() => {
-  if (props.showTags) groupsStore.fetchTags().catch(() => {})
+  if (props.showTags && !props.tags) groupsStore.fetchTags().catch(() => {})
 })
 </script>
 

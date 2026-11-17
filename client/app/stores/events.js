@@ -210,10 +210,10 @@ export const useEventsStore = defineStore('events', {
       const previousCurrent = this.current.data && this.current.data.id === id ? this.current.data : null
 
       if (previous) {
-        this.myEvents.data = this.myEvents.data.map((e) => (e.id === id ? { ...e, attending: true } : e))
+        this.myEvents.data = this.myEvents.data.map((e) => (e.id === id ? { ...e, attending: true, invitation_pending: false } : e))
       }
       if (previousCurrent) {
-        this.current.data = { ...previousCurrent, attending: true }
+        this.current.data = { ...previousCurrent, attending: true, invitation_pending: false }
       }
 
       const { $api } = useNuxtApp()
@@ -239,10 +239,10 @@ export const useEventsStore = defineStore('events', {
       const previousCurrent = this.current.data && this.current.data.id === id ? this.current.data : null
 
       if (previous) {
-        this.myEvents.data = this.myEvents.data.map((e) => (e.id === id ? { ...e, attending: false } : e))
+        this.myEvents.data = this.myEvents.data.map((e) => (e.id === id ? { ...e, attending: false, invitation_pending: false } : e))
       }
       if (previousCurrent) {
-        this.current.data = { ...previousCurrent, attending: false }
+        this.current.data = { ...previousCurrent, attending: false, invitation_pending: false }
       }
 
       const { $api } = useNuxtApp()
@@ -270,15 +270,23 @@ export const useEventsStore = defineStore('events', {
       return id
     },
 
-    // PATCH /api/v2/events/{id} (C4). Invalidates `current` so the edit
-    // page's next load re-fetches the freshly-saved event (same pattern as
-    // stores/groups.js#updateGroup).
+    // PATCH /api/v2/events/{id} (C4). Refreshes `current` in place, as
+    // stores/groups.js#updateGroup does, so the edit page keeps showing the
+    // form while the saved event is fetched. Emptying it instead left the
+    // page blank until something reloaded it.
     async updateEvent(id, payload) {
       const { $api } = useNuxtApp()
       const { id: returnedId } = await $api.event.update(id, payload)
+
       if (this.current.data && this.current.data.id === id) {
-        this.current.data = null
+        try {
+          const { data } = await $api.event.get(id)
+          this.current.data = data
+        } catch {
+          // The save worked; keep showing what we had rather than nothing.
+        }
       }
+
       return returnedId
     },
 

@@ -1,4 +1,5 @@
 <script setup>
+import LoadingPlaceholder from '~/components/LoadingPlaceholder.vue'
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import EventDeviceTable from './EventDeviceTable.vue'
@@ -79,7 +80,7 @@ function onAdded() {
              (desktop only - `d-none d-md-block` on the b-img itself). -->
         <img :src="'/images/tv.svg'" alt="" class="devices-title-icon d-none d-md-block me-2">
         {{ t('devices.title_items_at_event') }}
-        <span class="fw-normal">({{ devices.length }})</span>
+        <span class="fw-normal ms-1">({{ devices.length }})</span>
       </h2>
     </template>
 
@@ -88,9 +89,7 @@ function onAdded() {
          unmount the table - that destroyed DeviceRow's editing state and
          closed the edit form mid-upload. -->
     <div v-if="loading && devices.length === 0" data-testid="event-devices-loading">
-      <div class="placeholder-glow">
-        <span class="placeholder col-12" style="height: 3rem" />
-      </div>
+      <LoadingPlaceholder height="3rem" />
     </div>
 
     <!-- Gap 23: EventDevices.vue's content is desktop tabs (one table
@@ -160,7 +159,7 @@ function onAdded() {
              its powered/unpowered toggle, reusing the fixometer's existing
              devices.description_powered/description_unpowered lang keys
              (contain a <b> tag, hence v-html). -->
-        <p class="text-brand small" data-testid="event-devices-description">
+        <p class="event-devices-description" data-testid="event-devices-description">
           <!-- eslint-disable-next-line vue/no-v-html -->
           <span v-html="activeTab === 'powered' ? t('devices.description_powered') : t('devices.description_unpowered')" />
         </p>
@@ -208,7 +207,7 @@ function onAdded() {
               </div>
             </div>
           </template>
-          <p class="text-brand small" data-testid="event-devices-description-powered-mobile">
+          <p data-testid="event-devices-description-powered-mobile">
             <!-- eslint-disable-next-line vue/no-v-html -->
             <span v-html="t('devices.description_powered')" />
           </p>
@@ -240,7 +239,7 @@ function onAdded() {
               </div>
             </div>
           </template>
-          <p class="text-brand small" data-testid="event-devices-description-unpowered-mobile">
+          <p data-testid="event-devices-description-unpowered-mobile">
             <!-- eslint-disable-next-line vue/no-v-html -->
             <span v-html="t('devices.description_unpowered')" />
           </p>
@@ -263,6 +262,11 @@ function onAdded() {
 <style scoped lang="scss">
 .devices-title-icon {
   width: 20px;
+}
+
+// _events.scss: `.tab-content p { padding-left: 45px }` in the items tabs.
+.event-devices-description {
+  padding-left: 45px;
 }
 
 .event-devices-tab-impact {

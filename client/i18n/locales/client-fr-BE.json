@@ -115,7 +115,7 @@
       "no_devices": "Aucun objet enregistré pour le moment.",
       "no_search_results": "Aucun événement ne correspond à votre recherche.",
       "now_following_group": "Vous suivez maintenant ce groupe.",
-      "remove_photo": "Supprimer la photo",
+      "remove_photo": "Supprimer le fichier",
       "request_review": "Demander des avis",
       "search_label": "Rechercher des événements",
       "search_placeholder": "Rechercher par titre ou lieu",
@@ -222,8 +222,7 @@
       "discourse_aria": "Notifications Talk",
       "empty": "Vous n'avez aucune notification.",
       "load_error": "Désolé, nous n'avons pas pu charger vos notifications.",
-      "restarters_aria": "Notifications Restarters",
-      "unread": "{count} notification non lue | {count} notifications non lues"
+      "restarters_aria": "Notifications Restarters"
     },
     "profile": {
       "access_denied": "Vous n'avez pas la permission de modifier les paramètres de cet utilisateur.",
@@ -255,7 +254,7 @@
       "reveal_filters": "Afficher les filtres"
     },
     "cookies": {
-      "banner_text": "Nous utilisons des cookies pour faire fonctionner notre site web et des cookies analytiques pour l’améliorer. Cliquez sur Paramètres des cookies pour les modifier, ou sur OK pour tout accepter.",
+      "banner_text": "Nous utilisons des cookies pour faire fonctionner notre site web et des cookies analytiques pour l’améliorer. Cliquez sur <strong>Paramètres des cookies</strong> pour les modifier, ou sur OK pour tout accepter.",
       "settings": "Paramètres des cookies",
       "accept": "OK",
       "save": "Enregistrer les paramètres",
@@ -287,6 +286,9 @@
       "slide1_alt": "Deux Restarters tentant une réparation",
       "slide2_alt": "Un·e bénévole aidant un membre du public avec son téléphone",
       "slide3_alt": "Un·e Restarter réparant un appareil lors d’un de nos événements"
+    },
+    "uploads": {
+      "off": "L'envoi de photos est désactivé sur ce site."
     }
   }
 }

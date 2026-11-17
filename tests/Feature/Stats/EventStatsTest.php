@@ -4,6 +4,7 @@ namespace Tests\Feature\Stats;
 
 use App\Device;
 use App\Party;
+use App\Role;
 use Tests\Feature\Stats\StatsTestCase;
 
 class EventStatsTest extends StatsTestCase
@@ -179,5 +180,20 @@ class EventStatsTest extends StatsTestCase
         $response = $this->get('/party/stats/' . $event->idevents . '/wide');
         $response->assertSuccessful();
         $response->assertSee('<span id="ewaste-diverted-value">23</span>', false);
+    }
+
+    /**
+     * @test
+     * @story:PartyController::stats
+     */
+    public function event_stats_widget_for_a_deleted_event_is_not_found(): void {
+        // Sites keep embedding the widget after the event has gone.
+        $this->withExceptionHandling();
+        $this->loginAsTestUser(Role::ADMINISTRATOR);
+        $idevents = $this->createEvent($this->createGroup(), 'yesterday');
+        Party::findOrFail($idevents)->delete();
+
+        $this->get('/party/stats/'.$idevents.'/wide')->assertNotFound();
+        $this->get('/party/stats/99999999/wide')->assertNotFound();
     }
 }

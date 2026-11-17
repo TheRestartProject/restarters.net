@@ -115,7 +115,7 @@
       "no_devices": "No items recorded yet.",
       "no_search_results": "No events match your search.",
       "now_following_group": "You are now following this group.",
-      "remove_photo": "Remove photo",
+      "remove_photo": "Remove file",
       "request_review": "Request reviews",
       "search_label": "Search events",
       "search_placeholder": "Search by title or venue",
@@ -212,7 +212,6 @@
       "logo_upload_error": "Sorry, we couldn't upload that logo. Please try again.",
       "no_groups": "This network has no groups yet.",
       "not_found": "That network could not be found.",
-      "stats_unavailable": "Stats are not available for this network right now.",
       "tags_load_error": "Sorry, we couldn't load this network's tags.",
       "editing": "Editing {name}",
       "edit_forbidden": "You do not have permission to edit this network.",
@@ -222,8 +221,7 @@
       "discourse_aria": "Talk notifications",
       "empty": "You have no notifications.",
       "load_error": "Sorry, we couldn't load your notifications.",
-      "restarters_aria": "Restarters notifications",
-      "unread": "{count} unread notification | {count} unread notifications"
+      "restarters_aria": "Restarters notifications"
     },
     "profile": {
       "access_denied": "You don't have permission to edit any settings for this user.",
@@ -255,7 +253,7 @@
       "reveal_filters": "Reveal filters"
     },
     "cookies": {
-      "banner_text": "We use cookies to help our website function, and analytical cookies to improve our website. Please click Cookie Settings to amend cookie settings or click OK to accept all.",
+      "banner_text": "We use cookies to help our website function, and analytical cookies to improve our website. Please click <strong>Cookie Settings</strong> to amend cookie settings or click OK to accept all.",
       "settings": "Cookie settings",
       "accept": "OK",
       "save": "Save settings",
@@ -287,6 +285,9 @@
       "slide1_alt": "Two Restarters attempting a fix",
       "slide2_alt": "A volunteer helping a member of the public with their phone",
       "slide3_alt": "A Restarter fixing a device at one of our events"
+    },
+    "uploads": {
+      "off": "Photo uploads are switched off on this site."
     }
   }
 }

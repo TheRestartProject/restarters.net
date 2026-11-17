@@ -55,7 +55,7 @@ class CreateWordpressPostForGroup extends BaseEvent
         try {
             $this->createGroupOnWordpress($group);
         } catch (\Exception $e) {
-            Log::error('An error occurred during Wordpress group creation: '.$e->getMessage());
+            Log::error('An error occurred during Wordpress group creation', ['group' => $id, 'error' => $e->getMessage()]);
 
             $notify_users = Fixometer::usersWhoHavePreference('admin-approve-wordpress-group-failure');
             Notification::send($notify_users, new AdminWordPressCreateGroupFailure([

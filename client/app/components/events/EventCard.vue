@@ -46,7 +46,18 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  // GroupEventScrollTable.vue's addGroupName: the group name (and here the
+  // venue) under the title. Off on a group's own page, where develop shows
+  // just the title.
+  showGroup: {
+    type: Boolean,
+    default: true,
+  },
 })
+
+// After a successful RSVP/cancel, so a caller showing events that aren't in
+// the events store's lists (the group page's) can update its own copy.
+const emit = defineEmits(['attendance'])
 
 const { t } = useI18n()
 const eventsStore = useEventsStore()
@@ -96,8 +107,10 @@ async function onToggleAttendance() {
   try {
     if (attending.value) {
       await eventsStore.unattend(props.event.id)
+      emit('attendance', { id: props.event.id, attending: false })
     } else {
       await eventsStore.attend(props.event.id)
+      emit('attendance', { id: props.event.id, attending: true })
     }
   } catch {
     // Store already reverted the optimistic state and pushed a toast.
@@ -113,7 +126,7 @@ async function onToggleAttendance() {
     :class="{ attending }"
     :data-testid="`event-card-${event.id}`"
   >
-    <td class="datecell text-center fw-bold" :data-testid="`event-card-date-${event.id}`">
+    <td class="datecell ps-0 pe-0 text-center fw-bold" :data-testid="`event-card-date-${event.id}`">
       <div class="datebox mx-auto">
         <div class="day">{{ dayOfMonth }}</div>
         <div class="month">{{ month }}</div>
@@ -125,12 +138,14 @@ async function onToggleAttendance() {
          `d-none d-md-inline` - plus a small clock-icon/timezone line).
          useEventComputed.js already derives all four fields; this column
          was never wired up to render them. -->
-    <td class="text-start small" :data-testid="`event-card-datelong-${event.id}`">
-      <div>{{ date }}</div>
-      <div>{{ start }} <span class="d-none d-md-inline">- {{ end }}</span></div>
-      <div class="text-muted">
-        <img :src="'/images/clock.svg'" alt="" class="datelong-icon">
-        {{ timezone }}
+    <td class="text-start" :data-testid="`event-card-datelong-${event.id}`">
+      <div class="datelong">
+        <div>{{ date }}</div>
+        <div>{{ start }} <span class="d-none d-md-inline">- {{ end }}</span></div>
+        <div class="text-muted small">
+          <img :src="'/images/clock.svg'" alt="" class="icon datelong-icon">
+          {{ timezone }}
+        </div>
       </div>
     </td>
 
@@ -138,25 +153,19 @@ async function onToggleAttendance() {
       <NuxtLink :to="`/party/view/${event.id}`" :data-testid="`event-card-link-${event.id}`">
         <b>{{ event.title }}</b>
       </NuxtLink>
-
+      <!-- EventTitle.vue's online pill, for when the line below that says so is off. -->
       <BBadge
-        v-if="attending"
-        variant="success"
-        class="ms-2"
-        :data-testid="`event-card-attending-${event.id}`"
-      >
-        {{ t('client.dashboard.attending') }}
-      </BBadge>
-      <BBadge
-        v-if="hosting"
+        v-if="!showGroup && event.online"
         variant="primary"
-        class="ms-2"
-        :data-testid="`event-card-hosting-${event.id}`"
+        pill
+        class="ms-1"
+        :data-testid="`event-card-online-badge-${event.id}`"
       >
-        {{ t('client.events.hosting') }}
+        {{ t('events.online') }}
       </BBadge>
 
-      <div class="small text-muted">
+
+      <div v-if="showGroup" class="small text-muted">
         <NuxtLink v-if="event.group" :to="`/group/view/${event.group.id}`" :data-testid="`event-card-group-${event.id}`">
           {{ event.group.name }}
         </NuxtLink>
@@ -219,7 +228,7 @@ async function onToggleAttendance() {
       </td>
     </template>
 
-    <td class="text-end text-nowrap">
+    <td class="text-center text-nowrap d-none d-md-table-cell">
       <!-- GroupEventsScrollTableActions.vue gates this whole cell on
            `v-else-if="upcoming"`, so a past event gets no actions at all -
            we were offering a live RSVP/cancel button on events that had
@@ -235,8 +244,7 @@ async function onToggleAttendance() {
         </span>
         <BButton
           v-else
-          variant="outline-primary"
-          size="sm"
+          variant="primary"
           :disabled="pending || startingSoon"
           :data-testid="`event-attend-${event.id}`"
           @click="onToggleAttendance"
@@ -253,7 +261,7 @@ async function onToggleAttendance() {
    GroupEventScrollTable.vue rowClass()/.attending, incl. a black date
    cell) - in addition to the badge, not instead of it. */
 .event-card.attending {
-  background-color: var(--bs-secondary-bg, #eee);
+  background-color: #f5f7fa;
 }
 
 .event-card.attending .datecell {
@@ -261,13 +269,31 @@ async function onToggleAttendance() {
   color: #fff;
 }
 
+/* GroupEventScrollTable.vue's .datetd and GroupEventsScrollTableDateShort.vue's .datebox. */
+.datecell {
+  width: 87px;
+  min-height: 87px;
+}
+
 .datebox {
-  width: 48px;
+  padding-top: 8px;
 }
 
 .datebox .day {
-  font-size: 1.5rem;
-  line-height: 1.5rem;
+  font-size: 1.7rem;
+  line-height: 1.7rem;
+}
+
+.datebox .month {
+  line-height: 1rem;
+}
+
+/* GroupEventsScrollTableDateLong.vue's .date (with its pl-3). */
+.datelong {
+  padding-left: 1rem;
+  width: 150px;
+  font-size: 15px;
+  line-height: 1.3rem;
 }
 
 .datelong-icon {

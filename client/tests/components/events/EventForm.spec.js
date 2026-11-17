@@ -487,6 +487,16 @@ describe('components/events/EventForm', () => {
       expect(wrapper.find('[data-testid="event-form-notice"]').exists()).toBe(false)
     })
 
+    // develop keeps the empty notice slot, which pushes the buttons right;
+    // dropping it moved them to the left after a create.
+    it('keeps the buttons to the right of an empty notice slot when just created', () => {
+      const wrapper = mountForm({ eventId: 5, initialEvent: EVENT, justCreated: true })
+
+      const buttons = wrapper.find('.event-form-buttons')
+      expect(buttons.element.children).toHaveLength(2)
+      expect(buttons.element.children[0].classList.contains('flex-grow-1')).toBe(true)
+    })
+
     it('offers Duplicate from the edit form (EventAddEdit.vue:127)', () => {
       const wrapper = mountForm({ eventId: 5, initialEvent: EVENT })
 

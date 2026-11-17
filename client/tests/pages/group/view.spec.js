@@ -5,6 +5,8 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import GroupViewPage from '../../../app/pages/group/view/[id].vue'
 import { useGroupsStore } from '../../../app/stores/groups.js'
 import { useSessionStore } from '../../../app/stores/session.js'
+import { useToastStore } from '../../../app/stores/toast.js'
+import { stubSsoBridge, talkSso } from '../../helpers/ssoBridge.js'
 import en from '../../../i18n/locales/en.json'
 import clientEn from '../../../i18n/locales/client-en.json'
 import { GROUP_VIEW_STUBS } from '../../helpers/stubs.js'
@@ -62,6 +64,38 @@ describe('pages/group/view/[id]', () => {
     groupsStore.deleteGroup = vi.fn().mockResolvedValue({ archived: true })
 
     useSessionStore().config = { discourse_url: 'https://talk.example.com' }
+  })
+
+  // As on the event page: a used invite link lands here with ?invite=invalid, and a member needn't be told.
+  describe('an invite link that has been used (?invite=invalid)', () => {
+    beforeEach(() => {
+      vi.stubGlobal('useRoute', () => ({ params: { id: '5' }, query: { invite: 'invalid' }, fullPath: '/group/view/5?invite=invalid' }))
+    })
+
+    it('says nothing to a member', async () => {
+      const toast = useToastStore()
+      toast.error = vi.fn()
+      groupsStore.current.data = { ...BASE_GROUP, is_member: true }
+
+      mountPage()
+      await flushPromises()
+
+      expect(toast.error).not.toHaveBeenCalled()
+    })
+
+    it('warns someone who is not a member, once the group has loaded', async () => {
+      const toast = useToastStore()
+      toast.error = vi.fn()
+
+      mountPage()
+      await flushPromises()
+      expect(toast.error).not.toHaveBeenCalled()
+
+      groupsStore.current.data = { ...BASE_GROUP, is_member: false }
+      await flushPromises()
+      expect(toast.error).toHaveBeenCalledTimes(1)
+      expect(toast.error).toHaveBeenCalledWith(en.groups.invite_invalid)
+    })
   })
 
   it('fetches the group, stats, events and volunteers for the routed id on mount', () => {
@@ -183,6 +217,21 @@ describe('pages/group/view/[id]', () => {
       expect(talk.find('a').attributes('href')).toBe('https://talk.example.com/g/fixers-united')
     })
 
+    it('clicking the Discourse group link goes through Talk\'s SSO (#966)', async () => {
+      groupsStore.current.data = { ...BASE_GROUP, discourse_group: 'fixers-united' }
+      const wrapper = mountPage()
+      const bridge = stubSsoBridge()
+      try {
+        await wrapper.find('[data-testid="group-view-talk"] a').trigger('click')
+
+        expect(await bridge.redirect()).toBe(
+          talkSso('https://talk.example.com', 'https://talk.example.com/g/fixers-united')
+        )
+      } finally {
+        bridge.restore()
+      }
+    })
+
     it('does not render a Discourse link when the group has no discourse_group', () => {
       groupsStore.current.data = BASE_GROUP
       const wrapper = mountPage()
@@ -280,6 +329,9 @@ describe('pages/group/view/[id]', () => {
       expect(wrapper.find('[data-testid="group-actions-leave"]').exists()).toBe(true)
 
       await wrapper.find('[data-testid="group-actions-leave"]').trigger('click')
+      // Nothing happens until the confirm modal is confirmed (live's GroupActions).
+      expect(groupsStore.leave).not.toHaveBeenCalled()
+      await wrapper.find('[data-testid="group-view-leave-confirm"]').trigger('click')
       expect(groupsStore.leave).toHaveBeenCalledWith(5)
     })
 
@@ -294,6 +346,7 @@ describe('pages/group/view/[id]', () => {
       expect(wrapper.find('[data-testid="group-view-unfollowed"]').exists()).toBe(false)
 
       await wrapper.find('[data-testid="group-actions-leave"]').trigger('click')
+      await wrapper.find('[data-testid="group-view-leave-confirm"]').trigger('click')
       await flushPromises()
 
       const banner = wrapper.find('[data-testid="group-view-unfollowed"]')
@@ -310,6 +363,7 @@ describe('pages/group/view/[id]', () => {
 
       const wrapper = mountPage()
       await wrapper.find('[data-testid="group-actions-leave"]').trigger('click')
+      await wrapper.find('[data-testid="group-view-leave-confirm"]').trigger('click')
       await flushPromises()
 
       const banner = wrapper.find('[data-testid="group-view-unfollowed"]')
@@ -324,6 +378,7 @@ describe('pages/group/view/[id]', () => {
 
       const wrapper = mountPage()
       await wrapper.find('[data-testid="group-actions-leave"]').trigger('click')
+      await wrapper.find('[data-testid="group-view-leave-confirm"]').trigger('click')
       await flushPromises()
 
       expect(wrapper.find('[data-testid="group-view-unfollowed"]').exists()).toBe(false)
@@ -505,6 +560,8 @@ describe('pages/group/view/[id]', () => {
       expect(wrapper.find('[data-testid="group-stats-layout-compact"]').exists()).toBe(false)
       expect(wrapper.find('[data-testid="group-stats-layout-after"]').exists()).toBe(true)
       expect(wrapper.findAll('.stats-before-events')).toHaveLength(0)
+      // Not butting up against the events box above.
+      expect(wrapper.find('[data-testid="group-stats-layout-after"]').classes()).toContain('mt-4')
     })
 
     it('ignores an unknown layout', () => {

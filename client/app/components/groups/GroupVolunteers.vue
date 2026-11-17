@@ -1,8 +1,10 @@
 <script setup>
-import { ref } from 'vue'
+import LoadingPlaceholder from '~/components/LoadingPlaceholder.vue'
+import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useGroupsStore } from '../../stores/groups.js'
 import GroupCollapsibleSection from './GroupCollapsibleSection.vue'
+import ConfirmModal from '~/components/ConfirmModal.vue'
 
 // GET /api/v2/groups/{id}/volunteers (already implemented server-side -
 // API\GroupController::getVolunteersForGroupv2). Functional spec:
@@ -38,8 +40,15 @@ const emit = defineEmits(['invite'])
 const { t } = useI18n()
 const groupsStore = useGroupsStore()
 
-// user id currently in the "remove this volunteer?" confirm state.
+// The volunteer pending removal; non-null while the confirm modal is open
+// (live: GroupVolunteer.vue's ConfirmModal).
 const confirmingRemove = ref(null)
+const removeModalOpen = computed({
+  get: () => confirmingRemove.value !== null,
+  set: (open) => {
+    if (!open) confirmingRemove.value = null
+  },
+})
 
 function skillCount(volunteer) {
   return volunteer.skills ? volunteer.skills.length : 0
@@ -50,7 +59,7 @@ function skillCount(volunteer) {
 // resolved via Laravel's JSON translation files (lang/en.json et al, NOT
 // lang/en/*.php), the same mechanism getRoleName()/@lang() uses for role
 // names (see PublicProfileView.vue's roleLabel doc comment) - and already
-// exported as flat top-level keys in i18n/locales/{en,fr,fr-BE}.json
+// exported as flat top-level keys in i18n/locales/<code>.json
 // (php artisan translations:export-client), so t(s.skill_name) resolves
 // each one per-locale exactly like develop's @lang() does (matching
 // pages/user/consent.vue and pages/user/register.vue's own skill lists).
@@ -67,15 +76,13 @@ async function removeHostRole(volunteer) {
 }
 
 function askRemove(volunteer) {
-  confirmingRemove.value = volunteer.user
+  confirmingRemove.value = volunteer
 }
 
-function cancelRemove() {
+async function confirmRemove() {
+  const volunteer = confirmingRemove.value
   confirmingRemove.value = null
-}
-
-async function confirmRemove(volunteer) {
-  confirmingRemove.value = null
+  if (!volunteer) return
   await groupsStore.removeVolunteer(props.groupId, volunteer.user).catch(() => {})
 }
 </script>
@@ -90,9 +97,7 @@ async function confirmRemove(volunteer) {
     </template>
 
     <div v-if="loading" data-testid="group-volunteers-loading">
-      <div class="placeholder-glow">
-        <span class="placeholder col-12" style="height: 3rem" />
-      </div>
+      <LoadingPlaceholder height="3rem" />
     </div>
 
     <p v-else-if="!volunteers.length" data-testid="group-volunteers-empty">
@@ -139,7 +144,7 @@ async function confirmRemove(volunteer) {
               >
                 {{ t('partials.host') }}
               </span>
-              <div class="small text-muted d-flex align-items-center" :title="skillNames(volunteer)">
+              <div :id="`group-volunteer-skills-${volunteer.user}`" class="small text-muted d-flex align-items-center">
                 <svg
                   width="16"
                   height="16"
@@ -155,29 +160,22 @@ async function confirmRemove(volunteer) {
                 </svg>
                 {{ skillCount(volunteer) }} {{ t('partials.skills', skillCount(volunteer)) }}
               </div>
+              <!-- Live: v-b-tooltip.hover on the skills count, a styled tooltip. -->
+              <BTooltip
+                v-if="skillCount(volunteer)"
+                :target="`group-volunteer-skills-${volunteer.user}`"
+                :data-testid="`group-volunteer-skills-tooltip-${volunteer.user}`"
+              >
+                {{ skillNames(volunteer) }}
+              </BTooltip>
             </div>
           </div>
 
           <div v-if="canedit" class="text-nowrap">
-            <template v-if="confirmingRemove === volunteer.user">
-              <span class="small me-2">{{ t('partials.are_you_sure') }}</span>
-              <BButton
-                size="sm"
-                variant="danger"
-                :data-testid="`group-volunteer-remove-confirm-${volunteer.user}`"
-                @click="confirmRemove(volunteer)"
-              >
-                {{ t('partials.yes') }}
-              </BButton>
-              <BButton size="sm" variant="link" @click="cancelRemove">
-                {{ t('partials.cancel') }}
-              </BButton>
-            </template>
             <!-- develop's GroupVolunteer.vue: a single no-caret pencil-icon
                  dropdown (edit_ico_green.svg) replaces the row of inline
                  buttons. -->
             <BDropdown
-              v-else
               variant="none"
               no-caret
               class="edit-dropdown"
@@ -217,6 +215,12 @@ async function confirmRemove(volunteer) {
         {{ t('groups.invite_to_group') }}
       </a>
     </div>
+
+    <ConfirmModal
+      v-model="removeModalOpen"
+      :confirm-testid="confirmingRemove ? `group-volunteer-remove-confirm-${confirmingRemove.user}` : 'group-volunteer-remove-confirm'"
+      @confirm="confirmRemove"
+    />
   </GroupCollapsibleSection>
 </template>
 

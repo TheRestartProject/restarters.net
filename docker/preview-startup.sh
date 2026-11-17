@@ -126,6 +126,14 @@ else
     : > /etc/nginx/auth-gate.conf
 fi
 
+# Uploads made on this preview stay on its own disk (public/uploads), since
+# its bucket key is read-only. nginx serves them from there and falls back to
+# the shared bucket for everything else (nginx-fly.conf, location /uploads/).
+# They go when the machine cold-boots, along with the restored database.
+if [[ "${FILESYSTEM_DISK:-}" != "s3" ]]; then
+    echo 'set $local_upload $uri;' > /etc/nginx/uploads-local.conf
+fi
+
 if [ -n "$AWS_BUCKET" ]; then
     export TIGRIS_BUCKET_URL="https://${AWS_BUCKET}.fly.storage.tigris.dev"
     export TIGRIS_BUCKET_HOST="${AWS_BUCKET}.fly.storage.tigris.dev"
@@ -226,7 +234,7 @@ if [ "$RESTORE_OK" = "true" ]; then
         # Errors with no SQLSTATE (class not found, bad config, PHP fatal) cannot
         # quote database rows, so their first line is safe to publish.
         PHP_ERR=""
-        if [ -z "$SQL_STATE" ]; then
+        if [[ -z $SQL_STATE ]]; then
             PHP_ERR=$(grep -vE '^\s*$|vendor/' "$MIGRATE_OUT" | head -12 | tr '\n' ' ' | cut -c1-900)
         fi
         MIGRATE_DETAIL="${PHP_ERR:+$PHP_ERR - }migrate failed at ${FAILED_MIGRATION:-unknown} ${EXC_CLASS} ${SQL_STATE} ${SQL_CODE:+driver $SQL_CODE} - see machine logs"
@@ -237,8 +245,12 @@ if [ "$RESTORE_OK" = "true" ]; then
 fi
 
 # Warm up Laravel caches
-php /var/www/artisan config:cache 2>/dev/null || true
-php /var/www/artisan route:cache 2>/dev/null || true
+# config:cache and route:cache have never succeeded here - config/sentry.php's before_send is a
+# closure and routes/api.php has closure routes - and each failed attempt was reported to Sentry.
+# The app runs uncached; enabling caching needs the 60-odd direct env() calls outside config/
+# auditing first. Clear instead so nothing stale can be picked up.
+php /var/www/artisan config:clear 2>/dev/null || true
+php /var/www/artisan route:clear 2>/dev/null || true
 php /var/www/artisan view:cache 2>/dev/null || true
 chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
 

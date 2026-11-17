@@ -6,6 +6,7 @@ return [
   'logout' => 'Se déconnecter',
   'new_group' => 'Créer un nouveau Repair Café',
   'alert_uptodate' => 'Merci ! Vous êtes à jour',
+  'alert_uptodate_text' => 'Vous n\'avez rien à faire. Quand vous devrez, nous vous préviendrons.',
   'general' => 'Général',
   'your_name' => 'Prénom & Nom',
   'repair_skills' => 'Compétences',

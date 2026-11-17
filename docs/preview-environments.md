@@ -90,8 +90,9 @@ What to expect:
   may reset at any time. Log in with real production credentials (the
   database is an exact copy of live, behind the login gate).
 - **Emails** go to shared Mailpit (https://restarters-dev-mail.fly.dev),
-  never to real recipients. **Image uploads are disabled** (image reads come
-  from the live bucket). Discourse/wiki/WordPress integrations are off.
+  never to real recipients. **Image uploads work** but stay on the preview
+  machine, and go when it restarts along with the data; existing images come
+  from the live bucket. Discourse/wiki/WordPress integrations are off.
 - A red **PR-\<N\>** banner marks the preview, linking to Mailpit.
 - ❌ *migrate failed* in the PR comment means the PR's migrations broke
   against real data — usually a signal to rebase; check
@@ -170,7 +171,7 @@ flyctl machine start <machine-id> -a restarters-pr-<N>
 | GitHub environment `preview` | required reviewers: edwh, ngm, restart-tech, restart-neil (any one approves); holds `FLY_ORG_TOKEN`, `FLY_PREVIEW_SECRETS` |
 | GitHub environment `preview-cleanup` | no reviewers; deployment branches restricted to `develop`; holds `FLY_ORG_TOKEN` |
 | Restore identity | `restarters-preview-restore@restarters-previews.iam.gserviceaccount.com` (GCP project `restarters-previews`, owned by edward@therestartproject.org; Drive API enabled). Needs **Viewer** on the backups folder — never anything stronger, so previews can never delete backups — and the shared drive must allow viewers to download (see Troubleshooting). |
-| Tigris (image store) | a dedicated **read-only** access key for `restarters-uploads` — the real enforcement behind the disabled-uploads flag |
+| Tigris (image store) | a dedicated **read-only** access key for `restarters-uploads`, which is what keeps previews out of the live bucket; their uploads go to local disk (`FILESYSTEM_DISK=local`) |
 | Label | `preview` |
 | `restarters-dev` | the develop preview. Holds the same secret set as `FLY_PREVIEW_SECRETS`, set once by hand rather than by the workflow. Deployed by CircleCI's `deploy-fly-dev` job using CircleCI's own `FLY_API_TOKEN`, not the GitHub org token. |
 

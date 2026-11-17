@@ -13,9 +13,9 @@ const BButtonStub = { template: '<button v-bind="$attrs"><slot /></button>' }
 const BModalStub = {
   props: ['modelValue', 'title'],
   emits: ['hide'],
-  template: '<div v-if="modelValue"><slot /></div>',
+  template: '<div v-if="modelValue"><slot /><slot name="footer" /></div>',
 }
-const BPopoverStub = { props: ['target'], template: '<div><slot /></div>' }
+const BPopoverStub = { props: ['target', 'click', 'triggers'], template: '<div :data-click="click" :data-triggers="triggers"><slot /></div>' }
 
 function confirmedAttendee(overrides = {}) {
   return {
@@ -55,6 +55,24 @@ function mountComponent(props = {}) {
 describe('components/events/EventAttendees', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
+  })
+
+  it('caps the attendee lists at a scrolling height inside the fixed-height tab box', () => {
+    const wrapper = mountComponent({ confirmed: [confirmedAttendee()], invited: [confirmedAttendee({ id: 2, confirmed: false })] })
+
+    expect(wrapper.find('.ourtabs').classes()).toContain('attendance-tabs')
+    expect(wrapper.find('[data-testid="event-attendee-1"]').element.closest('ul').classList.contains('maxheight')).toBe(true)
+  })
+
+  it('opens the skills popover on click, as live does, not on hover', () => {
+    const wrapper = mountComponent({
+      confirmed: [confirmedAttendee({ volunteer: { id: 10, name: 'Sam', user_skills: [{ id: 1, skill_name: 'Soldering' }] } })],
+    })
+    const popover = wrapper.find('[data-testid="event-attendee-skills-popover-1"]')
+
+    expect(popover.exists()).toBe(true)
+    expect(popover.attributes('data-click')).toBeDefined()
+    expect(popover.attributes('data-triggers')).toBeUndefined()
   })
 
   it('shows a loading skeleton and no tabs while loading', () => {
