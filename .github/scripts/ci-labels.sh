@@ -2,8 +2,9 @@
 #
 # Labels open PRs "CI: Running", "CI: Passed" or "CI: Failed" from the CircleCI statuses on their head commit.
 #
-#   ci-labels.sh <sha>   the open PRs whose head is that commit
-#   ci-labels.sh         every open PR
+#   ci-labels.sh <sha> <pr>   that PR, whose head is that commit
+#   ci-labels.sh <sha>        the open PRs whose head is that commit
+#   ci-labels.sh              every open PR
 #
 # Needs GH_TOKEN and REPO (owner/name). DRY_RUN=1 prints the changes instead of making them.
 
@@ -13,11 +14,12 @@ set -euo pipefail
 
 LABELS=("CI: Running" "CI: Passed" "CI: Failed")
 
+# A failed change is reported and skipped rather than stopping the run: the next status puts it right.
 run() {
   if [ "${DRY_RUN:-}" = 1 ]; then
     echo "  would run: $*"
-  else
-    "$@" > /dev/null
+  elif ! "$@" > /dev/null; then
+    echo "::warning::Failed: $*"
   fi
 }
 
@@ -36,15 +38,10 @@ ci_label() {
   esac
 }
 
+# With no CircleCI status yet (a push CI hasn't picked up), the PR keeps no CI label rather than the last commit's.
 label_pr() {
   local pr=$1 sha=$2 want current label
   want=$(ci_label "$sha")
-
-  if [ -z "$want" ]; then
-    echo "#$pr: no CircleCI status yet"
-    return
-  fi
-
   current=$(gh api "repos/$REPO/issues/$pr/labels" --jq '.[].name')
 
   for label in "${LABELS[@]}"; do
@@ -53,24 +50,45 @@ label_pr() {
     fi
   done
 
-  if ! grep -qxF "$want" <<< "$current"; then
+  if [ -n "$want" ] && ! grep -qxF "$want" <<< "$current"; then
     run gh api -X POST "repos/$REPO/issues/$pr/labels" -f "labels[]=$want"
   fi
 
-  echo "#$pr: $want"
+  echo "#$pr: ${want:-no CircleCI status yet}"
 }
 
-if [ -n "${1:-}" ]; then
-  sha=$1
+# Open PRs whose head is still this commit, so that a late status for an earlier push can't relabel a PR. Just after
+# a push GitHub can take a few seconds to link the commit to its PR, so an empty answer is tried again.
+prs_for() {
+  local prs attempt
+  for attempt in 1 2 3 4; do
+    prs=$(gh api "repos/$REPO/commits/$1/pulls" \
+      --jq ".[] | select(.state == \"open\" and .head.sha == \"$1\") | .number")
+    if [ -n "$prs" ] || [ "$attempt" = 4 ]; then
+      echo "$prs"
+      return
+    fi
+    sleep 10
+  done
+}
 
-  if ! [[ $sha =~ ^[0-9a-f]{40}$ ]]; then
-    echo "Not a commit SHA: $sha" >&2
-    exit 1
-  fi
+sha=${1:-}
+pr=${2:-}
 
-  # Only PRs whose head is still this commit, so that a late status for an earlier push can't relabel a PR.
-  for pr in $(gh api "repos/$REPO/commits/$sha/pulls" \
-    --jq ".[] | select(.state == \"open\" and .head.sha == \"$sha\") | .number"); do
+if [ -n "$sha" ] && ! [[ $sha =~ ^[0-9a-f]{40}$ ]]; then
+  echo "Not a commit SHA: $sha" >&2
+  exit 1
+fi
+
+if [ -n "$pr" ] && ! [[ $pr =~ ^[0-9]+$ ]]; then
+  echo "Not a PR number: $pr" >&2
+  exit 1
+fi
+
+if [ -n "$pr" ]; then
+  label_pr "$pr" "$sha"
+elif [ -n "$sha" ]; then
+  for pr in $(prs_for "$sha"); do
     label_pr "$pr" "$sha"
   done
 else
