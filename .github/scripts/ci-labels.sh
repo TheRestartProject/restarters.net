@@ -24,11 +24,11 @@ run() {
 }
 
 # Failed as soon as any CircleCI job has failed, Running while any is still going, and Passed once they all have.
-# Empty when CircleCI hasn't reported on the commit.
+# Empty when CircleCI hasn't reported on the commit; fails if the statuses can't be read.
 ci_label() {
   local states
   states=$(gh api "repos/$REPO/commits/$1/status" \
-    --jq '[.statuses[] | select(.context | startswith("ci/circleci")) | .state] | join(" ")')
+    --jq '[.statuses[] | select(.context | startswith("ci/circleci")) | .state] | join(" ")') || return 1
 
   case " $states " in
     "  ") echo "" ;;
@@ -39,10 +39,14 @@ ci_label() {
 }
 
 # With no CircleCI status yet (a push CI hasn't picked up), the PR keeps no CI label rather than the last commit's.
+# If GitHub can't be read, the PR's labels are left as they are.
 label_pr() {
   local pr=$1 sha=$2 want current label
-  want=$(ci_label "$sha")
-  current=$(gh api "repos/$REPO/issues/$pr/labels" --jq '.[].name')
+
+  if ! want=$(ci_label "$sha") || ! current=$(gh api "repos/$REPO/issues/$pr/labels" --jq '.[].name'); then
+    echo "::warning::#$pr: couldn't read its CI statuses or labels, so left them alone"
+    return
+  fi
 
   for label in "${LABELS[@]}"; do
     if [ "$label" != "$want" ] && grep -qxF "$label" <<< "$current"; then
@@ -57,19 +61,14 @@ label_pr() {
   echo "#$pr: ${want:-no CircleCI status yet}"
 }
 
-# Open PRs whose head is still this commit, so that a late status for an earlier push can't relabel a PR. Just after
-# a push GitHub can take a few seconds to link the commit to its PR, so an empty answer is tried again.
+# Open PRs whose head is still this commit, so that a late run for an earlier push can't relabel a PR.
 prs_for() {
-  local prs attempt
-  for attempt in 1 2 3 4; do
-    prs=$(gh api "repos/$REPO/commits/$1/pulls" \
-      --jq ".[] | select(.state == \"open\" and .head.sha == \"$1\") | .number")
-    if [ -n "$prs" ] || [ "$attempt" = 4 ]; then
-      echo "$prs"
-      return
-    fi
-    sleep 10
-  done
+  gh api "repos/$REPO/commits/$1/pulls" --jq ".[] | select(.state == \"open\" and .head.sha == \"$1\") | .number"
+}
+
+# Whether the PR is open with this commit as its head (same reason).
+is_head_of() {
+  [ "$(gh api "repos/$REPO/pulls/$2" --jq '"\(.state) \(.head.sha)"')" = "open $1" ]
 }
 
 sha=${1:-}
@@ -86,7 +85,11 @@ if [ -n "$pr" ] && ! [[ $pr =~ ^[0-9]+$ ]]; then
 fi
 
 if [ -n "$pr" ]; then
-  label_pr "$pr" "$sha"
+  if is_head_of "$sha" "$pr"; then
+    label_pr "$pr" "$sha"
+  else
+    echo "#$pr: has moved on from $sha"
+  fi
 elif [ -n "$sha" ]; then
   for pr in $(prs_for "$sha"); do
     label_pr "$pr" "$sha"

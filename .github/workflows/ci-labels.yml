@@ -4,8 +4,9 @@
 # - status: CircleCI reporting on a commit relabels the PRs whose head it is. GitHub runs this from the default
 #   branch's copy of the file, so it covers every PR whatever its base, fork PRs included.
 # - pull_request_target: a new push drops the last commit's label, and a PR opened after CI finished gets one.
-#   This runs the base branch's copy with a write token, so it must never check out or run the PR's code: the
-#   checkout below is always the default branch, and the PR only supplies its number and head SHA.
+#   GitHub runs the PR's base branch's copy of this file, so PRs into another base (nuxt-client) get this once that
+#   branch has the file. It runs with a write token, so it must never check out or run the PR's code: the checkout
+#   below is always the default branch, and the PR only supplies its number and head SHA.
 # - workflow_dispatch: labels all the open PRs at once.
 #
 # It must use github.token: label changes made with that token don't trigger other workflows, so they can't set off
