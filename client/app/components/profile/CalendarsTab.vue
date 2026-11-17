@@ -14,7 +14,7 @@ import { useSsoBridge } from '~/composables/useSsoBridge.js'
 const { t } = useI18n()
 const profileStore = useProfileStore()
 const sessionStore = useSessionStore()
-const { goToTalk } = useSsoBridge()
+const { followTalkLink } = useSsoBridge()
 
 const loading = ref(true)
 const selectedArea = ref('')
@@ -58,7 +58,7 @@ function copy(text) {
     <h3>{{ t('profile.calendars.title') }}</h3>
     <p>
       {{ t('profile.calendars.explainer') }}
-      <a :href="findOutMoreUrl" @click.prevent="goToTalk(findOutMoreUrl)">{{ t('profile.calendars.find_out_more') }}</a>.
+      <a :href="findOutMoreUrl" @click="followTalkLink($event, findOutMoreUrl)">{{ t('profile.calendars.find_out_more') }}</a>.
     </p>
 
     <BAlert v-if="profileStore.calendars.error" :model-value="true" variant="danger" data-testid="calendars-error">

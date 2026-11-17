@@ -28,6 +28,8 @@ export function useSsoBridge() {
       return
     }
 
+    const { $api } = useNuxtApp()
+
     // Open the tab now, while still inside the click: browsers block
     // window.open() once we've awaited the ticket. If it's blocked anyway,
     // fall back to this tab rather than going nowhere.
@@ -39,8 +41,6 @@ export function useSsoBridge() {
         target = tab
       }
     }
-
-    const { $api } = useNuxtApp()
 
     try {
       const { data } = await $api.auth.ssoTicket()
@@ -81,5 +81,17 @@ export function useSsoBridge() {
     return goTo(`${base}/session/sso?return_path=${encodeURIComponent(url)}`, options)
   }
 
-  return { goTo, goToTalk, isTalkUrl }
+  // Click handler for a link to Talk: goToTalk() to `url` (default: the
+  // link's own href), in a new tab when the click asks for one - the link's
+  // target="_blank", or Ctrl/Cmd/Shift-click, as a plain link would.
+  function followTalkLink(event, url) {
+    event.preventDefault()
+
+    const link = event.target?.closest?.('a')
+    const newTab = link?.target === '_blank' || event.ctrlKey || event.metaKey || event.shiftKey
+
+    return goToTalk(url ?? link?.href, { newTab })
+  }
+
+  return { goTo, goToTalk, followTalkLink, isTalkUrl }
 }

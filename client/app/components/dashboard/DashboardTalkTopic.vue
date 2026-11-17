@@ -6,7 +6,7 @@ import { useSsoBridge } from '~/composables/useSsoBridge.js'
 // One Talk topic row (legacy resources/js/components/DiscourseTopic.vue): the
 // title links to the Discourse topic, a category badge (colour dot + name)
 // sits below, and the comment count + "created ... ago" show on desktop.
-// Both links go through Talk's SSO (useSsoBridge's goToTalk) so that someone
+// Both links go through Talk's SSO (useSsoBridge's followTalkLink) so that someone
 // not yet logged in to Talk is logged in on the way, rather than shown
 // "Access Denied" for a topic that needs an account (#966).
 const props = defineProps({
@@ -14,7 +14,7 @@ const props = defineProps({
   discourseBaseUrl: { type: String, default: '' },
 })
 
-const { goToTalk } = useSsoBridge()
+const { followTalkLink } = useSsoBridge()
 
 // /t/{slug}/{id}: with the id Discourse can go straight to the topic, rather
 // than first looking the slug up.
@@ -33,9 +33,9 @@ const ago = computed(() => (props.topic.created_at ? moment(props.topic.created_
 <template>
   <tr class="talk-topic" :data-testid="`talk-topic-${topic.id}`">
     <td class="talk-topic__main">
-      <a :href="url" :data-testid="`talk-topic-link-${topic.id}`" @click.prevent="goToTalk(url)">{{ topic.title }}</a>
+      <a :href="url" :data-testid="`talk-topic-link-${topic.id}`" @click="followTalkLink($event, url)">{{ topic.title }}</a>
       <div v-if="topic.category">
-        <a class="talk-topic__badge" :href="categoryUrl" @click.prevent="goToTalk(categoryUrl)">
+        <a class="talk-topic__badge" :href="categoryUrl" @click="followTalkLink($event, categoryUrl)">
           <span class="talk-topic__badge-dot" :style="{ backgroundColor: `#${topic.category.color}` }" />
           <span class="talk-topic__badge-name">{{ topic.category.name }}</span>
         </a>

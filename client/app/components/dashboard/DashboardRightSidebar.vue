@@ -15,17 +15,17 @@ import { useSsoBridge } from '~/composables/useSsoBridge.js'
 // desktop-only) - replicated here the same way rather than showing it twice
 // on desktop.
 const { t } = useI18n()
-const { goToTalk, isTalkUrl } = useSsoBridge()
+const { followTalkLink, isTalkUrl } = useSsoBridge()
 
 // The getting-started bullets are translated HTML with Talk links in them.
-// Send those through Talk's SSO (as a new tab, like their target="_blank")
-// so the user arrives logged in to Talk rather than at "Access Denied" (#966).
+// Send those through Talk's SSO (still in a new tab, as their target="_blank"
+// asks) so the user arrives logged in to Talk rather than at "Access Denied"
+// (#966).
 function onBulletClick(event) {
   const link = event.target.closest?.('a[href]')
 
   if (link && isTalkUrl(link.href)) {
-    event.preventDefault()
-    goToTalk(link.href, { newTab: link.target === '_blank' })
+    followTalkLink(event, link.href)
   }
 }
 </script>

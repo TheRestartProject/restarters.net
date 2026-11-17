@@ -81,7 +81,7 @@ const location = computed(() => {
   return typeof loc === 'string' ? loc : loc.location
 })
 
-const { goToTalk } = useSsoBridge()
+const { followTalkLink } = useSsoBridge()
 
 // GroupDescription.vue's discourseGroup (view.blade.php: $group->discourse_group
 // ? DISCOURSE_URL.'/g/'.$group->discourse_group : null). The v2 Group
@@ -426,7 +426,7 @@ onMounted(() => {
                  shown once the group has a linked discourse_group. -->
             <p v-if="discourseGroup" class="d-flex align-items-center gap-2" data-testid="group-view-talk">
               <img :src="'/icons/talk_ico.svg'" alt="" width="30" height="30" class="flex-shrink-0">
-              <a :href="discourseGroup" @click.prevent="goToTalk(discourseGroup)">{{ t('groups.talk_group') }}</a>
+              <a :href="discourseGroup" @click="followTalkLink($event, discourseGroup)">{{ t('groups.talk_group') }}</a>
             </p>
           </GroupCollapsibleSection>
         </section>

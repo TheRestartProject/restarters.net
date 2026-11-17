@@ -27,7 +27,7 @@ const props = defineProps({
 const { t } = useI18n()
 const profileStore = useProfileStore()
 const sessionStore = useSessionStore()
-const { goToTalk } = useSsoBridge()
+const { followTalkLink } = useSsoBridge()
 
 const invites = ref(false)
 const loading = ref(true)
@@ -97,7 +97,7 @@ async function save() {
 
       <div class="button-group row mt-3">
         <div class="col-sm-9 d-flex align-items-center justify-content-start">
-          <a class="btn-preferences" :href="platformPreferencesUrl" @click.prevent="goToTalk(platformPreferencesUrl)">{{ t('auth.set_preferences') }}</a>
+          <a class="btn-preferences" :href="platformPreferencesUrl" @click="followTalkLink($event, platformPreferencesUrl)">{{ t('auth.set_preferences') }}</a>
         </div>
         <div class="col-sm-3 d-flex align-items-center justify-content-end">
           <BButton type="submit" variant="primary" class="btn-save" :disabled="saving" data-testid="email-preferences-save">

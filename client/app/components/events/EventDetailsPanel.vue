@@ -42,7 +42,7 @@ const calendarLinks = useCalendarLinks(() => props.event)
 // gate). Same {discourse_url}/t/{id} URL-building pattern as
 // pages/group/view/[id].vue's discourseGroup.
 const sessionStore = useSessionStore()
-const { goToTalk } = useSsoBridge()
+const { followTalkLink } = useSsoBridge()
 const discourseThread = computed(() => {
   const id = props.event.discourse_thread
   const base = sessionStore.config?.discourse_url
@@ -94,7 +94,7 @@ const discourseThread = computed(() => {
 
     <div v-if="discourseThread" class="detail-row d-flex pt-1 pb-1" data-testid="event-details-talk">
       <img src="/icons/talk_ico.svg" alt="" class="detail-icon me-2">
-      <a :href="discourseThread" @click.prevent="goToTalk(discourseThread)">{{ t('events.talk_thread') }}</a>
+      <a :href="discourseThread" @click="followTalkLink($event, discourseThread)">{{ t('events.talk_thread') }}</a>
     </div>
 
     <div v-if="hosts.length" class="detail-row d-flex pt-1 pb-1" data-testid="event-details-hosts">
