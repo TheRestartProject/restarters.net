@@ -222,8 +222,10 @@ onBeforeUnmount(() => {
   }
 
   // On a phone the popover is a sheet at the foot of the screen rather than
-  // something squeezed into a one-seventh-width cell.
-  .day-popover {
+  // something squeezed into a one-seventh-width cell, whichever column the
+  // day is in (.align-end would otherwise pin Fri-Sun to the right edge).
+  .day-popover,
+  .day-popover.align-end {
     position: fixed;
     top: auto;
     left: 1rem;
