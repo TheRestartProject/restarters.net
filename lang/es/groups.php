@@ -90,7 +90,6 @@ return [
   'remove_volunteer' => 'Eliminar voluntario',
   'remove_host_role' => 'Eliminar rol de anfitrión',
   'make_host' => 'Hacer anfitrión',
-  'not_counting' => 'No se cuenta para el impacto ambiental de este grupo|No se cuentan para el impacto ambiental de este grupo',
   'calendar_copy_title' => 'Accede a todos los eventos del grupo en tu calendario personal',
   'calendar_copy_description' => 'Añade todos los próximos eventos de :group a tu calendario de Google/Outlook/Yahoo/Apple con el enlace a continuación:',
   'volunteers_invited' => 'Voluntarios invitados',

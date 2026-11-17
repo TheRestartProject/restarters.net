@@ -112,8 +112,7 @@ function baseEvent(overrides = {}) {
 }
 
 function mountPage() {
-  // events.environmental_impact/not_counting/to_be_recycled/to_be_repaired/
-  // no_weight/stat-0/stat-2 are new lang/en/events.php keys (this task's
+  // events.environmental_impact/stat-0/stat-2 are new lang/en/events.php keys (this task's
   // D1/D3 gaps) not yet in the generated client i18n JSON - the main agent
   // regenerates that centrally, so they're overlaid here inline rather than
   // editing client/i18n/locales/*.json directly (see DashboardWhatsHappening
@@ -128,10 +127,6 @@ function mountPage() {
         events: {
           ...en.events,
           environmental_impact: 'Environmental impact',
-          not_counting: "Not counting toward this event's environmental impact is|Not counting toward this event's environmental impact are",
-          to_be_recycled: '{value} item to be recycled|{value} items to be recycled',
-          to_be_repaired: '{value} item to be repaired|{value} items to be repaired',
-          no_weight: '{value} misc or unpowered item with no weight estimate|{value} misc or unpowered items with no weight estimate',
           'stat-0': 'Participants',
           'stat-2': 'Volunteers',
           // RES gap-closure pass (parity-v2/events.md) - same overlay

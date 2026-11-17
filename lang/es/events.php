@@ -97,7 +97,6 @@ return [
   'add_new_event' => 'Añadir nuevo evento',
   'created_success_message' => '¡Evento creado! Será aprobado por un coordinador en breve. Puedes continuar editándolo mientras tanto.',
   'items_fixed' => 'Artículos reparados',
-  'not_counting' => 'No se cuenta para el impacto ambiental de este evento|No se cuentan para el impacto ambiental de este evento',
   'impact_calculation' => '<p><strong>¿Cómo calculamos el impacto ambiental?</strong></p>
 <p>Hemos investigado el peso promedio y la huella de CO<sub>2</sub>e de los productos en una serie de categorías, desde teléfonos inteligentes hasta camisetas. Cuando introduces un artículo que has reparado, usamos estos promedios para estimar el impacto de esa reparación según la categoría del artículo.</p>
 <p>Para los artículos varios, aplicamos un ratio genérico de CO<sub>2</sub>e al peso para estimar el impacto de cada reparación exitosa.</p>
@@ -157,7 +156,4 @@ return [
   'image_upload_error' => 'Lo sentimos, no se pudo subir la imagen.',
   'no_date_selected' => 'Ninguna fecha seleccionada',
   'no_devices_added' => 'No se han añadido dispositivos',
-  'no_weight' => ':value artículo varios o sin alimentación eléctrica sin peso estimado|:value artículos varios o sin alimentación eléctrica sin peso estimado',
-  'to_be_recycled' => ':value artículo para reciclar|:value artículos para reciclar',
-  'to_be_repaired' => ':value artículo para reparar|:value artículos para reparar',
 ];

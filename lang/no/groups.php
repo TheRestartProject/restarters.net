@@ -90,7 +90,6 @@ return [
   'remove_volunteer' => 'Fjern frivillig',
   'remove_host_role' => 'Fjern vertrolle',
   'make_host' => 'Gjør til vert',
-  'not_counting' => 'Teller ikke mot denne gruppens miljøpåvirkning er|Teller ikke mot denne gruppens miljøpåvirkning er',
   'calendar_copy_title' => 'Få tilgang til alle gruppearrangementer i din personlige kalender',
   'calendar_copy_description' => 'Legg til alle kommende arrangementer for :group i din Google/Outlook/Yahoo/Apple-kalender med lenken nedenfor:',
   'volunteers_invited' => 'Frivillige invitert',

@@ -81,7 +81,6 @@ return [
 <p>We\'ve researched the average weight and CO<sub>2</sub>e footprint of products across a range of categories, from smartphones to t-shirts. When you enter an item that you\'ve repaired, we use these averages to estimate the impact of that repair based on the category of the item.</p>
 <p>For misc items, we apply a generic CO<sub>2</sub>e to weight ratio to estimate the impact of each successful repair.</p>
 <p><a href="https://talk.restarters.net/t/how-do-we-measure-the-environmental-impact-of-events/6077" target="_blank" rel="nofollow">Learn more about how we calculate impact here</a></p>',
-  'not_counting' => 'Not counting toward this group\'s environmental impact is|Not counting toward this group\'s environmental impact are',
   'events' => 'event|events',
   'no_volunteers' => 'There are no volunteers in this group',
   'remove_volunteer' => 'Remove Volunteer',
@@ -97,7 +96,6 @@ return [
   'infographic_message' => 'An infographic of an easy-to-understand equivalent of the CO<sub>2</sub> emissions that your group has prevented.',
   'embed_code_header' => 'Embed code',
   'export_group_data' => 'Download repair data',
-  'not_counting' => 'Not counting toward this group\'s environmental impact is|Not counting toward this group\'s environmental impact are',
   'calendar_copy_title' => 'Access all group events in your personal calendar',
   'calendar_copy_description' => 'Add all upcoming events for :group to your Google/Outlook/Yahoo/Apple calendar with the link below:',
   'volunteers_invited' => 'Volunteers invited',

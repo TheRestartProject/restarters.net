@@ -68,11 +68,6 @@ function printableCount(value) {
   return Math.round(value ?? 0).toLocaleString()
 }
 
-// StatsImpact.vue's notincluded(): the "not counting X/Y/Z devices" caveat,
-// built from dead/repairable/no-weight counts and joined with "and" when
-// more than one applies. events.to_be_recycled/to_be_repaired/no_weight are
-// reused as-is (already exported to the client, identical wording pattern to
-// the group-specific groups.not_counting intro).
 const { equivalentConsumer, popoverConsumer } = useCo2Equivalent()
 
 const co2Description = computed(() => {

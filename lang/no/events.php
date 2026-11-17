@@ -97,7 +97,6 @@ return [
   'add_new_event' => 'Legg til nytt arrangement',
   'created_success_message' => 'Arrangement opprettet! Det vil bli godkjent av en koordinator snart. Du kan fortsette å redigere det i mellomtiden.',
   'items_fixed' => 'Gjenstander reparert',
-  'not_counting' => 'Teller ikke mot dette arrangementets miljøpåvirkning er|Teller ikke mot dette arrangementets miljøpåvirkning er',
   'impact_calculation' => '<p><strong>Hvordan beregner vi miljøpåvirkning?</strong></p>
 <p>Vi har undersøkt gjennomsnittsvekt og CO<sub>2</sub>e-avtrykk for produkter på tvers av en rekke kategorier, fra smarttelefoner til t-skjorter. Når du registrerer en gjenstand du har reparert, bruker vi disse gjennomsnittene til å estimere påvirkningen av reparasjonen basert på kategorien til gjenstanden.</p>
 <p>For diverse gjenstander bruker vi et generisk CO<sub>2</sub>e-til-vekt-forhold for å estimere påvirkningen av hver vellykkede reparasjon.</p>
@@ -157,7 +156,4 @@ return [
   'image_upload_error' => 'Beklager, men bildet kunne ikke lastes opp.',
   'no_date_selected' => 'Ingen dato valgt',
   'no_devices_added' => 'Ingen enheter lagt til',
-  'no_weight' => ':value diverse eller ikke-elektrisk gjenstand uten vektestimat|:value diverse eller ikke-elektriske gjenstander uten vektestimat',
-  'to_be_recycled' => ':value gjenstand skal resirkuleres|:value gjenstander skal resirkuleres',
-  'to_be_repaired' => ':value gjenstand skal repareres|:value gjenstander skal repareres',
 ];
