@@ -197,6 +197,24 @@ describe('composables/useSsoBridge', () => {
       expect(window.location.href).toBe('')
     })
 
+    it('finds the link when the click lands on something inside it', async () => {
+      const link = document.createElement('a')
+      link.href = 'https://talk.example.com/t/kit/324'
+      link.target = '_blank'
+      const badge = document.createElement('span')
+      link.appendChild(badge)
+      const event = new MouseEvent('click', { cancelable: true })
+      Object.defineProperty(event, 'target', { value: badge })
+
+      const { followTalkLink } = useSsoBridge()
+      await followTalkLink(event)
+
+      expect(openSpy).toHaveBeenCalledWith('', '_blank')
+      expect(new URL(tab.location.href).searchParams.get('redirect')).toBe(
+        'https://talk.example.com/session/sso?return_path=' + encodeURIComponent('https://talk.example.com/t/kit/324')
+      )
+    })
+
     it('defaults to the clicked link\'s own href', async () => {
       const { followTalkLink } = useSsoBridge()
       await followTalkLink(click())
