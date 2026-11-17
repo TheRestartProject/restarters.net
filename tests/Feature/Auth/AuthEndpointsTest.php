@@ -429,4 +429,46 @@ class AuthEndpointsTest extends TestCase
 
         $this->getJson('/api/users/me', $headers)->assertStatus(401);
     }
+
+    /**
+     * @story:AuthController::logoutv2
+     */
+    public function testLogoutLogsOutOfTheWiki(): void
+    {
+        // Live's /logout cleared the wiki's login cookies, so logging out of Restarters, on the site or from the
+        // wiki's own menu, logged you out of the wiki too.
+        $user = $this->makeUser('wikileaver@restarters.test');
+        $token = $user->createToken('spa')->plainTextToken;
+
+        $response = $this->post('/api/v2/auth/logout', [], ['Authorization' => 'Bearer '.$token, 'Accept' => 'application/json']);
+
+        $response->assertOk();
+        $this->assertWikiCookiesCleared($response);
+    }
+
+    /**
+     * @story:AuthController::logoutv2
+     */
+    public function testLogoutWithoutATokenStillLogsOutOfTheWiki(): void
+    {
+        // Someone whose Restarters login has lapsed can still be logged in to the wiki, and its Logout link
+        // brings them here. Live's /logout cleared the wiki's cookies whoever asked.
+        $this->assertWikiCookiesCleared($this->post('/api/v2/auth/logout', [], ['Accept' => 'application/json'])->assertOk());
+    }
+
+    /**
+     * @story:AuthController::logoutv2
+     */
+    public function testLogoutWithAnExpiredTokenStillLogsOutOfTheWiki(): void
+    {
+        $expired = ['Authorization' => 'Bearer 999|no-such-token', 'Accept' => 'application/json'];
+        $this->assertWikiCookiesCleared($this->post('/api/v2/auth/logout', [], $expired)->assertOk());
+    }
+
+    private function assertWikiCookiesCleared($response): void
+    {
+        foreach (['mw__session', 'mw_Token', 'mw_UserID', 'mw_UserName'] as $name) {
+            $response->assertCookieExpired(config('restarters.wiki.cookie_prefix').'_'.$name);
+        }
+    }
 }

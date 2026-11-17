@@ -116,6 +116,29 @@ describe('components/fixometer/AddDataModal', () => {
     expect(goLink.attributes('href')).toBe('/party/view/10#devices-section')
   })
 
+  // A group's events usually share a venue, so the title alone couldn't tell
+  // them apart: develop puts the date first.
+  it('labels each event with its date and title, newest first', async () => {
+    const authStore = useAuthStore()
+    authStore.token = 'a-token'
+    authStore.user = { id: 1, role_name: 'Restarter' }
+
+    dashboardStore.data = { your_groups: [{ id: 1, name: 'Ulverston Repair Café' }] }
+    eventsStore.myEvents.data = [
+      { id: 10, title: 'Croftlands Community Centre', group: { id: 1 }, start: '2026-11-10T18:30:00Z' },
+      { id: 11, title: 'Croftlands Community Centre', group: { id: 1 }, start: '2026-12-08T18:30:00Z' },
+    ]
+
+    const wrapper = mountComponent()
+    await flushPromises()
+
+    const eventOpts = wrapper.find('[data-testid="add-data-event"]').findAll('option')
+    expect(eventOpts.map((o) => o.text())).toEqual([
+      '08 Dec 26 / Croftlands Community Centre',
+      '10 Nov 26 / Croftlands Community Centre',
+    ])
+  })
+
   it('shows a "no events yet" warning with a create-event link when the selected group has none', async () => {
     const authStore = useAuthStore()
     authStore.token = 'a-token'

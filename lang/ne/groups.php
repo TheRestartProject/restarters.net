@@ -90,7 +90,6 @@ return [
   'remove_volunteer' => 'Vrijwilliger verwijderen',
   'remove_host_role' => 'Hostrol verwijderen',
   'make_host' => 'Host maken',
-  'not_counting' => 'Telt niet mee voor de milieu-impact van deze groep|Tellen niet mee voor de milieu-impact van deze groep',
   'calendar_copy_title' => 'Toegang tot alle groepsevenementen in je persoonlijke agenda',
   'calendar_copy_description' => 'Voeg alle aankomende evenementen voor :group toe aan je Google/Outlook/Yahoo/Apple-agenda met de onderstaande link:',
   'volunteers_invited' => 'Vrijwilligers uitgenodigd',

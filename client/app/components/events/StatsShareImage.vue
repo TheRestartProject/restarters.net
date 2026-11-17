@@ -230,7 +230,7 @@ async function paint() {
     let x = initialX(props.target)
     let y = initialY(props.target)
 
-    const kgStr = `${parseInt(props.count, 10).toLocaleString()} kg`
+    const kgStr = `${Number.parseInt(props.count, 10).toLocaleString()} kg`
     const savedLine = t('partials.share_modal_weve_saved') + kgStr + t('partials.share_modal_of_co2')
     let height1 = lineHeight(ctx, savedLine, kgStr)
 

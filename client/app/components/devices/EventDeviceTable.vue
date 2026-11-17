@@ -107,6 +107,7 @@ const colspan = computed(() => {
     </BButton>
     <DeviceForm
       v-if="adding"
+      :class="{ 'event-device-add-form': variant === 'desktop' }"
       :event-id="eventId"
       :powered="powered"
       :group-features="groupFeatures"
@@ -118,6 +119,11 @@ const colspan = computed(() => {
 </template>
 
 <style scoped>
+/* On live the add form's panel reaches the edges of the tabs box, past the padding the box gives its content. */
+.event-device-add-form {
+  margin: 0.5rem -1rem -1rem;
+}
+
 /* Gap fix (dropped-behaviour finding): EventDevices.vue's own
    `b-img class="icon mb-1"` sizing for the add-device button icon. */
 .add-device-icon {

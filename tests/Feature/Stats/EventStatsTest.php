@@ -4,6 +4,7 @@ namespace Tests\Feature\Stats;
 
 use App\Device;
 use App\Party;
+use App\Role;
 use Tests\Feature\Stats\StatsTestCase;
 
 class EventStatsTest extends StatsTestCase
@@ -180,6 +181,7 @@ class EventStatsTest extends StatsTestCase
         $response->assertSuccessful();
         $response->assertSee('<span id="ewaste-diverted-value">23</span>', false);
     }
+
     /** @test */
     public function a_weight_entered_on_a_powered_item_outside_misc_counts(): void
     {
@@ -243,5 +245,20 @@ class EventStatsTest extends StatsTestCase
         // They still count as items with no weight entered.
         $this->assertEquals(1, $stats['no_weight_powered']);
         $this->assertEquals(1, $stats['no_weight_unpowered']);
+    }
+
+    /**
+     * @test
+     * @story:PartyController::stats
+     */
+    public function event_stats_widget_for_a_deleted_event_is_not_found(): void {
+        // Sites keep embedding the widget after the event has gone.
+        $this->withExceptionHandling();
+        $this->loginAsTestUser(Role::ADMINISTRATOR);
+        $idevents = $this->createEvent($this->createGroup(), 'yesterday');
+        Party::findOrFail($idevents)->delete();
+
+        $this->get('/party/stats/'.$idevents.'/wide')->assertNotFound();
+        $this->get('/party/stats/99999999/wide')->assertNotFound();
     }
 }

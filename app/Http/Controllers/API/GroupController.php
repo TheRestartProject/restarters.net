@@ -94,13 +94,17 @@ class GroupController extends Controller
             }
         }
 
-        $groups = [];
+        $groups = new \Illuminate\Database\Eloquent\Collection();
 
-        foreach ($authenticatedUser->networks as $network) {
+        foreach ($authenticatedUser->networks()->with('groups')->get() as $network) {
             foreach ($network->groups as $group) {
-                $groups[] = $group;
+                $groups->push($group);
             }
         }
+
+        // One query each for the images and events of all the groups, rather than three per group.
+        $groups->load(['groupImage.image', 'parties']);
+        $now = date('Y-m-d H:i:s');
 
         $allGroupStats = Group::bulkGroupStats($groups);
 
@@ -150,7 +154,7 @@ class GroupController extends Controller
                                       'network_data' => $group->network_data
                                   ]);
 
-                foreach ($group->upcomingParties() as $event) {
+                foreach ($group->parties->filter(fn ($event) => $event->event_end_utc > $now) as $event) {
                     $upcoming_parties_collection->push([
                                                            'event_id' => $event->idevents,
                                                            'event_date' => $event->event_date_local,
@@ -171,7 +175,7 @@ class GroupController extends Controller
                                                        ]);
                 }
 
-                foreach ($group->pastParties() as $key => $event) {
+                foreach ($group->parties->filter(fn ($event) => $event->event_end_utc < $now) as $event) {
                     $past_parties_collection->push([
                                                        'event_id' => $event->idevents,
                                                        'event_date' => $event->event_date_local,
@@ -935,7 +939,7 @@ class GroupController extends Controller
      *      operationId="getGroupAuditsv2",
      *      tags={"Groups"},
      *      summary="Audit trail for a group",
-     *      description="Backs the edit page's Group log tab. Administrator only, matching the legacy edit view's gate. Strings are rendered server-side from the group-audits lang files, so the placeholder substitution stays in one place; heading and changes are HTML.",
+     *      description="Backs the edit page's Group log tab: the latest 100 changes, newest first. Administrator only, matching the legacy edit view's gate. Strings are rendered server-side from the group-audits lang files, so the placeholder substitution stays in one place; heading and changes are HTML.",
      *      security={{"apiToken":{}}},
      *      @OA\Parameter(name="id", in="path", required=true, @OA\Schema(type="integer")),
      *      @OA\Response(
@@ -965,8 +969,9 @@ class GroupController extends Controller
             return response()->json(['error' => 'No such group'], 404);
         }
 
-        // Same shape and rationale as EventController::auditsv2 - see there.
-        $audits = $group->audits()->with('user')->orderBy('created_at', 'desc')->get();
+        // Same shape and rationale as EventController::auditsv2 - see there. Only the latest 100, as the legacy
+        // edit page sent: a busy group's whole history was too much for the page.
+        $audits = $group->audits()->with('user')->orderBy('created_at', 'desc')->orderBy('id', 'desc')->limit(100)->get();
 
         return response()->json([
             'data' => $audits->map(function ($audit) {

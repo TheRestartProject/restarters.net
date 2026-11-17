@@ -28,6 +28,12 @@ const eventsStore = useEventsStore()
 
 const id = computed(() => Number(route.params.id))
 const event = computed(() => eventsStore.current.data)
+// The form copies the event once, when it mounts, so it waits for this page's
+// own fetch even when the store already holds the event: seeded from the copy
+// the event's page fetched earlier, a save would write back stale values.
+// A save refreshes the store without setting `loading`, so the form stays.
+const fetched = ref(false)
+const showLoading = computed(() => !fetched.value || eventsStore.current.loading)
 const { uploadedImageUrl } = useUploadedImageUrl()
 
 // No permissions object on the v2 Event resource (unlike Group's) - approximate
@@ -92,7 +98,13 @@ onMounted(() => {
 useHead({ title: computed(() => (event.value ? `${t('events.editing', { event: event.value.title })}` : t('events.editing', { event: '' }))) })
 
 function load() {
-  eventsStore.fetchEvent(id.value)
+  // A failure is shown from the store's error.
+  eventsStore
+    .fetchEvent(id.value)
+    .catch(() => {})
+    .finally(() => {
+      fetched.value = true
+    })
   ensureEventPerms().catch(() => {})
 }
 
@@ -102,13 +114,14 @@ function retry() {
   load()
 }
 
+// The store has already refreshed the event (updateEvent). Reloading here
+// would swap the form for the loading placeholder, as develop never does.
 function onUpdated() {
   updatedMessage.value = t('events.save_event')
   // EventAddEditPage.vue:11 - `@edited="justCreated = false"`. Once saved the
   // event is no longer merely "just created", and the pre-submit notice the
   // banner was suppressing becomes relevant again.
   justCreated.value = false
-  load()
 }
 
 async function onImageUploaded({ uploadKey }) {
@@ -148,7 +161,7 @@ async function removeImage(image) {
 
 <template>
   <div class="container py-4" data-testid="event-edit-page">
-    <div v-if="eventsStore.current.loading" data-testid="event-edit-loading">
+    <div v-if="showLoading" data-testid="event-edit-loading">
       <LoadingPlaceholder height="6rem" />
     </div>
 

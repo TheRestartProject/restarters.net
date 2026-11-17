@@ -90,7 +90,6 @@ return [
   'remove_volunteer' => 'Rimuovi volontario',
   'remove_host_role' => 'Rimuovi ruolo organizzatore',
   'make_host' => 'Rendi organizzatore',
-  'not_counting' => 'Non conteggiato nell\'impatto ambientale di questo gruppo è|Non conteggiati nell\'impatto ambientale di questo gruppo sono',
   'calendar_copy_title' => 'Accedi a tutti gli eventi del gruppo nel tuo calendario personale',
   'calendar_copy_description' => 'Aggiungi tutti i prossimi eventi di :group al tuo calendario Google/Outlook/Yahoo/Apple con il link qui sotto:',
   'volunteers_invited' => 'Volontari invitati',

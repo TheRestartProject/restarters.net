@@ -130,7 +130,7 @@ const centre = ref(null)
 // side in GroupController::mine); anyone else gets every group in view.
 const yourPoint = computed(() => {
   const p = profileStore.info.data
-  return p && p.lat != null && p.lng != null && !isNaN(+p.lat) && !isNaN(+p.lng) ? { lat: +p.lat, lng: +p.lng } : null
+  return p && p.lat != null && p.lng != null && !Number.isNaN(+p.lat) && !Number.isNaN(+p.lng) ? { lat: +p.lat, lng: +p.lng } : null
 })
 
 const yourArea = computed(() => profileStore.info.data?.location || '')
@@ -145,7 +145,7 @@ const countryBounds = computed(() => {
   if (!name) return null
 
   const inCountry = allGroups.value.filter(
-    (g) => !g.archived_at && g.country === name && g.lat != null && g.lng != null && !isNaN(+g.lat) && !isNaN(+g.lng)
+    (g) => !g.archived_at && g.country === name && g.lat != null && g.lng != null && !Number.isNaN(+g.lat) && !Number.isNaN(+g.lng)
   )
   if (!inCountry.length) return null
 

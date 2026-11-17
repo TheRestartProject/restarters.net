@@ -541,8 +541,8 @@
         "getting_the_most": "Primeros pasos",
         "getting_the_most_intro": "Restarters.net es una plataforma gratuita y de código abierto para una comunidad global de personas que organizan eventos de reparación locales y luchan por nuestro Derecho a Reparar.",
         "getting_the_most_bullet1": "<strong>Repara</strong>: <a href=\"https://restarters.net/group\" target=\"_blank\" rel=\"noopener\">sigue el grupo de reparación comunitaria más cercano</a> y repasa o comparte tus habilidades con nuestra <a href=\"https://wiki.restarters.net/\" target=\"_blank\">wiki de reparación</a>.",
-        "getting_the_most_bullet2": "<strong>Organiza</strong>: <a href=\"https://talk.restarters.net/session/sso?return_path=https://talk.restarters.net/t/how-to-run-a-repair-event-the-restart-party-kit/324/\" target=\"_blank\">aprende cómo organizar un evento de reparación</a> y/o <a href=\"https://talk.restarters.net/c/community-repair/5\" target=\"_blank\">pide ayuda a la comunidad en Talk</a>.",
-        "getting_the_most_bullet3": "<strong>Charla</strong>: <a href=\"https://talk.restarters.net/session/sso?return_path=https://talk.restarters.net/\" target=\"_blank\">ponte al día con las últimas conversaciones</a> en nuestro foro, Talk. ¿Por qué no <a href=\"https://talk.restarters.net/t/who-is-everyone-meet-and-greet/44\" target=\"_blank\">te presentas</a> también?",
+        "getting_the_most_bullet2": "<strong>Organiza</strong>: <a href=\"https://talk.restarters.net/session/sso?return_path=https://talk.restarters.net/t/how-to-run-a-repair-event-the-restart-party-kit/324/\" target=\"_blank\">aprende cómo organizar un evento de reparación</a> y/o <a href=\"https://talk.restarters.net/session/sso?return_path=https://talk.restarters.net/c/community-repair/5\" target=\"_blank\">pide ayuda a la comunidad en Talk</a>.",
+        "getting_the_most_bullet3": "<strong>Charla</strong>: <a href=\"https://talk.restarters.net/session/sso?return_path=https://talk.restarters.net/\" target=\"_blank\">ponte al día con las últimas conversaciones</a> en nuestro foro, Talk. ¿Por qué no <a href=\"https://talk.restarters.net/session/sso?return_path=https://talk.restarters.net/t/who-is-everyone-meet-and-greet/44\" target=\"_blank\">te presentas</a> también?",
         "getting_the_most_bullet4": "<strong>Analiza</strong>: ve nuestro impacto en <a href=\"https://restarters.net/fixometer\" target=\"_blank\">el Fixometer</a>.",
         "upcoming_events_title": "Próximos eventos",
         "upcoming_events_subtitle": "Próximos eventos de tus grupos:",
@@ -832,7 +832,6 @@
         "add_new_event": "Añadir nuevo evento",
         "created_success_message": "¡Evento creado! Será aprobado por un coordinador en breve. Puedes continuar editándolo mientras tanto.",
         "items_fixed": "Artículos reparados",
-        "not_counting": "No se cuenta para el impacto ambiental de este evento|No se cuentan para el impacto ambiental de este evento",
         "impact_calculation": "<p><strong>¿Cómo calculamos el impacto ambiental?</strong></p>\n<p>Hemos investigado el peso promedio y la huella de CO<sub>2</sub>e de los productos en una serie de categorías, desde teléfonos inteligentes hasta camisetas. Cuando introduces un artículo que has reparado, usamos estos promedios para estimar el impacto de esa reparación según la categoría del artículo.</p>\n<p>Para los artículos varios, aplicamos un ratio genérico de CO<sub>2</sub>e al peso para estimar el impacto de cada reparación exitosa.</p>\n<p><a href=\"https://talk.restarters.net/t/how-do-we-measure-the-environmental-impact-of-events/6077\" target=\"_blank\" rel=\"nofollow\">Más información sobre cómo calculamos el impacto aquí</a></p>",
         "delete_event": "Eliminar evento",
         "confirmed_none": "No hay voluntarios confirmados.",
@@ -888,10 +887,7 @@
         "copied_to_clipboard": "Copiado al portapapeles.",
         "image_upload_error": "Lo sentimos, no se pudo subir la imagen.",
         "no_date_selected": "Ninguna fecha seleccionada",
-        "no_devices_added": "No se han añadido dispositivos",
-        "no_weight": "{value} artículo varios o sin alimentación eléctrica sin peso estimado|{value} artículos varios o sin alimentación eléctrica sin peso estimado",
-        "to_be_recycled": "{value} artículo para reciclar|{value} artículos para reciclar",
-        "to_be_repaired": "{value} artículo para reparar|{value} artículos para reparar"
+        "no_devices_added": "No se han añadido dispositivos"
     },
     "general": {
         "general": "General",
@@ -1063,7 +1059,6 @@
         "remove_volunteer": "Eliminar voluntario",
         "remove_host_role": "Eliminar rol de anfitrión",
         "make_host": "Hacer anfitrión",
-        "not_counting": "No se cuenta para el impacto ambiental de este grupo|No se cuentan para el impacto ambiental de este grupo",
         "calendar_copy_title": "Accede a todos los eventos del grupo en tu calendario personal",
         "calendar_copy_description": "Añade todos los próximos eventos de {group} a tu calendario de Google/Outlook/Yahoo/Apple con el enlace a continuación:",
         "volunteers_invited": "Voluntarios invitados",

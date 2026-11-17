@@ -42,7 +42,7 @@ class DeleteEventFromWordPress extends BaseEvent
                 $this->wpClient->deletePost($repairEvent->wordpress_post_id);
             }
         } catch (\Exception $ex) {
-            Log::error('An error occurred during Wordpress event deletion: '.$ex->getMessage());
+            Log::error('An error occurred during Wordpress event deletion', ['event' => $repairEvent->idevents, 'error' => $ex->getMessage()]);
 
             $usersToNotify = Fixometer::usersWhoHavePreference('delete-event-notification');
 

@@ -366,7 +366,7 @@ function maybeOpenFromEditId() {
 }
 
 function retry() {
-  load()
+  void load()
 }
 
 onMounted(load)

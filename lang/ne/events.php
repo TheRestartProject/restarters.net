@@ -97,7 +97,6 @@ return [
   'add_new_event' => 'Nieuw evenement toevoegen',
   'created_success_message' => 'Evenement aangemaakt! Het wordt binnenkort goedgekeurd door een coördinator. Je kunt het in de tussentijd blijven bewerken.',
   'items_fixed' => 'Gerepareerde items',
-  'not_counting' => 'Telt niet mee voor de milieu-impact van dit evenement|Tellen niet mee voor de milieu-impact van dit evenement',
   'impact_calculation' => '<p><strong>Hoe berekenen we de milieu-impact?</strong></p>
 <p>We hebben het gemiddelde gewicht en de CO<sub>2</sub>e-voetafdruk van producten in verschillende categorieën onderzocht, van smartphones tot t-shirts. Wanneer je een gerepareerd item invoert, gebruiken we deze gemiddelden om de impact van die reparatie te schatten op basis van de categorie van het item.</p>
 <p>Voor overige items passen we een generieke CO<sub>2</sub>e-gewichtsverhouding toe om de impact van elke succesvolle reparatie te schatten.</p>
@@ -157,7 +156,4 @@ return [
   'image_upload_error' => 'Sorry, de afbeelding kon niet worden geüpload.',
   'no_date_selected' => 'Geen datum geselecteerd',
   'no_devices_added' => 'Geen apparaten toegevoegd',
-  'no_weight' => ':value diverse of niet-elektrisch item zonder gewichtsschatting|:value diverse of niet-elektrische items zonder gewichtsschatting',
-  'to_be_recycled' => ':value item om te recyclen|:value items om te recyclen',
-  'to_be_repaired' => ':value item om te repareren|:value items om te repareren',
 ];

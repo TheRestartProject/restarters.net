@@ -147,21 +147,10 @@ class ExportTest extends TestCase
         $row2 = fgetcsv($fh);
         self::assertEquals($event2->getEventName(), $row2[1]);
         self::assertEquals($group2->name, $row2[10]);
-
-        // group3 is the unapproved one. Whether its event appears is now the
-        // point of the test rather than an incidental: an Administrator or a
-        // coordinator for the network may see it, a plain Host of the other
-        // two groups may not (User::userCanSeeEvent). This block previously
-        // asserted every role saw it, which is what the export was doing
-        // wrong.
-        $row2 = fgetcsv($fh);
-
-        if ($role === 'Host') {
-            self::assertFalse($row2, 'A host of other groups must not see an unapproved group\'s event');
-        } else {
-            self::assertEquals($event3->getEventName(), $row2[1]);
-            self::assertEquals($group3->name, $row2[10]);
-        }
+        // group3 is the unapproved one. Its event stays out of the network
+        // export for every role: the export only lists approved events of
+        // approved groups, before any per-viewer check.
+        self::assertFalse(fgetcsv($fh));
 
         // Export devices.
         $response = $this->get("/export/devices");

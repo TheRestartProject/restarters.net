@@ -10,6 +10,8 @@ import { useGroupsStore } from '../../../app/stores/groups.js'
 import { useDevicesStore } from '../../../app/stores/devices.js'
 import { useAuthStore } from '../../../app/stores/auth.js'
 import { useSessionStore } from '../../../app/stores/session.js'
+import { useToastStore } from '../../../app/stores/toast.js'
+import { stubSsoBridge, talkSso } from '../../helpers/ssoBridge.js'
 import en from '../../../i18n/locales/en.json'
 import clientEn from '../../../i18n/locales/client-en.json'
 
@@ -110,8 +112,7 @@ function baseEvent(overrides = {}) {
 }
 
 function mountPage() {
-  // events.environmental_impact/not_counting/to_be_recycled/to_be_repaired/
-  // no_weight/stat-0/stat-2 are new lang/en/events.php keys (this task's
+  // events.environmental_impact/stat-0/stat-2 are new lang/en/events.php keys (this task's
   // D1/D3 gaps) not yet in the generated client i18n JSON - the main agent
   // regenerates that centrally, so they're overlaid here inline rather than
   // editing client/i18n/locales/*.json directly (see DashboardWhatsHappening
@@ -126,10 +127,6 @@ function mountPage() {
         events: {
           ...en.events,
           environmental_impact: 'Environmental impact',
-          not_counting: "Not counting toward this event's environmental impact is|Not counting toward this event's environmental impact are",
-          to_be_recycled: '{value} item to be recycled|{value} items to be recycled',
-          to_be_repaired: '{value} item to be repaired|{value} items to be repaired',
-          no_weight: '{value} misc or unpowered item with no weight estimate|{value} misc or unpowered items with no weight estimate',
           'stat-0': 'Participants',
           'stat-2': 'Volunteers',
           // RES gap-closure pass (parity-v2/events.md) - same overlay
@@ -194,6 +191,40 @@ describe('pages/party/view/[id]', () => {
     authStore = useAuthStore()
 
     useSessionStore().config = { discourse_url: 'https://talk.example.com' }
+  })
+
+  // Following an emailed invite again finds its code spent. The server can't tell it's someone already going (the
+  // client signs in with a token, not the session the link arrives in), so the page checks once the event loads.
+  describe('an invite link that has been used (?invite=invalid)', () => {
+    beforeEach(() => {
+      vi.stubGlobal('useRoute', () => ({ params: { id: '5' }, query: { invite: 'invalid' }, fullPath: '/party/view/5?invite=invalid' }))
+    })
+
+    it('says nothing to someone already going', async () => {
+      const toast = useToastStore()
+      toast.error = vi.fn()
+      eventsStore.current.data = baseEvent({ attending: true })
+
+      mountPage()
+      await flushPromises()
+
+      expect(toast.error).not.toHaveBeenCalled()
+    })
+
+    it('warns someone who is not going, once the event has loaded', async () => {
+      const toast = useToastStore()
+      toast.error = vi.fn()
+      eventsStore.current.data = { ...baseEvent(), id: 99 }
+
+      mountPage()
+      await flushPromises()
+      expect(toast.error).not.toHaveBeenCalled()
+
+      eventsStore.current.data = baseEvent({ attending: false })
+      await flushPromises()
+      expect(toast.error).toHaveBeenCalledTimes(1)
+      expect(toast.error).toHaveBeenCalledWith(en.events.invite_invalid)
+    })
   })
 
   it('fetches the event, attendees and devices for the routed id on mount', () => {
@@ -468,28 +499,16 @@ describe('pages/party/view/[id]', () => {
       expect(wrapper.find('[data-testid="event-view-impact"]').exists()).toBe(false)
     })
 
-    it('lists dead/repairable/no-weight devices excluded from the totals', () => {
+    it('does not show a "not counting" note, as on the group page', () => {
       eventsStore.current.data = baseEvent({
         ...finishedRange,
         stats: { ...baseEvent().stats, dead_devices: 2, repairable_devices: 1, no_weight_powered: 1, no_weight_unpowered: 2 },
       })
       const wrapper = mountPage()
 
-      const note = wrapper.find('[data-testid="event-view-impact-notincluded"]').text()
-      // Exact, not toContain: the strings begin with the count, so a stray
-      // manual prefix produced "2 2 items to be recycled" - which still
-      // CONTAINS "2 items to be recycled", so the substring assertions here
-      // passed all the way through that bug reaching a screenshot.
-      expect(note.replace(/\s+/g, ' ')).toBe(
-        "Not counting toward this event's environmental impact are 2 items to be recycled, " +
-        '1 item to be repaired, 3 misc or unpowered items with no weight estimate.'
-      )
-    })
-
-    it('omits the notincluded note when nothing is excluded', () => {
-      eventsStore.current.data = baseEvent({ ...finishedRange })
-      const wrapper = mountPage()
+      expect(wrapper.find('[data-testid="event-view-impact"]').exists()).toBe(true)
       expect(wrapper.find('[data-testid="event-view-impact-notincluded"]').exists()).toBe(false)
+      expect(wrapper.text()).not.toContain('Not counting')
     })
   })
 
@@ -609,6 +628,21 @@ describe('pages/party/view/[id]', () => {
       const talk = wrapper.find('[data-testid="event-details-talk"]')
       expect(talk.exists()).toBe(true)
       expect(talk.find('a').attributes('href')).toBe('https://talk.example.com/t/4242')
+    })
+
+    // #966: the thread is a private message, so a plain link showed anyone
+    // not yet logged in to Talk "Access Denied".
+    it('clicking the talk-thread link goes through Talk\'s SSO', async () => {
+      eventsStore.current.data = baseEvent({ discourse_thread: '4242' })
+      const wrapper = mountPage()
+      const bridge = stubSsoBridge()
+      try {
+        await wrapper.find('[data-testid="event-details-talk"] a').trigger('click')
+
+        expect(await bridge.redirect()).toBe(talkSso('https://talk.example.com', 'https://talk.example.com/t/4242'))
+      } finally {
+        bridge.restore()
+      }
     })
 
     it('does not render a talk-thread link when discourse_thread is null (non-attendee, or no linked thread)', () => {

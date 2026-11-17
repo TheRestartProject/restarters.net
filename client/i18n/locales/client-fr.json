@@ -297,6 +297,9 @@
       "slide2_alt": "Un·e bénévole aidant un membre du public avec son téléphone",
       "slide3_alt": "Un·e Restarter réparant un appareil lors d’un de nos événements"
     },
+    "uploads": {
+      "off": "L'envoi de photos est désactivé sur ce site."
+    },
     "features": {
       "network_title": "Options pour les groupes de ce réseau",
       "network_intro": "Choisissez comment chaque fonctionnalité est réglée pour les groupes de ce réseau.",

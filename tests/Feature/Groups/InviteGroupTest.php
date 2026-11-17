@@ -131,6 +131,16 @@ class InviteGroupTest extends TestCase
         $frontend = rtrim(config('restarters.frontend_url'), '/');
         $this->assertEquals($frontend.'/group/view/'.$group->idgroups.'?joined=1', $redirectTo);
 
+        // Following the link again finds the code spent, but they're a member, so there's nothing to warn about.
+        $again = $this->get($invitation);
+        $this->assertEquals($frontend.'/group/view/'.$group->idgroups, $again->getTargetUrl());
+
+        // Someone who isn't in it, with a code that was never sent, still gets the warning.
+        $this->actingAs(User::factory()->restarter()->create());
+        $bogus = $this->get('/group/accept-invite/'.$group->idgroups.'/notacode');
+        $this->assertEquals($frontend.'/group/view/'.$group->idgroups.'?invite=invalid', $bogus->getTargetUrl());
+        $this->actingAs($user);
+
         // Acceptance should notify the host.
         Notification::assertSentTo(
             [$host],

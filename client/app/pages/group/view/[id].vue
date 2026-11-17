@@ -1,10 +1,12 @@
 <script setup>
+import { stripTags } from '~/utils/safeText.js'
 import LoadingPlaceholder from '~/components/LoadingPlaceholder.vue'
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useToastStore } from '~/stores/toast.js'
 import { useI18n } from 'vue-i18n'
 import { useGroupsStore } from '~/stores/groups.js'
 import { useSessionStore } from '~/stores/session.js'
+import { useSsoBridge } from '~/composables/useSsoBridge.js'
 import { useUploadedImageUrl } from '~/composables/useUploadedImageUrl.js'
 import { escapeHtml } from '~/utils/escapeHtml.js'
 import ConfirmModal from '~/components/ConfirmModal.vue'
@@ -79,6 +81,8 @@ const location = computed(() => {
   return typeof loc === 'string' ? loc : loc.location
 })
 
+const { followTalkLink } = useSsoBridge()
+
 // GroupDescription.vue's discourseGroup (view.blade.php: $group->discourse_group
 // ? DISCOURSE_URL.'/g/'.$group->discourse_group : null). The v2 Group
 // resource doesn't carry discourse_group yet, so this stays null (the link
@@ -96,7 +100,7 @@ const DESCRIPTION_LIMIT = 440
 const showFullDescription = ref(false)
 
 function stripHtml(value) {
-  return String(value).replace(/<[^>]*>/g, '')
+  return stripTags(value)
 }
 
 const strippedDescription = computed(() => {
@@ -231,6 +235,27 @@ function load() {
   groupsStore.fetchVolunteers(id.value)
 }
 
+// Following an emailed invite again finds its code spent, and the server can't tell that it's someone
+// already a member (the client signs in with a token, not the session the link arrives in). So wait for the
+// group to load, and only warn someone who isn't.
+function warnOfInvalidInviteUnlessMember() {
+  let done = false
+  let stop = null
+  stop = watch(
+    () => (group.value?.id === id.value ? group.value : null),
+    (loaded) => {
+      if (done || !loaded) return
+      done = true
+      if (!loaded.is_member) {
+        useToastStore().error(t('groups.invite_invalid'))
+      }
+      stop?.()
+    },
+    { immediate: true },
+  )
+  if (done) stop()
+}
+
 onMounted(() => {
   load()
 
@@ -240,7 +265,7 @@ onMounted(() => {
   if (route.query.joined === '1') {
     useToastStore().success(t('groups.invite_confirmed'))
   } else if (route.query.invite === 'invalid') {
-    useToastStore().error(t('groups.invite_invalid'))
+    warnOfInvalidInviteUnlessMember()
   }
   if (route.query.joined || route.query.invite) {
     const { joined, invite, ...rest } = route.query
@@ -401,7 +426,7 @@ onMounted(() => {
                  shown once the group has a linked discourse_group. -->
             <p v-if="discourseGroup" class="d-flex align-items-center gap-2" data-testid="group-view-talk">
               <img :src="'/icons/talk_ico.svg'" alt="" width="30" height="30" class="flex-shrink-0">
-              <a :href="discourseGroup">{{ t('groups.talk_group') }}</a>
+              <a :href="discourseGroup" @click="followTalkLink($event, discourseGroup)">{{ t('groups.talk_group') }}</a>
             </p>
           </GroupCollapsibleSection>
         </section>

@@ -556,8 +556,8 @@
         "getting_the_most": "Aan de slag",
         "getting_the_most_intro": "Restarters.net is een gratis, open source platform voor een wereldwijde gemeenschap van mensen die lokale reparatie-evenementen organiseren en strijden voor ons Recht op Reparatie.",
         "getting_the_most_bullet1": "<strong>Ga repareren</strong>: <a href=\"https://restarters.net/group\" target=\"_blank\" rel=\"noopener\">volg je dichtstbijzijnde gemeenschapsreparatiegroep</a> en vergroot of deel je vaardigheden via onze <a href=\"https://wiki.restarters.net/\" target=\"_blank\">reparatiewiki</a>.",
-        "getting_the_most_bullet2": "<strong>Ga organiseren</strong>: <a href=\"https://talk.restarters.net/session/sso?return_path=https://talk.restarters.net/t/how-to-run-a-repair-event-the-restart-party-kit/324/\" target=\"_blank\">leer hoe je een reparatie-evenement organiseert</a> en/of <a href=\"https://talk.restarters.net/c/community-repair/5\" target=\"_blank\">vraag de gemeenschap om hulp op Talk</a>.",
-        "getting_the_most_bullet3": "<strong>Ga chatten</strong>: <a href=\"https://talk.restarters.net/session/sso?return_path=https://talk.restarters.net/\" target=\"_blank\">lees de nieuwste gesprekken</a> op ons forum, Talk. Stel je ook gerust <a href=\"https://talk.restarters.net/t/who-is-everyone-meet-and-greet/44\" target=\"_blank\">voor</a>!",
+        "getting_the_most_bullet2": "<strong>Ga organiseren</strong>: <a href=\"https://talk.restarters.net/session/sso?return_path=https://talk.restarters.net/t/how-to-run-a-repair-event-the-restart-party-kit/324/\" target=\"_blank\">leer hoe je een reparatie-evenement organiseert</a> en/of <a href=\"https://talk.restarters.net/session/sso?return_path=https://talk.restarters.net/c/community-repair/5\" target=\"_blank\">vraag de gemeenschap om hulp op Talk</a>.",
+        "getting_the_most_bullet3": "<strong>Ga chatten</strong>: <a href=\"https://talk.restarters.net/session/sso?return_path=https://talk.restarters.net/\" target=\"_blank\">lees de nieuwste gesprekken</a> op ons forum, Talk. Stel je ook gerust <a href=\"https://talk.restarters.net/session/sso?return_path=https://talk.restarters.net/t/who-is-everyone-meet-and-greet/44\" target=\"_blank\">voor</a>!",
         "getting_the_most_bullet4": "<strong>Ga analyseren</strong>: bekijk onze impact in <a href=\"https://restarters.net/fixometer\" target=\"_blank\">de Fixometer</a>.",
         "upcoming_events_title": "Aankomende evenementen",
         "upcoming_events_subtitle": "Aankomende evenementen van jouw groepen:",
@@ -847,7 +847,6 @@
         "add_new_event": "Nieuw evenement toevoegen",
         "created_success_message": "Evenement aangemaakt! Het wordt binnenkort goedgekeurd door een coördinator. Je kunt het in de tussentijd blijven bewerken.",
         "items_fixed": "Gerepareerde items",
-        "not_counting": "Telt niet mee voor de milieu-impact van dit evenement|Tellen niet mee voor de milieu-impact van dit evenement",
         "impact_calculation": "<p><strong>Hoe berekenen we de milieu-impact?</strong></p>\n<p>We hebben het gemiddelde gewicht en de CO<sub>2</sub>e-voetafdruk van producten in verschillende categorieën onderzocht, van smartphones tot t-shirts. Wanneer je een gerepareerd item invoert, gebruiken we deze gemiddelden om de impact van die reparatie te schatten op basis van de categorie van het item.</p>\n<p>Voor overige items passen we een generieke CO<sub>2</sub>e-gewichtsverhouding toe om de impact van elke succesvolle reparatie te schatten.</p>\n<p><a href=\"https://talk.restarters.net/t/how-do-we-measure-the-environmental-impact-of-events/6077\" target=\"_blank\" rel=\"nofollow\">Lees hier meer over hoe we de impact berekenen</a></p>",
         "delete_event": "Evenement verwijderen",
         "confirmed_none": "Er zijn geen bevestigde vrijwilligers.",
@@ -903,10 +902,7 @@
         "copied_to_clipboard": "Gekopieerd naar het klembord.",
         "image_upload_error": "Sorry, de afbeelding kon niet worden geüpload.",
         "no_date_selected": "Geen datum geselecteerd",
-        "no_devices_added": "Geen apparaten toegevoegd",
-        "no_weight": "{value} diverse of niet-elektrisch item zonder gewichtsschatting|{value} diverse of niet-elektrische items zonder gewichtsschatting",
-        "to_be_recycled": "{value} item om te recyclen|{value} items om te recyclen",
-        "to_be_repaired": "{value} item om te repareren|{value} items om te repareren"
+        "no_devices_added": "Geen apparaten toegevoegd"
     },
     "general": {
         "general": "Algemeen",
@@ -1078,7 +1074,6 @@
         "remove_volunteer": "Vrijwilliger verwijderen",
         "remove_host_role": "Hostrol verwijderen",
         "make_host": "Host maken",
-        "not_counting": "Telt niet mee voor de milieu-impact van deze groep|Tellen niet mee voor de milieu-impact van deze groep",
         "calendar_copy_title": "Toegang tot alle groepsevenementen in je persoonlijke agenda",
         "calendar_copy_description": "Voeg alle aankomende evenementen voor {group} toe aan je Google/Outlook/Yahoo/Apple-agenda met de onderstaande link:",
         "volunteers_invited": "Vrijwilligers uitgenodigd",

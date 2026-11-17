@@ -34,6 +34,7 @@ const rows = computed(() =>
     name: group.name,
     archivedAt: group.archived ? true : null,
     isMember: true,
+    image: group.image_url || null,
     location: group.location || null,
     hosts: group.hosts,
     restarters: group.restarters,

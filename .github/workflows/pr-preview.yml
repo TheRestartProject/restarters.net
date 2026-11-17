@@ -229,7 +229,7 @@ jobs:
           - Password-protected test environment (usual dev gate password); commit \`${{ steps.pr.outputs.sha }}\` merged with \`${{ steps.pr.outputs.base }}\`.
           - If you see a "warming up" page, give it a few minutes - it refreshes itself.
           - The preview database is refreshed on every deploy and may reset at any time; anything you create here is disposable.
-          - Emails go to [shared Mailpit](https://restarters-dev-mail.fly.dev), never to real recipients. Image uploads are disabled.
+          - Emails go to [shared Mailpit](https://restarters-dev-mail.fly.dev), never to real recipients. Image uploads stay on the preview and go when it restarts.
           - The app suspends when idle; the first request after a pause can take a moment.
           EOF
           )

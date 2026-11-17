@@ -40,7 +40,7 @@ function onClick() {
     return
   }
 
-  doJoin()
+  void doJoin()
 }
 
 async function doJoin() {

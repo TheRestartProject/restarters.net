@@ -282,7 +282,7 @@ function onStartTimeChange() {
   if (!form.startTime) return
 
   const [hoursStr, minsStr] = form.startTime.split(':')
-  const hours = parseInt(hoursStr, 10)
+  const hours = Number.parseInt(hoursStr, 10)
 
   if (!form.endTime || form.endTime <= form.startTime) {
     if (hours < 21) {
@@ -452,7 +452,7 @@ function closeDuplicates() {
 function postAnyway() {
   showDuplicates.value = false
   duplicatesAccepted.value = true
-  submit()
+  void submit()
 }
 
 defineExpose({ submit })
@@ -466,7 +466,9 @@ defineExpose({ submit })
     </BAlert>
 
     <div class="event-form-layout">
-      <div class="event-form-venue d-flex flex-wrap align-items-end gap-3">
+      <!-- mb-3: the same space below as every other field group (the group
+           inside has mb-0 so the checkbox lines up with its input). -->
+      <div class="event-form-venue d-flex flex-wrap align-items-end gap-3 mb-3">
         <BFormGroup class="flex-grow-1 mb-0" :label="`${t('events.field_event_name')}:`" label-for="event-form-venue">
           <input
             id="event-form-venue" v-model="form.venue"
@@ -720,13 +722,17 @@ defineExpose({ submit })
         <div v-if="creating" class="flex-grow-1 text-end pe-3" data-testid="event-form-notice">
           {{ autoApprove ? t('events.before_submit_text_autoapproved') : t('events.before_submit_text') }}
         </div>
-        <div v-else-if="!justCreated" class="flex-grow-1 text-end pe-3">
-          <span v-if="autoApprove" data-testid="event-form-notice">
-            {{ t('events.before_submit_text_autoapproved') }}
-          </span>
-          <span v-else-if="!canApprove && form.moderate !== 'approve'" data-testid="event-form-notice">
-            {{ t('events.before_submit_text') }}
-          </span>
+        <!-- The slot stays even when empty, as develop's does, so the buttons
+             keep to the right after a create. -->
+        <div v-else class="flex-grow-1 text-end pe-3">
+          <template v-if="!justCreated">
+            <span v-if="autoApprove" data-testid="event-form-notice">
+              {{ t('events.before_submit_text_autoapproved') }}
+            </span>
+            <span v-else-if="!canApprove && form.moderate !== 'approve'" data-testid="event-form-notice">
+              {{ t('events.before_submit_text') }}
+            </span>
+          </template>
         </div>
 
         <div class="d-flex align-items-center gap-2">

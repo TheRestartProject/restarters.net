@@ -93,6 +93,20 @@ describe('pages/group/index (mine)', () => {
     expect(wrapper.find('[data-testid="group-join-1"]').exists()).toBe(false)
   })
 
+  // The rows left the image out, so every one of your groups showed the
+  // placeholder while the moderation list above had real ones.
+  it('shows each group\'s own image', () => {
+    groupsStore.mine.data = [
+      { id: 1, name: 'Ulverston Repair Café', role: 3, archived: false, image_url: 'https://restarters.net/uploads/mid_urc.png' },
+      { id: 2, name: 'No Picture Fixers', role: 3, archived: false, image_url: null },
+    ]
+
+    const wrapper = mountPage()
+
+    expect(wrapper.find('[data-testid="group-row-photo-1"]').attributes('src')).toBe('https://restarters.net/uploads/mid_urc.png')
+    expect(wrapper.find('[data-testid="group-row-photo-2"]').attributes('src')).toBe('/images/placeholder-avatar.webp')
+  })
+
   it('shows an archived badge for archived groups', () => {
     groupsStore.mine.data = [{ id: 2, name: 'Old Group', role: 4, archived: true, image_url: null }]
 

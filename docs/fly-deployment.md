@@ -131,7 +131,7 @@ Email sent from `restarters-dev` or any PR preview lands in the shared Mailpit i
 
 ## File Storage (Tigris)
 
-Uploaded files are stored in a shared Tigris S3-compatible bucket. All Fly apps read from the same bucket — there is no per-environment image storage. Only production writes to it: preview apps (`restarters-dev`, `restarters-pr-*`) hold a read-only key and set `FEATURE__IMAGE_UPLOAD=false`. nginx proxies all `/uploads/*` requests to the bucket; the PHP app never serves these files directly.
+Uploaded files are stored in a shared Tigris S3-compatible bucket. All Fly apps read from the same bucket. Only production writes to it: preview apps (`restarters-dev`, `restarters-pr-*`) hold a read-only key and set `FILESYSTEM_DISK=local`, so their uploads stay on the machine's own disk (`public/uploads`) and go when it cold-boots. nginx proxies `/uploads/*` requests to the bucket; on a preview it first serves any file uploaded there (`/etc/nginx/uploads-local.conf`, written by `docker/preview-startup.sh`). The PHP app never serves these files.
 
 - **Reads:** nginx → Tigris (30-day cache headers)
 - **Writes:** Laravel S3 filesystem driver (`FILESYSTEM_DISK=s3`)
@@ -258,9 +258,9 @@ Previews hold **no production-capable credentials**:
 
 - Fresh `APP_KEY` generated per app (never production's — that key can forge
   production session cookies).
-- Read-only Tigris credentials; `FEATURE__IMAGE_UPLOAD=false` gives users a
-  clean error instead of an IAM failure. Image *reads* come from the shared
-  live bucket.
+- Read-only Tigris credentials. Uploads go to the machine's own disk
+  (`FILESYSTEM_DISK=local`), never to the bucket; image *reads* fall back to
+  the shared live bucket.
 - Read-only Google Drive service account for the backup restore (the
   production backup SA can delete backups; that one never leaves production).
 - `FEATURE__WIKI/DISCOURSE/WORDPRESS_INTEGRATION` all `false`; mail goes to

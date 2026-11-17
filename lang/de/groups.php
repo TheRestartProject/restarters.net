@@ -90,7 +90,6 @@ return [
   'remove_volunteer' => 'Freiwillige(n) entfernen',
   'remove_host_role' => 'Host-Rolle entfernen',
   'make_host' => 'Zum Host machen',
-  'not_counting' => 'Nicht in der Umweltwirkung dieser Gruppe enthalten ist|Nicht in der Umweltwirkung dieser Gruppe enthalten sind',
   'calendar_copy_title' => 'Alle Gruppenveranstaltungen in Ihrem persönlichen Kalender aufrufen',
   'calendar_copy_description' => 'Fügen Sie alle bevorstehenden Veranstaltungen von :group mit dem folgenden Link zu Ihrem Google-/Outlook-/Yahoo-/Apple-Kalender hinzu:',
   'volunteers_invited' => 'Eingeladene Freiwillige',

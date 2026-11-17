@@ -3,7 +3,7 @@ import { join } from 'node:path'
 import { mount } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
 import { createI18n } from 'vue-i18n'
-import { beforeEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import ProfileTabs from '../../../app/components/profile/ProfileTabs.vue'
 import { useProfileStore } from '../../../app/stores/profile.js'
 import en from '../../../i18n/locales/en.json'
@@ -51,6 +51,27 @@ function isPaneVisible(wrapper, testid) {
 describe('components/profile/ProfileTabs', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
+  })
+
+  describe('the "Change password" link (#change-password)', () => {
+    afterEach(() => {
+      vi.stubGlobal('useRoute', () => ({ query: {}, params: {}, fullPath: '/' }))
+    })
+
+    it('opens the account tab, which holds the password form, as live did', () => {
+      vi.stubGlobal('useRoute', () => ({ query: {}, params: {}, hash: '#change-password', fullPath: '/profile/edit/5#change-password' }))
+      const wrapper = mountComponent({ isOwnProfile: true })
+
+      expect(isPaneVisible(wrapper, 'profile-tab-panel-account')).toBe(true)
+      expect(isPaneVisible(wrapper, 'profile-tab-panel-profile')).toBe(false)
+    })
+
+    it('opens the first tab without it', () => {
+      const wrapper = mountComponent({ isOwnProfile: true })
+
+      expect(isPaneVisible(wrapper, 'profile-tab-panel-profile')).toBe(true)
+      expect(isPaneVisible(wrapper, 'profile-tab-panel-account')).toBe(false)
+    })
   })
 
   describe('editing your own profile (isOwnProfile, not an Administrator)', () => {

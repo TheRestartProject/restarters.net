@@ -8,7 +8,10 @@ import en from '../../../i18n/locales/en.json'
 import clientEn from '../../../i18n/locales/client-en.json'
 
 const BFormStub = { emits: ['submit'], template: '<form @submit.prevent="$emit(\'submit\', $event)"><slot /></form>' }
-const BFormGroupStub = { template: '<div><slot name="label" /><slot /></div>' }
+const BFormGroupStub = {
+  props: ['label', 'labelFor', 'labelClass'],
+  template: '<div><label v-if="label" :for="labelFor" :class="labelClass">{{ label }}</label><slot name="label" /><slot /></div>',
+}
 const BAlertStub = { template: '<div><slot /></div>' }
 const BButtonStub = { template: '<button v-bind="$attrs"><slot /></button>' }
 const DevicePhotosStub = {
@@ -61,7 +64,7 @@ function seedMeta(store) {
   store.options.loaded = true
 }
 
-function mountForm(props = {}) {
+function mountForm(props = {}, options = {}) {
   // devices.title_repair/unknown_item_type/unknown_brand (gaps 7 and 13)
   // and devices.repair_outcome (control-substitution finding: the repair
   // status multiselect's placeholder) aren't in the checked-in
@@ -92,6 +95,7 @@ function mountForm(props = {}) {
       plugins: [i18n],
       stubs: GLOBAL_STUBS,
     },
+    ...options,
   })
 }
 
@@ -141,9 +145,8 @@ describe('components/devices/DeviceForm', () => {
   // DeviceBrand.vue/DeviceModel.vue prompt with "Brand (if known)" /
   // "Model (if known)". That "(if known)" is the only thing telling anyone
   // the fields are optional, so dropping it loses information rather than
-  // just styling. Kept as a placeholder ALONGSIDE the real <label>, not
-  // instead of it - develop has placeholder-only, which leaves the field
-  // unnamed once anything is typed into it.
+  // just styling. Like develop, the placeholder is what people see; each
+  // field keeps a <label> for screen readers.
   it('prompts that brand and model are optional', () => {
     const wrapper = mountForm()
 
@@ -412,6 +415,108 @@ describe('components/devices/DeviceForm', () => {
     })
   })
 
+  // Neil (10 Nov): "can it be made to match more closely to live? e.g. the size and placement of the (i)
+  // indicators looks odd. The quantity field is in a random place. I think the background colour is changed."
+  describe('laid out as live', () => {
+    const device = { id: 7, item_type: 'Kettle', category: { id: 10, name: 'Toaster', powered: true }, images: [] }
+
+    it('is a teal panel while adding and a grey one while editing', () => {
+      expect(mountForm().find('[data-testid="device-form"]').classes()).toContain('add-device')
+      expect(mountForm({ device }).find('[data-testid="device-form"]').classes()).toContain('edit-device')
+    })
+
+    it('prompts with placeholders and keeps each label for screen readers', () => {
+      const wrapper = mountForm()
+
+      expect(wrapper.find('[data-testid="device-form-item-type"]').attributes('placeholder')).toBe(en.devices.item_type)
+      const label = wrapper.find('label[for="device-form-item-type"]')
+      expect(label.text()).toBe(en.devices.item_type)
+      expect(label.classes()).toContain('visually-hidden')
+    })
+
+    it('names each dropdown for screen readers, as its label is hidden', async () => {
+      const wrapper = mountForm()
+      await chooseOption(wrapper, 'device-form-status', 'End of life')
+
+      const names = {
+        'device-form-category': en.devices.category,
+        'device-form-status': en.devices.repair_status,
+        'device-form-barrier': en.partials.choose_barriers,
+      }
+      for (const [testid, name] of Object.entries(names)) {
+        const control = wrapper.find(`[data-testid="${testid}"]`)
+        expect(control.attributes('role')).toBe('combobox')
+        expect(control.attributes('aria-label')).toBe(name)
+      }
+    })
+
+    it('puts each (i) in the column to the right of its own field', () => {
+      const wrapper = mountForm()
+
+      const toggles = wrapper.findAll('[data-testid="field-info-toggle"]')
+      expect(toggles).toHaveLength(5)
+      for (const toggle of toggles) {
+        const row = toggle.element.closest('.device-select-row')
+        expect(row).not.toBeNull()
+        expect(row.querySelector('input, textarea, .multiselect__tags')).not.toBeNull()
+      }
+    })
+
+    it('shows age on one row: label, box and hint', () => {
+      const wrapper = mountForm()
+
+      const row = wrapper.find('[data-testid="device-form-age"]').element.closest('.device-field-row')
+      expect(row).not.toBeNull()
+      expect(row.querySelector('label').textContent.trim()).toBe(en.devices.age)
+      expect(row.textContent).toContain(en.devices.age_approx)
+    })
+
+    it('puts the quantity between Add item and Cancel', () => {
+      const wrapper = mountForm()
+
+      const order = [...wrapper.find('.device-form-buttons').element.children]
+        .map((el) => el.dataset.testid)
+        .filter(Boolean)
+      expect(order).toEqual(['device-form-submit', 'device-form-quantity', 'device-form-cancel'])
+    })
+
+    it('starts with "What is it?" focused when adding, and not when editing', () => {
+      const adding = mountForm({}, { attachTo: document.body })
+      expect(document.activeElement).toBe(adding.find('[data-testid="device-form-item-type"]').element)
+      adding.unmount()
+
+      const editing = mountForm({ device }, { attachTo: document.body })
+      expect(document.activeElement).not.toBe(editing.find('[data-testid="device-form-item-type"]').element)
+      editing.unmount()
+    })
+  })
+
+  // Neil (10 Nov), on clearing a dropdown: "You can deselect it now by clicking on it, but it's not clear
+  // visually that you can do that."
+  describe('taking a choice off', () => {
+    it('labels the chosen repair status "remove", and only that option', async () => {
+      const wrapper = mountForm()
+
+      await chooseOption(wrapper, 'device-form-status', 'Fixed')
+      await wrapper.find('[data-testid="device-form-status"]').trigger('click')
+
+      const hints = wrapper.findAll('[data-testid="device-form-option-remove"]')
+      expect(hints).toHaveLength(1)
+      expect(hints[0].text()).toBe(en.partials.remove)
+      expect(hints[0].element.closest('[data-testid="device-form-status-option-Fixed"]')).not.toBeNull()
+    })
+
+    it('does not offer to remove the category, which is required', async () => {
+      const wrapper = mountForm()
+
+      await chooseOption(wrapper, 'device-form-category', '10')
+      await wrapper.find('[data-testid="device-form-category"]').trigger('click')
+
+      expect(wrapper.find('[data-testid="device-form-category-option-10"]').classes()).toContain('multiselect__option--selected')
+      expect(wrapper.find('[data-testid="device-form-option-remove"]').exists()).toBe(false)
+    })
+  })
+
   describe('unknown item-type/brand warning (gap 33)', () => {
     it('warns when the typed item type matches no suggestion', async () => {
       const wrapper = mountForm()
@@ -542,6 +647,64 @@ describe('components/devices/DeviceForm', () => {
       expect(wrapper.find('[data-testid="device-form-brand"]').element.value).toBe('Acme')
     })
 
+    // Neil's testing: "Sometimes I can get the list of item suggestions to stop working."  The list opened on focus
+    // only, so anything that closed it while the field kept focus (choosing a suggestion, Escape, opening another
+    // panel) left it shut however much was typed afterwards.
+    describe.each([
+      ['item-type', 'Blen', 'Blender'],
+      ['brand', 'Ac', 'Acme'],
+    ])('%s suggestions keep coming while the field has focus', (field, typed, suggestion) => {
+      const input = (wrapper) => wrapper.find(`[data-testid="device-form-${field}"]`)
+      const option = (wrapper) => wrapper.find(`[data-testid="device-form-${field}-option-${suggestion}"]`)
+
+      it('reappear when you edit the text after choosing a suggestion', async () => {
+        const wrapper = mountForm({ powered: true })
+        await input(wrapper).trigger('focus')
+        await input(wrapper).setValue(typed)
+        await option(wrapper).trigger('mousedown')
+        expect(option(wrapper).exists()).toBe(false)
+
+        await input(wrapper).setValue(typed)
+        expect(option(wrapper).exists()).toBe(true)
+      })
+
+      it('reappear when you type after pressing Escape', async () => {
+        const wrapper = mountForm({ powered: true })
+        await input(wrapper).trigger('focus')
+        await input(wrapper).setValue(typed)
+        await input(wrapper).trigger('keydown', { key: 'Escape' })
+        expect(option(wrapper).exists()).toBe(false)
+
+        await input(wrapper).setValue(typed.slice(0, -1))
+        await input(wrapper).setValue(typed)
+        expect(option(wrapper).exists()).toBe(true)
+      })
+
+      it('reappear when you click into the field you are already in', async () => {
+        const wrapper = mountForm({ powered: true })
+        await input(wrapper).trigger('focus')
+        await input(wrapper).setValue(typed)
+        await option(wrapper).trigger('mousedown')
+        await input(wrapper).setValue(typed)
+        await input(wrapper).trigger('keydown', { key: 'Escape' })
+        expect(option(wrapper).exists()).toBe(false)
+
+        await input(wrapper).trigger('click')
+        expect(option(wrapper).exists()).toBe(true)
+      })
+
+      it('reappear when you type after another panel was opened without leaving the field', async () => {
+        const wrapper = mountForm({ powered: true })
+        await input(wrapper).trigger('focus')
+        await input(wrapper).setValue(typed)
+        await wrapper.find('[data-testid="device-form-category"]').trigger('click')
+        expect(option(wrapper).exists()).toBe(false)
+
+        await input(wrapper).setValue(typed)
+        expect(option(wrapper).exists()).toBe(true)
+      })
+    })
+
     // vue-typeahead-bootstrap (DeviceType.vue, `:minMatchingChars="1"
     // :maxMatches="5"`): nothing until typed, then a stable sort by match
     // position, capped at 5.
@@ -559,6 +722,34 @@ describe('components/devices/DeviceForm', () => {
       const shown = wrapper.findAll('[data-testid^="device-form-item-type-option-"]').map((o) => o.text())
 
       expect(shown).toEqual(['KETTLE LEAD', 'Kettle', 'Ceramic kettle', 'Electric Kettle', 'Iron with kettle'])
+    })
+
+    // Live's typeahead shows what you typed in bold in each suggestion.
+    it('shows the typed text in bold in each suggestion', async () => {
+      store.itemTypes.data = ['Smeg Kettle', 'Kettle base'].map((type) => ({ type, powered: true }))
+      const wrapper = mountForm({ powered: true })
+      const input = wrapper.find('[data-testid="device-form-item-type"]')
+
+      await input.trigger('focus')
+      await input.setValue('kettle')
+
+      const option = wrapper.find('[data-testid="device-form-item-type-option-Smeg Kettle"]')
+      expect(option.text()).toBe('Smeg Kettle')
+      expect(option.findAll('strong').map((b) => b.text())).toEqual(['Kettle'])
+      expect(wrapper.find('[data-testid="device-form-item-type-option-Kettle base"] strong').text()).toBe('Kettle')
+    })
+
+    it('bolds typed text holding brackets or dots as it is', async () => {
+      store.itemTypes.data = ['Hi-Fi (stereo) amp'].map((type) => ({ type, powered: true }))
+      const wrapper = mountForm({ powered: true })
+      const input = wrapper.find('[data-testid="device-form-item-type"]')
+
+      await input.trigger('focus')
+      await input.setValue('(STEREO)')
+
+      const option = wrapper.find('[data-testid="device-form-item-type-option-Hi-Fi (stereo) amp"]')
+      expect(option.text()).toBe('Hi-Fi (stereo) amp')
+      expect(option.findAll('strong').map((b) => b.text())).toEqual(['(stereo)'])
     })
   })
 

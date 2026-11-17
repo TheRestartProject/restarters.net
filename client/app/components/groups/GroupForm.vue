@@ -1,4 +1,5 @@
 <script setup>
+import { isEmailLike } from '~/utils/safeText.js'
 import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { LMap, LMarker, LTileLayer } from '@vue-leaflet/vue-leaflet'
@@ -21,6 +22,7 @@ import GroupMultiSelect from './GroupMultiSelect.vue'
 import GroupNetworkData from './GroupNetworkData.vue'
 import SpinIcon from '../forms/SpinIcon.vue'
 import { useSpinButton } from '../../composables/useSpinButton.js'
+import { useLeafletUnmountGuard } from '../../composables/useLeafletUnmountGuard.js'
 
 const leafletTiles = useLeafletTiles()
 
@@ -52,6 +54,8 @@ const props = defineProps({
     default: false,
   },
 })
+
+useLeafletUnmountGuard()
 
 const emit = defineEmits(['created', 'updated'])
 
@@ -264,7 +268,7 @@ function validate() {
   if (form.website && !/^https?:\/\/.+/i.test(form.website)) {
     errors.website = [t('groups.groups_website_invalid')]
   }
-  if (form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+  if (form.email && !isEmailLike(form.email)) {
     errors.email = [t('client.groups.email_invalid')]
   }
   if (!timezoneValid.value) {

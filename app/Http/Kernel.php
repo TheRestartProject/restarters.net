@@ -22,6 +22,7 @@ class Kernel extends HttpKernel
         \App\Http\Middleware\TrustProxies::class,
         \Illuminate\Http\Middleware\HandleCors::class,
         \App\Http\Middleware\HttpsProtocol::class,
+        \App\Http\Middleware\ReportBrokenLinksToSentry::class,
     ];
 
     /**

@@ -42,6 +42,12 @@ const groupsStore = useGroupsStore()
 
 const id = computed(() => Number(route.params.id))
 const group = computed(() => groupsStore.current.data)
+// The form copies the group once, when it mounts, so it waits for this page's
+// own fetch even when the store already holds the group: seeded from the copy
+// the group's page fetched earlier, a save would write back stale values.
+// A save refreshes the store without setting `loading`, so the form stays.
+const fetched = ref(false)
+const showLoading = computed(() => !fetched.value || groupsStore.current.loading)
 const permissions = computed(() => group.value?.permissions || {})
 const canEdit = computed(() => !!permissions.value.can_edit)
 
@@ -80,7 +86,13 @@ const updatedMessage = ref('')
 useHead({ title: computed(() => (group.value ? `${t('groups.editing')} ${group.value.name}` : t('groups.editing'))) })
 
 function load() {
-  groupsStore.fetchCurrent(id.value)
+  // A failure is shown from the store's error.
+  groupsStore
+    .fetchCurrent(id.value)
+    .catch(() => {})
+    .finally(() => {
+      fetched.value = true
+    })
 }
 
 onMounted(load)
@@ -98,7 +110,7 @@ function onUpdated() {
 
 <template>
   <div class="container py-4" data-testid="group-edit-page">
-    <div v-if="groupsStore.current.loading" data-testid="group-edit-loading">
+    <div v-if="showLoading" data-testid="group-edit-loading">
       <LoadingPlaceholder height="6rem" />
     </div>
 

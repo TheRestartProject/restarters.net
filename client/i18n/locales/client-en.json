@@ -296,6 +296,9 @@
       "slide2_alt": "A volunteer helping a member of the public with their phone",
       "slide3_alt": "A Restarter fixing a device at one of our events"
     },
+    "uploads": {
+      "off": "Photo uploads are switched off on this site."
+    },
     "features": {
       "network_title": "Options for groups in this network",
       "network_intro": "Choose how each feature is set for the groups in this network.",
