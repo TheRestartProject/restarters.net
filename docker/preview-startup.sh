@@ -130,7 +130,7 @@ fi
 # its bucket key is read-only. nginx serves them from there and falls back to
 # the shared bucket for everything else (nginx-fly.conf, location /uploads/).
 # They go when the machine cold-boots, along with the restored database.
-if [ "${FILESYSTEM_DISK:-}" != "s3" ]; then
+if [[ "${FILESYSTEM_DISK:-}" != "s3" ]]; then
     echo 'set $local_upload $uri;' > /etc/nginx/uploads-local.conf
 fi
 

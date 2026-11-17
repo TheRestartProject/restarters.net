@@ -57,7 +57,9 @@ export function useSsoBridge() {
   }
 
   function talkBase() {
-    return (useSessionStore().config?.discourse_url || '').replace(/\/+$/, '')
+    let base = useSessionStore().config?.discourse_url || ''
+    while (base.endsWith('/')) base = base.slice(0, -1)
+    return base
   }
 
   // Whether `url` is on Talk (the session's configured Discourse).
