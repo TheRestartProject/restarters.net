@@ -14,12 +14,16 @@ set -euo pipefail
 
 LABELS=("CI: Running" "CI: Passed" "CI: Failed")
 
-# A failed change is reported and skipped rather than stopping the run: the next status puts it right.
+# A failed change is reported and skipped rather than stopping the run: the next status puts it right. The run
+# still fails at the end, so that changes that never work (a missing permission) don't pass unseen.
+failures=0
+
 run() {
   if [ "${DRY_RUN:-}" = 1 ]; then
     echo "  would run: $*"
   elif ! "$@" > /dev/null; then
     echo "::warning::Failed: $*"
+    failures=$((failures + 1))
   fi
 }
 
@@ -95,8 +99,15 @@ elif [ -n "$sha" ]; then
     label_pr "$pr" "$sha"
   done
 else
-  gh api "repos/$REPO/pulls?state=open&per_page=100" --paginate --jq '.[] | "\(.number) \(.head.sha)"' |
-    while read -r pr sha; do
-      label_pr "$pr" "$sha"
-    done
+  # Read into a variable rather than piping into the loop, so the loop runs in this shell and can count failures.
+  open_prs=$(gh api "repos/$REPO/pulls?state=open&per_page=100" --paginate --jq '.[] | "\(.number) \(.head.sha)"')
+
+  while read -r pr sha; do
+    [ -n "$pr" ] && label_pr "$pr" "$sha"
+  done <<< "$open_prs"
+fi
+
+if [ "$failures" -gt 0 ]; then
+  echo "::error::$failures label change(s) failed"
+  exit 1
 fi
