@@ -14,7 +14,7 @@ import CollapsibleSection from '~/components/CollapsibleSection.vue'
 // same empty state the legacy page had.
 const { t } = useI18n()
 const sessionStore = useSessionStore()
-const { goTo } = useSsoBridge()
+const { goToTalk } = useSsoBridge()
 
 const topics = ref([])
 const discourseBaseUrl = computed(() => sessionStore.config?.discourse_url || '')
@@ -34,7 +34,7 @@ onMounted(async () => {
 
 function seeAll() {
   const base = sessionStore.config?.discourse_url
-  goTo(base ? `${base}/latest` : null)
+  goToTalk(base ? `${base}/latest` : null)
 }
 </script>
 

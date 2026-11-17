@@ -1,6 +1,7 @@
 <script setup>
 import { useI18n } from 'vue-i18n'
 import CollapsibleSection from '~/components/CollapsibleSection.vue'
+import { useSsoBridge } from '~/composables/useSsoBridge.js'
 
 // Legacy source: resources/js/components/DashboardRightSidebar.vue. The
 // legacy version had a couple of display classes that contradicted their
@@ -14,6 +15,19 @@ import CollapsibleSection from '~/components/CollapsibleSection.vue'
 // desktop-only) - replicated here the same way rather than showing it twice
 // on desktop.
 const { t } = useI18n()
+const { goToTalk, isTalkUrl } = useSsoBridge()
+
+// The getting-started bullets are translated HTML with Talk links in them.
+// Send those through Talk's SSO (as a new tab, like their target="_blank")
+// so the user arrives logged in to Talk rather than at "Access Denied" (#966).
+function onBulletClick(event) {
+  const link = event.target.closest?.('a[href]')
+
+  if (link && isTalkUrl(link.href)) {
+    event.preventDefault()
+    goToTalk(link.href, { newTab: link.target === '_blank' })
+  }
+}
 </script>
 
 <template>
@@ -42,7 +56,7 @@ const { t } = useI18n()
                comment above) - not shown here either. -->
           <p class="d-block d-md-none">{{ t('dashboard.sidebar_intro_1') }}</p>
 
-          <ul class="list-unstyled getting-started__list">
+          <ul class="list-unstyled getting-started__list" @click="onBulletClick">
             <!-- eslint-disable vue/no-v-html -->
             <li v-html="t('dashboard.getting_the_most_bullet1')" />
             <li v-html="t('dashboard.getting_the_most_bullet2')" />

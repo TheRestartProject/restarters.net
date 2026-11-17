@@ -75,13 +75,17 @@ describe('components/dashboard/DashboardWhatsHappening', () => {
     expect(window.location.href).toBe('')
   })
 
-  it('targets /latest on the session\'s configured discourse_url', async () => {
+  it('targets /latest on the session\'s configured discourse_url, through Talk\'s SSO', async () => {
     useSessionStore().config = { discourse_url: 'https://talk.restarters.net' }
 
     const wrapper = mountComponent()
+    // No ticket endpoint in this suite's $api stub, so the bridge falls back
+    // to navigating straight to its redirect - which is what's checked here.
     await wrapper.find('[data-testid="whats-happening-see-all"]').trigger('click')
 
-    expect(window.location.href).toBe('https://talk.restarters.net/latest')
+    expect(window.location.href).toBe(
+      'https://talk.restarters.net/session/sso?return_path=' + encodeURIComponent('https://talk.restarters.net/latest')
+    )
   })
 
   it('renders a row per live Talk topic, linking each to its Discourse topic', async () => {
@@ -106,7 +110,7 @@ describe('components/dashboard/DashboardWhatsHappening', () => {
     expect(wrapper.find('[data-testid="whats-happening-topics"]').exists()).toBe(true)
     const link = wrapper.find('[data-testid="talk-topic-link-7"]')
     expect(link.text()).toBe('Fixing kettles')
-    expect(link.attributes('href')).toBe('https://talk.restarters.net/t/fixing-kettles')
+    expect(link.attributes('href')).toBe('https://talk.restarters.net/t/fixing-kettles/7')
   })
 
   it('still shows the table header/chrome (with an empty body) when the API returns no topics, degrading to just header + see-all link', async () => {

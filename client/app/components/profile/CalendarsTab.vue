@@ -3,6 +3,7 @@ import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useProfileStore } from '~/stores/profile.js'
 import { useSessionStore } from '~/stores/session.js'
+import { useSsoBridge } from '~/composables/useSsoBridge.js'
 
 // GET /api/v2/users/me/calendars. Functional spec:
 // resources/js/components/CalendarsTab.vue +
@@ -13,6 +14,7 @@ import { useSessionStore } from '~/stores/session.js'
 const { t } = useI18n()
 const profileStore = useProfileStore()
 const sessionStore = useSessionStore()
+const { goToTalk } = useSsoBridge()
 
 const loading = ref(true)
 const selectedArea = ref('')
@@ -56,7 +58,7 @@ function copy(text) {
     <h3>{{ t('profile.calendars.title') }}</h3>
     <p>
       {{ t('profile.calendars.explainer') }}
-      <a :href="findOutMoreUrl">{{ t('profile.calendars.find_out_more') }}</a>.
+      <a :href="findOutMoreUrl" @click.prevent="goToTalk(findOutMoreUrl)">{{ t('profile.calendars.find_out_more') }}</a>.
     </p>
 
     <BAlert v-if="profileStore.calendars.error" :model-value="true" variant="danger" data-testid="calendars-error">

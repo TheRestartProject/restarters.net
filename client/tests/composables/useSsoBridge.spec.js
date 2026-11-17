@@ -1,11 +1,14 @@
+import { createPinia, setActivePinia } from 'pinia'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { useSsoBridge } from '../../app/composables/useSsoBridge.js'
+import { useSessionStore } from '../../app/stores/session.js'
 
 describe('composables/useSsoBridge', () => {
   let mockApi
   let originalHref
 
   beforeEach(() => {
+    setActivePinia(createPinia())
     mockApi = {
       auth: {
         ssoTicket: vi.fn(),
@@ -54,5 +57,122 @@ describe('composables/useSsoBridge', () => {
     await goTo('https://wiki.example.com')
 
     expect(window.location.href).toBe('https://wiki.example.com')
+  })
+
+  describe('opening in a new tab', () => {
+    let openSpy
+
+    afterEach(() => {
+      openSpy.mockRestore()
+    })
+
+    it('opens the tab before awaiting the ticket, cuts its opener, and sends the tab (not this one) through the bridge', async () => {
+      const tab = { opener: window, location: { href: '' } }
+      openSpy = vi.spyOn(window, 'open').mockReturnValue(tab)
+      mockApi.auth.ssoTicket.mockResolvedValueOnce({
+        data: { ticket: 'tok-abc', bridge_url: 'http://localhost:8001/auth/bridge' },
+      })
+
+      const { goTo } = useSsoBridge()
+      const going = goTo('https://talk.example.com/session/sso?return_path=x', { newTab: true })
+
+      // Synchronously, inside the click - before the ticket call resolves.
+      expect(openSpy).toHaveBeenCalledWith('', '_blank')
+      await going
+
+      expect(tab.opener).toBe(null)
+      expect(tab.location.href).toBe(
+        'http://localhost:8001/auth/bridge?ticket=tok-abc&redirect=' +
+          encodeURIComponent('https://talk.example.com/session/sso?return_path=x')
+      )
+      expect(window.location.href).toBe('')
+    })
+
+    it('falls back to this tab when the new one is blocked', async () => {
+      openSpy = vi.spyOn(window, 'open').mockReturnValue(null)
+      mockApi.auth.ssoTicket.mockResolvedValueOnce({
+        data: { ticket: 'tok-abc', bridge_url: 'http://localhost:8001/auth/bridge' },
+      })
+
+      const { goTo } = useSsoBridge()
+      await goTo('https://talk.example.com', { newTab: true })
+
+      expect(window.location.href).toBe(
+        'http://localhost:8001/auth/bridge?ticket=tok-abc&redirect=' + encodeURIComponent('https://talk.example.com')
+      )
+    })
+  })
+
+  // #966: Talk only logs someone in when they arrive via its /session/sso
+  // endpoint; a direct link to a page needing an account shows "Access Denied".
+  describe('goToTalk()', () => {
+    beforeEach(() => {
+      useSessionStore().config = { discourse_url: 'https://talk.example.com' }
+      mockApi.auth.ssoTicket.mockResolvedValue({
+        data: { ticket: 'tok-abc', bridge_url: 'http://localhost:8001/auth/bridge' },
+      })
+    })
+
+    function redirect() {
+      return new URL(window.location.href).searchParams.get('redirect')
+    }
+
+    it('sends a Talk page through Talk\'s SSO, returning to that page', async () => {
+      const { goToTalk } = useSsoBridge()
+      await goToTalk('https://talk.example.com/t/meet-and-greet/44')
+
+      expect(redirect()).toBe(
+        'https://talk.example.com/session/sso?return_path=' + encodeURIComponent('https://talk.example.com/t/meet-and-greet/44')
+      )
+    })
+
+    it('uses a link that is already a /session/sso one as it is', async () => {
+      const sso = 'https://talk.example.com/session/sso?return_path=https://talk.example.com/t/kit/324'
+      const { goToTalk } = useSsoBridge()
+      await goToTalk(sso)
+
+      expect(redirect()).toBe(sso)
+    })
+
+    it('is a no-op for an empty url', async () => {
+      const { goToTalk } = useSsoBridge()
+      await goToTalk(null)
+
+      expect(mockApi.auth.ssoTicket).not.toHaveBeenCalled()
+      expect(window.location.href).toBe('')
+    })
+  })
+
+  describe('isTalkUrl()', () => {
+    it('recognises the configured Talk origin and pages under it', () => {
+      useSessionStore().config = { discourse_url: 'https://talk.example.com' }
+      const { isTalkUrl } = useSsoBridge()
+
+      expect(isTalkUrl('https://talk.example.com')).toBe(true)
+      expect(isTalkUrl('https://talk.example.com/t/kit/324')).toBe(true)
+      expect(isTalkUrl('https://talk.example.com/session/sso?return_path=x')).toBe(true)
+    })
+
+    it('rejects other sites, including lookalike hosts', () => {
+      useSessionStore().config = { discourse_url: 'https://talk.example.com' }
+      const { isTalkUrl } = useSsoBridge()
+
+      expect(isTalkUrl('https://talk.example.com.evil.test/t/1')).toBe(false)
+      expect(isTalkUrl('https://wiki.example.com/Main_Page')).toBe(false)
+      expect(isTalkUrl('')).toBe(false)
+    })
+
+    it('copes with a configured Talk URL that ends in a slash', () => {
+      useSessionStore().config = { discourse_url: 'https://talk.example.com/' }
+      const { isTalkUrl } = useSsoBridge()
+
+      expect(isTalkUrl('https://talk.example.com/t/kit/324')).toBe(true)
+    })
+
+    it('is false for everything when no Talk URL is configured', () => {
+      const { isTalkUrl } = useSsoBridge()
+
+      expect(isTalkUrl('https://talk.example.com/t/1')).toBe(false)
+    })
   })
 })

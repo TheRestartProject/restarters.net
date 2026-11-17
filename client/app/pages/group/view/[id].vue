@@ -6,6 +6,7 @@ import { useToastStore } from '~/stores/toast.js'
 import { useI18n } from 'vue-i18n'
 import { useGroupsStore } from '~/stores/groups.js'
 import { useSessionStore } from '~/stores/session.js'
+import { useSsoBridge } from '~/composables/useSsoBridge.js'
 import { useUploadedImageUrl } from '~/composables/useUploadedImageUrl.js'
 import { escapeHtml } from '~/utils/escapeHtml.js'
 import ConfirmModal from '~/components/ConfirmModal.vue'
@@ -79,6 +80,8 @@ const location = computed(() => {
   if (!loc) return null
   return typeof loc === 'string' ? loc : loc.location
 })
+
+const { goToTalk } = useSsoBridge()
 
 // GroupDescription.vue's discourseGroup (view.blade.php: $group->discourse_group
 // ? DISCOURSE_URL.'/g/'.$group->discourse_group : null). The v2 Group
@@ -423,7 +426,7 @@ onMounted(() => {
                  shown once the group has a linked discourse_group. -->
             <p v-if="discourseGroup" class="d-flex align-items-center gap-2" data-testid="group-view-talk">
               <img :src="'/icons/talk_ico.svg'" alt="" width="30" height="30" class="flex-shrink-0">
-              <a :href="discourseGroup">{{ t('groups.talk_group') }}</a>
+              <a :href="discourseGroup" @click.prevent="goToTalk(discourseGroup)">{{ t('groups.talk_group') }}</a>
             </p>
           </GroupCollapsibleSection>
         </section>

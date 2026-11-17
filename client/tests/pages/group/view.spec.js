@@ -6,6 +6,7 @@ import GroupViewPage from '../../../app/pages/group/view/[id].vue'
 import { useGroupsStore } from '../../../app/stores/groups.js'
 import { useSessionStore } from '../../../app/stores/session.js'
 import { useToastStore } from '../../../app/stores/toast.js'
+import { stubSsoBridge, talkSso } from '../../helpers/ssoBridge.js'
 import en from '../../../i18n/locales/en.json'
 import clientEn from '../../../i18n/locales/client-en.json'
 import { GROUP_VIEW_STUBS } from '../../helpers/stubs.js'
@@ -214,6 +215,21 @@ describe('pages/group/view/[id]', () => {
       const talk = wrapper.find('[data-testid="group-view-talk"]')
       expect(talk.exists()).toBe(true)
       expect(talk.find('a').attributes('href')).toBe('https://talk.example.com/g/fixers-united')
+    })
+
+    it('clicking the Discourse group link goes through Talk\'s SSO (#966)', async () => {
+      groupsStore.current.data = { ...BASE_GROUP, discourse_group: 'fixers-united' }
+      const wrapper = mountPage()
+      const bridge = stubSsoBridge()
+      try {
+        await wrapper.find('[data-testid="group-view-talk"] a').trigger('click')
+
+        expect(await bridge.redirect()).toBe(
+          talkSso('https://talk.example.com', 'https://talk.example.com/g/fixers-united')
+        )
+      } finally {
+        bridge.restore()
+      }
     })
 
     it('does not render a Discourse link when the group has no discourse_group', () => {

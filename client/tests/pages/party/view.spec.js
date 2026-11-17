@@ -11,6 +11,7 @@ import { useDevicesStore } from '../../../app/stores/devices.js'
 import { useAuthStore } from '../../../app/stores/auth.js'
 import { useSessionStore } from '../../../app/stores/session.js'
 import { useToastStore } from '../../../app/stores/toast.js'
+import { stubSsoBridge, talkSso } from '../../helpers/ssoBridge.js'
 import en from '../../../i18n/locales/en.json'
 import clientEn from '../../../i18n/locales/client-en.json'
 
@@ -632,6 +633,21 @@ describe('pages/party/view/[id]', () => {
       const talk = wrapper.find('[data-testid="event-details-talk"]')
       expect(talk.exists()).toBe(true)
       expect(talk.find('a').attributes('href')).toBe('https://talk.example.com/t/4242')
+    })
+
+    // #966: the thread is a private message, so a plain link showed anyone
+    // not yet logged in to Talk "Access Denied".
+    it('clicking the talk-thread link goes through Talk\'s SSO', async () => {
+      eventsStore.current.data = baseEvent({ discourse_thread: '4242' })
+      const wrapper = mountPage()
+      const bridge = stubSsoBridge()
+      try {
+        await wrapper.find('[data-testid="event-details-talk"] a').trigger('click')
+
+        expect(await bridge.redirect()).toBe(talkSso('https://talk.example.com', 'https://talk.example.com/t/4242'))
+      } finally {
+        bridge.restore()
+      }
     })
 
     it('does not render a talk-thread link when discourse_thread is null (non-attendee, or no linked thread)', () => {

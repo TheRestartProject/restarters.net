@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import CalendarsTab from '../../../app/components/profile/CalendarsTab.vue'
 import { useProfileStore } from '../../../app/stores/profile.js'
 import { useSessionStore } from '../../../app/stores/session.js'
+import { stubSsoBridge } from '../../helpers/ssoBridge.js'
 import en from '../../../i18n/locales/en.json'
 import clientEn from '../../../i18n/locales/client-en.json'
 
@@ -71,5 +72,26 @@ describe('components/profile/CalendarsTab', () => {
     await flushPromises()
 
     expect(wrapper.find('[data-testid="calendars-error"]').exists()).toBe(true)
+  })
+
+  // The link is already a Talk /session/sso one, but the SPA has no Laravel
+  // web session for Discourse to log in against, so it still has to go
+  // through the bridge (#966).
+  it('clicking "find out more" goes through the SSO bridge to Talk\'s SSO', async () => {
+    profileStore.fetchCalendars = vi.fn().mockResolvedValue(CALENDARS_RESPONSE)
+    profileStore.calendars.data = CALENDARS_RESPONSE
+
+    const wrapper = mountComponent()
+    await flushPromises()
+
+    const link = wrapper.findAll('a').find((a) => a.attributes('href')?.includes('/session/sso'))
+    const bridge = stubSsoBridge()
+    try {
+      await link.trigger('click')
+
+      expect(await bridge.redirect()).toBe(link.attributes('href'))
+    } finally {
+      bridge.restore()
+    }
   })
 })
