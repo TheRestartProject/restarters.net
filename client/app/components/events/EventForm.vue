@@ -19,6 +19,8 @@ import 'vue-datepicker-next/index.css'
 import GroupNetworkData from '../groups/GroupNetworkData.vue'
 import EventDuplicateModal from './EventDuplicateModal.vue'
 import { findDuplicateEvents } from '../../utils/duplicateEvents.js'
+import SpinIcon from '../forms/SpinIcon.vue'
+import { useSpinButton } from '../../composables/useSpinButton.js'
 
 // Shared by /party/create/[[group_id]], /party/edit/[id] and
 // /party/duplicate/[id] (design.md §6.2 section 4 C4 task brief).
@@ -204,7 +206,7 @@ const venueLat = ref(typeof props.initialEvent?.lat === 'number' ? props.initial
 const venueLng = ref(typeof props.initialEvent?.lng === 'number' ? props.initialEvent.lng : null)
 const showVenueMap = computed(() => !form.online && venueLat.value !== null && venueLng.value !== null)
 
-const submitting = ref(false)
+const spin = useSpinButton()
 const generalError = ref('')
 
 // Duplicate check: groups kept ending up with the same event posted twice.
@@ -280,7 +282,7 @@ function onStartTimeChange() {
   if (!form.startTime) return
 
   const [hoursStr, minsStr] = form.startTime.split(':')
-  const hours = parseInt(hoursStr, 10)
+  const hours = Number.parseInt(hoursStr, 10)
 
   if (!form.endTime || form.endTime <= form.startTime) {
     if (hours < 21) {
@@ -395,7 +397,8 @@ async function submit() {
     }
   }
 
-  submitting.value = true
+  spin.start()
+  let saved = false
 
   const payload = {
     start: toUtcIso(form.eventDate, form.startTime, form.timezone),
@@ -423,10 +426,12 @@ async function submit() {
   try {
     if (creating.value) {
       const id = await eventsStore.createEvent(payload)
+      saved = true
       emit('created', id)
     } else {
       const id = await eventsStore.updateEvent(props.eventId, payload)
       approved.value = approved.value || form.moderate === 'approve'
+      saved = true
       emit('updated', id)
     }
   } catch (err) {
@@ -435,7 +440,7 @@ async function submit() {
     }
     generalError.value = creating.value ? t('events.create_failed') : t('events.edit_failed')
   } finally {
-    submitting.value = false
+    spin.finish(saved)
   }
 }
 
@@ -447,7 +452,7 @@ function closeDuplicates() {
 function postAnyway() {
   showDuplicates.value = false
   duplicatesAccepted.value = true
-  submit()
+  void submit()
 }
 
 defineExpose({ submit })
@@ -461,7 +466,9 @@ defineExpose({ submit })
     </BAlert>
 
     <div class="event-form-layout">
-      <div class="event-form-venue d-flex flex-wrap align-items-end gap-3">
+      <!-- mb-3: the same space below as every other field group (the group
+           inside has mb-0 so the checkbox lines up with its input). -->
+      <div class="event-form-venue d-flex flex-wrap align-items-end gap-3 mb-3">
         <BFormGroup class="flex-grow-1 mb-0" :label="`${t('events.field_event_name')}:`" label-for="event-form-venue">
           <input
             id="event-form-venue" v-model="form.venue"
@@ -702,7 +709,7 @@ defineExpose({ submit })
       </div>
 
       <!-- EventAddEdit.vue:94 -->
-      <BAlert v-if="justCreated" :model-value="true" variant="success" class="mt-2 mb-2" data-testid="event-form-created">
+      <BAlert v-if="justCreated" :model-value="true" variant="success" class="event-form-created mt-2 mb-2" data-testid="event-form-created">
         {{ autoApprove ? t('events.created_success_message_autoapproved') : t('events.created_success_message') }}
       </BAlert>
 
@@ -715,13 +722,17 @@ defineExpose({ submit })
         <div v-if="creating" class="flex-grow-1 text-end pe-3" data-testid="event-form-notice">
           {{ autoApprove ? t('events.before_submit_text_autoapproved') : t('events.before_submit_text') }}
         </div>
-        <div v-else-if="!justCreated" class="flex-grow-1 text-end pe-3">
-          <span v-if="autoApprove" data-testid="event-form-notice">
-            {{ t('events.before_submit_text_autoapproved') }}
-          </span>
-          <span v-else-if="!canApprove && form.moderate !== 'approve'" data-testid="event-form-notice">
-            {{ t('events.before_submit_text') }}
-          </span>
+        <!-- The slot stays even when empty, as develop's does, so the buttons
+             keep to the right after a create. -->
+        <div v-else class="flex-grow-1 text-end pe-3">
+          <template v-if="!justCreated">
+            <span v-if="autoApprove" data-testid="event-form-notice">
+              {{ t('events.before_submit_text_autoapproved') }}
+            </span>
+            <span v-else-if="!canApprove && form.moderate !== 'approve'" data-testid="event-form-notice">
+              {{ t('events.before_submit_text') }}
+            </span>
+          </template>
         </div>
 
         <div class="d-flex align-items-center gap-2">
@@ -735,7 +746,8 @@ defineExpose({ submit })
           >
             {{ t('events.duplicate_event') }}
           </BButton>
-          <BButton type="submit" variant="primary" :disabled="submitting" data-testid="event-form-submit">
+          <BButton type="submit" variant="primary" :disabled="spin.state.value === 'spinning'" data-testid="event-form-submit">
+            <SpinIcon :state="spin.state.value" />
             {{ creating ? t('events.create_event') : t('events.save_event') }}
           </BButton>
         </div>
@@ -836,7 +848,10 @@ defineExpose({ submit })
     left: 8px;
   }
 
-  :deep(.mx-input) {
+  // Targets the input via its wrapper: `input-class` above replaces the
+  // library's own `mx-input` class, so a `.mx-input` selector never matched
+  // and "No date selected" ran under the icon.
+  :deep(.mx-input-wrapper input) {
     padding-left: 30px;
     padding-right: 10px;
   }
@@ -862,8 +877,17 @@ defineExpose({ submit })
   grid-column: 1 / 2;
 }
 
-.event-form-buttons {
+// EventAddEdit.vue's .creation-message: its own full-width row just above
+// the buttons. Without a grid position the browser auto-placed it into the
+// empty right-hand cell beside the description and stretched it to the
+// editor's height.
+.event-form-created {
   grid-row: 10 / 11;
+  grid-column: 1 / 2;
+}
+
+.event-form-buttons {
+  grid-row: 11 / 12;
   grid-column: 1 / 2;
 }
 
@@ -901,8 +925,13 @@ defineExpose({ submit })
     grid-column: 1 / 3;
   }
 
-  .event-form-buttons {
+  .event-form-created {
     grid-row: 7 / 8;
+    grid-column: 1 / 3;
+  }
+
+  .event-form-buttons {
+    grid-row: 8 / 9;
     grid-column: 1 / 3;
   }
 }

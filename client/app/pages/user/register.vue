@@ -478,18 +478,82 @@ async function submit() {
    separate, narrower cap. */
 .registration-step {
   position: relative;
+  /* live renders this panel's border and shadow pure black */
+  border-color: #000;
+  box-shadow: 6px 6px 0 0 #000;
+}
+
+@media (min-width: 992px) {
+  .registration-step__status {
+    top: 40px;
+  }
+}
+
+/* Skill groups: live spaces the headings 27px above and uses 15px row gutters. */
+.registration-step fieldset > .mb-3 {
+  margin-bottom: 0 !important;
+}
+
+.registration-step h5 {
+  margin-top: 27px;
+}
+
+.registration-step .row-compressed {
+  margin-left: -15px;
+  margin-right: -15px;
 }
 
 .registration-step__status {
+  font-family: 'Open Sans', sans-serif;
   position: absolute;
   top: 20px;
-  right: 25px;
+  right: 35px;
   font-size: 14px;
   color: #757575;
 }
 
+/* resources/sass/_registration.scss (.registration / .registration__step):
+   live renders the step heading at 20px bold and the intro <legend> at 15px
+   Open Sans. Without these, Bootstrap 5's reboot makes the legend ~1.5rem
+   and floated, and the h3 falls back to the global heading size. */
+.registration-wizard {
+  padding: 30px 0 50px; /* the 44px top lives on the layout's .login-page */
+}
+
 .registration-step h3 {
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.2;
+  margin: 0 0 10px;
   padding-right: 100px;
+}
+
+.registration-step legend {
+  float: none;
+  font-size: 15px;
+  line-height: 1;
+  font-weight: 500;
+  margin-bottom: 15px;
+  font-family: 'Open Sans', sans-serif;
+}
+
+.registration-step fieldset {
+  margin-bottom: 10px;
+}
+
+/* Consent/notification checkboxes: legacy markup was
+   .form-check.d-flex.align-items-top with input.checkbox-top (margin-top 5px),
+   i.e. the box sits beside the first line of its label, not above it. */
+.registration-step :deep(.form-check) {
+  display: flex;
+  align-items: flex-start;
+  padding-left: 0;
+}
+
+.registration-step :deep(.form-check-input) {
+  float: none;
+  flex: none;
+  margin: 5px 10px 0 0;
 }
 
 /* Required-field marker: resources/sass/_registration.scss's

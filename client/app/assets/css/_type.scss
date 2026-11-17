@@ -12,9 +12,11 @@ html {
   font-size: 18px;
 }
 
-body {
-  padding-bottom: 80px;
-}
+// Live's `body { padding-bottom: 80px }` is deliberately not ported: live also
+// sets `html, body { height: 100% }`, so that padding sits inside the
+// viewport-high body box and never shows below the content. Without the
+// height rule it became an 80px grey band under the footer. The plain layouts'
+// fixed language bar reserves its own space (_navigation-bar.scss).
 
 @mixin font-default {
   font-family: $font-family-third;

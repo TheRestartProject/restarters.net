@@ -1,4 +1,5 @@
 <script setup>
+import LoadingPlaceholder from '~/components/LoadingPlaceholder.vue'
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { sortAriaValue, sortHintKey } from '../../composables/useSortAria.js'
@@ -59,6 +60,12 @@ const props = defineProps({
   testidPrefix: {
     type: String,
     required: true,
+  },
+  // Live's create modals for brands/skills/tags are .modal-form (445px wide);
+  // brands adds .modal-brand (wider padding). See assets/css/_modal.scss.
+  createModalClass: {
+    type: String,
+    default: '',
   },
   allowCreate: {
     type: Boolean,
@@ -359,7 +366,7 @@ function maybeOpenFromEditId() {
 }
 
 function retry() {
-  load()
+  void load()
 }
 
 onMounted(load)
@@ -392,9 +399,7 @@ onMounted(load)
       </div>
 
       <div v-if="listLoading" :data-testid="`${testidPrefix}-loading`">
-        <div class="placeholder-glow">
-          <span class="placeholder col-12" style="height: 6rem" />
-        </div>
+        <LoadingPlaceholder height="6rem" />
       </div>
 
       <BAlert v-else-if="listError" :model-value="true" variant="danger" :data-testid="`${testidPrefix}-load-error`">
@@ -529,6 +534,7 @@ onMounted(load)
     <BModal
       :model-value="showCreate"
       :title="labels.createButton"
+      :modal-class="createModalClass"
       no-footer
       :data-testid="`${testidPrefix}-create-modal`"
       @hide="showCreate = false; resetCreateForm()"

@@ -1,9 +1,11 @@
 <script setup>
+import LoadingPlaceholder from '~/components/LoadingPlaceholder.vue'
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useUploadedImageUrl } from '../../composables/useUploadedImageUrl.js'
 import { useEventsStore } from '../../stores/events.js'
 import { EVENT_ROLE_HOST } from '../../composables/useEventAttendance.js'
+import ConfirmModal from '~/components/ConfirmModal.vue'
 import EventAttendanceCount from './EventAttendanceCount.vue'
 
 // GET /api/v2/events/{id}/attendees (api-contracts-phase-c.md C1b).
@@ -127,9 +129,7 @@ async function confirmRemove() {
     </h2>
 
     <div v-if="loading" data-testid="event-attendees-loading">
-      <div class="placeholder-glow">
-        <span class="placeholder col-12" style="height: 3rem" />
-      </div>
+      <LoadingPlaceholder height="3rem" />
     </div>
 
     <template v-else>
@@ -174,7 +174,7 @@ async function confirmRemove() {
              - a white panel with a 1px black border and a 5px offset black
              shadow. Without it the tabs and the volunteer list float loose on
              the page background, which is how this rendered before. -->
-        <div class="ourtabs">
+        <div class="ourtabs attendance-tabs">
           <ul class="nav nav-tabs">
             <li class="nav-item">
               <button
@@ -204,7 +204,7 @@ async function confirmRemove() {
             <p v-if="!confirmed.length" data-testid="event-attendees-empty-confirmed" class="text-muted">
               {{ t('events.confirmed_none') }}
             </p>
-            <ul v-else class="list-unstyled">
+            <ul v-else class="list-unstyled maxheight">
               <li
                 v-for="attendee in confirmed"
                 :key="attendee.id"
@@ -235,7 +235,7 @@ async function confirmRemove() {
                     <BPopover
                       v-if="skillCount(attendee)"
                       :target="`event-attendee-skills-${attendee.id}`"
-                      triggers="hover focus"
+                      click
                       :data-testid="`event-attendee-skills-popover-${attendee.id}`"
                     >
                       {{ skillNames(attendee) }}
@@ -274,7 +274,7 @@ async function confirmRemove() {
             <p v-if="!invited.length" data-testid="event-attendees-empty-invited" class="text-muted">
               {{ t('events.invited_none') }}
             </p>
-            <ul v-else class="list-unstyled">
+            <ul v-else class="list-unstyled maxheight">
               <li
                 v-for="attendee in invited"
                 :key="attendee.id"
@@ -296,25 +296,14 @@ async function confirmRemove() {
       </div>
     </template>
 
-    <!-- Gap 22: real confirm modal instead of an inline confirm/cancel row. -->
-    <BModal
+    <!-- Live's EventAttendee.vue: ConfirmModal with the default title/message. -->
+    <ConfirmModal
       :model-value="!!removeTarget"
-      :title="t('partials.are_you_sure')"
-      no-footer
       data-testid="event-attendee-remove-modal"
-      @hide="cancelRemove"
-    >
-      <div class="d-flex justify-content-end gap-2">
-        <BButton variant="outline-secondary" @click="cancelRemove">{{ t('partials.cancel') }}</BButton>
-        <BButton
-          variant="danger"
-          :data-testid="removeTarget ? `event-attendee-remove-confirm-${removeTarget.id}` : 'event-attendee-remove-confirm'"
-          @click="confirmRemove"
-        >
-          {{ t('partials.yes') }}
-        </BButton>
-      </div>
-    </BModal>
+      :confirm-testid="removeTarget ? `event-attendee-remove-confirm-${removeTarget.id}` : 'event-attendee-remove-confirm'"
+      @update:model-value="(open) => { if (!open) cancelRemove() }"
+      @confirm="confirmRemove"
+    />
   </div>
 </template>
 
@@ -331,6 +320,19 @@ async function confirmRemove() {
     grid-template-columns: 1fr 2fr;
     column-gap: 1.5rem;
   }
+}
+
+/* EventAttendance.vue: a fixed 380px tab box whose lists keep a 240px
+   scrolling area, so a long attendee list scrolls instead of growing the page. */
+.attendance-tabs {
+  height: 380px;
+}
+
+.maxheight {
+  max-height: 240px;
+  min-height: 240px;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 /* Gap 22: black divider (not Bootstrap's default light grey), matching

@@ -71,14 +71,14 @@ describe('pages/group/index (mine)', () => {
     expect(groupsStore.fetchMine).toHaveBeenCalledTimes(2)
   })
 
-  it('shows the empty state, with a link to /group/nearby, when there are no groups', () => {
+  it('shows the empty state, with the link to find a group (/group/other), when there are no groups', () => {
     groupsStore.mine.data = []
 
     const wrapper = mountPage()
 
     const empty = wrapper.find('[data-testid="group-mine-empty"]')
     expect(empty.exists()).toBe(true)
-    expect(empty.html()).toContain('/group/nearby')
+    expect(empty.html()).toContain('/group/other')
   })
 
   // Develop's list has no per-row follow button (ece9aed10e): following belongs
@@ -91,6 +91,20 @@ describe('pages/group/index (mine)', () => {
     expect(wrapper.find('[data-testid="group-row-1"]').exists()).toBe(true)
     expect(wrapper.find('[data-testid="group-leave-1"]').exists()).toBe(false)
     expect(wrapper.find('[data-testid="group-join-1"]').exists()).toBe(false)
+  })
+
+  // The rows left the image out, so every one of your groups showed the
+  // placeholder while the moderation list above had real ones.
+  it('shows each group\'s own image', () => {
+    groupsStore.mine.data = [
+      { id: 1, name: 'Ulverston Repair Café', role: 3, archived: false, image_url: 'https://restarters.net/uploads/mid_urc.png' },
+      { id: 2, name: 'No Picture Fixers', role: 3, archived: false, image_url: null },
+    ]
+
+    const wrapper = mountPage()
+
+    expect(wrapper.find('[data-testid="group-row-photo-1"]').attributes('src')).toBe('https://restarters.net/uploads/mid_urc.png')
+    expect(wrapper.find('[data-testid="group-row-photo-2"]').attributes('src')).toBe('/images/placeholder-avatar.webp')
   })
 
   it('shows an archived badge for archived groups', () => {

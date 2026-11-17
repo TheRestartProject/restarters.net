@@ -1,0 +1,215 @@
+// Entry panels (login, forgotten password, password reset)
+// ========================================================
+// resources/sass/_entry.scss, as it actually renders on live. Live loads that
+// file before the Bootstrap 4 global bundle, so `.col-12` (max-width:100%),
+// `.card` (border/radius) and the global h1 size win over parts of it: the
+// panel is full container width with a faint card border, not the 450px
+// rounded box the source file suggests. These are the computed values from
+// live, so the Nuxt pages match what users see today.
+.entry-panel {
+  background-color: $white;
+  border: 1px solid rgba(34, 34, 34, 0.125);
+  border-radius: 4.5px;
+  padding: 40px 15px 50px;
+  font-size: 15px;
+  line-height: 1.5;
+
+  h1 {
+    line-height: 1.2;
+    margin-bottom: 20px;
+  }
+
+  p {
+    font-size: 15px;
+    margin-bottom: 20px;
+  }
+
+  label {
+    font-size: 17px;
+    line-height: 1.5;
+  }
+
+  a {
+    color: #000;
+  }
+
+  .form-control {
+    background-color: $white;
+    font-family: $font-family-second;
+    font-size: 15px;
+    line-height: 1.5;
+  }
+
+  &__link {
+    margin-top: auto;
+    margin-bottom: auto;
+    display: block;
+  }
+
+  &__actions {
+    padding-top: 15px;
+  }
+}
+
+// Logged-out page wrapper (login / register / recover / reset)
+// ============================================================
+// Live's `.login-page` (resources/sass/_login-page.scss + the Bootstrap 4
+// values it renders with). Measured against https://restarters.net/login.
+.login-page {
+  padding-top: 10px;
+
+  @include media-breakpoint-up(lg) {
+    padding-top: 44px;
+  }
+
+  // Bootstrap 4 gutters (30px / 15px container padding), not BS5's 1.5rem.
+  .container {
+    padding-left: 15px;
+    padding-right: 15px;
+  }
+
+  .row {
+    --bs-gutter-x: 30px;
+  }
+
+  // Login panels: wider side padding and gap at xl.
+  .row-expanded:not(#logostats-header) {
+    @include media-breakpoint-up(xl) {
+      > * {
+        padding-left: 35px;
+        padding-right: 35px;
+      }
+    }
+  }
+
+  // Landing page: live's .landing-page wrapper pads 31px, and its header row is
+  // 1110px wide with a 180px logo.
+  &:has(.landing-layout) {
+    padding-top: 31px;
+
+    #logostats-header {
+      margin: 0 15px 0 -15px;
+
+      header svg {
+        width: 180px;
+      }
+    }
+  }
+
+  // Reset page: live's .entry-wrapper pads 50px, not the 44px of .login-page.
+  &:has(.entry-wrapper) {
+    padding-top: 50px;
+  }
+
+  // Live's header columns shrink on narrow screens (BS5 rows forbid it by default).
+  #logostats-header > .col-md-3 {
+    flex-shrink: 1;
+  }
+
+  // Rounded corners + pure black border, as live's .card.panel renders here.
+  .card__login.panel,
+  .card__content.panel {
+    border-radius: 4.5px;
+    border-color: #000;
+    box-shadow: 6px 6px 0 0 #000;
+  }
+
+  // The form panels (login, recover, reset) share live's 15px base type,
+  // 17px labels and 20px buttons.
+  .card__login {
+    font-size: 15px;
+    line-height: 1.5;
+
+    legend {
+      font-size: 20px;
+      line-height: 1;
+      font-weight: 400;
+      margin-bottom: 20px;
+      float: none;
+      width: 100%;
+    }
+
+    label {
+      display: inline-block !important; // as Bootstrap 4: keeps the 9px margin from collapsing into the input's
+      font-size: 17px;
+      line-height: 1.5;
+      margin-bottom: 9px;
+    }
+
+    .b-form-group,
+    .form-group {
+      margin-bottom: 15px !important;
+    }
+
+    .form-control {
+      font-family: $font-family-second;
+      font-size: 15px;
+      line-height: 1.5;
+      height: 40px;
+    }
+
+    .btn {
+      font-size: 20px;
+      line-height: 1.13;
+      padding: 10px;
+      min-width: 100px;
+    }
+  }
+
+  // Login page only: the stats header runs 20px past the panels' right edge
+  // and leaves 60px before them.
+  &:has([data-testid='login-form']) #logostats-header {
+    margin-bottom: 10px;
+
+    @include media-breakpoint-up(lg) {
+      margin: 0 -35px 60px -15px;
+    }
+  }
+
+  // Stacked panels (below lg) sit 10px apart on live.
+  .card__login.panel {
+    margin-bottom: 10px;
+
+    @include media-breakpoint-up(lg) {
+      margin-bottom: 0;
+    }
+  }
+
+  // Recover/reset: live's input margin collapses into the group's, so the
+  // fieldset-based group here needs 2px less than the login form's.
+  .entry-panel.card__login .b-form-group {
+    margin-bottom: 13px !important;
+  }
+
+  .card__content {
+    h3 {
+      font-size: 23px;
+      line-height: 1.2;
+      margin-bottom: 15px;
+    }
+
+    p {
+      margin-bottom: 10px;
+    }
+
+    ul {
+      padding-left: 0;
+      margin-bottom: 0;
+    }
+
+    li {
+      margin: 6px 10px 6px 17px;
+    }
+
+    .card__link {
+      display: block;
+      margin: 10px 0;
+    }
+  }
+}
+
+// Plain layouts: the page is exactly one viewport high; the fixed language bar's
+// 65px is the body's padding-bottom (_navigation-bar.scss), so subtract it.
+.plain-layout {
+  min-height: calc(100vh - 65px);
+}

@@ -13,10 +13,9 @@ import { defineStore } from 'pinia'
  * coordinators) - the pages themselves do the role gate (design.md §4.4),
  * this store makes no assumption about who's calling it.
  *
- * `current.data.stats` (from GET /api/v2/networks/{id} - App\Http\
- * Resources\Network already embeds unfiltered stats) covers the page's
- * default stats block; `fetchStats(id, {group_tag})` is only needed for
- * the tag-filtered view (GetNetworkStatsv2).
+ * `current.data` is the network without its stats, which are slow to
+ * calculate for a large network; `stats.data` (GET /api/v2/networks/{id}/
+ * stats, via fetchStats) arrives after it, as on develop's network page.
  *
  * `groups.data` holds the raw GroupSummary array from GET /api/v2/
  * networks/{id}/groups?includeCounts=true&includeNextEvent=true - the page
@@ -33,6 +32,7 @@ export const useNetworksStore = defineStore('networks', {
   state: () => ({
     list: { data: [], loading: false, error: null },
     current: { data: null, loading: false, error: null },
+    stats: { data: null, loading: false, error: null },
     groups: { data: [], loading: false, error: null },
     tags: { data: [], loading: false, error: null },
   }),
@@ -63,7 +63,9 @@ export const useNetworksStore = defineStore('networks', {
       this.current.error = null
 
       try {
-        const { data } = await $api.network.get(id)
+        // Without the stats, so the page can show the network straight away: they are slow to calculate for a large
+        // network, and fetchStats() gets them separately.
+        const { data } = await $api.network.get(id, { includeStats: false })
         this.current.data = data
         return data
       } catch (error) {
@@ -116,7 +118,22 @@ export const useNetworksStore = defineStore('networks', {
 
     async fetchStats(id, params) {
       const { $api } = useNuxtApp()
-      return $api.network.stats(id, params)
+
+      // Not the previous network's figures while this one's load.
+      this.stats.data = null
+      this.stats.loading = true
+      this.stats.error = null
+
+      try {
+        const data = await $api.network.stats(id, params)
+        this.stats.data = data
+        return data
+      } catch (error) {
+        this.stats.error = error
+        throw error
+      } finally {
+        this.stats.loading = false
+      }
     },
 
     async fetchTags(id) {

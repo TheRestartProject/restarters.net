@@ -96,5 +96,10 @@ return [
   'share_modal_seedlings' => "Baumsetzling über 10 Jahre.*|Baumsetzlingen über 10 Jahre.*",
   'share_modal_planting_around' => "der Pflanzung von etwa",
   'share_modal_hectares' => "Hektar Wald.*|Hektar Wald.*",
-  'impact_estimates' => 'Wirkungszahlen sind Schätzungen auf Grundlage der von Gruppen in Restarters.net eingegebenen Daten.'
+  'impact_estimates' => 'Wirkungszahlen sind Schätzungen auf Grundlage der von Gruppen in Restarters.net eingegebenen Daten.',
+  'dragmap' => 'Der Pin sitzt nicht ganz richtig? Ziehen Sie ihn an die richtige Stelle.',
+  'see_further_reports' => 'Weitere Analysen finden Sie in unseren weiteren Berichten.',
+  'share_modal_footnote' => '*Nadel- oder Laubbäume mit mittlerem Wachstum, in städtischer Umgebung gepflanzt und 10 Jahre lang gewachsen',
+  'share_modal_footnote_hectares' => '*Laubbaum-Setzlinge, die 1 Jahr lang in einer Plantage oder einem Waldstück in England gewachsen sind',
+  'share_modal_generated_by' => 'erstellt von :site',
 ];

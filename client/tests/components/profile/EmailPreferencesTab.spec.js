@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import EmailPreferencesTab from '../../../app/components/profile/EmailPreferencesTab.vue'
 import { useProfileStore } from '../../../app/stores/profile.js'
 import { useSessionStore } from '../../../app/stores/session.js'
+import { stubSsoBridge, talkSso } from '../../helpers/ssoBridge.js'
 import en from '../../../i18n/locales/en.json'
 import clientEn from '../../../i18n/locales/client-en.json'
 
@@ -81,6 +82,23 @@ describe('components/profile/EmailPreferencesTab', () => {
     const link = wrapper.find('a.btn-preferences')
 
     expect(link.attributes('href')).toBe('https://talk.example/u/jane/preferences/emails')
+  })
+
+  it('clicking the platform preferences link goes through Talk\'s SSO, as the page needs a Talk login (#966)', async () => {
+    profileStore.fetchEmailPreferences = vi.fn().mockResolvedValue({ invites: false })
+
+    const wrapper = mountComponent()
+    await Promise.resolve()
+    await Promise.resolve()
+
+    const bridge = stubSsoBridge()
+    try {
+      await wrapper.find('a.btn-preferences').trigger('click')
+
+      expect(await bridge.redirect()).toBe(talkSso('https://talk.example', 'https://talk.example/u/jane/preferences/emails'))
+    } finally {
+      bridge.restore()
+    }
   })
 
   describe('editing someone else\'s profile (isOwnProfile: false)', () => {

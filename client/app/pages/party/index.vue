@@ -1,4 +1,5 @@
 <script setup>
+import LoadingPlaceholder from '~/components/LoadingPlaceholder.vue'
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useEventsStore } from '~/stores/events.js'
@@ -201,14 +202,16 @@ onMounted(load)
         class="btn btn-primary"
         data-testid="party-add-event"
       >
-        {{ t('events.add_event') }}
+        <!-- events/index.blade.php: "Create" below lg, "Add event" from lg up. -->
+        <span class="d-none d-lg-block">{{ t('events.add_event') }}</span>
+        <span class="d-block d-lg-none">{{ t('events.create_new_event_mobile') }}</span>
       </NuxtLink>
     </div>
 
     <!-- events/index.blade.php:55 renders <EventsRequiringModeration/>, the
          full events table, not the plain name-only list. Same substitution
          already corrected on /group and the network page. -->
-    <EventsRequiringModeration v-if="showModeration" class="mb-3" />
+    <EventsRequiringModeration v-if="showModeration" class="mb-3" hide-when-empty />
 
     <!-- Gap 20: AlertsBanner sits after the moderation queue, matching
          GroupEvents.vue's slot order (h1/add-event row + moderation queue
@@ -217,9 +220,7 @@ onMounted(load)
     <AlertsBanner />
 
     <div v-if="eventsStore.myEvents.loading || !eventsStore.myEvents.loaded" data-testid="party-mine-loading">
-      <div class="placeholder-glow mb-3">
-        <span class="placeholder col-12" style="height: 6rem" />
-      </div>
+      <LoadingPlaceholder height="6rem" class="mb-3" />
     </div>
 
     <BAlert
@@ -256,6 +257,9 @@ onMounted(load)
           </h2>
         </template>
 
+        <!-- The same tabs box as the group page's events (develop's
+             GroupEvents.vue renders both). -->
+        <div class="events-tabs" data-testid="party-mine-tabs">
         <ul class="nav nav-tabs">
           <li class="nav-item">
             <button
@@ -281,14 +285,14 @@ onMounted(load)
           </li>
         </ul>
 
-        <div v-if="mineTab === 'upcoming'" class="pt-3" data-testid="party-mine-panel-upcoming">
+        <div v-if="mineTab === 'upcoming'" class="events-tabs__content" data-testid="party-mine-panel-upcoming">
           <EventsList
             :events="upcomingMine"
             :hosted-group-ids="hostedGroupIds"
             :empty-message="t('groups.no_upcoming_events')"
           />
         </div>
-        <div v-else class="pt-3" data-testid="party-mine-panel-past">
+        <div v-else class="events-tabs__content" data-testid="party-mine-panel-past">
           <EventsList
             :events="pastMine"
             :hosted-group-ids="hostedGroupIds"
@@ -296,6 +300,7 @@ onMounted(load)
             :empty-message="t('groups.no_past_events')"
             past
           />
+        </div>
         </div>
       </EventCollapsibleSection>
 
@@ -305,6 +310,7 @@ onMounted(load)
             <h2 class="mb-0">{{ t('events.other_events') }}</h2>
           </template>
 
+          <div class="events-tabs" data-testid="party-other-tabs">
           <ul class="nav nav-tabs">
             <li class="nav-item">
               <button
@@ -330,10 +336,10 @@ onMounted(load)
             </li>
           </ul>
 
-          <div v-if="otherTab === 'nearby'" class="pt-3" data-testid="party-other-panel-nearby">
+          <div v-if="otherTab === 'nearby'" class="events-tabs__content" data-testid="party-other-panel-nearby">
             <EventsList :events="nearbyEvents" :empty-message="nearbyEmptyMessage" />
           </div>
-          <div v-else class="pt-3" data-testid="party-other-panel-all">
+          <div v-else class="events-tabs__content" data-testid="party-other-panel-all">
             <EventFilters
               v-model:search="allSearch"
               v-model:country="allCountry"
@@ -347,12 +353,14 @@ onMounted(load)
               :empty-message="hasAllFilters ? t('client.events.no_search_results') : t('groups.no_other_events')"
             />
           </div>
+          </div>
         </EventCollapsibleSection>
       </template>
     </template>
 
     <BModal
       :model-value="showCalendarModal"
+      size="lg"
       :title="t('groups.calendar_copy_title', { group: t('groups.groups_title1').toLowerCase() })"
       no-footer
       data-testid="party-calendar-modal"

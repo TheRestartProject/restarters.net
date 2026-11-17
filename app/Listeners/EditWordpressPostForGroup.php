@@ -87,7 +87,7 @@ class EditWordpressPostForGroup extends BaseEvent
                 }
             }
         } catch (\Exception $e) {
-            Log::error('An error occurred during Wordpress group editing: '.$e->getMessage());
+            Log::error('An error occurred during Wordpress group editing', ['group' => $id, 'error' => $e->getMessage()]);
             $notify_users = Fixometer::usersWhoHavePreference('admin-edit-wordpress-group-failure');
             Notification::send($notify_users, new AdminWordPressEditGroupFailure([
             'group_name' => $group->name,

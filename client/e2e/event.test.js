@@ -79,11 +79,16 @@ test.describe('events', () => {
     const button = page.getByTestId('event-actions-request-review')
     await expect(button).toBeVisible({ timeout: 10000 })
 
+    // The item opens a confirmation modal; nothing is sent until "Send".
+    await button.click()
+    const confirm = page.getByTestId('event-view-request-review-confirm')
+    await expect(confirm).toBeVisible()
+
     const [response] = await Promise.all([
       page.waitForResponse(
         (resp) => resp.url().includes(`/api/v2/events/${eventId}/request-review`) && resp.request().method() === 'POST',
       ),
-      button.click(),
+      confirm.click(),
     ])
     expect(response.status()).toBe(200)
   })

@@ -160,7 +160,7 @@ const RANGES = [
 ]
 
 export function rangeIndex(count) {
-  count = parseInt(count, 10)
+  count = Number.parseInt(count, 10)
   let ix = 1
 
   while (ix < RANGES.length && count > RANGES[ix][6]) {
@@ -279,7 +279,7 @@ export async function paint(canvas, data) {
   }
 
   const portrait = isPortrait(target)
-  const count = parseInt(data.count, 10) || 0
+  const count = Number.parseInt(data.count, 10) || 0
 
   canvas.width = dims.width
   canvas.height = dims.height

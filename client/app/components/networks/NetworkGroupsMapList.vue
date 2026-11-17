@@ -1,4 +1,5 @@
 <script setup>
+import LoadingPlaceholder from '~/components/LoadingPlaceholder.vue'
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useGroupsStore } from '~/stores/groups.js'
@@ -22,6 +23,13 @@ const props = defineProps({
   canManageTags: {
     type: Boolean,
     default: false,
+  },
+  // This network's own tags, for the Tag filter (develop's NetworkPage.vue
+  // groupFilterTags) - not the role-filtered list of every tag the viewer
+  // can see, which for an admin is all of them.
+  tags: {
+    type: Array,
+    default: () => [],
   },
 })
 
@@ -119,9 +127,7 @@ onMounted(() => {
 <template>
   <div data-testid="network-groups-map-list">
     <div v-if="groupsStore.namesLoading" data-testid="network-groups-map-loading">
-      <div class="placeholder-glow mb-3">
-        <span class="placeholder col-12" style="height: 400px" />
-      </div>
+      <LoadingPlaceholder height="400px" class="mb-3" />
     </div>
 
     <BAlert v-else-if="groupsStore.namesError" :model-value="true" variant="danger" data-testid="network-groups-map-error">
@@ -147,7 +153,9 @@ onMounted(() => {
         :groups="rows"
         show-filters
         :show-tags="canManageTags"
+        :filter-tags="tags"
         :optional-columns="{ location: true, next_event: true }"
+        show-all-button
         @update:filters="onFilters"
       />
     </template>

@@ -245,7 +245,7 @@ client/
     plugins/     api.ts (provides $api), i18n message loading
   api/          BaseAPI.js + GroupAPI.js, EventAPI.js, … (class per resource)
   assets/css/   restarters.scss (global brand sheet §6.3) + bootstrap overrides
-  i18n/locales/ en.json, fr.json, fr-BE.json   # generated, committed
+  i18n/locales/ <code>.json (8 locales)  # generated, committed
   tests/        vitest unit tests (components/, stores/, api/, composables/)
   e2e/          playwright specs (ported from tests/Integration)
   nuxt.config.ts            # ssr:false; runtimeConfig.public.apiBase; IS_APP flag
@@ -313,7 +313,7 @@ migration order (each section = deliverable slice with tests):
 
 ## 7. i18n
 
-- `lang/{en,fr,fr-BE}` stay the source of truth (server needs them for emails,
+- `lang/{en,fr,fr-BE,de,es,it,nl,nl-BE}` stay the source of truth (server needs them for emails,
   API-side strings, exports).
 - New artisan command `translations:export-client` walks `lang/<locale>/*.php` +
   `lang/<locale>.json` and emits `client/i18n/locales/<locale>.json` (committed;
@@ -326,7 +326,7 @@ migration order (each section = deliverable slice with tests):
   today's `__('groups.…')`.
 - Locale: `@nuxtjs/i18n` cookie/localStorage persistence; logged-in users PATCH
   /api/v2/session; every API call carries the locale header so `APISetLocale`
-  (already built) localizes server-side strings. Only en/fr/fr-BE are selectable.
+  (already built) localizes server-side strings. The selectable set is live's: de, en, es, fr, fr-BE, it, nl, nl-BE (untranslated strings fall back to English).
 
 ## 8. Testing
 

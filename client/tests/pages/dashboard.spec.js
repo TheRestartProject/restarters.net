@@ -6,7 +6,6 @@ import DashboardPage from '../../app/pages/dashboard.vue'
 import { useAuthStore } from '../../app/stores/auth.js'
 import { useSessionStore } from '../../app/stores/session.js'
 import { useDashboardStore } from '../../app/stores/dashboard.js'
-import { useEventsStore } from '../../app/stores/events.js'
 import en from '../../i18n/locales/en.json'
 import clientEn from '../../i18n/locales/client-en.json'
 
@@ -53,9 +52,6 @@ describe('pages/dashboard', () => {
 
     dashboardStore = useDashboardStore()
     dashboardStore.fetch = vi.fn().mockResolvedValue(emptyData)
-
-    // dashboard.vue also fetches the user's events (for the Add Data picker).
-    useEventsStore().fetchMyEvents = vi.fn().mockResolvedValue([])
 
     const authStore = useAuthStore()
     authStore.user = { id: 1, name: 'Jane' }
@@ -130,22 +126,30 @@ describe('pages/dashboard', () => {
     expect(wrapper.find('[data-testid="dashboard-upcoming-events"]').exists()).toBe(false)
   })
 
-  it('renders the dashboard sections in the legacy order: getting started, your groups, add data, what\'s happening', () => {
+  it('renders the dashboard sections in the legacy order: getting started, your groups, what\'s happening', () => {
     dashboardStore.data = {
       ...emptyData,
       your_groups: [{ id: 1, name: 'A Group', role: 4, archived: false, image_url: null }],
     }
-    useEventsStore().myEvents.data = [
-      { id: 1, title: 'Event', start: '2026-08-01T10:00:00Z', group: { id: 1, name: 'A Group' } },
-    ]
 
     const wrapper = mountDashboard()
 
-    const testids = ['dashboard-getting-started', 'dashboard-yourgroups-panel', 'dashboard-add-data', 'dashboard-whats-happening']
+    const testids = ['dashboard-getting-started', 'dashboard-yourgroups-panel', 'dashboard-whats-happening']
     const positions = testids.map((id) => wrapper.html().indexOf(`data-testid="${id}"`))
 
     expect(positions.every((p) => p !== -1)).toBe(true)
     expect(positions).toEqual([...positions].sort((a, b) => a - b))
+  })
+
+  it('does not render the Add Data panel (live never shows it)', () => {
+    dashboardStore.data = {
+      ...emptyData,
+      your_groups: [{ id: 1, name: 'A Group', role: 4, archived: false, image_url: null }],
+    }
+
+    const wrapper = mountDashboard()
+
+    expect(wrapper.find('[data-testid="dashboard-add-data"]').exists()).toBe(false)
   })
 
   it('nests the nearby-groups fallback inside the single Your Groups panel, not as its own panel', () => {

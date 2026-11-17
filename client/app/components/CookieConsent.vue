@@ -37,9 +37,8 @@ function onSave() {
 
 <template>
   <div v-if="!decided" class="cookie-consent" role="region" aria-label="Cookie notice" data-testid="cookie-consent">
-    <p class="cookie-consent__text mb-0">
-      {{ t('client.cookies.banner_text') }}
-    </p>
+    <!-- eslint-disable-next-line vue/no-v-html -- fixed lang string (bold "Cookie Settings", as live) -->
+    <p class="cookie-consent__text mb-0" v-html="t('client.cookies.banner_text')" />
     <div class="cookie-consent__actions">
       <button
         type="button"
@@ -113,16 +112,31 @@ function onSave() {
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
-  padding: 1rem 1.25rem;
+  padding: 20px;
   background: #333;
   color: rgba(255, 255, 255, 0.75);
   font-size: 14px;
+  line-height: 20px;
+
+  // As live's gdpr-cookie-notice: stacked, smaller text up to 768px.
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: center;
+  }
 }
 
 .cookie-consent__text {
   flex: 1 1 320px;
+  padding-right: 16px;
   color: rgba(255, 255, 255, 0.75);
+
+  @media (max-width: 768px) {
+    flex: 0 0 auto;
+    padding-right: 0;
+    margin-bottom: 10px !important;
+    font-size: 12px;
+    line-height: 18px;
+  }
 }
 
 // margin-left: auto pins the row to the right, matching legacy .gdpr-cookie-notice-nav.
@@ -131,6 +145,10 @@ function onSave() {
   align-items: center;
   margin-left: auto;
   white-space: nowrap;
+
+  @media (max-width: 768px) {
+    align-self: flex-end;
+  }
 }
 
 // Both controls share the legacy .gdpr-cookie-notice-nav-item look: bold white

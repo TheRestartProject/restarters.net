@@ -1,4 +1,5 @@
 <script setup>
+import LoadingPlaceholder from '~/components/LoadingPlaceholder.vue'
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useEventsStore } from '~/stores/events.js'
@@ -27,6 +28,12 @@ const eventsStore = useEventsStore()
 
 const id = computed(() => Number(route.params.id))
 const event = computed(() => eventsStore.current.data)
+// The form copies the event once, when it mounts, so it waits for this page's
+// own fetch even when the store already holds the event: seeded from the copy
+// the event's page fetched earlier, a save would write back stale values.
+// A save refreshes the store without setting `loading`, so the form stays.
+const fetched = ref(false)
+const showLoading = computed(() => !fetched.value || eventsStore.current.loading)
 const { uploadedImageUrl } = useUploadedImageUrl()
 
 // No permissions object on the v2 Event resource (unlike Group's) - approximate
@@ -91,7 +98,13 @@ onMounted(() => {
 useHead({ title: computed(() => (event.value ? `${t('events.editing', { event: event.value.title })}` : t('events.editing', { event: '' }))) })
 
 function load() {
-  eventsStore.fetchEvent(id.value)
+  // A failure is shown from the store's error.
+  eventsStore
+    .fetchEvent(id.value)
+    .catch(() => {})
+    .finally(() => {
+      fetched.value = true
+    })
   ensureEventPerms().catch(() => {})
 }
 
@@ -101,13 +114,14 @@ function retry() {
   load()
 }
 
+// The store has already refreshed the event (updateEvent). Reloading here
+// would swap the form for the loading placeholder, as develop never does.
 function onUpdated() {
   updatedMessage.value = t('events.save_event')
   // EventAddEditPage.vue:11 - `@edited="justCreated = false"`. Once saved the
   // event is no longer merely "just created", and the pre-submit notice the
   // banner was suppressing becomes relevant again.
   justCreated.value = false
-  load()
 }
 
 async function onImageUploaded({ uploadKey }) {
@@ -147,10 +161,8 @@ async function removeImage(image) {
 
 <template>
   <div class="container py-4" data-testid="event-edit-page">
-    <div v-if="eventsStore.current.loading" data-testid="event-edit-loading">
-      <div class="placeholder-glow">
-        <span class="placeholder col-12" style="height: 6rem" />
-      </div>
+    <div v-if="showLoading" data-testid="event-edit-loading">
+      <LoadingPlaceholder height="6rem" />
     </div>
 
     <BAlert v-else-if="eventsStore.current.error" :model-value="true" variant="danger" data-testid="event-edit-error">
@@ -267,28 +279,43 @@ async function removeImage(image) {
       </div>
 
       <div v-show="activeTab === 'photos'" class="pt-3" data-testid="event-edit-pane-photos">
-        <div v-if="event?.images?.length" class="d-flex flex-wrap gap-2 mb-3">
-          <div
-            v-for="image in event.images"
-            :key="image.idimages"
-            class="position-relative"
-            data-testid="event-edit-photo"
-          >
-            <img :src="uploadedImageUrl(image.path)" width="100" height="100" style="object-fit: cover" alt="">
-            <button
-              type="button"
-              class="btn btn-sm btn-light position-absolute top-0 end-0 p-1 lh-1"
-              :disabled="deletingImageId === image.idimages"
-              :aria-label="t('client.events.remove_photo')"
-              :data-testid="`event-edit-photo-remove-${image.idimages}`"
-              @click="removeImage(image)"
-            >
-              &times;
-            </button>
+        <!-- events/edit.blade.php's photos pane: "Add images:" + the dropzone in
+             the left half, the existing photos in the right half, each a
+             thumbnail (linking to the full image) with a "Remove file" link. -->
+        <div class="row">
+          <div class="col-6">
+            <label for="event-photos-input">{{ t('events.field_add_image') }}:</label>
+            <TusImageUpload
+              dropzone
+              input-id="event-photos-input"
+              :message="t('events.field_event_images')"
+              :hint="t('events.field_event_images_2')"
+              @uploaded="onImageUploaded"
+              @upload-error="onImageUploadError"
+            />
+          </div>
+          <div class="col-6">
+            <div class="previews">
+              <div
+                v-for="image in event?.images || []"
+                :key="image.idimages"
+                class="dz-image"
+                data-testid="event-edit-photo"
+              >
+                <a :href="uploadedImageUrl(image.path)" target="_blank" rel="noopener">
+                  <img :src="uploadedImageUrl(`thumbnail_${image.path}`)" alt="">
+                </a>
+                <a
+                  href="#"
+                  class="dz-remove"
+                  :class="{ disabled: deletingImageId === image.idimages }"
+                  :data-testid="`event-edit-photo-remove-${image.idimages}`"
+                  @click.prevent="deletingImageId !== image.idimages && removeImage(image)"
+                >{{ t('client.events.remove_photo') }}</a>
+              </div>
+            </div>
           </div>
         </div>
-
-        <TusImageUpload @uploaded="onImageUploaded" @upload-error="onImageUploadError" />
         <div v-if="imageMessage" class="text-success" data-testid="event-edit-image-success">{{ imageMessage }}</div>
         <div v-if="imageError" class="text-danger" data-testid="event-edit-image-error">{{ imageError }}</div>
       </div>

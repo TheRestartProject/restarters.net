@@ -128,14 +128,14 @@ const { t } = useI18n()
         >
           {{ t('events.invite_volunteers') }}
         </BDropdownItem>
-        <BPopover
+        <!-- Live uses v-b-tooltip.hover here: a dark tooltip, not a popover. -->
+        <BTooltip
           v-if="isAttending && upcoming && !approved"
           target="event-actions-invite-disabled"
-          triggers="hover focus"
           data-testid="event-actions-invite-tooltip"
         >
           {{ t('events.invite_when_approved') }}
-        </BPopover>
+        </BTooltip>
         <BDropdownItem v-if="!isAttending" data-testid="event-actions-rsvp" @click="emit('rsvp')">
           {{ t('events.RSVP') }}
         </BDropdownItem>

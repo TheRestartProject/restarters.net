@@ -12,6 +12,8 @@ return [
     'actions' => 'Acciones de la red',
     'coordinators' => 'Coordinadores de la red',
     'impact' => 'Impacto',
+    'see_network_reports' => 'Ver más en los informes de tu red',
+    'view_reports' => 'Ver informes',
   ],
   'stats' => [
     'groups' => '{1} Grupo|[0,*] Grupos',
@@ -63,5 +65,12 @@ return [
     'add_new_field' => 'Añadir nuevo campo',
     'new_field_name' => 'Nombre del nuevo campo',
     'add_field' => 'Añadir campo',
+    'help_reporting_url' => 'Dónde se publican los informes de esta red. Déjalo en blanco si la red no tiene informes.',
+    'label_reporting_url' => 'Dirección del panel de informes',
+  ],
+  'moderation' => [
+    'events_title' => 'Eventos por moderar',
+    'group_requires_moderation' => 'El grupo requiere moderación',
+    'groups_title' => 'Grupos por moderar',
   ],
 ];

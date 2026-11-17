@@ -1,4 +1,5 @@
 <script setup>
+import { isEmailLike } from '~/utils/safeText.js'
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useGroupsStore } from '../../stores/groups.js'
@@ -47,8 +48,6 @@ const generalError = ref('')
 const fieldErrors = ref({})
 const successMessage = ref('')
 
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-
 function parseEmails(text) {
   return text
     .split(/[,;\n]+/)
@@ -72,7 +71,7 @@ async function submit() {
     return
   }
 
-  const malformed = emails.filter((e) => !EMAIL_RE.test(e))
+  const malformed = emails.filter((e) => !isEmailLike(e))
   if (malformed.length) {
     fieldErrors.value = { emails: [t('client.groups.invite_emails_invalid', { emails: malformed.join(', ') })] }
     return
@@ -111,7 +110,7 @@ function close() {
 </script>
 
 <template>
-  <BModal :model-value="show" data-testid="group-invite-modal" :title="t('groups.invite_group_header_link')" no-footer @hide="close">
+  <BModal :model-value="show" size="lg" modal-class="modal__invite" data-testid="group-invite-modal" :title="t('groups.invite_group_header_link')" no-footer @hide="close">
     <BAlert v-if="successMessage" :model-value="true" variant="success" data-testid="group-invite-success">
       {{ successMessage }}
     </BAlert>

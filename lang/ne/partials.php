@@ -96,5 +96,10 @@ return [
   'share_modal_seedlings' => "boomzaailing gedurende 10 jaar.*|boomzaalingen gedurende 10 jaar.*",
   'share_modal_planting_around' => "het planten van ongeveer",
   'share_modal_hectares' => "hectare bomen.*|hectaren bomen.*",
-  'impact_estimates' => 'Impactcijfers zijn schattingen op basis van gegevens ingevoerd door groepen in Restarters.net.'
+  'impact_estimates' => 'Impactcijfers zijn schattingen op basis van gegevens ingevoerd door groepen in Restarters.net.',
+  'dragmap' => 'Staat de pin niet helemaal op de juiste plek?  Sleep hem naar de juiste plek.',
+  'see_further_reports' => 'Zie meer analyses in onze verdere rapporten.',
+  'share_modal_footnote' => '*naald- of loofbomen met gemiddelde groei, geplant in een stedelijke omgeving en 10 jaar gegroeid',
+  'share_modal_footnote_hectares' => '*zaailingen van loofbomen gekweekt in een plantage of bosperceel in Engeland gedurende 1 jaar',
+  'share_modal_generated_by' => 'gegenereerd door :site',
 ];

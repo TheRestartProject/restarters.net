@@ -24,9 +24,9 @@ const BFormSelectStub = {
   template: '<select :value="modelValue" v-bind="$attrs" @change="$emit(\'update:modelValue\', Number($event.target.value))"><slot /></select>',
 }
 const BModalStub = {
-  props: ['modelValue', 'title'],
+  props: ['modelValue', 'title', 'modalClass'],
   emits: ['hide'],
-  template: '<div v-if="modelValue" :data-modal-title="title"><slot /></div>',
+  template: '<div v-if="modelValue" :data-modal-title="title" :class="modalClass"><slot /></div>',
 }
 const NuxtLinkStub = { props: ['to'], template: '<a :href="to"><slot /></a>' }
 
@@ -369,6 +369,15 @@ describe('components/admin/AdminCrudTable', () => {
   })
 
   describe('create modal', () => {
+    it('applies the createModalClass variant (live\'s .modal-form) to the create modal', async () => {
+      const wrapper = mountTable({ createModalClass: 'modal-form modal-brand' })
+      await flushPromises()
+
+      await wrapper.find('[data-testid="widgets-add-button"]').trigger('click')
+
+      expect(wrapper.find('[data-testid="widgets-create-modal"]').classes()).toEqual(expect.arrayContaining(['modal-form', 'modal-brand']))
+    })
+
     it('opens with a blank form on the add button', async () => {
       const wrapper = mountTable()
       await flushPromises()

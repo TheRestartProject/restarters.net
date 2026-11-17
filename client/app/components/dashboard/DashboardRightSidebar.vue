@@ -1,6 +1,8 @@
 <script setup>
+import { onBeforeUnmount, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import CollapsibleSection from '~/components/CollapsibleSection.vue'
+import { useSsoBridge } from '~/composables/useSsoBridge.js'
 
 // Legacy source: resources/js/components/DashboardRightSidebar.vue. The
 // legacy version had a couple of display classes that contradicted their
@@ -14,6 +16,29 @@ import CollapsibleSection from '~/components/CollapsibleSection.vue'
 // desktop-only) - replicated here the same way rather than showing it twice
 // on desktop.
 const { t } = useI18n()
+const { followTalkLink, isTalkUrl } = useSsoBridge()
+
+// The getting-started bullets are translated HTML with Talk links in them.
+// Send those through Talk's SSO (still in a new tab, as their target="_blank"
+// asks) so the user arrives logged in to Talk rather than at "Access Denied"
+// (#966).
+//
+// The links come from v-html, so the click is caught on the list around them.
+// It's attached here rather than with @click because a click handler on a <ul>
+// looks mouse-only to accessibility checkers. Keyboard users are covered
+// anyway: Enter on a focused link fires a click that bubbles up to the list.
+const bulletList = ref(null)
+
+function onBulletClick(event) {
+  const link = event.target.closest?.('a[href]')
+
+  if (link && isTalkUrl(link.href)) {
+    followTalkLink(event, link.href)
+  }
+}
+
+onMounted(() => bulletList.value?.addEventListener('click', onBulletClick))
+onBeforeUnmount(() => bulletList.value?.removeEventListener('click', onBulletClick))
 </script>
 
 <template>
@@ -42,7 +67,7 @@ const { t } = useI18n()
                comment above) - not shown here either. -->
           <p class="d-block d-md-none">{{ t('dashboard.sidebar_intro_1') }}</p>
 
-          <ul class="list-unstyled getting-started__list">
+          <ul ref="bulletList" class="list-unstyled getting-started__list">
             <!-- eslint-disable vue/no-v-html -->
             <li v-html="t('dashboard.getting_the_most_bullet1')" />
             <li v-html="t('dashboard.getting_the_most_bullet2')" />

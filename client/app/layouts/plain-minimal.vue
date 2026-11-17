@@ -4,6 +4,8 @@ import LocaleSwitcher from '~/components/LocaleSwitcher.vue'
 import ToastContainer from '~/components/ToastContainer.vue'
 import CookieConsent from '~/components/CookieConsent.vue'
 
+const route = useRoute()
+
 // Chrome for /user/recover only. plain.vue (login/register/reset/etc) shows
 // the brand mark + impact-stats bar (includes/info.blade.php,
 // #logostats-header) - but legacy's forgot-password.blade.php diverges from
@@ -15,16 +17,19 @@ import CookieConsent from '~/components/CookieConsent.vue'
 </script>
 
 <template>
-  <div class="d-flex flex-column min-vh-100">
-    <header class="container container-nav py-3 d-flex justify-content-center">
-      <NuxtLink to="/" data-testid="plain-minimal-logo">
-        <IconLogo />
-      </NuxtLink>
-    </header>
-    <main class="flex-grow-1">
+  <div class="plain-layout d-flex flex-column">
+    <main class="login-page flex-grow-1">
+      <!-- Centred, except where live puts the logo at the top left of the
+           content (the cookie policy): definePageMeta({ logoStart: true }). -->
+      <header class="container d-flex" :class="route.meta.logoStart ? 'justify-content-start' : 'justify-content-center'">
+        <NuxtLink to="/" data-testid="plain-minimal-logo">
+          <IconLogo />
+        </NuxtLink>
+      </header>
       <slot />
     </main>
-    <footer class="container d-flex justify-content-end py-3" data-testid="plain-language-bar">
+    <!-- No .container: live's fixed .language-bar spans the full viewport. -->
+    <footer data-testid="plain-language-bar">
       <LocaleSwitcher />
     </footer>
     <ToastContainer />

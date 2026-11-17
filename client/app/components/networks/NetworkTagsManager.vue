@@ -1,4 +1,5 @@
 <script setup>
+import LoadingPlaceholder from '~/components/LoadingPlaceholder.vue'
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useNetworksStore } from '~/stores/networks.js'
@@ -131,9 +132,7 @@ async function performDelete() {
 <template>
   <div data-testid="network-tags-manager">
     <div v-if="loading" data-testid="network-tags-loading">
-      <div class="placeholder-glow">
-        <span class="placeholder col-12" style="height: 4rem" />
-      </div>
+      <LoadingPlaceholder height="4rem" />
     </div>
 
     <BAlert v-else-if="error" :model-value="true" variant="danger" data-testid="network-tags-load-error">

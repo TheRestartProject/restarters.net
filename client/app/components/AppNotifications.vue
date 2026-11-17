@@ -6,6 +6,7 @@ import { useAuthStore } from '~/stores/auth.js'
 import { useNotificationsStore } from '~/stores/notifications.js'
 import { useSsoBridge } from '~/composables/useSsoBridge.js'
 import IconBell from './icons/IconBell.vue'
+import NotificationCard from './NotificationCard.vue'
 
 // Port of resources/js/components/Notifications.vue: two badges (Talk
 // unread count via Discourse, Restarters unread count), both sourced from
@@ -37,8 +38,22 @@ function pad(value) {
   return value > 99 ? '99+' : String(value)
 }
 
+const panel = computed(() => notificationsStore.panel)
+
+// Opening the bell loads the latest notifications for the panel (live
+// renders them server-side into #notifications on every page load).
 function toggleRestarters() {
   open.value = !open.value
+
+  if (open.value) {
+    notificationsStore.fetchPanel()
+  }
+}
+
+// Marking read from the panel updates the cards and the bell count, as
+// live's per-card "Mark as read" link does.
+function markOne(id) {
+  notificationsStore.markRead(id).catch(() => {})
 }
 
 // Mirrors the legacy widget's goto(): DISCOURSE_URL + '/session/sso?
@@ -103,14 +118,33 @@ onUnmounted(() => {
       <span class="notification-badge__count" data-testid="notifications-restarters-count">{{ pad(restarters) }}</span>
     </button>
 
-    <div v-if="open" class="notifications-panel" data-testid="notifications-restarters-panel">
-      <p v-if="restarters" data-testid="notifications-restarters-text">
-        {{ t('client.notifications.unread', { count: restarters }, restarters) }}
-      </p>
-      <p v-else data-testid="notifications-restarters-empty">
-        {{ t('general.alert_uptodate') }}
-      </p>
-    </div>
+    <!-- Live's #notifications aside (navbar.blade.php): a full-height panel
+         under the navbar, not a dropdown of the bell. Teleported to the body
+         so the navbar's own positioning does not contain it; the layout is
+         the shared .notifications rules in assets/css/_notifications.scss. -->
+    <Teleport to="body">
+      <aside v-if="open" id="notifications" class="notifications" data-testid="notifications-restarters-panel">
+        <div class="notifications__scroll">
+          <div class="notifications__inner">
+            <div v-if="panel.items.length" class="cards" data-testid="notifications-restarters-cards">
+              <NotificationCard v-for="n in panel.items" :key="n.id" :notification="n" @mark-read="markOne" />
+            </div>
+            <div v-else-if="!panel.loading" class="alert alert-secondary" role="alert" data-testid="notifications-restarters-empty">
+              <h3>{{ t('general.alert_uptodate') }}</h3>
+              <p>{{ t('general.alert_uptodate_text') }}</p>
+            </div>
+          </div>
+          <NuxtLink
+            to="/notifications"
+            class="notifications__older"
+            data-testid="notifications-view-all"
+            @click="open = false"
+          >
+            {{ t('notifications.view_all') }}
+          </NuxtLink>
+        </div>
+      </aside>
+    </Teleport>
   </div>
 </template>
 
@@ -173,24 +207,6 @@ onUnmounted(() => {
     margin-right: 10px;
     padding-left: 15px;
     padding-right: 15px;
-  }
-}
-
-.notifications-panel {
-  position: absolute;
-  top: 100%;
-  right: 0;
-  min-width: 220px;
-  background: #fff;
-  border: 1px solid rgba(0, 0, 0, 0.15);
-  border-radius: 0.25rem;
-  padding: 0.75rem 1rem;
-  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-  z-index: 20;
-  margin-top: 0.5rem;
-
-  p {
-    margin: 0;
   }
 }
 </style>

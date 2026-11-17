@@ -57,7 +57,7 @@ vi.mock('leaflet-control-geocoder', () => {
 const { LMapStub, LTileLayerStub } = vi.hoisted(() => ({
   LMapStub: {
     name: 'LMap',
-    props: ['minZoom', 'maxZoom', 'bounds', 'options', 'useGlobalLeaflet'],
+    props: ['minZoom', 'maxZoom', 'bounds', 'center', 'zoom', 'options', 'useGlobalLeaflet'],
     emits: ['ready', 'moveend', 'zoomend', 'dragend'],
     template: '<div class="stub-lmap"><slot /></div>',
   },
@@ -70,17 +70,26 @@ const { LMapStub, LTileLayerStub } = vi.hoisted(() => ({
 
 vi.mock('@vue-leaflet/vue-leaflet', () => ({ LMap: LMapStub, LTileLayer: LTileLayerStub }))
 
-function fakeLeafletMap({ size = { x: 688, y: 400 }, bounds } = {}) {
+function fakeLeafletMap({ size = { x: 688, y: 400 }, bounds, hasView = true } = {}) {
   return {
+    // Leaflet sets _loaded once the map has a centre and zoom; until then
+    // getBounds() and getCenter() throw.
+    _loaded: hasView,
     addLayer: vi.fn(),
     invalidateSize: vi.fn(),
     fitBounds: vi.fn(),
     flyToBounds: vi.fn(),
     flyTo: vi.fn(),
     getSize: () => size,
-    getBounds: () => bounds ?? L.latLngBounds([50, -1], [52, 1]),
+    getBounds: () => {
+      if (!hasView) throw new Error('Set map center and zoom first.')
+      return bounds ?? L.latLngBounds([50, -1], [52, 1])
+    },
     getZoom: () => 5,
-    getCenter: () => ({ lat: 51, lng: 0 }),
+    getCenter: () => {
+      if (!hasView) throw new Error('Set map center and zoom first.')
+      return { lat: 51, lng: 0 }
+    },
   }
 }
 
@@ -88,7 +97,8 @@ function mountMap(props = {}) {
   const i18n = createI18n({ legacy: false, locale: 'en', messages: { en } })
 
   return mount(GroupMap, {
-    props: { groups: [], ...props },
+    // minCluster 0 so small fixtures still go through the cluster group.
+    props: { groups: [], minCluster: 0, ...props },
     global: {
       plugins: [i18n],
     },
@@ -116,6 +126,29 @@ describe('components/groups/GroupMap', () => {
     expect(wrapper.findComponent(LMapStub).props('maxZoom')).toBe(18)
   })
 
+  // With nothing to frame (no box, and groups with no location) the map had no
+  // view, and asking what was in view failed the page: "Set map center and
+  // zoom first".
+  it('starts on the whole world when it has no box to frame', () => {
+    const lmap = mountMap().findComponent(LMapStub)
+    expect(lmap.props('center')).toEqual([20, 0])
+    expect(lmap.props('zoom')).toBe(2)
+
+    const framed = mountMap({ initialBounds: [[50, -1], [52, 1]] }).findComponent(LMapStub)
+    expect(framed.props('center')).toBeUndefined()
+    expect(framed.props('bounds')).toEqual([[50, -1], [52, 1]])
+  })
+
+  it('does not ask what is in view before the map has a view', async () => {
+    const wrapper = mountMap({ groups: [] })
+    const map = fakeLeafletMap({ hasView: false, size: { x: 0, y: 0 } })
+
+    expect(() => wrapper.findComponent(LMapStub).vm.$emit('ready', map)).not.toThrow()
+    await wrapper.setProps({ groups: [{ id: 1, name: 'G1', lat: null, lng: null }] })
+
+    expect(wrapper.emitted('update:groupIdsInBounds')).toBeUndefined()
+  })
+
   it('passes zoom bounds and CARTO tiles through to the underlying map/tile layer', () => {
     const wrapper = mountMap({ minZoom: 3, maxZoom: 12 })
 
@@ -125,6 +158,30 @@ describe('components/groups/GroupMap', () => {
 
     const tiles = wrapper.findComponent(LTileLayerStub)
     expect(tiles.props('url')).toContain('cartocdn.com')
+  })
+
+  describe('clustering threshold', () => {
+    const group = (id) => ({ id, name: `G${id}`, lat: 51 + id / 10, lng: 0 })
+
+    async function ready(groups, props = {}) {
+      const wrapper = mountMap({ groups, ...props })
+      const map = fakeLeafletMap()
+      wrapper.findComponent(LMapStub).vm.$emit('ready', map)
+      await wrapper.vm.$nextTick()
+      return map
+    }
+
+    it('draws pins individually below 10 groups', async () => {
+      const map = await ready([1, 2, 3].map(group), { minCluster: 10 })
+      expect(fakeClusterGroup.addLayers).not.toHaveBeenCalled()
+      // The cluster layer plus the plain layer holding the pins.
+      expect(map.addLayer).toHaveBeenCalledTimes(2)
+    })
+
+    it('clusters from 10 groups up', async () => {
+      await ready([1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(group), { minCluster: 10 })
+      expect(fakeClusterGroup.addLayers.mock.calls[0][0]).toHaveLength(10)
+    })
   })
 
   describe('mapOptions', () => {

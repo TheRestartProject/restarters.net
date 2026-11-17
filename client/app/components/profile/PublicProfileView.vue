@@ -1,4 +1,5 @@
 <script setup>
+import LoadingPlaceholder from '~/components/LoadingPlaceholder.vue'
 import { computed, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAuth } from '~/composables/useAuth.js'
@@ -52,7 +53,7 @@ const avatarUrl = computed(() => uploadedImageUrl(profile.value?.avatar_url))
 // nothing). Those JSON files translate every role name (en: Administrator ->
 // "Admin", Restarter -> "Repairer", NetworkCoordinator -> "Network
 // Coordinator"; fr/fr-BE: Administrator -> "Administrateur", etc) and are
-// already exported as flat top-level keys in i18n/locales/{en,fr,fr-BE}.json
+// already exported as flat top-level keys in i18n/locales/<code>.json
 // (php artisan translations:export-client) - t() resolves the role name
 // straight through those, matching @lang() exactly, in every locale.
 const roleLabel = computed(() => (profile.value?.role_name ? t(profile.value.role_name) : ''))
@@ -78,9 +79,7 @@ watch(() => props.userId, load)
     </BAlert>
 
     <div v-else-if="loading" data-testid="profile-view-loading">
-      <div class="placeholder-glow">
-        <span class="placeholder col-12" style="height: 6rem" />
-      </div>
+      <LoadingPlaceholder height="6rem" />
     </div>
 
     <BAlert v-else-if="notFound" :model-value="true" variant="danger" data-testid="profile-view-not-found">

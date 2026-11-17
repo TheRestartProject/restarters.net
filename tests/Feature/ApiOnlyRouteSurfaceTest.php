@@ -24,6 +24,8 @@ class ApiOnlyRouteSurfaceTest extends TestCase
         'GET party/accept-invite/{id}/{hash}',
         'GET party/invite/{code}',
         'GET group/invite/{code}',
+        'GET user/thumbnail',
+        'GET user/menus',
         'GET export/devices/event/{id}',
         'GET export/devices/group/{id}',
         'GET export/devices',

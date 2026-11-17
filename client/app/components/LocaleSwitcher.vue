@@ -1,16 +1,21 @@
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '~/stores/auth.js'
 import { useSessionStore } from '~/stores/session.js'
 
-// en/fr/fr-BE only (nuxt.config.ts i18n.locales - design.md §7); native
-// names are not translated (a French speaker still needs to see
-// "Français" while browsing in English to find it).
+// Live's language menu (config/laravellocalization.php order; nuxt.config.ts
+// i18n.locales). Native names are not translated (a French speaker still
+// needs to see "Français" while browsing in English to find it).
 const LOCALES = [
+  { code: 'de', native: 'Deutsch' },
   { code: 'en', native: 'English' },
+  { code: 'es', native: 'Español' },
   { code: 'fr', native: 'Français' },
   { code: 'fr-BE', native: 'Français (Belgique)' },
+  { code: 'it', native: 'Italiano' },
+  { code: 'nl', native: 'Nederlands' },
+  { code: 'nl-BE', native: 'Nederlands (België)' },
 ]
 
 // @nuxtjs/i18n extends the shared vue-i18n composer returned by useI18n()
@@ -42,6 +47,31 @@ function close() {
   open.value = false
 }
 
+// As Bootstrap's dropdown on live: a click anywhere else, or Escape, closes the menu.
+const root = ref(null)
+
+function onDocumentClick(event) {
+  if (open.value && root.value && !root.value.contains(event.target)) {
+    close()
+  }
+}
+
+function onKeydown(event) {
+  if (open.value && event.key === 'Escape') {
+    close()
+  }
+}
+
+onMounted(() => {
+  document.addEventListener('click', onDocumentClick)
+  document.addEventListener('keydown', onKeydown)
+})
+
+onBeforeUnmount(() => {
+  document.removeEventListener('click', onDocumentClick)
+  document.removeEventListener('keydown', onKeydown)
+})
+
 async function choose(code) {
   close()
 
@@ -68,7 +98,7 @@ async function choose(code) {
 </script>
 
 <template>
-  <div class="language-bar" :class="{ show: open }" data-testid="locale-switcher">
+  <div ref="root" class="language-bar" :class="{ show: open }" data-testid="locale-switcher">
     <div class="d-none" data-testid="locale-current">{{ current }}</div>
 
     <button
@@ -142,8 +172,10 @@ async function choose(code) {
       width: 190px;
     }
 
+    // Above the bar, so the whole menu is on screen and the toggle stays
+    // visible to close it again.
     &.show {
-      bottom: 0;
+      bottom: 100%;
     }
   }
 
@@ -210,7 +242,6 @@ async function choose(code) {
       position: relative;
       z-index: 1;
       left: -2px;
-      margin-right: 4px;
     }
   }
 

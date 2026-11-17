@@ -67,12 +67,11 @@ describe('components/devices/DeviceRow', () => {
     expect(wrapper.find('[data-testid="event-device-status-1"]').text()).toBe('Fixed')
   })
 
-  // PR #775: groups cross-reference items to their own repair-tracking
-  // software, so the reference has to be readable without opening the row.
-  it('shows the reference above the item type when one is set', () => {
+  // PR #775/#907: the reference is hidden until live has it.
+  it('hides the reference even when one is set', () => {
     const wrapper = mountRow({ device: device({ reference: 'REP1234' }) })
 
-    expect(wrapper.find('[data-testid="event-device-reference-1"]').text()).toBe('REP1234')
+    expect(wrapper.find('[data-testid="event-device-reference-1"]').exists()).toBe(false)
   })
 
   it('shows nothing where the reference would be when it is unset', () => {
@@ -90,6 +89,15 @@ describe('components/devices/DeviceRow', () => {
     it('shows the tick for Manufacturer', () => {
       const wrapper = mountRow({ device: device({ spare_parts: 'Manufacturer' }) })
       expect(wrapper.find('[data-testid="event-device-spare-parts-1"]').exists()).toBe(true)
+    })
+
+    // develop's tick is `class="icon spare-parts-tick"`: the icon class keeps
+    // it out of the 50px bordered table-thumbnail rule (.table td img:not(.icon)).
+    it("renders live's tick icon, exempt from the thumbnail styling", () => {
+      const wrapper = mountRow({ device: device({ spare_parts: 'Manufacturer' }) })
+      const tick = wrapper.find('[data-testid="event-device-spare-parts-1"]')
+      expect(tick.element.tagName).toBe('IMG')
+      expect(tick.classes()).toContain('icon')
     })
 
     it('shows the tick for Third party', () => {

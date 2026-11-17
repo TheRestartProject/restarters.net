@@ -231,7 +231,9 @@ class Network extends JsonResource
             'reporting_url' => $this->reporting_url,
             'shortname' => $this->shortname,
             'default_language' => $this->default_language,
-            'stats' => $this->resource->stats(),
+            // Calculating the stats walks every device of every past event in the network, so callers that
+            // show the network before its stats (the network page) can leave them out and fetch them separately.
+            'stats' => $this->when($request->boolean('includeStats', true), fn () => $this->resource->stats()),
             'timezone' => $this->resource->timezone,
             'full' => true,
             // Legacy NetworkController@show built this the same way (User::

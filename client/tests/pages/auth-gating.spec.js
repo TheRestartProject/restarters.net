@@ -53,8 +53,11 @@ const EXPECTED_GATES = {
   '/group/invite/{code}': 'public',
   '/group/map': 'auth',
   '/group/nearby': 'auth',
+  '/group/other': 'auth',
   '/group/view/{id}': 'auth',
   '/login': 'guest',
+  // Logs out whoever is there (the wiki's user menu links to it).
+  '/logout': 'public',
   '/networks': 'auth',
   '/networks/{id}': 'auth',
   // networks/edit.blade.php sits behind develop's auth+role middleware; the

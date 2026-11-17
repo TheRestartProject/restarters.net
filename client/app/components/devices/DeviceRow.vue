@@ -79,12 +79,17 @@ async function confirmDelete() {
     deleting.value = false
   }
 }
+
+// The device reference (PR #907) isn't on the live site yet; hidden until the
+// rest of the Nuxt client matches live. Flip to true to bring it back -
+// stored values are untouched either way.
+const SHOW_DEVICE_REFERENCE = false
 </script>
 
 <template>
   <tr v-if="!editing" :data-testid="`event-device-${device.id}`">
     <td class="device-reference-cell">
-      <span v-if="device.reference" class="device-reference text-muted d-block" :data-testid="`event-device-reference-${device.id}`">
+      <span v-if="SHOW_DEVICE_REFERENCE && device.reference" class="device-reference text-muted d-block" :data-testid="`event-device-reference-${device.id}`">
         {{ device.reference }}
       </span>
       {{ device.item_type || '-' }}
@@ -101,13 +106,13 @@ async function confirmDelete() {
       </BBadge>
     </td>
     <td class="text-center d-none d-md-table-cell">
-      <span v-if="sparePartsNeeded" :data-testid="`event-device-spare-parts-${device.id}`">&#10003;</span>
+      <img v-if="sparePartsNeeded" src="/images/tick.svg" class="icon spare-parts-tick" :alt="t('partials.yes')" :data-testid="`event-device-spare-parts-${device.id}`">
     </td>
     <td v-if="canedit" class="text-end">
       <!-- Gap fix (MEDIUM): legacy uses small icon buttons
            (edit_ico_green.svg/delete_ico_red.svg), not text links. -->
       <button type="button" class="device-row-icon-btn me-2" :data-testid="`event-device-edit-${device.id}`" @click="edit">
-        <img src="/icons/edit_ico_green.svg" class="device-row-icon-btn__icon" alt="">
+        <img src="/icons/edit_ico_green.svg" class="icon device-row-icon-btn__icon" alt="">
         <span class="visually-hidden">{{ t('client.devices.edit') }}</span>
       </button>
       <button
@@ -116,7 +121,7 @@ async function confirmDelete() {
         :data-testid="`event-device-delete-${device.id}`"
         @click="askDelete"
       >
-        <img src="/icons/delete_ico_red.svg" class="device-row-icon-btn__icon" alt="">
+        <img src="/icons/delete_ico_red.svg" class="icon device-row-icon-btn__icon" alt="">
         <span class="visually-hidden">{{ t('devices.delete_device') }}</span>
       </button>
       <div v-if="deleteError" class="small text-danger" :data-testid="`event-device-delete-error-${device.id}`">
@@ -165,6 +170,11 @@ async function confirmDelete() {
   background: none;
   line-height: 1;
   cursor: pointer;
+}
+
+/* EventDeviceSummary.vue's .icon: 21px wide. */
+.spare-parts-tick {
+  width: 21px;
 }
 
 .device-row-icon-btn__icon {

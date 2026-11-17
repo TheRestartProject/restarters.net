@@ -49,4 +49,5 @@ return [
   'picture_error' => 'Profilbild konnte nicht hochgeladen werden!',
   'admin_success' => 'Administrator-Einstellungen aktualisiert',
   'create_success' => 'Benutzer erfolgreich erstellt!',
+  'other_profile' => 'Profil von :name',
 ];

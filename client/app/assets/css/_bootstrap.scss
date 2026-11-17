@@ -77,3 +77,11 @@ $spacers: map-merge(
 
 // Utilities
 @import 'bootstrap/scss/utilities/api';
+
+// Bootstrap paints .placeholder in currentColor (#222 body text) at 50%
+// opacity: dark grey slabs while pages load. Live's loading state
+// (.vue-placeholder in resources/global/css/_global.scss) is lightgrey at 50%
+// opacity, pulsing - keep Bootstrap's shapes and glow, in live's colour.
+.placeholder {
+  background-color: lightgrey;
+}

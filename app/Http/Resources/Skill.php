@@ -18,6 +18,13 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *          example=1
  *     ),
  *     @OA\Property(
+ *          property="name",
+ *          title="name",
+ *          description="Name of this skill. The same value as skill_name, which it predates; kept for existing API clients.",
+ *          format="string",
+ *          example="First aid"
+ *     ),
+ *     @OA\Property(
  *          property="skill_name",
  *          title="skill_name",
  *          description="Name of this skill",
@@ -52,6 +59,8 @@ class Skill extends JsonResource
     {
         return [
             'id' => $this->id,
+            // What the API sent before skill_name; third-party clients may read it.
+            'name' => $this->skill_name,
             'skill_name' => $this->skill_name,
             'description' => $this->description,
             'category' => $this->category !== null ? (int) $this->category : null,

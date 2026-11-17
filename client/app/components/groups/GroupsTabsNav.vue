@@ -44,7 +44,9 @@ function isActive(tab) {
         data-testid="groups-tab-mine"
         :aria-current="isActive('mine') ? 'page' : undefined"
       >
-        <b>{{ t('groups.groups_title1') }}</b>
+        <!-- Live's GroupsPage.vue: short titles below md (tab 1) / lg (tab 2). -->
+        <b class="d-block d-md-none" data-testid="groups-tab-mine-short">{{ t('groups.groups_title1_mobile') }}</b>
+        <b class="d-none d-md-block">{{ t('groups.groups_title1') }}</b>
       </NuxtLink>
       <NuxtLink
         to="/group/map"
@@ -53,7 +55,8 @@ function isActive(tab) {
         data-testid="groups-tab-map"
         :aria-current="isActive('map') ? 'page' : undefined"
       >
-        <b>{{ t('groups.groups_title2') }}</b>
+        <b class="d-block d-lg-none" data-testid="groups-tab-map-short">{{ t('groups.groups_title2_mobile') }}</b>
+        <b class="d-none d-lg-block">{{ t('groups.groups_title2') }}</b>
       </NuxtLink>
     </nav>
     <div class="groups-tabs-panel-body">

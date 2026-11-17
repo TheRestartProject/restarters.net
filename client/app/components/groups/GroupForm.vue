@@ -1,4 +1,5 @@
 <script setup>
+import { isEmailLike } from '~/utils/safeText.js'
 import { computed, onMounted, reactive, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { LMap, LMarker, LTileLayer } from '@vue-leaflet/vue-leaflet'
@@ -19,6 +20,9 @@ import LocationPicker from '../forms/LocationPicker.vue'
 import TusImageUpload from '../forms/TusImageUpload.vue'
 import GroupMultiSelect from './GroupMultiSelect.vue'
 import GroupNetworkData from './GroupNetworkData.vue'
+import SpinIcon from '../forms/SpinIcon.vue'
+import { useSpinButton } from '../../composables/useSpinButton.js'
+import { useLeafletUnmountGuard } from '../../composables/useLeafletUnmountGuard.js'
 
 const leafletTiles = useLeafletTiles()
 
@@ -50,6 +54,8 @@ const props = defineProps({
     default: false,
   },
 })
+
+useLeafletUnmountGuard()
 
 const emit = defineEmits(['created', 'updated'])
 
@@ -133,6 +139,25 @@ const networkData = ref({ ...(props.initialGroup?.network_data || {}) })
 const approved = ref(!!props.initialGroup?.approved)
 
 const timezones = ref([])
+// Live's GroupTimeZone.vue is a vue-typeahead-bootstrap (maxMatches 3,
+// minMatchingChars 1): a real input plus a custom suggestion panel, not a
+// native <datalist>. Matches are case-insensitive substrings, ordered by
+// where the match starts.
+const timezoneOpen = ref(false)
+const timezoneMatches = computed(() => {
+  const term = (form.timezone || '').toLowerCase()
+  if (!term) return []
+  return timezones.value
+    .map((text, i) => ({ text, i, pos: text.toLowerCase().indexOf(term) }))
+    .filter((m) => m.pos !== -1)
+    .sort((a, b) => a.pos - b.pos || a.i - b.i)
+    .slice(0, 3)
+    .map((m) => m.text)
+})
+function selectTimezone(zone) {
+  form.timezone = zone
+  timezoneOpen.value = false
+}
 const timezoneValid = computed(() => !form.timezone || !timezones.value.length || timezones.value.includes(form.timezone))
 
 const networkOptions = ref([])
@@ -159,7 +184,7 @@ const duplicateName = computed(() => {
   return groupsStore.names.some((g) => (creating.value || g.id !== props.groupId) && g.name.toLowerCase() === name)
 })
 
-const submitting = ref(false)
+const spin = useSpinButton()
 const generalError = ref('')
 const fieldErrors = ref({})
 
@@ -243,7 +268,7 @@ function validate() {
   if (form.website && !/^https?:\/\/.+/i.test(form.website)) {
     errors.website = [t('groups.groups_website_invalid')]
   }
-  if (form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+  if (form.email && !isEmailLike(form.email)) {
     errors.email = [t('client.groups.email_invalid')]
   }
   if (!timezoneValid.value) {
@@ -270,7 +295,8 @@ async function submit() {
     return
   }
 
-  submitting.value = true
+  spin.start()
+  let saved = false
 
   const payload = {
     name: form.name,
@@ -327,10 +353,12 @@ async function submit() {
         }
       }
 
+      saved = true
       emit('created', id)
     } else {
       const id = await groupsStore.updateGroup(props.groupId, payload)
       approved.value = approved.value || form.moderate === 'approve'
+      saved = true
       emit('updated', id)
     }
   } catch (err) {
@@ -339,7 +367,7 @@ async function submit() {
     }
     generalError.value = creating.value ? t('groups.create_failed') : t('groups.edit_failed')
   } finally {
-    submitting.value = false
+    spin.finish(saved)
   }
 }
 
@@ -447,18 +475,36 @@ defineExpose({ submit })
       </div>
 
       <BFormGroup class="group-form-timezone" :label="`${t('groups.timezone')}:`" label-for="group-form-timezone">
-        <input
-          id="group-form-timezone" v-model="form.timezone"
-          :aria-label="`${t('groups.timezone')}`"
-          type="text"
-          list="group-form-timezones"
-          class="form-control"
-          :class="{ 'is-invalid': !timezoneValid }"
-          data-testid="group-form-timezone"
-        >
-        <datalist id="group-form-timezones">
-          <option v-for="zone in timezones" :key="zone" :value="zone" />
-        </datalist>
+        <div class="position-relative typeahead-field">
+          <input
+            id="group-form-timezone" v-model="form.timezone"
+            :aria-label="`${t('groups.timezone')}`"
+            type="text"
+            autocomplete="off"
+            class="form-control"
+            :class="{ 'is-invalid': !timezoneValid }"
+            data-testid="group-form-timezone"
+            @focus="timezoneOpen = true"
+            @blur="timezoneOpen = false"
+          >
+          <div
+            v-if="timezoneOpen && timezoneMatches.length"
+            class="multiselect__content-wrapper"
+            data-testid="group-form-timezone-suggestions"
+          >
+            <ul class="multiselect__content">
+              <li
+                v-for="z in timezoneMatches"
+                :key="z"
+                class="multiselect__option"
+                :data-testid="`group-form-timezone-option-${z}`"
+                @mousedown.prevent="selectTimezone(z)"
+              >
+                {{ z }}
+              </li>
+            </ul>
+          </div>
+        </div>
         <small class="form-text text-muted">{{ t('groups.timezone_placeholder') }}</small>
       </BFormGroup>
 
@@ -528,11 +574,8 @@ defineExpose({ submit })
           <div v-if="creating" class="flex-grow-1">
             {{ t('groups.groups_approval_text') }}
           </div>
-          <BButton type="submit" variant="primary" :disabled="submitting" data-testid="group-form-submit">
-            <svg v-if="!submitting" width="14" height="14" viewBox="0 0 16 16" fill="currentColor" class="me-1" aria-hidden="true">
-              <path d="M2 1a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4.414a1 1 0 0 0-.293-.707l-2.414-2.414A1 1 0 0 0 11.586 1H2zm0 1h9.586L14 4.414V14H2V2zm2 0h5v3H4V2zm-1 5h10v7H3V7z" />
-            </svg>
-            <span v-else class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true" />
+          <BButton type="submit" variant="primary" :disabled="spin.state.value === 'spinning'" data-testid="group-form-submit">
+            <SpinIcon :state="spin.state.value" />
             {{ creating ? t('groups.create_group') : t('groups.edit_group_save_changes') }}
           </BButton>
         </div>

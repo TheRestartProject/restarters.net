@@ -3,10 +3,12 @@
 namespace Tests\Feature\Groups;
 
 use App\Device;
+use App\EventsUsers;
 use App\Group;
 use App\Party;
 use App\Role;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
@@ -161,6 +163,38 @@ class GroupViewTest extends TestCase
         $this->assertEquals(1, $events[0]['stats']['fixed_devices']);
         $this->assertEquals(3, $events[0]['stats']['participants']);
         $this->assertEquals(2, $events[0]['stats']['volunteers']);
+    }
+
+    public function testEventsListSaysWhichEventsYouAreAttending(): void {
+        // The group page's events list shows "You're going!" and highlights the rows for events the
+        // viewer is attending (develop's expandEvent() 'attending'), so the list endpoint carries it.
+        $user = $this->loginAsTestUser(Role::RESTARTER);
+        $id = $this->createGroup();
+
+        $going = Party::factory()->moderated()->create([
+            'event_start_utc' => Carbon::parse('1pm tomorrow')->toIso8601String(),
+            'event_end_utc' => Carbon::parse('3pm tomorrow')->toIso8601String(),
+            'group' => $id,
+        ]);
+        $invited = Party::factory()->moderated()->create([
+            'event_start_utc' => Carbon::parse('1pm next week')->toIso8601String(),
+            'event_end_utc' => Carbon::parse('3pm next week')->toIso8601String(),
+            'group' => $id,
+        ]);
+
+        EventsUsers::create(['event' => $going->idevents, 'user' => $user->id, 'status' => 1, 'role' => Role::RESTARTER]);
+        // Invited but not yet confirmed isn't attending.
+        EventsUsers::create(['event' => $invited->idevents, 'user' => $user->id, 'status' => 0, 'role' => Role::RESTARTER]);
+
+        $events = collect($this->get("/api/v2/groups/$id/events")->assertSuccessful()->json('data'))->keyBy('id');
+        $this->assertTrue($events[$going->idevents]['attending']);
+        $this->assertFalse($events[$invited->idevents]['attending']);
+
+        // Logged out, there's nobody to be attending.
+        Auth::logout();
+        $events = collect($this->get("/api/v2/groups/$id/events")->assertSuccessful()->json('data'));
+        $this->assertCount(2, $events);
+        $this->assertArrayNotHasKey('attending', $events[0]);
     }
 
     public function testGroupIndexNextEventIsEagerLoaded(): void

@@ -94,9 +94,15 @@ test.describe('groups', () => {
     // membership. A prior failed/retried run may have left nc mid-flow
     // (joined but not left), so normalize to "not a member" first rather than
     // assuming a fixed starting state.
+    // Leaving asks for confirmation first, as on live.
+    const leave = async () => {
+      await leaveItem.click()
+      await Promise.all([membership('DELETE'), page.getByTestId('group-view-leave-confirm').click()])
+    }
+
     await openMenu()
     if (await leaveItem.isVisible()) {
-      await Promise.all([membership('DELETE'), leaveItem.click()])
+      await leave()
       await openMenu()
       await expect(joinItem).toBeVisible()
     }
@@ -105,7 +111,7 @@ test.describe('groups', () => {
     await openMenu()
     await expect(leaveItem).toBeVisible()
 
-    await Promise.all([membership('DELETE'), leaveItem.click()])
+    await leave()
     await openMenu()
     await expect(joinItem).toBeVisible()
   })

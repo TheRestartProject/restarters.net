@@ -149,6 +149,9 @@ before starting F proper).
   locale via session/param), InformationAlertCookieController dies.
 - route('registration') has no references in kept trees → name dropped.
 - user/thumbnail: no consumers outside its controller (verified) → dies.
+  CORRECTED: the wiki's server calls user/thumbnail and user/menus to build
+  its header (live nginx logs, ~400 calls each in 7 weeks). Both are kept in
+  routes/web.php and routed to Laravel in docker/nginx-fly.conf.
 - /about/cookie-policy: SPA page exists (client/app/pages/about/cookie-policy
   .vue); route dies, catch-all redirect covers old links.
 - admin/preview-deploy (PR previews to restarters.dev, cfb47d7fd3): KEPT +
@@ -229,7 +232,8 @@ are still wanted in the SPA they need API endpoints + client UI:
 - Admin SOFT-DELETE another user (old /user/soft-delete) — deleteMyAccountv2
   is self-only. Ported to UserPolicy assertion + model check.
 - MediaWiki avatar THUMBNAIL lookup (old /user/thumbnail) — no v2 route
-  (getThumbnail now unreachable). testBadMediaWikiId deleted.
+  (getThumbnail now unreachable). testBadMediaWikiId deleted. CORRECTED: kept
+  after all, with /user/menus (see above); tests/Feature/Users/MenusTest.php.
 The security GUARANTEES (non-admins can't touch others) are preserved via
 UserPolicy tests; what's absent is the admin-does-it-to-another *capability*
 over the API. DECISION: confirm whether D3/D5 admin scope intends these.

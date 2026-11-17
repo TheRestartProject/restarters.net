@@ -35,8 +35,14 @@ describe('composables/useCo2Equivalent', () => {
   it('uses the singular seedling phrasing for a value that rounds to 1', () => {
     const { equivalentConsumer } = withI18n(() => useCo2Equivalent())
     // 60 / 60 = 1 seedling
-    expect(equivalentConsumer(60)).toContain('1 tree seedling')
+    expect(equivalentConsumer(60).replace(/<[^>]*>/g, '')).toContain('1 tree seedling')
     expect(equivalentConsumer(60)).not.toContain('seedlings')
+  })
+
+  // As co2equivalent.js on live: the figure stands out in bold brand teal.
+  it('highlights the figure', () => {
+    const { equivalentConsumer } = withI18n(() => useCo2Equivalent())
+    expect(equivalentConsumer(600)).toContain('<span class="text-brand-light fw-bold">10</span> tree seedlings')
   })
 
   it('switches to hectares of trees at the 13501 threshold (12 tonnes/hectare/year)', () => {

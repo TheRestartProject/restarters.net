@@ -102,6 +102,7 @@ const labels = computed(() => ({
       :form-fields="formFields"
       :labels="labels"
       testid-prefix="tags"
+      create-modal-class="modal-form"
       :edit-id="editId"
       :items="adminStore.groupTags.data"
       :fetch-items="adminStore.fetchGroupTags"

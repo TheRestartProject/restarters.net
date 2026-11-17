@@ -1,4 +1,5 @@
 <script setup>
+import { isEmailLike } from '~/utils/safeText.js'
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useEventsStore } from '../../stores/events.js'
@@ -95,17 +96,15 @@ function toggleAllMembers(checked) {
 watch(
   () => props.show,
   (visible) => {
-    if (visible) loadMembers()
+    if (visible) void loadMembers()
   },
   { immediate: true }
 )
 
-const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-
 // Chips the user typed that aren't addresses. The control renders these in the
 // danger fill, as develop's multiselect does via its has-invalid-email class,
 // so a typo is visible before submitting rather than only in the error line.
-const invalidEmails = computed(() => manualEmails.value.filter((e) => !EMAIL_RE.test(e)))
+const invalidEmails = computed(() => manualEmails.value.filter((e) => !isEmailLike(e)))
 
 function reset() {
   generalError.value = ''
@@ -170,7 +169,7 @@ function close() {
 </script>
 
 <template>
-  <BModal :model-value="show" data-testid="event-invite-modal" :title="t('events.invite_restarters_modal_heading')" no-footer @hide="close">
+  <BModal :model-value="show" size="lg" modal-class="modal__invite" data-testid="event-invite-modal" :title="t('events.invite_restarters_modal_heading')" no-footer @hide="close">
     <BAlert v-if="successMessage" :model-value="true" variant="success" data-testid="event-invite-success">
       {{ successMessage }}
     </BAlert>

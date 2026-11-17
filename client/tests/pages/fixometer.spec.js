@@ -14,7 +14,7 @@ const BButtonStub = { template: '<button v-bind="$attrs"><slot /></button>' }
 // stubbed here so this page-level suite doesn't also need a working $api
 // mock for its onMounted() searches/metadata fetches.
 const DevicesSearchTableStub = {
-  emits: ['update:filteredDownloadUrl'],
+  emits: ['update:filteredDownloadUrl', 'update:total'],
   template: '<div data-testid="devices-search-table-stub" />',
 }
 // AddDataModal.spec.js covers its own fetch/render logic - stubbed here so
@@ -179,5 +179,30 @@ describe('pages/fixometer', () => {
     wrapper.findComponent(DevicesSearchTableStub).vm.$emit('update:filteredDownloadUrl', null)
     await flushPromises()
     expect(wrapper.find('[data-testid="fixometer-export-devices-filtered"]').exists()).toBe(false)
+  })
+
+  it('headlines the repair records with the sitewide total until the list reports its own', async () => {
+    fixometerStore.impactData.data = {
+      participants: 5, hours_volunteered: 100, waste_total: 100, co2_total: 100,
+      total_powered: 1200, total_unpowered: 34,
+    }
+    fixometerStore.impactData.loaded = true
+
+    const wrapper = mountPage()
+    await flushPromises()
+
+    expect(wrapper.find('[data-testid="records-total"]').text()).toBe('(1,234)')
+    expect(wrapper.find('h2 .records-total').exists()).toBe(true)
+
+    wrapper.findComponent(DevicesSearchTableStub).vm.$emit('update:total', 56)
+    await flushPromises()
+    expect(wrapper.find('[data-testid="records-total"]').text()).toBe('(56)')
+  })
+
+  it('shows the browse text under the records heading', async () => {
+    const wrapper = mountPage()
+    await flushPromises()
+
+    expect(wrapper.text()).toContain(en.devices.search_text)
   })
 })

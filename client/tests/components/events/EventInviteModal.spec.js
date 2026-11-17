@@ -9,9 +9,9 @@ import en from '../../../i18n/locales/en.json'
 import clientEn from '../../../i18n/locales/client-en.json'
 
 const BModalStub = {
-  props: ['modelValue'],
+  props: ['modelValue', 'size'],
+  template: '<div v-if="modelValue" :data-size="size"><slot /></div>',
   emits: ['hide'],
-  template: '<div v-if="modelValue"><slot /></div>',
 }
 const BAlertStub = { template: '<div><slot /></div>' }
 const BFormStub = { template: '<form @submit.prevent="$emit(\'submit\', $event)"><slot /></form>' }
@@ -46,6 +46,12 @@ function pickerOptions(wrapper, testid) {
 }
 
 describe('components/events/EventInviteModal', () => {
+  it('opens as a large modal, as on the live site', () => {
+    const wrapper = mountComponent()
+    expect(wrapper.find('[data-testid="event-invite-modal"]').exists() || wrapper.find('[data-size]').exists()).toBe(true)
+    expect(wrapper.find('[data-size]').attributes('data-size')).toBe('lg')
+  })
+
   // The Blade modal's chain-link header toggle swaps the email form for a
   // box holding the shareable join link. Both halves exist; they are never
   // shown at once.

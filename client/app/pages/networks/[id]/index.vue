@@ -1,4 +1,6 @@
 <script setup>
+import { stripTags } from '~/utils/safeText.js'
+import LoadingPlaceholder from '~/components/LoadingPlaceholder.vue'
 import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAuth } from '~/composables/useAuth.js'
@@ -82,18 +84,8 @@ const showReadMore = computed(() => {
 })
 
 function stripHtml(value) {
-  return String(value).replace(/<[^>]*>/g, '')
+  return stripTags(value)
 }
-
-// The tally comes from the network's own stats (App\Network::stats()), which
-// counts only non-archived groups. Until they arrive, fall back to the
-// non-archived rows of the groups list.
-const groupsCount = computed(() => {
-  const fromStats = network.value?.stats?.groups
-  if (fromStats !== undefined && fromStats !== null) return fromStats
-  if (networksStore.groups.loading) return null
-  return networksStore.groups.data.filter((g) => !g.archived_at).length
-})
 
 // Mirrors app/Network.php#groupsNotIn() exactly (parity-v2/networks.md gap
 // #9): every group not already in the network, archived or not - archived
@@ -111,6 +103,9 @@ function loadGroups() {
 
 function loadNetwork() {
   networksStore.fetchCurrent(id.value)
+  // Separately, and after the network: they are slow to calculate for a large network, so the page doesn't wait
+  // for them.
+  networksStore.fetchStats(id.value).catch(() => {})
   networksStore.fetchTags(id.value)
   loadGroups()
 }
@@ -133,9 +128,7 @@ function retry() {
 <template>
   <div class="container py-4" data-testid="network-show-page">
     <div v-if="networksStore.current.loading" data-testid="network-show-loading">
-      <div class="placeholder-glow">
-        <span class="placeholder col-12" style="height: 6rem" />
-      </div>
+      <LoadingPlaceholder height="6rem" />
     </div>
 
     <BAlert
@@ -187,7 +180,7 @@ function retry() {
 
       <section class="mb-4">
         <h2>{{ t('networks.general.impact') }}</h2>
-        <NetworkStats :stats="network.stats" :groups-count="groupsCount" />
+        <NetworkStats :stats="networksStore.stats.data" :error="!!networksStore.stats.error" />
         <p v-if="network.reporting_url" class="mt-3 mb-0 text-end">
           <a
             :href="network.reporting_url"
@@ -256,7 +249,7 @@ function retry() {
            groups, starting zoomed out so every group is in view. -->
       <section class="groups-section mb-4">
         <h2>{{ t('networks.general.groups') }}</h2>
-        <NetworkGroupsMapList :network-id="id" :can-manage-tags="canManage" />
+        <NetworkGroupsMapList :network-id="id" :can-manage-tags="canManage" :tags="networksStore.tags.data" />
       </section>
 
       <!-- NetworkPage.vue wraps the tags-management section in a

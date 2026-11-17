@@ -408,7 +408,8 @@ class Group extends JsonResource
         $user = \Illuminate\Support\Facades\Auth::user()
             ?? auth('sanctum')->user()
             ?? auth('api')->user();
-        $ret['is_member'] = $user ? $this->resource->isVolunteer($user->id) : null;
+        $membership = $user ? $this->resource->preloadedViewerMembership : null;
+        $ret['is_member'] = $user ? ($membership['is_member'] ?? $this->resource->isVolunteer($user->id)) : null;
 
         // The group's reporting dashboard is for people who belong to the group or look after it
         // (administrators, the network coordinator, hosts), not for the general public.  Null when
@@ -430,15 +431,15 @@ class Group extends JsonResource
         // has status '1'. Only ever the caller's own invite, and absent
         // entirely when there isn't one.
         $ret['has_pending_invite'] = $user
-            ? (\App\UserGroups::where('group', $this->idgroups)
+            ? ($membership ? $membership['pending_invite'] : (\App\UserGroups::where('group', $this->idgroups)
                 ->where('user', $user->id)
                 ->where('status', '<>', '1')
                 ->whereNotNull('status')
-                ->value('status') ?: null)
+                ->value('status') ?: null))
             : null;
 
         // Get next approved event for group
-        $nextevent = \App\Group::find($this->idgroups)->getNextUpcomingEvent();
+        $nextevent = $this->resource->getNextUpcomingEvent();
 
         if ($nextevent) {
             // Using the resource for the nested event causes infinite loops.  Just add the model attributes we

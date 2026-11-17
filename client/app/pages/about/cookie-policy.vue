@@ -22,7 +22,8 @@ import { useCookieConsent } from '~/composables/useCookieConsent.js'
 // this page's own markup. Same "logo-only chrome" need as pages/user/
 // recover.vue, which is why layouts/plain-minimal.vue already exists -
 // reused here rather than duplicated.
-definePageMeta({ layout: 'plain-minimal' })
+// Live's cookie policy has the logo at the top left of the content.
+definePageMeta({ layout: 'plain-minimal', logoStart: true })
 
 const { t } = useI18n()
 useHead({ title: t('client.cookie_policy.title') })

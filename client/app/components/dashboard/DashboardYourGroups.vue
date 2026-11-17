@@ -172,7 +172,10 @@ h2 {
   border-bottom-color: #000 !important;
 }
 
-.new-highlight {
+/* Doubled class: the global `.panel:not(.note-editor) a` rule (_panels.scss,
+   specificity 0,2,1) otherwise beats a single scoped class and turns this
+   link's text black on the #222 background - only the white arrow showed. */
+.new-highlight.new-highlight {
   font-size: 0.85rem;
   background-color: #222;
   color: #fff;

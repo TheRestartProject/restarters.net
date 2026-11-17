@@ -97,4 +97,9 @@ return [
   'share_modal_planting_around' => 'plantar alrededor de',
   'share_modal_hectares' => "hectárea de árboles.*|hectáreas de árboles.*",
   'impact_estimates' => 'Las cifras de impacto son estimaciones basadas en los datos introducidos por los grupos en Restarters.net.',
+  'dragmap' => '¿El marcador no está del todo en su sitio? Arrástralo al lugar correcto.',
+  'see_further_reports' => 'Consulta más análisis en nuestros otros informes.',
+  'share_modal_footnote' => '*árboles coníferas o de hoja caduca de crecimiento medio, plantados en un entorno urbano y cultivados durante 10 años',
+  'share_modal_footnote_hectares' => '*plántulas de árboles de hoja ancha cultivadas en una plantación o bosquete en Inglaterra durante 1 año',
+  'share_modal_generated_by' => 'generado por :site',
 ];

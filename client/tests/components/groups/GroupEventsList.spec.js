@@ -1,7 +1,10 @@
 import { mount } from '@vue/test-utils'
+import { createPinia, setActivePinia } from 'pinia'
 import { createI18n } from 'vue-i18n'
-import { describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 import GroupEventsList from '../../../app/components/groups/GroupEventsList.vue'
+import { useAuthStore } from '../../../app/stores/auth.js'
+import { useGroupsStore } from '../../../app/stores/groups.js'
 import en from '../../../i18n/locales/en.json'
 import clientEn from '../../../i18n/locales/client-en.json'
 import { GROUP_VIEW_STUBS } from '../../helpers/stubs.js'
@@ -15,93 +18,22 @@ function mountComponent(props = {}) {
   })
 }
 
-const PAST_ISO = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
-const FUTURE_ISO = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
+const DAY = 24 * 60 * 60 * 1000
+const PAST_ISO = new Date(Date.now() - 7 * DAY).toISOString()
+const FUTURE_ISO = new Date(Date.now() + 7 * DAY).toISOString()
 
 const EVENTS = [
-  { id: 1, title: 'Past Cafe', start: PAST_ISO, end: PAST_ISO, location: 'Town Hall' },
-  { id: 2, title: 'Future Cafe', start: FUTURE_ISO, end: FUTURE_ISO, location: 'Village Hall' },
+  { id: 1, title: 'Past Cafe', start: PAST_ISO, end: PAST_ISO, location: 'Town Hall', group: { id: 5, name: 'Fixers United' } },
+  { id: 2, title: 'Future Cafe', start: FUTURE_ISO, end: FUTURE_ISO, location: 'Village Hall', group: { id: 5, name: 'Fixers United' } },
 ]
 
+function rowIds(wrapper) {
+  return wrapper.findAll('tbody tr').map((row) => row.attributes('data-testid'))
+}
+
 describe('components/groups/GroupEventsList', () => {
-  // GroupEventScrollTable.vue shows per-event stats on past events. The
-  // columns are icon-only with the label as a tooltip, so they are asserted
-  // by testid rather than by visible text.
-  describe('per-event stats columns', () => {
-    const WITH_STATS = [
-      {
-        id: 1,
-        title: 'Past Cafe',
-        start: PAST_ISO,
-        end: PAST_ISO,
-        location: 'Town Hall',
-        stats: {
-          participants: 12,
-          volunteers: 4,
-          waste_total: 37.4,
-          co2_total: 128.6,
-          fixed_devices: 7,
-          repairable_devices: 2,
-          dead_devices: 1,
-        },
-      },
-    ]
-
-    function pastTable(events) {
-      const wrapper = mountComponent({ events })
-      wrapper.find('[data-testid="group-events-tab-past"]').trigger('click')
-      return wrapper
-    }
-
-    it('renders every stat column on past events', async () => {
-      const wrapper = pastTable(WITH_STATS)
-      await wrapper.vm.$nextTick()
-
-      expect(wrapper.find('[data-testid="group-event-1-participants"]').text()).toBe('12')
-      expect(wrapper.find('[data-testid="group-event-1-volunteers"]').text()).toBe('4')
-      expect(wrapper.find('[data-testid="group-event-1-waste"]').text()).toBe('37 kg')
-      expect(wrapper.find('[data-testid="group-event-1-co2"]').text()).toBe('129 kg')
-      expect(wrapper.find('[data-testid="group-event-1-fixed"]').text()).toBe('7')
-      expect(wrapper.find('[data-testid="group-event-1-repairable"]').text()).toBe('2')
-      expect(wrapper.find('[data-testid="group-event-1-dead"]').text()).toBe('1')
-    })
-
-    it('leaves cells blank rather than showing zero when an event has no stats', async () => {
-      const wrapper = pastTable([{ ...WITH_STATS[0], stats: undefined }])
-      await wrapper.vm.$nextTick()
-
-      expect(wrapper.find('[data-testid="group-event-1-participants"]').text()).toBe('')
-      expect(wrapper.find('[data-testid="group-event-1-waste"]').text()).toBe('')
-    })
-
-    it('flags an event nobody attended, and one with a lone volunteer', async () => {
-      const wrapper = pastTable([
-        { ...WITH_STATS[0], stats: { ...WITH_STATS[0].stats, participants: 0, volunteers: 1 } },
-      ])
-      await wrapper.vm.$nextTick()
-
-      expect(wrapper.find('[data-testid="group-event-1-participants"]').classes()).toContain('cell-danger')
-      expect(wrapper.find('[data-testid="group-event-1-volunteers"]').classes()).toContain('cell-danger')
-      expect(wrapper.find('[data-testid="group-event-1-fixed"]').classes()).not.toContain('cell-danger')
-    })
-
-    it('flags a finished event with no devices logged', async () => {
-      const wrapper = pastTable([
-        {
-          ...WITH_STATS[0],
-          stats: { ...WITH_STATS[0].stats, fixed_devices: 0, repairable_devices: 0, dead_devices: 0 },
-        },
-      ])
-      await wrapper.vm.$nextTick()
-
-      expect(wrapper.find('[data-testid="group-event-1-waste"]').classes()).toContain('cell-danger')
-    })
-
-    it('does not show stat columns on upcoming events', () => {
-      const wrapper = mountComponent({ events: EVENTS })
-
-      expect(wrapper.find('[data-testid="group-events-col-participants"]').exists()).toBe(false)
-    })
+  beforeEach(() => {
+    setActivePinia(createPinia())
   })
 
   it('shows a loading skeleton', () => {
@@ -113,114 +45,88 @@ describe('components/groups/GroupEventsList', () => {
     const wrapper = mountComponent({ events: EVENTS })
 
     expect(wrapper.find('[data-testid="group-events-panel-upcoming"]').exists()).toBe(true)
-    expect(wrapper.find('[data-testid="group-event-2"]').exists()).toBe(true)
-    expect(wrapper.find('[data-testid="group-event-1"]').exists()).toBe(false)
+    expect(wrapper.find('[data-testid="event-card-2"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="event-card-1"]').exists()).toBe(false)
   })
 
   it('switches to the past tab and shows past events', async () => {
     const wrapper = mountComponent({ events: EVENTS })
-
     await wrapper.find('[data-testid="group-events-tab-past"]').trigger('click')
 
     expect(wrapper.find('[data-testid="group-events-panel-past"]').exists()).toBe(true)
-    expect(wrapper.find('[data-testid="group-event-1"]').exists()).toBe(true)
-    expect(wrapper.find('[data-testid="group-event-link-1"]').attributes('href')).toBe('/party/view/1')
+    expect(wrapper.find('[data-testid="event-card-1"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="event-card-link-1"]').attributes('href')).toBe('/party/view/1')
   })
 
   it('shows empty states per tab when there are no events', async () => {
     const wrapper = mountComponent({ events: [] })
-
-    expect(wrapper.find('[data-testid="group-events-empty-upcoming"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="events-list-empty"]').text()).toBe(en.groups.no_upcoming_events)
 
     await wrapper.find('[data-testid="group-events-tab-past"]').trigger('click')
-    expect(wrapper.find('[data-testid="group-events-empty-past"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="events-list-empty"]').text()).toBe(en.groups.no_past_events)
   })
 
-  it('renders events as a sortable table with a location column (gap 5)', () => {
+  // GroupEventScrollTable.vue's rows: date box, long date/time/timezone, title,
+  // invited and volunteers, then "You're going!" for events you're attending.
+  it('shows live\'s upcoming row: date, time and timezone, counts and "You\'re going!"', () => {
+    const wrapper = mountComponent({
+      events: [{ ...EVENTS[1], timezone: 'Europe/London', attending: true, stats: { invited: 3, volunteers: 2 } }],
+    })
+
+    expect(wrapper.find('[data-testid="event-card-date-2"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="event-card-datelong-2"]').text()).toContain('Europe/London')
+    expect(wrapper.find('[data-testid="event-card-stat-invited-2"]').text()).toBe('3')
+    expect(wrapper.find('[data-testid="event-card-stat-volunteers-2"]').text()).toBe('2')
+    expect(wrapper.find('[data-testid="event-attending-text-2"]').text()).toBe(en.events.youre_going)
+    expect(wrapper.find('[data-testid="event-card-2"]').classes()).toContain('attending')
+  })
+
+  // addGroupName is off on the group's own page: every row is this group.
+  it('leaves out the group name under each title', () => {
     const wrapper = mountComponent({ events: EVENTS })
 
-    const table = wrapper.find('[data-testid="group-events-table-upcoming"]')
-    expect(table.exists()).toBe(true)
-    expect(table.text()).toContain('Village Hall')
-
-    const header = table.find('th.sortable')
-    expect(header.exists()).toBe(true)
+    expect(wrapper.find('[data-testid="event-card-group-2"]').exists()).toBe(false)
   })
 
-  it('toggling the sortable header reverses row order', async () => {
+  it('shows the per-event stats on past events', async () => {
+    const wrapper = mountComponent({
+      events: [{ ...EVENTS[0], stats: { participants: 12, volunteers: 4, waste_total: 37.4, co2_total: 128.6, fixed_devices: 7, repairable_devices: 2, dead_devices: 1 } }],
+    })
+    await wrapper.find('[data-testid="group-events-tab-past"]').trigger('click')
+
+    expect(wrapper.find('[data-testid="event-card-stat-participants-1"]').text()).toBe('12')
+    expect(wrapper.find('[data-testid="event-card-stat-waste-1"]').text()).toBe('37 kg')
+    expect(wrapper.find('[data-testid="event-card-stat-dead-1"]').text()).toBe('1')
+  })
+
+  it('starts upcoming soonest first and past most recent first, and sorts by a clicked column', async () => {
     const events = [
-      { id: 3, title: 'Soonest', start: FUTURE_ISO, end: FUTURE_ISO, location: 'A' },
-      {
-        id: 4,
-        title: 'Latest',
-        start: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
-        end: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
-        location: 'B',
-      },
+      { id: 3, title: 'B', start: new Date(Date.now() + 9 * DAY).toISOString(), end: new Date(Date.now() + 9 * DAY).toISOString(), stats: { invited: 1 } },
+      { id: 4, title: 'A', start: new Date(Date.now() + 2 * DAY).toISOString(), end: new Date(Date.now() + 2 * DAY).toISOString(), stats: { invited: 5 } },
+      { id: 5, title: 'C', start: new Date(Date.now() - 9 * DAY).toISOString(), end: new Date(Date.now() - 9 * DAY).toISOString() },
+      { id: 6, title: 'D', start: new Date(Date.now() - 2 * DAY).toISOString(), end: new Date(Date.now() - 2 * DAY).toISOString() },
     ]
     const wrapper = mountComponent({ events })
 
-    const rowsBefore = wrapper.findAll('[data-testid="group-events-table-upcoming"] tbody tr')
-    expect(rowsBefore[0].attributes('data-testid')).toBe('group-event-3')
+    expect(rowIds(wrapper)).toEqual(['event-card-4', 'event-card-3'])
 
-    await wrapper.find('[data-testid="group-events-table-upcoming"] th.sortable').trigger('click')
+    await wrapper.find('[data-testid="events-list-sort-invited"]').trigger('click')
+    expect(rowIds(wrapper)).toEqual(['event-card-3', 'event-card-4'])
 
-    const rowsAfter = wrapper.findAll('[data-testid="group-events-table-upcoming"] tbody tr')
-    expect(rowsAfter[0].attributes('data-testid')).toBe('group-event-4')
+    await wrapper.find('[data-testid="group-events-tab-past"]').trigger('click')
+    expect(rowIds(wrapper)).toEqual(['event-card-6', 'event-card-5'])
   })
 
-  // GroupEventScrollTable.vue is a b-table with every column sortable. Only
-  // the date header sorted here, so the stats columns were decorative.
-  describe('sorting by stats column', () => {
-    const PAST = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
-    const withStats = (id, participants) => ({
-      id,
-      title: `E${id}`,
-      start: PAST,
-      end: PAST,
-      location: 'X',
-      stats: { participants, volunteers: 0, waste_total: 0, co2_total: 0, fixed_devices: 0, repairable_devices: 0, dead_devices: 0 },
-    })
+  // RSVPing from here goes through the events store, which doesn't hold this
+  // list - so the row would keep offering RSVP without this.
+  it('marks an event as attended in the group\'s list after an RSVP from it', async () => {
+    const groupsStore = useGroupsStore()
+    groupsStore.events.data = [EVENTS[1]]
+    const wrapper = mountComponent({ events: groupsStore.events.data })
 
-    async function pastTable(events) {
-      const wrapper = mountComponent({ events })
-      await wrapper.find('[data-testid="group-events-tab-past"]').trigger('click')
-      return wrapper
-    }
+    wrapper.findComponent({ name: 'EventsList' }).vm.$emit('attendance', { id: 2, attending: true })
 
-    it('sorts ascending on first click of a stats column, and flips on the second', async () => {
-      const wrapper = await pastTable([withStats(1, 9), withStats(2, 3)])
-      const order = () => wrapper.findAll('[data-testid="group-events-table-past"] tbody tr')
-        .map((r) => r.attributes('data-testid'))
-
-      await wrapper.find('[data-testid="group-events-col-participants"]').trigger('click')
-      expect(order()).toEqual(['group-event-2', 'group-event-1'])
-
-      await wrapper.find('[data-testid="group-events-col-participants"]').trigger('click')
-      expect(order()).toEqual(['group-event-1', 'group-event-2'])
-    })
-
-    it('marks only the active column via aria-sort', async () => {
-      const wrapper = await pastTable([withStats(1, 9), withStats(2, 3)])
-
-      await wrapper.find('[data-testid="group-events-col-waste"]').trigger('click')
-
-      expect(wrapper.find('[data-testid="group-events-col-waste"]').attributes('aria-sort')).toBe('ascending')
-      expect(wrapper.find('[data-testid="group-events-col-participants"]').attributes('aria-sort')).toBe('none')
-    })
-
-    it('sorts an event with no stats apart from one recording zero', async () => {
-      // "not recorded" and "zero" are different things; -1 keeps them from
-      // interleaving.
-      const noStats = { id: 3, title: 'E3', start: PAST, end: PAST, location: 'X' }
-      const wrapper = await pastTable([withStats(1, 0), noStats])
-
-      await wrapper.find('[data-testid="group-events-col-participants"]').trigger('click')
-
-      const order = wrapper.findAll('[data-testid="group-events-table-past"] tbody tr')
-        .map((r) => r.attributes('data-testid'))
-      expect(order).toEqual(['group-event-3', 'group-event-1'])
-    })
+    expect(groupsStore.events.data[0].attending).toBe(true)
   })
 
   it('shows Add new event and Export event list only when canedit is true (gap 2, 5)', () => {
@@ -267,6 +173,16 @@ describe('components/groups/GroupEventsList', () => {
 
     await wrapper.find('[data-testid="group-events-calendar"]').trigger('click')
     expect(wrapper.find('[data-testid="group-events-calendar-modal"]').exists()).toBe(true)
-    expect(wrapper.find('[data-testid="group-events-calendar-url"]').element.value).toBe('/calendar/group/5')
+  })
+
+  // develop passes url("/calendar/group/{id}"): a calendar app can't subscribe
+  // to a bare path.
+  it('offers the full calendar address, and links to your calendar settings', async () => {
+    useAuthStore().user = { id: 42 }
+    const wrapper = mountComponent({ events: EVENTS, showCalendar: true })
+    await wrapper.find('[data-testid="group-events-calendar"]').trigger('click')
+
+    expect(wrapper.find('[data-testid="group-events-calendar-url"]').element.value).toBe(`${window.location.origin}/calendar/group/5`)
+    expect(wrapper.find('[data-testid="group-events-calendar-see-all"]').attributes('href')).toBe('/profile/edit/42')
   })
 })

@@ -146,6 +146,14 @@
   .nav-left {
     @extend %nav-items-shared;
 
+    // layouts/navbar.blade.php gives every item style="flex-basis: 100%", so
+    // the five share equal-width cells with each label centred in its cell.
+    // Without it justify-content-between pushes Talk and Wiki to the edges and
+    // the gaps between items grow.
+    > li {
+      flex-basis: 100%;
+    }
+
     @include media-breakpoint-down(md) {
       justify-content: space-between !important;
       position: fixed;
@@ -625,6 +633,8 @@
             padding: 0.25em;
             display: block;
             color: #000;
+            // Bootstrap 4 (live) didn't underline links by default; 5 does.
+            text-decoration: none;
 
             &:hover {
               background-color: #ffcc81;
@@ -748,6 +758,8 @@
 [data-testid='plain-language-bar'] .language-bar {
   position: fixed !important;
   bottom: 0 !important;
+  left: 0;
+  right: 0;
   z-index: 10 !important;
 }
 

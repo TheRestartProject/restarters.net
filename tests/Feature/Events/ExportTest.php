@@ -113,7 +113,6 @@ class ExportTest extends TestCase
                                                                       'category' => 222,
                                                                       'category_creation' => 222,
                                                                       'event' => $idevents2,
-                                                                      'reference' => 'REF-42',
                                                                   ]);
         $device = Device::factory()->fixed()->create([
                                                                       'category' => 111,
@@ -148,35 +147,24 @@ class ExportTest extends TestCase
         $row2 = fgetcsv($fh);
         self::assertEquals($event2->getEventName(), $row2[1]);
         self::assertEquals($group2->name, $row2[10]);
-
-        // group3 is the unapproved one. Whether its event appears is now the
-        // point of the test rather than an incidental: an Administrator or a
-        // coordinator for the network may see it, a plain Host of the other
-        // two groups may not (User::userCanSeeEvent). This block previously
-        // asserted every role saw it, which is what the export was doing
-        // wrong.
-        $row2 = fgetcsv($fh);
-
-        if ($role === 'Host') {
-            self::assertFalse($row2, 'A host of other groups must not see an unapproved group\'s event');
-        } else {
-            self::assertEquals($event3->getEventName(), $row2[1]);
-            self::assertEquals($group3->name, $row2[10]);
-        }
+        // group3 is the unapproved one. Its event stays out of the network
+        // export for every role: the export only lists approved events of
+        // approved groups, before any per-viewer check.
+        self::assertFalse(fgetcsv($fh));
 
         // Export devices.
         $response = $this->get("/export/devices");
         $header = $response->headers->get('content-disposition');
         $fh = fopen($response->getFile()->getPathname(), 'r');
         $headerRow = fgetcsv($fh);
-        self::assertEquals('Reference', end($headerRow));
+        // The device reference isn't on live yet, so it's not exported either.
+        self::assertNotContains('Reference', $headerRow);
         $row2 = fgetcsv($fh);
         self::assertEquals(e($event1->getEventName()), e($row2[7]));
         self::assertEquals('Unpowered', e($row2[12]));
         $row3 = fgetcsv($fh);
         self::assertEquals(e($event2->getEventName()), e($row3[7]));
         self::assertEquals('Powered', e($row3[12]));
-        self::assertEquals('REF-42', $row3[13]);
         $row4 = fgetcsv($fh);
 
         if ($role == 'Host') {
