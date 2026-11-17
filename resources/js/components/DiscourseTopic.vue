@@ -38,12 +38,18 @@ export default {
       return new moment(this.topic.created_at).fromNow()
     },
     url() {
-      return this.discourseBaseUrl + '/t/' + this.topic.slug
+      return this.viaSso('/t/' + this.topic.slug + '/' + this.topic.id)
     },
     categoryUrl() {
       // todo - should be category url, but needs building for child categories
-      //return this.discourseBaseUrl + this.topic.category.topic_url
-      return this.discourseBaseUrl + this.topic.category.topic_url
+      return this.viaSso(this.topic.category.topic_url)
+    }
+  },
+  methods: {
+    viaSso(path) {
+      // Go through Discourse SSO, as the navbar's Talk link does, so that someone not yet logged in to Talk is logged
+      // in on the way rather than shown "Access Denied" for topics that need an account.
+      return this.discourseBaseUrl + '/session/sso?return_path=' + encodeURIComponent(this.discourseBaseUrl + path)
     }
   }
 }

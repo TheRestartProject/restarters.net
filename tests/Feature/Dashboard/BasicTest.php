@@ -61,7 +61,7 @@ class BasicTest extends TestCase
                 'location' => "$city",
                 ':your-groups' => '[]',
                 ':upcoming-events' => '[]',
-                'see-all-topics-link' => env('DISCOURSE_URL').'/latest',
+                'see-all-topics-link' => env('DISCOURSE_URL').'/session/sso?return_path='.rawurlencode(env('DISCOURSE_URL').'/latest'),
                 ':is-logged-in' => 'true',
                 'discourse-base-url' => env('DISCOURSE_URL'),
             ],

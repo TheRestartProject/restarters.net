@@ -75,7 +75,7 @@
           // Group members and those who look after the group can go to the group's reports.
           $reporting_url = ($can_edit_group || $in_group) ? $group->reportingUrl() : null;
 
-          $discourseGroup = $group->discourse_group ? (env('DISCOURSE_URL').'/g/'.$group->discourse_group) : null;
+          $discourseGroup = $group->discourse_group ? (env('DISCOURSE_URL').'/session/sso?return_path='.rawurlencode(env('DISCOURSE_URL').'/g/'.$group->discourse_group)) : null;
 
           ?>
 

@@ -35,6 +35,11 @@ class GroupViewTest extends TestCase
             'event' => $event->idevents,
         ]);
 
+        // Link the group to a Talk group.
+        $group = Group::findOrFail($id);
+        $group->discourse_group = 'test-talk-group';
+        $group->save();
+
         // View with id.
         $response = $this->get("/group/view/$id");
 
@@ -42,6 +47,8 @@ class GroupViewTest extends TestCase
             [],
             [
                 ':idgroups' => $id,
+                // The Talk group link goes through Discourse SSO so that it logs them in to Talk on the way.
+                'discourse-group' => env('DISCOURSE_URL').'/session/sso?return_path='.rawurlencode(env('DISCOURSE_URL').'/g/test-talk-group'),
                 ':canedit' => 'true',
                 ':can-see-delete' => 'true',
                 ':can-perform-delete' => 'false',

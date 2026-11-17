@@ -54,12 +54,14 @@ class JoinEventTest extends TestCase
         $attending = EventsUsers::where('event', $event->idevents)->where('user', $user->id)->get()->first();
         $this->assertEquals($user->id, $attending->user);
 
-        // Should now show attendance on the event page.
+        // Should now show attendance on the event page, with the Talk thread link going through Discourse SSO so
+        // that it logs them in to Talk on the way.
         $response = $this->get('/party/view/'.$event->idevents);
         $this->assertVueProperties($response, [
             [],
             [
                 ':is-attending' => 'true',
+                'discourse-thread' => env('DISCOURSE_URL').'/session/sso?return_path='.rawurlencode(env('DISCOURSE_URL').'/t/123'),
             ],
         ]);
 

@@ -140,6 +140,21 @@ class EditProfileTest extends TestCase
 
     /**
      * @test
+     * @story:UserController::getProfileEdit
+     */
+    public function test_talk_email_preferences_link_logs_in_to_talk(): void
+    {
+        $user = User::factory()->create();
+        $this->actingAs($user);
+
+        // The link to their Talk email preferences goes through Discourse SSO, so that Talk logs them in on the way
+        // rather than refusing them the page.
+        $response = $this->get('/profile/edit');
+        $response->assertSee('href="'.env('DISCOURSE_URL').'/session/sso?return_path='.rawurlencode(env('DISCOURSE_URL').'/u/'.$user->username.'/preferences/emails').'"', false);
+    }
+
+    /**
+     * @test
      * @dataProvider idProvider
      * @story:UserController::postProfileTagsEdit
      * @story:UserController::getProfileEdit
