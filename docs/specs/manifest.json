@@ -1,5 +1,5 @@
 {
-    "generatedAt": "2026-11-11T15:24:47Z",
+    "generatedAt": "2026-11-17T13:10:51Z",
     "features": {
         "Administration": {
             "description": "Platform administration and configuration",
@@ -3491,6 +3491,10 @@
                     "class": "App\\Http\\Controllers\\UserController",
                     "file": "app/Http/Controllers/UserController.php",
                     "tests": [
+                        {
+                            "file": "tests/Feature/Users/EditProfileTest.php",
+                            "test": "test_talk_email_preferences_link_logs_in_to_talk"
+                        },
                         {
                             "file": "tests/Feature/Users/EditProfileTest.php",
                             "test": "test_tags_update"

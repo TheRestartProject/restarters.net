@@ -37,7 +37,7 @@
 
         <div class="button-group row">
             <div class="col-sm-9 d-flex align-items-center justify-content-start">
-                <a class="btn-preferences" href="{{ env('PLATFORM_COMMUNITY_URL') }}/u/{{ Auth::user()->username }}/preferences/emails">@lang('auth.set_preferences')</a>
+                <a class="btn-preferences" href="{{ env('DISCOURSE_URL') }}/session/sso?return_path={{ rawurlencode(env('DISCOURSE_URL').'/u/'.Auth::user()->username.'/preferences/emails') }}">@lang('auth.set_preferences')</a>
             </div>
             <div class="col-sm-3 d-flex align-items-center justify-content-end">
                 <button class="btn btn-primary btn-save">@lang('auth.save_preferences')</button>

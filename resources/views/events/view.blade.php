@@ -74,7 +74,7 @@
           $expanded_invited = $event->expandVolunteers($invited, $can_edit_event);
           $expanded_hosts = $event->expandVolunteers($hosts, $can_edit_event);
 
-          $discourseThread = ($is_attending && $event->discourse_thread) ? (env('DISCOURSE_URL').'/t/'.$event->discourse_thread) : null;
+          $discourseThread = ($is_attending && $event->discourse_thread) ? (env('DISCOURSE_URL').'/session/sso?return_path='.rawurlencode(env('DISCOURSE_URL').'/t/'.$event->discourse_thread)) : null;
 
           $collected_images = [];
 
