@@ -1,0 +1,39 @@
+# Labels each open PR "CI: Running", "CI: Passed" or "CI: Failed" from the CircleCI statuses on its head commit, so
+# the PR list shows how CI is getting on, as Freegle's does.
+#
+# GitHub runs status-triggered workflows from the default branch's copy of this file, so it covers every PR whatever
+# its base, fork PRs included. Run it by hand to label all the open PRs at once.
+#
+# It must use github.token: label changes made with that token don't trigger other workflows, so they can't set off
+# pr-preview.yml's `labeled` deploy.
+
+name: CI labels
+
+on:
+  status:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  statuses: read
+  issues: write
+  pull-requests: write
+
+# Statuses for one commit arrive close together; take them one at a time so the label ends up matching the last.
+concurrency:
+  group: ci-labels-${{ github.event.sha || 'all' }}
+
+jobs:
+  label:
+    if: github.event_name == 'workflow_dispatch' || startsWith(github.event.context, 'ci/circleci')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: .github/scripts
+      - name: Label PRs
+        run: bash .github/scripts/ci-labels.sh "$SHA"
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          SHA: ${{ github.event.sha }}
