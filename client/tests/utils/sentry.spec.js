@@ -28,6 +28,26 @@ describe('sentryOptions', () => {
     consent = true
     expect(options.beforeSend(event)).toBe(event)
   })
+
+  const frame = (filename) => ({ exception: { values: [{ stacktrace: { frames: [{ filename }] } }] } })
+
+  it('drops errors from code put into the page rather than loaded from a script', () => {
+    // The Google app on iOS: frames at lines of the page that hold markup.
+    const options = sentryOptions(config, () => true)
+
+    expect(options.beforeSend(frame('https://restarters.net/user/register'))).toBeNull()
+    expect(options.beforeSend(frame('https://restarters.net/_nuxt/entry-B5x9Yq2k.js?v=1'))).not.toBeNull()
+  })
+
+  it('drops requests that got no response, but not the server turning one down', () => {
+    const options = sentryOptions(config, () => true)
+    const event = { message: 'x' }
+    const failure = (status) => Object.assign(new Error('API request failed'), { name: 'APIError', status })
+
+    expect(options.beforeSend(event, { originalException: failure(null) })).toBeNull()
+    expect(options.beforeSend(event, { originalException: failure(500) })).toBe(event)
+    expect(options.beforeSend(event, { originalException: new Error('x') })).toBe(event)
+  })
 })
 
 describe('pathShape', () => {
