@@ -5,6 +5,7 @@ import moment from 'moment-timezone'
 import NetworkEventsList from '~/components/networks/NetworkEventsList.vue'
 import NetworkEventsCalendar from '~/components/networks/NetworkEventsCalendar.vue'
 import { shiftMonth } from '~/utils/networkEvents.js'
+import { useClipboard } from '~/composables/useClipboard.js'
 
 // The "Upcoming events" section of /networks/{id}: the network's events as a
 // calendar (the default) or a list, with filters, and a button to subscribe to
@@ -22,6 +23,7 @@ const props = defineProps({
 const { t } = useI18n()
 const { $api } = useNuxtApp()
 const runtimeConfig = useRuntimeConfig()
+const { copy } = useClipboard()
 
 const VIEW_KEY = 'networkEventsView'
 
@@ -135,9 +137,7 @@ function toggleGroup(id) {
 }
 
 function copyCalendarUrl() {
-  if (navigator.clipboard) {
-    navigator.clipboard.writeText(calendarUrl.value)
-  }
+  copy(calendarUrl.value)
 }
 
 async function load() {
