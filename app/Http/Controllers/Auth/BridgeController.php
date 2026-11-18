@@ -1,0 +1,100 @@
+<?php
+
+namespace App\Http\Controllers\Auth;
+
+use App\Attributes\Feature;
+use App\Attributes\UserStory;
+use App\Http\Controllers\Controller;
+use App\SsoTicket;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+
+/**
+ * GET /auth/bridge?ticket=…&redirect=…
+ *
+ * The token-authenticated SPA cannot carry an Authorization header on a
+ * top-level navigation, but Discourse SSO (GET /discourse/sso, web+auth) and
+ * MediaWiki silent login both need a real Laravel web session in the browser.
+ * The SPA obtains a one-time ticket (POST /api/v2/auth/sso-ticket) and sends
+ * the browser here; we establish the web session — firing the Login event, so
+ * LogInToWiki queues the mw_* cookies onto this first-party response — and
+ * redirect onward to an allowlisted target.
+ */
+#[Feature('Users', description: 'User accounts, profiles, and authentication')]
+class BridgeController extends Controller
+{
+    #[UserStory('As a Restarter, I am logged in to the Restarters web session after signing in through the app', persona: 'Restarter', theme: 'Authentication')]
+    public function bridge(Request $request): RedirectResponse
+    {
+        $redirect = $this->safeRedirect($request->query('redirect'));
+
+        // Target the web guard explicitly: the session is what we are here to
+        // establish, regardless of what the default guard has been set to.
+        if (Auth::guard('web')->check()) {
+            // Already have a web session (e.g. second bridge hop); no ticket needed.
+            return redirect($redirect);
+        }
+
+        $user = SsoTicket::consume($request->query('ticket'));
+
+        if (! $user) {
+            // Invalid/expired ticket: bounce to the SPA login, preserving the
+            // intended destination so the user can retry after logging in.
+            return redirect(config('restarters.frontend_url').'/login?redirect='.urlencode($redirect));
+        }
+
+        // Fires Illuminate\Auth\Events\Login → LogSuccessfulLogin + LogInToWiki.
+        Auth::guard('web')->login($user);
+        $request->session()->regenerate();
+
+        return redirect($redirect);
+    }
+
+    /**
+     * Only ever redirect to: this host's Discourse SSO entrypoint, the wiki,
+     * Discourse itself, or the SPA. Anything else falls back to the SPA —
+     * this is what stops /auth/bridge being an open redirect.
+     */
+    private function safeRedirect(?string $target): string
+    {
+        $frontend = rtrim(config('restarters.frontend_url'), '/');
+
+        if (! $target) {
+            return $frontend;
+        }
+
+        $allowedPrefixes = array_filter([
+            url('/discourse/sso'),
+            '/discourse/sso',
+            config('restarters.wiki.base_url'),
+            config('services.discourse.url'),
+            $frontend,
+        ]);
+
+        foreach ($allowedPrefixes as $prefix) {
+            $prefix = rtrim($prefix, '/');
+
+            // Match on an origin/path *boundary*, not a bare string prefix: a
+            // plain str_starts_with lets "https://app.example.com.attacker.com"
+            // pass the "https://app.example.com" allowlist entry (open redirect).
+            // Only the exact target, or one continuing with '/' or '?', is safe.
+            if ($target === $prefix
+                || str_starts_with($target, $prefix.'/')
+                || str_starts_with($target, $prefix.'?')) {
+                // Rebuild from the trusted prefix plus a suffix restricted to
+                // RFC 3986 URL characters (no backslash, whitespace or control
+                // characters that browsers normalise into a different host).
+                $suffix = substr($target, strlen($prefix));
+
+                if (preg_match('~^[A-Za-z0-9\-._\~!$&\'()*+,;=:@%/?#]*$~', $suffix) !== 1) {
+                    return $frontend;
+                }
+
+                return $prefix.$suffix;
+            }
+        }
+
+        return $frontend;
+    }
+}

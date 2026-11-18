@@ -24,6 +24,18 @@ Each platform maintains its own session cookie:
 
 On logout, the Laravel and MediaWiki session cookies are cleared. The Discourse session cookie behaviour at logout is uncertain — it may persist.
 
+### API tokens for outside callers
+
+The API accepts two kinds of bearer token: Sanctum tokens, and the older `users.api_token` value (as `?api_token=` or a Bearer header), which existing callers still use.
+
+To give someone a new API key, issue a named Sanctum token for the account it should act as:
+
+```bash
+php artisan user:token someone@example.com "Repair Together sync"
+```
+
+The token is printed once. The caller sends it as `Authorization: Bearer <token>`. The name is stored in `personal_access_tokens`, which also records when each token was last used. The token stops working if that account's password is changed or reset. If the account hasn't given data consent, the API refuses its writes.
+
 ---
 
 ## Discourse

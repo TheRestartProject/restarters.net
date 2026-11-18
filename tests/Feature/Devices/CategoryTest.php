@@ -45,6 +45,7 @@ class CategoryTest extends TestCase
             'estimate' => 100.00,
             'item_type' => 'Test item type',
             'repair_status' => 'Fixed',
+            'reference' => 'REP12456',
         ]);
 
         $rsp->assertSuccessful();
@@ -52,6 +53,7 @@ class CategoryTest extends TestCase
         $device = Device::findOrFail($iddevices);
         self::assertEquals($device->category_creation, 11);
         self::assertEquals($device->category, 46);
+        self::assertEquals($device->reference, 'REP12456');
     }
 
     /** @story:ItemController::listItemsv2 */
@@ -76,6 +78,30 @@ class CategoryTest extends TestCase
         self::assertEquals(true, $json['data'][0]['powered']);
         self::assertEquals(444, $json['data'][0]['idcategories']);
         self::assertEquals('Flat screen 22-24"', $json['data'][0]['categoryname']);
+    }
+
+    /**
+     * The item form shows suggestions in this order among names that match equally well, so the most used come
+     * first: "Kettle" before "KETTLE LEAD". Without an order it was whatever MySQL's grouping produced.
+     *
+     * @story:ItemController::listItemsv2
+     */
+    public function testItemTypesMostUsedFirst(): void
+    {
+        $cat = Category::where('powered', true)->first();
+
+        // Counts that match no alphabetical order, either way round, with or without case.
+        foreach (['kettle base' => 3, 'KETTLE LEAD' => 2, 'Kettle' => 1] as $type => $times) {
+            for ($i = 0; $i < $times; $i++) {
+                Device::factory()->fixed()->create(['category' => $cat->idcategories, 'item_type' => $type]);
+            }
+        }
+
+        \Cache::forget('item_types');
+        $types = array_column($this->get('/api/v2/items')->assertSuccessful()->json('data'), 'type');
+        $kettles = array_values(array_filter($types, fn ($t) => stripos($t, 'kettle') !== false));
+
+        self::assertEquals(['kettle base', 'KETTLE LEAD', 'Kettle'], $kettles);
     }
 
     public function testCategorySuggestionLogic(): void

@@ -1,0 +1,51 @@
+// Brand content panels
+// =====================
+// The signature "Restart" content card: white fill, thin black border, hard
+// offset drop-shadow (matching .box-shadow-offset in _type.scss). Ported
+// verbatim from the legacy resources/sass/_panels.scss, remapping its
+// $brand-black -> $black (same #222). Used on the login, dashboard and other
+// content pages via the .panel class + its .panel__orange / .panel__blue
+// colour variants, so it belongs in the global layer, not per-component
+// scoped styles.
+//
+// The :not(.note-editor) guard is inherited from the source: the rich-text
+// editor reuses .panel for its chrome and must not pick up the card styling.
+.panel:not(.note-editor) {
+  padding: 30px;
+  background-color: $white;
+  border: 1px solid $black;
+  box-shadow: 6px 6px 0 0 $black;
+
+  // Links inside a content panel are black + underlined, matching the legacy
+  // site (.panel p a / .link-text). Scoped to `.panel a` (not just `p a`) so
+  // panel action links that aren't inside a <p> - e.g. the login panel's
+  // "Forgot password" / "Create an account" / "Find out more" - are black too,
+  // rather than falling back to the Bootstrap 5 themed link colour (teal).
+  a {
+    color: $black;
+    text-decoration: underline;
+
+    &:hover {
+      color: $black;
+      text-decoration: none;
+    }
+  }
+
+  &.panel__blue {
+    background-color: $brand-blue;
+  }
+
+  &.panel__orange {
+    font-size: 16px;
+    background-color: $brand-orange;
+    color: $black;
+
+    h3 {
+      color: $black;
+    }
+
+    a {
+      color: $black;
+    }
+  }
+}

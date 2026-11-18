@@ -35,9 +35,6 @@ return [
   'upcoming_events_title' => 'Kommende Veranstaltungen',
   'upcoming_events_subtitle' => 'Kommende Veranstaltungen Ihrer Gruppen:',
   'add_event' => 'Hinzufügen',
-  'add_data_heading' => 'Daten hinzufügen',
-  'see_your_impact' => 'Und sehen Sie Ihre Wirkung im Fixometer',
-  'add_data_add' => 'Hinzufügen',
   'newly_added' => 'Neu hinzugefügt: :count Gruppe in Ihrer Nähe!|Neu hinzugefügt: :count Gruppen in Ihrer Nähe!',
   'no_groups' => '<strong>Es gibt noch keine Gruppen in Ihrer Nähe.</strong><br />',
   'interested_starting' => 'Möchten Sie Ihre eigene Gemeinschaftsreparaturgruppe gründen?',
@@ -45,4 +42,6 @@ return [
   'see_all_groups_near_you' => 'Alle Gruppen in Ihrer Nähe anzeigen →',
   'see_all_groups' => 'Alle Gruppen anzeigen',
   'no_groups_intro' => 'Es gibt Gemeinschafts-<a href="/group/all">Gruppen auf der ganzen Welt</a>. Sie können jeder Gruppe folgen, um benachrichtigt zu werden, wenn Veranstaltungen geplant werden.',
+  'whats_happening_heading' => 'Was gerade passiert',
+  'whats_happening_see_all' => 'alle anzeigen',
 ];

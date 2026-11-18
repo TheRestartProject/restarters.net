@@ -10,25 +10,24 @@ class NetworkReportingLinkTest extends TestCase
 {
     private const REPORTS = 'https://reports.example.org/dashboard/7';
 
-    private function networkUrl(Network $network, string $suffix = ''): string
+    private function networkUrl(Network $network): string
     {
-        return '/networks/' . $network->id . $suffix;
+        return '/api/v2/networks/' . $network->id;
     }
 
-    private function networkData($response): array
+    private function patchAs(?User $user, Network $network, array $data)
     {
-        $props = $this->getVueProperties($response);
+        $url = $this->networkUrl($network);
 
-        foreach ($props as $prop) {
-            if (array_key_exists(':network', $prop)) {
-                return json_decode($prop[':network'], true);
-            }
+        if ($user) {
+            $this->actingAs($user);
+            $url .= '?api_token=' . $user->api_token;
         }
 
-        $this->fail('No :network property on the page');
+        return $this->patchJson($url, $data);
     }
 
-    public function testNetworkPageCarriesTheReportingUrl(): void
+    public function testNetworkCarriesTheReportingUrl(): void
     {
         $network = Network::factory()->create([
             'reporting_url' => self::REPORTS,
@@ -36,8 +35,7 @@ class NetworkReportingLinkTest extends TestCase
 
         $this->actingAs(User::factory()->administrator()->create());
 
-        $data = $this->networkData($this->get($this->networkUrl($network)));
-        $this->assertEquals(self::REPORTS, $data['reporting_url']);
+        $this->get($this->networkUrl($network))->assertJsonPath('data.reporting_url', self::REPORTS);
     }
 
     public function testNetworkWithoutReportsHasNoReportingUrl(): void
@@ -46,27 +44,24 @@ class NetworkReportingLinkTest extends TestCase
 
         $this->actingAs(User::factory()->administrator()->create());
 
-        $data = $this->networkData($this->get($this->networkUrl($network)));
-        $this->assertNull($data['reporting_url']);
+        $this->get($this->networkUrl($network))->assertJsonPath('data.reporting_url', null);
     }
 
     public function testAdministratorCanSetTheReportingUrl(): void
     {
         $network = Network::factory()->create();
-        $this->actingAs(User::factory()->administrator()->create());
+        $admin = User::factory()->administrator()->create(['api_token' => 'nrl-admin']);
 
-        $this->get($this->networkUrl($network, '/edit'))->assertSee('reporting_url');
-
-        $this->put($this->networkUrl($network), [
+        $this->patchAs($admin, $network, [
             'reporting_url' => 'https://reports.example.org/dashboard/9',
-        ])->assertRedirect();
+        ])->assertSuccessful()->assertJsonPath('data.reporting_url', 'https://reports.example.org/dashboard/9');
 
         $this->assertEquals('https://reports.example.org/dashboard/9', $network->fresh()->reporting_url);
 
         // Blank clears it.
-        $this->put($this->networkUrl($network), [
+        $this->patchAs($admin, $network, [
             'reporting_url' => '',
-        ])->assertRedirect();
+        ])->assertSuccessful();
 
         $this->assertNull($network->fresh()->reporting_url);
     }
@@ -74,12 +69,12 @@ class NetworkReportingLinkTest extends TestCase
     public function testReportingUrlMustBeAWebAddress(): void
     {
         $network = Network::factory()->create();
-        $this->actingAs(User::factory()->administrator()->create());
+        $admin = User::factory()->administrator()->create(['api_token' => 'nrl-admin']);
         $this->withExceptionHandling();
 
-        $this->put($this->networkUrl($network), [
+        $this->patchAs($admin, $network, [
             'reporting_url' => 'javascript:alert(1)',
-        ])->assertSessionHasErrors('reporting_url');
+        ])->assertStatus(422)->assertJsonValidationErrors('reporting_url');
 
         $this->assertNull($network->fresh()->reporting_url);
     }
@@ -90,15 +85,23 @@ class NetworkReportingLinkTest extends TestCase
             'reporting_url' => self::REPORTS,
         ]);
 
-        $coordinator = User::factory()->networkCoordinator()->create();
+        $coordinator = User::factory()->networkCoordinator()->create(['api_token' => 'nrl-coord']);
         $network->addCoordinator($coordinator);
-        $this->actingAs($coordinator);
 
-        $this->get($this->networkUrl($network, '/edit'))->assertDontSee('reporting_url');
-
-        $this->put($this->networkUrl($network), [
+        $this->patchAs($coordinator, $network, [
             'reporting_url' => 'https://elsewhere.example.org/',
-        ])->assertRedirect();
+        ])->assertForbidden();
+
+        $this->assertEquals(self::REPORTS, $network->fresh()->reporting_url);
+    }
+
+    public function testAnonymousCannotChangeTheReportingUrl(): void
+    {
+        $network = Network::factory()->create(['reporting_url' => self::REPORTS]);
+        $this->withExceptionHandling();
+
+        $this->patchAs(null, $network, ['reporting_url' => 'https://elsewhere.example.org/'])
+            ->assertUnauthorized();
 
         $this->assertEquals(self::REPORTS, $network->fresh()->reporting_url);
     }

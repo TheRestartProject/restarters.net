@@ -33,6 +33,13 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *          example="/mid_1597853610178a4b76e4d666b2a7b32ee75d8a24c706f1cbf213970.png"
  *     ),
  *     @OA\Property(
+ *          property="description",
+ *          title="description",
+ *          description="HTML description of the network.",
+ *          format="string",
+ *          example="<p>This is a description.</p>"
+ *     ),
+ *     @OA\Property(
  *          property="summary",
  *          title="summary",
  *          description="Indicates that this is a summary result, not full network information.",
@@ -53,6 +60,7 @@ class NetworkSummary extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'logo' => $this->logo ? ($request->root() . '/uploads/' . $this->logo) : null,
+            'description' => $this->description,
             'summary' => true
         ];
     }

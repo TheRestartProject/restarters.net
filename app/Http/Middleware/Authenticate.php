@@ -12,6 +12,8 @@ class Authenticate extends Middleware
      */
     protected function redirectTo(Request $request): ?string
     {
-        return $request->expectsJson() ? null : route('login');
+        // The login page lives in the SPA; Auth::routes() (and with it the
+        // 'login' route name) is gone.
+        return $request->expectsJson() ? null : rtrim(config('restarters.frontend_url'), '/').'/login';
     }
 }

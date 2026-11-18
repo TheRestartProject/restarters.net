@@ -1,0 +1,146 @@
+import BaseAPI from './BaseAPI.js'
+
+/**
+ * Thin, hardcoded-path client for the group endpoint family. Full surface
+ * (invites, images, stats...) lands with later Groups migration slices
+ * (design.md §5.3, §6.2); this slice (B4 - group list pages) adds the
+ * names index + membership + nearby methods used by stores/groups.js.
+ */
+export default class GroupAPI extends BaseAPI {
+  list(params) {
+    return this.$get('/api/v2/groups', params)
+  }
+
+  get(id) {
+    return this.$get(`/api/v2/groups/${id}`)
+  }
+
+  // GET /api/v2/groups/{id}/audits - the edit page's Group log tab.
+  // Administrator only; strings arrive pre-rendered as HTML (the placeholder
+  // substitution lives in the group-audits lang files server-side).
+  audits(id) {
+    return this.$get(`/api/v2/groups/${id}/audits`)
+  }
+
+  create(payload) {
+    return this.$post('/api/v2/groups', payload)
+  }
+
+  update(id, payload) {
+    return this.$patch(`/api/v2/groups/${id}`, payload)
+  }
+
+  // GET /api/v2/groups/names - {id, name, archived_at} for every group.
+  // Currently the only field set (api-contracts-phase-b.md client notes);
+  // the location/hosts/restarters/tags/next_event summary fields land with
+  // PR #887 - see docs/nuxt-migration/api-gaps.md.
+  names(params) {
+    return this.$get('/api/v2/groups/names', params)
+  }
+
+  // POST /api/v2/groups/{id}/members/me (api-contracts-phase-b.md B2, not
+  // yet implemented server-side) - self-join.
+  join(id) {
+    return this.$post(`/api/v2/groups/${id}/members/me`)
+  }
+
+  // DELETE /api/v2/groups/{id}/members/me (api-contracts-phase-b.md B2, not
+  // yet implemented server-side) - self-leave.
+  leave(id) {
+    return this.$del(`/api/v2/groups/${id}/members/me`)
+  }
+
+  // GET /api/v2/groups/nearby (api-contracts-phase-b.md B2, not yet
+  // implemented server-side) - nearby_groups shape, for the current user.
+  nearby(params) {
+    return this.$get('/api/v2/groups/nearby', params)
+  }
+
+  // GET /api/v2/groups/summary - GroupSummary[] (location/image/networks/
+  // tags/hosts/restarters/next_event), implemented server-side by PR #887
+  // (API\GroupController::listSummaryv2). `params.ids` (comma-separated,
+  // max 200) hydrates just the given rows; omitted, returns every
+  // non-archived group. Used by stores/groups.js#fetchSummaries to hydrate
+  // only the groups currently visible on /group/map - see that action's
+  // doc comment for why (831KB/3.7s TTFB fetching every group's summary
+  // up front, on the pre-migration equivalent).
+  summary(params) {
+    return this.$get('/api/v2/groups/summary', params)
+  }
+
+  // GET /api/v2/groups/{id}/stats (api-contracts-phase-b.md B2, not yet
+  // implemented server-side) - {group_stats, device_stats, cluster_stats,
+  // top_devices}, per the group/view.blade.php Blade props it replaces. See
+  // docs/nuxt-migration/api-gaps.md B5.
+  stats(id) {
+    return this.$get(`/api/v2/groups/${id}/stats`)
+  }
+
+  // GET /api/v2/groups/{id}/events - already implemented server-side
+  // (API\GroupController::getEventsForGroupv2) - EventSummary[] for the
+  // group, unfiltered; the client splits upcoming/past itself.
+  events(id, params) {
+    return this.$get(`/api/v2/groups/${id}/events`, params)
+  }
+
+  // GET /api/v2/groups/{id}/volunteers - already implemented server-side
+  // (API\GroupController::getVolunteersForGroupv2) - Volunteer[].
+  volunteers(id, params) {
+    return this.$get(`/api/v2/groups/${id}/volunteers`, params)
+  }
+
+  // POST /api/v2/groups/{id}/invites (api-contracts-phase-b.md B2, not yet
+  // implemented server-side) - {emails:[...], message?} ->
+  // {invites_sent, invalid:[...]}.
+  invite(id, payload) {
+    return this.$post(`/api/v2/groups/${id}/invites`, payload)
+  }
+
+  // DELETE /api/v2/groups/{id} - archive semantics (sets archived_at, and is
+  // reversible). Gated client-side on can_perform_archive.
+  del(id) {
+    return this.$del(`/api/v2/groups/${id}`)
+  }
+
+  // DELETE /api/v2/groups/{id}/permanent - the hard delete, removing the group
+  // and its events for good. Administrator only, and only when the group has
+  // no event with a device; the endpoint enforces both independently of the
+  // can_see_delete/can_perform_delete flags the UI gates on.
+  deletePermanently(id) {
+    return this.$del(`/api/v2/groups/${id}/permanent`)
+  }
+
+  // DELETE /api/v2/groups/{id}/volunteers/{iduser} - already implemented
+  // server-side (API\GroupController::deleteVolunteerForGroupv2).
+  removeVolunteer(id, iduser) {
+    return this.$del(`/api/v2/groups/${id}/volunteers/${iduser}`)
+  }
+
+  // PATCH /api/v2/groups/{id}/volunteers/{iduser} {host:bool} - already
+  // implemented server-side (API\GroupController::patchVolunteerForGroupv2).
+  setVolunteerHost(id, iduser, host) {
+    return this.$patch(`/api/v2/groups/${id}/volunteers/${iduser}`, { host })
+  }
+
+  // GET /api/v2/groups/tags - already implemented server-side
+  // (API\GroupController::listTagsv2). Role-filtered server-side: admins see
+  // every tag, network coordinators only tags from networks they coordinate,
+  // everyone else gets [].
+  tags(params) {
+    return this.$get('/api/v2/groups/tags', params)
+  }
+
+  // POST /api/v2/groups/{id}/images {upload_key} (api-contracts-phase-b.md
+  // B2, not yet implemented server-side) - attaches a completed tus upload
+  // (see TusImageUpload.vue) as the group's image. See
+  // docs/nuxt-migration/api-gaps.md B6.
+  uploadImage(id, uploadKey) {
+    return this.$post(`/api/v2/groups/${id}/images`, { upload_key: uploadKey })
+  }
+
+  // DELETE /api/v2/groups/{id}/images/{idimages} (api-contracts-phase-b.md
+  // B2, not yet implemented server-side).
+  deleteImage(id, idimages) {
+    return this.$del(`/api/v2/groups/${id}/images/${idimages}`)
+  }
+}

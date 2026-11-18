@@ -2,93 +2,36 @@
 
 namespace App\Http\Controllers;
 
-use App\Attributes\Feature;
-use App\Attributes\UserStory;
-use Illuminate\Http\RedirectResponse;
 use App\GroupTags;
 use App\Helpers\Fixometer;
+use App\Http\Resources\Tag;
 use Auth;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Redirect;
 
 #[Feature('Administration', description: 'Platform administration and configuration')]
 class GroupTagsController extends Controller
 {
+    /**
+     * Render the global group-tags admin page (a Vue SPA that talks to
+     * /api/v2/group-tags). Network-scoped tags are managed elsewhere.
+     */
     #[UserStory('As an Admin, I can view all group tags', persona: 'Admin', theme: 'Reference data')]
-    public function index()
+    public function index($editId = null)
     {
-        if (! Fixometer::hasRole(Auth::user(), 'Administrator')) {
+        $user = Auth::user();
+
+        if (! Fixometer::hasRole($user, 'Administrator')) {
             return redirect('/user/forbidden');
         }
 
-        $all_tags = GroupTags::all();
+        $tags = GroupTags::global()->orderBy('tag_name', 'asc')->get();
+        $tagsForVue = $tags->map(fn ($tag) => (new Tag($tag))->toArray(request()))->values();
 
         return view('tags.index', [
-        'title' => __('group-tags.title'),
-        'tags' => $all_tags,
+            'title' => __('group-tags.title'),
+            'tags' => $tags,
+            'tagsForVue' => $tagsForVue,
+            'apiToken' => $user->api_token,
+            'editId' => $editId !== null ? (int) $editId : null,
         ]);
-    }
-
-    #[UserStory('As an Admin, I can create a new group tag', persona: 'Admin', theme: 'Reference data')]
-    public function postCreateTag(Request $request): RedirectResponse
-    {
-        if (! Fixometer::hasRole(Auth::user(), 'Administrator')) {
-            return redirect('/user/forbidden');
-        }
-
-        $name = $request->input('tag-name');
-        $description = $request->input('tag-description');
-
-        $group_tag = GroupTags::create([
-        'tag_name'    => $name,
-        'description' => $description,
-        ]);
-
-        return Redirect::to('tags/edit/'.$group_tag->id)->with('success', __('group-tags.create_success'));
-    }
-
-    #[UserStory('As an Admin, I can access the form to edit a group tag', persona: 'Admin', theme: 'Reference data')]
-    public function getEditTag($id)
-    {
-        if (! Fixometer::hasRole(Auth::user(), 'Administrator')) {
-            return redirect('/user/forbidden');
-        }
-
-        $tag = GroupTags::find($id);
-
-        return view('tags.edit', [
-        'title' => __('group-tags.edit_tag'),
-        'tag'   => $tag,
-        ]);
-    }
-
-    #[UserStory('As an Admin, I can update a group tag', persona: 'Admin', theme: 'Reference data')]
-    public function postEditTag($id, Request $request): RedirectResponse
-    {
-        if (! Fixometer::hasRole(Auth::user(), 'Administrator')) {
-            return redirect('/user/forbidden');
-        }
-
-        $name = $request->input('tag-name');
-        $description = $request->input('tag-description');
-
-        GroupTags::find($id)->update([
-        'tag_name'    => $name,
-        'description' => $description,
-        ]);
-
-        return Redirect::back()->with('success', __('group-tags.update_success'));
-    }
-
-    #[UserStory('As an Admin, I can delete a group tag', persona: 'Admin', theme: 'Reference data')]
-    public function getDeleteTag($id): RedirectResponse
-    {
-        if (! Fixometer::hasRole(Auth::user(), 'Administrator')) {
-            return redirect('/user/forbidden');
-        }
-
-        GroupTags::find($id)->delete();
-
-        return Redirect::to('/tags')->with('success', __('group-tags.delete_success'));
     }
 }

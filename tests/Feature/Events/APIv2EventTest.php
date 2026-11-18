@@ -10,6 +10,7 @@ use App\User;
 use Carbon\Carbon;
 use DB;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Facades\Auth;
 use Symfony\Component\DomCrawler\Crawler;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -81,6 +82,29 @@ class APIv2EventTest extends TestCase
         $this->assertEquals($id1, $json[1]['id']);
         self::assertFalse($json[0]['approved']);
         self::assertFalse($json[1]['approved']);
+    }
+
+    /**
+     * therestartproject.org's WordPress site, the API's busiest client, asks for /api/v2/events/{id}&api_token=...
+     * and /api/v2/groups/{id}&api_token=... (an & where the ? belongs), so the token ends up in the id. Live answers
+     * with the event or group; so must this.
+     *
+     * @story:EventController::getEventv2
+     * @story:GroupController::getGroupv2
+     */
+    public function testGetWithTheTokenInThePath(): void {
+        $this->actingAs(User::factory()->administrator()->create());
+        $idgroups = $this->createGroup();
+        $idevents = $this->createEvent($idgroups, 'tomorrow');
+        Auth::logout();
+
+        $response = $this->get("/api/v2/events/$idevents&api_token=1234");
+        $response->assertSuccessful();
+        $this->assertEquals($idevents, $response->json('data.id'));
+
+        $response = $this->get("/api/v2/groups/$idgroups&api_token=1234");
+        $response->assertSuccessful();
+        $this->assertEquals($idgroups, $response->json('data.id'));
     }
 
     /**

@@ -20,7 +20,7 @@
         @yield('extra-css')
 
         <!-- Styles -->
-        @vite(['resources/sass/app.scss', 'resources/global/css/app.scss'])
+        @vite(['resources/global/css/app.scss'])
         @if( isset($iframe) )
         <link href="{{ asset('css/iframe.css') }}" rel="stylesheet">
         @endif

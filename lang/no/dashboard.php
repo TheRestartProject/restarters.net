@@ -34,9 +34,6 @@ return [
   'upcoming_events_title' => 'Kommende arrangementer',
   'upcoming_events_subtitle' => 'Kommende arrangementer fra dine grupper:',
   'add_event' => 'Legg til',
-  'add_data_heading' => 'Legg til data',
-  'see_your_impact' => 'Og se din påvirkning i Fixometer',
-  'add_data_add' => 'Legg til',
   'newly_added' => 'Nylig lagt til: :count gruppe i ditt område!|Nylig lagt til: :count grupper i ditt område!',
   'no_groups' => '<strong>Det er ingen grupper i ditt område ennå.</strong><br />',
   'interested_starting' => 'Vil du starte din egen fellesskapsreparasjonsgruppe?',
@@ -45,4 +42,6 @@ return [
   'see_all_groups' => 'Se alle grupper',
   'no_groups_intro' => 'Det finnes fellesskaps<a href="/group/all">grupper over hele verden</a>. Du er velkommen til å følge en gruppe for å bli varslet når de arrangerer arrangementer.',
   'join_group' => 'Bli med i en gruppe',
+  'whats_happening_heading' => 'Hva skjer',
+  'whats_happening_see_all' => 'se alle',
 ];

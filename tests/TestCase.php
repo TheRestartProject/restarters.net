@@ -57,6 +57,21 @@ abstract class TestCase extends BaseTestCase
     {
         parent::setUp();
 
+        // Reset any auth guard state carried over from a previous test. The
+        // token ('api') and sanctum guards cache their resolved user across
+        // requests within the app instance; without this, a test that runs
+        // after one which left a guard resolved as null (unauthenticated) can
+        // itself see that stale null even when it supplies a valid
+        // ?api_token= / actingAs — an order-dependent "Unauthenticated"
+        // failure that only shows up in the full suite, not in isolation.
+        $this->app['auth']->forgetGuards();
+
+        // Blade-rendering tests must not depend on a built Vite manifest:
+        // CI's phpunit-only job skips npm entirely (SKIP_NPM_INSTALL), and
+        // these page-render tests assert content, not asset tags. Dies with
+        // the Blade tests at Phase F cutover.
+        $this->withoutVite();
+
         // DELETE rather than TRUNCATE, and no per-table ALTER TABLE: both are DDL, and with processIsolation this
         // runs before every test.  Together they cost ~5s per test - most of the suite's CI runtime, which was
         // pushing the build job past CircleCI's 60 minute limit.  The tables are near-empty so DELETE is quick.
@@ -180,20 +195,30 @@ abstract class TestCase extends BaseTestCase
 
     public function loginAsTestUser($role = Role::RESTARTER)
     {
-        // This is testing the external interface, whereas actingAs() wouldn't be.
-        $response = $this->get('/logout');
-        $response = $this->post('/user/register/', $this->userAttributes($role));
+        // The Blade login/registration pages are gone (Nuxt cutover): the
+        // auth "external interface" is now the token API, exercised directly
+        // by tests/Feature/Auth/AuthEndpointsTest. Legacy callers of this
+        // helper only need a logged-in user of the given role with an API
+        // token, so create one and populate the session guard the way the
+        // newer API tests do (User::factory + actingAs).
+        // The old registration flow geocoded a 'city' form field into the
+        // location/latitude/longitude columns (there is no 'city' column);
+        // set them directly to London so CheckForRepairNetwork can still
+        // derive the user's repair_network on the createGroup() '/' hit.
+        $user = User::factory()->create([
+            'role' => $role,
+            'location' => 'London',
+            'latitude' => 51.5073509,
+            'longitude' => -0.1277583,
+        ]);
 
-        $response->assertStatus(302);
-        $response->assertRedirect('dashboard');
+        // Factory already seeds an api_token; keep this for callers that
+        // relied on the old post-registration ensureAPIToken().
+        $user->ensureAPIToken();
 
-        // Set the role.
-        Auth::user()->role = $role;
+        $this->actingAs($user);
 
-        // Ensure API token in case we need to make API calls.
-        Auth::user()->ensureAPIToken();
-
-        return Auth::user();
+        return $user;
     }
 
     public function createGroup($name = 'Test Group', $website = 'https://therestartproject.org', $location = 'London', $text = 'Some text.', $assert = true, $approve = true, $email = null)
@@ -476,17 +501,25 @@ abstract class TestCase extends BaseTestCase
         }
     }
 
-    // Production serves each request in a fresh process, but a test's requests share one app: the token guard
-    // remembers the user it resolved from the first request's api_token, and auth:api leaves the api guard as the
-    // default (shouldUse() writes it into auth.defaults.guard, so the config can't be used to restore it).  Reset
-    // both so that each request authenticates as it would in production - from its own token, or from the web
-    // session set up by actingAs() or logging in.
+    // Production serves each request in a fresh process, but a test's requests share one app: the token guards
+    // remember the user they resolved from the first request's api_token or Sanctum token, and auth:api leaves the
+    // api guard as the default (shouldUse() writes it into auth.defaults.guard, so the config can't be used to
+    // restore it).  Reset them so that each request authenticates as it would in production - from its own token,
+    // or from the web session set up by actingAs() or logging in.
     public function call($method, $uri, $parameters = [], $cookies = [], $files = [], $server = [], $content = null)
     {
         $this->app['auth']->guard('api')->forgetUser();
+        $this->app['auth']->guard('sanctum')->forgetUser();
         $this->app['auth']->shouldUse('web');
 
         return parent::call($method, $uri, $parameters, $cookies, $files, $server, $content);
+    }
+
+    // A request through auth:api leaves the api guard as the default, so actingAs() without a guard would then log in
+    // to the token guard, which call() resets before each request.  Log in to the web session, as in a fresh test.
+    public function actingAs(\Illuminate\Contracts\Auth\Authenticatable $user, $guard = null)
+    {
+        return parent::actingAs($user, $guard ?? 'web');
     }
 
     // We override the methods to make HTTP requests so that we can automatically validate them against our OpenAPI

@@ -97,7 +97,6 @@ return [
   'add_new_event' => 'Legg til nytt arrangement',
   'created_success_message' => 'Arrangement opprettet! Det vil bli godkjent av en koordinator snart. Du kan fortsette å redigere det i mellomtiden.',
   'items_fixed' => 'Gjenstander reparert',
-  'not_counting' => 'Teller ikke mot dette arrangementets miljøpåvirkning er|Teller ikke mot dette arrangementets miljøpåvirkning er',
   'impact_calculation' => '<p><strong>Hvordan beregner vi miljøpåvirkning?</strong></p>
 <p>Vi har undersøkt gjennomsnittsvekt og CO<sub>2</sub>e-avtrykk for produkter på tvers av en rekke kategorier, fra smarttelefoner til t-skjorter. Når du registrerer en gjenstand du har reparert, bruker vi disse gjennomsnittene til å estimere påvirkningen av reparasjonen basert på kategorien til gjenstanden.</p>
 <p>For diverse gjenstander bruker vi et generisk CO<sub>2</sub>e-til-vekt-forhold for å estimere påvirkningen av hver vellykkede reparasjon.</p>
@@ -151,4 +150,10 @@ return [
   'geocode_failed' => 'Sted ikke funnet. Hvis du ikke kan finne stedet for arrangementet ditt, prøv et mer generelt sted (som landsby/by) eller en spesifikk gateadresse, i stedet for et bygningsnavn.',
   'create_failed' => 'Arrangementet kunne <strong>ikke</strong> opprettes. Se på feilene som er rapportert, korriger dem, og prøv igjen.',
   'edit_failed' => 'Arrangementet kunne ikke redigeres.',
+  'add_a_device' => 'Legg til en enhet',
+  'already_member' => 'Du er allerede medlem av dette arrangementet.',
+  'copied_to_clipboard' => 'Kopiert til utklippstavlen.',
+  'image_upload_error' => 'Beklager, men bildet kunne ikke lastes opp.',
+  'no_date_selected' => 'Ingen dato valgt',
+  'no_devices_added' => 'Ingen enheter lagt til',
 ];

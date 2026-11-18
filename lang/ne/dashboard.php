@@ -34,9 +34,6 @@ return [
   'upcoming_events_title' => 'Aankomende evenementen',
   'upcoming_events_subtitle' => 'Aankomende evenementen van jouw groepen:',
   'add_event' => 'Toevoegen',
-  'add_data_heading' => 'Gegevens toevoegen',
-  'see_your_impact' => 'En bekijk jouw impact in de Fixometer',
-  'add_data_add' => 'Toevoegen',
   'newly_added' => 'Nieuw toegevoegd: :count groep in jouw regio!|Nieuw toegevoegd: :count groepen in jouw regio!',
   'no_groups' => '<strong>Er zijn nog geen groepen in jouw regio.</strong><br />',
   'interested_starting' => 'Wil jij je eigen gemeenschapsreparatiegroep starten?',
@@ -44,4 +41,6 @@ return [
   'see_all_groups_near_you' => 'Alle groepen bij jou in de buurt bekijken →',
   'see_all_groups' => 'Alle groepen bekijken',
   'no_groups_intro' => 'Er zijn gemeenschaps<a href="/group/all">groepen over de hele wereld</a>. Je bent welkom om elke groep te volgen om meldingen te ontvangen wanneer zij evenementen organiseren.',
+  'whats_happening_heading' => 'Wat gebeurt er',
+  'whats_happening_see_all' => 'alles bekijken',
 ];

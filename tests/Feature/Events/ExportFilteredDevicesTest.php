@@ -56,7 +56,8 @@ class ExportFilteredDevicesTest extends TestCase
         $this->assertStringContainsString('repair-data-filtered.csv', $header);
 
         // Same columns as the full export.
-        $this->assertEquals(13, $columns);
+        [, , $allColumns] = $this->rows('/export/devices');
+        $this->assertEquals($allColumns, $columns);
 
         // Dates are inclusive, and combine with other filters.
         [$rows] = $this->rows('/export/devices?brand=Zorblax&from_date=2024-02-01&to_date=2024-03-01');

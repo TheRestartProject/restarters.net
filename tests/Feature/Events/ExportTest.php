@@ -123,8 +123,7 @@ class ExportTest extends TestCase
         // Export parties.
         $response = $this->get("/export/groups/{$group1->idgroups}/events");
         $response->assertSuccessful();
-        $filename = storage_path('app/exports') . '/events.csv';
-        $fh = fopen($filename, 'r');
+        $fh = fopen($response->getFile()->getPathname(), 'r');
         fgetcsv($fh);
         $row2 = fgetcsv($fh);
         self::assertEquals($event1->getEventName(), $row2[1]);
@@ -132,8 +131,7 @@ class ExportTest extends TestCase
 
         $response = $this->get("/export/groups/{$group2->idgroups}/events");
         $response->assertSuccessful();
-        $filename = storage_path('app/exports') . '/events.csv';
-        $fh = fopen($filename, 'r');
+        $fh = fopen($response->getFile()->getPathname(), 'r');
         fgetcsv($fh);
         $row2 = fgetcsv($fh);
         self::assertEquals($event2->getEventName(), $row2[1]);
@@ -141,8 +139,7 @@ class ExportTest extends TestCase
 
         $response = $this->get("/export/networks/{$network->id}/events");
         $response->assertSuccessful();
-        $filename = storage_path('app/exports') . '/events.csv';
-        $fh = fopen($filename, 'r');
+        $fh = fopen($response->getFile()->getPathname(), 'r');
         fgetcsv($fh);
         $row2 = fgetcsv($fh);
         self::assertEquals($event1->getEventName(), $row2[1]);
@@ -150,16 +147,18 @@ class ExportTest extends TestCase
         $row2 = fgetcsv($fh);
         self::assertEquals($event2->getEventName(), $row2[1]);
         self::assertEquals($group2->name, $row2[10]);
-        // The unapproved group3's event must not be in the network export.
+        // group3 is the unapproved one. Its event stays out of the network
+        // export for every role: the export only lists approved events of
+        // approved groups, before any per-viewer check.
         self::assertFalse(fgetcsv($fh));
 
         // Export devices.
         $response = $this->get("/export/devices");
         $header = $response->headers->get('content-disposition');
-        $filename = $response->baseResponse->getFile()->getPathname();
-
-        $fh = fopen($filename, 'r');
-        fgetcsv($fh);
+        $fh = fopen($response->getFile()->getPathname(), 'r');
+        $headerRow = fgetcsv($fh);
+        // The device reference isn't on live yet, so it's not exported either.
+        self::assertNotContains('Reference', $headerRow);
         $row2 = fgetcsv($fh);
         self::assertEquals(e($event1->getEventName()), e($row2[7]));
         self::assertEquals('Unpowered', e($row2[12]));
@@ -177,8 +176,7 @@ class ExportTest extends TestCase
         // Export devices for a particular event.
         $response = $this->get("/export/devices/event/$idevents1");
         $header = $response->headers->get('content-disposition');
-        $filename = $response->baseResponse->getFile()->getPathname();
-        $fh = fopen($filename, 'r');
+        $fh = fopen($response->getFile()->getPathname(), 'r');
         fgetcsv($fh);
         $row2 = fgetcsv($fh);
         self::assertEquals(e($event1->getEventName()), e($row2[7]));
@@ -186,16 +184,14 @@ class ExportTest extends TestCase
 
         $response = $this->get("/export/devices/event/$idevents2");
         $header = $response->headers->get('content-disposition');
-        $filename = $response->baseResponse->getFile()->getPathname();
-        $fh = fopen($filename, 'r');
+        $fh = fopen($response->getFile()->getPathname(), 'r');
         fgetcsv($fh);
         $row2 = fgetcsv($fh);
         self::assertEquals(e($event2->getEventName()), e($row2[7]));
 
         $response = $this->get("/export/devices/event/$idevents3");
         $header = $response->headers->get('content-disposition');
-        $filename = $response->baseResponse->getFile()->getPathname();
-        $fh = fopen($filename, 'r');
+        $fh = fopen($response->getFile()->getPathname(), 'r');
         fgetcsv($fh);
         $row2 = fgetcsv($fh);
 
@@ -208,24 +204,21 @@ class ExportTest extends TestCase
         // Export devices for a particular group.
         $response = $this->get("/export/devices/group/{$group1->idgroups}");
         $header = $response->headers->get('content-disposition');
-        $filename = $response->baseResponse->getFile()->getPathname();
-        $fh = fopen($filename, 'r');
+        $fh = fopen($response->getFile()->getPathname(), 'r');
         fgetcsv($fh);
         $row2 = fgetcsv($fh);
         self::assertEquals(e($event1->getEventName()), e($row2[7]));
 
         $response = $this->get("/export/devices/group/{$group2->idgroups}");
         $header = $response->headers->get('content-disposition');
-        $filename = $response->baseResponse->getFile()->getPathname();
-        $fh = fopen($filename, 'r');
+        $fh = fopen($response->getFile()->getPathname(), 'r');
         fgetcsv($fh);
         $row2 = fgetcsv($fh);
         self::assertEquals(e($event2->getEventName()), e($row2[7]));
 
         $response = $this->get("/export/devices/group/{$group3->idgroups}");
         $header = $response->headers->get('content-disposition');
-        $filename = $response->baseResponse->getFile()->getPathname();
-        $fh = fopen($filename, 'r');
+        $fh = fopen($response->getFile()->getPathname(), 'r');
         fgetcsv($fh);
         $row2 = fgetcsv($fh);
 
@@ -237,9 +230,65 @@ class ExportTest extends TestCase
     }
 
     /**
-     * @story:ExportController::devicesGroup
-     * @story:ExportController::devicesEvent
+     * The event export used to apply no visibility filtering at all, so an
+     * anonymous request returned events belonging to groups still awaiting
+     * moderation - data /api/v2 withholds from the same caller
+     * (APIv2EventVisibilityTest). The device export had always filtered;
+     * this one had not.
      */
+    public function testEventExportHidesUnapprovedGroupsFromAnonymousUsers(): void
+    {
+        $admin = User::factory()->administrator()->create();
+        $this->actingAs($admin);
+
+        $approved = Group::factory()->create(['name' => 'Approved Group']);
+        $approved->approved = true;
+        $approved->save();
+
+        $unapproved = Group::factory()->create(['name' => 'Unapproved Group']);
+        $unapproved->approved = false;
+        $unapproved->save();
+
+        foreach ([$approved, $unapproved] as $group) {
+            $idevents = $this->createEvent($group->idgroups, '2000-01-01');
+            $event = Party::find($idevents);
+            $event->approved = true;
+            $event->save();
+        }
+
+        \Auth::logout();
+
+        $response = $this->get("/export/groups/{$unapproved->idgroups}/events");
+        $response->assertSuccessful();
+        $rows = $this->csvRows($response);
+        // Header only - the one event is withheld.
+        $this->assertCount(1, $rows);
+
+        $response = $this->get("/export/groups/{$approved->idgroups}/events");
+        $response->assertSuccessful();
+        $this->assertCount(2, $this->csvRows($response));
+
+        // An admin sees the unapproved group's event.
+        $this->actingAs($admin);
+        $response = $this->get("/export/groups/{$unapproved->idgroups}/events");
+        $response->assertSuccessful();
+        $this->assertCount(2, $this->csvRows($response));
+    }
+
+    private function csvRows($response): array
+    {
+        $fh = fopen($response->getFile()->getPathname(), 'r');
+        $rows = [];
+
+        while (($row = fgetcsv($fh)) !== false) {
+            $rows[] = $row;
+        }
+
+        fclose($fh);
+
+        return $rows;
+    }
+
     public function testSlashesExport()
     {
         $admin = User::factory()->administrator()->create();
@@ -279,6 +328,16 @@ class ExportTest extends TestCase
             'event' => $idevents,
         ]);
 
+        // Clear any copy left under the docroot by an older build before
+        // exporting, so the assertion below reflects THIS request rather
+        // than whatever is lying around. A dev checkout of this repo had 270
+        // such files, dating back months - that accumulation is what the
+        // leak looked like in practice.
+        $leaked = public_path() . '/repair-data-Test-Group-Name.csv';
+        if (file_exists($leaked)) {
+            unlink($leaked);
+        }
+
         // Export devices for this group - should not fail
         $response = $this->get("/export/devices/group/{$group->idgroups}");
         $response->assertSuccessful();
@@ -288,10 +347,12 @@ class ExportTest extends TestCase
         $expectedFilename = 'repair-data-Test-Group-Name.csv';
         $this->assertStringContainsString($expectedFilename, $header);
 
-        // Verify the file can be read
-        $filename = $response->baseResponse->getFile()->getPathname();
-        $this->assertFileExists($filename);
-        $fh = fopen($filename, 'r');
+        // Read the CSV back off the response. It used to be asserted at
+        // public_path()/repair-data-*.csv - that WAS the bug: the export is
+        // filtered per caller, so leaving it under the docroot published one
+        // caller's rows at a guessable URL.
+        $this->assertFileDoesNotExist($leaked);
+        $fh = fopen($response->getFile()->getPathname(), 'r');
         $this->assertNotFalse($fh);
         fgetcsv($fh); // Skip header
         $row = fgetcsv($fh);
@@ -307,9 +368,7 @@ class ExportTest extends TestCase
         $this->assertStringContainsString('.csv', $header);
 
         // Verify the event export file can be read and contains event data
-        $filename = $response->baseResponse->getFile()->getPathname();
-        $this->assertFileExists($filename);
-        $fh = fopen($filename, 'r');
+        $fh = fopen($response->getFile()->getPathname(), 'r');
         $this->assertNotFalse($fh);
         fgetcsv($fh); // Skip header
         $row = fgetcsv($fh);
@@ -367,9 +426,7 @@ class ExportTest extends TestCase
             $response = $this->get("/export/networks/{$network->id}/events");
             $response->assertSuccessful();
 
-            $filename = storage_path('app/exports') . '/events.csv';
-            $this->assertFileExists($filename);
-            $fh = fopen($filename, 'r');
+            $fh = fopen($response->getFile()->getPathname(), 'r');
             $this->assertNotFalse($fh);
 
             $header = fgetcsv($fh);

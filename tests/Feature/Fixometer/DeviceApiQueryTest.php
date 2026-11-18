@@ -92,44 +92,10 @@ class DeviceApiQueryTest extends TestCase
         );
     }
 
-    public function testFixometerPageQueryCountScalesWithO1NotN(): void
-    {
-        // The /fixometer page has a per-group N+1 for user_groups.
-        $user = $this->loginAsTestUser(Role::ADMINISTRATOR);
-
-        $id1 = $this->createGroup('Group A');
-        $this->createDevicesForGroup($id1, 2);
-
-        // Warm up
-        $this->get('/fixometer');
-
-        DB::enableQueryLog();
-        $this->get('/fixometer')->assertSuccessful();
-        $queriesFor1Group = count(DB::getQueryLog());
-        DB::disableQueryLog();
-        DB::flushQueryLog();
-
-        // Join 4 more groups.
-        for ($i = 0; $i < 4; $i++) {
-            $id = $this->createGroup("Extra Group $i");
-            \App\UserGroups::create([
-                'user' => $user->id,
-                'group' => $id,
-                'role' => Role::HOST,
-                'status' => 1,
-            ]);
-        }
-
-        DB::enableQueryLog();
-        $this->get('/fixometer')->assertSuccessful();
-        $queriesFor5Groups = count(DB::getQueryLog());
-        DB::disableQueryLog();
-        DB::flushQueryLog();
-
-        $this->assertLessThan(
-            $queriesFor1Group * 1.5,
-            $queriesFor5Groups,
-            "Query count grew too much when user joined more groups — N+1 in DeviceController::index. 1 group: $queriesFor1Group, 5 groups: $queriesFor5Groups"
-        );
-    }
+    // testFixometerPageQueryCountScalesWithO1NotN was a query-count regression
+    // check for the /fixometer page (a per-group N+1 for user_groups). That
+    // route is retired under the Nuxt cutover — the Fixometer page is now
+    // client-side in the SPA, so the page-level query-count concern is moot.
+    // The equivalent concern for the live /api/devices endpoint is covered
+    // by testDeviceApiQueryCountScalesWithO1NotN above.
 }

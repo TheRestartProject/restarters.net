@@ -34,9 +34,6 @@ return [
   'upcoming_events_title' => 'Próximos eventos',
   'upcoming_events_subtitle' => 'Próximos eventos de tus grupos:',
   'add_event' => 'Añadir',
-  'add_data_heading' => 'Añadir datos',
-  'see_your_impact' => 'Y ver tu impacto en el Fixometer',
-  'add_data_add' => 'Añadir',
   'newly_added' => 'Recién añadido: ¡:count grupo en tu zona!|Recién añadidos: ¡:count grupos en tu zona!',
   'no_groups' => '<strong>Aún no hay grupos en tu zona.</strong><br />',
   'interested_starting' => '¿Quieres crear tu propio grupo de reparación comunitaria?',
@@ -44,4 +41,6 @@ return [
   'see_all_groups_near_you' => 'Ver todos los grupos cerca de ti →',
   'see_all_groups' => 'Ver todos los grupos',
   'no_groups_intro' => 'Hay <a href="/group/all">grupos comunitarios en todo el mundo</a>. Puedes seguir cualquier grupo para recibir notificaciones cuando organicen eventos.',
+  'whats_happening_heading' => 'Qué está pasando',
+  'whats_happening_see_all' => 'ver todo',
 ];

@@ -12,6 +12,8 @@ return [
     'actions' => 'Netzwerkaktionen',
     'coordinators' => 'Netzwerkkoordinatoren',
     'impact' => 'Wirkung',
+    'see_network_reports' => 'Mehr in den Berichten Ihres Netzwerks ansehen',
+    'view_reports' => 'Berichte ansehen',
   ],
   'stats' => [
     'groups' => '{1} Gruppe|[0,*] Gruppen',
@@ -63,5 +65,12 @@ return [
     'add_new_field' => 'Neues Feld hinzufügen',
     'new_field_name' => 'Name des neuen Felds',
     'add_field' => 'Feld hinzufügen',
+    'help_reporting_url' => 'Wo die Berichte dieses Netzwerks veröffentlicht werden. Leer lassen, wenn das Netzwerk keine Berichte hat.',
+    'label_reporting_url' => 'Adresse des Berichts-Dashboards',
+  ],
+  'moderation' => [
+    'events_title' => 'Zu moderierende Veranstaltungen',
+    'group_requires_moderation' => 'Gruppe erfordert Moderation',
+    'groups_title' => 'Zu moderierende Gruppen',
   ],
 ];

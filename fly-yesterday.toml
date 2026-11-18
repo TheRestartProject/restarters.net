@@ -30,6 +30,7 @@ primary_region = "lhr"
   FEATURE__WIKI_INTEGRATION = "false"
   FEATURE__DISCOURSE_INTEGRATION = "false"
   SENTRY_ENVIRONMENT = "yesterday-restore"
+  NUXT_PUBLIC_SENTRY_ENVIRONMENT = "yesterday-restore"
   # Table type constants
   TBL_USERS = "1"
   TBL_GROUPS = "2"

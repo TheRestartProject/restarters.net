@@ -7,15 +7,18 @@ return [
     | Cross-Origin Resource Sharing (CORS) Configuration
     |--------------------------------------------------------------------------
     |
-    | Here you may configure your settings for cross-origin resource sharing
-    | or "CORS". This determines what cross-origin operations may execute
-    | in web browsers. You are free to adjust these settings as needed.
-    |
-    | To learn more: https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
+    | The API is consumed cross-origin by (a) the Nuxt SPA and (b) partner
+    | sites' browser JavaScript (therestartproject.org stats widgets/share
+    | plugins), which is why allowed_origins stays '*'. That is safe here
+    | because auth is header-token based and supports_credentials is false:
+    | no browser will attach cookies, and a hostile origin cannot read
+    | anything a public browser couldn't — it has no way to obtain a user's
+    | bearer token. Do NOT set supports_credentials=true together with '*';
+    | if credentialed CORS is ever needed, switch to an explicit origin list.
     |
     */
 
-    'paths' => ['api/*', 'sanctum/csrf-cookie'],
+    'paths' => ['api/*'],
 
     'allowed_methods' => ['*'],
 
@@ -27,7 +30,7 @@ return [
 
     'exposed_headers' => [],
 
-    'max_age' => 0,
+    'max_age' => 3600,
 
     'supports_credentials' => false,
 

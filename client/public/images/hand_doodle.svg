@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" id="hand_doodle" width="70" height="86" viewBox="0 0 70 86">
+    <defs>
+        <style>
+            .cls-1{stroke:#707070}.cls-2{clip-path:url(#clip-path)}.cls-3{fill:none;stroke:#000;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;stroke-width:2px}
+        </style>
+        <clipPath id="clip-path">
+            <path id="Rectangle_1123" d="M0 0h70v86H0z" class="cls-1" data-name="Rectangle 1123" transform="translate(1477 809)"/>
+        </clipPath>
+    </defs>
+    <g id="hand_doodle-2" class="cls-2" data-name="hand_doodle" transform="translate(-1477 -809)">
+        <g id="Group_2825" data-name="Group 2825" transform="rotate(-154.03 863.228 272.934)">
+            <path id="Path_2156" d="M41.926 85.41C39.715 79.758 23.5 48.959 19.154 44.617c-3.932-4.505-9.01-7.372-13.516-11.222-1.064-.495-4.423-3.522-4.338-4.423-.082-1.311.246-2.7 1.393-3.113 1.884-.737 7.208 2.867 8.273 3.277.491.246 1.311 1.229 2.212 1.311-.328-.9-3.195-7.536-6.062-16.465C4.983 7.511 1.461 2.76 4.983 1.367 8.014.221 9.816 5.955 12.6 11.607s3.932 7.946 4.423 9.01c-1.063-2.617-1.637-6.963.985-8.517 2.212-1.311 4.014 2.539 4.423 3.686 0-2.212-.819-5.324 2.539-5.816 2.375-.491 3.031 2.457 3.768 4.341-.41-1.147-.246-5.9 3.277-4.751 3.113.983 4.669 14.99 10.4 30.635 6.635 18.1 16.219 35.059 16.628 35.386" class="cls-3" data-name="Path 2156"/>
+        </g>
+    </g>
+</svg>

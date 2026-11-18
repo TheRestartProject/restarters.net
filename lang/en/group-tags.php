@@ -5,5 +5,7 @@ return [
     'update_success' => 'Group Tag successfully updated!',
     'delete_success' => 'Group Tag deleted!',
     'title' => 'Group Tags',
-    'edit_tag' => 'Edit Group Tag',
+    'create_error' => 'Could not create group tag.',
+    'update_error' => 'Could not save group tag.',
+    'delete_error' => 'Could not delete group tag.',
 ];

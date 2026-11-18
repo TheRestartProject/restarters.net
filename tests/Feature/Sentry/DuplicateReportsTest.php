@@ -39,8 +39,9 @@ class DuplicateReportsTest extends TestCase
         // The exception handler sends exceptions through the container's hub.
         $this->app->instance('sentry', $hub);
 
-        Route::middleware('web')->get('/_sentry_test/throws', fn () => throw new \RuntimeException('Something broke'));
-        Route::middleware('web')->get('/_sentry_test/unavailable', fn () => response('Down for maintenance', 503));
+        // Under api/, which routes/web.php's catch-all leaves alone; it would otherwise take these, as it's registered first.
+        Route::middleware('web')->get('/api/_sentry_test/throws', fn () => throw new \RuntimeException('Something broke'));
+        Route::middleware('web')->get('/api/_sentry_test/unavailable', fn () => response('Down for maintenance', 503));
     }
 
     protected function tearDown(): void
@@ -84,7 +85,7 @@ class DuplicateReportsTest extends TestCase
         // The exception handler reports the exception, with its stack trace; "HTTP return code 500" was a copy.
         $this->withExceptionHandling();
 
-        $this->get('/_sentry_test/throws')->assertStatus(500);
+        $this->get('/api/_sentry_test/throws')->assertStatus(500);
 
         $this->assertEmpty($this->messages());
     }
@@ -96,7 +97,7 @@ class DuplicateReportsTest extends TestCase
         $this->app['env'] = 'production';
 
         try {
-            $this->get('/_sentry_test/throws')->assertStatus(500);
+            $this->get('/api/_sentry_test/throws')->assertStatus(500);
         } finally {
             $this->app['env'] = 'testing';
         }
@@ -107,9 +108,9 @@ class DuplicateReportsTest extends TestCase
 
     public function testAnErrorResponseWithoutAnExceptionIsReportedForItsRoute(): void
     {
-        $this->get('/_sentry_test/unavailable')->assertStatus(503);
+        $this->get('/api/_sentry_test/unavailable')->assertStatus(503);
 
-        $this->assertEquals(['HTTP return code 503 from /_sentry_test/unavailable'], $this->messages());
+        $this->assertEquals(['HTTP return code 503 from /api/_sentry_test/unavailable'], $this->messages());
     }
 
     public function testAMissingApiDocsSourceMapIsNotFound(): void

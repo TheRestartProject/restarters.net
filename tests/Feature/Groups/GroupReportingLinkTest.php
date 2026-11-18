@@ -13,7 +13,7 @@ class GroupReportingLinkTest extends TestCase
 
     private function viewGroup()
     {
-        return $this->get('/group/view/' . $this->group->idgroups);
+        return $this->get('/api/v2/groups/' . $this->group->idgroups);
     }
 
     protected function setUp(): void
@@ -30,13 +30,7 @@ class GroupReportingLinkTest extends TestCase
 
     private function reportingUrl($response): ?string
     {
-        foreach ($this->getVueProperties($response) as $prop) {
-            if (($prop['VueComponent'] ?? null) === 'grouppage') {
-                return $prop['reporting-url'] ?? null;
-            }
-        }
-
-        $this->fail('No GroupPage on the page');
+        return $response->assertSuccessful()->json('data.reporting_url');
     }
 
     public function testHostGetsALinkToTheirGroupsReports(): void

@@ -213,13 +213,13 @@ class Party extends Model implements Auditable
     public function scopeFuture($query) {
         // A future event is an event where the start time is greater than now.
         $query = $query->undeleted();
-        // undeleted() has already applied an ORDER BY event_start_utc DESC, and
-        // orderBy() appends rather than replaces.  Without the reorder() we end up
-        // with "ORDER BY event_start_utc DESC, event_start_utc ASC", where the DESC
-        // wins - so a caller asking for the *next* event would get the one furthest
-        // in the future.  scopeFutureForUser() does the same.
+        // reorder() before orderBy: a parent scope may already have applied an
+        // ORDER BY (e.g. DESC), and orderBy() APPENDS rather than replaces, so
+        // without this we get "ORDER BY event_start_utc DESC, event_start_utc
+        // ASC" - the DESC wins and future() returns the LAST future event first,
+        // making a "next event" lookup pick the wrong one (RES-1995 / PR 887).
         $query = $query->where('event_start_utc', '>', date('Y-m-d H:i:s'))
-            ->reorder()->orderBy('event_start_utc','ASC');
+            ->reorder()->orderBy('event_start_utc', 'ASC');
         return $query;
     }
 
@@ -636,7 +636,10 @@ class Party extends Model implements Auditable
     public function getShareableLinkAttribute()
     {
         if (! empty($this->shareable_code)) {
-            return url("party/invite/{$this->shareable_code}");
+            // Points at the SPA, matching Group::getShareableLinkAttribute();
+            // the claim happens via POST /api/v2/invites/claim (or the
+            // invite_code param on login/register).
+            return rtrim(config('restarters.frontend_url'), '/')."/party/invite/{$this->shareable_code}";
         }
 
         return '';
@@ -650,11 +653,80 @@ class Party extends Model implements Auditable
 
     public function isBeingAttendedBy($userId)
     {
+        // '1' as a string: compared as a number, MySQL takes an invite hash that starts with 1 (1a3f...) for 1.
         return EventsUsers::where([
             ['event', '=', $this->idevents],
             ['user', '=', $userId],
-            ['status', '=', 1],
+            ['status', '=', '1'],
         ])->exists();
+    }
+
+    /**
+     * Whether the user holds an invitation they haven't accepted: an events_users
+     * row whose status is anything other than '1' (invites store a hash there).
+     * Mirrors events/view.blade.php's pending-invite banner condition.
+     */
+    public function hasPendingInvitationFor($userId): bool
+    {
+        return EventsUsers::where('event', $this->idevents)
+            ->where('user', $userId)
+            ->where('status', '!=', '1')
+            ->exists();
+    }
+
+    // Set by callers that batch-load images to avoid N+1 (see FixometerFile::findImagesForMany).
+    public ?array $preloadedImages = null;
+
+    // Set by callers that batch-load whether the current user is attending each event in a list, to
+    // avoid an isBeingAttendedBy() query per event (see API\GroupController::getEventsForGroupv2).
+    // PartySummary returns it as 'attending' when set.
+    public ?bool $preloadedAttending = null;
+
+    // Set with $preloadedAttending by preloadViewerState(): whether the viewer holds an invitation they haven't
+    // accepted, saving the Party resource a hasPendingInvitationFor() query per event.
+    public ?bool $preloadedInvitationPending = null;
+
+    // Set by callers that already know the viewer may edit every event in a list (the moderation queue), saving the
+    // Party resource a permission check per event.
+    public ?bool $preloadedCanEdit = null;
+
+    /**
+     * Fetch the viewer's attendance and invitations for all of the given events in a single query.  Same
+     * conditions as isBeingAttendedBy() and hasPendingInvitationFor().
+     */
+    public static function preloadViewerState(iterable $events, User $user): void
+    {
+        $events = collect($events);
+
+        if ($events->isEmpty()) {
+            return;
+        }
+
+        $rows = EventsUsers::whereIn('event', $events->pluck('idevents')->all())
+            ->where('user', $user->id)
+            ->get(['event', 'status'])
+            ->groupBy('event');
+
+        foreach ($events as $event) {
+            // A row with no status (from before invitations were stored) is neither, as in SQL.
+            $statuses = $rows->get($event->idevents, collect())->pluck('status')->filter(fn ($s) => $s !== null)
+                ->map(fn ($s) => (string) $s);
+            $event->preloadedAttending = $statuses->contains('1');
+            $event->preloadedInvitationPending = $statuses->contains(fn ($s) => $s !== '1');
+        }
+    }
+
+    // Mirrors Device::getImages() - event photos are a gallery (multiple per event), same
+    // xref-backed images table the upload/delete endpoints already use.
+    public function getImages()
+    {
+        if ($this->preloadedImages !== null) {
+            return $this->preloadedImages;
+        }
+
+        $File = new \FixometerFile;
+
+        return $File->findImages(env('TBL_EVENTS'), $this->idevents);
     }
 
     /**
@@ -694,8 +766,11 @@ class Party extends Model implements Auditable
 
     public function scopeEventHasFinished($query)
     {
-        $now = Carbon::now();
-        return $query->whereRaw("`event_end_utc` < '{$now}'");
+        // Bound, not interpolated. $now is server-generated so this was never
+        // injectable, but it was the only interpolated raw SQL in the codebase
+        // - and one benign example is enough to make a grep for the dangerous
+        // pattern useless.
+        return $query->where('event_end_utc', '<', Carbon::now());
     }
 
     public function getWastePreventedAttribute()

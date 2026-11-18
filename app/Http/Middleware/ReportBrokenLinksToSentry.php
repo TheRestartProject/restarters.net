@@ -69,9 +69,13 @@ class ReportBrokenLinksToSentry
         $path = $request->getPathInfo();
 
         // A script as the referrer means a crawler pulling strings out of our JavaScript, not a link.  A page
-        // referring to itself is a reload or a bot.
+        // referring to itself is a reload or a bot.  The site's own pages calling its API aren't following links:
+        // a missing record there is a stale page, and the Nuxt client reports its own API errors.
+        $ownHost = $host === strtolower($request->getHost());
+
         if (str_ends_with($referrerPath, '.js')
-            || ($host === strtolower($request->getHost()) && rtrim($referrerPath, '/') === rtrim($path, '/'))
+            || ($ownHost && rtrim($referrerPath, '/') === rtrim($path, '/'))
+            || ($ownHost && str_starts_with($path, '/api/'))
             || preg_match(self::PROBE, $path)) {
             return null;
         }

@@ -97,7 +97,18 @@ class BrokenLinkReportingTest extends TestCase
     {
         $this->expectReports(0);
 
-        $this->fetch('/about', 'https://restarters.net/')->assertSuccessful();
+        // Pages are the Nuxt client's; Laravel serves the API and a few routes such as the stats widgets.
+        $this->fetch('/api/v2/groups/names', 'https://restarters.net/')->assertSuccessful();
+    }
+
+    public function testTheSitesOwnApiCallsAreNotLinks(): void
+    {
+        // The Nuxt client asks the API for a record that has gone (a stale page, another tab deleted it). That
+        // isn't a link, and the client reports its own API errors.
+        $this->expectReports(0);
+        $site = 'https://'.parse_url(config('app.url'), PHP_URL_HOST).'/group/view/999999';
+
+        $this->fetch('/api/v2/groups/999999', $site)->assertNotFound();
     }
 
     /**

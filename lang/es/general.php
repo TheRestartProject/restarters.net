@@ -36,4 +36,5 @@ return [
   'menu_fixometer' => 'Fixometer',
   'menu_events' => 'Eventos',
   'menu_groups' => 'Grupos',
+  'error_occurred' => 'Se ha producido un error. Por favor, inténtalo de nuevo.',
 ];

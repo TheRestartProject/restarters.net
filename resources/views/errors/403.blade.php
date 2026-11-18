@@ -1,8 +1,4 @@
-@if (Auth::check())
-@include('layouts.header')
-@else
 @include('layouts.header_plain')
-@endif
 
 @yield('content')
 

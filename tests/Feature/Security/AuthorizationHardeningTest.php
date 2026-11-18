@@ -13,16 +13,14 @@ use Tests\TestCase;
 /**
  * Missing per-object authorization checks.
  *
- * Two families here:
+ * updateDevicev2 authorises against an event id taken from the request body but
+ * mutates a device identified by the URL path - the two were never reconciled.
+ * createEventv2 only checked that the caller hosts *some* group.
  *
- *  1. The three image-upload endpoints, where the sibling delete-image endpoint
- *     got an ownership check and the upload endpoint did not.
- *  2. updateDevicev2, which authorises against an event id taken from the request
- *     body but mutates a device identified by the URL path — the two were never
- *     reconciled. Plus createEventv2, which only checks that the caller hosts
- *     *some* group (a standing TODO in the code).
- *
- * Written before the fixes; these should fail on the unpatched code.
+ * The image-upload endpoints (group, event, device) are covered by
+ * APIv2GroupImagesTest, APIv2EventImagesTest and APIv2DeviceImagesTest, and the
+ * retired GET-reachable destructive routes by ApiOnlyRouteSurfaceTest, so neither
+ * is repeated here.
  */
 class AuthorizationHardeningTest extends TestCase
 {
@@ -38,78 +36,6 @@ class AuthorizationHardeningTest extends TestCase
         ]);
 
         return $group;
-    }
-
-    // -------------------------------------------------------------------------
-    // Image uploads
-    // -------------------------------------------------------------------------
-
-    /** @test */
-    public function a_stranger_cannot_upload_an_image_to_a_group(): void
-    {
-        $this->withExceptionHandling();
-
-        $host = User::factory()->host()->create();
-        $group = $this->makeHostOfNewGroup($host);
-
-        $stranger = User::factory()->restarter()->create();
-        $this->actingAs($stranger);
-
-        $response = $this->post('/group/image-upload/' . $group->idgroups);
-
-        $response->assertStatus(403);
-    }
-
-    /** @test */
-    public function a_group_host_can_still_upload_an_image_to_their_own_group(): void
-    {
-        $this->withExceptionHandling();
-
-        $host = User::factory()->host()->create();
-        $group = $this->makeHostOfNewGroup($host);
-
-        $this->actingAs($host);
-
-        // No file is attached, so nothing is stored — we are asserting only that
-        // the authorization guard lets a legitimate host through.
-        $response = $this->post('/group/image-upload/' . $group->idgroups);
-
-        $this->assertNotEquals(403, $response->getStatusCode());
-    }
-
-    /** @test */
-    public function a_stranger_cannot_upload_an_image_to_an_event(): void
-    {
-        $this->withExceptionHandling();
-
-        $host = User::factory()->host()->create();
-        $group = $this->makeHostOfNewGroup($host);
-        $event = Party::factory()->create(['group' => $group->idgroups]);
-
-        $stranger = User::factory()->restarter()->create();
-        $this->actingAs($stranger);
-
-        $response = $this->post('/party/image-upload/' . $event->idevents);
-
-        $response->assertStatus(403);
-    }
-
-    /** @test */
-    public function a_stranger_cannot_upload_an_image_to_a_device(): void
-    {
-        $this->withExceptionHandling();
-
-        $host = User::factory()->host()->create();
-        $group = $this->makeHostOfNewGroup($host);
-        $event = Party::factory()->create(['group' => $group->idgroups]);
-        $device = Device::factory()->fixed()->create(['event' => $event->idevents]);
-
-        $stranger = User::factory()->restarter()->create();
-        $this->actingAs($stranger);
-
-        $response = $this->post('/device/image-upload/' . $device->iddevices);
-
-        $response->assertStatus(403);
     }
 
     // -------------------------------------------------------------------------
@@ -253,41 +179,5 @@ class AuthorizationHardeningTest extends TestCase
         $response = $this->get('/test/check-auth');
 
         $response->assertStatus(404);
-    }
-
-    // -------------------------------------------------------------------------
-    // Destructive actions must not be reachable by GET
-    // -------------------------------------------------------------------------
-
-    /**
-     * Laravel's CSRF middleware only covers POST/PUT/PATCH/DELETE, so a destructive action
-     * on a GET route can be triggered by any page an admin happens to load. These are all
-     * POST now; a GET must not reach the controller at all.
-     *
-     * @test
-     */
-    public function destructive_actions_are_not_reachable_by_get(): void
-    {
-        $this->withExceptionHandling();
-
-        $admin = User::factory()->administrator()->create();
-        $this->actingAs($admin);
-
-        $group = Group::factory()->create(['approved' => true]);
-        $skill = \App\Skills::create(['skill_name' => 'Soldering', 'description' => 'x', 'category' => 2]);
-        $tag = \App\GroupTags::create(['tag_name' => 'Tagged', 'description' => 'x']);
-
-        foreach ([
-            '/group/delete/' . $group->idgroups,
-            '/skills/delete/' . $skill->id,
-            '/tags/delete/' . $tag->id,
-        ] as $url) {
-            $this->get($url)->assertStatus(405, "GET $url should not be routable");
-        }
-
-        // ...and the objects are all still there.
-        $this->assertNotNull(Group::find($group->idgroups));
-        $this->assertNotNull(\App\Skills::find($skill->id));
-        $this->assertNotNull(\App\GroupTags::find($tag->id));
     }
 }

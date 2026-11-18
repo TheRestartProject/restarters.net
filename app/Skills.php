@@ -3,10 +3,13 @@
 namespace App;
 
 use DB;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Skills extends Model
 {
+    use HasFactory;
+
     protected $table = 'skills';
     /**
      * The attributes that are mass assignable.
