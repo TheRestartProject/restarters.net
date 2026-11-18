@@ -20,11 +20,12 @@ on:
     types: [opened, reopened, synchronize]
   workflow_dispatch:
 
+# Labelling a PR takes pull-requests: write; issues: write alone gets a 403.
 permissions:
   contents: read
   statuses: read
-  pull-requests: read
-  issues: write
+  pull-requests: write
+  issues: read
 
 jobs:
   label:
