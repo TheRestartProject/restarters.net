@@ -136,6 +136,13 @@ export const useNetworksStore = defineStore('networks', {
       }
     },
 
+    // One period's figures (e.g. last_12_months). Returned rather than held, so
+    // they don't replace the all-time figures in `stats`.
+    async fetchPeriodStats(id, period) {
+      const { $api } = useNuxtApp()
+      return $api.network.stats(id, { period })
+    },
+
     async fetchTags(id) {
       const { $api } = useNuxtApp()
 

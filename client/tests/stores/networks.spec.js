@@ -79,6 +79,19 @@ describe('stores/networks', () => {
     })
   })
 
+  describe('fetchPeriodStats', () => {
+    it('returns one period\'s figures without replacing the all-time ones', async () => {
+      const store = useNetworksStore()
+      store.stats.data = { groups: 7, parties: 30 }
+      mockApi.network.stats.mockResolvedValue({ groups: 7, parties: 3 })
+
+      await expect(store.fetchPeriodStats(1, 'last_12_months')).resolves.toEqual({ groups: 7, parties: 3 })
+
+      expect(mockApi.network.stats).toHaveBeenCalledWith(1, { period: 'last_12_months' })
+      expect(store.stats.data).toEqual({ groups: 7, parties: 30 })
+    })
+  })
+
   describe('fetchStats', () => {
     it('holds the stats, and clears the previous network\'s while loading', async () => {
       const store = useNetworksStore()

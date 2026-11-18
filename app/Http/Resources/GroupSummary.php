@@ -99,6 +99,12 @@ use Cache;
  *          description="If present, this group has been archived and is no longer active.",
  *          format="date-time",
  *     ),
+ *     @OA\Property(
+ *          property="approved",
+ *          title="approved",
+ *          description="Whether this group has been approved.",
+ *          type="boolean",
+ *     ),
  * )
  */
 
@@ -129,6 +135,7 @@ class GroupSummary extends JsonResource
             }),
             'updated_at' => Carbon::parse($this->updated_at)->toIso8601String(),
             'archived_at' => $this->archived_at ? Carbon::parse($this->archived_at)->toIso8601String() : null,
+            'approved' => (bool) $this->approved,
             'summary' => true
         ];
 

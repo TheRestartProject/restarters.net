@@ -76,10 +76,10 @@ async function openNetworkTagsPage(page, networkId) {
 }
 
 async function createNetworkTag(page, networkId, name) {
-  // NetworkTagsManager renders an always-visible inline create form
-  // (network-tags-create-*), not a modal opened by an add button. Earlier this
-  // helper drove a modal UI that was never built, so it hung 360s waiting for
-  // tag-add-button and timed the whole e2e job out.
+  // NetworkTagsManager's inline create form (network-tags-create-*) stays
+  // hidden until "Add tag" is clicked, and hides again after a successful
+  // create. It is not a modal.
+  await page.getByTestId('network-tags-add').click()
   await page.getByTestId('network-tags-create-name').fill(name)
 
   const [response] = await Promise.all([
@@ -212,6 +212,7 @@ for (const { label, user } of ROLES) {
       const tagName = `${label} Dup Tag ${Date.now()}`
       await createNetworkTag(page, networkId, tagName)
 
+      await page.getByTestId('network-tags-add').click()
       await page.getByTestId('network-tags-create-name').fill(tagName)
       await page.getByTestId('network-tags-create-submit').click()
 
