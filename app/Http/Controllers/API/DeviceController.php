@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Services\CustomFields;
+
 use Illuminate\Http\JsonResponse;
 use App\Barrier;
 use App\Device;
@@ -235,6 +237,8 @@ class DeviceController extends Controller {
             'repaired_by' => $user->id,
         ];
 
+        $data['custom_values'] = $this->customValues($request, $event, []);
+
         $device = Device::create($data);
         $idDevice = $device->iddevices;
 
@@ -459,6 +463,10 @@ class DeviceController extends Controller {
             'repaired_by' => $user->id,
         ];
 
+        if ($request->has('custom_values')) {
+            $data['custom_values'] = $this->customValues($request, $event, $device->custom_values ?? []);
+        }
+
         $device->update($data);
 
         event(new DeviceCreatedOrUpdated($device));
@@ -556,11 +564,36 @@ class DeviceController extends Controller {
         ]);
     }
 
+    /**
+     * The item's custom field values after this request (see CustomFields::mergeValues). Null when there are none.
+     */
+    private function customValues(Request $request, Party $event, array $existing): ?array
+    {
+        $sent = $request->input('custom_values');
+
+        if (is_string($sent)) {
+            $sent = json_decode($sent, true);
+        }
+
+        if ($sent !== null && ! is_array($sent)) {
+            throw ValidationException::withMessages(['custom_values' => 'custom_values must be an object of field key to value.']);
+        }
+
+        $values = $sent ? CustomFields::mergeValues($event->theGroup, $existing, $sent) : $existing;
+
+        return $values ?: null;
+    }
+
     private function validateDeviceParams(Request $request, $create): array
     {
         // We don't validate max lengths of other strings, to avoid duplicating the length information both here
         // and in the migrations.  If we wanted to do that we should extract the length dynamically from the
         // schema, which is possible but not trivial.
+        // A comma works as a decimal point in weights ("1,5" is 1.5 kg).
+        if (is_string($request->input('estimate'))) {
+            $request->merge(['estimate' => str_replace(',', '.', trim($request->input('estimate')))]);
+        }
+
         $request->validate([
             'eventid' => 'required|integer',
             'item_type' => 'string',  // Some of the tests, at least, treat this as optional.
@@ -568,7 +601,7 @@ class DeviceController extends Controller {
             'brand' => 'string',
             'model' => 'string',
             'age' => [ 'numeric', 'max:500' ],
-            'estimate' => [ 'numeric', 'min:0' ],
+            'estimate' => [ 'nullable', 'numeric', 'min:0', 'max:999.999' ],
             'problem' => [ 'string', 'nullable' ],
             'reference' => [ 'string', 'nullable', 'max:255' ],
             'notes' => 'string',
@@ -585,8 +618,9 @@ class DeviceController extends Controller {
         $model = $request->input('model');
         $age = $request->input('age');
         $age = $age ? $age : 0;
+        // Blank means nobody weighed the item: NULL, not 0.
         $estimate = $request->input('estimate');
-        $estimate = $estimate ? $estimate : 0;
+        $estimate = ($estimate === null || $estimate === '') ? null : (float) $estimate;
         $problem = $request->input('problem');
         $notes = $request->input('notes');
         $reference = $request->input('reference');

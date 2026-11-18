@@ -98,6 +98,17 @@ export const useNetworksStore = defineStore('networks', {
       return data
     },
 
+    // Save the network's feature switches (PATCH /networks/{id}/options) and
+    // reflect them on the loaded network.
+    async updateOptions(id, payload) {
+      const { $api } = useNuxtApp()
+      const { data } = await $api.network.updateOptions(id, payload)
+      if (this.current.data && this.current.data.id === id) {
+        this.current.data = { ...this.current.data, features: data.features, feature_defaults: data.feature_defaults }
+      }
+      return data
+    },
+
     async fetchGroups(id, params) {
       const { $api } = useNuxtApp()
 

@@ -54,6 +54,9 @@ class AppServiceProvider extends ServiceProvider
         // table is already present but still creates it on fresh installs.
         Sanctum::ignoreMigrations();
 
+        // The typical Misc weight is worked out once per request (ItemImpact).
+        $this->app->singleton(\App\Services\TypicalMiscWeights::class);
+
         $this->app->singleton(Geocoder::class, function () {
             return config('restarters.geocoder_stub')
                 ? new \App\Helpers\StubGeocoder()

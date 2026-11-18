@@ -52,6 +52,12 @@ export default class NetworkAPI extends BaseAPI {
     return this.$del(`/api/v2/networks/${id}/tags/${tagId}`)
   }
 
+  // PATCH /api/v2/networks/{id}/options {features: {key: on|off|default_on|default_off|null}}
+  // -> {data: {features, feature_defaults}}.
+  updateOptions(id, payload) {
+    return this.$patch(`/api/v2/networks/${id}/options`, payload)
+  }
+
   // The network's stats (getNetworkStatsv2); the group_tag query param narrows them to groups carrying that tag.
   stats(id, params) {
     return this.$get(`/api/v2/networks/${id}/stats`, params)

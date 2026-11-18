@@ -2,6 +2,7 @@
 
 namespace App\Helpers;
 
+use App\Services\ItemImpact;
 use DB;
 
 class LcaStats
@@ -22,21 +23,21 @@ class LcaStats
     }
 
     /**
-     * Misc weight/footprint values must = 0 in categories table.
-     * Unpowered estimate takes precedence over unpowered category weight.
+     * Site-wide or one group's waste and CO2e for fixed items, using the rule in ItemImpact. Misc categories are
+     * the ones with weight 0.
      */
     public static function getWasteStats($group = null)
     {
         $dF = self::getDisplacementFactor();
-        $eR = self::getEmissionRatioPowered();
-        $uR = self::getEmissionRatioUnpowered();
+        $waste = ItemImpact::sqlWaste('d', 'c');
+        $co2 = ItemImpact::sqlCo2('d', 'c');
 
         $t1 = "
 SELECT
-CASE WHEN (c.powered = 1) THEN (CASE WHEN (c.weight = 0) THEN d.estimate ELSE c.weight END) ELSE 0 END  AS powered_device_weights,
-CASE WHEN (c.powered = 0) THEN (CASE WHEN (d.estimate = 0) THEN c.weight ELSE d.estimate END) ELSE 0 END AS unpowered_device_weights,
-CASE WHEN (c.powered = 1) THEN (CASE WHEN (c.weight = 0) THEN (d.estimate * $eR) ELSE c.footprint END) ELSE 0 END AS powered_footprints,
-CASE WHEN (c.powered = 0) THEN (CASE WHEN (d.estimate = 0) THEN c.footprint ELSE (d.estimate * $uR) END) ELSE 0 END AS unpowered_footprints
+CASE WHEN (c.powered = 1) THEN $waste ELSE 0 END AS powered_device_weights,
+CASE WHEN (c.powered = 0) THEN $waste ELSE 0 END AS unpowered_device_weights,
+CASE WHEN (c.powered = 1) THEN $co2 ELSE 0 END AS powered_footprints,
+CASE WHEN (c.powered = 0) THEN $co2 ELSE 0 END AS unpowered_footprints
 FROM devices d, categories c, events e
 WHERE d.category = c.idcategories
 AND d.event = e.idevents

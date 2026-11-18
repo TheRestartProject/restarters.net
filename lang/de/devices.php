@@ -42,8 +42,6 @@ return [
   'powered_items' => 'elektrische Geräte',
   'unpowered_items' => 'nicht-elektrische Gegenstände',
   'weight' => 'Gewicht',
-  'required_impact' => 'kg – erforderlich zur Berechnung der Umweltwirkung',
-  'optional_impact' => 'kg – wird zur Präzisierung der Umweltwirkungsberechnung verwendet (optional)',
   'age_approx' => 'Jahre (ungefähr, falls unbekannt)',
   'tooltip_category' => 'Wählen Sie die Kategorie, die am besten zu diesem Artikel passt. <a target=\'_blank\' rel=\'noopener noreferrer\' href=\'https://talk.restarters.net/t/fixometer-how-to-log-repair-data-from-your-event/1028#heading--category\'>Weitere Informationen zu diesen Kategorien...</a>',
   'tooltip_model' => 'Geben Sie hier so viele Informationen zum spezifischen Modell des Geräts wie möglich ein (z. B. \'Galaxy S10 5G\'). Lassen Sie das Feld leer, wenn Sie das Modell nicht kennen.',

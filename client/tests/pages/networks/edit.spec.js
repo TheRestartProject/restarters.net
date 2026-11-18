@@ -14,6 +14,7 @@ const STUBS = {
   BAlert: { template: '<div v-bind="$attrs"><slot /></div>' },
   BButton: { template: '<button v-bind="$attrs"><slot /></button>' },
   TusImageUpload: { template: '<div data-testid="stub-upload" />' },
+  NetworkOptions: { template: '<div data-testid="stub-network-options" />' },
 }
 
 const NETWORK = { id: 1, name: 'Test London', logo: null, reporting_url: 'https://reports.example.org/dashboard/7' }
@@ -96,5 +97,22 @@ describe('pages/networks/[id]/edit', () => {
 
     expect(wrapper.find('[data-testid="network-edit-page"]').exists()).toBe(true)
     expect(wrapper.find('[data-testid="network-edit-reporting"]').exists()).toBe(false)
+  })
+
+  it('shows the group options to administrators and to this network\'s coordinators only', async () => {
+    setUser({ id: 1, role_name: 'Administrator', networks: [] })
+    let wrapper = mountPage()
+    await flushPromises()
+    expect(wrapper.find('[data-testid="stub-network-options"]').exists()).toBe(true)
+
+    setUser({ id: 2, role_name: 'NetworkCoordinator', networks: [{ id: 1, name: 'Test London' }] })
+    wrapper = mountPage()
+    await flushPromises()
+    expect(wrapper.find('[data-testid="stub-network-options"]').exists()).toBe(true)
+
+    setUser({ id: 3, role_name: 'NetworkCoordinator', networks: [{ id: 9, name: 'Other' }] })
+    wrapper = mountPage()
+    await flushPromises()
+    expect(wrapper.find('[data-testid="stub-network-options"]').exists()).toBe(false)
   })
 })

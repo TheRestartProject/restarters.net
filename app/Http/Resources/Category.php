@@ -2,6 +2,8 @@
 
 namespace App\Http\Resources;
 
+use App\Services\ItemImpact;
+
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -46,6 +48,30 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *          type="number",
  *          format="float",
  *          example=210.0,
+ *          nullable=true
+ *     ),
+ *     @OA\Property(
+ *          property="typical_weight",
+ *          description="The weight used for an item in this category when nobody enters one, in kg. For Misc it is the median of Misc weights entered in the last 12 months.",
+ *          type="number",
+ *          format="float",
+ *          example=1.28,
+ *          nullable=true
+ *     ),
+ *     @OA\Property(
+ *          property="weight_min",
+ *          description="The lowest entered weight that counts towards impact figures, in kg",
+ *          type="number",
+ *          format="float",
+ *          example=0.0128,
+ *          nullable=true
+ *     ),
+ *     @OA\Property(
+ *          property="weight_max",
+ *          description="The highest entered weight that counts towards impact figures, in kg. Null when there is no limit.",
+ *          type="number",
+ *          format="float",
+ *          example=12.8,
  *          nullable=true
  *     ),
  *     @OA\Property(
@@ -95,6 +121,25 @@ class Category extends JsonResource
             'cluster' => $this->cluster !== null ? (int) $this->cluster : null,
             'cluster_name' => $this->cluster_name ?? null,
             'description_short' => $this->description_short,
+        ] + $this->weightsThatCount();
+    }
+
+    /**
+     * The weight used when nobody enters one, and the range of entered weights that count towards impact
+     * figures (see ItemImpact). weight_max is null when there is no upper limit.
+     */
+    private function weightsThatCount(): array
+    {
+        if ($this->weight === null || $this->powered === null) {
+            return ['typical_weight' => null, 'weight_min' => null, 'weight_max' => null];
+        }
+
+        [$min, $max] = ItemImpact::countedRange((float) $this->weight, (bool) $this->powered);
+
+        return [
+            'typical_weight' => ItemImpact::typicalWeight((float) $this->weight, (bool) $this->powered),
+            'weight_min' => $min,
+            'weight_max' => $max,
         ];
     }
 }

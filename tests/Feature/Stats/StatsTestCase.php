@@ -31,6 +31,21 @@ class StatsTestCase extends TestCase
         $this->_idUnpoweredNonMisc = 5;
     }
 
+    /**
+     * Fix the typical Misc weights (normally the median of the last 12 months' Misc weights).
+     */
+    protected function _setTypicalMiscWeights(float $powered, float $unpowered): void
+    {
+        $this->app->instance(\App\Services\TypicalMiscWeights::class, new class($powered, $unpowered) extends \App\Services\TypicalMiscWeights {
+            public function __construct(private float $p, private float $u) {}
+
+            public function get(bool $powered): float
+            {
+                return $powered ? $this->p : $this->u;
+            }
+        });
+    }
+
     protected function _setupCategoriesWithUnpoweredWeights()
     {
         DB::statement('SET foreign_key_checks=0');

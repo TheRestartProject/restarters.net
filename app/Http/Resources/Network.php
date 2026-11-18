@@ -2,6 +2,8 @@
 
 namespace App\Http\Resources;
 
+use App\Services\GroupFeatures;
+
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -67,6 +69,22 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *          description="Default timezone for this network.",
  *          format="string",
  *          example="Europe/London"
+ *     ),
+ *     @OA\Property(
+ *          property="features",
+ *          title="features",
+ *          description="The network's setting for each optional feature: on or off (always, for every group), default_on or default_off (a default groups can change), or null (not set).",
+ *          type="object",
+ *          @OA\AdditionalProperties(type="string", nullable=true, enum={"on", "off", "default_on", "default_off"}),
+ *          example={"item_weight": null, "custom_fields": "default_on"}
+ *     ),
+ *     @OA\Property(
+ *          property="feature_defaults",
+ *          title="feature_defaults",
+ *          description="Each optional feature's own default, used when neither the group nor its networks have set it.",
+ *          type="object",
+ *          @OA\AdditionalProperties(type="boolean"),
+ *          example={"item_weight": true, "custom_fields": false}
  *     ),
  *     @OA\Property(
  *          property="stats",
@@ -235,6 +253,9 @@ class Network extends JsonResource
             // show the network before its stats (the network page) can leave them out and fetch them separately.
             'stats' => $this->when($request->boolean('includeStats', true), fn () => $this->resource->stats()),
             'timezone' => $this->resource->timezone,
+            // The network's options for its groups (RES-2063): each feature's setting, or null.
+            'features' => GroupFeatures::networkSettings($this->resource),
+            'feature_defaults' => GroupFeatures::FEATURES,
             'full' => true,
             // Legacy NetworkController@show built this the same way (User::
             // getProfile() thumbnail lookup) for the "Network Coordinators"

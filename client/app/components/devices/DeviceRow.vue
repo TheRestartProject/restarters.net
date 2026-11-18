@@ -29,6 +29,14 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  groupFeatures: {
+    type: Object,
+    default: null,
+  },
+  groupCustomFields: {
+    type: Array,
+    default: () => [],
+  },
 })
 
 const { t } = useI18n()
@@ -131,7 +139,15 @@ const SHOW_DEVICE_REFERENCE = false
   </tr>
   <tr v-else class="device-row-editing" :data-testid="`event-device-editing-${device.id}`">
     <td :colspan="(powered ? 7 : 6) + (canedit ? 1 : 0)" class="p-0">
-      <DeviceForm :event-id="eventId" :device="device" :powered="powered" @saved="onSaved" @cancel="onCancel" />
+      <DeviceForm
+        :event-id="eventId"
+        :device="device"
+        :powered="powered"
+        :group-features="groupFeatures"
+        :group-custom-fields="groupCustomFields"
+        @saved="onSaved"
+        @cancel="onCancel"
+      />
     </td>
   </tr>
 

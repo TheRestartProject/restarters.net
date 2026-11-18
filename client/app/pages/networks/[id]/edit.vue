@@ -6,6 +6,7 @@ import { useAuth } from '~/composables/useAuth.js'
 import { useSessionStore } from '~/stores/session.js'
 import { useNetworksStore } from '~/stores/networks.js'
 import TusImageUpload from '~/components/forms/TusImageUpload.vue'
+import NetworkOptions from '~/components/networks/NetworkOptions.vue'
 
 // /networks/[id]/edit - resources/views/networks/edit.blade.php, reached from
 // Route::resource('networks', ...)->only(['index','show','edit','update']).
@@ -139,6 +140,8 @@ async function onLogoUploaded({ uploadKey }) {
           </BButton>
         </div>
       </form>
+
+      <NetworkOptions :network="network" />
 
       <div class="d-flex justify-content-end mt-4">
         <NuxtLink :to="`/networks/${id}`" class="btn btn-primary" data-testid="network-edit-done">

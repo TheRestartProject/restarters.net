@@ -163,7 +163,8 @@ class LcaStatsTest extends StatsTestCase
             'powered_waste' => 8 + 1.23,
             'unpowered_waste' => 5 + 4.56,
             'powered_footprint' => round(((14.4 * 2) + (1.23 * $this->_ratioPowered)) * $this->_displacementFactor, 2),
-            'unpowered_footprint' => round((15.5 + (4.56 * $this->_ratioUnpowered)) * $this->_displacementFactor, 2),
+            // An entered weight uses its category's own CO2e per kg: 15.5 kg CO2e / 5 kg = 3.1.
+            'unpowered_footprint' => round((15.5 + (4.56 * 15.5 / 5)) * $this->_displacementFactor, 2),
         ];
         $result = LcaStats::getWasteStats();
         $this->assertIsArray($result);

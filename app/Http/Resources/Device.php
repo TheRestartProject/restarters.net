@@ -116,8 +116,9 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *     @OA\Property(
  *          property="estimate",
  *          title="estimate",
- *          description="The weight estimage for this item in kg.",
+ *          description="The weight someone entered for this item, in kg. Null when nobody weighed it.",
  *          format="float",
+ *          nullable=true,
  *          minimum="0",
  *          example="1.5"
  *     ),
@@ -191,6 +192,13 @@ use Illuminate\Http\Resources\Json\JsonResource;
  *         maxLength=255,
  *         example="REP1234"
  *     ),
+ *     @OA\Property(
+ *         property="custom_values",
+ *         title="custom_values",
+ *         description="Values of the group's custom item fields, keyed by field key. On create and update, values not sent are kept and null or an empty string removes one.",
+ *         type="object",
+ *         example={"town": "Leeds"}
+ *     ),
  * )
  */
 
@@ -219,11 +227,13 @@ class Device extends JsonResource
             'brand' => $this->brand,
             'model' => $this->model,
             'age' => floatval($this->age),
-            'estimate' => floatval($this->estimate),
+            'estimate' => $this->estimate === null ? null : floatval($this->estimate),
             'problem' => $this->problem,
             'short_problem' => $this->getShortProblem(),
             'notes' => $this->notes,
             'reference' => $this->reference,
+            // Values of the group's custom item fields, keyed by field key (RES-2063). Always an object.
+            'custom_values' => (object) ($this->custom_values ?? []),
             'created_at' => $this->created_at->toIso8601String(),
             'updated_at' => $this->created_at->toIso8601String(),
         ];

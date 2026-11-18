@@ -41,6 +41,29 @@ class APIv2CategoriesTest extends TestCase
         $this->assertArrayHasKey('description_short', $row);
     }
 
+    public function testListIncludesTheWeightsThatCount(): void
+    {
+        Category::factory()->create(['idcategories' => 901, 'revision' => 2, 'name' => 'Weighed', 'powered' => 1, 'weight' => 1.28, 'footprint' => 17.5]);
+        Category::factory()->create(['idcategories' => 902, 'revision' => 2, 'name' => 'Unweighed', 'powered' => 0, 'weight' => 0, 'footprint' => 0]);
+        $this->app->instance(\App\Services\TypicalMiscWeights::class, new class extends \App\Services\TypicalMiscWeights {
+            public function get(bool $powered): float
+            {
+                return $powered ? 2 : 0.75;
+            }
+        });
+
+        $rows = collect($this->get('/api/v2/categories')->json('data'))->keyBy('name');
+
+        // A weight counts between a hundredth of the category weight and 10 times it.
+        $this->assertEquals(1.28, $rows['Weighed']['typical_weight']);
+        $this->assertEquals(0.0128, $rows['Weighed']['weight_min']);
+        $this->assertEquals(12.8, $rows['Weighed']['weight_max']);
+        // Misc uses the typical Misc weight, up to 20 times it.
+        $this->assertEquals(0.75, $rows['Unweighed']['typical_weight']);
+        $this->assertEquals(0.001, $rows['Unweighed']['weight_min']);
+        $this->assertEquals(15, $rows['Unweighed']['weight_max']);
+    }
+
     public function testGetSingleCategory(): void
     {
         $response = $this->getJson('/api/v2/categories/222');

@@ -2,6 +2,8 @@
 
 namespace App;
 
+use App\Services\ItemImpact;
+
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -532,15 +534,11 @@ class Party extends Model implements Auditable
                         $result['fixed_devices']++;
                         $result['fixed_powered']++;
 
-                        if ($device->category == $miscPoweredId && $device->estimate > 0) {
-                            $result['co2_powered']   += $device->estimate * $eEmissionRatio * $displacementFactor;
-                            $result['waste_powered'] += $device->estimate;
-                        } else {
-                            $result['co2_powered']   += $device->footprint * $displacementFactor;
-                            $result['waste_powered'] += $device->weight;
-                        }
+                        $entered = $device->estimate === null ? null : (float) $device->estimate;
+                        $result['co2_powered']   += ItemImpact::co2($entered, (float) $device->weight, (float) $device->footprint, true, (float) $eEmissionRatio) * $displacementFactor;
+                        $result['waste_powered'] += ItemImpact::waste($entered, (float) $device->weight, true);
 
-                        if ($device->weight == 0 && $device->estimate == 0 && $device->category == $miscPoweredId) {
+                        if (round((float) $device->weight, 3) == 0 && ! ($device->estimate > 0) && $device->category == $miscPoweredId) {
                             $result['no_weight_powered']++;
                         }
                     }
@@ -551,15 +549,11 @@ class Party extends Model implements Auditable
                         $result['fixed_devices']++;
                         $result['fixed_unpowered']++;
 
-                        if ($device->estimate > 0) {
-                            $result['co2_unpowered']   += $device->estimate * $uEmissionratio * $displacementFactor;
-                            $result['waste_unpowered'] += $device->estimate;
-                        } else {
-                            $result['co2_unpowered']   += $device->footprint * $displacementFactor;
-                            $result['waste_unpowered'] += $device->weight;
-                        }
+                        $entered = $device->estimate === null ? null : (float) $device->estimate;
+                        $result['co2_unpowered']   += ItemImpact::co2($entered, (float) $device->weight, (float) $device->footprint, false, (float) $uEmissionratio) * $displacementFactor;
+                        $result['waste_unpowered'] += ItemImpact::waste($entered, (float) $device->weight, false);
 
-                        if ($device->weight == 0 && $device->estimate == 0 && $device->category == $miscUnpoweredId) {
+                        if (round((float) $device->weight, 3) == 0 && ! ($device->estimate > 0) && $device->category == $miscUnpoweredId) {
                             $result['no_weight_unpowered']++;
                         }
                     }

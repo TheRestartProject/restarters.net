@@ -607,8 +607,6 @@
         "powered_items": "powered items",
         "unpowered_items": "unpowered items",
         "weight": "Weight",
-        "required_impact": "kg - required to calculate environmental impact",
-        "optional_impact": "kg - used to refine environmental impact calculation (optional)",
         "age_approx": "years (approximate if unknown)",
         "placeholder_notes": "Notes.  Examples: repair difficulties, owner's perception of problem etc. Helping with the end of Windows 10? Add the #EndOf10 hashtag in the notes.",
         "title_items": "ITEM",
