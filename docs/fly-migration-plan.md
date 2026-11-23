@@ -23,7 +23,7 @@
 - [x] Production DB synced from `restarters_mc2RhNw` via `fly-migrate.sh --db --images` (6m16s); row counts verified against TCP connection
 - [x] API compatibility check — no breaking changes for known consumers. All v1 stats endpoints, RepairTogether, Zapier triggers, and TRP.org widgets are unchanged. Tag visibility changes are intentional and fine.
 - [ ] Check and renew `restarters.net` domain at iwantmyname (noted as due soon)
-- [ ] Write Fly.io ops crib for Neil
+- [x] Write Fly.io ops crib for Neil: `fly-cheatsheet.md`, with security-patch redeploys in `fly-deployment.md` → *Security Patches*
 
 ### Neil
 - [ ] Re-check known-issues list (some may be fixed since Laravel 10 / group tags work)

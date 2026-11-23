@@ -157,6 +157,92 @@ The `production` branch deploy runs without waiting for tests (it is triggered b
 
 ---
 
+## Security Patches (PHP, nginx, Debian packages)
+
+PHP, nginx and the OS packages are baked into the image at build time, and a
+machine runs that image until the next deploy. There is no patching in place:
+an `apt upgrade` over ssh is lost on the next restart. A security fix in any of
+them reaches live only by rebuilding and redeploying.
+
+The runtime stage builds `FROM php:8.2-fpm`. That tag moves: Docker republishes
+it within a day or two of each PHP release, and for Debian security updates. A
+rebuild with no code change therefore picks up the patched PHP.
+
+### When to redeploy
+
+- **A PHP 8.2 security release** (php.net, or advisories from Wordfence,
+  Patchstack and the like). First check that Docker has republished the tag
+  since the release:
+  ```bash
+  curl -s https://hub.docker.com/v2/repositories/library/php/tags/8.2-fpm | grep -o '"last_updated":"[^"]*"'
+  ```
+- **A high or critical nginx or Debian advisory.**
+- **PHP 8.2 gets security fixes only until 31 December 2026.** After that the
+  `FROM` lines in `Dockerfile.fly` have to move to a newer PHP; redeploying
+  will no longer bring fixes.
+
+### Redeploying production without a code change
+
+Rebuild the commit that is already on `production`, either way:
+
+1. **CircleCI:** open the restarters.net project, filter to branch
+   `production`, open the latest pipeline and choose **Rerun workflow from
+   start** (or **Trigger Pipeline** on branch `production`). The
+   `deploy-fly-prod` job builds, deploys, then checks the site is serving.
+2. **By hand**, from a clean checkout of `production`:
+   ```bash
+   git fetch origin
+   git worktree add ../restarters-prod origin/production
+   cd ../restarters-prod
+   flyctl deploy --app restarters --remote-only
+   ```
+
+Don't merge anything into `production` just to force a deploy.
+
+If the check below still shows the old version, the remote builder reused a
+cached base layer. Deploy by hand again with `--no-cache` added.
+
+The other apps built from `Dockerfile.fly` need the same treatment:
+
+- `restarters-dev`: the next green `develop` build, or rerun the latest
+  `develop` pipeline.
+- `restarters-yesterday`: `flyctl deploy --config fly-yesterday.toml --remote-only`
+- PR previews: the next push to the PR.
+
+The WordPress site and the MediaWiki server are not on Fly. Their PHP is
+patched on their own hosts.
+
+### Checking what live is running
+
+No login needed. PHP reports its version in a response header:
+
+```bash
+curl -sI https://restarters.net/login | grep -i x-powered-by   # e.g. x-powered-by: PHP/8.2.36
+```
+
+With flyctl (run `fly auth login` first, as a member of the Fly organisation):
+
+```bash
+fly releases --app restarters | head -3                  # newest release and its date
+fly ssh console --app restarters --command "php -v"
+fly ssh console --app restarters --command "nginx -v"
+```
+
+### Is a PHP bug reachable here?
+
+Many advisories only bite in certain configurations. For PHP-FPM bugs, the
+relevant fact is that nginx reaches PHP-FPM over a Unix socket with one
+connection per request: no `fastcgi_keep_conn`, no upstream keepalive (see
+`docker/nginx-fly.conf`). That is why CVE-2026-129289 (November 2026, FastCGI
+connection reuse) could not be exploited here. Live still took that release for
+the other fixes in it. To confirm on the running machine:
+
+```bash
+fly ssh console --app restarters --command "grep -rn fastcgi_keep_conn /etc/nginx"   # no output = off
+```
+
+---
+
 ## PR Previews
 
 Operating guide and concrete setup record: `preview-environments.md` in this

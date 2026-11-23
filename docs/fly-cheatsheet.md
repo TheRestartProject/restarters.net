@@ -67,6 +67,21 @@ flyctl deploy --config fly.dev.toml --remote-only
 flyctl deploy --config fly.toml --remote-only
 ```
 
+### Security patch (PHP, nginx, OS)
+
+Fixes arrive only by rebuilding the image, so redeploy the current `production`
+commit: in CircleCI, rerun the latest `production` workflow from the start.
+Then check:
+
+```bash
+curl -sI https://restarters.net/login | grep -i x-powered-by   # PHP version live is running
+fly releases --app restarters | head -3                        # new release, dated today
+fly ssh console --app restarters --command "php -v"
+```
+
+Full procedure, including the by-hand deploy and the other apps: `fly-deployment.md`
+→ *Security Patches*.
+
 ---
 
 ## Logs
