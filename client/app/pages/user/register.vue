@@ -2,6 +2,7 @@
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '~/stores/auth.js'
+import { useSessionStore } from '~/stores/session.js'
 
 // 4-step wizard, ported from resources/views/auth/register-new.blade.php
 // (design.md parity rebuild - verified at 07e6abd7cc^): step 1 skills, step 2
@@ -14,6 +15,11 @@ const { t, tm } = useI18n()
 useHead({ title: t('login.join_title') })
 
 const authStore = useAuthStore()
+const sessionStore = useSessionStore()
+
+// Live (UserController::getRegister): only the Restarters site offers the
+// Restarters newsletter; a network's own site hides it.
+const showNewsletterSignup = computed(() => !sessionStore.site || sessionStore.site.shortname === 'restarters')
 const route = useRoute()
 const { $api } = useNuxtApp()
 
@@ -405,10 +411,10 @@ async function submit() {
             <h3>{{ t('registration.reg-step-3-heading') }}</h3>
 
             <fieldset>
-              <legend>{{ t('registration.reg-step-3-2b') }}</legend>
+              <legend v-if="showNewsletterSignup">{{ t('registration.reg-step-3-2b') }}</legend>
               <legend>{{ t('registration.reg-step-3-1a') }}</legend>
 
-              <BFormCheckbox v-model="form.newsletter" data-testid="register-newsletter">
+              <BFormCheckbox v-if="showNewsletterSignup" v-model="form.newsletter" data-testid="register-newsletter">
                 {{ t('registration.reg-step-3-label1') }}
               </BFormCheckbox>
               <BFormCheckbox v-model="form.invites" data-testid="register-invites">

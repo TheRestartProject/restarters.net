@@ -10,6 +10,9 @@ export const useSessionStore = defineStore('session', {
     user: null,
     config: null,
     flags: null,
+    // The network whose site this is (repairtogether.restarters.net etc.):
+    // its logo, default language and whether it offers the newsletter.
+    site: null,
     loaded: false,
   }),
 
@@ -21,6 +24,7 @@ export const useSessionStore = defineStore('session', {
       this.user = data.user
       this.config = data.config
       this.flags = data.flags
+      this.site = data.site ?? null
       this.loaded = true
 
       // Keep the auth store's user summary in step with the session's

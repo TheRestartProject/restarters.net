@@ -8,13 +8,18 @@ import { useSessionStore } from '../../app/stores/session.js'
 // logged-out (the bug the grouptags e2e port exposed).
 describe('plugins/session (cold-boot bootstrap)', () => {
   let mockApi
+  let mockI18n
+  let localeChosen
 
   beforeEach(() => {
     setActivePinia(createPinia())
     mockApi = {
-      session: { fetch: vi.fn() },
+      session: { fetch: vi.fn().mockResolvedValue({ data: { user: null, config: {}, flags: {}, site: null } }) },
     }
-    vi.stubGlobal('useNuxtApp', () => ({ $api: mockApi }))
+    mockI18n = { setLocale: vi.fn(), localeCodes: { value: ['de', 'en', 'es', 'fr', 'fr-BE', 'it', 'nl', 'nl-BE'] } }
+    localeChosen = false
+    vi.stubGlobal('useNuxtApp', () => ({ $api: mockApi, $i18n: mockI18n }))
+    vi.stubGlobal('useState', () => ({ value: localeChosen }))
     vi.stubGlobal('defineNuxtPlugin', (fn) => fn)
   })
 
@@ -36,9 +41,59 @@ describe('plugins/session (cold-boot bootstrap)', () => {
     expect(useAuthStore().user?.role_name).toBe('Administrator')
   })
 
-  it('does nothing for guests', async () => {
+  // A guest needs the session too: it says which network's site this is, for
+  // the logo, the newsletter sign-up and the default language.
+  it('fetches the session for guests too', async () => {
+    mockApi.session.fetch.mockResolvedValueOnce({
+      data: { user: null, config: {}, flags: {}, site: { shortname: 'repairtogether', default_language: 'fr-BE' } },
+    })
+
     await runPlugin()
-    expect(mockApi.session.fetch).not.toHaveBeenCalled()
+
+    expect(mockApi.session.fetch).toHaveBeenCalledTimes(1)
+    expect(useSessionStore().site?.shortname).toBe('repairtogether')
+    expect(useAuthStore().token).toBeNull()
+  })
+
+  // Live (CheckForRepairNetwork): a visitor who hasn't picked a language gets
+  // the network's language on its own site, whatever their browser says.
+  describe("network site's language", () => {
+    function siteIs(site) {
+      mockApi.session.fetch.mockResolvedValueOnce({ data: { user: null, config: {}, flags: {}, site } })
+    }
+
+    it("switches a visitor who hasn't chosen a language to the network's language", async () => {
+      siteIs({ shortname: 'repairtogether', default_language: 'fr-BE' })
+
+      await runPlugin()
+
+      expect(mockI18n.setLocale).toHaveBeenCalledWith('fr-BE')
+    })
+
+    it('keeps a language the visitor has already chosen', async () => {
+      localeChosen = true
+      siteIs({ shortname: 'repairtogether', default_language: 'fr-BE' })
+
+      await runPlugin()
+
+      expect(mockI18n.setLocale).not.toHaveBeenCalled()
+    })
+
+    it("leaves the Restarters site on the browser's language", async () => {
+      siteIs({ shortname: 'restarters', default_language: 'en' })
+
+      await runPlugin()
+
+      expect(mockI18n.setLocale).not.toHaveBeenCalled()
+    })
+
+    it("ignores a network language the client doesn't offer", async () => {
+      siteIs({ shortname: 'norway', default_language: 'no' })
+
+      await runPlugin()
+
+      expect(mockI18n.setLocale).not.toHaveBeenCalled()
+    })
   })
 
   it('does not refetch when the session is already loaded', async () => {

@@ -8,7 +8,6 @@ use App;
 use App\Network;
 use Auth;
 use Closure;
-use Illuminate\Support\Str;
 use LaravelLocalization;
 
 class CheckForRepairNetwork
@@ -21,23 +20,10 @@ class CheckForRepairNetwork
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $host = $request->getHost();
         $update_user = [];
 
         // Restart network is the default.
-        if (Str::contains($host, 'repairshare')) {
-            $networkQuery = Network::where('shortname', 'repairshare');
-        } elseif (Str::contains($host, 'repairtogether')) {
-            $networkQuery = Network::where('shortname', 'repairtogether');
-        } elseif (Str::contains($host, 'hauts-de-france')) {
-            $networkQuery = Network::where('shortname', 'hauts-de-france');
-        } elseif (Str::contains($host, 'test-restarters')) {
-            $networkQuery = Network::where('shortname', 'test');
-        } else {
-            $networkQuery = Network::where('shortname', 'like', 'restarters');
-        }
-
-        $network = $networkQuery->first();
+        $network = Network::forHost($request->getHost());
         if (empty($network)) {
             // In testing environment, fall back to any available network or create one
             if (app()->environment('testing')) {

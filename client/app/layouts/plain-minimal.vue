@@ -1,5 +1,5 @@
 <script setup>
-import IconLogo from '~/components/icons/IconLogo.vue'
+import SiteLogo from '~/components/SiteLogo.vue'
 import LocaleSwitcher from '~/components/LocaleSwitcher.vue'
 import ToastContainer from '~/components/ToastContainer.vue'
 import CookieConsent from '~/components/CookieConsent.vue'
@@ -23,7 +23,7 @@ const route = useRoute()
            content (the cookie policy): definePageMeta({ logoStart: true }). -->
       <header class="container d-flex" :class="route.meta.logoStart ? 'justify-content-start' : 'justify-content-center'">
         <NuxtLink to="/" data-testid="plain-minimal-logo">
-          <IconLogo />
+          <SiteLogo />
         </NuxtLink>
       </header>
       <slot />

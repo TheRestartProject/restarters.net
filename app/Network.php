@@ -8,10 +8,62 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Group;
 use App\Party;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
 
 class Network extends Model
 {
     use HasFactory;
+
+    /**
+     * Networks with their own site, keyed by a word in the site's host name, with the logo that site shows in
+     * place of the Restarters wordmark.  Every other host is the Restarters site.
+     */
+    private const SITES = [
+        'repairshare' => ['shortname' => 'repairshare', 'logo' => 'images/logos/repairshare.png'],
+        'repairtogether' => ['shortname' => 'repairtogether', 'logo' => 'images/logos/repairtogether.png'],
+        'hauts-de-france' => ['shortname' => 'hauts-de-france', 'logo' => 'images/logos/RC-Hauts-de-France.png'],
+        'test-restarters' => ['shortname' => 'test', 'logo' => null],
+    ];
+
+    /**
+     * The network whose site is served on this host.
+     */
+    public static function forHost(string $host): ?Network
+    {
+        foreach (self::SITES as $word => $site) {
+            if (str_contains($host, $word)) {
+                return self::where('shortname', $site['shortname'])->first();
+            }
+        }
+
+        return self::where('shortname', 'like', 'restarters')->first();
+    }
+
+    /**
+     * The network whose site the browser making this request is on.  The client calls the API on restarters.net
+     * from every network's site, so the browser's Origin names the site; a same-origin GET has no Origin, and then
+     * the request's own host does.
+     */
+    public static function forRequest(Request $request): ?Network
+    {
+        $originHost = parse_url((string) $request->headers->get('Origin'), PHP_URL_HOST);
+
+        return self::forHost($originHost ?: $request->getHost());
+    }
+
+    /**
+     * The logo this network's site shows in place of the Restarters wordmark, if it has one.
+     */
+    public function siteLogo(): ?string
+    {
+        foreach (self::SITES as $site) {
+            if ($site['shortname'] === $this->shortname) {
+                return $site['logo'];
+            }
+        }
+
+        return null;
+    }
 
     /**
      * The network description is rendered with v-html in NetworkPage.vue, so sanitise it

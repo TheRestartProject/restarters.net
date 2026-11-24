@@ -6,7 +6,7 @@ import { useAuthStore } from '~/stores/auth.js'
 import { useAuth } from '~/composables/useAuth.js'
 import { useSsoBridge } from '~/composables/useSsoBridge.js'
 import { useUploadedImageUrl } from '~/composables/useUploadedImageUrl.js'
-import IconLogo from './icons/IconLogo.vue'
+import SiteLogo from './SiteLogo.vue'
 import IconTalk from './icons/IconTalk.vue'
 import IconFixometer from './icons/IconFixometer.vue'
 import IconEvents from './icons/IconEvents.vue'
@@ -141,7 +141,7 @@ onUnmounted(() => {
          to clip on a phone. -->
     <NuxtLink to="/" class="icon-brand" data-testid="nav-logo">
       <span class="d-none d-md-block">
-        <IconLogo />
+        <SiteLogo />
       </span>
       <img
         src="/images/logo_mini.png"

@@ -15,6 +15,10 @@ Admins can view all networks on the platform and perform any action a NetworkCoo
 
 Guests can list all networks, view network details, and browse a network's groups and events via the public API.
 
+## Network sites
+
+Some networks have their own site on a subdomain (repairshare, repairtogether and hauts-de-france.restarters.net). It shows the network's logo instead of the Restarters wordmark, starts a visitor who hasn't picked a language in the network's language, and doesn't offer the Restarters newsletter at registration. A logged-in user's network is the site they last loaded, and groups they create join it.
+
 ## What ThirdParties can do
 
 External organisations can retrieve network listings, details, groups, and events via the public API to display on their own platforms.

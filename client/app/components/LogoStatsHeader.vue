@@ -2,7 +2,7 @@
 import { computed, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useFixometerStore } from '~/stores/fixometer.js'
-import IconLogo from '~/components/icons/IconLogo.vue'
+import SiteLogo from '~/components/SiteLogo.vue'
 
 // The logged-out header: brand mark + the global impact-stats bar
 // (#logostats-header / includes/info.blade.php). Legacy showed this on the
@@ -49,7 +49,7 @@ const stats = computed(() => {
     <div class="col-md-3 offset-2 p-0">
       <header>
         <NuxtLink to="/" data-testid="logo-stats-logo">
-          <IconLogo />
+          <SiteLogo />
         </NuxtLink>
       </header>
     </div>

@@ -1,5 +1,5 @@
 {
-    "generatedAt": "2026-11-16T17:33:21Z",
+    "generatedAt": "2026-11-24T15:06:02Z",
     "features": {
         "Administration": {
             "description": "Platform administration and configuration",
@@ -2082,6 +2082,10 @@
                             "test": "given_specific_domain_when_group_created_then_it_is_created_as_part_of_corresponding_network"
                         },
                         {
+                            "file": "tests/Feature/Networks/SiteNetworkTest.php",
+                            "test": "testLoadingTheAppOnANetworkSiteRecordsItAsTheUsersNetwork"
+                        },
+                        {
                             "file": "tests/Feature/Zapier/ZapierNetworkTests.php",
                             "test": "given_restart_network_when_new_group_created_included_in_trigger"
                         },
@@ -3332,13 +3336,38 @@
                     "tests": []
                 },
                 {
-                    "story": "As a Guest, I get the right language and my account state when the app loads",
+                    "story": "As a Guest, I get the right language, logo and my account state for the network site I am on when the app loads",
                     "persona": "Guest",
                     "theme": "Authentication",
                     "method": "SessionController::getSessionv2",
                     "class": "App\\Http\\Controllers\\API\\SessionController",
                     "file": "app/Http/Controllers/API/SessionController.php",
-                    "tests": []
+                    "tests": [
+                        {
+                            "file": "tests/Feature/Networks/SiteNetworkTest.php",
+                            "test": "testSessionReportsTheNetworkOfTheSiteFromTheOrigin"
+                        },
+                        {
+                            "file": "tests/Feature/Networks/SiteNetworkTest.php",
+                            "test": "testSessionFallsBackToTheRequestHostWithoutAnOrigin"
+                        },
+                        {
+                            "file": "tests/Feature/Networks/SiteNetworkTest.php",
+                            "test": "testMainSiteUsesTheRestartersWordmark"
+                        },
+                        {
+                            "file": "tests/Feature/Networks/SiteNetworkTest.php",
+                            "test": "testEachNetworkSiteHasLiveLogo"
+                        },
+                        {
+                            "file": "tests/Feature/Networks/SiteNetworkTest.php",
+                            "test": "testLoadingTheAppOnANetworkSiteRecordsItAsTheUsersNetwork"
+                        },
+                        {
+                            "file": "tests/Feature/Networks/SiteNetworkTest.php",
+                            "test": "testLoadingTheMainSiteRecordsRestartersAsTheUsersNetwork"
+                        }
+                    ]
                 },
                 {
                     "story": "As a Guest, I can choose my language for the session",
@@ -3871,6 +3900,6 @@
     },
     "coverage": {
         "annotatedStories": 256,
-        "storiesWithTests": 112
+        "storiesWithTests": 113
     }
 }

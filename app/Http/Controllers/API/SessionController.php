@@ -6,6 +6,7 @@ use App\Attributes\Feature;
 use App\Attributes\UserStory;
 use App\Attributes\NoStory;
 use App\Http\Controllers\Controller;
+use App\Network;
 use App\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -25,7 +26,7 @@ class SessionController extends Controller
      *      operationId="getSessionv2",
      *      tags={"Session"},
      *      summary="Client bootstrap: current user, config and flags",
-     *      description="Callable anonymously (guest bootstrap) - the route carries no auth middleware, so 'user' is simply null when there is no valid token.",
+     *      description="Callable anonymously (guest bootstrap) - the route carries no auth middleware, so 'user' is simply null when there is no valid token. 'site' is the network whose site the browser is on (from the Origin header, else the request host); for a logged-in user it is also recorded as their repair_network, which decides the network of groups they create.",
      *      @OA\Response(
      *          response=200,
      *          description="Session context",
@@ -64,16 +65,32 @@ class SessionController extends Controller
      *                  ),
      *                  @OA\Property(property="flags", type="object",
      *                      @OA\Property(property="onboarding", type="boolean")
+     *                  ),
+     *                  @OA\Property(property="site", type="object", nullable=true,
+     *                      @OA\Property(property="network_id", type="integer"),
+     *                      @OA\Property(property="shortname", type="string"),
+     *                      @OA\Property(property="name", type="string"),
+     *                      @OA\Property(property="default_language", type="string", nullable=true),
+     *                      @OA\Property(property="logo", type="string", nullable=true, description="Shown in place of the Restarters wordmark")
      *                  )
      *              )
      *          )
      *      )
      * )
      */
-    #[UserStory('As a Guest, I get the right language and my account state when the app loads', persona: 'Guest', theme: 'Authentication')]
-    public function getSessionv2(): JsonResponse
+    #[UserStory('As a Guest, I get the right language, logo and my account state for the network site I am on when the app loads', persona: 'Guest', theme: 'Authentication')]
+    public function getSessionv2(Request $request): JsonResponse
     {
-        return response()->json(['data' => self::sessionPayload(self::currentUser())]);
+        $user = self::currentUser();
+        $network = Network::forRequest($request);
+
+        // Live records the site a logged-in user is on as their network on every page load
+        // (CheckForRepairNetwork); the client calls this on every app load and after logging in.
+        if ($user && $network && $user->repair_network != $network->id) {
+            $user->update(['repair_network' => $network->id]);
+        }
+
+        return response()->json(['data' => self::sessionPayload($user)]);
     }
 
     /**
@@ -156,6 +173,24 @@ class SessionController extends Controller
                 // with real gating logic (e.g. $user->number_of_logins < 2).
                 'onboarding' => false,
             ],
+            'site' => self::sitePayload(Network::forRequest(request())),
+        ];
+    }
+
+    private static function sitePayload(?Network $network): ?array
+    {
+        if (! $network) {
+            return null;
+        }
+
+        $logo = $network->siteLogo();
+
+        return [
+            'network_id' => (int) $network->id,
+            'shortname' => $network->shortname,
+            'name' => $network->name,
+            'default_language' => $network->default_language,
+            'logo' => $logo ? asset($logo) : null,
         ];
     }
 

@@ -1134,8 +1134,8 @@ class GroupController extends Controller
         $group = Group::create($data);
         $idGroup = $group->idgroups;
 
-        // Add the group to the same network as this logged in user.  Note that the CheckForRepairNetwork middleware
-        // which checks the host name is only used for the web interface, not the API.
+        // Add the group to the same network as this logged in user: the network of the site they last loaded the
+        // app on (recorded by GET /api/v2/session).
         //
         // The networks can be amended in the update call.
         if ($user->repair_network) {

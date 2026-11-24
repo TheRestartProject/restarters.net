@@ -4,6 +4,7 @@ import { createI18n } from 'vue-i18n'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import RegisterPage from '../../app/pages/user/register.vue'
 import { useAuthStore } from '../../app/stores/auth.js'
+import { useSessionStore } from '../../app/stores/session.js'
 import en from '../../i18n/locales/en.json'
 import clientEn from '../../i18n/locales/client-en.json'
 
@@ -107,6 +108,37 @@ describe('pages/user/register', () => {
 
     await clickPrev(wrapper)
     expect(wrapper.find('[data-testid="register-step-1"]').exists()).toBe(true)
+  })
+
+  // Live (UserController::getRegister): only the Restarters site offers the
+  // Restarters newsletter; a network's own site hides it.
+  describe('newsletter sign-up', () => {
+    async function goToStep3(wrapper) {
+      await Promise.resolve()
+      await clickNext(wrapper) // step 1 -> 2
+      await fillStep2(wrapper)
+      await clickNext(wrapper) // step 2 -> 3
+    }
+
+    it('is offered on the Restarters site', async () => {
+      useSessionStore().site = { shortname: 'restarters' }
+      const wrapper = mountRegister()
+      await goToStep3(wrapper)
+
+      expect(wrapper.find('[data-testid="register-newsletter"]').exists()).toBe(true)
+      expect(wrapper.text()).toContain(en.registration['reg-step-3-2b'])
+    })
+
+    it("is not offered on a network's own site", async () => {
+      useSessionStore().site = { shortname: 'repairtogether' }
+      const wrapper = mountRegister()
+      await goToStep3(wrapper)
+
+      expect(wrapper.find('[data-testid="register-step-3"]').exists()).toBe(true)
+      expect(wrapper.find('[data-testid="register-newsletter"]').exists()).toBe(false)
+      expect(wrapper.text()).not.toContain(en.registration['reg-step-3-2b'])
+      expect(wrapper.find('[data-testid="register-invites"]').exists()).toBe(true)
+    })
   })
 
   it('only shows the submit button on the last step', async () => {
