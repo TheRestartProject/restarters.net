@@ -1,7 +1,9 @@
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useAuthStore } from '~/stores/auth.js'
+import { useSsoBridge } from '~/composables/useSsoBridge.js'
+import { isTalkSignOn } from '~/utils/talkSignOn.js'
 
 definePageMeta({ layout: 'plain', guest: true })
 
@@ -12,6 +14,19 @@ const authStore = useAuthStore()
 const route = useRoute()
 
 const email = ref(typeof route.query.email === 'string' ? route.query.email : '')
+
+// Where to go after logging in: an app path, or back to Talk's sign-on
+// through the SSO bridge (utils/talkSignOn.js). Someone already logged in to
+// the app arrives here from Talk's "Log in" when they have no web session;
+// send them straight back.
+const redirect = typeof route.query.redirect === 'string' ? route.query.redirect : ''
+const toTalk = isTalkSignOn(redirect)
+
+onMounted(() => {
+  if (toTalk && authStore.loggedIn) {
+    useSsoBridge().goTo(redirect)
+  }
+})
 
 // UserController::reset() redirects here with the passwords.updated flash
 // after a successful password change; login.blade.php prints it as a success
@@ -48,11 +63,12 @@ async function submit() {
       invite_hash: route.query.invite_hash,
     })
 
-    const redirect =
-      typeof route.query.redirect === 'string' && route.query.redirect
-        ? route.query.redirect
-        : '/dashboard'
-    await navigateTo(redirect)
+    if (toTalk) {
+      await useSsoBridge().goTo(redirect)
+      return
+    }
+
+    await navigateTo(redirect.startsWith('/') && !redirect.startsWith('//') ? redirect : '/dashboard')
   } catch (err) {
     if (err?.status === 422) {
       fieldErrors.value = err.data?.errors || {}

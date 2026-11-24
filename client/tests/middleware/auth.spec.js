@@ -10,6 +10,7 @@ describe('middleware/auth.global', () => {
     setActivePinia(createPinia())
     navigateToMock = vi.fn()
     vi.stubGlobal('navigateTo', navigateToMock)
+    vi.stubGlobal('useRuntimeConfig', () => ({ public: { apiBase: 'https://restarters.net' } }))
   })
 
   function route({ auth, role, fullPath = '/somewhere', path = '/somewhere' } = {}) {
@@ -133,6 +134,31 @@ describe('middleware/auth.global', () => {
       authStore.user = { id: 1, role_name: 'Restarter' }
 
       authMiddleware(guestRoute('/login'), route())
+
+      expect(navigateToMock).toHaveBeenCalledWith('/dashboard')
+    })
+
+    // Talk's "Log in" lands a user with no Laravel web session on
+    // /login?redirect=<the /discourse/sso URL>; login.vue sends them back to
+    // Talk through the SSO bridge, so they must reach it even when logged in.
+    it('lets a logged-in user reach the login page on the way back to Talk', () => {
+      const authStore = useAuthStore()
+      authStore.token = 'tok-1'
+      authStore.user = { id: 1, role_name: 'Restarter' }
+      const sso = 'https://restarters.net/discourse/sso?sso=abc&sig=def'
+
+      const result = authMiddleware({ ...guestRoute('/login'), query: { redirect: sso } }, route())
+
+      expect(result).toBeUndefined()
+      expect(navigateToMock).not.toHaveBeenCalled()
+    })
+
+    it('still bounces a logged-in user off the login page for an app path', () => {
+      const authStore = useAuthStore()
+      authStore.token = 'tok-1'
+      authStore.user = { id: 1, role_name: 'Restarter' }
+
+      authMiddleware({ ...guestRoute('/login'), query: { redirect: '/group/view/9' } }, route())
 
       expect(navigateToMock).toHaveBeenCalledWith('/dashboard')
     })

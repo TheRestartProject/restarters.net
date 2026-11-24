@@ -1,4 +1,5 @@
 import { useAuthStore } from '../stores/auth.js'
+import { isTalkSignOn } from '../utils/talkSignOn.js'
 
 /**
  * Reads definePageMeta({ auth: true, role: '...' }) on the target route.
@@ -27,7 +28,9 @@ export default defineNuxtRouteMiddleware((to) => {
   if (to.meta.guest === true) {
     const guestStore = useAuthStore()
 
-    if (guestStore.loggedIn) {
+    // Except the login page on the way back to Talk's sign-on, which sends
+    // a logged-in user on through the SSO bridge (pages/login.vue).
+    if (guestStore.loggedIn && !isTalkSignOn(to.query?.redirect)) {
       return navigateTo('/dashboard')
     }
 

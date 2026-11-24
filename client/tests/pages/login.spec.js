@@ -6,6 +6,9 @@ import LoginPage from '../../app/pages/login.vue'
 import { useAuthStore } from '../../app/stores/auth.js'
 import en from '../../i18n/locales/en.json'
 
+const { goTo } = vi.hoisted(() => ({ goTo: vi.fn() }))
+vi.mock('../../app/composables/useSsoBridge.js', () => ({ useSsoBridge: () => ({ goTo }) }))
+
 const NuxtLinkStub = {
   props: ['to'],
   // `to` can be a plain path string or a { path, query } object (e.g. the
@@ -85,6 +88,66 @@ describe('pages/login', () => {
     await Promise.resolve()
 
     expect(navigateToMock).toHaveBeenCalledWith('/group/view/9')
+  })
+
+  // Talk's own "Log in" button: Discourse asks /discourse/sso, which sends a
+  // browser with no Laravel web session here with redirect=<that SSO URL>
+  // (AuthenticateRedirectingToFrontend). The SPA login is token-only, so the
+  // way back to Talk is through the SSO bridge, which makes the web session.
+  describe('redirect back to Talk', () => {
+    const SSO_URL = 'https://restarters.net/discourse/sso?sso=abc&sig=def'
+
+    beforeEach(() => {
+      goTo.mockReset()
+      vi.stubGlobal('useRuntimeConfig', () => ({ public: { apiBase: 'https://restarters.net' } }))
+    })
+
+    async function logIn(wrapper) {
+      await wrapper.find('[data-testid="login-email"]').setValue('jane@bloggs.net')
+      await wrapper.find('[data-testid="login-password"]').setValue('passw0rd')
+      await wrapper.find('[data-testid="login-form"]').trigger('submit')
+      await Promise.resolve()
+      await Promise.resolve()
+    }
+
+    it('goes back to Talk through the SSO bridge after logging in', async () => {
+      useAuthStore().login = vi.fn().mockResolvedValue({ token: 'tok-1', user: { id: 1 } })
+
+      const wrapper = mountLogin({ redirect: SSO_URL })
+      await logIn(wrapper)
+
+      expect(goTo).toHaveBeenCalledWith(SSO_URL)
+      expect(navigateToMock).not.toHaveBeenCalled()
+      expect(wrapper.find('[data-testid="login-error"]').exists()).toBe(false)
+    })
+
+    it('goes straight back to Talk when already logged in to the app', async () => {
+      useAuthStore().token = 'tok-1'
+
+      mountLogin({ redirect: SSO_URL })
+      await Promise.resolve()
+
+      expect(goTo).toHaveBeenCalledWith(SSO_URL)
+    })
+
+    it('does not leave a logged-in user on the login page for an app path', async () => {
+      useAuthStore().token = 'tok-1'
+
+      mountLogin({ redirect: '/group/view/9' })
+      await Promise.resolve()
+
+      expect(goTo).not.toHaveBeenCalled()
+    })
+
+    it('ignores a redirect to any other site', async () => {
+      useAuthStore().login = vi.fn().mockResolvedValue({ token: 'tok-1', user: { id: 1 } })
+
+      const wrapper = mountLogin({ redirect: 'https://evil.example.com/discourse/sso?sso=abc' })
+      await logIn(wrapper)
+
+      expect(goTo).not.toHaveBeenCalled()
+      expect(navigateToMock).toHaveBeenCalledWith('/dashboard')
+    })
   })
 
   it('passes invite_code/invite_type/invite_hash query params through to login()', async () => {
