@@ -87,6 +87,14 @@ describe('plugins/session (cold-boot bootstrap)', () => {
       expect(mockI18n.setLocale).not.toHaveBeenCalled()
     })
 
+    it('does not break the app load if i18n is not ready', async () => {
+      mockI18n = undefined
+      siteIs({ shortname: 'repairtogether', default_language: 'fr-BE' })
+
+      await expect(runPlugin()).resolves.toBeUndefined()
+      expect(useSessionStore().site?.shortname).toBe('repairtogether')
+    })
+
     it("ignores a network language the client doesn't offer", async () => {
       siteIs({ shortname: 'norway', default_language: 'no' })
 

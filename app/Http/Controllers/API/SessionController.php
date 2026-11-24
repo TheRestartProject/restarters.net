@@ -90,7 +90,7 @@ class SessionController extends Controller
             $user->update(['repair_network' => $network->id]);
         }
 
-        return response()->json(['data' => self::sessionPayload($user)]);
+        return response()->json(['data' => self::sessionPayload($user, $network)]);
     }
 
     /**
@@ -146,7 +146,7 @@ class SessionController extends Controller
     }
 
     #[NoStory(reason: 'Internal helper building the session payload; not a route')]
-    public static function sessionPayload(?User $user): array
+    public static function sessionPayload(?User $user, ?Network $site = null): array
     {
         return [
             'user' => $user ? self::userPayload($user) : null,
@@ -173,7 +173,7 @@ class SessionController extends Controller
                 // with real gating logic (e.g. $user->number_of_logins < 2).
                 'onboarding' => false,
             ],
-            'site' => self::sitePayload(Network::forRequest(request())),
+            'site' => self::sitePayload($site ?? Network::forRequest(request())),
         ];
     }
 

@@ -22,9 +22,37 @@ const email = ref(typeof route.query.email === 'string' ? route.query.email : ''
 const redirect = typeof route.query.redirect === 'string' ? route.query.redirect : ''
 const toTalk = isTalkSignOn(redirect)
 
+// A browser that comes straight back here from the bridge didn't keep the
+// web session (cookies blocked?); sending it round again would never end.
+const BRIDGED_AT = 'restarters_talk_bridged_at'
+
+function bridgedJustNow() {
+  try {
+    return Date.now() - Number(sessionStorage.getItem(BRIDGED_AT) || 0) < 60000
+  } catch {
+    return false
+  }
+}
+
+async function backToTalk() {
+  try {
+    sessionStorage.setItem(BRIDGED_AT, String(Date.now()))
+  } catch {
+    // No sessionStorage: nothing to guard with, go anyway.
+  }
+
+  if (!(await useSsoBridge().goTo(redirect, { fallback: false }))) {
+    await navigateTo('/dashboard')
+  }
+}
+
 onMounted(() => {
   if (toTalk && authStore.loggedIn) {
-    useSsoBridge().goTo(redirect)
+    if (bridgedJustNow()) {
+      navigateTo('/dashboard')
+    } else {
+      backToTalk()
+    }
   }
 })
 
@@ -64,11 +92,12 @@ async function submit() {
     })
 
     if (toTalk) {
-      await useSsoBridge().goTo(redirect)
+      await backToTalk()
       return
     }
 
-    await navigateTo(redirect.startsWith('/') && !redirect.startsWith('//') ? redirect : '/dashboard')
+    // Only a path in this app: not '//host' or '/\host', which browsers read as another site.
+    await navigateTo(/^\/(?![/\\])/.test(redirect) ? redirect : '/dashboard')
   } catch (err) {
     if (err?.status === 422) {
       fieldErrors.value = err.data?.errors || {}

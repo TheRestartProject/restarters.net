@@ -22,10 +22,12 @@ import { useSessionStore } from '~/stores/session.js'
  */
 export function useSsoBridge() {
   // `newTab` opens the destination in a new tab, for links that would have
-  // had target="_blank".
-  async function goTo(redirect, { newTab = false } = {}) {
+  // had target="_blank". `fallback: false` stays put if there's no ticket,
+  // for a destination that would only come back here without one (the login
+  // page's return to Talk). Resolves true once on the way, false if not.
+  async function goTo(redirect, { newTab = false, fallback = true } = {}) {
     if (!redirect) {
-      return
+      return false
     }
 
     const { $api } = useNuxtApp()
@@ -48,11 +50,20 @@ export function useSsoBridge() {
       url.searchParams.set('ticket', data.ticket)
       url.searchParams.set('redirect', redirect)
       target.location.href = url.toString()
+      return true
     } catch {
+      if (!fallback) {
+        if (target !== window) {
+          target.close()
+        }
+        return false
+      }
+
       // Best-effort: land on the target directly rather than trap the user
       // behind a broken link - they'll just arrive unauthenticated, same as
       // clicking a plain link ever did before the bridge existed.
       target.location.href = redirect
+      return true
     }
   }
 

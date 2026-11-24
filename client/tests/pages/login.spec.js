@@ -1,4 +1,4 @@
-import { mount } from '@vue/test-utils'
+import { flushPromises, mount } from '@vue/test-utils'
 import { createPinia, setActivePinia } from 'pinia'
 import { createI18n } from 'vue-i18n'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -99,6 +99,8 @@ describe('pages/login', () => {
 
     beforeEach(() => {
       goTo.mockReset()
+      goTo.mockResolvedValue(true)
+      sessionStorage.clear()
       vi.stubGlobal('useRuntimeConfig', () => ({ public: { apiBase: 'https://restarters.net' } }))
     })
 
@@ -116,7 +118,7 @@ describe('pages/login', () => {
       const wrapper = mountLogin({ redirect: SSO_URL })
       await logIn(wrapper)
 
-      expect(goTo).toHaveBeenCalledWith(SSO_URL)
+      expect(goTo).toHaveBeenCalledWith(SSO_URL, { fallback: false })
       expect(navigateToMock).not.toHaveBeenCalled()
       expect(wrapper.find('[data-testid="login-error"]').exists()).toBe(false)
     })
@@ -127,7 +129,30 @@ describe('pages/login', () => {
       mountLogin({ redirect: SSO_URL })
       await Promise.resolve()
 
-      expect(goTo).toHaveBeenCalledWith(SSO_URL)
+      expect(goTo).toHaveBeenCalledWith(SSO_URL, { fallback: false })
+    })
+
+    it('goes to the dashboard when the bridge cannot be reached', async () => {
+      useAuthStore().token = 'tok-1'
+      goTo.mockResolvedValue(false)
+
+      mountLogin({ redirect: SSO_URL })
+      await flushPromises()
+
+      expect(navigateToMock).toHaveBeenCalledWith('/dashboard')
+    })
+
+    // A browser that comes straight back from the bridge didn't keep the web
+    // session (cookies blocked?); sending it round again would never end.
+    it('does not send a logged-in user round again straight after going through the bridge', async () => {
+      useAuthStore().token = 'tok-1'
+      sessionStorage.setItem('restarters_talk_bridged_at', String(Date.now()))
+
+      mountLogin({ redirect: SSO_URL })
+      await flushPromises()
+
+      expect(goTo).not.toHaveBeenCalled()
+      expect(navigateToMock).toHaveBeenCalledWith('/dashboard')
     })
 
     it('does not leave a logged-in user on the login page for an app path', async () => {
@@ -137,6 +162,15 @@ describe('pages/login', () => {
       await Promise.resolve()
 
       expect(goTo).not.toHaveBeenCalled()
+    })
+
+    it('treats a backslash path as another site', async () => {
+      useAuthStore().login = vi.fn().mockResolvedValue({ token: 'tok-1', user: { id: 1 } })
+
+      const wrapper = mountLogin({ redirect: '/\\evil.example.com' })
+      await logIn(wrapper)
+
+      expect(navigateToMock).toHaveBeenCalledWith('/dashboard')
     })
 
     it('ignores a redirect to any other site', async () => {

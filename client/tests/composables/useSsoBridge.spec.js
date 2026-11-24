@@ -59,6 +59,27 @@ describe('composables/useSsoBridge', () => {
     expect(window.location.href).toBe('https://wiki.example.com')
   })
 
+  it('goTo() reports that it is on its way', async () => {
+    mockApi.auth.ssoTicket.mockResolvedValueOnce({
+      data: { ticket: 'tok-abc', bridge_url: 'http://localhost:8001/auth/bridge' },
+    })
+
+    const { goTo } = useSsoBridge()
+
+    expect(await goTo('https://talk.example.com')).toBe(true)
+  })
+
+  // The login page's return to Talk: going to the sign-on URL without the
+  // bridge would only come back to the login page, round and round.
+  it('goTo() with fallback off stays put and reports failure if the ticket call fails', async () => {
+    mockApi.auth.ssoTicket.mockRejectedValueOnce({ status: 429 })
+
+    const { goTo } = useSsoBridge()
+
+    expect(await goTo('https://restarters.net/discourse/sso?sso=a&sig=b', { fallback: false })).toBe(false)
+    expect(window.location.href).toBe('')
+  })
+
   describe('opening in a new tab', () => {
     let openSpy
 

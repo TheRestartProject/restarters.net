@@ -56,7 +56,7 @@ async function applyNetworkLanguage(site: { shortname?: string, default_language
 
   const { $i18n } = useNuxtApp()
 
-  if ($i18n.localeCodes.value.includes(language)) {
+  if ($i18n?.localeCodes?.value?.includes(language)) {
     await $i18n.setLocale(language)
   }
 }
